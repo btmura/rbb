@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, RedditIsHoloActivity!</string>
-    <string name="app_name">RedditIsHolo</string>
+    <string name="app_name">reddit is holo</string>
 
 </resources>
