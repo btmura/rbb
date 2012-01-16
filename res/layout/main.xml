@@ -2,27 +2,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     	android:layout_width="match_parent"
     	android:layout_height="match_parent"
-    	android:orientation="horizontal"
+    	android:orientation="vertical"
     	>
 
-    <fragment android:name="com.btmura.android.reddit.TopicListFragment"
-        	android:id="@+id/topic_list"
-        	android:layout_width="200dp"
-        	android:layout_height="match_parent"
-        	android:tag="topicList"
-        	/>
+    <LinearLayout android:layout_weight="1"
+        	android:layout_width="match_parent"
+        	android:layout_height="0dp"
+        	android:orientation="horizontal"
+        	>
+        	
+        <FrameLayout android:id="@+id/topic_list_container"
+        		android:layout_width="200dp"
+        		android:layout_height="match_parent"
+        		/>
+        	
+	    <FrameLayout android:id="@+id/thing_list_container"
+	        	android:layout_weight="1"
+	        	android:layout_width="0dp"
+	        	android:layout_height="match_parent"
+	        	/>
 
-    <FrameLayout android:id="@+id/thing_list_container"
-        	android:layout_weight="1"
-        	android:layout_width="0dp"
-        	android:layout_height="match_parent"
-        	/>
-    
+	</LinearLayout>
+	    
     <FrameLayout android:id="@+id/thing_container"
-        	android:layout_weight="1"
-        	android:layout_width="0dp"
-        	android:layout_height="match_parent"
-        	android:visibility="gone"
+        	android:layout_weight="2"
+        	android:layout_width="match_parent"
+        	android:layout_height="0dp"
         	/>
     
 </LinearLayout>

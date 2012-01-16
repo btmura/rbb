@@ -12,16 +12,15 @@ import android.view.View;
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.TopicListFragment.OnTopicSelectedListener;
 
-public class MainActivity extends Activity {
-
-	private static final String TOPIC_LIST_FRAG = "topicList";
-
-	private static final String THING_LIST_FRAG = "thingList";
-
-	private static final String THING_FRAG_TAG = "thing";
+public class MainActivity extends Activity implements OnBackStackChangedListener,
+		OnTopicSelectedListener, OnThingSelectedListener {
 
 	private static final String TAG = "MainActivity";
 	
+	private static final String TOPIC_LIST_TAG = "topicList";
+	private static final String THING_LIST_TAG = "thingList";
+	private static final String THING_TAG = "thing";
+
 	private FragmentManager manager;
 
 	private View thingContainer;
@@ -35,20 +34,33 @@ public class MainActivity extends Activity {
         thingContainer = findViewById(R.id.thing_container);
         
         manager = getFragmentManager();
-        manager.addOnBackStackChangedListener(new OnBackStackChangedListener() {
-        	public void onBackStackChanged() {
-        		refreshBackStackChanges();
-        	}
-        });
+        manager.addOnBackStackChangedListener(this);
         
-        TopicListFragment topicFrag = (TopicListFragment) manager.findFragmentById(R.id.topic_list);
-        topicFrag.setOnTopicSelectedListener(new OnTopicSelectedListener() {
-        	public void onTopicSelected(Topic topic, int position) {
-        		replaceThingListFragment(topic, position, true);
-        	}
-        });
-    
-        replaceThingListFragment(Topic.frontPage(), 0, false);
+        if (savedInstanceState != null) {
+        	Log.v(TAG, "savedInstanceState found");
+        	restoreState(savedInstanceState);
+        } else {
+        	insertTopicListFragment();
+	        replaceThingListFragment(Topic.frontPage(), 0, false);
+        }
+	}
+	
+	private void restoreState(Bundle savedInstanceState) {
+		Log.v(TAG, "restoreState");
+    	TopicListFragment topicFrag = (TopicListFragment) manager.findFragmentByTag(TOPIC_LIST_TAG);
+    	if (topicFrag != null) {
+    		Log.v(TAG, "setting topic listener");
+            topicFrag.setOnTopicSelectedListener(this);
+    	}
+    	
+    	ThingListFragment thingListFrag = (ThingListFragment) manager.findFragmentByTag(THING_LIST_TAG);        	
+    	if (thingListFrag != null) {
+    		Log.v(TAG, "setting thingList listener");
+    		thingListFrag.setOnThingSelectedListener(this);
+    	}
+    	
+    	ThingFragment thingFrag = (ThingFragment) manager.findFragmentByTag(THING_TAG);
+    	thingContainer.setVisibility(thingFrag != null ? View.VISIBLE : View.GONE);
 	}
 	
 	@Override
@@ -57,28 +69,41 @@ public class MainActivity extends Activity {
 		super.onSaveInstanceState(outState);
 	}
 	
+	private void insertTopicListFragment() {
+		FragmentTransaction transaction = manager.beginTransaction();
+		TopicListFragment topicFrag = new TopicListFragment();
+        topicFrag.setOnTopicSelectedListener(this);
+        transaction.replace(R.id.topic_list_container, topicFrag, TOPIC_LIST_TAG);
+		transaction.commit();
+	}
+	
+	public void onTopicSelected(Topic topic, int position) {
+		replaceThingListFragment(topic, position, true);
+	}
+	
 	private void replaceThingListFragment(Topic topic, int position, boolean addToBackStack) {
 		Log.v(TAG, "replaceThingListFragment");
 		FragmentTransaction transaction = manager.beginTransaction();
 		
-		Fragment thingFrag = manager.findFragmentByTag(THING_FRAG_TAG);
+		Fragment thingFrag = manager.findFragmentByTag(THING_TAG);
 		if (thingFrag != null) {
-			transaction.hide(thingFrag);
+			transaction.remove(thingFrag);
 		}
+		thingContainer.setVisibility(thingFrag != null ? View.VISIBLE : View.GONE);
 		
 		ThingListFragment thingListFrag = new ThingListFragment();
 		thingListFrag.setTopic(topic, position);
-		thingListFrag.setOnThingSelectedListener(new OnThingSelectedListener() {
-			public void onThingSelected(Thing thing, int position) {
-				replaceThingFragment(thing, position);
-			}
-		});
+		thingListFrag.setOnThingSelectedListener(this);
 		
-		transaction.replace(R.id.thing_list_container, thingListFrag, THING_LIST_FRAG);
+		transaction.replace(R.id.thing_list_container, thingListFrag, THING_LIST_TAG);
 		if (addToBackStack) {
 			transaction.addToBackStack(null);
 		}
 		transaction.commit();
+	}
+	
+	public void onThingSelected(Thing thing, int position) {
+		replaceThingFragment(thing, position);
 	}
 	
 	private void replaceThingFragment(Thing thing, int position) {
@@ -88,22 +113,24 @@ public class MainActivity extends Activity {
 		ThingFragment thingFragment = new ThingFragment();
 		thingFragment.setThing(thing, position);
 		
-		transaction.replace(R.id.thing_container, thingFragment, THING_FRAG_TAG);
+		transaction.replace(R.id.thing_container, thingFragment, THING_TAG);
 		transaction.addToBackStack(null);
 		transaction.commit();		
 	}
 	
-	private void refreshBackStackChanges() {
-		TopicListFragment topicFrag = (TopicListFragment) manager.findFragmentByTag(TOPIC_LIST_FRAG);
-		ThingListFragment thingListFrag = (ThingListFragment) manager.findFragmentByTag(THING_LIST_FRAG);
-		ThingFragment thingFrag = (ThingFragment) manager.findFragmentByTag(THING_FRAG_TAG);
+	public void onBackStackChanged() {
+		Log.v(TAG, "onBackStackChanged");
+		
+		TopicListFragment topicFrag = (TopicListFragment) manager.findFragmentByTag(TOPIC_LIST_TAG);
+		ThingListFragment thingListFrag = (ThingListFragment) manager.findFragmentByTag(THING_LIST_TAG);
+		ThingFragment thingFrag = (ThingFragment) manager.findFragmentByTag(THING_TAG);
 
-		thingContainer.setVisibility(thingFrag != null && thingFrag.isVisible() ? View.VISIBLE : View.GONE);
+		thingContainer.setVisibility(thingFrag != null ? View.VISIBLE : View.GONE);
 		
 		int topicPosition = thingListFrag.getTopicPosition();
 		topicFrag.setTopicSelected(topicPosition);
 		
-		int thingPosition = thingFrag != null && thingFrag.isVisible() ? thingFrag.getThingPosition() : -1;
+		int thingPosition = thingFrag != null ? thingFrag.getThingPosition() : -1;
 		thingListFrag.setThingSelected(thingPosition);
 	}
 }

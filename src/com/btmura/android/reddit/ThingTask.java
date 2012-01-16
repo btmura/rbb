@@ -46,28 +46,23 @@ public class ThingTask extends AsyncTask<Thing, String, Boolean> {
 	@Override
 	protected Boolean doInBackground(Thing... threads) {
 		try {
-			Log.v(TAG, "Connecting to reddit");
+			Log.v(TAG, "Loading thing");
 			URL url = new URL("http://www.reddit.com/by_id/" + threads[0].name + ".json");
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.connect();
 			
-			Log.v(TAG, "Opening input stream");
 			InputStream stream = connection.getInputStream();
 			
-			Log.v(TAG, "Parsing JSON");
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
 			parseListing(reader);
 			stream.close();
 			
-			Log.v(TAG, "Connecting to reddit");
 			url = new URL("http://www.reddit.com/comments/" + threads[0].getId() + ".json");
 			connection = (HttpURLConnection) url.openConnection();
 			connection.connect();
 			
-			Log.v(TAG, "Opening input stream");
 			stream = connection.getInputStream();
 			
-			Log.v(TAG, "Parsing JSON");
 			reader = new JsonReader(new InputStreamReader(stream));
 			parseThings(reader);
 			stream.close();

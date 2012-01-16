@@ -32,6 +32,10 @@ public class ThingFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
+		if (savedInstanceState != null) {
+			thing = savedInstanceState.getParcelable("thing");
+			thingPosition = savedInstanceState.getInt("thingPosition");
+		}
 	}
 	
 	@Override
@@ -54,6 +58,8 @@ public class ThingFragment extends ListFragment {
 	public void onSaveInstanceState(Bundle outState) {
 		Log.i(TAG, "onSaveInstanceState");
 		super.onSaveInstanceState(outState);
+		outState.putParcelable("thing", thing);
+		outState.putInt("thingPosition", thingPosition);
 	}
 	
 	private void updateThread() {
