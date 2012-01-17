@@ -9,21 +9,23 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 public class ThingListFragment extends ListFragment {
-	
-	private static final String TAG = "ThreadListFragment";
 
 	interface OnThingSelectedListener {
 		void onThingSelected(Thing thread, int position);
 	}
 
+	private static final String TAG = "ThingListFragment";
+	
+	private static final String TOPIC_STATE = "topic";
+	private static final String TOPIC_POSITION_STATE = "topicPosition";
+	private static final String SINGLE_CHOICE_STATE = "singleChoice";
+
 	private ThingListAdapter adapter;
-	
 	private ThingListTask task;
-	
 	private OnThingSelectedListener listener;
+	private boolean singleChoice;
 	
 	private Topic topic = Topic.frontPage();
-	
 	private int topicPosition;
 	
 	public void setTopic(Topic topic, int position) {
@@ -39,11 +41,18 @@ public class ThingListFragment extends ListFragment {
 		this.listener = listener;
 	}
 	
+	public void setSingleChoice(boolean singleChoice) {
+		this.singleChoice = singleChoice;
+	}
+	
 	public void setThingSelected(int position) {
+		ListView list = getListView();
 		if (position < 0) {
-			getListView().clearChoices();
+			Log.v(TAG, "Clearing choices");
+			list.clearChoices();
 		} else {
-			getListView().setItemChecked(position, true);
+			Log.v(TAG, "Setting position");
+			list.setItemChecked(position, true);
 		}
 	}
 	
@@ -52,8 +61,9 @@ public class ThingListFragment extends ListFragment {
 		Log.v(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState != null) {
-			topic = savedInstanceState.getParcelable("topic");
-			topicPosition = savedInstanceState.getInt("topicPosition");
+			topic = savedInstanceState.getParcelable(TOPIC_STATE);
+			topicPosition = savedInstanceState.getInt(TOPIC_POSITION_STATE);
+			singleChoice = savedInstanceState.getBoolean(SINGLE_CHOICE_STATE);
 		}
 	}
 	
@@ -62,7 +72,7 @@ public class ThingListFragment extends ListFragment {
 		Log.v(TAG, "onCreateView");
 		View view = super.onCreateView(inflater, container, savedInstanceState);
 		ListView list = (ListView) view.findViewById(android.R.id.list);
-		list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		list.setChoiceMode(singleChoice ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 		return view;
 	}
 
@@ -80,8 +90,9 @@ public class ThingListFragment extends ListFragment {
 	public void onSaveInstanceState(Bundle outState) {
 		Log.v(TAG, "onSaveInstanceState");
 		super.onSaveInstanceState(outState);
-		outState.putParcelable("topic", topic);
-		outState.putInt("topicPosition", topicPosition);
+		outState.putParcelable(TOPIC_STATE, topic);
+		outState.putInt(TOPIC_POSITION_STATE, topicPosition);
+		outState.putBoolean(SINGLE_CHOICE_STATE, singleChoice);
 	}
 	
 	@Override

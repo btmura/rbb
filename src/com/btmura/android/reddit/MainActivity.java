@@ -24,6 +24,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
 	private FragmentManager manager;
 
+	private boolean hasTopicList;
+	private boolean hasThingList;
+	private boolean hasThing;
+
 	private View thingContainer;
 		
 	@Override
@@ -32,8 +36,11 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
  
-        thingContainer = findViewById(R.id.thing_container);
-        
+		hasTopicList = findViewById(R.id.topic_list_container) != null;
+		hasThingList = findViewById(R.id.thing_list_container) != null;
+		thingContainer = findViewById(R.id.thing_container);
+        hasThing = thingContainer != null;
+		
         manager = getFragmentManager();
         manager.addOnBackStackChangedListener(this);
     
@@ -42,12 +49,15 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void setupFragments() {
-		if (findViewById(R.id.topic_list_container) != null) {
+		Log.v(TAG, "hasThing: " + hasThing);
+		
+		if (hasTopicList) {
 			TopicListFragment frag = (TopicListFragment) manager.findFragmentByTag(TOPIC_LIST_TAG);
 			boolean createFrag = frag == null;
 			if (createFrag) {
 				frag = new TopicListFragment();
 			}
+			frag.setSingleChoice(hasThingList);
 			frag.setOnTopicSelectedListener(this);   
 			if (createFrag) {
 				FragmentTransaction transaction = manager.beginTransaction();
@@ -56,12 +66,13 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			}
 		}
 		
-		if (findViewById(R.id.thing_list_container) != null) {
+		if (hasThingList) {
 			ThingListFragment frag = (ThingListFragment) manager.findFragmentByTag(THING_LIST_TAG);
 			boolean createFrag = frag == null;
 			if (createFrag) {
 				frag = new ThingListFragment();
 			}
+			frag.setSingleChoice(hasThing);
 			frag.setOnThingSelectedListener(this);
 			if (createFrag) {
 				FragmentTransaction transaction = manager.beginTransaction();
@@ -83,11 +94,11 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		if (thingFrag != null) {
 			transaction.remove(thingFrag);
 		}
-		refreshThingContainer();
-		
+
 		ThingListFragment thingListFrag = new ThingListFragment();
 		thingListFrag.setTopic(topic, position);
 		thingListFrag.setOnThingSelectedListener(this);
+		thingListFrag.setSingleChoice(hasThing);
 		
 		transaction.replace(R.id.thing_list_container, thingListFrag, THING_LIST_TAG);
 		if (addToBackStack) {
@@ -132,14 +143,18 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			topicFrag.setTopicSelected(topicPosition);
 		}
 		
-		int thingPosition = thingFrag != null ? thingFrag.getThingPosition() : -1;
+		int thingPosition = thingFrag != null && thingFrag.isAdded() ? thingFrag.getThingPosition() : -1;
 		thingListFrag.setThingSelected(thingPosition);
 	}
 	
 	private void refreshThingContainer() {
+		Log.v(TAG, "refreshThingContainer");
 		if (thingContainer != null) {
 			ThingFragment thingFrag = (ThingFragment) manager.findFragmentByTag(THING_TAG);
-			thingContainer.setVisibility(thingFrag != null ? View.VISIBLE : View.GONE);
+			if (thingFrag != null) {
+				Log.v(TAG, "Visible: " + thingFrag.isVisible());
+			}
+			thingContainer.setVisibility(thingFrag != null && thingFrag.isAdded() ? View.VISIBLE : View.GONE);
 		}
 	}
 }

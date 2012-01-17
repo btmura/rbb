@@ -12,15 +12,22 @@ public class TopicListFragment extends ListFragment {
 	
 	private static final String TAG = "TopicListFragment";
 	
+	private static final String SINGLE_CHOICE_STATE = "singleChoice";
+	
 	interface OnTopicSelectedListener {
 		void onTopicSelected(Topic topic, int position);
 	}
 	
 	private TopicAdapter adapter;
 	private OnTopicSelectedListener listener;
+	private boolean singleChoice;
 	
 	public void setOnTopicSelectedListener(OnTopicSelectedListener listener) {
 		this.listener = listener;
+	}
+	
+	public void setSingleChoice(boolean singleChoice) {
+		this.singleChoice = singleChoice;
 	}
 	
 	public void setTopicSelected(int position) {
@@ -31,6 +38,9 @@ public class TopicListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		Log.v(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
+		if (savedInstanceState != null) {
+			singleChoice = savedInstanceState.getBoolean(SINGLE_CHOICE_STATE);
+		}
 	}
 	
 	@Override
@@ -38,7 +48,7 @@ public class TopicListFragment extends ListFragment {
 		Log.v(TAG, "onCreateView");
 		View view = super.onCreateView(inflater, container, savedInstanceState);
 		ListView list = (ListView) view.findViewById(android.R.id.list);
-		list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		list.setChoiceMode(singleChoice ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 		return view;
 	}
 	
@@ -55,6 +65,7 @@ public class TopicListFragment extends ListFragment {
 	public void onSaveInstanceState(Bundle outState) {
 		Log.v(TAG, "onSaveInstanceState");
 		super.onSaveInstanceState(outState);
+		outState.putBoolean(SINGLE_CHOICE_STATE, singleChoice);
 	}
 	
 	@Override
