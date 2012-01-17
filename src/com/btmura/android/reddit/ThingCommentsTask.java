@@ -7,20 +7,21 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import android.app.ListFragment;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.stream.JsonReader;
 
-public class ThingTask extends AsyncTask<Thing, String, Boolean> {
+public class ThingCommentsTask extends AsyncTask<Thing, ThingPart, Boolean> {
 	
 	private static final String TAG = "ThingTask";
 	
-	private final ThingFragment frag;
+	private final ListFragment frag;
 	
-	private final ThingAdapter adapter;
+	private final ThingPartAdapter adapter;
 	
-	public ThingTask(ThingFragment frag, ThingAdapter adapter) {
+	public ThingCommentsTask(ListFragment frag, ThingPartAdapter adapter) {
 		this.frag = frag;
 		this.adapter = adapter;
 	}
@@ -28,17 +29,17 @@ public class ThingTask extends AsyncTask<Thing, String, Boolean> {
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		if (frag.isVisible()) {
+		if (frag.isAdded()) {
 			frag.setListShown(false);
 		}
 		adapter.clear();
 	}
 	
 	@Override
-	protected void onProgressUpdate(String... values) {
-		super.onProgressUpdate(values);
-		adapter.addAll(values);
-		if (frag.isVisible()) {
+	protected void onProgressUpdate(ThingPart... parts) {
+		super.onProgressUpdate(parts);
+		adapter.addAll(parts);
+		if (frag.isAdded()) {
 			frag.setListShown(true);
 		}
 	}
@@ -46,25 +47,26 @@ public class ThingTask extends AsyncTask<Thing, String, Boolean> {
 	@Override
 	protected Boolean doInBackground(Thing... threads) {
 		try {
-			Log.v(TAG, "Loading thing");
 			URL url = new URL("http://www.reddit.com/by_id/" + threads[0].name + ".json");
+			Log.v(TAG, url.toString());
+			
+			URL commentsUrl = new URL("http://www.reddit.com/comments/" + threads[0].getId() + ".json");
+			Log.v(TAG, commentsUrl.toString());
+			
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.connect();
 			
-			InputStream stream = connection.getInputStream();
-			
-			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			parseListing(reader);
-			stream.close();
-			
-			url = new URL("http://www.reddit.com/comments/" + threads[0].getId() + ".json");
-			connection = (HttpURLConnection) url.openConnection();
+			HttpURLConnection commentsConnection = (HttpURLConnection) commentsUrl.openConnection();
 			connection.connect();
 			
-			stream = connection.getInputStream();
+			InputStream stream = connection.getInputStream();
+			JsonReader reader = new JsonReader(new InputStreamReader(stream));
+			parseListing(reader, false);
+			stream.close();
 			
+			stream = commentsConnection.getInputStream();
 			reader = new JsonReader(new InputStreamReader(stream));
-			parseThings(reader);
+			parseThings(reader, true);
 			stream.close();
 			
 			return true;
@@ -77,21 +79,21 @@ public class ThingTask extends AsyncTask<Thing, String, Boolean> {
 		return false;
 	}
 	
-	private void parseThings(JsonReader reader) throws IOException {
+	private void parseThings(JsonReader reader, boolean onlyComments) throws IOException {
 		Log.v(TAG, "parseThings");
 		reader.beginArray();
 		while (reader.hasNext()) {
-			parseListing(reader);
+			parseListing(reader, onlyComments);
 		}
 		reader.endArray();
 	}
 
-	private void parseListing(JsonReader reader) throws IOException {
+	private void parseListing(JsonReader reader, boolean onlyComments) throws IOException {
 		reader.beginObject();
 		while (reader.hasNext()) {
 			String name = reader.nextName();
 			if (name.equals("data")) {
-				parseListingData(reader);
+				parseListingData(reader, onlyComments);
 			} else {
 				reader.skipValue();
 			}
@@ -99,12 +101,12 @@ public class ThingTask extends AsyncTask<Thing, String, Boolean> {
 		reader.endObject();
 	}
 	
-	private void parseListingData(JsonReader reader) throws IOException {
+	private void parseListingData(JsonReader reader, boolean onlyComments) throws IOException {
 		reader.beginObject();
 		while (reader.hasNext()) {
 			String name = reader.nextName();
 			if (name.equals("children")) {
-				parseChildren(reader);
+				parseChildren(reader, onlyComments);
 			} else {
 				reader.skipValue();
 			}
@@ -112,20 +114,20 @@ public class ThingTask extends AsyncTask<Thing, String, Boolean> {
 		reader.endObject();
 	}
 	
-	private void parseChildren(JsonReader reader) throws IOException {
+	private void parseChildren(JsonReader reader, boolean onlyComments) throws IOException {
 		reader.beginArray();
 		while (reader.hasNext()) {
-			parseThread(reader);
+			parseThread(reader, onlyComments);
 		}
 		reader.endArray();
 	}
 	
-	private void parseThread(JsonReader reader) throws IOException {
+	private void parseThread(JsonReader reader, boolean onlyComments) throws IOException {
 		reader.beginObject();
 		while (reader.hasNext()) {
 			String name = reader.nextName();
 			if (name.equals("data")) {
-				parseThreadData(reader);
+				parseThreadData(reader, onlyComments);
 			} else {
 				reader.skipValue();
 			}
@@ -133,31 +135,40 @@ public class ThingTask extends AsyncTask<Thing, String, Boolean> {
 		reader.endObject();
 	}
 	
-	private void parseThreadData(JsonReader reader) throws IOException {
+	private void parseThreadData(JsonReader reader, boolean onlyComments) throws IOException {
 		reader.beginObject();
 		String title = null;
-		String description = null;
+		String selfText = null;
 		String body = null;
+		String url = null;
 		while (reader.hasNext()) {
 			String name = reader.nextName();
 			if (name.equals("title")) {
 				title = reader.nextString();
 			} else if (name.equals("selftext")) {
-				description = reader.nextString();
+				selfText = reader.nextString();
+			} else if (name.equals("url")) {
+				url = reader.nextString();
 			} else if (name.equals("body")) {
 				body = reader.nextString();
 			} else {
 				reader.skipValue();
 			}
 		}
-		if (title != null) {
-			publishProgress(title);
-		}
-		if (description != null) {
-			publishProgress(description);
-		}
-		if (body != null) {
-			publishProgress(body);
+		if (!onlyComments) {
+			if (title != null && title.length() > 0) {
+				publishProgress(ThingPart.text(title));
+			}
+			if (selfText != null && selfText.length() > 0) {
+				publishProgress(ThingPart.text(selfText));
+			}
+			if (url != null && url.length() > 0) {
+				publishProgress(ThingPart.link(url));
+			}
+		} else {
+			if (body != null) {
+				publishProgress(ThingPart.text(body));
+			}
 		}
 		reader.endObject();
 	}

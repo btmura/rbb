@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
-public class ThingActivity extends Activity {
+import com.btmura.android.reddit.ThingFragment.OnThingPartSelectedListener;
+
+public class ThingActivity extends Activity implements OnThingPartSelectedListener {
 
 	static final String EXTRA_THING = "thing";
 
@@ -20,13 +23,20 @@ public class ThingActivity extends Activity {
 		Intent intent = getIntent();
 		Thing thing = intent.getParcelableExtra(EXTRA_THING);
 		int position = intent.getIntExtra(EXTRA_POSITION, -1);
-		
-		ThingFragment frag = new ThingFragment();
+			
+		ThingCommentsFragment frag = new ThingCommentsFragment();
 		frag.setThing(thing, position);
+		frag.setOnThingPartSelected(this);
 		
 		FragmentManager manager = getFragmentManager();
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.thing_container, frag);
 		transaction.commit();
+	}
+	
+	public void onThingPartSelected(Thing thing, int position, ThingPart part) {
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setData(Uri.parse(part.value));
+		startActivity(intent);
 	}
 }

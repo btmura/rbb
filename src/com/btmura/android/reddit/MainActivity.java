@@ -1,7 +1,9 @@
 package com.btmura.android.reddit;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentBreadCrumbs;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
@@ -10,11 +12,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.btmura.android.reddit.ThingFragment.OnThingPartSelectedListener;
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.TopicListFragment.OnTopicSelectedListener;
 
 public class MainActivity extends Activity implements OnBackStackChangedListener,
-		OnTopicSelectedListener, OnThingSelectedListener {
+		OnTopicSelectedListener, OnThingSelectedListener, OnThingPartSelectedListener {
 
 	private static final String TAG = "MainActivity";
 	
@@ -29,12 +32,16 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private boolean hasThing;
 
 	private View thingContainer;
-		
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        ActionBar bar = getActionBar();
+        bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_CUSTOM);
+        bar.setCustomView(new FragmentBreadCrumbs(this));
  
 		hasTopicList = findViewById(R.id.topic_list_container) != null;
 		hasThingList = findViewById(R.id.thing_list_container) != null;
@@ -80,6 +87,13 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 				transaction.commit();
 			}
 		}
+		
+		if (hasThing) {
+			ThingFragment frag = (ThingFragment) manager.findFragmentByTag(THING_TAG);
+			if (frag != null) {
+				frag.setOnThingPartSelected(this);
+			}
+		}
 	}
 	
 	public void onTopicSelected(Topic topic, int position) {
@@ -100,6 +114,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		thingListFrag.setOnThingSelectedListener(this);
 		thingListFrag.setSingleChoice(hasThing);
 		
+		transaction.setBreadCrumbTitle(topic.title);
 		transaction.replace(R.id.thing_list_container, thingListFrag, THING_LIST_TAG);
 		if (addToBackStack) {
 			transaction.addToBackStack(null);
@@ -122,12 +137,27 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		Log.v(TAG, "replaceThingFragment");
 		FragmentTransaction transaction = manager.beginTransaction();
 		
-		ThingFragment thingFragment = new ThingFragment();
-		thingFragment.setThing(thing, position);
+		ThingCommentsFragment frag = new ThingCommentsFragment();
+		frag.setThing(thing, position);
+		frag.setOnThingPartSelected(this);
 		
-		transaction.replace(R.id.thing_container, thingFragment, THING_TAG);
+		transaction.replace(R.id.thing_container, frag, THING_TAG);
 		transaction.addToBackStack(null);
 		transaction.commit();		
+	}
+	
+	public void onThingPartSelected(Thing thing, int position, ThingPart part) {
+		Log.v(TAG, "onThingPartSelected");
+		FragmentTransaction transaction = manager.beginTransaction();
+		
+		ThingWebFragment frag = new ThingWebFragment();	
+		frag.setThing(thing, position);
+		frag.setOnThingPartSelected(this);
+		frag.setUrl(part.value);
+		
+		transaction.replace(R.id.thing_container, frag, THING_TAG);
+		transaction.addToBackStack(null);
+		transaction.commit();
 	}
 	
 	public void onBackStackChanged() {
@@ -143,18 +173,22 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			topicFrag.setTopicSelected(topicPosition);
 		}
 		
-		int thingPosition = thingFrag != null && thingFrag.isAdded() ? thingFrag.getThingPosition() : -1;
+		boolean thingShowing = thingFrag != null && thingFrag.isAdded();
+		if (thingListFrag != null && !thingShowing) {
+			setTitle(thingListFrag.getTopic().title);
+		} else if (thingShowing) {
+			setTitle(thingFrag.getThing().title);
+		}
+		
+		int thingPosition = thingShowing ? thingFrag.getThingPosition() : -1;
 		thingListFrag.setThingSelected(thingPosition);
 	}
 	
 	private void refreshThingContainer() {
 		Log.v(TAG, "refreshThingContainer");
 		if (thingContainer != null) {
-			ThingFragment thingFrag = (ThingFragment) manager.findFragmentByTag(THING_TAG);
-			if (thingFrag != null) {
-				Log.v(TAG, "Visible: " + thingFrag.isVisible());
-			}
-			thingContainer.setVisibility(thingFrag != null && thingFrag.isAdded() ? View.VISIBLE : View.GONE);
+			Fragment frag = manager.findFragmentByTag(THING_TAG);
+			thingContainer.setVisibility(frag != null && frag.isAdded() ? View.VISIBLE : View.GONE);
 		}
 	}
 }

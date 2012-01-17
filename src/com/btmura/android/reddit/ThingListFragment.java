@@ -33,6 +33,10 @@ public class ThingListFragment extends ListFragment {
 		this.topicPosition = position;
 	}
 	
+	public Topic getTopic() {
+		return topic;
+	}
+	
 	public int getTopicPosition() {
 		return topicPosition;
 	}
