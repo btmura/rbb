@@ -13,7 +13,8 @@ public class TopicListFragment extends ListFragment {
 	
 	private static final String TAG = "TopicListFragment";
 	
-	private static final String SINGLE_CHOICE_STATE = "singleChoice";
+	private static final String STATE_POSITION = "position";
+	private static final String STATE_SINGLE_CHOICE = "singleChoice";
 	
 	interface OnTopicSelectedListener {
 		void onTopicSelected(Topic topic, int position);
@@ -21,14 +22,14 @@ public class TopicListFragment extends ListFragment {
 	
 	private TopicAdapter adapter;
 	private OnTopicSelectedListener listener;
+	private int position;
 	private boolean singleChoice;
 
-	public void setSingleChoice(boolean singleChoice) {
-		this.singleChoice = singleChoice;
-	}
-	
-	public void setTopicSelected(int position) {
-		getListView().setItemChecked(position, true);
+	public static TopicListFragment newInstance(int position, boolean singleChoice) {
+		TopicListFragment frag = new TopicListFragment();
+		frag.position = position;
+		frag.singleChoice = singleChoice;
+		return frag;
 	}
 	
 	@Override
@@ -43,7 +44,8 @@ public class TopicListFragment extends ListFragment {
 		Log.v(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState != null) {
-			singleChoice = savedInstanceState.getBoolean(SINGLE_CHOICE_STATE);
+			position = savedInstanceState.getInt(STATE_POSITION);
+			singleChoice = savedInstanceState.getBoolean(STATE_SINGLE_CHOICE);
 		}
 	}
 	
@@ -62,19 +64,25 @@ public class TopicListFragment extends ListFragment {
 		super.onActivityCreated(savedInstanceState);
 		adapter = new TopicAdapter(getActivity());
 		setListAdapter(adapter);
-		setTopicSelected(0);
+		setItemChecked(position);
 	}
 	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		Log.v(TAG, "onSaveInstanceState");
 		super.onSaveInstanceState(outState);
-		outState.putBoolean(SINGLE_CHOICE_STATE, singleChoice);
+		outState.putInt(STATE_POSITION, position);
+		outState.putBoolean(STATE_SINGLE_CHOICE, singleChoice);
 	}
 	
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
+		this.position = position;
 		listener.onTopicSelected(adapter.getItem(position), position);
+	}
+	
+	public void setItemChecked(int position) {
+		getListView().setItemChecked(position, true);
 	}
 }

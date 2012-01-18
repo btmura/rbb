@@ -47,25 +47,14 @@ public class ThingCommentsTask extends AsyncTask<Thing, ThingPart, Boolean> {
 	@Override
 	protected Boolean doInBackground(Thing... threads) {
 		try {
-			URL url = new URL("http://www.reddit.com/by_id/" + threads[0].name + ".json");
-			Log.v(TAG, url.toString());
-			
 			URL commentsUrl = new URL("http://www.reddit.com/comments/" + threads[0].getId() + ".json");
 			Log.v(TAG, commentsUrl.toString());
 			
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.connect();
-			
-			HttpURLConnection commentsConnection = (HttpURLConnection) commentsUrl.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) commentsUrl.openConnection();
 			connection.connect();
 			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			parseListing(reader, false);
-			stream.close();
-			
-			stream = commentsConnection.getInputStream();
-			reader = new JsonReader(new InputStreamReader(stream));
 			parseThings(reader, true);
 			stream.close();
 			

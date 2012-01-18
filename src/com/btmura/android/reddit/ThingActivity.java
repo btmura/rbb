@@ -7,9 +7,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.btmura.android.reddit.ThingFragment.OnThingPartSelectedListener;
 
-public class ThingActivity extends Activity implements OnThingPartSelectedListener {
+public class ThingActivity extends Activity {
 
 	static final String EXTRA_THING = "thing";
 

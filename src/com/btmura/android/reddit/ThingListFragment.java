@@ -17,50 +17,31 @@ public class ThingListFragment extends ListFragment {
 
 	private static final String TAG = "ThingListFragment";
 	
-	private static final String TOPIC_STATE = "topic";
-	private static final String TOPIC_POSITION_STATE = "topicPosition";
-	private static final String SINGLE_CHOICE_STATE = "singleChoice";
+
+	private static final String STATE_POSITION = "position";
+	private static final String STATE_SINGLE_CHOICE = "singleChoice";
 
 	private ThingListAdapter adapter;
 	private ThingListTask task;
 	private OnThingSelectedListener listener;
+	
+	private int position;
 	private boolean singleChoice;
 	
-	private Topic topic = Topic.frontPage();
-	private int topicPosition;
+	private TopicHolder topicHolder;
 	
-	public void setTopic(Topic topic, int position) {
-		this.topic = topic;
-		this.topicPosition = position;
-	}
-	
-	public Topic getTopic() {
-		return topic;
-	}
-	
-	public int getTopicPosition() {
-		return topicPosition;
-	}
-
-	public void setSingleChoice(boolean singleChoice) {
-		this.singleChoice = singleChoice;
-	}
-	
-	public void setThingSelected(int position) {
-		ListView list = getListView();
-		if (position < 0) {
-			Log.v(TAG, "Clearing choices");
-			list.clearChoices();
-		} else {
-			Log.v(TAG, "Setting position");
-			list.setItemChecked(position, true);
-		}
+	public static ThingListFragment newInstance(int position, boolean singleChoice) {
+		ThingListFragment frag = new ThingListFragment();
+		frag.position = position;
+		frag.singleChoice = singleChoice;
+		return frag;
 	}
 	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		listener = (OnThingSelectedListener) activity;
+		topicHolder = (TopicHolder) activity;
 	}
 	
 	@Override
@@ -68,9 +49,8 @@ public class ThingListFragment extends ListFragment {
 		Log.v(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState != null) {
-			topic = savedInstanceState.getParcelable(TOPIC_STATE);
-			topicPosition = savedInstanceState.getInt(TOPIC_POSITION_STATE);
-			singleChoice = savedInstanceState.getBoolean(SINGLE_CHOICE_STATE);
+			position = savedInstanceState.getInt(STATE_POSITION);
+			singleChoice = savedInstanceState.getBoolean(STATE_SINGLE_CHOICE);
 		}
 	}
 	
@@ -89,7 +69,7 @@ public class ThingListFragment extends ListFragment {
 		super.onActivityCreated(savedInstanceState);
 		adapter = new ThingListAdapter(getActivity());
 		setListAdapter(adapter);
-		setThingSelected(-1);
+		setItemChecked(-1);
 		updateThreadList();
 	}
 	
@@ -97,9 +77,8 @@ public class ThingListFragment extends ListFragment {
 	public void onSaveInstanceState(Bundle outState) {
 		Log.v(TAG, "onSaveInstanceState");
 		super.onSaveInstanceState(outState);
-		outState.putParcelable(TOPIC_STATE, topic);
-		outState.putInt(TOPIC_POSITION_STATE, topicPosition);
-		outState.putBoolean(SINGLE_CHOICE_STATE, singleChoice);
+		outState.putInt(STATE_POSITION, position);
+		outState.putBoolean(STATE_SINGLE_CHOICE, singleChoice);
 	}
 	
 	@Override
@@ -122,7 +101,18 @@ public class ThingListFragment extends ListFragment {
 			task.cancel(true);
 		}
 		task = new ThingListTask(this, adapter);
-		task.execute(topic);
+		task.execute(topicHolder.getTopic());
+	}
+	
+	public void setItemChecked(int position) {
+		ListView list = getListView();
+		if (position < 0) {
+			Log.v(TAG, "Clearing choices");
+			list.clearChoices();
+		} else {
+			Log.v(TAG, "Setting position");
+			list.setItemChecked(position, true);
+		}
 	}
 }
 

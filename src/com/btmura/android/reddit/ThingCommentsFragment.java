@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class ThingCommentsFragment extends ListFragment implements ThingFragment {
+public class ThingCommentsFragment extends ListFragment {
 
 	private static final String TAG = "ThingCommentsFragment";
 
@@ -18,8 +18,7 @@ public class ThingCommentsFragment extends ListFragment implements ThingFragment
 
 	private ThingPartAdapter adapter;
 	private ThingCommentsTask task;	
-	private OnThingPartSelectedListener listener;
-	
+
 	private Thing thing;
 	private int thingPosition;
 	
@@ -58,7 +57,6 @@ public class ThingCommentsFragment extends ListFragment implements ThingFragment
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		listener = (OnThingPartSelectedListener) activity;
 	}
 	
 	@Override
@@ -81,7 +79,6 @@ public class ThingCommentsFragment extends ListFragment implements ThingFragment
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		ThingPart part = adapter.getItem(position);
-		listener.onThingPartSelected(getThing(), getThingPosition(), part);
 	}
 	
 	private void updateThread() {
