@@ -65,7 +65,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 				frag = new TopicListFragment();
 			}
 			frag.setSingleChoice(hasThingList);
-			frag.setOnTopicSelectedListener(this);   
 			if (createFrag) {
 				FragmentTransaction transaction = manager.beginTransaction();
 				transaction.replace(R.id.topic_list_container, frag, TOPIC_LIST_TAG);
@@ -80,18 +79,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 				frag = new ThingListFragment();
 			}
 			frag.setSingleChoice(hasThing);
-			frag.setOnThingSelectedListener(this);
 			if (createFrag) {
 				FragmentTransaction transaction = manager.beginTransaction();
 				transaction.replace(R.id.thing_list_container, frag, THING_LIST_TAG);
 				transaction.commit();
-			}
-		}
-		
-		if (hasThing) {
-			ThingFragment frag = (ThingFragment) manager.findFragmentByTag(THING_TAG);
-			if (frag != null) {
-				frag.setOnThingPartSelected(this);
 			}
 		}
 	}
@@ -111,7 +102,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
 		ThingListFragment thingListFrag = new ThingListFragment();
 		thingListFrag.setTopic(topic, position);
-		thingListFrag.setOnThingSelectedListener(this);
 		thingListFrag.setSingleChoice(hasThing);
 		
 		transaction.setBreadCrumbTitle(topic.title);
@@ -139,7 +129,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		
 		ThingCommentsFragment frag = new ThingCommentsFragment();
 		frag.setThing(thing, position);
-		frag.setOnThingPartSelected(this);
 		
 		transaction.replace(R.id.thing_container, frag, THING_TAG);
 		transaction.addToBackStack(null);
@@ -152,7 +141,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		
 		ThingWebFragment frag = new ThingWebFragment();	
 		frag.setThing(thing, position);
-		frag.setOnThingPartSelected(this);
 		frag.setUrl(part.value);
 		
 		transaction.replace(R.id.thing_container, frag, THING_TAG);

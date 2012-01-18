@@ -1,5 +1,6 @@
 package com.btmura.android.reddit;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,17 +22,20 @@ public class TopicListFragment extends ListFragment {
 	private TopicAdapter adapter;
 	private OnTopicSelectedListener listener;
 	private boolean singleChoice;
-	
-	public void setOnTopicSelectedListener(OnTopicSelectedListener listener) {
-		this.listener = listener;
-	}
-	
+
 	public void setSingleChoice(boolean singleChoice) {
 		this.singleChoice = singleChoice;
 	}
 	
 	public void setTopicSelected(int position) {
 		getListView().setItemChecked(position, true);
+	}
+	
+	@Override
+	public void onAttach(Activity activity) {
+		Log.v(TAG, "onAttach");
+		super.onAttach(activity);
+		listener = (OnTopicSelectedListener) activity;
 	}
 	
 	@Override

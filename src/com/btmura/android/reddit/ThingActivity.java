@@ -26,8 +26,7 @@ public class ThingActivity extends Activity implements OnThingPartSelectedListen
 			
 		ThingCommentsFragment frag = new ThingCommentsFragment();
 		frag.setThing(thing, position);
-		frag.setOnThingPartSelected(this);
-		
+
 		FragmentManager manager = getFragmentManager();
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.thing_container, frag);

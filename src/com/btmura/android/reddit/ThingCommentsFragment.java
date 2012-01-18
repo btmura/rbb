@@ -1,5 +1,6 @@
 package com.btmura.android.reddit;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -53,9 +54,11 @@ public class ThingCommentsFragment extends ListFragment implements ThingFragment
 		outState.putParcelable(STATE_THING, thing);
 		outState.putInt(STATE_THING_POSITION, thingPosition);
 	}
-	
-	public void setOnThingPartSelected(OnThingPartSelectedListener listener) {
-		this.listener = listener;
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		listener = (OnThingPartSelectedListener) activity;
 	}
 	
 	@Override

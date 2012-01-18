@@ -37,9 +37,6 @@ public class ThingWebFragment extends WebViewFragment implements ThingFragment {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	
-	public void setOnThingPartSelected(OnThingPartSelectedListener listener) {	
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

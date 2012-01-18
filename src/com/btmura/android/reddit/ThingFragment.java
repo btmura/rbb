@@ -13,7 +13,5 @@ public interface ThingFragment {
 	int getThingPosition();
 	
 	boolean isAdded();
-	
-	void setOnThingPartSelected(OnThingPartSelectedListener listener);
 }
 
