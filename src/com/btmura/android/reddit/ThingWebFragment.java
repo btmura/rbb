@@ -107,13 +107,14 @@ public class ThingWebFragment extends WebViewFragment {
 		@Override
 		protected void onPostExecute(String url) {
 			super.onPostExecute(url);
+			Log.v(TAG, url);
 			WebView webView = getWebView();
 			if (webView != null) {
 				webView.loadUrl(url);
 				if (url.contains("youtube") || url.contains("youtu.be")) {
 					Intent intent = new Intent(Intent.ACTION_VIEW);
 					intent.setData(Uri.parse(url));
-					startActivity(intent);
+					startActivity(Intent.createChooser(intent, getString(R.string.chooser)));
 				}
 			}
 		}
