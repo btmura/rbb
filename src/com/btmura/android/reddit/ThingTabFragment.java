@@ -45,11 +45,11 @@ public class ThingTabFragment extends Fragment {
 		tabHost.setup();
 
 		tabHost.addTab(tabHost.newTabSpec(TAB_LINK)
-				.setIndicator(getString(R.string.link))
+				.setIndicator(getString(R.string.tab_link))
 				.setContent(R.id.link_content));
 		
 		tabHost.addTab(tabHost.newTabSpec(TAB_COMMENTS)
-				.setIndicator(getString(R.string.comments))
+				.setIndicator(getString(R.string.tab_comments))
 				.setContent(R.id.comments_content));
 	}
 	

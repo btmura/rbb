@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">reddit is holo</string>
-    
-    <string name="comments">Comments</string>
-    <string name="link">Link</string>
+    <string name="menu_subreddits">Subreddits</string>
+    <string name="tab_comments">Comments</string>
+    <string name="tab_link">Link</string>
 </resources>

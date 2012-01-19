@@ -8,6 +8,8 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
@@ -24,6 +26,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private static final String THING_TAG = "thing";
 
 	private FragmentManager manager;
+	
+	private View topicListContainer;
 	private View thingContainer;
 	
 	@Override
@@ -35,6 +39,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         manager = getFragmentManager();
         manager.addOnBackStackChangedListener(this);
         
+        topicListContainer = findViewById(R.id.topic_list_container);
         thingContainer = findViewById(R.id.thing_container);
         if (thingContainer != null) {
         	thingContainer.setVisibility(View.GONE);
@@ -145,6 +150,14 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return (MainControlFragment) manager.findFragmentByTag(CONTROL_TAG);
 	}
 	
+	private TopicListFragment getTopicListFragment() {
+		return (TopicListFragment) manager.findFragmentByTag(TOPIC_LIST_TAG);
+	}
+	
+	private ThingListFragment getThingListFragment() {
+		return (ThingListFragment) manager.findFragmentByTag(THING_LIST_TAG);
+	}
+	
 	public void onBackStackChanged() {
 		Log.v(TAG, "onBackStackChanged");
 		refreshCheckedItems();
@@ -152,16 +165,29 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void refreshCheckedItems() {
-		TopicListFragment topicFrag = (TopicListFragment) manager.findFragmentByTag(TOPIC_LIST_TAG);
-		topicFrag.setItemChecked(getTopicPosition());
-		
-		ThingListFragment thingListFrag = (ThingListFragment) manager.findFragmentByTag(THING_LIST_TAG);
-		thingListFrag.setItemChecked(getThingPosition());
+		getTopicListFragment().setItemChecked(getTopicPosition());
+		getThingListFragment().setItemChecked(getThingPosition());
 	}
 	
 	private void refreshThingContainer() {
 		if (thingContainer != null) {
 			thingContainer.setVisibility(getThing() != null ? View.VISIBLE : View.GONE);
 		}
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		Log.v(TAG, "onPrepareOptionsMenu");
+		super.onPrepareOptionsMenu(menu);
+		menu.findItem(R.id.menu_subreddits).setVisible(topicListContainer.getVisibility() != View.VISIBLE);
+		return true;
 	}
 }
