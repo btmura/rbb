@@ -22,7 +22,6 @@ public class ThingCommentsFragment extends ListFragment {
 	private Thing thing;
 	private int thingPosition;
 	
-	
 	public void setThing(Thing thing, int position) {
 		this.thing = thing;
 		this.thingPosition = position;

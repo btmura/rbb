@@ -21,6 +21,10 @@ public class ThingTabFragment extends Fragment {
 	private ThingHolder thingHolder;
 	private TabHost tabHost;
 	
+	public static ThingTabFragment newInstance() {
+		return new ThingTabFragment();
+	}
+	
 	@Override
 	public void onAttach(Activity activity) {
 		Log.v(TAG, "onAttach");

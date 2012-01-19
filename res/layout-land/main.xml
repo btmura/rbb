@@ -4,16 +4,13 @@
     	android:layout_height="match_parent"
     	android:orientation="horizontal"
     	>
-
     <FrameLayout android:id="@+id/topic_list_container"
        		android:layout_width="150dp"
        		android:layout_height="match_parent"
        		/>
-       	
     <FrameLayout android:id="@+id/thing_list_container"
         	android:layout_weight="1"
         	android:layout_width="0dp"
         	android:layout_height="match_parent"
         	/>
-
 </LinearLayout>

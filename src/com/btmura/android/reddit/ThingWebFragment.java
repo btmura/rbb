@@ -99,7 +99,10 @@ public class ThingWebFragment extends WebViewFragment {
 		@Override
 		protected void onPostExecute(String url) {
 			super.onPostExecute(url);
-			getWebView().loadUrl(url);
+			WebView webView = getWebView();
+			if (webView != null) {
+				webView.loadUrl(url);
+			}
 		}
 	}
 

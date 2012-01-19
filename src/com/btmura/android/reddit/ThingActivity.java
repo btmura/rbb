@@ -3,38 +3,45 @@ package com.btmura.android.reddit;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 
-public class ThingActivity extends Activity {
+public class ThingActivity extends Activity implements ThingHolder {
 
 	static final String EXTRA_THING = "thing";
-
 	static final String EXTRA_POSITION = "position";
+	
+	private static final String THING_TAG = "thing";
+	
+	private static final String STATE_THING = "thing";
+	
+	private Thing thing;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.thing);
 		
-		Intent intent = getIntent();
-		Thing thing = intent.getParcelableExtra(EXTRA_THING);
-		int position = intent.getIntExtra(EXTRA_POSITION, -1);
-			
-		ThingCommentsFragment frag = new ThingCommentsFragment();
-		frag.setThing(thing, position);
-
+		if (savedInstanceState != null) {
+			thing = savedInstanceState.getParcelable(STATE_THING);
+		} else {
+			thing = getIntent().getParcelableExtra(EXTRA_THING);
+		}
+		
 		FragmentManager manager = getFragmentManager();
 		FragmentTransaction transaction = manager.beginTransaction();
-		transaction.replace(R.id.thing_container, frag);
+		ThingTabFragment frag = ThingTabFragment.newInstance();
+		transaction.replace(R.id.thing_container, frag, THING_TAG);
 		transaction.commit();
 	}
 	
-	public void onThingPartSelected(Thing thing, int position, ThingPart part) {
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setData(Uri.parse(part.value));
-		startActivity(intent);
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putParcelable(STATE_THING, thing);
+	}
+	
+	public Thing getThing() {
+		return thing;
 	}
 }

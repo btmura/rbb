@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,7 +14,7 @@ import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.TopicListFragment.OnTopicSelectedListener;
 
 public class MainActivity extends Activity implements OnBackStackChangedListener,
-		OnTopicSelectedListener, OnThingSelectedListener, TopicHolder, ThingHolder {
+		OnTopicSelectedListener, OnThingSelectedListener, TopicHolder, ThingHolder, LayoutInfo {
 
 	private static final String TAG = "MainActivity";
 	
@@ -35,7 +36,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         manager.addOnBackStackChangedListener(this);
         
         thingContainer = findViewById(R.id.thing_container);
-        thingContainer.setVisibility(View.GONE);
+        if (thingContainer != null) {
+        	thingContainer.setVisibility(View.GONE);
+        }
         
         setupFragments();
 	}
@@ -54,7 +57,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 		
 		if (manager.findFragmentByTag(THING_LIST_TAG) == null) {
-			ThingListFragment frag = ThingListFragment.newInstance(-1, true);
+			ThingListFragment frag = ThingListFragment.newInstance();
 			FragmentTransaction transaction = manager.beginTransaction();
 			transaction.replace(R.id.thing_list_container, frag, THING_LIST_TAG);
 			transaction.commit();
@@ -77,7 +80,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		MainControlFragment controlFrag = MainControlFragment.newInstance(topic, position, null, -1);
 		transaction.add(controlFrag, CONTROL_TAG);
 		
-		ThingListFragment thingListFrag = ThingListFragment.newInstance(-1, true);
+		ThingListFragment thingListFrag = ThingListFragment.newInstance();
 		transaction.replace(R.id.thing_list_container, thingListFrag, THING_LIST_TAG);
 		
 		Fragment thingFrag = manager.findFragmentByTag(THING_TAG);
@@ -91,16 +94,31 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	public void onThingSelected(Thing thing, int position) {
 		Log.v(TAG, "onThingSelected");
+		if (thingContainer != null) {
+			replaceThingFragment(thing, position);
+		} else {
+			startThingActivity(thing, position);
+		}
+	}
+	
+	private void replaceThingFragment(Thing thing, int position) {
 		FragmentTransaction transaction = manager.beginTransaction();
 		
 		MainControlFragment controlFrag = MainControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
 		transaction.add(controlFrag, CONTROL_TAG);
 		
-		ThingTabFragment frag = new ThingTabFragment();
+		ThingTabFragment frag = ThingTabFragment.newInstance();
 		transaction.replace(R.id.thing_container, frag, THING_TAG);
 		
 		transaction.addToBackStack(null);
 		transaction.commit();		
+	}
+	
+	private void startThingActivity(Thing thing, int position) {
+		Intent intent = new Intent(this, ThingActivity.class);
+		intent.putExtra(ThingActivity.EXTRA_THING, thing);
+		intent.putExtra(ThingActivity.EXTRA_POSITION, position);
+		startActivity(intent);
 	}
 	
 	public Topic getTopic() {
@@ -111,11 +129,15 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return getControlFragment().getThing();
 	}
 	
-	public int getTopicPosition() {
+	public boolean hasThingContainer() {
+		return thingContainer != null;
+	}
+	
+	private int getTopicPosition() {
 		return getControlFragment().getTopicPosition();
 	}
 	
-	public int getThingPosition() {
+	private int getThingPosition() {
 		return getControlFragment().getThingPosition();
 	}
 	
