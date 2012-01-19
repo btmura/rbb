@@ -8,6 +8,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -108,6 +110,11 @@ public class ThingWebFragment extends WebViewFragment {
 			WebView webView = getWebView();
 			if (webView != null) {
 				webView.loadUrl(url);
+				if (url.contains("youtube") || url.contains("youtu.be")) {
+					Intent intent = new Intent(Intent.ACTION_VIEW);
+					intent.setData(Uri.parse(url));
+					startActivity(intent);
+				}
 			}
 		}
 	}
@@ -123,10 +130,5 @@ public class ThingWebFragment extends WebViewFragment {
 	}
 
 	class ThingWebClient extends WebViewClient {
-		@Override
-		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			view.loadUrl(url);
-			return true;
-		}
 	}
 }
