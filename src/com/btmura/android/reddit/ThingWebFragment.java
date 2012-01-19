@@ -64,6 +64,12 @@ public class ThingWebFragment extends WebViewFragment {
 		private String url;
 		
 		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			
+		}
+		
+		@Override
 		protected String doInBackground(Void... voidRay) {
 			try {
 				Thing thing = thingHolder.getThing();
