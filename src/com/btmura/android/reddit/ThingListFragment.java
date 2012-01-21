@@ -67,6 +67,7 @@ public class ThingListFragment extends ListFragment {
 		super.onActivityCreated(savedInstanceState);
 		adapter = new ThingListAdapter(getActivity());
 		setListAdapter(adapter);
+		setListShown(false);
 		setItemChecked(-1);
 		updateThreadList();
 	}

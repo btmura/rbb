@@ -10,11 +10,18 @@ public class TopicAdapter extends ArrayAdapter<Topic> {
 		add(Topic.frontPage());
 		add(Topic.newTopic("AskReddit"));
 		add(Topic.newTopic("android"));
+		add(Topic.newTopic("askscience"));
 		add(Topic.newTopic("atheism"));
 		add(Topic.newTopic("funny"));
+		add(Topic.newTopic("fitness"));
+		add(Topic.newTopic("health"));
+		add(Topic.newTopic("humor"));
 		add(Topic.newTopic("IAmA"));
 		add(Topic.newTopic("pics"));
 		add(Topic.newTopic("politics"));
+		add(Topic.newTopic("todayilearned"));
+		add(Topic.newTopic("videos"));
+		add(Topic.newTopic("worldnews"));
 		add(Topic.newTopic("WTF"));
 	}
 }

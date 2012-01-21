@@ -8,8 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -107,16 +105,18 @@ public class ThingWebFragment extends WebViewFragment {
 		@Override
 		protected void onPostExecute(String url) {
 			super.onPostExecute(url);
-			Log.v(TAG, url);
-			WebView webView = getWebView();
-			if (webView != null) {
-				webView.loadUrl(url);
-				if (url.contains("youtube") || url.contains("youtu.be")) {
-					Intent intent = new Intent(Intent.ACTION_VIEW);
-					intent.setData(Uri.parse(url));
-					startActivity(Intent.createChooser(intent, getString(R.string.chooser)));
-				}
+			if (url == null) {
+				Log.v(TAG, "Url is null");
+				return;
 			}
+			
+			WebView webView = getWebView();
+			if (webView == null) {
+				Log.v(TAG, "WebView is null");
+				return;
+			}
+			
+			webView.loadUrl(url);
 		}
 	}
 
