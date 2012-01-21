@@ -1,6 +1,7 @@
 .classpath
 .project
 .settings
+apk
 bin
 gen
 project.properties
