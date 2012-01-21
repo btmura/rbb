@@ -11,6 +11,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,7 +38,7 @@ public class ThingFragment extends Fragment {
 
 	private ProgressBar progress;
 	private WebView webView;
-	private MenuItem copyItem;
+	private Menu menu;
 
 	private LoadUrlTask task;
 	private String url;
@@ -169,7 +171,7 @@ public class ThingFragment extends Fragment {
 			}
 			url = loadedUrl;
 			webView.loadUrl(url);
-			copyItem.setEnabled(true);
+			enableUrlMenuItems(true);
 		}
 	}
 	
@@ -177,25 +179,42 @@ public class ThingFragment extends Fragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.thing_fragment, menu);
-		copyItem = menu.findItem(R.id.menu_copy_link);
-		copyItem.setEnabled(false);
+		this.menu = menu;
+		enableUrlMenuItems(false);
+	}
+	
+	private void enableUrlMenuItems(boolean enabled) {
+		menu.findItem(R.id.menu_copy_link).setEnabled(enabled);
+		menu.findItem(R.id.menu_view).setEnabled(enabled);
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Log.v(TAG, "onOptionsItemSelected!");
+		super.onOptionsItemSelected(item);
+		
 		switch (item.getItemId()) {
 		case R.id.menu_copy_link:
-			handleCopyLink();
-			break;
+			handleCopyLinkItem();
+			return true;
+		
+		case R.id.menu_view:
+			handleViewItem();
+			return true;
 		}
-		return true;
+		return false;
 	}
 
-	private void handleCopyLink() {
-		Log.v(TAG, url);
+	private void handleCopyLinkItem() {
 		ClipboardManager clip = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
 		clip.setText(url);
 		Toast.makeText(getActivity(), url, Toast.LENGTH_SHORT).show();
 	}
+	
+	private void handleViewItem() {
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setData(Uri.parse(url));
+		startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));
+	}
+	
 }

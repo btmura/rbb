@@ -5,6 +5,8 @@ import android.app.ListFragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -54,6 +56,7 @@ public class ThingListFragment extends ListFragment {
 		
 		LayoutInfo info = (LayoutInfo) getActivity();
 		boolean singleChoice = info.hasThingContainer();
+		setHasOptionsMenu(!info.hasTopicListContainer());
 		
 		View view = super.onCreateView(inflater, container, savedInstanceState);
 		ListView list = (ListView) view.findViewById(android.R.id.list);
@@ -111,6 +114,12 @@ public class ThingListFragment extends ListFragment {
 			Log.v(TAG, "Setting position");
 			list.setItemChecked(position, true);
 		}
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.main, menu);
 	}
 }
 

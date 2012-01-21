@@ -3,6 +3,8 @@
     <string name="app_name">reddit is funny</string>
     
     <string name="menu_subreddits">Subreddits</string>    
+    <string name="menu_comments">Comments</string>
     <string name="menu_copy_link">Copy link</string>
-
+    <string name="menu_view">View in other app</string>
+    
 </resources>

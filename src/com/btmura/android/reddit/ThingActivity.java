@@ -1,5 +1,6 @@
 package com.btmura.android.reddit;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -27,6 +28,9 @@ public class ThingActivity extends Activity implements ThingHolder {
 		} else {
 			thing = getIntent().getParcelableExtra(EXTRA_THING);
 		}
+	
+		ActionBar bar = getActionBar();
+		bar.setTitle(thing.title);
 		
 		FragmentManager manager = getFragmentManager();
 		FragmentTransaction transaction = manager.beginTransaction();
