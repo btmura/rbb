@@ -4,7 +4,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 
-public class MainControlFragment extends Fragment implements TopicHolder, ThingHolder {
+public class ControlFragment extends Fragment implements TopicHolder, ThingHolder {
 	
 	private static final String TAG = "MainControlFragment";
 
@@ -18,8 +18,8 @@ public class MainControlFragment extends Fragment implements TopicHolder, ThingH
 	private int topicPosition;
 	private int thingPosition;
 	
-	public static MainControlFragment newInstance(Topic topic, int topicPosition, Thing thing, int thingPosition) {
-		MainControlFragment frag = new MainControlFragment();
+	public static ControlFragment newInstance(Topic topic, int topicPosition, Thing thing, int thingPosition) {
+		ControlFragment frag = new ControlFragment();
 		frag.topic = topic;
 		frag.thing = thing;
 		frag.topicPosition = topicPosition;

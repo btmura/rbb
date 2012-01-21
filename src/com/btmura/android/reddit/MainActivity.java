@@ -1,5 +1,6 @@
 package com.btmura.android.reddit;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
@@ -26,7 +28,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private static final String THING_TAG = "thing";
 
 	private FragmentManager manager;
-	
+	private ActionBar bar;
 	private View topicListContainer;
 	private View thingContainer;
 	
@@ -39,6 +41,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         manager = getFragmentManager();
         manager.addOnBackStackChangedListener(this);
         
+        bar = getActionBar();
+        
         topicListContainer = findViewById(R.id.topic_list_container);
         thingContainer = findViewById(R.id.thing_container);
         if (thingContainer != null) {
@@ -50,7 +54,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
 	private void setupFragments() {
 		if (manager.findFragmentByTag(CONTROL_TAG) == null) {
-			MainControlFragment controlFrag = MainControlFragment.newInstance(Topic.frontPage(), 0, null, -1);
+			ControlFragment controlFrag = ControlFragment.newInstance(Topic.frontPage(), 0, null, -1);
 			manager.beginTransaction().add(controlFrag, CONTROL_TAG).commit();
 		}
 		
@@ -80,9 +84,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	public void onTopicSelected(Topic topic, int position) {
 		Log.v(TAG, "onTopicSelected");
+		
 		FragmentTransaction transaction = manager.beginTransaction();
 
-		MainControlFragment controlFrag = MainControlFragment.newInstance(topic, position, null, -1);
+		ControlFragment controlFrag = ControlFragment.newInstance(topic, position, null, -1);
 		transaction.add(controlFrag, CONTROL_TAG);
 		
 		ThingListFragment thingListFrag = ThingListFragment.newInstance();
@@ -109,10 +114,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void replaceThingFragment(Thing thing, int position) {
 		FragmentTransaction transaction = manager.beginTransaction();
 		
-		MainControlFragment controlFrag = MainControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
+		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
 		transaction.add(controlFrag, CONTROL_TAG);
 		
-		ThingTabFragment frag = ThingTabFragment.newInstance();
+		ThingFragment frag = ThingFragment.newInstance();
 		transaction.replace(R.id.thing_container, frag, THING_TAG);
 		
 		transaction.addToBackStack(null);
@@ -146,8 +151,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return getControlFragment().getThingPosition();
 	}
 	
-	private MainControlFragment getControlFragment() {
-		return (MainControlFragment) manager.findFragmentByTag(CONTROL_TAG);
+	private ControlFragment getControlFragment() {
+		return (ControlFragment) manager.findFragmentByTag(CONTROL_TAG);
 	}
 	
 	private TopicListFragment getTopicListFragment() {
@@ -160,6 +165,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	public void onBackStackChanged() {
 		Log.v(TAG, "onBackStackChanged");
+		bar.setDisplayHomeAsUpEnabled(getThing() != null);
 		refreshCheckedItems();
 		refreshThingContainer();
 	}
@@ -189,5 +195,20 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		super.onPrepareOptionsMenu(menu);
 		menu.findItem(R.id.menu_subreddits).setVisible(topicListContainer.getVisibility() != View.VISIBLE);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		super.onOptionsItemSelected(item);
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			handleUpItemSelected();
+			return true;
+		}
+		return false;
+	}
+	
+	private void handleUpItemSelected() {
+		onTopicSelected(getTopic(), getTopicPosition());
 	}
 }

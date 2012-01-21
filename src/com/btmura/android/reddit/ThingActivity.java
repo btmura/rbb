@@ -30,7 +30,7 @@ public class ThingActivity extends Activity implements ThingHolder {
 		
 		FragmentManager manager = getFragmentManager();
 		FragmentTransaction transaction = manager.beginTransaction();
-		ThingTabFragment frag = ThingTabFragment.newInstance();
+		ThingFragment frag = ThingFragment.newInstance();
 		transaction.replace(R.id.thing_container, frag, THING_TAG);
 		transaction.commit();
 	}

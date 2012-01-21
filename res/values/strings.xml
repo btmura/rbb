@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">reddit is funny</string>
-    <string name="chooser">View this link using</string>
-    <string name="menu_subreddits">Subreddits</string>
-    <string name="tab_comments">Comments</string>
-    <string name="tab_link">Link</string>
+    
+    <string name="menu_subreddits">Subreddits</string>    
+    <string name="menu_copy_link">Copy link</string>
+
 </resources>
