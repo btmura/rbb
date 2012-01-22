@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.os.AsyncTask;
+import android.text.Html;
 import android.util.Log;
 
 import com.google.gson.stream.JsonReader;
@@ -35,9 +36,9 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> {
 	}
 
 	@Override
-	protected void onProgressUpdate(Thing... threads) {
-		super.onProgressUpdate(threads);
-		adapter.addAll(threads);
+	protected void onProgressUpdate(Thing... things) {
+		super.onProgressUpdate(things);
+		adapter.addAll(things);
 		if (frag.isVisible()) {
 			frag.setListShown(true);
 		}
@@ -128,7 +129,7 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> {
 				reader.skipValue();
 			}
 		}
-		publishProgress(new Thing(id, title));
+		publishProgress(new Thing(id, Html.fromHtml(title).toString()));
 		reader.endObject();
 	}
 }
