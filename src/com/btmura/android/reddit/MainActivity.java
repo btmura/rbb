@@ -59,7 +59,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         crumbs.setActivity(this);
 
         bar = getActionBar();
-        bar.setDisplayShowHomeEnabled(singleContainer == null);
+        bar.setDisplayShowHomeEnabled(true);
         bar.setDisplayShowCustomEnabled(true);
         bar.setCustomView(crumbs);
         
@@ -73,15 +73,28 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 
 	private void setupFragments() {
-		Topic topic = Topic.newTopic("all");
-		ControlFragment controlFrag = ControlFragment.newInstance(topic, 0, null, -1);
-		TopicListFragment topicFrag = TopicListFragment.newInstance(0);
+		if (singleContainer != null) {
+			ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1);
+			TopicListFragment topicFrag = TopicListFragment.newInstance(-1);
+			
+			FragmentTransaction trans = manager.beginTransaction();
+			trans.add(controlFrag, CONTROL_TAG);
+			trans.replace(topicListContainerId, topicFrag);
+			trans.commit();
+		}
 		
-		FragmentTransaction trans = manager.beginTransaction();
-		trans.add(controlFrag, CONTROL_TAG);
-		trans.replace(topicListContainerId, topicFrag, TOPIC_LIST_TAG);
-		trans.commit();
-	
+		Topic topic = Topic.newTopic("all");
+		
+		if (topicListContainer != null) {
+			ControlFragment controlFrag = ControlFragment.newInstance(topic, 0, null, -1);
+			TopicListFragment topicFrag = TopicListFragment.newInstance(0);
+			
+			FragmentTransaction trans = manager.beginTransaction();
+			trans.add(controlFrag, CONTROL_TAG);
+			trans.replace(topicListContainerId, topicFrag, TOPIC_LIST_TAG);
+			trans.commit();
+		}
+			
 		if (thingListContainer != null) {
 			replaceThingList(topic, 0, false);
 		}
@@ -195,7 +208,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void refreshHome() {
-		bar.setDisplayHomeAsUpEnabled(getThing() != null);
+		bar.setDisplayHomeAsUpEnabled(singleContainer != null && getTopic() != null || getThing() != null);
 	}
 	
 	private void refreshCheckedItems() {
@@ -228,6 +241,14 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void handleUpItem() {
-		manager.popBackStack(THING_LIST_TAG, 0);
+		int count = manager.getBackStackEntryCount();
+		if (count > 0) {
+			String name = manager.getBackStackEntryAt(count - 1).getName();
+			if (THING_TAG.equals(name)) {
+				manager.popBackStack(THING_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			} else if (THING_LIST_TAG.equals(name)) {
+				manager.popBackStack(THING_LIST_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			}
+		}
 	}
 }
