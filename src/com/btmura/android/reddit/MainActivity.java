@@ -122,15 +122,14 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void replaceThingFragment(Thing thing, int position) {
-		FragmentTransaction transaction = manager.beginTransaction();
-		
 		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
-		transaction.add(controlFrag, CONTROL_TAG);
-		
 		ThingFragment frag = ThingFragment.newInstance();
-		transaction.replace(R.id.thing_container, frag, THING_TAG);
 		
-		transaction.addToBackStack(null).commit();		
+		FragmentTransaction trans = manager.beginTransaction();
+		trans.add(controlFrag, CONTROL_TAG);
+		trans.replace(R.id.thing_container, frag, THING_TAG);
+		trans.addToBackStack(null);
+		trans.commit();		
 	}
 	
 	private void startThingActivity(Thing thing, int position) {
@@ -228,20 +227,26 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void handleUpItem() {
-		onTopicSelected(getTopic(), getTopicPosition());
+		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), null, -1);
+		ThingFragment thingFrag = getThingFragment();
+		
+		FragmentTransaction trans = manager.beginTransaction();
+		trans.add(controlFrag, CONTROL_TAG);
+		trans.remove(thingFrag);
+		trans.addToBackStack(null);
+		trans.commit();
 	}
 	
 	private void handleSubredditsItem() {
-		FragmentTransaction transaction = manager.beginTransaction();
-		
-		ThingListFragment thingListFrag = getThingListFragment();
-		if (thingListFrag != null) {
-			transaction.remove(thingListFrag);
-		}
-		
 		TopicListFragment topicFrag = TopicListFragment.newInstance(getTopicPosition());
-		transaction.replace(topicListContainerId, topicFrag, TOPIC_LIST_TAG);
-	
-		transaction.addToBackStack(null).commit();
+		ThingListFragment thingListFrag = getThingListFragment();
+		
+		FragmentTransaction trans = manager.beginTransaction();
+		if (thingListFrag != null) {
+			trans.remove(thingListFrag);
+		}
+		trans.replace(topicListContainerId, topicFrag, TOPIC_LIST_TAG);
+		trans.addToBackStack(null);
+		trans.commit();
 	}
 }
