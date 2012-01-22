@@ -23,6 +23,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
@@ -66,12 +68,15 @@ public class ThingFragment extends Fragment {
 	}
 	
 	private void setupWebView(WebView webView) {
-		webView.getSettings().setBuiltInZoomControls(true);
-		webView.getSettings().setDisplayZoomControls(false);
-		webView.getSettings().setJavaScriptEnabled(true);
-		webView.getSettings().setLoadWithOverviewMode(true);
-		webView.getSettings().setSupportZoom(true);
-		webView.getSettings().setUseWideViewPort(true);		
+		WebSettings settings = webView.getSettings();
+		settings.setBuiltInZoomControls(true);
+		settings.setDisplayZoomControls(false);
+		settings.setJavaScriptEnabled(true);
+		settings.setLoadWithOverviewMode(true);
+		settings.setSupportZoom(true);
+		settings.setPluginState(PluginState.ON_DEMAND);
+		settings.setUseWideViewPort(true);	
+		
 		webView.setWebViewClient(new WebViewClient() {
 			@Override
 			public void onPageStarted(WebView view, String url, Bitmap favicon) {
