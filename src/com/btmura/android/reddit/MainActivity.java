@@ -6,9 +6,7 @@ import android.app.FragmentBreadCrumbs;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -18,6 +16,7 @@ import com.btmura.android.reddit.TopicListFragment.OnTopicSelectedListener;
 public class MainActivity extends Activity implements OnBackStackChangedListener,
 		OnTopicSelectedListener, OnThingSelectedListener, TopicHolder, ThingHolder, LayoutInfo {
 
+	@SuppressWarnings("unused")
 	private static final String TAG = "MainActivity";
 	
 	private static final String CONTROL_TAG = "control";
@@ -35,19 +34,20 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
 	private int topicListContainerId;
 	private int thingListContainerId;
+	private int thingContainerId;
 
 	private FragmentBreadCrumbs crumbs;
 		
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.v(TAG, "onCreate");
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
         manager = getFragmentManager();
         manager.addOnBackStackChangedListener(this);
         
         singleContainer = findViewById(R.id.single_container);
+        
         topicListContainer = findViewById(R.id.topic_list_container);
         thingListContainer = findViewById(R.id.thing_list_container);
         thingContainer = findViewById(R.id.thing_container);
@@ -65,6 +65,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         
         topicListContainerId = topicListContainer != null ? R.id.topic_list_container : R.id.single_container;
         thingListContainerId = thingListContainer != null ? R.id.thing_list_container : R.id.single_container;
+        thingContainerId = thingContainer != null ? R.id.thing_container : R.id.single_container;
 		
         if (savedInstanceState == null) {
         	setupFragments();
@@ -88,7 +89,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		Log.v(TAG, "onRestoreInstanceState");
 		super.onRestoreInstanceState(savedInstanceState);
 		if (savedInstanceState != null) {
 			onBackStackChanged();
@@ -96,7 +96,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	public void onTopicSelected(Topic topic, int position) {
-		Log.v(TAG, "onTopicSelected");
 		replaceThingList(topic, position, true);
 	}
 	
@@ -132,15 +131,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	public void onThingSelected(Thing thing, int position) {
-		Log.v(TAG, "onThingSelected");
-		if (thingContainer != null) {
-			replaceThingFragment(thing, position);
-		} else {
-			startThingActivity(thing, position);
-		}
-	}
-	
-	private void replaceThingFragment(Thing thing, int position) {
 		manager.popBackStack(THING_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		
 		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
@@ -148,17 +138,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		
 		FragmentTransaction trans = manager.beginTransaction();
 		trans.add(controlFrag, CONTROL_TAG);
-		trans.replace(R.id.thing_container, frag, THING_TAG);
+		trans.replace(thingContainerId, frag, THING_TAG);
 		trans.setBreadCrumbTitle(thing.title);
 		trans.addToBackStack(THING_TAG);
 		trans.commit();		
-	}
-	
-	private void startThingActivity(Thing thing, int position) {
-		Intent intent = new Intent(this, ThingActivity.class);
-		intent.putExtra(ThingActivity.EXTRA_THING, thing);
-		intent.putExtra(ThingActivity.EXTRA_POSITION, position);
-		startActivity(intent);
 	}
 	
 	public Topic getTopic() {
