@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">reddit is funny</string>
+    <string name="app_name">reddit again</string>
     
     <string name="menu_subreddits">Subreddits</string>    
     <string name="menu_comments">Comments</string>

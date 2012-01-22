@@ -58,6 +58,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         crumbs = new FragmentBreadCrumbs(this);
         crumbs.setActivity(this);
 
+        if (singleContainer != null) {
+        	crumbs.setMaxVisible(1);
+        }
+        
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
         bar.setDisplayShowCustomEnabled(true);
