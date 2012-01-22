@@ -125,20 +125,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		ControlFragment controlFrag = ControlFragment.newInstance(topic, position, null, -1);
 		trans.add(controlFrag, CONTROL_TAG);
 		
-		if (singleContainer != null) {
-			TopicListFragment topicFrag = getTopicListFragment();
-			if (topicFrag != null) {
-				trans.remove(topicFrag);
-			}
-		}
-		
 		ThingListFragment thingListFrag = ThingListFragment.newInstance();
 		trans.replace(thingListContainerId, thingListFrag, THING_LIST_TAG);
-		
-		ThingFragment thingFrag = getThingFragment();
-		if (thingFrag != null) {
-			trans.remove(thingFrag);
-		}
 		
 		trans.setBreadCrumbTitle(topic.title);
 		if (addToBackStack) {
