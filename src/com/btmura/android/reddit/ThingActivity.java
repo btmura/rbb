@@ -31,6 +31,7 @@ public class ThingActivity extends Activity implements ThingHolder {
 	
 		ActionBar bar = getActionBar();
 		bar.setTitle(thing.title);
+		bar.setDisplayShowHomeEnabled(false);
 		
 		FragmentManager manager = getFragmentManager();
 		FragmentTransaction transaction = manager.beginTransaction();

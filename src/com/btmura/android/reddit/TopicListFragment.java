@@ -82,6 +82,10 @@ public class TopicListFragment extends ListFragment {
 	}
 	
 	public void setItemChecked(int position) {
-		getListView().setItemChecked(position, true);
+		if (position < 0) {
+			getListView().clearChoices();
+		} else {
+			getListView().setItemChecked(position, true);
+		}
 	}
 }

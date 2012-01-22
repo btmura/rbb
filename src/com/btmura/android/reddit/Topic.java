@@ -17,32 +17,20 @@ public class Topic implements Parcelable {
 	
 	public final String title;
 	
-	private final boolean isFrontPage;
-
-	public static Topic frontPage() {
-		return new Topic("front page", true);
-	}
-	
 	public static Topic newTopic(String title) {
-		return new Topic(title, false);
+		return new Topic(title);
 	}
 	
-	private Topic(String title, boolean isFrontPage) {
+	private Topic(String title) {
 		this.title = title;
-		this.isFrontPage = isFrontPage;
 	}
 	
 	private Topic(Parcel in) {
 		this.title = in.readString();
-		this.isFrontPage = in.readInt() == 1;
 	}
 	
 	public String getUrl() {
-		if (isFrontPage) {
-			return "http://www.reddit.com/.json";
-		} else {
-			return "http://www.reddit.com/r/" + title + "/.json";
-		}
+		return "http://www.reddit.com/r/" + title + "/.json";
 	}
 	
 	@Override
@@ -56,6 +44,5 @@ public class Topic implements Parcelable {
 	
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(title);
-		dest.writeInt(isFrontPage ? 1 : 0);
 	}
 }

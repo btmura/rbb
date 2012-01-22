@@ -7,7 +7,7 @@ public class TopicAdapter extends ArrayAdapter<Topic> {
 
 	public TopicAdapter(Context context) {
 		super(context, android.R.layout.simple_list_item_activated_1);
-		add(Topic.frontPage());
+		add(Topic.newTopic("all"));
 		add(Topic.newTopic("AskReddit"));
 		add(Topic.newTopic("android"));
 		add(Topic.newTopic("askscience"));

@@ -5,8 +5,6 @@ import android.app.ListFragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -114,12 +112,6 @@ public class ThingListFragment extends ListFragment {
 			Log.v(TAG, "Setting position");
 			list.setItemChecked(position, true);
 		}
-	}
-	
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.main, menu);
 	}
 }
 

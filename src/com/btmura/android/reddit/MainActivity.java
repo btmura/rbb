@@ -2,6 +2,7 @@ package com.btmura.android.reddit;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.FragmentBreadCrumbs;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
@@ -34,7 +35,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
 	private int topicListContainerId;
 	private int thingListContainerId;
-	
+
+	private FragmentBreadCrumbs crumbs;
+		
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
@@ -44,8 +47,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         manager = getFragmentManager();
         manager.addOnBackStackChangedListener(this);
         
-        bar = getActionBar();
-        
         singleContainer = findViewById(R.id.single_container);
         topicListContainer = findViewById(R.id.topic_list_container);
         thingListContainer = findViewById(R.id.thing_list_container);
@@ -54,26 +55,34 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         	thingContainer.setVisibility(View.GONE);
         }
         
+        crumbs = new FragmentBreadCrumbs(this);
+        crumbs.setActivity(this);
+
+        bar = getActionBar();
+        bar.setDisplayShowHomeEnabled(singleContainer == null);
+        bar.setDisplayShowCustomEnabled(true);
+        bar.setCustomView(crumbs);
+        
         topicListContainerId = topicListContainer != null ? R.id.topic_list_container : R.id.single_container;
         thingListContainerId = thingListContainer != null ? R.id.thing_list_container : R.id.single_container;
 		
-        setupFragments();
+        if (savedInstanceState == null) {
+        	setupFragments();
+        }
 	}
 
 	private void setupFragments() {
-		if (manager.findFragmentByTag(CONTROL_TAG) == null) {
-			ControlFragment controlFrag = ControlFragment.newInstance(Topic.frontPage(), 0, null, -1);
-			manager.beginTransaction().add(controlFrag, CONTROL_TAG).commit();
-		}
+		Topic topic = Topic.newTopic("all");
+		ControlFragment controlFrag = ControlFragment.newInstance(topic, 0, null, -1);
+		TopicListFragment topicFrag = TopicListFragment.newInstance(0);
 		
-		if (manager.findFragmentByTag(TOPIC_LIST_TAG) == null && topicListContainer != null) {
-			TopicListFragment frag = TopicListFragment.newInstance(0);
-			manager.beginTransaction().replace(topicListContainerId, frag, TOPIC_LIST_TAG).commit();
-		}
-		
-		if (manager.findFragmentByTag(THING_LIST_TAG) == null) {
-			ThingListFragment frag = ThingListFragment.newInstance();
-			manager.beginTransaction().replace(thingListContainerId, frag, THING_LIST_TAG).commit();
+		FragmentTransaction trans = manager.beginTransaction();
+		trans.add(controlFrag, CONTROL_TAG);
+		trans.replace(topicListContainerId, topicFrag, TOPIC_LIST_TAG);
+		trans.commit();
+	
+		if (thingListContainer != null) {
+			replaceThingList(topic, 0, false);
 		}
 	}
 	
@@ -88,28 +97,38 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	public void onTopicSelected(Topic topic, int position) {
 		Log.v(TAG, "onTopicSelected");
+		replaceThingList(topic, position, true);
+	}
+	
+	private void replaceThingList(Topic topic, int position, boolean addToBackStack) {
+		manager.popBackStack(THING_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		manager.popBackStack(THING_LIST_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		
-		FragmentTransaction transaction = manager.beginTransaction();
+		FragmentTransaction trans = manager.beginTransaction();
 
 		ControlFragment controlFrag = ControlFragment.newInstance(topic, position, null, -1);
-		transaction.add(controlFrag, CONTROL_TAG);
+		trans.add(controlFrag, CONTROL_TAG);
 		
 		if (singleContainer != null) {
 			TopicListFragment topicFrag = getTopicListFragment();
 			if (topicFrag != null) {
-				transaction.remove(topicFrag);
+				trans.remove(topicFrag);
 			}
 		}
 		
 		ThingListFragment thingListFrag = ThingListFragment.newInstance();
-		transaction.replace(thingListContainerId, thingListFrag, THING_LIST_TAG);
+		trans.replace(thingListContainerId, thingListFrag, THING_LIST_TAG);
 		
 		ThingFragment thingFrag = getThingFragment();
 		if (thingFrag != null) {
-			transaction.remove(thingFrag);
+			trans.remove(thingFrag);
 		}
-
-		transaction.addToBackStack(null).commit();
+		
+		trans.setBreadCrumbTitle(topic.title);
+		if (addToBackStack) {
+			trans.addToBackStack(THING_LIST_TAG);
+		}
+		trans.commit();
 	}
 	
 	public void onThingSelected(Thing thing, int position) {
@@ -122,13 +141,16 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void replaceThingFragment(Thing thing, int position) {
+		manager.popBackStack(THING_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		
 		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
 		ThingFragment frag = ThingFragment.newInstance();
 		
 		FragmentTransaction trans = manager.beginTransaction();
 		trans.add(controlFrag, CONTROL_TAG);
 		trans.replace(R.id.thing_container, frag, THING_TAG);
-		trans.addToBackStack(null);
+		trans.setBreadCrumbTitle(thing.title);
+		trans.addToBackStack(THING_TAG);
 		trans.commit();		
 	}
 	
@@ -184,7 +206,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	public void onBackStackChanged() {
-		Log.v(TAG, "onBackStackChanged");
 		refreshHome();
 		refreshCheckedItems();
 		refreshThingContainer();
@@ -219,34 +240,11 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		case android.R.id.home:
 			handleUpItem();
 			return true;
-		case R.id.menu_subreddits:
-			handleSubredditsItem();
-			return true;
 		}
 		return false;
 	}
 	
 	private void handleUpItem() {
-		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), null, -1);
-		ThingFragment thingFrag = getThingFragment();
-		
-		FragmentTransaction trans = manager.beginTransaction();
-		trans.add(controlFrag, CONTROL_TAG);
-		trans.remove(thingFrag);
-		trans.addToBackStack(null);
-		trans.commit();
-	}
-	
-	private void handleSubredditsItem() {
-		TopicListFragment topicFrag = TopicListFragment.newInstance(getTopicPosition());
-		ThingListFragment thingListFrag = getThingListFragment();
-		
-		FragmentTransaction trans = manager.beginTransaction();
-		if (thingListFrag != null) {
-			trans.remove(thingListFrag);
-		}
-		trans.replace(topicListContainerId, topicFrag, TOPIC_LIST_TAG);
-		trans.addToBackStack(null);
-		trans.commit();
+		manager.popBackStack(THING_LIST_TAG, 0);
 	}
 }
