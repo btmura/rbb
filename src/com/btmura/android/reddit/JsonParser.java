@@ -7,7 +7,11 @@ import com.google.gson.stream.JsonReader;
 public class JsonParser {
 	
 	public interface JsonParseListener {
+		void onDataStart();
+		void onId(String id);
+		void onTitle(String title);
 		void onUrl(String url);
+		void onDataEnd();
 	}
 	
 	private final JsonParseListener listener;
@@ -64,20 +68,21 @@ public class JsonParser {
 	}
 	
 	private void parseThreadData(JsonReader reader) throws IOException {
+		listener.onDataStart();
 		reader.beginObject();
-		String url = null;
 		while (reader.hasNext()) {
 			String name = reader.nextName();
-			if (name.equals("url")) {
-				url = reader.nextString();
+			if ("name".equals(name)) {
+				listener.onId(reader.nextString());
+			} else if ("title".equals(name)) {
+				listener.onTitle(reader.nextString());
+			} else if ("url".equals(name)) {
+				listener.onUrl(reader.nextString());
 			} else {
 				reader.skipValue();
 			}
 		}
-
-		if (url != null && url.length() > 0) {
-			listener.onUrl(url);
-		}
 		reader.endObject();
+		listener.onDataEnd();
 	}
 }

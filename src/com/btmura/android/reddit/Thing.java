@@ -15,23 +15,23 @@ public class Thing implements Parcelable {
 		}
 	};
 
-	public final String name;
+	public final String id;
 	
 	public final String title;
 	
-	public Thing(String name, String title) {
-		this.name = name;
+	public Thing(String id, String title) {
+		this.id = id;
 		this.title = title;
 	}
 	
 	private Thing(Parcel parcel) {
-		this.name = parcel.readString();
+		this.id = parcel.readString();
 		this.title = parcel.readString();
 	}
 	
 	public String getId() {
-		int sepIndex = name.indexOf('_');
-		return name.substring(sepIndex + 1);
+		int sepIndex = id.indexOf('_');
+		return id.substring(sepIndex + 1);
 	}
 	
 	@Override
@@ -44,7 +44,7 @@ public class Thing implements Parcelable {
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(name);
+		dest.writeString(id);
 		dest.writeString(title);
 	}		
 }

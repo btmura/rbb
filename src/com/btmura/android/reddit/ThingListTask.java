@@ -11,15 +11,18 @@ import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
 
+import com.btmura.android.reddit.JsonParser.JsonParseListener;
 import com.google.gson.stream.JsonReader;
 
-public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> {
+public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements JsonParseListener {
 	
 	private static final String TAG = "ThreadListTask";
 
 	private final ThingListFragment frag;
-	
 	private final ThingListAdapter adapter; 
+	
+	private String id;
+	private String title;
 	
 	public ThingListTask(ThingListFragment frag, ThingListAdapter adapter) {
 		this.frag = frag;
@@ -53,7 +56,7 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> {
 			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			parseListing(reader);
+			new JsonParser(this).parse(reader);
 			stream.close();
 			
 			connection.disconnect();
@@ -67,69 +70,22 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> {
 		}
 		return false;
 	}
-	
-	private void parseListing(JsonReader reader) throws IOException {
-		reader.beginObject();
-		while (reader.hasNext()) {
-			String name = reader.nextName();
-			if (name.equals("data")) {
-				parseListingData(reader);
-			} else {
-				reader.skipValue();
-			}
-		}
-		reader.endObject();
+
+	public void onId(String id) {
+		this.id = id;
 	}
 	
-	private void parseListingData(JsonReader reader) throws IOException {
-		reader.beginObject();
-		while (reader.hasNext()) {
-			String name = reader.nextName();
-			if (name.equals("children")) {
-				parseChildren(reader);
-			} else {
-				reader.skipValue();
-			}
-		}
-		reader.endObject();
+	public void onTitle(String title) {
+		this.title = title;
 	}
-	
-	private void parseChildren(JsonReader reader) throws IOException {
-		reader.beginArray();
-		while (reader.hasNext()) {
-			parseThread(reader);
-		}
-		reader.endArray();
-	}
-	
-	private void parseThread(JsonReader reader) throws IOException {
-		reader.beginObject();
-		while (reader.hasNext()) {
-			String name = reader.nextName();
-			if (name.equals("data")) {
-				parseThreadData(reader);
-			} else {
-				reader.skipValue();
-			}
-		}
-		reader.endObject();
-	}
-	
-	private void parseThreadData(JsonReader reader) throws IOException {
-		reader.beginObject();
-		String id = null;
-		String title = null;
-		while (reader.hasNext()) {
-			String name = reader.nextName();
-			if (name.equals("name")) {
-				id = reader.nextString();
-			} else if (name.equals("title")) {
-				title = reader.nextString();
-			} else {
-				reader.skipValue();
-			}
-		}
+
+	public void onDataEnd() {	
 		publishProgress(new Thing(id, Html.fromHtml(title).toString()));
-		reader.endObject();
+	}
+	
+	public void onDataStart() {
+	}
+	
+	public void onUrl(String url) {	
 	}
 }

@@ -134,7 +134,7 @@ public class ThingFragment extends Fragment {
 					return null;
 				}
 		
-				URL url = new URL("http://www.reddit.com/by_id/" + thing.name + ".json");
+				URL url = new URL("http://www.reddit.com/by_id/" + thing.id + ".json");
 				Log.v(TAG, url.toString());
 		
 				HttpURLConnection connection = (HttpURLConnection) url
@@ -170,6 +170,18 @@ public class ThingFragment extends Fragment {
 			}
 			url = resolvedUrl;
 			loadUrl();
+		}
+		
+		public void onDataStart() {
+		}
+		
+		public void onId(String id) {
+		}
+		
+		public void onTitle(String title) {
+		}
+		
+		public void onDataEnd() {
 		}
 	}
 
