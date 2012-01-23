@@ -24,12 +24,17 @@ import android.widget.Toast;
 
 public class ThingFragment extends Fragment {
 
-	private static final String STATE_SHOW_LINK = "showLink";
+	static final int VIEW_LINK = 0;
+	static final int VIEW_COMMENTS = 1;
+	
+	private static final String STATE_DISPLAYED_VIEW = "displayedView";
 	
 	private ThingHolder thingHolder;
 
 	private WebView linkView;
 	private ListView commentsView;
+	
+	private int[] viewProgress = new int[2];
 	private ProgressBar progress;
 	
 	private CommentAdapter adapter;
@@ -70,15 +75,36 @@ public class ThingFragment extends Fragment {
 			@Override
 			public void onPageStarted(WebView view, String url, Bitmap favicon) {
 				super.onPageStarted(view, url, favicon);
-				progress.setVisibility(View.VISIBLE);
+				showProgress(VIEW_LINK, View.VISIBLE);
 			}
 			
 			@Override
 			public void onPageFinished(WebView view, String url) {
 				super.onPageFinished(view, url);
-				progress.setVisibility(View.GONE);
+				showProgress(VIEW_LINK, View.GONE);
 			}
 		});
+	}
+	
+	void showProgress(int view, int visibility) {
+		viewProgress[view] = visibility;
+		if (isShowing(view)) {
+			progress.setVisibility(visibility);
+		}
+	}
+	
+	void refreshProgress(int view) {
+		progress.setVisibility(viewProgress[view]);
+	}
+	
+	private boolean isShowing(int view) {
+		switch (view) {
+		case VIEW_LINK:
+			return linkView.getVisibility() == View.VISIBLE;
+		case VIEW_COMMENTS:
+			return commentsView.getVisibility() == View.VISIBLE;
+		}
+		return false;
 	}
 	
 	@Override
@@ -91,24 +117,35 @@ public class ThingFragment extends Fragment {
 		adapter = new CommentAdapter(getActivity());
 		commentsView.setAdapter(adapter);
 		
-		task = new CommentLoaderTask(adapter);
-		task.execute(thing);
-		
+		task = new CommentLoaderTask(this, adapter);
+		task.execute(thing);		
 		linkView.loadUrl(thing.url);
-		
-		switchViews(savedInstanceState != null ? savedInstanceState.getBoolean(STATE_SHOW_LINK) : !thing.isSelf);
+
+		restoreDisplayedView(savedInstanceState, thing);
 	}
 	
-	private void switchViews(boolean showLink) {
-		linkView.setVisibility(showLink ? View.VISIBLE : View.GONE);
-		commentsView.setVisibility(showLink ? View.GONE : View.VISIBLE);
+	private void restoreDisplayedView(Bundle savedInstanceState, Thing thing) {
+		int displayedView;
+		if (savedInstanceState != null) {
+			displayedView = savedInstanceState.getInt(STATE_DISPLAYED_VIEW);
+		} else {
+			displayedView = thing.isSelf ? VIEW_COMMENTS : VIEW_LINK;
+		}
+		setDisplayedView(displayedView);	
+	}
+	
+	private void setDisplayedView(int view) {
+		linkView.setVisibility(view == VIEW_LINK ? View.VISIBLE : View.GONE);
+		commentsView.setVisibility(view == VIEW_COMMENTS ? View.VISIBLE : View.VISIBLE);
+		refreshProgress(view);
 		getActivity().invalidateOptionsMenu();
 	}
 	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putBoolean(STATE_SHOW_LINK, linkView.getVisibility() == View.VISIBLE);
+		outState.putInt(STATE_DISPLAYED_VIEW, 
+				linkView.getVisibility() == View.VISIBLE ? VIEW_LINK : VIEW_COMMENTS);
 	}
 
 	@Override
@@ -170,11 +207,11 @@ public class ThingFragment extends Fragment {
 	}
 	
 	private void handleLinkItem() {
-		switchViews(true);
+		setDisplayedView(VIEW_LINK);
 	}
 	
 	private void handleCommentsItem() {
-		switchViews(false);
+		setDisplayedView(VIEW_COMMENTS);
 	}
 
 	private void handleCopyLinkItem() {

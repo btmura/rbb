@@ -10,6 +10,7 @@ import java.net.URL;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
+import android.view.View;
 
 import com.btmura.android.reddit.JsonParser.JsonParseListener;
 import com.google.gson.stream.JsonReader;
@@ -18,17 +19,20 @@ public class CommentLoaderTask extends AsyncTask<Thing, Comment, Boolean> implem
 	
 	private static final String TAG = "CommentLoaderTask";
 	
+	private final ThingFragment frag;
 	private final CommentAdapter adapter;
 	
 	private int nesting;
 	
-	public CommentLoaderTask(CommentAdapter adapter) {
+	public CommentLoaderTask(ThingFragment frag, CommentAdapter adapter) {
+		this.frag = frag;
 		this.adapter = adapter;
 	}
 	
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
+		frag.showProgress(ThingFragment.VIEW_COMMENTS, View.VISIBLE);
 		adapter.clear();
 	}
 	
@@ -36,6 +40,7 @@ public class CommentLoaderTask extends AsyncTask<Thing, Comment, Boolean> implem
 	protected void onProgressUpdate(Comment... comments) {
 		super.onProgressUpdate(comments);
 		adapter.addAll(comments);
+		frag.showProgress(ThingFragment.VIEW_COMMENTS, View.GONE);
 	}
 
 	@Override
