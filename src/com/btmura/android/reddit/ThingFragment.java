@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 public class ThingFragment extends Fragment {
 
+	private static final String STATE_SHOW_LINK = "showLink";
+	
 	private ThingHolder thingHolder;
 
 	private WebView linkView;
@@ -93,12 +95,19 @@ public class ThingFragment extends Fragment {
 		task.execute(thing);
 		
 		linkView.loadUrl(thing.url);
-		switchViews(!thing.isSelf);
+		
+		switchViews(savedInstanceState != null ? savedInstanceState.getBoolean(STATE_SHOW_LINK) : !thing.isSelf);
 	}
 	
 	private void switchViews(boolean showLink) {
 		linkView.setVisibility(showLink ? View.VISIBLE : View.GONE);
 		commentsView.setVisibility(showLink ? View.GONE : View.VISIBLE);
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(STATE_SHOW_LINK, linkView.getVisibility() == View.VISIBLE);
 	}
 
 	@Override
