@@ -102,6 +102,7 @@ public class ThingFragment extends Fragment {
 	private void switchViews(boolean showLink) {
 		linkView.setVisibility(showLink ? View.VISIBLE : View.GONE);
 		commentsView.setVisibility(showLink ? View.GONE : View.VISIBLE);
+		getActivity().invalidateOptionsMenu();
 	}
 	
 	@Override
@@ -170,12 +171,10 @@ public class ThingFragment extends Fragment {
 	
 	private void handleLinkItem() {
 		switchViews(true);
-		getActivity().invalidateOptionsMenu();
 	}
 	
 	private void handleCommentsItem() {
 		switchViews(false);
-		getActivity().invalidateOptionsMenu();
 	}
 
 	private void handleCopyLinkItem() {

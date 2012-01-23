@@ -8,7 +8,7 @@ import com.google.gson.stream.JsonToken;
 public class JsonParser {
 	
 	public interface JsonParseListener {
-		void onDataStart();
+		void onDataStart(int nesting);
 		void onId(String id);
 		void onTitle(String title);
 		void onUrl(String url);
@@ -22,6 +22,8 @@ public class JsonParser {
 	
 	private boolean includeReplies;
 	
+	private int nesting;
+	
 	public JsonParser(JsonParseListener listener) {
 		this.listener = listener;
 	}
@@ -32,14 +34,21 @@ public class JsonParser {
 	}
 	
 	public void parseListingArray(JsonReader reader) throws IOException {
+		resetNesting();
 		reader.beginArray();
 		while (reader.hasNext()) {
-			parseListing(reader);
+			parseListingObject(reader);
 		}
 		reader.endArray();
 	}
-
+	
 	public void parseListing(JsonReader reader) throws IOException {
+		resetNesting();
+		parseListingObject(reader);
+	}
+	
+	private void parseListingObject(JsonReader reader) throws IOException {
+		nesting++;
 		if (JsonToken.BEGIN_OBJECT.equals(reader.peek())) {
 			reader.beginObject();
 			while (reader.hasNext()) {
@@ -54,10 +63,11 @@ public class JsonParser {
 		} else {
 			reader.skipValue();
 		}
+		nesting--;
 	}
 	
 	private void parseData(JsonReader reader) throws IOException {
-		listener.onDataStart();
+		listener.onDataStart(nesting);
 		reader.beginObject();
 		while (reader.hasNext()) {
 			String name = reader.nextName();
@@ -74,7 +84,7 @@ public class JsonParser {
 			} else if ("body".equals(name)) {
 				listener.onBody(reader.nextString());
 			} else if (includeReplies && "replies".equals(name)) {
-				parseListing(reader);
+				parseListingObject(reader);
 			} else if ("children".equals(name)) {
 				parseChildren(reader);
 			} else {
@@ -89,11 +99,15 @@ public class JsonParser {
 		if (JsonToken.BEGIN_ARRAY.equals(reader.peek())) {
 			reader.beginArray();
 			while (reader.hasNext()) {
-				parseListing(reader);
+				parseListingObject(reader);
 			}
 			reader.endArray();
 		} else {
 			reader.skipValue();
 		}
+	}
+	
+	private void resetNesting() {
+		nesting = -1;
 	}
 }

@@ -14,11 +14,13 @@ import android.util.Log;
 import com.btmura.android.reddit.JsonParser.JsonParseListener;
 import com.google.gson.stream.JsonReader;
 
-public class CommentLoaderTask extends AsyncTask<Thing, String, Boolean> implements JsonParseListener {
+public class CommentLoaderTask extends AsyncTask<Thing, Comment, Boolean> implements JsonParseListener {
 	
 	private static final String TAG = "CommentLoaderTask";
 	
 	private final CommentAdapter adapter;
+	
+	private int nesting;
 	
 	public CommentLoaderTask(CommentAdapter adapter) {
 		this.adapter = adapter;
@@ -31,7 +33,7 @@ public class CommentLoaderTask extends AsyncTask<Thing, String, Boolean> impleme
 	}
 	
 	@Override
-	protected void onProgressUpdate(String... comments) {
+	protected void onProgressUpdate(Comment... comments) {
 		super.onProgressUpdate(comments);
 		adapter.addAll(comments);
 	}
@@ -60,7 +62,8 @@ public class CommentLoaderTask extends AsyncTask<Thing, String, Boolean> impleme
 		return false;
 	}
 
-	public void onDataStart() {
+	public void onDataStart(int nesting) {
+		this.nesting = nesting;
 	}
 
 	public void onId(String id) {
@@ -77,12 +80,12 @@ public class CommentLoaderTask extends AsyncTask<Thing, String, Boolean> impleme
 
 	public void onSelfText(String text) {	
 		if (!text.trim().isEmpty()) {
-			publishProgress(Html.fromHtml(text).toString());
+			publishProgress(new Comment(Html.fromHtml(text).toString(), nesting));
 		}
 	}
 
 	public void onBody(String body) {
-		publishProgress(Html.fromHtml(body).toString());
+		publishProgress(new Comment(Html.fromHtml(body).toString(), nesting));
 	}
 
 	public void onDataEnd() {	

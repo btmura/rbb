@@ -93,7 +93,7 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements J
 		publishProgress(new Thing(id, Html.fromHtml(title).toString(), url, isSelf));
 	}
 	
-	public void onDataStart() {
+	public void onDataStart(int nesting) {
 	}
 	
 	public void onSelfText(String text) {
