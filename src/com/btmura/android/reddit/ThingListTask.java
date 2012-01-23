@@ -23,6 +23,8 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements J
 	
 	private String id;
 	private String title;
+	private String url;
+	private boolean isSelf;
 	
 	public ThingListTask(ThingListFragment frag, ThingListAdapter adapter) {
 		this.frag = frag;
@@ -56,7 +58,7 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements J
 			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			new JsonParser(this).parse(reader);
+			new JsonParser(this).parseObject(reader);
 			stream.close();
 			
 			connection.disconnect();
@@ -78,14 +80,25 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements J
 	public void onTitle(String title) {
 		this.title = title;
 	}
-
+	
+	public void onUrl(String url) {	
+		this.url = url;
+	}
+	
+	public void onIsSelf(boolean isSelf) {
+		this.isSelf = isSelf;
+	}
+	
 	public void onDataEnd() {	
-		publishProgress(new Thing(id, Html.fromHtml(title).toString()));
+		publishProgress(new Thing(id, Html.fromHtml(title).toString(), url, isSelf));
 	}
 	
 	public void onDataStart() {
 	}
 	
-	public void onUrl(String url) {	
+	public void onSelfText(String text) {
+	}
+	
+	public void onBody(String body) {
 	}
 }

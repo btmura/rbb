@@ -19,14 +19,22 @@ public class Thing implements Parcelable {
 	
 	public final String title;
 	
-	public Thing(String id, String title) {
+	public final String url;
+	
+	public final boolean isSelf;
+	
+	public Thing(String id, String title, String url, boolean isSelf) {
 		this.id = id;
 		this.title = title;
+		this.url = url;
+		this.isSelf = isSelf;
 	}
 	
 	private Thing(Parcel parcel) {
 		this.id = parcel.readString();
 		this.title = parcel.readString();
+		this.url = parcel.readString();
+		this.isSelf = parcel.readInt() == 1;
 	}
 	
 	public String getId() {
@@ -46,5 +54,7 @@ public class Thing implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(id);
 		dest.writeString(title);
+		dest.writeString(url);
+		dest.writeInt(isSelf ? 1 : 0);
 	}		
 }

@@ -1,12 +1,5 @@
 package com.btmura.android.reddit;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ClipboardManager;
@@ -14,9 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,26 +18,20 @@ import android.webkit.WebSettings;
 import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.btmura.android.reddit.JsonParser.JsonParseListener;
-import com.google.gson.stream.JsonReader;
-
 public class ThingFragment extends Fragment {
-
-	private static final String TAG = "ThingFragment";
-	
-	private static final String STATE_URL = "url";
 
 	private ThingHolder thingHolder;
 
+	private WebView linkView;
+	private ListView commentsView;
 	private ProgressBar progress;
-	private WebView webView;
-
-	private ResolveUrlTask task;
-	private String url;
-	private boolean loaded;
+	
+	private CommentAdapter adapter;
+	private CommentLoaderTask task;
 
 	public static ThingFragment newInstance() {
 		return new ThingFragment();
@@ -63,8 +48,9 @@ public class ThingFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.thing_fragment, container, false);
 		progress = (ProgressBar) view.findViewById(R.id.progress);
-		webView = (WebView) view.findViewById(R.id.webview);
-		setupWebView(webView);
+		linkView = (WebView) view.findViewById(R.id.link);
+		commentsView = (ListView) view.findViewById(R.id.comments);
+		setupWebView(linkView);
 		return view;
 	}
 	
@@ -97,113 +83,38 @@ public class ThingFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		setHasOptionsMenu(true);
-		if (savedInstanceState != null) {
-			url = savedInstanceState.getString(STATE_URL);
-		}
-	}
+		
+		Thing thing = thingHolder.getThing();
 
-	@Override
-	public void onStart() {
-		Log.v(TAG, "onStart");
-		super.onStart();
-		if (url == null) {
-			Log.v(TAG, "Resolving url...");
-			task = new ResolveUrlTask();
-			task.execute();
-		} else if (!loaded) {
-			loadUrl();
-			loaded = true;
-		}
+		adapter = new CommentAdapter(getActivity());
+		commentsView.setAdapter(adapter);
+		
+		task = new CommentLoaderTask(adapter);
+		task.execute(thing);
+		
+		linkView.loadUrl(thing.url);
+		switchViews(!thing.isSelf);
 	}
 	
-	class ResolveUrlTask extends AsyncTask<Void, Void, Void> implements JsonParseListener {
-		
-		private String resolvedUrl;
-		
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			progress.setVisibility(View.VISIBLE);
-		}
-		
-		@Override
-		protected Void doInBackground(Void... voidRay) {
-			try {
-				Thing thing = thingHolder.getThing();
-				if (thing == null) {
-					return null;
-				}
-		
-				URL url = new URL("http://www.reddit.com/by_id/" + thing.id + ".json");
-				Log.v(TAG, url.toString());
-		
-				HttpURLConnection connection = (HttpURLConnection) url
-						.openConnection();
-				connection.connect();
-		
-				InputStream stream = connection.getInputStream();
-				try {
-					JsonReader reader = new JsonReader(new InputStreamReader(
-							stream));
-					new JsonParser(this).parse(reader);
-				} finally {
-					stream.close();
-				}
-			} catch (MalformedURLException e) {
-				Log.e(TAG, "", e);
-			} catch (IOException e) {
-				Log.e(TAG, "", e);
-			}
-			return null;
-		}
-		
-		public void onUrl(String url) {
-			resolvedUrl = url;
-		}
-		
-		@Override
-		protected void onPostExecute(Void intoTheVoid) {
-			super.onPostExecute(intoTheVoid);
-			if (resolvedUrl == null || resolvedUrl.isEmpty()) {
-				Log.v(TAG, "Url is null");
-				return;
-			}
-			url = resolvedUrl;
-			loadUrl();
-		}
-		
-		public void onDataStart() {
-		}
-		
-		public void onId(String id) {
-		}
-		
-		public void onTitle(String title) {
-		}
-		
-		public void onDataEnd() {
-		}
-	}
-
-	private void loadUrl() {
-		webView.loadUrl(url);
+	private void switchViews(boolean showLink) {
+		linkView.setVisibility(showLink ? View.VISIBLE : View.GONE);
+		commentsView.setVisibility(showLink ? View.GONE : View.VISIBLE);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		webView.onResume();
+		linkView.onResume();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		webView.onPause();
+		linkView.onPause();
 	}
 	
 	@Override
 	public void onStop() {
-		Log.v(TAG, "onStop");
 		super.onStop();
 		if (task != null) {
 			task.cancel(true);
@@ -212,15 +123,16 @@ public class ThingFragment extends Fragment {
 	}
 	
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putString(STATE_URL, url);
-	}
-
-	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.thing_fragment, menu);
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+		menu.findItem(R.id.menu_link).setVisible(commentsView.getVisibility() == View.VISIBLE);
+		menu.findItem(R.id.menu_comments).setVisible(linkView.getVisibility() == View.VISIBLE);
 	}
 
 	@Override
@@ -228,6 +140,14 @@ public class ThingFragment extends Fragment {
 		super.onOptionsItemSelected(item);
 		
 		switch (item.getItemId()) {
+		case R.id.menu_link:
+			handleLinkItem();
+			return true;
+			
+		case R.id.menu_comments:
+			handleCommentsItem();
+			return true;
+			
 		case R.id.menu_copy_link:
 			handleCopyLinkItem();
 			return true;
@@ -238,20 +158,28 @@ public class ThingFragment extends Fragment {
 		}
 		return false;
 	}
+	
+	private void handleLinkItem() {
+		switchViews(true);
+		getActivity().invalidateOptionsMenu();
+	}
+	
+	private void handleCommentsItem() {
+		switchViews(false);
+		getActivity().invalidateOptionsMenu();
+	}
 
 	private void handleCopyLinkItem() {
-		if (url != null) {
-			ClipboardManager clip = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-			clip.setText(url);
-			Toast.makeText(getActivity(), url, Toast.LENGTH_SHORT).show();
-		}
+		Thing thing = thingHolder.getThing();
+		ClipboardManager clip = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+		clip.setText(thing.url);
+		Toast.makeText(getActivity(), thing.url, Toast.LENGTH_SHORT).show();	
 	}
 	
 	private void handleViewItem() {
-		if (url != null) {
-			Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setData(Uri.parse(url));
-			startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));
-		}
+		Thing thing = thingHolder.getThing();
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setData(Uri.parse(thing.url));
+		startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));	
 	}
 }

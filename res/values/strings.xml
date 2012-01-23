@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">reddit again</string>
-    
-    <string name="menu_subreddits">Subreddits</string>    
+      
+    <string name="menu_link">Link</string>
     <string name="menu_comments">Comments</string>
     <string name="menu_copy_link">Copy link</string>
     <string name="menu_view">View in other app</string>

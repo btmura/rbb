@@ -11,6 +11,9 @@ public class JsonParser {
 		void onId(String id);
 		void onTitle(String title);
 		void onUrl(String url);
+		void onIsSelf(boolean isSelf);
+		void onSelfText(String text);
+		void onBody(String body);
 		void onDataEnd();
 	}
 	
@@ -19,8 +22,16 @@ public class JsonParser {
 	public JsonParser(JsonParseListener listener) {
 		this.listener = listener;
 	}
+	
+	public void parseArray(JsonReader reader) throws IOException {
+		reader.beginArray();
+		while (reader.hasNext()) {
+			parseObject(reader);
+		}
+		reader.endArray();
+	}
 
-	public void parse(JsonReader reader) throws IOException {
+	public void parseObject(JsonReader reader) throws IOException {
 		reader.beginObject();
 		while (reader.hasNext()) {
 			String name = reader.nextName();
@@ -78,6 +89,12 @@ public class JsonParser {
 				listener.onTitle(reader.nextString());
 			} else if ("url".equals(name)) {
 				listener.onUrl(reader.nextString());
+			} else if ("is_self".equals(name)) {
+				listener.onIsSelf(reader.nextBoolean());
+			} else if ("selftext".equals(name)) {
+				listener.onSelfText(reader.nextString());
+			} else if ("body".equals(name)) {
+				listener.onBody(reader.nextString());
 			} else {
 				reader.skipValue();
 			}
