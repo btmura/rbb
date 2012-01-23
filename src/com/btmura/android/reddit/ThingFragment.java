@@ -136,7 +136,7 @@ public class ThingFragment extends Fragment {
 	
 	private void setDisplayedView(int view) {
 		linkView.setVisibility(view == VIEW_LINK ? View.VISIBLE : View.GONE);
-		commentsView.setVisibility(view == VIEW_COMMENTS ? View.VISIBLE : View.VISIBLE);
+		commentsView.setVisibility(view == VIEW_COMMENTS ? View.VISIBLE : View.GONE);
 		refreshProgress(view);
 		getActivity().invalidateOptionsMenu();
 	}

@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">reddit again</string>
       
-    <string name="menu_link">Link</string>
-    <string name="menu_comments">Comments</string>
+    <string name="menu_link">View Link</string>
+    <string name="menu_comments">View Comments</string>
     <string name="menu_copy_link">Copy link</string>
     <string name="menu_view">View in other app</string>
     
