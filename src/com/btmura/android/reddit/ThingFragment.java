@@ -46,6 +46,7 @@ public class ThingFragment extends Fragment {
 
 	private ResolveUrlTask task;
 	private String url;
+	private boolean loaded;
 
 	public static ThingFragment newInstance() {
 		return new ThingFragment();
@@ -109,8 +110,9 @@ public class ThingFragment extends Fragment {
 			Log.v(TAG, "Resolving url...");
 			task = new ResolveUrlTask();
 			task.execute();
-		} else {
+		} else if (!loaded) {
 			loadUrl();
+			loaded = true;
 		}
 	}
 	
@@ -132,8 +134,7 @@ public class ThingFragment extends Fragment {
 					return null;
 				}
 		
-				URL url = new URL("http://www.reddit.com/by_id/" + thing.name
-						+ ".json");
+				URL url = new URL("http://www.reddit.com/by_id/" + thing.name + ".json");
 				Log.v(TAG, url.toString());
 		
 				HttpURLConnection connection = (HttpURLConnection) url

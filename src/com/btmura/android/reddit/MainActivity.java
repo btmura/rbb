@@ -188,11 +188,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private ThingListFragment getThingListFragment() {
 		return (ThingListFragment) manager.findFragmentByTag(THING_LIST_TAG);
 	}
-	
-	private ThingFragment getThingFragment() {
-		return (ThingFragment) manager.findFragmentByTag(THING_TAG);
-	}
-	
+
 	public void onBackStackChanged() {
 		refreshHome();
 		refreshCheckedItems();
