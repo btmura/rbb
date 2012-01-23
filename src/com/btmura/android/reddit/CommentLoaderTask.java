@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.os.AsyncTask;
+import android.text.Html;
 import android.util.Log;
 
 import com.btmura.android.reddit.JsonParser.JsonParseListener;
@@ -46,7 +47,7 @@ public class CommentLoaderTask extends AsyncTask<Thing, String, Boolean> impleme
 			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			new JsonParser(this).parseArray(reader);
+			new JsonParser(this).withReplies(true).parseListingArray(reader);
 			stream.close();
 			
 			return true;
@@ -75,10 +76,13 @@ public class CommentLoaderTask extends AsyncTask<Thing, String, Boolean> impleme
 	}
 
 	public void onSelfText(String text) {	
+		if (!text.trim().isEmpty()) {
+			publishProgress(Html.fromHtml(text).toString());
+		}
 	}
 
 	public void onBody(String body) {
-		publishProgress(body);
+		publishProgress(Html.fromHtml(body).toString());
 	}
 
 	public void onDataEnd() {	

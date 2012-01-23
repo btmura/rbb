@@ -58,7 +58,7 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements J
 			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			new JsonParser(this).parseObject(reader);
+			new JsonParser(this).parseListing(reader);
 			stream.close();
 			
 			connection.disconnect();

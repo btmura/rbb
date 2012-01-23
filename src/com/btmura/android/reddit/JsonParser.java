@@ -3,6 +3,7 @@ package com.btmura.android.reddit;
 import java.io.IOException;
 
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 
 public class JsonParser {
 	
@@ -19,66 +20,43 @@ public class JsonParser {
 	
 	private final JsonParseListener listener;
 	
+	private boolean includeReplies;
+	
 	public JsonParser(JsonParseListener listener) {
 		this.listener = listener;
 	}
 	
-	public void parseArray(JsonReader reader) throws IOException {
+	public JsonParser withReplies(boolean includeReplies) {
+		this.includeReplies = includeReplies;
+		return this;
+	}
+	
+	public void parseListingArray(JsonReader reader) throws IOException {
 		reader.beginArray();
 		while (reader.hasNext()) {
-			parseObject(reader);
+			parseListing(reader);
 		}
 		reader.endArray();
 	}
 
-	public void parseObject(JsonReader reader) throws IOException {
-		reader.beginObject();
-		while (reader.hasNext()) {
-			String name = reader.nextName();
-			if (name.equals("data")) {
-				parseListingData(reader);
-			} else {
-				reader.skipValue();
+	public void parseListing(JsonReader reader) throws IOException {
+		if (JsonToken.BEGIN_OBJECT.equals(reader.peek())) {
+			reader.beginObject();
+			while (reader.hasNext()) {
+				String name = reader.nextName();
+				if (name.equals("data")) {
+					parseData(reader);
+				} else {
+					reader.skipValue();
+				}
 			}
+			reader.endObject();
+		} else {
+			reader.skipValue();
 		}
-		reader.endObject();
 	}
 	
-	private void parseListingData(JsonReader reader) throws IOException {
-		reader.beginObject();
-		while (reader.hasNext()) {
-			String name = reader.nextName();
-			if (name.equals("children")) {
-				parseChildren(reader);
-			} else {
-				reader.skipValue();
-			}
-		}
-		reader.endObject();
-	}
-	
-	private void parseChildren(JsonReader reader) throws IOException {
-		reader.beginArray();
-		while (reader.hasNext()) {
-			parseThread(reader);
-		}
-		reader.endArray();
-	}
-	
-	private void parseThread(JsonReader reader) throws IOException {
-		reader.beginObject();
-		while (reader.hasNext()) {
-			String name = reader.nextName();
-			if (name.equals("data")) {
-				parseThreadData(reader);
-			} else {
-				reader.skipValue();
-			}
-		}
-		reader.endObject();
-	}
-	
-	private void parseThreadData(JsonReader reader) throws IOException {
+	private void parseData(JsonReader reader) throws IOException {
 		listener.onDataStart();
 		reader.beginObject();
 		while (reader.hasNext()) {
@@ -95,11 +73,27 @@ public class JsonParser {
 				listener.onSelfText(reader.nextString());
 			} else if ("body".equals(name)) {
 				listener.onBody(reader.nextString());
+			} else if (includeReplies && "replies".equals(name)) {
+				parseListing(reader);
+			} else if ("children".equals(name)) {
+				parseChildren(reader);
 			} else {
 				reader.skipValue();
 			}
 		}
 		reader.endObject();
 		listener.onDataEnd();
+	}
+	
+	private void parseChildren(JsonReader reader) throws IOException {
+		if (JsonToken.BEGIN_ARRAY.equals(reader.peek())) {
+			reader.beginArray();
+			while (reader.hasNext()) {
+				parseListing(reader);
+			}
+			reader.endArray();
+		} else {
+			reader.skipValue();
+		}
 	}
 }
