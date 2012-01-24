@@ -22,10 +22,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-public class ThingFragment extends Fragment {
+public class ThingFragment extends Fragment implements TaskListener {
 
-	static final int VIEW_LINK = 0;
-	static final int VIEW_COMMENTS = 1;
+	private static final int VIEW_LINK = 0;
+	private static final int VIEW_COMMENTS = 1;
 	
 	private static final String STATE_DISPLAYED_VIEW = "displayedView";
 	
@@ -33,7 +33,6 @@ public class ThingFragment extends Fragment {
 
 	private WebView linkView;
 	private ListView commentsView;
-	
 	private int[] viewProgress = new int[2];
 	private ProgressBar progress;
 	
@@ -49,7 +48,7 @@ public class ThingFragment extends Fragment {
 		super.onAttach(activity);
 		thingHolder = (ThingHolder) activity;
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -86,42 +85,38 @@ public class ThingFragment extends Fragment {
 		});
 	}
 	
-	void showProgress(int view, int visibility) {
-		viewProgress[view] = visibility;
-		if (isShowing(view)) {
-			progress.setVisibility(visibility);
-		}
-	}
-	
-	void refreshProgress(int view) {
-		progress.setVisibility(viewProgress[view]);
-	}
-	
-	private boolean isShowing(int view) {
-		switch (view) {
-		case VIEW_LINK:
-			return linkView.getVisibility() == View.VISIBLE;
-		case VIEW_COMMENTS:
-			return commentsView.getVisibility() == View.VISIBLE;
-		}
-		return false;
-	}
-	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		setHasOptionsMenu(true);
-		
+		loadComments();
+
 		Thing thing = thingHolder.getThing();
-
-		adapter = new CommentAdapter(getActivity());
-		commentsView.setAdapter(adapter);
-		
-		task = new CommentLoaderTask(this, adapter);
-		task.execute(thing);		
 		linkView.loadUrl(thing.url);
-
 		restoreDisplayedView(savedInstanceState, thing);
+	}
+	
+	private void loadComments() {
+		if (adapter == null) {
+			adapter = new CommentAdapter(getActivity());
+		}
+		commentsView.setAdapter(adapter);
+		if (task == null) {
+			task = new CommentLoaderTask(adapter, this);
+			task.execute(thingHolder.getThing());
+		}
+	}
+	
+	public void onPreExecute() {
+		showProgress(VIEW_COMMENTS, View.VISIBLE);
+	}
+	
+	public void onProgressUpdate() {
+		showProgress(VIEW_COMMENTS, View.GONE);
+	}
+	
+	public void onPostExecute() {
+		showProgress(VIEW_COMMENTS, View.GONE);
 	}
 	
 	private void restoreDisplayedView(Bundle savedInstanceState, Thing thing) {
@@ -133,14 +128,7 @@ public class ThingFragment extends Fragment {
 		}
 		setDisplayedView(displayedView);	
 	}
-	
-	private void setDisplayedView(int view) {
-		linkView.setVisibility(view == VIEW_LINK ? View.VISIBLE : View.GONE);
-		commentsView.setVisibility(view == VIEW_COMMENTS ? View.VISIBLE : View.GONE);
-		refreshProgress(view);
-		getActivity().invalidateOptionsMenu();
-	}
-	
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -159,13 +147,16 @@ public class ThingFragment extends Fragment {
 		super.onPause();
 		linkView.onPause();
 	}
-	
+
 	@Override
-	public void onStop() {
-		super.onStop();
+	public void onDestroy() {
+		super.onDestroy();
 		if (task != null) {
 			task.cancel(true);
 			task = null;
+		}
+		if (adapter != null) {
+			adapter = null;
 		}
 	}
 	
@@ -226,5 +217,29 @@ public class ThingFragment extends Fragment {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setData(Uri.parse(thing.url));
 		startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));	
+	}
+	
+	private void setDisplayedView(int view) {
+		linkView.setVisibility(view == VIEW_LINK ? View.VISIBLE : View.GONE);
+		commentsView.setVisibility(view == VIEW_COMMENTS ? View.VISIBLE : View.GONE);
+		progress.setVisibility(viewProgress[view]);
+		getActivity().invalidateOptionsMenu();
+	}
+	
+	private void showProgress(int view, int visibility) {
+		viewProgress[view] = visibility;
+		if (isShowing(view)) {
+			progress.setVisibility(visibility);
+		}
+	}
+	
+	private boolean isShowing(int view) {
+		switch (view) {
+		case VIEW_LINK:
+			return linkView.getVisibility() == View.VISIBLE;
+		case VIEW_COMMENTS:
+			return commentsView.getVisibility() == View.VISIBLE;
+		}
+		return false;
 	}
 }

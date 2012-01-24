@@ -40,7 +40,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
         manager = getFragmentManager();

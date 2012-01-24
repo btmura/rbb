@@ -18,35 +18,35 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements J
 	
 	private static final String TAG = "ThreadListTask";
 
-	private final ThingListFragment frag;
 	private final ThingListAdapter adapter; 
+	private final TaskListener listener;
 	
 	private String id;
 	private String title;
 	private String url;
 	private boolean isSelf;
 	
-	public ThingListTask(ThingListFragment frag, ThingListAdapter adapter) {
-		this.frag = frag;
+	
+	public ThingListTask(ThingListAdapter adapter, TaskListener listener) {
 		this.adapter = adapter;
+		this.listener = listener;
 	}
 	
 	@Override
 	protected void onPreExecute() {
-		super.onPreExecute();
-		if (frag.isVisible()) {
-			frag.setListShown(false);
-		}
+		listener.onPreExecute();
 		adapter.clear();
 	}
-
+	
 	@Override
 	protected void onProgressUpdate(Thing... things) {
-		super.onProgressUpdate(things);
+		listener.onProgressUpdate();	
 		adapter.addAll(things);
-		if (frag.isVisible()) {
-			frag.setListShown(true);
-		}
+	}
+	
+	@Override
+	protected void onPostExecute(Boolean result) {
+		listener.onPostExecute();
 	}
 
 	@Override
