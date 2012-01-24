@@ -9,12 +9,23 @@
         android:id="@+id/topic_list_container"
         android:layout_width="150dp"
         android:layout_height="match_parent" />
+    
+    <View 
+        android:background="@android:color/darker_gray"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"/>
 
     <FrameLayout
         android:id="@+id/thing_list_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1" />
+    
+    <View 
+        android:background="@android:color/darker_gray"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"/>
+    
 
     <FrameLayout
         android:id="@+id/thing_container"
