@@ -2,12 +2,9 @@ package com.btmura.android.reddit;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 
 public class ControlFragment extends Fragment implements TopicHolder, ThingHolder {
 	
-	private static final String TAG = "MainControlFragment";
-
 	private static final String STATE_TOPIC = "topic";
 	private static final String STATE_THING = "thing";
 	private static final String STATE_TOPIC_POSITION = "topicPosition";
@@ -45,7 +42,6 @@ public class ControlFragment extends Fragment implements TopicHolder, ThingHolde
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.v(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
         	topic = savedInstanceState.getParcelable(STATE_TOPIC);
@@ -57,7 +53,6 @@ public class ControlFragment extends Fragment implements TopicHolder, ThingHolde
 	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		Log.v(TAG, "onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 		outState.putParcelable(STATE_TOPIC, topic);
 		outState.putParcelable(STATE_THING, thing);
