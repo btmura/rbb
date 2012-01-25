@@ -18,28 +18,26 @@ public class CommentLoaderTask extends AsyncTask<Thing, Comment, Boolean> implem
 	
 	private static final String TAG = "CommentLoaderTask";
 	
-	private final CommentAdapter adapter;
-	private final TaskListener listener;
-	
+	private final TaskListener<Comment, Boolean> listener;
 	private int nesting;
 	
-	public CommentLoaderTask(CommentAdapter adapter, TaskListener listener) {
-		this.adapter = adapter;
+	public CommentLoaderTask(TaskListener<Comment, Boolean> listener) {
 		this.listener = listener;
 	}
 	
 	@Override
 	protected void onPreExecute() {
 		listener.onPreExecute();
-		super.onPreExecute();
-		adapter.clear();
 	}
 	
 	@Override
 	protected void onProgressUpdate(Comment... comments) {
-		super.onProgressUpdate(comments);
-		adapter.addAll(comments);
-		listener.onProgressUpdate();
+		listener.onProgressUpdate(comments);
+	}
+	
+	@Override
+	protected void onPostExecute(Boolean result) {
+		listener.onPostExecute(result);
 	}
 
 	@Override

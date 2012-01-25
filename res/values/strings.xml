@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">reddit again</string>
-      
+    
+    <string name="empty">Nothing to see here...</string>
+    <string name="error">Something went wrong...</string>
+    
     <string name="menu_link">View Link</string>
     <string name="menu_comments">View Comments</string>
     <string name="menu_copy_link">Copy link</string>

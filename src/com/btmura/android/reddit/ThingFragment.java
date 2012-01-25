@@ -22,7 +22,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-public class ThingFragment extends Fragment implements TaskListener {
+public class ThingFragment extends Fragment implements TaskListener<Comment, Boolean> {
 
 	private static final int VIEW_LINK = 0;
 	private static final int VIEW_COMMENTS = 1;
@@ -102,20 +102,22 @@ public class ThingFragment extends Fragment implements TaskListener {
 		}
 		commentsView.setAdapter(adapter);
 		if (task == null) {
-			task = new CommentLoaderTask(adapter, this);
+			task = new CommentLoaderTask(this);
 			task.execute(thingHolder.getThing());
 		}
 	}
 	
 	public void onPreExecute() {
+		adapter.clear();
 		showProgress(VIEW_COMMENTS, View.VISIBLE);
 	}
 	
-	public void onProgressUpdate() {
+	public void onProgressUpdate(Comment[] comments) {
+		adapter.addAll(comments);
 		showProgress(VIEW_COMMENTS, View.GONE);
 	}
 	
-	public void onPostExecute() {
+	public void onPostExecute(Boolean result) {
 		showProgress(VIEW_COMMENTS, View.GONE);
 	}
 	

@@ -8,11 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class ThingListFragment extends ListFragment implements TaskListener {
-	
-	interface OnThingSelectedListener {
-		void onThingSelected(Thing thing, int position);
-	}
+public class ThingListFragment extends ListFragment implements TaskListener<Thing, Boolean> {
 	
 	private OnThingSelectedListener listener;
 	private TopicHolder topicHolder;
@@ -21,6 +17,10 @@ public class ThingListFragment extends ListFragment implements TaskListener {
 	private ThingListAdapter adapter;
 	private ThingListTask task;
 
+	interface OnThingSelectedListener {
+		void onThingSelected(Thing thing, int position);
+	}
+	
 	public static ThingListFragment newInstance() {
 		return new ThingListFragment();
 	}
@@ -32,7 +32,7 @@ public class ThingListFragment extends ListFragment implements TaskListener {
 		topicHolder = (TopicHolder) activity;
 		layoutInfo = (LayoutInfo) activity;
 	}
-	
+		
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = super.onCreateView(inflater, container, savedInstanceState);
@@ -52,29 +52,24 @@ public class ThingListFragment extends ListFragment implements TaskListener {
 		if (adapter == null) {
 			adapter = new ThingListAdapter(getActivity());
 		}
-		setListAdapter(adapter);	
 		if (task == null) {
-			task = new ThingListTask(adapter, this);
+			task = new ThingListTask(this);
 			task.execute(topicHolder.getTopic());	
 		}
 	}
 	
 	public void onPreExecute() {
-		if (isVisible()) {
-			setListShown(false);
-		}
+		adapter.clear();
 	}
 	
-	public void onProgressUpdate() {
-		if (isVisible()) {
-			setListShown(true);
-		}
+	public void onProgressUpdate(Thing[] things) {
+		adapter.addAll(things);
+		setListAdapter(adapter);
 	}
 	
-	public void onPostExecute() {
-		if (isVisible()) {
-			setListShown(true);
-		}
+	public void onPostExecute(Boolean success) {
+		setEmptyText(getString(success ? R.string.empty : R.string.error));
+		setListAdapter(adapter);
 	}
 	
 	@Override
@@ -96,10 +91,6 @@ public class ThingListFragment extends ListFragment implements TaskListener {
 		super.onDestroy();
 		if (task != null) {
 			task.cancel(true);	
-			task = null;
-		}
-		if (adapter != null) {
-			adapter = null;
 		}
 	}
 }
