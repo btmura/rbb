@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.os.AsyncTask;
 import android.text.Html;
@@ -14,14 +16,15 @@ import android.util.Log;
 import com.btmura.android.reddit.JsonParser.JsonParseListener;
 import com.google.gson.stream.JsonReader;
 
-public class CommentLoaderTask extends AsyncTask<Thing, Comment, Boolean> implements JsonParseListener {
+public class CommentLoaderTask extends AsyncTask<Thing, Void, List<Comment>> implements JsonParseListener {
 	
 	private static final String TAG = "CommentLoaderTask";
 	
-	private final TaskListener<Comment, Boolean> listener;
+	private final TaskListener<List<Comment>> listener;
+	private final List<Comment> comments = new ArrayList<Comment>();
 	private int nesting;
 	
-	public CommentLoaderTask(TaskListener<Comment, Boolean> listener) {
+	public CommentLoaderTask(TaskListener<List<Comment>> listener) {
 		this.listener = listener;
 	}
 	
@@ -29,19 +32,14 @@ public class CommentLoaderTask extends AsyncTask<Thing, Comment, Boolean> implem
 	protected void onPreExecute() {
 		listener.onPreExecute();
 	}
-	
+
 	@Override
-	protected void onProgressUpdate(Comment... comments) {
-		listener.onProgressUpdate(comments);
-	}
-	
-	@Override
-	protected void onPostExecute(Boolean result) {
-		listener.onPostExecute(result);
+	protected void onPostExecute(List<Comment> comments) {
+		listener.onPostExecute(comments);
 	}
 
 	@Override
-	protected Boolean doInBackground(Thing... threads) {
+	protected List<Comment> doInBackground(Thing... threads) {
 		try {
 			URL commentsUrl = new URL("http://www.reddit.com/comments/" + threads[0].getId() + ".json");
 			Log.v(TAG, commentsUrl.toString());
@@ -54,14 +52,14 @@ public class CommentLoaderTask extends AsyncTask<Thing, Comment, Boolean> implem
 			new JsonParser(this).withReplies(true).parseListingArray(reader);
 			stream.close();
 			
-			return true;
+			return comments;
 			
 		} catch (MalformedURLException e) {
 			Log.e(TAG, "", e);
 		} catch (IOException e) {
 			Log.e(TAG, "", e);
 		}
-		return false;
+		return null;
 	}
 
 	public void onDataStart(int nesting) {
@@ -82,12 +80,12 @@ public class CommentLoaderTask extends AsyncTask<Thing, Comment, Boolean> implem
 
 	public void onSelfText(String text) {	
 		if (!text.trim().isEmpty()) {
-			publishProgress(new Comment(Html.fromHtml(text).toString(), nesting));
+			comments.add(new Comment(Html.fromHtml(text).toString(), nesting));
 		}
 	}
 
 	public void onBody(String body) {
-		publishProgress(new Comment(Html.fromHtml(body).toString(), nesting));
+		comments.add(new Comment(Html.fromHtml(body).toString(), nesting));
 	}
 
 	public void onDataEnd() {	

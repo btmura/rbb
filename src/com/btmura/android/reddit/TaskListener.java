@@ -1,7 +1,6 @@
 package com.btmura.android.reddit;
 
-public interface TaskListener<U, RS> {
+public interface TaskListener<T> {
 	void onPreExecute();
-	void onProgressUpdate(U[] updates);
-	void onPostExecute(RS result);
+	void onPostExecute(T result);
 }

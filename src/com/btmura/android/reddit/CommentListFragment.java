@@ -1,10 +1,12 @@
 package com.btmura.android.reddit;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
 
-public class CommentListFragment extends ListFragment implements TaskListener<Comment, Boolean> {
+public class CommentListFragment extends ListFragment implements TaskListener<List<Comment>> {
 
 	private ThingHolder thingHolder;
 
@@ -42,13 +44,11 @@ public class CommentListFragment extends ListFragment implements TaskListener<Co
 		adapter.clear();
 	}
 	
-	public void onProgressUpdate(Comment[] comments) {
-		adapter.addAll(comments);
-		setListAdapter(adapter);
-	}
-	
-	public void onPostExecute(Boolean success) {
-		setEmptyText(getString(success ? R.string.empty : R.string.error));
+	public void onPostExecute(List<Comment> comments) {
+		if (comments != null) {
+			adapter.addAll(comments);
+		}
+		setEmptyText(getString(comments != null ? R.string.empty : R.string.error));
 		setListAdapter(adapter);
 	}
 		
@@ -57,10 +57,6 @@ public class CommentListFragment extends ListFragment implements TaskListener<Co
 		super.onDestroy();
 		if (task != null) {
 			task.cancel(true);
-			task = null;
-		}
-		if (adapter != null) {
-			adapter = null;
 		}
 	}
 }

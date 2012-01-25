@@ -7,9 +7,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class ThingListAdapter extends ArrayAdapter<Thing> {
+public class ThingAdapter extends ArrayAdapter<Thing> {
 
-	public ThingListAdapter(Context context) {
+	public ThingAdapter(Context context) {
 		super(context, android.R.layout.simple_list_item_activated_1);
 	}
 	

@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.os.AsyncTask;
 import android.text.Html;
@@ -14,18 +16,19 @@ import android.util.Log;
 import com.btmura.android.reddit.JsonParser.JsonParseListener;
 import com.google.gson.stream.JsonReader;
 
-public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements JsonParseListener {
+public class ThingLoaderTask extends AsyncTask<Topic, Void, List<Thing>> implements JsonParseListener {
 	
-	private static final String TAG = "ThreadListTask";
+	private static final String TAG = "ThingLoaderTask";
 
-	private final TaskListener<Thing, Boolean> listener;
+	private final TaskListener<List<Thing>> listener;
+	private final List<Thing> things = new ArrayList<Thing>();
 	
 	private String id;
 	private String title;
 	private String url;
 	private boolean isSelf;
 	
-	public ThingListTask(TaskListener<Thing, Boolean> listener) {
+	public ThingLoaderTask(TaskListener<List<Thing>> listener) {
 		this.listener = listener;
 	}
 	
@@ -35,17 +38,12 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements J
 	}
 	
 	@Override
-	protected void onProgressUpdate(Thing... things) {
-		listener.onProgressUpdate(things);	
-	}
-	
-	@Override
-	protected void onPostExecute(Boolean result) {
-		listener.onPostExecute(result);
+	protected void onPostExecute(List<Thing> things) {
+		listener.onPostExecute(things);
 	}
 
 	@Override
-	protected Boolean doInBackground(Topic... topics) {
+	protected List<Thing> doInBackground(Topic... topics) {
 		try {
 			URL url = new URL(topics[0].getUrl());
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -58,14 +56,14 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements J
 			
 			connection.disconnect();
 			
-			return true;
+			return things;
 			
 		} catch (MalformedURLException e) {
 			Log.e(TAG, "", e);
 		} catch (IOException e) {
 			Log.e(TAG, "", e);
 		}
-		return false;
+		return null;
 	}
 
 	public void onId(String id) {
@@ -84,8 +82,8 @@ public class ThingListTask extends AsyncTask<Topic, Thing, Boolean> implements J
 		this.isSelf = isSelf;
 	}
 	
-	public void onDataEnd() {	
-		publishProgress(new Thing(id, Html.fromHtml(title).toString(), url, isSelf));
+	public void onDataEnd() {
+		things.add(new Thing(id, Html.fromHtml(title).toString(), url, isSelf));
 	}
 	
 	public void onDataStart(int nesting) {

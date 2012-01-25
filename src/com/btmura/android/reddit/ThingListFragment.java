@@ -1,5 +1,7 @@
 package com.btmura.android.reddit;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
@@ -8,14 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class ThingListFragment extends ListFragment implements TaskListener<Thing, Boolean> {
+public class ThingListFragment extends ListFragment implements TaskListener<List<Thing>> {
 	
 	private OnThingSelectedListener listener;
 	private TopicHolder topicHolder;
 	private LayoutInfo layoutInfo;
 	
-	private ThingListAdapter adapter;
-	private ThingListTask task;
+	private ThingAdapter adapter;
+	private ThingLoaderTask task;
 
 	interface OnThingSelectedListener {
 		void onThingSelected(Thing thing, int position);
@@ -49,10 +51,10 @@ public class ThingListFragment extends ListFragment implements TaskListener<Thin
 	
 	private void loadThings() {
 		if (adapter == null) {
-			adapter = new ThingListAdapter(getActivity());
+			adapter = new ThingAdapter(getActivity());
 		}
 		if (task == null) {
-			task = new ThingListTask(this);
+			task = new ThingLoaderTask(this);
 			task.execute(topicHolder.getTopic());	
 		}
 	}
@@ -60,14 +62,12 @@ public class ThingListFragment extends ListFragment implements TaskListener<Thin
 	public void onPreExecute() {
 		adapter.clear();
 	}
-	
-	public void onProgressUpdate(Thing[] things) {
-		adapter.addAll(things);
-		setListAdapter(adapter);
-	}
-	
-	public void onPostExecute(Boolean success) {
-		setEmptyText(getString(success ? R.string.empty : R.string.error));
+
+	public void onPostExecute(List<Thing> things) {
+		if (things != null) {
+			adapter.addAll(things);
+		}
+		setEmptyText(getString(things != null ? R.string.empty : R.string.error));
 		setListAdapter(adapter);
 	}
 	
