@@ -44,7 +44,6 @@ public class ThingListFragment extends ListFragment implements TaskListener<Thin
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		setHasOptionsMenu(!layoutInfo.hasTopicListContainer());
 		loadThings();
 	}
 	

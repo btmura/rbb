@@ -2,13 +2,20 @@ package com.btmura.android.reddit;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentBreadCrumbs;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.TopicListFragment.OnTopicSelectedListener;
@@ -23,6 +30,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private static final String TOPIC_LIST_TAG = "topicList";
 	private static final String THING_LIST_TAG = "thingList";
 	private static final String THING_TAG = "thing";
+	
+	private static final String THING_FRAG_TYPE = "type";
+	private static final int THING_FRAG_LINK = 0;
+	private static final int THING_FRAG_COMMENTS = 1;
 
 	private FragmentManager manager;
 	private ActionBar bar;
@@ -136,10 +147,18 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	public void onThingSelected(Thing thing, int position) {
+		replaceThing(thing, position, thing.isSelf ? THING_FRAG_COMMENTS : THING_FRAG_LINK);
+	}
+	
+	private void replaceThing(Thing thing, int position, int thingFragType) {
 		manager.popBackStack(THING_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		
 		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
-		ThingFragment frag = ThingFragment.newInstance();
+		Fragment frag = thingFragType == THING_FRAG_COMMENTS ? CommentListFragment.newInstance() : LinkFragment.newInstance();
+		
+		Bundle args = new Bundle();
+		args.putInt(THING_FRAG_TYPE, thingFragType);
+		frag.setArguments(args);
 		
 		FragmentTransaction trans = manager.beginTransaction();
 		trans.add(controlFrag, CONTROL_TAG);
@@ -188,11 +207,16 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private ThingListFragment getThingListFragment() {
 		return (ThingListFragment) manager.findFragmentByTag(THING_LIST_TAG);
 	}
+	
+	private Fragment getThingFragment() {
+		return manager.findFragmentByTag(THING_TAG);
+	}
 
 	public void onBackStackChanged() {
 		refreshHome();
 		refreshCheckedItems();
 		refreshThingContainer();
+		invalidateOptionsMenu();
 	}
 	
 	private void refreshHome() {
@@ -218,17 +242,56 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+		boolean hasThing = getThing() != null;
+		menu.findItem(R.id.menu_link).setVisible(hasThing && isThingFragmentType(THING_FRAG_COMMENTS));
+		menu.findItem(R.id.menu_comments).setVisible(hasThing && isThingFragmentType(THING_FRAG_LINK));
+		menu.findItem(R.id.menu_copy_link).setVisible(hasThing);
+		menu.findItem(R.id.menu_view).setVisible(hasThing);
+		return true;
+	}
+	
+	private boolean isThingFragmentType(int type) {
+		Fragment thingFrag = getThingFragment();
+		return thingFrag != null && thingFrag.getArguments().getInt(THING_FRAG_TYPE) == type;
+	}
+	
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		super.onOptionsItemSelected(item);
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			handleUpItem();
+			handleHome();
+			return true;
+
+		case R.id.menu_link:
+			handleLink();
+			return true;
+			
+		case R.id.menu_comments:
+			handleComments();
+			return true;
+			
+		case R.id.menu_copy_link:
+			handleCopyLink();
+			return true;
+		
+		case R.id.menu_view:
+			handleView();
 			return true;
 		}
 		return false;
 	}
 	
-	private void handleUpItem() {
+	private void handleHome() {
 		int count = manager.getBackStackEntryCount();
 		if (count > 0) {
 			String name = manager.getBackStackEntryAt(count - 1).getName();
@@ -238,5 +301,26 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 				manager.popBackStack(THING_LIST_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			}
 		}
+	}
+	
+	private void handleLink() {
+		replaceThing(getThing(), getThingPosition(), THING_FRAG_LINK);
+	}
+	
+	private void handleComments() {
+		replaceThing(getThing(), getThingPosition(), THING_FRAG_COMMENTS);
+	}
+	
+	private void handleCopyLink() {
+		String url = getThing().url;
+		ClipboardManager clip = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+		clip.setText(url);
+		Toast.makeText(this, url, Toast.LENGTH_SHORT).show();	
+	}
+	
+	private void handleView() {
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setData(Uri.parse(getThing().url));
+		startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));	
 	}
 }

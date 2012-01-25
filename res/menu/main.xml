@@ -4,13 +4,11 @@
     <item
         android:id="@+id/menu_link"
         android:showAsAction="ifRoom|withText"
-        android:title="@string/menu_link"
-        android:visible="false"/>
+        android:title="@string/menu_link"/>
     <item
         android:id="@+id/menu_comments"
         android:showAsAction="ifRoom|withText"
-        android:title="@string/menu_comments"
-        android:visible="false"/>
+        android:title="@string/menu_comments"/>
     <item
         android:id="@+id/menu_copy_link"
         android:showAsAction="withText"
