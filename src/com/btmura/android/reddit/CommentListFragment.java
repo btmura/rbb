@@ -32,19 +32,16 @@ public class CommentListFragment extends ListFragment implements TaskListener<Li
 	
 	private void loadComments() {
 		if (adapter == null) {
-			adapter = new CommentAdapter(getActivity());
-		}
-		if (task == null) {
 			task = new CommentLoaderTask(this);
 			task.execute(thingHolder.getThing());
 		}
 	}
 	
 	public void onPreExecute() {
-		adapter.clear();
 	}
 	
 	public void onPostExecute(List<Comment> comments) {
+		adapter = new CommentAdapter(getActivity());
 		if (comments != null) {
 			adapter.addAll(comments);
 		}
@@ -53,8 +50,8 @@ public class CommentListFragment extends ListFragment implements TaskListener<Li
 	}
 		
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
+	public void onDestroyView() {
+		super.onDestroyView();
 		if (task != null) {
 			task.cancel(true);
 		}

@@ -51,19 +51,16 @@ public class ThingListFragment extends ListFragment implements TaskListener<List
 	
 	private void loadThings() {
 		if (adapter == null) {
-			adapter = new ThingAdapter(getActivity());
-		}
-		if (task == null) {
 			task = new ThingLoaderTask(this);
 			task.execute(topicHolder.getTopic());	
 		}
 	}
 	
 	public void onPreExecute() {
-		adapter.clear();
 	}
 
 	public void onPostExecute(List<Thing> things) {
+		adapter = new ThingAdapter(getActivity());
 		if (things != null) {
 			adapter.addAll(things);
 		}
@@ -86,10 +83,10 @@ public class ThingListFragment extends ListFragment implements TaskListener<List
 	}
 	
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
+	public void onDestroyView() {
+		super.onDestroyView();
 		if (task != null) {
-			task.cancel(true);	
+			task.cancel(true);
 		}
 	}
 }
