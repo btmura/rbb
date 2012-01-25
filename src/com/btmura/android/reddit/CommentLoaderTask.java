@@ -22,8 +22,12 @@ public class CommentLoaderTask extends AsyncTask<Thing, Void, List<Comment>> imp
 	
 	private final TaskListener<List<Comment>> listener;
 	private final List<Comment> comments = new ArrayList<Comment>();
-	private int nesting;
 	
+	private int nesting;
+	private String title;
+	private String selfText;
+	private String body;
+
 	public CommentLoaderTask(TaskListener<List<Comment>> listener) {
 		this.listener = listener;
 	}
@@ -68,8 +72,9 @@ public class CommentLoaderTask extends AsyncTask<Thing, Void, List<Comment>> imp
 
 	public void onId(String id) {
 	}
-
+	
 	public void onTitle(String title) {
+		this.title = title.trim();
 	}
 
 	public void onUrl(String url) {
@@ -79,15 +84,26 @@ public class CommentLoaderTask extends AsyncTask<Thing, Void, List<Comment>> imp
 	}
 
 	public void onSelfText(String text) {	
-		if (!text.trim().isEmpty()) {
-			comments.add(new Comment(Html.fromHtml(text).toString(), nesting));
-		}
+		this.selfText = text.trim();
 	}
 
 	public void onBody(String body) {
-		comments.add(new Comment(Html.fromHtml(body).toString(), nesting));
+		this.body = body.trim();
 	}
 
-	public void onDataEnd() {	
+	public void onDataEnd() {
+		addComment(title);
+		addComment(selfText);
+		addComment(body);
+		title = selfText = body = null;
+	}
+	
+	private void addComment(String text) {
+		if (text != null && !text.isEmpty()) {
+			comments.add(new Comment(format(text), nesting));
+		}
+	}
+	private String format(String text) {
+		return Html.fromHtml(text.replaceAll("\n", "<br />")).toString();
 	}
 }

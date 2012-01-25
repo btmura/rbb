@@ -83,7 +83,10 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, List<Thing>> impleme
 	}
 	
 	public void onDataEnd() {
-		things.add(new Thing(id, Html.fromHtml(title).toString(), url, isSelf));
+		if (id != null && title != null && url != null) {
+			things.add(new Thing(id, Html.fromHtml(title).toString(), url, isSelf));
+		}
+		id = title = url = null;
 	}
 	
 	public void onDataStart(int nesting) {
