@@ -5,9 +5,10 @@ import android.os.Parcelable;
 
 public class Entity implements Parcelable {
 	
-	public static final int TYPE_THING = 0;
-	public static final int TYPE_COMMENT = 1;
-	public static final int TYPE_MORE = 2;
+	public static final int TYPE_TITLE = 0;
+	public static final int TYPE_HEADER = 1;
+	public static final int TYPE_COMMENT = 2;
+	public static final int TYPE_MORE = 3;
 	
 	public int type;
 	public String name;

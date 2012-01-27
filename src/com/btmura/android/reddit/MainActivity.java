@@ -146,11 +146,11 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		trans.commit();
 	}
 	
-	public void onThingSelected(Thing thing, int position) {
+	public void onThingSelected(Entity thing, int position) {
 		replaceThing(thing, position, thing.isSelf ? THING_FRAG_COMMENTS : THING_FRAG_LINK);
 	}
 	
-	private void replaceThing(Thing thing, int position, int thingFragType) {
+	private void replaceThing(Entity thing, int position, int thingFragType) {
 		manager.popBackStack(THING_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		
 		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
@@ -172,7 +172,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return getControlFragment().getTopic();
 	}
 
-	public Thing getThing() {
+	public Entity getThing() {
 		return getControlFragment().getThing();
 	}
 	

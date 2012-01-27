@@ -14,7 +14,7 @@ import android.util.Log;
 
 import com.google.gson.stream.JsonReader;
 
-public class CommentLoaderTask extends AsyncTask<Thing, Void, ArrayList<Entity>> {
+public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>> {
 	
 	private static final String TAG = "CommentLoaderTask";
 	
@@ -36,9 +36,9 @@ public class CommentLoaderTask extends AsyncTask<Thing, Void, ArrayList<Entity>>
 	}
 
 	@Override
-	protected ArrayList<Entity> doInBackground(Thing... threads) {
+	protected ArrayList<Entity> doInBackground(Entity... things) {
 		try {
-			URL commentsUrl = new URL("http://www.reddit.com/comments/" + threads[0].getId() + ".json");
+			URL commentsUrl = new URL("http://www.reddit.com/comments/" + things[0].getId() + ".json");
 			Log.v(TAG, commentsUrl.toString());
 			
 			HttpURLConnection connection = (HttpURLConnection) commentsUrl.openConnection();
@@ -76,7 +76,7 @@ public class CommentLoaderTask extends AsyncTask<Thing, Void, ArrayList<Entity>>
 			Entity e = entities.get(entityIndex);
 			String kind = reader.nextString();
 			if (entityIndex == 0) {
-				e.type = Entity.TYPE_THING;
+				e.type = Entity.TYPE_HEADER;
 			} else if ("more".equalsIgnoreCase(kind)) {
 				e.type = Entity.TYPE_MORE;
 			} else {

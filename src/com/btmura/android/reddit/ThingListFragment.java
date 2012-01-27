@@ -1,6 +1,6 @@
 package com.btmura.android.reddit;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.ListFragment;
@@ -10,17 +10,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class ThingListFragment extends ListFragment implements TaskListener<List<Thing>> {
+public class ThingListFragment extends ListFragment implements TaskListener<ArrayList<Entity>> {
 	
 	private OnThingSelectedListener listener;
 	private TopicHolder topicHolder;
 	private LayoutInfo layoutInfo;
 	
-	private ThingAdapter adapter;
+	private EntityAdapter adapter;
 	private ThingLoaderTask task;
 
 	interface OnThingSelectedListener {
-		void onThingSelected(Thing thing, int position);
+		void onThingSelected(Entity thing, int position);
 	}
 	
 	public static ThingListFragment newInstance() {
@@ -59,11 +59,8 @@ public class ThingListFragment extends ListFragment implements TaskListener<List
 	public void onPreExecute() {
 	}
 
-	public void onPostExecute(List<Thing> things) {
-		adapter = new ThingAdapter(getActivity());
-		if (things != null) {
-			adapter.addAll(things);
-		}
+	public void onPostExecute(ArrayList<Entity> things) {
+		adapter = new EntityAdapter(things, getActivity().getLayoutInflater());
 		setEmptyText(getString(things != null ? R.string.empty : R.string.error));
 		setListAdapter(adapter);
 	}

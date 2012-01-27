@@ -7,7 +7,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import android.os.AsyncTask;
 import android.text.Html;
@@ -15,13 +14,13 @@ import android.util.Log;
 
 import com.google.gson.stream.JsonReader;
 
-public class ThingLoaderTask extends AsyncTask<Topic, Void, List<Thing>> {
+public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 	
 	private static final String TAG = "ThingLoaderTask";
 
-	private final TaskListener<List<Thing>> listener;
+	private final TaskListener<ArrayList<Entity>> listener;
 
-	public ThingLoaderTask(TaskListener<List<Thing>> listener) {
+	public ThingLoaderTask(TaskListener<ArrayList<Entity>> listener) {
 		this.listener = listener;
 	}
 	
@@ -31,12 +30,12 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, List<Thing>> {
 	}
 	
 	@Override
-	protected void onPostExecute(List<Thing> things) {
+	protected void onPostExecute(ArrayList<Entity> things) {
 		listener.onPostExecute(things);
 	}
 
 	@Override
-	protected List<Thing> doInBackground(Topic... topics) {
+	protected ArrayList<Entity> doInBackground(Topic... topics) {
 		try {
 			URL url = new URL(topics[0].getUrl());
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -62,39 +61,33 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, List<Thing>> {
 	
 	class ThingParser extends JsonParser {
 		
-		private final ArrayList<Thing> things = new ArrayList<Thing>();
+		private final ArrayList<Entity> things = new ArrayList<Entity>(50);
 		
-		String id;
-		String title;
-		String url;
-		boolean isSelf;
+		@Override
+		public void onEntityStart() {
+			Entity e = new Entity();
+			e.type = Entity.TYPE_TITLE;
+			things.add(e);
+		}
 		
 		@Override
 		public void onId(JsonReader reader) throws IOException {
-			this.id = reader.nextString();
+			things.get(entityIndex).name = reader.nextString();
 		}
 		
 		@Override
 		public void onTitle(JsonReader reader) throws IOException {
-			this.title = reader.nextString();
+			things.get(entityIndex).title = Html.fromHtml(reader.nextString()).toString();
 		}
 		
 		@Override
 		public void onUrl(JsonReader reader) throws IOException {
-			this.url = reader.nextString();
+			things.get(entityIndex).url = reader.nextString();
 		}
 		
 		@Override
 		public void onIsSelf(JsonReader reader) throws IOException {
-			this.isSelf = reader.nextBoolean();
-		}
-		
-		@Override
-		public void onEntityEnd() {
-			if (id != null && title != null && url != null) {
-				things.add(new Thing(id, Html.fromHtml(title).toString(), url, isSelf));
-			}
-			id = title = url = null;
+			things.get(entityIndex).isSelf = reader.nextBoolean();
 		}
 	}
 }

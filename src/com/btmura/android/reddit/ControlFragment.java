@@ -11,11 +11,11 @@ public class ControlFragment extends Fragment implements TopicHolder, ThingHolde
 	private static final String STATE_THING_POSITION = "thingPosition";
 	
 	private Topic topic;
-	private Thing thing;
+	private Entity thing;
 	private int topicPosition;
 	private int thingPosition;
 	
-	public static ControlFragment newInstance(Topic topic, int topicPosition, Thing thing, int thingPosition) {
+	public static ControlFragment newInstance(Topic topic, int topicPosition, Entity thing, int thingPosition) {
 		ControlFragment frag = new ControlFragment();
 		frag.topic = topic;
 		frag.thing = thing;
@@ -28,7 +28,7 @@ public class ControlFragment extends Fragment implements TopicHolder, ThingHolde
 		return topic;
 	}
 	
-	public Thing getThing() {
+	public Entity getThing() {
 		return thing;
 	}
 	
