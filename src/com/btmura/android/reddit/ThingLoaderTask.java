@@ -13,21 +13,14 @@ import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
 
-import com.btmura.android.reddit.JsonParser.JsonParseListener;
 import com.google.gson.stream.JsonReader;
 
-public class ThingLoaderTask extends AsyncTask<Topic, Void, List<Thing>> implements JsonParseListener {
+public class ThingLoaderTask extends AsyncTask<Topic, Void, List<Thing>> {
 	
 	private static final String TAG = "ThingLoaderTask";
 
 	private final TaskListener<List<Thing>> listener;
-	private final List<Thing> things = new ArrayList<Thing>();
-	
-	private String id;
-	private String title;
-	private String url;
-	private boolean isSelf;
-	
+
 	public ThingLoaderTask(TaskListener<List<Thing>> listener) {
 		this.listener = listener;
 	}
@@ -51,12 +44,13 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, List<Thing>> impleme
 			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			new JsonParser(this).parseListing(reader);
+			ThingParser parser = new ThingParser();
+			parser.parseListingObject(reader);
 			stream.close();
 			
 			connection.disconnect();
 			
-			return things;
+			return parser.things;
 			
 		} catch (MalformedURLException e) {
 			Log.e(TAG, "", e);
@@ -65,36 +59,42 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, List<Thing>> impleme
 		}
 		return null;
 	}
-
-	public void onId(String id) {
-		this.id = id;
-	}
 	
-	public void onTitle(String title) {
-		this.title = title;
-	}
-	
-	public void onUrl(String url) {	
-		this.url = url;
-	}
-	
-	public void onIsSelf(boolean isSelf) {
-		this.isSelf = isSelf;
-	}
-	
-	public void onDataEnd() {
-		if (id != null && title != null && url != null) {
-			things.add(new Thing(id, Html.fromHtml(title).toString(), url, isSelf));
+	class ThingParser extends JsonParser {
+		
+		private final ArrayList<Thing> things = new ArrayList<Thing>();
+		
+		String id;
+		String title;
+		String url;
+		boolean isSelf;
+		
+		@Override
+		public void onId(JsonReader reader) throws IOException {
+			this.id = reader.nextString();
 		}
-		id = title = url = null;
-	}
-	
-	public void onDataStart(int nesting) {
-	}
-	
-	public void onSelfText(String text) {
-	}
-	
-	public void onBody(String body) {
+		
+		@Override
+		public void onTitle(JsonReader reader) throws IOException {
+			this.title = reader.nextString();
+		}
+		
+		@Override
+		public void onUrl(JsonReader reader) throws IOException {
+			this.url = reader.nextString();
+		}
+		
+		@Override
+		public void onIsSelf(JsonReader reader) throws IOException {
+			this.isSelf = reader.nextBoolean();
+		}
+		
+		@Override
+		public void onEntityEnd() {
+			if (id != null && title != null && url != null) {
+				things.add(new Thing(id, Html.fromHtml(title).toString(), url, isSelf));
+			}
+			id = title = url = null;
+		}
 	}
 }

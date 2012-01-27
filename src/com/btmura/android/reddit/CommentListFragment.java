@@ -1,16 +1,16 @@
 package com.btmura.android.reddit;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
 
-public class CommentListFragment extends ListFragment implements TaskListener<List<Comment>> {
+public class CommentListFragment extends ListFragment implements TaskListener<ArrayList<Entity>> {
 
 	private ThingHolder thingHolder;
 
-	private CommentAdapter adapter;
+	private EntityAdapter adapter;
 	private CommentLoaderTask task;
 
 	public static CommentListFragment newInstance() {
@@ -40,12 +40,9 @@ public class CommentListFragment extends ListFragment implements TaskListener<Li
 	public void onPreExecute() {
 	}
 	
-	public void onPostExecute(List<Comment> comments) {
-		adapter = new CommentAdapter(getActivity());
-		if (comments != null) {
-			adapter.addAll(comments);
-		}
-		setEmptyText(getString(comments != null ? R.string.empty : R.string.error));
+	public void onPostExecute(ArrayList<Entity> entities) {
+		adapter = new EntityAdapter(entities, getActivity().getLayoutInflater());
+		setEmptyText(getString(entities != null ? R.string.empty : R.string.error));
 		setListAdapter(adapter);
 	}
 		
