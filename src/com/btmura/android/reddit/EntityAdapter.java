@@ -62,7 +62,7 @@ public class EntityAdapter extends BaseAdapter {
 			return tv;
 			
 		case Entity.TYPE_HEADER:
-			return inflater.inflate(android.R.layout.two_line_list_item, parent, false);
+			return inflater.inflate(R.layout.entity_header, parent, false);
 			
 		default:
 			throw new IllegalArgumentException("Unsupported view type: " + getItemViewType(position));
@@ -121,6 +121,7 @@ public class EntityAdapter extends BaseAdapter {
 		tv2.setMovementMethod(LinkMovementMethod.getInstance());
 		tv1.setText(e.title);
 		tv2.setText(e.selfText);
+		tv2.setVisibility(e.selfText != null && e.selfText.length() > 0 ? View.VISIBLE : View.GONE);
 	}
 	
 	private void setPadding(TextView tv, int nesting) {
