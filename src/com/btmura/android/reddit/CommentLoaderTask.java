@@ -111,25 +111,43 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		}
 	}
 	
+	static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+);");
 	static Pattern NAMED_LINK_PATTERN = Pattern.compile("(\\[([^\\]]+?)\\]\\(([^\\)]+?)\\))");
 	static Pattern LINK_PATTERN = Pattern.compile("http[s]?://([A-Za-z0-9\\./\\-_#\\?&=;,]+)");
 	
 	private static SpannableStringBuilder linkify(CharSequence text) {
 		SpannableStringBuilder builder = new SpannableStringBuilder(text);
 		
-		Matcher m = NAMED_LINK_PATTERN.matcher(text);
+		Matcher m = ESCAPED_PATTERN.matcher(text);
+		for (int deleted = 0; m.find(); ) {
+			String escaped = m.group(1);
+			
+			int start = m.start() - deleted;
+			int end = m.end() - deleted;
+			
+			if ("amp".equals(escaped)) {
+				builder.replace(start, end, "&");
+				deleted += 4;
+			} else if ("gt".equals(escaped)) {
+				builder.replace(start, end, ">");
+				deleted += 3;
+			} 
+		}
+		
+		m.usePattern(NAMED_LINK_PATTERN);
+		m.reset(builder);
 		for (int deleted = 0; m.find(); ) {
 			String whole = m.group(1);
 			String title = m.group(2);
 			String url = m.group(3);
-			
+				
 			int start = m.start() - deleted;
 			int end = m.end() - deleted;
 			builder.replace(start, end, title);
 			
 			if (url.startsWith("/r/")) {
 				url = "http://www.reddit.com" + url;
-			} else if (!url.startsWith("http://")) {
+			} else if (!url.startsWith("http://") && !url.startsWith("https://")) {
 				url = "http://" + url;
 			}
 			
@@ -138,7 +156,7 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			
 			deleted += whole.length() - title.length();
 		}
-		
+				
 		m.usePattern(LINK_PATTERN);
 		m.reset(builder);
 		while (m.find()) {

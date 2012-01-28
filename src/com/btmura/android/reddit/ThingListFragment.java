@@ -18,6 +18,7 @@ public class ThingListFragment extends ListFragment implements TaskListener<Arra
 	
 	private EntityAdapter adapter;
 	private ThingLoaderTask task;
+	private int position = ListView.INVALID_POSITION;
 
 	interface OnThingSelectedListener {
 		void onThingSelected(Entity thing, int position);
@@ -63,6 +64,7 @@ public class ThingListFragment extends ListFragment implements TaskListener<Arra
 		adapter = new EntityAdapter(things, getActivity().getLayoutInflater());
 		setEmptyText(getString(things != null ? R.string.empty : R.string.error));
 		setListAdapter(adapter);
+		setPosition();
 	}
 	
 	@Override
@@ -72,10 +74,15 @@ public class ThingListFragment extends ListFragment implements TaskListener<Arra
 	}
 	
 	public void setItemChecked(int position) {
+		this.position = position;
+	}
+	
+	private void setPosition() {
 		if (position == ListView.INVALID_POSITION) {
 			getListView().clearChoices();
 		} else {
 			getListView().setItemChecked(position, true);
+			getListView().setSelection(position);
 		}
 	}
 	
