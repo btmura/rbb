@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.os.AsyncTask;
-import android.text.Html;
 import android.util.Log;
 
 import com.google.gson.stream.JsonReader;
@@ -50,7 +49,6 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			parser.parseListingArray(reader);
 			stream.close();
 	
-			Log.v(TAG, "Number of comments: " + parser.entities.size());
 			return parser.entities;
 			
 		} catch (MalformedURLException e) {
@@ -60,7 +58,7 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		}
 		return null;
 	}
-
+	
 	class EntityParser extends JsonParser {
 		
 		private final ArrayList<Entity> entities = new ArrayList<Entity>(250);
@@ -89,7 +87,6 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		public void onTitle(JsonReader reader) throws IOException {
 			Entity e = entities.get(entityIndex);
 			e.title = getString(reader);
-			Log.v(TAG, e.title);
 		}
 		
 		@Override
@@ -109,12 +106,8 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			return true;
 		}
 		
-		String getString(JsonReader reader) throws IOException {
-			return format(reader.nextString().trim());
-		}
-		
-		String format(String text) {
-			return Html.fromHtml(text.replaceAll("\n", "<br />")).toString();
+		private String getString(JsonReader reader) throws IOException {
+			return reader.nextString().trim();
 		}
 	}
 }

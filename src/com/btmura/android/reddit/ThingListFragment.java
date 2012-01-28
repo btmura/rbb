@@ -60,7 +60,7 @@ public class ThingListFragment extends ListFragment implements TaskListener<Arra
 	}
 
 	public void onPostExecute(ArrayList<Entity> things) {
-		adapter = new EntityAdapter(things, getActivity().getLayoutInflater());
+		adapter = new EntityAdapter(getActivity(), things);
 		setEmptyText(getString(things != null ? R.string.empty : R.string.error));
 		setListAdapter(adapter);
 	}
