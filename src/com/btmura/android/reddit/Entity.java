@@ -2,9 +2,11 @@ package com.btmura.android.reddit;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.Spanned;
 
 public class Entity implements Parcelable {
 	
+	public static final int NUM_TYPES = 4;
 	public static final int TYPE_TITLE = 0;
 	public static final int TYPE_HEADER = 1;
 	public static final int TYPE_COMMENT = 2;
@@ -15,8 +17,8 @@ public class Entity implements Parcelable {
 	public String title;
 	public String url;
 	public boolean isSelf;
-	public String selfText;
-	public String body;	
+	public Spanned selfText;
+	public Spanned body;	
 	public int nesting;
 	
 	public Entity() {
@@ -38,8 +40,6 @@ public class Entity implements Parcelable {
 		title = parcel.readString();
 		url = parcel.readString();
 		isSelf = parcel.readInt() == 1;
-		selfText = parcel.readString();
-		body = parcel.readString();
 		nesting = parcel.readInt();
 	}
 
@@ -49,8 +49,6 @@ public class Entity implements Parcelable {
 		dest.writeString(title);
 		dest.writeString(url);
 		dest.writeInt(isSelf ? 1 : 0);
-		dest.writeString(selfText);
-		dest.writeString(body);
 		dest.writeInt(nesting);
 	}
 	

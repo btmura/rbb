@@ -7,8 +7,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.os.AsyncTask;
+import android.text.SpannableStringBuilder;
+import android.text.style.URLSpan;
 import android.util.Log;
 
 import com.google.gson.stream.JsonReader;
@@ -86,28 +90,62 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		@Override
 		public void onTitle(JsonReader reader) throws IOException {
 			Entity e = entities.get(entityIndex);
-			e.title = getString(reader);
+			e.title = reader.nextString();
 		}
 		
 		@Override
 		public void onSelfText(JsonReader reader) throws IOException {
 			Entity e = entities.get(entityIndex);
-			e.selfText = getString(reader);
+			e.selfText = linkify(reader.nextString());
 		}
 		
 		@Override
 		public void onBody(JsonReader reader) throws IOException {
 			Entity e = entities.get(entityIndex);
-			e.body = getString(reader);
+			e.body = linkify(reader.nextString());
 		}
-		
+
 		@Override
 		public boolean parseReplies() {
 			return true;
 		}
+	}
+	
+	static Pattern NAMED_LINK_PATTERN = Pattern.compile("(\\[([^\\]]+?)\\]\\(([^\\)]+?)\\))");
+	static Pattern LINK_PATTERN = Pattern.compile("http[s]?://([A-Za-z0-9\\./\\-_#\\?&=;,]+)");
+	
+	private static SpannableStringBuilder linkify(CharSequence text) {
+		SpannableStringBuilder builder = new SpannableStringBuilder(text);
 		
-		private String getString(JsonReader reader) throws IOException {
-			return reader.nextString().trim();
+		Matcher m = NAMED_LINK_PATTERN.matcher(text);
+		for (int deleted = 0; m.find(); ) {
+			String whole = m.group(1);
+			String title = m.group(2);
+			String url = m.group(3);
+			
+			int start = m.start() - deleted;
+			int end = m.end() - deleted;
+			builder.replace(start, end, title);
+			
+			if (url.startsWith("/r/")) {
+				url = "http://www.reddit.com" + url;
+			} else if (!url.startsWith("http://")) {
+				url = "http://" + url;
+			}
+			
+			URLSpan span = new URLSpan(url);
+			builder.setSpan(span, start, start + title.length(), 0);
+			
+			deleted += whole.length() - title.length();
 		}
+		
+		m.usePattern(LINK_PATTERN);
+		m.reset(builder);
+		while (m.find()) {
+			URLSpan span = new URLSpan(m.group());
+			builder.setSpan(span, m.start(), m.end(), 0);
+		}
+
+		return builder;
 	}
 }
