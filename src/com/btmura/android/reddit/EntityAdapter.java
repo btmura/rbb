@@ -95,8 +95,8 @@ public class EntityAdapter extends BaseAdapter {
 		return builder;
 	}
 	
-	static Pattern NAMED_LINK_PATTERN = Pattern.compile("(\\[([^\\]]+)\\]\\(([^\\)]+)\\))");
-	static Pattern LINK_PATTERN = Pattern.compile("http[s]?://.*");
+	static Pattern NAMED_LINK_PATTERN = Pattern.compile("(\\[([^\\]]+?)\\]\\(([^\\)]+?)\\))");
+	static Pattern LINK_PATTERN = Pattern.compile("http[s]?://([A-Za-z0-9\\./\\-_#\\?&=;,]+)");
 	
 	private static SpannableStringBuilder linkify(CharSequence text) {
 		SpannableStringBuilder builder = new SpannableStringBuilder(text);
@@ -110,6 +110,12 @@ public class EntityAdapter extends BaseAdapter {
 			int start = m.start() - deleted;
 			int end = m.end() - deleted;
 			builder.replace(start, end, title);
+			
+			if (url.startsWith("/r/")) {
+				url = "http://www.reddit.com" + url;
+			} else if (!url.startsWith("http://")) {
+				url = "http://" + url;
+			}
 			
 			URLSpan span = new URLSpan(url);
 			builder.setSpan(span, start, start + title.length(), 0);
