@@ -220,7 +220,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void refreshHome() {
-		bar.setDisplayShowTitleEnabled(getTopic() == null);
+		bar.setDisplayShowTitleEnabled(manager.getBackStackEntryCount() == 0);
 		bar.setDisplayHomeAsUpEnabled(singleContainer != null && getTopic() != null || getThing() != null);
 	}
 	
