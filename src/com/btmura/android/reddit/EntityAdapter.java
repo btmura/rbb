@@ -62,30 +62,47 @@ public class EntityAdapter extends BaseAdapter {
 		case Entity.TYPE_HEADER:
 		case Entity.TYPE_COMMENT:
 		case Entity.TYPE_MORE:
-			return inflater.inflate(R.layout.entity, parent, false);
+			View v = inflater.inflate(R.layout.entity, parent, false);
+			v.setTag(createViewHolder(v));
+			return v;
 			
 		default:
 			throw new IllegalArgumentException("Unsupported view type: " + getItemViewType(position));
 		}
 	}
 	
+	private static ViewHolder createViewHolder(View v) {
+		ViewHolder holder = new ViewHolder();
+		holder.line1 = (TextView) v.findViewById(R.id.line1);
+		holder.line2 = (TextView) v.findViewById(R.id.line2);
+		holder.line3 = (TextView) v.findViewById(R.id.line3);
+		return holder;
+	}
+	
+	static class ViewHolder {
+		TextView line1;
+		TextView line2;
+		TextView line3;
+	}
+	
 	private void setView(int position, View v) {
 		Entity e = getItem(position);
+		ViewHolder h = (ViewHolder) v.getTag();
 		switch (getItemViewType(position)) {
 		case Entity.TYPE_TITLE:
 			setTitle(v, e);
 			break;
 			
 		case Entity.TYPE_HEADER:
-			setHeader(v, e);
+			setHeader(h, e);
 			break;
 			
 		case Entity.TYPE_COMMENT:
-			setComment(v, e);
+			setComment(h, e);
 			break;
 			
 		case Entity.TYPE_MORE:
-			setMore(v, e);
+			setMore(h, e);
 			break;
 			
 
@@ -94,67 +111,54 @@ public class EntityAdapter extends BaseAdapter {
 		}
 	}
 	
-	private void setTitle(View v, Entity e) {
+	private static void setTitle(View v, Entity e) {
 		TextView tv = (TextView) v;
 		tv.setSingleLine();
 		tv.setEllipsize(TruncateAt.END);
 		tv.setText(e.title);
 	}
 	
-	private void setHeader(View v, Entity e) {
-		TextView tv1 = (TextView) v.findViewById(R.id.line1);
-		TextView tv2 = (TextView) v.findViewById(R.id.line2);
-		TextView tv3 = (TextView) v.findViewById(R.id.line3);
-		
-		tv1.setMovementMethod(null);
-		tv2.setMovementMethod(LinkMovementMethod.getInstance());
+	private void setHeader(ViewHolder h, Entity e) {
+		h.line1.setMovementMethod(null);
+		h.line2.setMovementMethod(LinkMovementMethod.getInstance());
 
-		tv1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Large);
-		tv2.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Large);
+		h.line2.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
 		
-		tv1.setText(e.line1);
-		tv2.setText(e.line2);
+		h.line1.setText(e.line1);
+		h.line2.setText(e.line2);
 		
-		tv1.setVisibility(View.VISIBLE);
-		tv2.setVisibility(e.line2 != null && e.line2.length() > 0 ? View.VISIBLE : View.GONE);
-		tv3.setVisibility(View.GONE);
+		h.line1.setVisibility(View.VISIBLE);
+		h.line2.setVisibility(e.line2 != null && e.line2.length() > 0 ? View.VISIBLE : View.GONE);
+		h.line3.setVisibility(View.GONE);
 	}
 	
-	private void setComment(View v, Entity e) {
-		TextView tv1 = (TextView) v.findViewById(R.id.line1);
-		TextView tv2 = (TextView) v.findViewById(R.id.line2);
-		TextView tv3 = (TextView) v.findViewById(R.id.line3);
+	private void setComment(ViewHolder h, Entity e) {
+		h.line1.setMovementMethod(LinkMovementMethod.getInstance());
 		
-		tv1.setMovementMethod(LinkMovementMethod.getInstance());
-	
-		tv1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
 
-		tv1.setText(e.line1);
+		h.line1.setText(e.line1);
 
-		tv1.setVisibility(View.VISIBLE);
-		tv2.setVisibility(View.GONE);
-		tv3.setVisibility(View.GONE);
+		h.line1.setVisibility(View.VISIBLE);
+		h.line2.setVisibility(View.GONE);
+		h.line3.setVisibility(View.GONE);
 		
-		setPadding(tv1, e.nesting);
+		setPadding(h.line1, e.nesting);
 	}
 	
-	private void setMore(View v, Entity e) {
-		TextView tv1 = (TextView) v.findViewById(R.id.line1);
-		TextView tv2 = (TextView) v.findViewById(R.id.line2);
-		TextView tv3 = (TextView) v.findViewById(R.id.line3);
+	private void setMore(ViewHolder h, Entity e) {
+		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Small);
+		h.line1.setText(R.string.load_more);
 		
-		tv1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Small);
-		tv1.setTextColor(android.R.color.holo_blue_light);
-		tv1.setText(R.string.load_more);
+		h.line1.setVisibility(View.VISIBLE);
+		h.line2.setVisibility(View.GONE);
+		h.line3.setVisibility(View.GONE);
 		
-		tv1.setVisibility(View.VISIBLE);
-		tv2.setVisibility(View.GONE);
-		tv3.setVisibility(View.GONE);
-		
-		setPadding(tv1, e.nesting);
+		setPadding(h.line1, e.nesting);
 	}
 
-	private void setPadding(TextView tv, int nesting) {
+	private static void setPadding(TextView tv, int nesting) {
 		tv.setPadding(tv.getPaddingRight() + nesting * 20, tv.getPaddingTop(), tv.getPaddingRight(), tv.getPaddingBottom());
 	}
 }
