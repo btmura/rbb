@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.os.AsyncTask;
-import android.text.Html;
 import android.util.Log;
 
 import com.google.gson.stream.JsonReader;
@@ -77,7 +76,12 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			things.get(index).title = Html.fromHtml(reader.nextString()).toString();
+			things.get(index).title = reader.nextString();
+		}
+		
+		@Override
+		public void onAuthor(JsonReader reader, int index) throws IOException {
+			things.get(index).author = reader.nextString();
 		}
 		
 		@Override

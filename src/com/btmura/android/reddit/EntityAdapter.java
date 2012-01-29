@@ -93,7 +93,9 @@ public class EntityAdapter extends BaseAdapter {
 	private void setTitle(ViewHolder h, Entity e) {
 		h.line1.setSingleLine();
 		h.line1.setEllipsize(TruncateAt.END);
+		
 		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		
 		h.line1.setText(e.title);
 		h.line2.setVisibility(View.GONE);
 		h.line3.setVisibility(View.GONE);
@@ -104,39 +106,47 @@ public class EntityAdapter extends BaseAdapter {
 	private void setHeader(ViewHolder h, Entity e) {
 		h.line1.setSingleLine(false);
 		h.line1.setEllipsize(null);
+		
 		h.line1.setMovementMethod(null);
-		h.line2.setMovementMethod(LinkMovementMethod.getInstance());
+		h.line2.setMovementMethod(null);
+		h.line3.setMovementMethod(LinkMovementMethod.getInstance());
 
-		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Large);
-		h.line2.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		h.line1.setTextAppearance(context, R.style.SmallInfoText);
+		h.line2.setTextAppearance(context, android.R.style.TextAppearance_Holo_Large);
+		h.line3.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
 		
 		h.line1.setText(e.line1);
 		h.line2.setText(e.line2);
+		h.line3.setText(e.line3);
 		
 		h.line1.setVisibility(View.VISIBLE);
-		h.line2.setVisibility(e.line2 != null && e.line2.length() > 0 ? View.VISIBLE : View.GONE);
-		h.line3.setVisibility(View.GONE);
+		h.line2.setVisibility(View.VISIBLE);
+		h.line3.setVisibility(e.line3 != null && e.line3.length() > 0 ? View.VISIBLE : View.GONE);
 		
 		setPadding(h.line1, 0);
 		setPadding(h.line2, 0);
+		setPadding(h.line3, 0);
 	}
 	
 	private void setComment(ViewHolder h, Entity e) {
 		h.line1.setMovementMethod(LinkMovementMethod.getInstance());
 		
-		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
-
+		h.line1.setTextAppearance(context, R.style.SmallInfoText);
+		h.line2.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		
 		h.line1.setText(e.line1);
+		h.line2.setText(e.line2);
 
 		h.line1.setVisibility(View.VISIBLE);
-		h.line2.setVisibility(View.GONE);
+		h.line2.setVisibility(View.VISIBLE);
 		h.line3.setVisibility(View.GONE);
 		
 		setPadding(h.line1, e.nesting);
+		setPadding(h.line2, e.nesting);
 	}
 	
 	private void setMore(ViewHolder h, Entity e) {
-		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Small);
+		h.line1.setTextAppearance(context, R.style.LoadMoreText);
 		h.line1.setText(R.string.load_more);
 		
 		h.line1.setVisibility(View.VISIBLE);

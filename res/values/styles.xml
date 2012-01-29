@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="SmallInfoText" parent="@android:style/TextAppearance.Holo.Small">
+        <item name="android:textColor">#999999</item>
+    </style>
+    <style name="LoadMoreText" parent="@android:style/TextAppearance.Holo.Small">
+        <item name="android:textColor">#999999</item>
+    </style>
+</resources>
