@@ -2,6 +2,7 @@ package com.btmura.android.reddit;
 
 import java.util.ArrayList;
 
+import android.content.Context;
 import android.text.TextUtils.TruncateAt;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -12,13 +13,14 @@ import android.widget.TextView;
 
 public class EntityAdapter extends BaseAdapter {
 	
+	private final Context context;
 	private final ArrayList<Entity> entities;
 	private final LayoutInflater inflater;
-	private int origLeftPadding;
 
-	public EntityAdapter(ArrayList<Entity> entities, LayoutInflater inflater) {
+	public EntityAdapter(Context context, ArrayList<Entity> entities) {
+		this.context = context;
 		this.entities = entities;
-		this.inflater = inflater;
+		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 	
 	public int getCount() {
@@ -55,14 +57,12 @@ public class EntityAdapter extends BaseAdapter {
 	private View createView(int position, ViewGroup parent) {
 		switch (getItemViewType(position)) {
 		case Entity.TYPE_TITLE:
+			return inflater.inflate(android.R.layout.simple_list_item_activated_1, parent, false);
+
+		case Entity.TYPE_HEADER:
 		case Entity.TYPE_COMMENT:
 		case Entity.TYPE_MORE:
-			TextView tv = (TextView) inflater.inflate(android.R.layout.simple_list_item_activated_1, parent, false);
-			origLeftPadding = tv.getPaddingLeft();
-			return tv;
-			
-		case Entity.TYPE_HEADER:
-			return inflater.inflate(R.layout.entity_header, parent, false);
+			return inflater.inflate(R.layout.entity, parent, false);
 			
 		default:
 			throw new IllegalArgumentException("Unsupported view type: " + getItemViewType(position));
@@ -76,6 +76,10 @@ public class EntityAdapter extends BaseAdapter {
 			setTitle(v, e);
 			break;
 			
+		case Entity.TYPE_HEADER:
+			setHeader(v, e);
+			break;
+			
 		case Entity.TYPE_COMMENT:
 			setComment(v, e);
 			break;
@@ -84,10 +88,7 @@ public class EntityAdapter extends BaseAdapter {
 			setMore(v, e);
 			break;
 			
-		case Entity.TYPE_HEADER:
-			setHeader(v, e);
-			break;
-			
+
 		default:
 			throw new IllegalArgumentException("Unsupported view type: " + getItemViewType(position));
 		}
@@ -98,33 +99,61 @@ public class EntityAdapter extends BaseAdapter {
 		tv.setSingleLine();
 		tv.setEllipsize(TruncateAt.END);
 		tv.setText(e.title);
-		setPadding(tv, 0);
-	}
-	
-	private void setComment(View v, Entity e) {
-		TextView tv = (TextView) v;
-		tv.setMovementMethod(LinkMovementMethod.getInstance());
-		tv.setText(e.body);
-		setPadding(tv, e.nesting);
-	}
-	
-	private void setMore(View v, Entity e) {
-		TextView tv = (TextView) v;
-		tv.setText(R.string.load_more);
-		setPadding(tv, e.nesting);
 	}
 	
 	private void setHeader(View v, Entity e) {
-		TextView tv1 = (TextView) v.findViewById(android.R.id.text1);
-		TextView tv2 = (TextView) v.findViewById(android.R.id.text2);
-		tv1.setMovementMethod(LinkMovementMethod.getInstance());
+		TextView tv1 = (TextView) v.findViewById(R.id.line1);
+		TextView tv2 = (TextView) v.findViewById(R.id.line2);
+		TextView tv3 = (TextView) v.findViewById(R.id.line3);
+		
+		tv1.setMovementMethod(null);
 		tv2.setMovementMethod(LinkMovementMethod.getInstance());
-		tv1.setText(e.title);
-		tv2.setText(e.selfText);
-		tv2.setVisibility(e.selfText != null && e.selfText.length() > 0 ? View.VISIBLE : View.GONE);
+
+		tv1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Large);
+		tv2.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		
+		tv1.setText(e.line1);
+		tv2.setText(e.line2);
+		
+		tv1.setVisibility(View.VISIBLE);
+		tv2.setVisibility(e.line2 != null && e.line2.length() > 0 ? View.VISIBLE : View.GONE);
+		tv3.setVisibility(View.GONE);
 	}
 	
+	private void setComment(View v, Entity e) {
+		TextView tv1 = (TextView) v.findViewById(R.id.line1);
+		TextView tv2 = (TextView) v.findViewById(R.id.line2);
+		TextView tv3 = (TextView) v.findViewById(R.id.line3);
+		
+		tv1.setMovementMethod(LinkMovementMethod.getInstance());
+	
+		tv1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+
+		tv1.setText(e.line1);
+
+		tv1.setVisibility(View.VISIBLE);
+		tv2.setVisibility(View.GONE);
+		tv3.setVisibility(View.GONE);
+		
+		setPadding(tv1, e.nesting);
+	}
+	
+	private void setMore(View v, Entity e) {
+		TextView tv1 = (TextView) v.findViewById(R.id.line1);
+		TextView tv2 = (TextView) v.findViewById(R.id.line2);
+		TextView tv3 = (TextView) v.findViewById(R.id.line3);
+		
+		tv1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Small);
+		tv1.setText(R.string.load_more);
+		
+		tv1.setVisibility(View.VISIBLE);
+		tv2.setVisibility(View.GONE);
+		tv3.setVisibility(View.GONE);
+		
+		setPadding(tv1, e.nesting);
+	}
+
 	private void setPadding(TextView tv, int nesting) {
-		tv.setPadding(origLeftPadding + nesting * 20, tv.getPaddingTop(), tv.getPaddingRight(), tv.getPaddingBottom());
+		tv.setPadding(tv.getPaddingRight() + nesting * 20, tv.getPaddingTop(), tv.getPaddingRight(), tv.getPaddingBottom());
 	}
 }

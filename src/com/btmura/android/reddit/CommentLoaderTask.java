@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import android.os.AsyncTask;
 import android.text.SpannableStringBuilder;
+import android.text.SpannedString;
 import android.text.style.URLSpan;
 import android.util.Log;
 
@@ -68,16 +69,15 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		private final ArrayList<Entity> entities = new ArrayList<Entity>(250);
 		
 		@Override
-		public void onEntityStart() {
-			Entity e = new Entity();
-			entities.add(e);
+		public void onEntityStart(int index) {
+			entities.add(new Entity());
 		}
 		
 		@Override
-		public void onKind(JsonReader reader) throws IOException {
-			Entity e = entities.get(entityIndex);
+		public void onKind(JsonReader reader, int index) throws IOException {
+			Entity e = entities.get(index);
 			String kind = reader.nextString();
-			if (entityIndex == 0) {
+			if (index == 0) {
 				e.type = Entity.TYPE_HEADER;
 			} else if ("more".equalsIgnoreCase(kind)) {
 				e.type = Entity.TYPE_MORE;
@@ -88,21 +88,48 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		}
 		
 		@Override
-		public void onTitle(JsonReader reader) throws IOException {
-			Entity e = entities.get(entityIndex);
+		public void onTitle(JsonReader reader, int index) throws IOException {
+			Entity e = entities.get(index);
 			e.title = reader.nextString();
 		}
 		
 		@Override
-		public void onSelfText(JsonReader reader) throws IOException {
-			Entity e = entities.get(entityIndex);
-			e.selfText = linkify(reader.nextString());
+		public void onAuthor(JsonReader reader, int index) throws IOException {
+			Entity e = entities.get(index);
+			e.author = reader.nextString();
 		}
 		
 		@Override
-		public void onBody(JsonReader reader) throws IOException {
-			Entity e = entities.get(entityIndex);
-			e.body = linkify(reader.nextString());
+		public void onSelfText(JsonReader reader, int index) throws IOException {
+			Entity e = entities.get(index);
+			e.selfText = reader.nextString();
+		}
+		
+		@Override
+		public void onBody(JsonReader reader, int index) throws IOException {
+			Entity e = entities.get(index);
+			e.body = reader.nextString();
+		}
+		
+		@Override
+		public void onEntityEnd(int index) {
+			Entity e = entities.get(index);
+			switch (e.type) {
+			case Entity.TYPE_HEADER:
+				e.line1 = new SpannedString(e.title);
+				e.line2 = linkify(e.selfText);
+				break;
+				
+			case Entity.TYPE_COMMENT:
+				e.line1 = linkify(e.body);
+				break;
+				
+			case Entity.TYPE_MORE:
+				break;
+			
+			default:
+				throw new IllegalArgumentException("Unsupported type: " + e.type);
+			}
 		}
 
 		@Override
@@ -112,7 +139,7 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 	}
 	
 	static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+);");
-	static Pattern NAMED_LINK_PATTERN = Pattern.compile("(\\[([^\\]]+?)\\]\\(([^\\)]+?)\\))");
+	static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]+?)\\]\\(([^\\)]+?)\\)");
 	static Pattern LINK_PATTERN = Pattern.compile("http[s]?://([A-Za-z0-9\\./\\-_#\\?&=;,]+)");
 	
 	private static SpannableStringBuilder linkify(CharSequence text) {
@@ -137,9 +164,9 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		m.usePattern(NAMED_LINK_PATTERN);
 		m.reset(builder);
 		for (int deleted = 0; m.find(); ) {
-			String whole = m.group(1);
-			String title = m.group(2);
-			String url = m.group(3);
+			String whole = m.group();
+			String title = m.group(1);
+			String url = m.group(2);
 				
 			int start = m.start() - deleted;
 			int end = m.end() - deleted;

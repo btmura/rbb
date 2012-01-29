@@ -7,9 +7,10 @@ import com.google.gson.stream.JsonToken;
 
 public class JsonParser {
 
-	public int entityIndex;
 	public int replyNesting;
-		
+	
+	private int entityIndex;
+	
 	public void parseListingArray(JsonReader reader) throws IOException {
 		reset();
 		doParseListingArray(reader);
@@ -20,12 +21,12 @@ public class JsonParser {
 		doParseListingObject(reader);
 	}
 	
-	void reset() {
+	private void reset() {
 		entityIndex = -1;
 		replyNesting = 0;
 	}
 	
-	void doParseListingArray(JsonReader reader) throws IOException {
+	private void doParseListingArray(JsonReader reader) throws IOException {
 		reader.beginArray();
 		while (reader.hasNext()) {
 			doParseListingObject(reader);
@@ -33,7 +34,7 @@ public class JsonParser {
 		reader.endArray();
 	}
 
-	void doParseListingObject(JsonReader reader) throws IOException {
+	private void doParseListingObject(JsonReader reader) throws IOException {
 		if (JsonToken.BEGIN_OBJECT == reader.peek()) {
 			reader.beginObject();
 			while (reader.hasNext()) {
@@ -50,7 +51,7 @@ public class JsonParser {
 		}
 	}
 	
-	void doParseListingData(JsonReader reader) throws IOException {
+	private void doParseListingData(JsonReader reader) throws IOException {
 		reader.beginObject();
 		while (reader.hasNext()) {
 			String name = reader.nextName();
@@ -63,7 +64,7 @@ public class JsonParser {
 		reader.endObject();
 	}
 	
-	void doParseListingChildren(JsonReader reader) throws IOException {
+	private void doParseListingChildren(JsonReader reader) throws IOException {
 		reader.beginArray();
 		while (reader.hasNext()) {
 			doParseEntityObject(reader);
@@ -71,87 +72,93 @@ public class JsonParser {
 		reader.endArray();
 	}
 	
-	void doParseEntityObject(JsonReader reader) throws IOException {
-		++entityIndex;
-		onEntityStart();
-		reader.beginObject();
-		while (reader.hasNext()) {
-			String name = reader.nextName();
+	private void doParseEntityObject(JsonReader r) throws IOException {
+		int i = ++entityIndex;
+		onEntityStart(i);
+		r.beginObject();
+		while (r.hasNext()) {
+			String name = r.nextName();
 			if ("kind".equals(name)) {
-				onKind(reader);
+				onKind(r, i);
 			} else if ("data".equals(name)) {
-				doParseEntityData(reader);
+				doParseEntityData(r, i);
 			} else {
-				reader.skipValue();
+				r.skipValue();
 			}
 		}
-		reader.endObject();
-		onEntityEnd();
+		r.endObject();
+		onEntityEnd(i);
 	}
 	
-	void doParseEntityData(JsonReader reader) throws IOException {
-		reader.beginObject();
-		while (reader.hasNext()) {
-			String name = reader.nextName();
+	private void doParseEntityData(JsonReader r, int i) throws IOException {
+		r.beginObject();
+		while (r.hasNext()) {
+			String name = r.nextName();
 			if ("name".equals(name)) {
-				onId(reader);
+				onId(r, i);
 			} else if ("title".equals(name)) {
-				onTitle(reader);
+				onTitle(r, i);
+			} else if ("author".equals(name)) {
+				onAuthor(r, i);
 			} else if ("url".equals(name)) {
-				onUrl(reader);
+				onUrl(r, i);
 			} else if ("is_self".equals(name)) {
-				onIsSelf(reader);
+				onIsSelf(r, i);
 			} else if ("selftext".equals(name)) {
-				onSelfText(reader);
+				onSelfText(r, i);
 			} else if ("body".equals(name)) {
-				onBody(reader);
+				onBody(r, i);
 			} else if ("replies".equals(name)) {
 				if (parseReplies()) {
 					replyNesting++;
-					doParseListingObject(reader);
+					doParseListingObject(r);
 					replyNesting--;
 				} else {
-					reader.skipValue();
+					r.skipValue();
 				}
 			} else {
-				reader.skipValue();
+				r.skipValue();
 			}
 		}
-		reader.endObject();
+		r.endObject();
 	}
 	
-	public void onEntityStart() {
+	public void onEntityStart(int index) {
 	}
 	
-	public void onKind(JsonReader reader) throws IOException {
+	public void onKind(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	
-	public void onId(JsonReader reader) throws IOException {
+	public void onId(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	
-	public void onTitle(JsonReader reader) throws IOException {
+	public void onTitle(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	
-	public void onUrl(JsonReader reader) throws IOException {
+	public void onAuthor(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	
-	public void onIsSelf(JsonReader reader) throws IOException {
+	public void onUrl(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	
-	public void onSelfText(JsonReader reader) throws IOException {
+	public void onIsSelf(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	
-	public void onBody(JsonReader reader) throws IOException {
+	public void onSelfText(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	
-	public void onEntityEnd() {
+	public void onBody(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onEntityEnd(int index) {
 	}
 	
 	public boolean parseReplies() {

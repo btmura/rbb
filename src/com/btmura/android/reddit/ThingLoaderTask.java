@@ -64,30 +64,30 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 		private final ArrayList<Entity> things = new ArrayList<Entity>(50);
 		
 		@Override
-		public void onEntityStart() {
+		public void onEntityStart(int index) {
 			Entity e = new Entity();
 			e.type = Entity.TYPE_TITLE;
 			things.add(e);
 		}
 		
 		@Override
-		public void onId(JsonReader reader) throws IOException {
-			things.get(entityIndex).name = reader.nextString();
+		public void onId(JsonReader reader, int index) throws IOException {
+			things.get(index).name = reader.nextString();
 		}
 		
 		@Override
-		public void onTitle(JsonReader reader) throws IOException {
-			things.get(entityIndex).title = Html.fromHtml(reader.nextString()).toString();
+		public void onTitle(JsonReader reader, int index) throws IOException {
+			things.get(index).title = Html.fromHtml(reader.nextString()).toString();
 		}
 		
 		@Override
-		public void onUrl(JsonReader reader) throws IOException {
-			things.get(entityIndex).url = reader.nextString();
+		public void onUrl(JsonReader reader, int index) throws IOException {
+			things.get(index).url = reader.nextString();
 		}
 		
 		@Override
-		public void onIsSelf(JsonReader reader) throws IOException {
-			things.get(entityIndex).isSelf = reader.nextBoolean();
+		public void onIsSelf(JsonReader reader, int index) throws IOException {
+			things.get(index).isSelf = reader.nextBoolean();
 		}
 	}
 }

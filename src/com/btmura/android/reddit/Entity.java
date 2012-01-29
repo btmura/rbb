@@ -15,10 +15,15 @@ public class Entity implements Parcelable {
 	public int type;
 	public String name;
 	public String title;
+	public String author;
 	public String url;
 	public boolean isSelf;
-	public Spanned selfText;
-	public Spanned body;	
+	public String selfText;
+	public String body;	
+	
+	public Spanned line1;
+	public Spanned line2;
+	public Spanned line3;
 	public int nesting;
 	
 	public Entity() {
@@ -38,18 +43,22 @@ public class Entity implements Parcelable {
 		type = parcel.readInt();
 		name = parcel.readString();
 		title = parcel.readString();
+		author = parcel.readString();
 		url = parcel.readString();
 		isSelf = parcel.readInt() == 1;
-		nesting = parcel.readInt();
+		selfText = parcel.readString();
+		body = parcel.readString();
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(type);
 		dest.writeString(name);
 		dest.writeString(title);
+		dest.writeString(author);
 		dest.writeString(url);
 		dest.writeInt(isSelf ? 1 : 0);
-		dest.writeInt(nesting);
+		dest.writeString(selfText);
+		dest.writeString(body);
 	}
 	
 	public String getId() {
