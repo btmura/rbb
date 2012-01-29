@@ -35,6 +35,16 @@ public class EntityAdapter extends BaseAdapter {
 		return position;
 	}
 	
+	@Override
+	public int getItemViewType(int position) {
+		return getItem(position).type;
+	}
+	
+	@Override
+	public int getViewTypeCount() {
+		return Entity.NUM_TYPES;
+	}
+	
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;
 		if (v == null) {
@@ -45,9 +55,24 @@ public class EntityAdapter extends BaseAdapter {
 	}
 	
 	private View createView(int position, ViewGroup parent) {
-		View v = inflater.inflate(R.layout.entity, parent, false);
-		v.setTag(createViewHolder(v));
-		return v;
+		switch (getItemViewType(position)) {
+		case Entity.TYPE_TITLE:
+		case Entity.TYPE_MORE:
+			return inflater.inflate(android.R.layout.simple_list_item_activated_1, parent, false);
+			
+		case Entity.TYPE_HEADER:
+			View v = inflater.inflate(R.layout.entity_three, parent, false);
+			v.setTag(createViewHolder(v));
+			return v;
+			
+		case Entity.TYPE_COMMENT:
+			v = inflater.inflate(R.layout.entity_two, parent, false);
+			v.setTag(createViewHolder(v));
+			return v;
+			
+		default:
+			throw new IllegalArgumentException();
+		}
 	}
 	
 	private static ViewHolder createViewHolder(View v) {
@@ -69,7 +94,7 @@ public class EntityAdapter extends BaseAdapter {
 		ViewHolder h = (ViewHolder) v.getTag();
 		switch (e.type) {
 		case Entity.TYPE_TITLE:
-			setTitle(h, e);
+			setTitle(v, e);
 			break;
 			
 		case Entity.TYPE_HEADER:
@@ -81,7 +106,7 @@ public class EntityAdapter extends BaseAdapter {
 			break;
 			
 		case Entity.TYPE_MORE:
-			setMore(h, e);
+			setMore(v, e);
 			break;
 			
 
@@ -90,70 +115,47 @@ public class EntityAdapter extends BaseAdapter {
 		}
 	}
 	
-	private void setTitle(ViewHolder h, Entity e) {
-		h.line1.setSingleLine();
-		h.line1.setEllipsize(TruncateAt.END);
-		
-		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
-		
-		h.line1.setText(e.title);
-		h.line2.setVisibility(View.GONE);
-		h.line3.setVisibility(View.GONE);
-		
-		setPadding(h.line1, 0);
+	private void setTitle(View v, Entity e) {
+		TextView tv = (TextView) v;
+		tv.setSingleLine();
+		tv.setEllipsize(TruncateAt.END);
+		tv.setText(e.title);
 	}
 	
 	private void setHeader(ViewHolder h, Entity e) {
-		h.line1.setSingleLine(false);
-		h.line1.setEllipsize(null);
-		
-		h.line1.setMovementMethod(null);
-		h.line2.setMovementMethod(null);
-		h.line3.setMovementMethod(LinkMovementMethod.getInstance());
-
-		h.line1.setTextAppearance(context, R.style.SmallInfoText);
-		h.line2.setTextAppearance(context, android.R.style.TextAppearance_Holo_Large);
-		h.line3.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Large);
+		h.line2.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		h.line3.setTextAppearance(context, android.R.style.TextAppearance_Holo_Small);
 		
 		h.line1.setText(e.line1);
 		h.line2.setText(e.line2);
 		h.line3.setText(e.line3);
 		
-		h.line1.setVisibility(View.VISIBLE);
-		h.line2.setVisibility(View.VISIBLE);
-		h.line3.setVisibility(e.line3 != null && e.line3.length() > 0 ? View.VISIBLE : View.GONE);
-		
-		setPadding(h.line1, 0);
-		setPadding(h.line2, 0);
-		setPadding(h.line3, 0);
+		h.line2.setMovementMethod(LinkMovementMethod.getInstance());
+		h.line2.setVisibility(e.line3 != null && e.line3.length() > 0 ? View.VISIBLE : View.GONE);
 	}
 	
 	private void setComment(ViewHolder h, Entity e) {
 		h.line1.setMovementMethod(LinkMovementMethod.getInstance());
 		
-		h.line1.setTextAppearance(context, R.style.SmallInfoText);
-		h.line2.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		h.line2.setTextAppearance(context, android.R.style.TextAppearance_Holo_Small);
 		
 		h.line1.setText(e.line1);
 		h.line2.setText(e.line2);
 
 		h.line1.setVisibility(View.VISIBLE);
 		h.line2.setVisibility(View.VISIBLE);
-		h.line3.setVisibility(View.GONE);
 		
 		setPadding(h.line1, e.nesting);
 		setPadding(h.line2, e.nesting);
 	}
 	
-	private void setMore(ViewHolder h, Entity e) {
-		h.line1.setTextAppearance(context, R.style.LoadMoreText);
-		h.line1.setText(R.string.load_more);
-		
-		h.line1.setVisibility(View.VISIBLE);
-		h.line2.setVisibility(View.GONE);
-		h.line3.setVisibility(View.GONE);
-		
-		setPadding(h.line1, e.nesting);
+	private void setMore(View v, Entity e) {
+		TextView tv = (TextView) v;
+		tv.setText(R.string.load_more);
+		tv.setTextAppearance(context, R.style.LoadMoreText);
+		setPadding(tv, e.nesting);
 	}
 
 	private static void setPadding(TextView tv, int nesting) {

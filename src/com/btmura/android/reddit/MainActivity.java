@@ -75,7 +75,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         bar.setCustomView(crumbs);
         
         if (singleContainer != null) {
-        	bar.setDisplayShowTitleEnabled(false);
         	crumbs.setMaxVisible(1);
         }
         
@@ -221,6 +220,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void refreshHome() {
+		bar.setDisplayShowTitleEnabled(getTopic() == null);
 		bar.setDisplayHomeAsUpEnabled(singleContainer != null && getTopic() != null || getThing() != null);
 	}
 	
