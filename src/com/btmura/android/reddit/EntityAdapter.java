@@ -35,16 +35,6 @@ public class EntityAdapter extends BaseAdapter {
 		return position;
 	}
 	
-	@Override
-	public int getItemViewType(int position) {
-		return getItem(position).type;
-	}
-	
-	@Override
-	public int getViewTypeCount() {
-		return Entity.NUM_TYPES;
-	}
-	
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;
 		if (v == null) {
@@ -55,20 +45,9 @@ public class EntityAdapter extends BaseAdapter {
 	}
 	
 	private View createView(int position, ViewGroup parent) {
-		switch (getItemViewType(position)) {
-		case Entity.TYPE_TITLE:
-			return inflater.inflate(android.R.layout.simple_list_item_activated_1, parent, false);
-
-		case Entity.TYPE_HEADER:
-		case Entity.TYPE_COMMENT:
-		case Entity.TYPE_MORE:
-			View v = inflater.inflate(R.layout.entity, parent, false);
-			v.setTag(createViewHolder(v));
-			return v;
-			
-		default:
-			throw new IllegalArgumentException("Unsupported view type: " + getItemViewType(position));
-		}
+		View v = inflater.inflate(R.layout.entity, parent, false);
+		v.setTag(createViewHolder(v));
+		return v;
 	}
 	
 	private static ViewHolder createViewHolder(View v) {
@@ -88,9 +67,9 @@ public class EntityAdapter extends BaseAdapter {
 	private void setView(int position, View v) {
 		Entity e = getItem(position);
 		ViewHolder h = (ViewHolder) v.getTag();
-		switch (getItemViewType(position)) {
+		switch (e.type) {
 		case Entity.TYPE_TITLE:
-			setTitle(v, e);
+			setTitle(h, e);
 			break;
 			
 		case Entity.TYPE_HEADER:
@@ -111,14 +90,20 @@ public class EntityAdapter extends BaseAdapter {
 		}
 	}
 	
-	private static void setTitle(View v, Entity e) {
-		TextView tv = (TextView) v;
-		tv.setSingleLine();
-		tv.setEllipsize(TruncateAt.END);
-		tv.setText(e.title);
+	private void setTitle(ViewHolder h, Entity e) {
+		h.line1.setSingleLine();
+		h.line1.setEllipsize(TruncateAt.END);
+		h.line1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Medium);
+		h.line1.setText(e.title);
+		h.line2.setVisibility(View.GONE);
+		h.line3.setVisibility(View.GONE);
+		
+		setPadding(h.line1, 0);
 	}
 	
 	private void setHeader(ViewHolder h, Entity e) {
+		h.line1.setSingleLine(false);
+		h.line1.setEllipsize(null);
 		h.line1.setMovementMethod(null);
 		h.line2.setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -131,6 +116,9 @@ public class EntityAdapter extends BaseAdapter {
 		h.line1.setVisibility(View.VISIBLE);
 		h.line2.setVisibility(e.line2 != null && e.line2.length() > 0 ? View.VISIBLE : View.GONE);
 		h.line3.setVisibility(View.GONE);
+		
+		setPadding(h.line1, 0);
+		setPadding(h.line2, 0);
 	}
 	
 	private void setComment(ViewHolder h, Entity e) {
