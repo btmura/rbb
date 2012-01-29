@@ -144,6 +144,7 @@ public class EntityAdapter extends BaseAdapter {
 		TextView tv3 = (TextView) v.findViewById(R.id.line3);
 		
 		tv1.setTextAppearance(context, android.R.style.TextAppearance_Holo_Small);
+		tv1.setTextColor(android.R.color.holo_blue_light);
 		tv1.setText(R.string.load_more);
 		
 		tv1.setVisibility(View.VISIBLE);
