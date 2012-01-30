@@ -252,7 +252,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-		boolean hasThing = getThing() != null;
+		boolean hasThing = getThing() != null && !getThing().isSelf;
 		menu.findItem(R.id.menu_link).setVisible(hasThing && isThingFragmentType(THING_FRAG_COMMENTS));
 		menu.findItem(R.id.menu_comments).setVisible(hasThing && isThingFragmentType(THING_FRAG_LINK));
 		menu.findItem(R.id.menu_copy_link).setVisible(hasThing);
