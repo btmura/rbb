@@ -48,7 +48,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private int thingContainerId;
 
 	private FragmentBreadCrumbs crumbs;
-		
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

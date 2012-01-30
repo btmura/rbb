@@ -38,6 +38,7 @@ public class TopicListFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
 		adapter = new TopicAdapter(getActivity());
 		if (savedInstanceState != null) {
 			position = savedInstanceState.getInt(STATE_POSITION);

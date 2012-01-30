@@ -43,6 +43,7 @@ public class ControlFragment extends Fragment implements TopicHolder, ThingHolde
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
         if (savedInstanceState != null) {
         	topic = savedInstanceState.getParcelable(STATE_TOPIC);
         	thing = savedInstanceState.getParcelable(STATE_THING);

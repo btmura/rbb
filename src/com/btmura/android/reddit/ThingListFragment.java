@@ -27,13 +27,19 @@ public class ThingListFragment extends ListFragment implements TaskListener<Arra
 	public static ThingListFragment newInstance() {
 		return new ThingListFragment();
 	}
-	
+
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		listener = (OnThingSelectedListener) activity;
 		topicHolder = (TopicHolder) activity;
 		layoutInfo = (LayoutInfo) activity;
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
 	}
 		
 	@Override
