@@ -76,7 +76,7 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			things.get(index).title = reader.nextString();
+			things.get(index).title = Formatter.formatTitle(reader.nextString()).toString();
 		}
 		
 		@Override
