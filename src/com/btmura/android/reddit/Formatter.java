@@ -5,11 +5,13 @@ import java.util.regex.Pattern;
 
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
+import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
 
 public class Formatter {
 	private static Pattern BOLD_PATTERN = Pattern.compile("\\*\\*(.+?)\\*\\*");
+	private static Pattern STRIKE_THROUGH_PATTERN = Pattern.compile("~~(.+?)~~");
 	private static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+);");
 	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]+?)\\]\\(([^\\)]+?)\\)");
 	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([A-Za-z0-9\\./\\-_#\\?&=;,]+)");
@@ -26,6 +28,18 @@ public class Formatter {
 			deleted += 4;			
 			
 			StyleSpan span = new StyleSpan(Typeface.BOLD);
+			builder.setSpan(span, s, s + value.length(), 0);
+		}
+		
+		m.usePattern(STRIKE_THROUGH_PATTERN);
+		for (int deleted = 0; m.find(); ) {
+			int s = m.start() - deleted;
+			int e = m.end() - deleted;
+			String value = m.group(1);
+			builder.replace(s, e, value);
+			deleted += 4;			
+			
+			StrikethroughSpan span = new StrikethroughSpan();
 			builder.setSpan(span, s, s + value.length(), 0);
 		}
 		
