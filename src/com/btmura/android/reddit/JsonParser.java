@@ -108,6 +108,10 @@ public class JsonParser {
 				onSelfText(r, i);
 			} else if ("body".equals(name)) {
 				onBody(r, i);
+			} else if ("ups".equals(name)) {
+				onUps(r, i);
+			} else if ("downs".equals(name)) {
+				onDowns(r, i);
 			} else if ("replies".equals(name)) {
 				if (parseReplies()) {
 					replyNesting++;
@@ -155,6 +159,14 @@ public class JsonParser {
 	}
 	
 	public void onBody(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onUps(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onDowns(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	

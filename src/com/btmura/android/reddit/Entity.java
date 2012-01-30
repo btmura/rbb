@@ -19,7 +19,9 @@ public class Entity implements Parcelable {
 	public String url;
 	public boolean isSelf;
 	public String selfText;
-	public String body;	
+	public String body;
+	public int ups;
+	public int downs;
 	
 	public Spanned line1;
 	public Spanned line2;

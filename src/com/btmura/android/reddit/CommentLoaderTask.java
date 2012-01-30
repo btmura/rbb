@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.os.AsyncTask;
+import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
 import android.util.Log;
 
@@ -108,18 +109,30 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		}
 		
 		@Override
+		public void onUps(JsonReader reader, int index) throws IOException {
+			Entity e = entities.get(index);
+			e.ups = reader.nextInt();
+		}
+		
+		@Override
+		public void onDowns(JsonReader reader, int index) throws IOException {
+			Entity e = entities.get(index);
+			e.downs = reader.nextInt();
+		}
+		
+		@Override
 		public void onEntityEnd(int index) {
 			Entity e = entities.get(index);
 			switch (e.type) {
 			case Entity.TYPE_HEADER:
 				e.line1 = new SpannedString(e.title);
 				e.line2 = Formatter.format(e.selfText);
-				e.line3 = new SpannedString(e.author);
+				e.line3 = getStatus(e);
 				break;
 				
 			case Entity.TYPE_COMMENT:
 				e.line1 = Formatter.format(e.body);
-				e.line2 = new SpannedString(e.author);
+				e.line2 = getStatus(e);
 				break;
 				
 			case Entity.TYPE_MORE:
@@ -130,6 +143,20 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			}
 		}
 
+		private final SpannableStringBuilder getStatus(Entity e) {
+			SpannableStringBuilder b = new SpannableStringBuilder();
+			b.append(e.author);
+			if (e.ups > 0) {
+				b.append("  +");
+				b.append(Integer.toString(e.ups));
+			}
+			if (e.downs > 0) {
+				b.append("  -");
+				b.append(Integer.toString(e.downs));
+			}
+			return b;
+		}
+		
 		@Override
 		public boolean parseReplies() {
 			return true;
