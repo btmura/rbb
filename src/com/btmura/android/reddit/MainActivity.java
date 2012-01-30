@@ -252,11 +252,13 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-		boolean hasThing = getThing() != null && !getThing().isSelf;
-		menu.findItem(R.id.menu_link).setVisible(hasThing && isThingFragmentType(THING_FRAG_COMMENTS));
-		menu.findItem(R.id.menu_comments).setVisible(hasThing && isThingFragmentType(THING_FRAG_LINK));
-		menu.findItem(R.id.menu_copy_link).setVisible(hasThing);
-		menu.findItem(R.id.menu_view).setVisible(hasThing);
+		boolean hasThing = getThing() != null;
+		boolean isSelf = hasThing && getThing().isSelf;
+		menu.findItem(R.id.menu_link).setVisible(hasThing && !isSelf && isThingFragmentType(THING_FRAG_COMMENTS));
+		menu.findItem(R.id.menu_comments).setVisible(hasThing && !isSelf && isThingFragmentType(THING_FRAG_LINK));
+		menu.findItem(R.id.menu_copy_link).setVisible(hasThing && !isSelf);
+		menu.findItem(R.id.menu_copy_reddit_link).setVisible(hasThing);
+		menu.findItem(R.id.menu_view).setVisible(hasThing && !isSelf);
 		return true;
 	}
 	
@@ -283,6 +285,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			
 		case R.id.menu_copy_link:
 			handleCopyLink();
+			return true;
+			
+		case R.id.menu_copy_reddit_link:
+			handleCopyRedditLink();
 			return true;
 		
 		case R.id.menu_view:
@@ -313,10 +319,17 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void handleCopyLink() {
-		String url = getThing().url;
+		clipText(getThing().url);
+	}
+	
+	private void handleCopyRedditLink() {
+		clipText("http://www.reddit.com" + getThing().permaLink);
+	}
+	
+	private void clipText(String text) {
 		ClipboardManager clip = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-		clip.setText(url);
-		Toast.makeText(this, url, Toast.LENGTH_SHORT).show();	
+		clip.setText(text);
+		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();		
 	}
 	
 	private void handleView() {

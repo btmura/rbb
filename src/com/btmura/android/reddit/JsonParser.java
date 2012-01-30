@@ -102,6 +102,8 @@ public class JsonParser {
 				onAuthor(r, i);
 			} else if ("url".equals(name)) {
 				onUrl(r, i);
+			} else if ("permalink".equals(name)) {
+				onPermaLink(r, i);
 			} else if ("is_self".equals(name)) {
 				onIsSelf(r, i);
 			} else if ("selftext".equals(name)) {
@@ -147,6 +149,10 @@ public class JsonParser {
 	}
 	
 	public void onUrl(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onPermaLink(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	

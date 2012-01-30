@@ -90,6 +90,11 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 		}
 		
 		@Override
+		public void onPermaLink(JsonReader reader, int index) throws IOException {
+			things.get(index).permaLink = reader.nextString();
+		}
+		
+		@Override
 		public void onIsSelf(JsonReader reader, int index) throws IOException {
 			things.get(index).isSelf = reader.nextBoolean();
 		}

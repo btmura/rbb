@@ -14,6 +14,10 @@
         android:showAsAction="withText"
         android:title="@string/menu_copy_link"/>
     <item
+        android:id="@+id/menu_copy_reddit_link"
+        android:showAsAction="withText"
+        android:title="@string/menu_copy_reddit_link"/>
+    <item
         android:id="@+id/menu_view"
         android:showAsAction="withText"
         android:title="@string/menu_view"/>

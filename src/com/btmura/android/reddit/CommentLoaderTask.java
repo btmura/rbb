@@ -95,7 +95,7 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			Entity e = entities.get(index);
 			e.author = reader.nextString();
 		}
-		
+
 		@Override
 		public void onSelfText(JsonReader reader, int index) throws IOException {
 			Entity e = entities.get(index);

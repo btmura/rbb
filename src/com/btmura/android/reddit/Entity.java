@@ -17,6 +17,7 @@ public class Entity implements Parcelable {
 	public String title;
 	public String author;
 	public String url;
+	public String permaLink;
 	public boolean isSelf;
 	public String selfText;
 	public String body;
@@ -47,9 +48,12 @@ public class Entity implements Parcelable {
 		title = parcel.readString();
 		author = parcel.readString();
 		url = parcel.readString();
+		permaLink = parcel.readString();
 		isSelf = parcel.readInt() == 1;
 		selfText = parcel.readString();
 		body = parcel.readString();
+		ups = parcel.readInt();
+		downs = parcel.readInt();
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
@@ -58,9 +62,12 @@ public class Entity implements Parcelable {
 		dest.writeString(title);
 		dest.writeString(author);
 		dest.writeString(url);
+		dest.writeString(permaLink);
 		dest.writeInt(isSelf ? 1 : 0);
 		dest.writeString(selfText);
 		dest.writeString(body);
+		dest.writeInt(ups);
+		dest.writeInt(downs);
 	}
 	
 	public String getId() {
