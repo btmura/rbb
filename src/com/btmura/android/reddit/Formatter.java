@@ -13,7 +13,7 @@ public class Formatter {
 	private static Pattern BOLD_PATTERN = Pattern.compile("\\*\\*(.+?)\\*\\*");
 	private static Pattern STRIKE_THROUGH_PATTERN = Pattern.compile("~~(.+?)~~");
 	private static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+);");
-	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]+?)\\]\\(([^\\)]+?)\\)");
+	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\]\\(([^\\)]+?)\\)");
 	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([A-Za-z0-9\\./\\-_#\\?&=;,+%]+)");
 	
 	public static SpannableStringBuilder formatTitle(CharSequence text) {
