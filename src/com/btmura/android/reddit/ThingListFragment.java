@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class ThingListFragment extends ListFragment implements TaskListener<ArrayList<Entity>> {
+public class ThingListFragment extends ListFragment {
 	
 	private OnThingSelectedListener listener;
 	private TopicHolder topicHolder;
@@ -53,30 +53,52 @@ public class ThingListFragment extends ListFragment implements TaskListener<Arra
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		loadThings();
+		loadThings(null);
 	}
 	
-	private void loadThings() {
-		if (adapter == null) {
-			task = new ThingLoaderTask(this);
-			task.execute(topicHolder.getTopic());	
+	private void loadThings(String after) {
+		if (adapter == null || after != null) {
+			task = new ThingLoaderTask(after == null ? new InitialLoadListener() : new LoadMoreListener());
+			task.execute(topicHolder.getTopic().withTopic(after));	
 		}
 	}
 	
-	public void onPreExecute() {
+	class InitialLoadListener implements TaskListener<ArrayList<Entity>> {
+		public void onPreExecute() {
+		}
+		
+		public void onPostExecute(ArrayList<Entity> things) {
+			adapter = new EntityAdapter(getActivity(), things);
+			setEmptyText(getString(things != null ? R.string.empty : R.string.error));
+			setListAdapter(adapter);
+			setPosition();
+		}
 	}
-
-	public void onPostExecute(ArrayList<Entity> things) {
-		adapter = new EntityAdapter(getActivity(), things);
-		setEmptyText(getString(things != null ? R.string.empty : R.string.error));
-		setListAdapter(adapter);
-		setPosition();
+	
+	class LoadMoreListener implements TaskListener<ArrayList<Entity>> {
+		public void onPreExecute() {
+		}
+		
+		public void onPostExecute(ArrayList<Entity> things) {
+			adapter.remove(adapter.getCount() - 1);
+			adapter.addAll(things);
+		}
 	}
 	
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		listener.onThingSelected(adapter.getItem(position), position);
+		Entity e = adapter.getItem(position);
+		switch (e.type) {
+		case Entity.TYPE_TITLE:
+			listener.onThingSelected(e, position);
+			break;
+			
+		case Entity.TYPE_MORE:
+			v.findViewById(R.id.progress).setVisibility(View.VISIBLE);
+			loadThings(e.after);
+			break;
+		}
 	}
 	
 	public void setItemChecked(int position) {

@@ -24,6 +24,8 @@ public class Entity implements Parcelable {
 	public int ups;
 	public int downs;
 	
+	public String after;
+	
 	public Spanned line1;
 	public Spanned line2;
 	public Spanned line3;
@@ -54,6 +56,7 @@ public class Entity implements Parcelable {
 		body = parcel.readString();
 		ups = parcel.readInt();
 		downs = parcel.readInt();
+		after = parcel.readString();
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
@@ -68,6 +71,7 @@ public class Entity implements Parcelable {
 		dest.writeString(body);
 		dest.writeInt(ups);
 		dest.writeInt(downs);
+		dest.writeString(after);
 	}
 	
 	public String getId() {

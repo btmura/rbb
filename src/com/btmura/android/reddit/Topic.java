@@ -16,21 +16,32 @@ public class Topic implements Parcelable {
 	};
 	
 	public final String title;
+	public final String after;
 	
 	public static Topic newTopic(String title) {
-		return new Topic(title);
+		return new Topic(title, null);
 	}
 	
-	private Topic(String title) {
+	public Topic withTopic(String after) {
+		return after != null ? new Topic(title, after) : this;
+	}
+	
+	private Topic(String title, String after) {
 		this.title = title;
+		this.after = after;
 	}
 	
 	private Topic(Parcel in) {
 		this.title = in.readString();
+		this.after = in.readString();
 	}
 	
-	public String getUrl() {
-		return "http://www.reddit.com/r/" + title + "/.json";
+	public CharSequence getUrl() {
+		StringBuilder b = new StringBuilder("http://www.reddit.com/r/").append(title).append("/.json");
+		if (after != null) {
+			b.append("?count=25&after=").append(after);
+		}
+		return b;
 	}
 	
 	@Override

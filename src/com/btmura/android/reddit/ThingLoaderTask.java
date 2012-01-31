@@ -36,7 +36,9 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 	@Override
 	protected ArrayList<Entity> doInBackground(Topic... topics) {
 		try {
-			URL url = new URL(topics[0].getUrl());
+			URL url = new URL(topics[0].getUrl().toString());
+			Log.v(TAG, url.toString());
+			
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.connect();
 			
@@ -61,6 +63,8 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 	class ThingParser extends JsonParser {
 		
 		private final ArrayList<Entity> things = new ArrayList<Entity>(50);
+		
+		private String after;
 		
 		@Override
 		public void onEntityStart(int index) {
@@ -97,6 +101,21 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 		@Override
 		public void onIsSelf(JsonReader reader, int index) throws IOException {
 			things.get(index).isSelf = reader.nextBoolean();
+		}
+		
+		@Override
+		public void onAfter(JsonReader reader) throws IOException {
+			after = reader.nextString();
+		}
+		
+		@Override
+		public void onParseEnd() {
+			if (after != null) {
+				Entity e = new Entity();
+				e.type = Entity.TYPE_MORE;
+				e.after = after;
+				things.add(e);
+			}
 		}
 	}
 }

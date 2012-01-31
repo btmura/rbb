@@ -1,6 +1,7 @@
 package com.btmura.android.reddit;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.text.TextUtils.TruncateAt;
@@ -21,6 +22,16 @@ public class EntityAdapter extends BaseAdapter {
 		this.context = context;
 		this.entities = entities;
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	}
+	
+	public void addAll(List<Entity> entities) {
+		this.entities.addAll(entities);
+		notifyDataSetChanged();
+	}
+	
+	public void remove(int index) {
+		this.entities.remove(index);
+		notifyDataSetChanged();
 	}
 	
 	public int getCount() {
@@ -57,8 +68,10 @@ public class EntityAdapter extends BaseAdapter {
 	private View createView(int position, ViewGroup parent) {
 		switch (getItemViewType(position)) {
 		case Entity.TYPE_TITLE:
-		case Entity.TYPE_MORE:
 			return inflater.inflate(android.R.layout.simple_list_item_activated_1, parent, false);
+			
+		case Entity.TYPE_MORE:
+			return inflater.inflate(R.layout.load_more, parent, false);
 			
 		case Entity.TYPE_HEADER:
 			View v = inflater.inflate(R.layout.entity_three, parent, false);
@@ -152,13 +165,11 @@ public class EntityAdapter extends BaseAdapter {
 	}
 	
 	private void setMore(View v, Entity e) {
-		TextView tv = (TextView) v;
-		tv.setText(R.string.load_more);
-		tv.setTextAppearance(context, R.style.LoadMoreText);
-		setPadding(tv, e.nesting);
+		v.findViewById(R.id.progress).setVisibility(View.GONE);
+		setPadding(v, e.nesting);
 	}
 
-	private static void setPadding(TextView tv, int nesting) {
-		tv.setPadding(tv.getPaddingRight() + nesting * 20, tv.getPaddingTop(), tv.getPaddingRight(), tv.getPaddingBottom());
+	private static void setPadding(View v, int nesting) {
+		v.setPadding(v.getPaddingRight() + nesting * 20, v.getPaddingTop(), v.getPaddingRight(), v.getPaddingBottom());
 	}
 }

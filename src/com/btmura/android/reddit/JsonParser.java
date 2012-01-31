@@ -13,12 +13,16 @@ public class JsonParser {
 	
 	public void parseListingArray(JsonReader reader) throws IOException {
 		reset();
+		onParseStart();
 		doParseListingArray(reader);
+		onParseEnd();
 	}
 	
 	public void parseListingObject(JsonReader reader) throws IOException {
 		reset();
+		onParseStart();
 		doParseListingObject(reader);
+		onParseEnd();
 	}
 	
 	private void reset() {
@@ -57,6 +61,8 @@ public class JsonParser {
 			String name = reader.nextName();
 			if ("children".equals(name)) {
 				doParseListingChildren(reader);
+			} else if ("after".equals(name)) {
+				onAfter(reader);
 			} else {
 				reader.skipValue();
 			}
@@ -129,6 +135,13 @@ public class JsonParser {
 		r.endObject();
 	}
 	
+	public void onParseStart() {
+	}
+	
+	public void onAfter(JsonReader reader) throws IOException {
+		reader.skipValue();
+	}
+	
 	public void onEntityStart(int index) {
 	}
 	
@@ -177,6 +190,9 @@ public class JsonParser {
 	}
 	
 	public void onEntityEnd(int index) {
+	}
+	
+	public void onParseEnd() {
 	}
 	
 	public boolean parseReplies() {
