@@ -90,14 +90,21 @@ public class Formatter {
 			int e = m.end() - deleted;
 			String value = m.group(1);
 			
+			deleted += 2;
 			if ("amp".equals(value)) {
 				b.replace(s, e, "&");
-				deleted += 4;
+				deleted += 2;
 			} else if ("gt".equals(value)) {
 				b.replace(s, e, ">");
-				deleted += 3;
+				deleted += 1;
 			} else if ("lt".equals(value)) {
 				b.replace(s, e, "<");
+				deleted += 1;
+			} else if ("quot".equals(value)) {
+				b.replace(s, e, "\"");
+				deleted += 3;
+			} else if ("apos".equals(value)) {
+				b.replace(s, e, "'");
 				deleted += 3;
 			}
 		}

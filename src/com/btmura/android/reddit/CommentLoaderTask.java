@@ -146,14 +146,12 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		private final SpannableStringBuilder getStatus(Entity e) {
 			SpannableStringBuilder b = new SpannableStringBuilder();
 			b.append(e.author);
-			if (e.ups > 0) {
-				b.append("  +");
-				b.append(Integer.toString(e.ups));
+			b.append("  ");
+			int score = e.ups - e.downs;
+			if (score > 0) {
+				b.append("+");
 			}
-			if (e.downs > 0) {
-				b.append("  -");
-				b.append(Integer.toString(e.downs));
-			}
+			b.append(Integer.toString(score));
 			return b;
 		}
 		
