@@ -55,5 +55,6 @@ public class Topic implements Parcelable {
 	
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(title);
+		dest.writeString(after);
 	}
 }
