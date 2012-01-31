@@ -19,7 +19,7 @@ public class Formatter {
 	public static SpannableStringBuilder formatTitle(CharSequence text) {
 		SpannableStringBuilder b = new SpannableStringBuilder(text);
 		Matcher m = ESCAPED_PATTERN.matcher(text);
-		unescape(b, m);
+		formatEscaped(b, m);
 		return b;
 	}
 
@@ -27,6 +27,28 @@ public class Formatter {
 		SpannableStringBuilder b = new SpannableStringBuilder(text);
 
 		Matcher m = BOLD_PATTERN.matcher(text);
+		formatBold(b, m);
+		
+		m.usePattern(STRIKE_THROUGH_PATTERN);
+		m.reset(b);
+		formatStrikeThrough(b, m);
+		
+		m.usePattern(ESCAPED_PATTERN);
+		m.reset(b);
+		formatEscaped(b, m);
+
+		m.usePattern(NAMED_LINK_PATTERN);
+		m.reset(b);
+		formatNamedLinks(b, m);
+				
+		m.usePattern(RAW_LINK_PATTERN);
+		m.reset(b);
+		formatRawLinks(b, m);
+
+		return b;
+	}
+	
+	private static void formatBold(SpannableStringBuilder b, Matcher m) {
 		for (int deleted = 0; m.find(); ) {
 			int s = m.start() - deleted;
 			int e = m.end() - deleted;
@@ -37,8 +59,9 @@ public class Formatter {
 			StyleSpan span = new StyleSpan(Typeface.BOLD);
 			b.setSpan(span, s, s + value.length(), 0);
 		}
-		
-		m.usePattern(STRIKE_THROUGH_PATTERN);
+	}
+	
+	private static void formatStrikeThrough(SpannableStringBuilder b, Matcher m) {
 		for (int deleted = 0; m.find(); ) {
 			int s = m.start() - deleted;
 			int e = m.end() - deleted;
@@ -49,42 +72,9 @@ public class Formatter {
 			StrikethroughSpan span = new StrikethroughSpan();
 			b.setSpan(span, s, s + value.length(), 0);
 		}
-		
-		m.usePattern(ESCAPED_PATTERN);
-		m.reset(b);
-		unescape(b, m);
-
-		m.usePattern(NAMED_LINK_PATTERN);
-		m.reset(b);
-		for (int deleted = 0; m.find(); ) {
-			int s = m.start() - deleted;
-			int e = m.end() - deleted;
-			String name = m.group(1);
-			String url = m.group(2);
-			b.replace(s, e, name);
-			deleted += 4 + url.length();
-			
-			if (url.startsWith("/r/")) {
-				url = "http://www.reddit.com" + url;
-			} else if (!url.startsWith("http://") && !url.startsWith("https://")) {
-				url = "http://" + url;
-			}
-			
-			URLSpan span = new URLSpan(url);
-			b.setSpan(span, s, s + name.length(), 0);
-		}
-				
-		m.usePattern(RAW_LINK_PATTERN);
-		m.reset(b);
-		while (m.find()) {
-			URLSpan span = new URLSpan(m.group());
-			b.setSpan(span, m.start(), m.end(), 0);
-		}
-
-		return b;
 	}
 	
-	private static void unescape(SpannableStringBuilder b, Matcher m) {
+	private static void formatEscaped(SpannableStringBuilder b, Matcher m) {
 		for (int deleted = 0; m.find(); ) {
 			int s = m.start() - deleted;
 			int e = m.end() - deleted;
@@ -107,6 +97,33 @@ public class Formatter {
 				b.replace(s, e, "'");
 				deleted += 3;
 			}
+		}
+	}
+	
+	private static void formatNamedLinks(SpannableStringBuilder b, Matcher m) {
+		for (int deleted = 0; m.find(); ) {
+			int s = m.start() - deleted;
+			int e = m.end() - deleted;
+			String name = m.group(1);
+			String url = m.group(2);
+			b.replace(s, e, name);
+			deleted += 4 + url.length();
+			
+			if (url.startsWith("/r/")) {
+				url = "http://www.reddit.com" + url;
+			} else if (!url.startsWith("http://") && !url.startsWith("https://")) {
+				url = "http://" + url;
+			}
+			
+			URLSpan span = new URLSpan(url);
+			b.setSpan(span, s, s + name.length(), 0);
+		}
+	}
+	
+	private static void formatRawLinks(SpannableStringBuilder b, Matcher m) {
+		while (m.find()) {
+			URLSpan span = new URLSpan(m.group());
+			b.setSpan(span, m.start(), m.end(), 0);
 		}
 	}
 }
