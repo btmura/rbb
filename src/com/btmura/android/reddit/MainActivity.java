@@ -3,7 +3,6 @@ package com.btmura.android.reddit;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentBreadCrumbs;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
@@ -47,8 +46,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private int thingListContainerId;
 	private int thingContainerId;
 
-	private FragmentBreadCrumbs crumbs;
-	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -66,18 +63,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         	thingContainer.setVisibility(View.GONE);
         }
         
-        crumbs = new FragmentBreadCrumbs(this);
-        crumbs.setActivity(this);
-
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
-        bar.setDisplayShowCustomEnabled(true);
-        bar.setCustomView(crumbs);
-        
-        if (singleContainer != null) {
-        	crumbs.setMaxVisible(1);
-        }
-        
+
         topicListContainerId = topicListContainer != null ? R.id.topic_list_container : R.id.single_container;
         thingListContainerId = thingListContainer != null ? R.id.thing_list_container : R.id.single_container;
         thingContainerId = thingContainer != null ? R.id.thing_container : R.id.single_container;
@@ -139,7 +127,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		ThingListFragment thingListFrag = ThingListFragment.newInstance();
 		trans.replace(thingListContainerId, thingListFrag, THING_LIST_TAG);
 		
-		trans.setBreadCrumbTitle(topic.title);
 		if (addToBackStack) {
 			trans.addToBackStack(THING_LIST_TAG);
 		}
@@ -163,7 +150,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		FragmentTransaction trans = manager.beginTransaction();
 		trans.add(controlFrag, CONTROL_TAG);
 		trans.replace(thingContainerId, frag, THING_TAG);
-		trans.setBreadCrumbTitle(thing.title);
 		trans.addToBackStack(THING_TAG);
 		trans.commit();		
 	}
@@ -214,14 +200,26 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
 	public void onBackStackChanged() {
 		refreshHome();
+		refreshTitle();
 		refreshCheckedItems();
 		refreshThingContainer();
 		invalidateOptionsMenu();
 	}
 	
 	private void refreshHome() {
-		bar.setDisplayShowTitleEnabled(manager.getBackStackEntryCount() == 0);
 		bar.setDisplayHomeAsUpEnabled(singleContainer != null && getTopic() != null || getThing() != null);
+	}
+	
+	private void refreshTitle() {
+		Topic topic = getTopic();
+		Entity thing = getThing();
+		if (thing != null) {
+			bar.setTitle(thing.title);
+		} else if (topic != null) {
+			bar.setTitle(topic.title);
+		} else {
+			bar.setTitle(R.string.app_name);
+		}
 	}
 	
 	private void refreshCheckedItems() {
