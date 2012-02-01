@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class EntityAdapter extends BaseAdapter {
@@ -22,6 +23,11 @@ public class EntityAdapter extends BaseAdapter {
 		this.context = context;
 		this.entities = entities;
 		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	}
+
+	public void add(Entity entity) {
+		this.entities.add(entity);
+		notifyDataSetChanged();
 	}
 	
 	public void addAll(List<Entity> entities) {
@@ -71,10 +77,12 @@ public class EntityAdapter extends BaseAdapter {
 			return inflater.inflate(android.R.layout.simple_list_item_activated_1, parent, false);
 			
 		case Entity.TYPE_MORE:
-			return inflater.inflate(R.layout.load_more, parent, false);
+			View v = inflater.inflate(R.layout.progress, parent, false);
+			v.setTag(createViewHolder(v));
+			return v;
 			
 		case Entity.TYPE_HEADER:
-			View v = inflater.inflate(R.layout.entity_three, parent, false);
+			v = inflater.inflate(R.layout.entity_three, parent, false);
 			v.setTag(createViewHolder(v));
 			return v;
 			
@@ -93,6 +101,7 @@ public class EntityAdapter extends BaseAdapter {
 		holder.line1 = (TextView) v.findViewById(R.id.line1);
 		holder.line2 = (TextView) v.findViewById(R.id.line2);
 		holder.line3 = (TextView) v.findViewById(R.id.line3);
+		holder.progress = (ProgressBar) v.findViewById(R.id.progress);
 		return holder;
 	}
 	
@@ -100,8 +109,9 @@ public class EntityAdapter extends BaseAdapter {
 		TextView line1;
 		TextView line2;
 		TextView line3;
+		ProgressBar progress;
 	}
-	
+
 	private void setView(int position, View v) {
 		Entity e = getItem(position);
 		ViewHolder h = (ViewHolder) v.getTag();
@@ -119,7 +129,7 @@ public class EntityAdapter extends BaseAdapter {
 			break;
 			
 		case Entity.TYPE_MORE:
-			setMore(v, e);
+			setMore(h, e);
 			break;
 			
 
@@ -164,9 +174,10 @@ public class EntityAdapter extends BaseAdapter {
 		setPadding(h.line2, e.nesting);
 	}
 	
-	private void setMore(View v, Entity e) {
-		v.findViewById(R.id.progress).setVisibility(View.GONE);
-		setPadding(v, e.nesting);
+	private void setMore(ViewHolder h, Entity e) {
+		h.line1.setText(e.line1);
+		h.progress.setVisibility(e.progress ? View.VISIBLE : View.GONE);
+		setPadding(h.line1, e.nesting);
 	}
 
 	private static void setPadding(View v, int nesting) {

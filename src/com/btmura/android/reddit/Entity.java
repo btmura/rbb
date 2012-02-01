@@ -29,6 +29,7 @@ public class Entity implements Parcelable {
 	public Spanned line1;
 	public Spanned line2;
 	public Spanned line3;
+	public boolean progress;
 	public int nesting;
 	
 	public Entity() {

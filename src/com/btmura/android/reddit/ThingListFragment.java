@@ -1,16 +1,22 @@
 package com.btmura.android.reddit;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
+import android.text.SpannedString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
-public class ThingListFragment extends ListFragment {
+import com.btmura.android.reddit.ThingLoaderTask.ThingLoaderResult;
+
+public class ThingListFragment extends ListFragment implements OnScrollListener, TaskListener<ThingLoaderResult> {
+	
+	@SuppressWarnings("unused")
+	private static final String TAG = "ThingListFragment";
 	
 	private OnThingSelectedListener listener;
 	private TopicHolder topicHolder;
@@ -18,6 +24,8 @@ public class ThingListFragment extends ListFragment {
 	
 	private EntityAdapter adapter;
 	private ThingLoaderTask task;
+	private String after;
+	
 	private int position = ListView.INVALID_POSITION;
 
 	interface OnThingSelectedListener {
@@ -47,41 +55,41 @@ public class ThingListFragment extends ListFragment {
 		View view = super.onCreateView(inflater, container, savedInstanceState);
 		ListView list = (ListView) view.findViewById(android.R.id.list);
 		list.setChoiceMode(layoutInfo.hasThingContainer() ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
+		list.setOnScrollListener(this);
 		return view;
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		loadThings(null);
-	}
-	
-	private void loadThings(String after) {
-		if (adapter == null || after != null) {
-			task = new ThingLoaderTask(after == null ? new InitialLoadListener() : new LoadMoreListener());
-			task.execute(topicHolder.getTopic().withTopic(after));	
+		setPosition();
+		if (adapter == null) {
+			loadThings();
 		}
 	}
 	
-	class InitialLoadListener implements TaskListener<ArrayList<Entity>> {
-		public void onPreExecute() {
-		}
-		
-		public void onPostExecute(ArrayList<Entity> things) {
-			adapter = new EntityAdapter(getActivity(), things);
-			setEmptyText(getString(things != null ? R.string.empty : R.string.error));
+	private void loadThings() {
+		Topic topic = topicHolder.getTopic().withTopic(after);
+		task = new ThingLoaderTask(this);
+		task.execute(topic);
+	}
+	
+	public void onPreExecute() {
+	}
+	
+	public void onPostExecute(ThingLoaderResult result) {
+		after = result.after;
+		if (adapter == null) {
+			adapter = new EntityAdapter(getActivity(), result.entities);
 			setListAdapter(adapter);
-			setPosition();
-		}
-	}
-	
-	class LoadMoreListener implements TaskListener<ArrayList<Entity>> {
-		public void onPreExecute() {
-		}
-		
-		public void onPostExecute(ArrayList<Entity> things) {
-			adapter.remove(adapter.getCount() - 1);
-			adapter.addAll(things);
+			setEmptyText(getString(result.entities != null ? R.string.empty : R.string.error));
+		} else {
+			if (result.entities != null) {
+				removeProgressItem();
+				adapter.addAll(result.entities);
+			} else {
+				updateProgressItem(R.string.error, false);
+			}
 		}
 	}
 	
@@ -91,14 +99,49 @@ public class ThingListFragment extends ListFragment {
 		Entity e = adapter.getItem(position);
 		switch (e.type) {
 		case Entity.TYPE_TITLE:
-			listener.onThingSelected(e, position);
+			listener.onThingSelected(adapter.getItem(position), position);
 			break;
 			
 		case Entity.TYPE_MORE:
-			v.findViewById(R.id.progress).setVisibility(View.VISIBLE);
-			loadThings(e.after);
 			break;
 		}
+	}
+	
+	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		if (totalItemCount <= 0) {
+			return;
+		}
+		int lastVisibleItem = firstVisibleItem + visibleItemCount;
+		if (lastVisibleItem >= totalItemCount) {
+			if (after != null) {
+				addProgressItem(R.string.loading, true);
+				loadThings();
+				after = null;
+			}
+		}
+	}
+	
+	private void addProgressItem(int text, boolean progress) {
+		Entity e = new Entity();
+		e.type = Entity.TYPE_MORE;
+		e.line1 = new SpannedString(getString(text));
+		e.progress = progress;
+		e.after = after;
+		adapter.add(e);
+	}
+	
+	private void updateProgressItem(int text, boolean progress) {
+		Entity e = adapter.getItem(adapter.getCount() - 1);
+		e.line1 = new SpannedString(getString(text));
+		e.progress = progress;
+		adapter.notifyDataSetChanged();
+	}
+	
+	private void removeProgressItem() {
+		adapter.remove(adapter.getCount() - 1);
+	}
+	
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
 	}
 	
 	public void setItemChecked(int position) {

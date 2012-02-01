@@ -38,7 +38,7 @@ public class CommentListFragment extends ListFragment implements TaskListener<Ar
 	
 	private void loadComments() {
 		if (adapter == null) {
-			task = new CommentLoaderTask(this);
+			task = new CommentLoaderTask(getActivity().getApplicationContext(), this);
 			task.execute(thingHolder.getThing());
 		}
 	}

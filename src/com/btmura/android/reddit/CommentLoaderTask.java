@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
@@ -18,11 +19,12 @@ import com.google.gson.stream.JsonReader;
 public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>> {
 	
 	private static final String TAG = "CommentLoaderTask";
-	
+
+	private final Context context;
 	private final TaskListener<ArrayList<Entity>> listener;
 
-
-	public CommentLoaderTask(TaskListener<ArrayList<Entity>> listener) {
+	public CommentLoaderTask(Context context, TaskListener<ArrayList<Entity>> listener) {
+		this.context = context;
 		this.listener = listener;
 	}
 	
@@ -136,6 +138,8 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 				break;
 				
 			case Entity.TYPE_MORE:
+				e.line1 = new SpannedString(context.getString(R.string.load_more));
+				e.progress = false;
 				break;
 			
 			default:

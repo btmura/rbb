@@ -2,10 +2,11 @@
 <resources>
     <string name="app_name">reddit again</string>
     
-    <string name="empty">Nothing to see here...</string>
-    <string name="error">Something went wrong...</string>
+    <string name="empty">Nothing to see here…</string>
+    <string name="error">Something went wrong…</string>
     
-    <string name="load_more">Load more...</string>
+    <string name="loading">Loading…</string>
+    <string name="load_more">Load more…</string>
     
     <string name="menu_link">View Link</string>
     <string name="menu_comments">View Comments</string>

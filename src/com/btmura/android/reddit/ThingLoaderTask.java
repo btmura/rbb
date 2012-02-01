@@ -11,15 +11,21 @@ import java.util.ArrayList;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.btmura.android.reddit.ThingLoaderTask.ThingLoaderResult;
 import com.google.gson.stream.JsonReader;
 
-public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
+public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
+	
+	static class ThingLoaderResult {
+		ArrayList<Entity> entities;
+		String after;
+	}
 	
 	private static final String TAG = "ThingLoaderTask";
 
-	private final TaskListener<ArrayList<Entity>> listener;
+	private final TaskListener<ThingLoaderResult> listener;
 
-	public ThingLoaderTask(TaskListener<ArrayList<Entity>> listener) {
+	public ThingLoaderTask(TaskListener<ThingLoaderResult> listener) {
 		this.listener = listener;
 	}
 	
@@ -29,12 +35,13 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 	}
 	
 	@Override
-	protected void onPostExecute(ArrayList<Entity> things) {
-		listener.onPostExecute(things);
+	protected void onPostExecute(ThingLoaderResult result) {
+		listener.onPostExecute(result);
 	}
 
 	@Override
-	protected ArrayList<Entity> doInBackground(Topic... topics) {
+	protected ThingLoaderResult doInBackground(Topic... topics) {
+		ThingLoaderResult result = new ThingLoaderResult();
 		try {
 			URL url = new URL(topics[0].getUrl().toString());
 			Log.v(TAG, url.toString());
@@ -50,19 +57,20 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 			
 			connection.disconnect();
 			
-			return parser.things;
-			
+			result.entities = parser.entities;
+			result.after = parser.after;
+
 		} catch (MalformedURLException e) {
-			Log.e(TAG, "", e);
+			Log.e(TAG, e.getMessage(), e);
 		} catch (IOException e) {
-			Log.e(TAG, "", e);
+			Log.e(TAG, e.getMessage(), e);
 		}
-		return null;
+		return result;
 	}
 	
-	class ThingParser extends JsonParser {
+	static class ThingParser extends JsonParser {
 		
-		private final ArrayList<Entity> things = new ArrayList<Entity>(50);
+		private final ArrayList<Entity> entities = new ArrayList<Entity>(25);
 		
 		private String after;
 		
@@ -70,52 +78,46 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ArrayList<Entity>> {
 		public void onEntityStart(int index) {
 			Entity e = new Entity();
 			e.type = Entity.TYPE_TITLE;
-			things.add(e);
+			entities.add(e);
 		}
 		
 		@Override
 		public void onId(JsonReader reader, int index) throws IOException {
-			things.get(index).name = reader.nextString();
+			getEntity(index).name = reader.nextString();
 		}
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			things.get(index).title = Formatter.formatTitle(reader.nextString()).toString();
+			getEntity(index).title = Formatter.formatTitle(reader.nextString()).toString();
 		}
 		
 		@Override
 		public void onAuthor(JsonReader reader, int index) throws IOException {
-			things.get(index).author = reader.nextString();
+			getEntity(index).author = reader.nextString();
 		}
 		
 		@Override
 		public void onUrl(JsonReader reader, int index) throws IOException {
-			things.get(index).url = reader.nextString();
+			getEntity(index).url = reader.nextString();
 		}
 		
 		@Override
 		public void onPermaLink(JsonReader reader, int index) throws IOException {
-			things.get(index).permaLink = reader.nextString();
+			getEntity(index).permaLink = reader.nextString();
 		}
 		
 		@Override
 		public void onIsSelf(JsonReader reader, int index) throws IOException {
-			things.get(index).isSelf = reader.nextBoolean();
+			getEntity(index).isSelf = reader.nextBoolean();
+		}
+		
+		private Entity getEntity(int index) {
+			return entities.get(index);
 		}
 		
 		@Override
 		public void onAfter(JsonReader reader) throws IOException {
 			after = reader.nextString();
-		}
-		
-		@Override
-		public void onParseEnd() {
-			if (after != null) {
-				Entity e = new Entity();
-				e.type = Entity.TYPE_MORE;
-				e.after = after;
-				things.add(e);
-			}
 		}
 	}
 }
