@@ -6,6 +6,8 @@
     <string name="error">Something went wrong…</string>
     
     <string name="loading">Loading…</string>
+    <string name="loading_error">Error occurred. Try again?</string>
+    
     <string name="load_more">Load more…</string>
     
     <string name="menu_link">View Link</string>

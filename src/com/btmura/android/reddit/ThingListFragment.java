@@ -2,6 +2,7 @@ package com.btmura.android.reddit;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.text.SpannedString;
 import android.view.LayoutInflater;
@@ -24,7 +25,7 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	
 	private EntityAdapter adapter;
 	private ThingLoaderTask task;
-	private String after;
+	private String pendingAfter;
 	
 	private int position = ListView.INVALID_POSITION;
 
@@ -64,11 +65,11 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 		super.onActivityCreated(savedInstanceState);
 		setPosition();
 		if (adapter == null) {
-			loadThings();
+			loadThings(null);
 		}
 	}
 	
-	private void loadThings() {
+	private void loadThings(String after) {
 		Topic topic = topicHolder.getTopic().withTopic(after);
 		task = new ThingLoaderTask(this);
 		task.execute(topic);
@@ -78,7 +79,7 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	}
 	
 	public void onPostExecute(ThingLoaderResult result) {
-		after = result.after;
+		pendingAfter = result.after;
 		if (adapter == null) {
 			adapter = new EntityAdapter(getActivity(), result.entities);
 			setListAdapter(adapter);
@@ -88,7 +89,7 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 				removeProgressItem();
 				adapter.addAll(result.entities);
 			} else {
-				updateProgressItem(R.string.error, false);
+				updateProgressItem(R.string.loading_error, false);
 			}
 		}
 	}
@@ -103,6 +104,10 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 			break;
 			
 		case Entity.TYPE_MORE:
+			if (task.getStatus() == Status.FINISHED) {
+				updateProgressItem(R.string.loading, true);
+				loadThings(e.after);
+			}
 			break;
 		}
 	}
@@ -113,10 +118,10 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 		}
 		int lastVisibleItem = firstVisibleItem + visibleItemCount;
 		if (lastVisibleItem >= totalItemCount) {
-			if (after != null) {
+			if (pendingAfter != null) {
 				addProgressItem(R.string.loading, true);
-				loadThings();
-				after = null;
+				loadThings(pendingAfter);
+				pendingAfter = null;
 			}
 		}
 	}
@@ -126,7 +131,7 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 		e.type = Entity.TYPE_MORE;
 		e.line1 = new SpannedString(getString(text));
 		e.progress = progress;
-		e.after = after;
+		e.after = pendingAfter;
 		adapter.add(e);
 	}
 	
