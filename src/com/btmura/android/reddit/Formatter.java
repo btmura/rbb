@@ -17,40 +17,77 @@ public class Formatter {
 	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\]\\(([^\\)]+?)\\)");
 	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([A-Za-z0-9\\./\\-_#\\?&=;,+%']+)");
 	
-	public static SpannableStringBuilder formatTitle(CharSequence text) {
-		SpannableStringBuilder b = new SpannableStringBuilder(text);
-		Matcher m = ESCAPED_PATTERN.matcher(text);
-		formatEscaped(b, m);
-		return b;
+	private static final Matcher m = BOLD_PATTERN.matcher("");
+	
+	public static CharSequence formatTitle(String text) {
+		if (text.indexOf("&") != -1) {
+			SpannableStringBuilder b = new SpannableStringBuilder(text);
+			m.usePattern(ESCAPED_PATTERN);
+			m.reset(b);
+			formatEscaped(b, m);
+			return b;
+		}
+		return text;
 	}
-
-	public static SpannableStringBuilder format(CharSequence text) {
-		SpannableStringBuilder b = new SpannableStringBuilder(text);
+	
+	public static CharSequence format(String text) {
+		SpannableStringBuilder b = null;
+	
+		if (text.indexOf("**") != -1) {
+			m.usePattern(BOLD_PATTERN);
+			if (b == null) {
+				b = new SpannableStringBuilder(text);
+			}
+			m.reset(b);
+			formatBold(b, m);
+		}
 		
-		Matcher m = BOLD_PATTERN.matcher(text);
-		formatBold(b, m);
-
-		m.usePattern(ITALIC_PATTERN);
-		m.reset(b);
-		formatItalic(b, m);
+		if (text.indexOf("*") != -1) {
+			m.usePattern(ITALIC_PATTERN);
+			if (b == null) {
+				b = new SpannableStringBuilder(text);
+			}
+			m.reset(b);
+			formatItalic(b, m);
+		}
 		
-		m.usePattern(STRIKE_THROUGH_PATTERN);
-		m.reset(b);
-		formatStrikeThrough(b, m);
+		if (text.indexOf("~~") != -1) {
+			m.usePattern(STRIKE_THROUGH_PATTERN);
+			if (b == null) {
+				b = new SpannableStringBuilder(text);
+			}
+			m.reset(b);
+			formatStrikeThrough(b, m);
+		}
 		
-		m.usePattern(ESCAPED_PATTERN);
-		m.reset(b);
-		formatEscaped(b, m);
+		if (text.indexOf("&") != -1) {
+			m.usePattern(ESCAPED_PATTERN);
+			if (b == null) {
+				b = new SpannableStringBuilder(text);
+			}
+			m.reset(b);
+			formatEscaped(b, m);
+		}
 		
-		m.usePattern(NAMED_LINK_PATTERN);
-		m.reset(b);
-		formatNamedLinks(b, m);
-			
-		m.usePattern(RAW_LINK_PATTERN);
-		m.reset(b);
-		formatRawLinks(b, m);
+		if (text.indexOf("[") != -1) {
+			m.usePattern(NAMED_LINK_PATTERN);
+			if (b == null) {
+				b = new SpannableStringBuilder(text);
+			}
+			m.reset(b);
+			formatNamedLinks(b, m);
+		}
 		
-		return b;
+		if (text.indexOf("http") != -1) {
+			m.usePattern(RAW_LINK_PATTERN);
+			if (b == null) {
+				b = new SpannableStringBuilder(text);
+			}
+			m.reset(b);
+			formatRawLinks(b, m);
+		}
+		
+		return b != null ? b : text;
 	}
 	
 	private static void formatBold(SpannableStringBuilder b, Matcher m) {

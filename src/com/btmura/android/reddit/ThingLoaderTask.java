@@ -60,6 +60,7 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 			
 			long t2 = SystemClock.currentThreadTimeMillis();
 			Log.v(TAG, Long.toString(t2 - t1));
+			Log.v(TAG, Integer.toString(parser.entities.size()));
 			
 			connection.disconnect();
 			

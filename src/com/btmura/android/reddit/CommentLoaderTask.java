@@ -58,6 +58,7 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			
 			long t2 = SystemClock.currentThreadTimeMillis();
 			Log.v(TAG, Long.toString(t2 - t1));
+			Log.v(TAG, Integer.toString(parser.entities.size()));
 			
 			return parser.entities;
 			
@@ -71,7 +72,7 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 	
 	class EntityParser extends JsonParser {
 		
-		private final ArrayList<Entity> entities = new ArrayList<Entity>(250);
+		private final ArrayList<Entity> entities = new ArrayList<Entity>(360);
 		
 		@Override
 		public void onEntityStart(int index) {

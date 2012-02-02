@@ -2,7 +2,6 @@ package com.btmura.android.reddit;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.Spanned;
 
 public class Entity implements Parcelable {
 	
@@ -26,9 +25,9 @@ public class Entity implements Parcelable {
 	
 	public String after;
 	
-	public Spanned line1;
-	public Spanned line2;
-	public Spanned line3;
+	public CharSequence line1;
+	public CharSequence line2;
+	public CharSequence line3;
 	public boolean progress;
 	public int nesting;
 	
