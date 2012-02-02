@@ -127,7 +127,7 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			Entity e = entities.get(index);
 			switch (e.type) {
 			case Entity.TYPE_HEADER:
-				e.line1 = new SpannedString(e.title);
+				e.line1 = Formatter.formatTitle(e.title);
 				e.line2 = Formatter.format(e.selfText);
 				e.line3 = getStatus(e);
 				break;

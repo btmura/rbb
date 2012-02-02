@@ -11,6 +11,7 @@ import android.text.style.URLSpan;
 
 public class Formatter {
 	private static Pattern BOLD_PATTERN = Pattern.compile("\\*\\*(.+?)\\*\\*");
+	private static Pattern ITALIC_PATTERN = Pattern.compile("\\*(.+?)\\*");
 	private static Pattern STRIKE_THROUGH_PATTERN = Pattern.compile("~~(.+?)~~");
 	private static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+);");
 	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\]\\(([^\\)]+?)\\)");
@@ -28,6 +29,10 @@ public class Formatter {
 
 		Matcher m = BOLD_PATTERN.matcher(text);
 		formatBold(b, m);
+		
+		m.usePattern(ITALIC_PATTERN);
+		m.reset(b);
+		formatItalic(b, m);
 		
 		m.usePattern(STRIKE_THROUGH_PATTERN);
 		m.reset(b);
@@ -57,6 +62,19 @@ public class Formatter {
 			deleted += 4;			
 			
 			StyleSpan span = new StyleSpan(Typeface.BOLD);
+			b.setSpan(span, s, s + value.length(), 0);
+		}
+	}
+	
+	private static void formatItalic(SpannableStringBuilder b, Matcher m) {
+		for (int deleted = 0; m.find(); ) {
+			int s = m.start() - deleted;
+			int e = m.end() - deleted;
+			String value = m.group(1);
+			b.replace(s, e, value);
+			deleted += 2;			
+			
+			StyleSpan span = new StyleSpan(Typeface.ITALIC);
 			b.setSpan(span, s, s + value.length(), 0);
 		}
 	}
@@ -95,6 +113,9 @@ public class Formatter {
 				deleted += 3;
 			} else if ("apos".equals(value)) {
 				b.replace(s, e, "'");
+				deleted += 3;
+			} else if ("nbsp".equals(value)) {
+				b.replace(s, e, " ");
 				deleted += 3;
 			}
 		}
