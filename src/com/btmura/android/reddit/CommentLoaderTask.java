@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
 import android.util.Log;
@@ -47,12 +48,17 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			HttpURLConnection connection = (HttpURLConnection) commentsUrl.openConnection();
 			connection.connect();
 			
+			long t1 = SystemClock.currentThreadTimeMillis();
+			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
 			EntityParser parser = new EntityParser();
 			parser.parseListingArray(reader);
 			stream.close();
-	
+			
+			long t2 = SystemClock.currentThreadTimeMillis();
+			Log.v(TAG, Long.toString(t2 - t1));
+			
 			return parser.entities;
 			
 		} catch (MalformedURLException e) {

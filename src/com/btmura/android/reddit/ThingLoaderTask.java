@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.btmura.android.reddit.ThingLoaderTask.ThingLoaderResult;
@@ -49,11 +50,16 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.connect();
 			
+			long t1 = SystemClock.currentThreadTimeMillis();
+			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
 			ThingParser parser = new ThingParser();
 			parser.parseListingObject(reader);
 			stream.close();
+			
+			long t2 = SystemClock.currentThreadTimeMillis();
+			Log.v(TAG, Long.toString(t2 - t1));
 			
 			connection.disconnect();
 			

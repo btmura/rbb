@@ -13,9 +13,9 @@ public class Formatter {
 	private static Pattern BOLD_PATTERN = Pattern.compile("\\*\\*(.+?)\\*\\*");
 	private static Pattern ITALIC_PATTERN = Pattern.compile("\\*(.+?)\\*");
 	private static Pattern STRIKE_THROUGH_PATTERN = Pattern.compile("~~(.+?)~~");
-	private static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+);");
+	private static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+?);");
 	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\]\\(([^\\)]+?)\\)");
-	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([A-Za-z0-9\\./\\-_#\\?&=;,+%]+)");
+	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([A-Za-z0-9\\./\\-_#\\?&=;,+%']+)");
 	
 	public static SpannableStringBuilder formatTitle(CharSequence text) {
 		SpannableStringBuilder b = new SpannableStringBuilder(text);
@@ -26,10 +26,10 @@ public class Formatter {
 
 	public static SpannableStringBuilder format(CharSequence text) {
 		SpannableStringBuilder b = new SpannableStringBuilder(text);
-
+		
 		Matcher m = BOLD_PATTERN.matcher(text);
 		formatBold(b, m);
-		
+
 		m.usePattern(ITALIC_PATTERN);
 		m.reset(b);
 		formatItalic(b, m);
@@ -41,15 +41,15 @@ public class Formatter {
 		m.usePattern(ESCAPED_PATTERN);
 		m.reset(b);
 		formatEscaped(b, m);
-
+		
 		m.usePattern(NAMED_LINK_PATTERN);
 		m.reset(b);
 		formatNamedLinks(b, m);
-				
+			
 		m.usePattern(RAW_LINK_PATTERN);
 		m.reset(b);
 		formatRawLinks(b, m);
-
+		
 		return b;
 	}
 	
