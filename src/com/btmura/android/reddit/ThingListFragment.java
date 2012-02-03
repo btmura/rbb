@@ -19,11 +19,13 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	@SuppressWarnings("unused")
 	private static final String TAG = "ThingListFragment";
 	
+	private static final String ARG_TOPIC = "topic";
+
 	private OnThingSelectedListener listener;
-	private TopicHolder topicHolder;
 	private LayoutInfo layoutInfo;
 	
 	private EntityAdapter adapter;
+	private Topic topic;
 	private ThingLoaderTask task;
 	private String pendingAfter;
 	
@@ -33,15 +35,18 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 		void onThingSelected(Entity thing, int position);
 	}
 	
-	public static ThingListFragment newInstance() {
-		return new ThingListFragment();
+	public static ThingListFragment newInstance(Topic topic) {
+		ThingListFragment frag = new ThingListFragment();
+		Bundle b = new Bundle(1);
+		b.putParcelable(ARG_TOPIC, topic);
+		frag.setArguments(b);
+		return frag;
 	}
-
+	
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		listener = (OnThingSelectedListener) activity;
-		topicHolder = (TopicHolder) activity;
 		layoutInfo = (LayoutInfo) activity;
 	}
 	
@@ -49,6 +54,7 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
+		topic = getArguments().getParcelable(ARG_TOPIC);
 	}
 		
 	@Override
@@ -70,9 +76,9 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	}
 	
 	private void loadThings(String after) {
-		Topic topic = topicHolder.getTopic().withTopic(after);
-		task = new ThingLoaderTask(this, "all".equals(topic.title));
-		task.execute(topic);
+		Topic t = topic.withTopic(after);
+		task = new ThingLoaderTask(this, "all".equals(t.title));
+		task.execute(t);
 	}
 	
 	public void onPreExecute() {

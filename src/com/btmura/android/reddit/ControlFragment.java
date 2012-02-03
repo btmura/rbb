@@ -3,7 +3,7 @@ package com.btmura.android.reddit;
 import android.app.Fragment;
 import android.os.Bundle;
 
-public class ControlFragment extends Fragment implements TopicHolder, ThingHolder {
+public class ControlFragment extends Fragment {
 	
 	private static final String STATE_TOPIC = "topic";
 	private static final String STATE_THING = "thing";

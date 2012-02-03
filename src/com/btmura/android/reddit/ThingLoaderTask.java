@@ -107,7 +107,11 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 		
 		@Override
 		public void onSubreddit(JsonReader reader, int index) throws IOException {
-			getEntity(index).subreddit = getString(reader);
+			if (includeSubreddit) {
+				getEntity(index).subreddit = getString(reader);
+			} else {
+				reader.skipValue();
+			}
 		}
 		
 		@Override
@@ -150,7 +154,6 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 			case Entity.TYPE_THING:
 				e.line1 = Formatter.formatTitle(e.title);
 				e.line2 = getInfo(e);
-				e.author = e.url = e.permaLink = null;
 				break;
 			}
 		}

@@ -154,8 +154,6 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			default:
 				throw new IllegalArgumentException("Unsupported type: " + e.type);
 			}
-			
-			e.title = e.author = e.selfText = e.body = null;
 		}
 
 		private SpannableStringBuilder getStatus(Entity e) {

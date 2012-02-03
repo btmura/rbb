@@ -1,6 +1,5 @@
 package com.btmura.android.reddit;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -15,25 +14,26 @@ import android.widget.ProgressBar;
 
 public class LinkFragment extends Fragment {
 	
-	private ThingHolder thingHolder;
+	private static final String ARG_THING = "thing";
+
+	private Entity thing;
 
 	private WebView webView;
 	private ProgressBar progress;
 	
-	public static LinkFragment newInstance() {
-		return new LinkFragment();
+	public static LinkFragment newInstance(Entity thing) {
+		LinkFragment frag = new LinkFragment();
+		Bundle b = new Bundle(2);
+		b.putParcelable(ARG_THING, thing);
+		frag.setArguments(b);
+		return frag;
 	}
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		thingHolder = (ThingHolder) activity;
-	}
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
+		thing = getArguments().getParcelable(ARG_THING);
 	}
 	
 	@Override
@@ -74,7 +74,7 @@ public class LinkFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		webView.loadUrl(thingHolder.getThing().url);
+		webView.loadUrl(thing.url);
 	}
 	
 	@Override
