@@ -6,7 +6,7 @@ import android.os.Parcelable;
 public class Entity implements Parcelable {
 	
 	public static final int NUM_TYPES = 4;
-	public static final int TYPE_TITLE = 0;
+	public static final int TYPE_THING = 0;
 	public static final int TYPE_HEADER = 1;
 	public static final int TYPE_COMMENT = 2;
 	public static final int TYPE_MORE = 3;
@@ -14,15 +14,16 @@ public class Entity implements Parcelable {
 	public int type;
 	public String name;
 	public String title;
+	public String subreddit;
 	public String author;
 	public String url;
 	public String permaLink;
 	public boolean isSelf;
 	public String selfText;
 	public String body;
+	public int score;
 	public int ups;
 	public int downs;
-	
 	public String after;
 	
 	public CharSequence line1;
@@ -48,12 +49,14 @@ public class Entity implements Parcelable {
 		type = parcel.readInt();
 		name = parcel.readString();
 		title = parcel.readString();
+		subreddit = parcel.readString();
 		author = parcel.readString();
 		url = parcel.readString();
 		permaLink = parcel.readString();
 		isSelf = parcel.readInt() == 1;
 		selfText = parcel.readString();
 		body = parcel.readString();
+		score = parcel.readInt();
 		ups = parcel.readInt();
 		downs = parcel.readInt();
 		after = parcel.readString();
@@ -63,12 +66,14 @@ public class Entity implements Parcelable {
 		dest.writeInt(type);
 		dest.writeString(name);
 		dest.writeString(title);
+		dest.writeString(subreddit);
 		dest.writeString(author);
 		dest.writeString(url);
 		dest.writeString(permaLink);
 		dest.writeInt(isSelf ? 1 : 0);
 		dest.writeString(selfText);
 		dest.writeString(body);
+		dest.writeInt(score);
 		dest.writeInt(ups);
 		dest.writeInt(downs);
 		dest.writeString(after);

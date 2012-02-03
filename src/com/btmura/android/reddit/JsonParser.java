@@ -106,6 +106,8 @@ public class JsonParser {
 				onTitle(r, i);
 			} else if ("author".equals(name)) {
 				onAuthor(r, i);
+			} else if ("subreddit".equals(name)) {
+				onSubreddit(r, i);
 			} else if ("url".equals(name)) {
 				onUrl(r, i);
 			} else if ("permalink".equals(name)) {
@@ -116,6 +118,8 @@ public class JsonParser {
 				onSelfText(r, i);
 			} else if ("body".equals(name)) {
 				onBody(r, i);
+			} else if ("score".equals(name)) {
+				onScore(r, i);
 			} else if ("ups".equals(name)) {
 				onUps(r, i);
 			} else if ("downs".equals(name)) {
@@ -161,6 +165,10 @@ public class JsonParser {
 		reader.skipValue();
 	}
 	
+	public void onSubreddit(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
 	public void onUrl(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
@@ -178,6 +186,10 @@ public class JsonParser {
 	}
 	
 	public void onBody(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onScore(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	

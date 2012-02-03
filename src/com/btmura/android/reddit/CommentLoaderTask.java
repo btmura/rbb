@@ -95,40 +95,42 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			Entity e = entities.get(index);
-			e.title = reader.nextString();
+			getEntity(index).title = getString(reader);
 		}
 		
 		@Override
 		public void onAuthor(JsonReader reader, int index) throws IOException {
-			Entity e = entities.get(index);
-			e.author = reader.nextString();
+			getEntity(index).author = getString(reader);
 		}
 
 		@Override
 		public void onSelfText(JsonReader reader, int index) throws IOException {
-			Entity e = entities.get(index);
-			e.selfText = reader.nextString();
+			getEntity(index).selfText = getString(reader);
 		}
 		
 		@Override
 		public void onBody(JsonReader reader, int index) throws IOException {
-			Entity e = entities.get(index);
-			e.body = reader.nextString();
+			getEntity(index).body = getString(reader);
 		}
 		
 		@Override
 		public void onUps(JsonReader reader, int index) throws IOException {
-			Entity e = entities.get(index);
-			e.ups = reader.nextInt();
+			getEntity(index).ups = reader.nextInt();
 		}
 		
 		@Override
 		public void onDowns(JsonReader reader, int index) throws IOException {
-			Entity e = entities.get(index);
-			e.downs = reader.nextInt();
+			getEntity(index).downs = reader.nextInt();
 		}
 		
+		private Entity getEntity(int index) {
+			return entities.get(index);
+		}
+		
+		private String getString(JsonReader reader) throws IOException {
+			return reader.nextString().trim();
+		}
+
 		@Override
 		public void onEntityEnd(int index) {
 			Entity e = entities.get(index);
@@ -152,9 +154,11 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			default:
 				throw new IllegalArgumentException("Unsupported type: " + e.type);
 			}
+			
+			e.title = e.author = e.selfText = e.body = null;
 		}
 
-		private final SpannableStringBuilder getStatus(Entity e) {
+		private SpannableStringBuilder getStatus(Entity e) {
 			SpannableStringBuilder b = new SpannableStringBuilder();
 			b.append(e.author);
 			b.append("  ");

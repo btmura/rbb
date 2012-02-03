@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import android.os.AsyncTask;
 import android.os.SystemClock;
+import android.text.SpannableStringBuilder;
 import android.util.Log;
 
 import com.btmura.android.reddit.ThingLoaderTask.ThingLoaderResult;
@@ -25,9 +26,11 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 	private static final String TAG = "ThingLoaderTask";
 
 	private final TaskListener<ThingLoaderResult> listener;
+	private final boolean includeSubreddit;
 
-	public ThingLoaderTask(TaskListener<ThingLoaderResult> listener) {
+	public ThingLoaderTask(TaskListener<ThingLoaderResult> listener, boolean includeSubreddit) {
 		this.listener = listener;
+		this.includeSubreddit = includeSubreddit;
 	}
 	
 	@Override
@@ -54,7 +57,7 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			ThingParser parser = new ThingParser();
+			ThingParser parser = new ThingParser(includeSubreddit);
 			parser.parseListingObject(reader);
 			stream.close();
 			
@@ -77,40 +80,49 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 	
 	static class ThingParser extends JsonParser {
 		
+		private final boolean includeSubreddit;
 		private final ArrayList<Entity> entities = new ArrayList<Entity>(25);
-		
 		private String after;
+		
+		ThingParser(boolean includeSubreddit) {
+			this.includeSubreddit = includeSubreddit;
+		}
 		
 		@Override
 		public void onEntityStart(int index) {
 			Entity e = new Entity();
-			e.type = Entity.TYPE_TITLE;
+			e.type = Entity.TYPE_THING;
 			entities.add(e);
 		}
 		
 		@Override
 		public void onId(JsonReader reader, int index) throws IOException {
-			getEntity(index).name = reader.nextString();
+			getEntity(index).name = getString(reader);
 		}
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			getEntity(index).title = Formatter.formatTitle(reader.nextString()).toString();
+			getEntity(index).title = getString(reader);
+		}
+		
+		@Override
+		public void onSubreddit(JsonReader reader, int index) throws IOException {
+			getEntity(index).subreddit = getString(reader);
 		}
 		
 		@Override
 		public void onAuthor(JsonReader reader, int index) throws IOException {
-			getEntity(index).author = reader.nextString();
+			getEntity(index).author = getString(reader);
 		}
 		
 		@Override
 		public void onUrl(JsonReader reader, int index) throws IOException {
-			getEntity(index).url = reader.nextString();
+			getEntity(index).url = getString(reader);
 		}
 		
 		@Override
 		public void onPermaLink(JsonReader reader, int index) throws IOException {
-			getEntity(index).permaLink = reader.nextString();
+			getEntity(index).permaLink = getString(reader);
 		}
 		
 		@Override
@@ -118,8 +130,41 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 			getEntity(index).isSelf = reader.nextBoolean();
 		}
 		
+		@Override
+		public void onScore(JsonReader reader, int index) throws IOException {
+			getEntity(index).score = reader.nextInt();
+		}
+		
 		private Entity getEntity(int index) {
 			return entities.get(index);
+		}
+		
+		private static String getString(JsonReader reader) throws IOException {
+			return reader.nextString().trim();
+		}
+		
+		@Override
+		public void onEntityEnd(int index) {
+			Entity e = entities.get(index);
+			switch (e.type) {
+			case Entity.TYPE_THING:
+				e.line1 = Formatter.formatTitle(e.title);
+				e.line2 = getInfo(e);
+				e.author = e.url = e.permaLink = null;
+				break;
+			}
+		}
+		
+		private CharSequence getInfo(Entity e) {
+			SpannableStringBuilder b = new SpannableStringBuilder();
+			if (includeSubreddit) {
+				b.append(e.subreddit).append("  ");
+			}
+			b.append(e.author).append("  ");
+			if (e.score > 0) {
+				b.append("+");
+			}
+			return b.append(Integer.toString(e.score));
 		}
 		
 		@Override

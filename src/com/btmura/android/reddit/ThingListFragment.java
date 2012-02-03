@@ -71,7 +71,7 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	
 	private void loadThings(String after) {
 		Topic topic = topicHolder.getTopic().withTopic(after);
-		task = new ThingLoaderTask(this);
+		task = new ThingLoaderTask(this, "all".equals(topic.title));
 		task.execute(topic);
 	}
 	
@@ -81,7 +81,7 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	public void onPostExecute(ThingLoaderResult result) {
 		pendingAfter = result.after;
 		if (adapter == null) {
-			adapter = new EntityAdapter(getActivity(), result.entities);
+			adapter = new EntityAdapter(result.entities, getActivity().getLayoutInflater());
 			setListAdapter(adapter);
 			setEmptyText(getString(result.entities != null ? R.string.empty : R.string.error));
 		} else {
@@ -99,7 +99,7 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 		super.onListItemClick(l, v, position, id);
 		Entity e = adapter.getItem(position);
 		switch (e.type) {
-		case Entity.TYPE_TITLE:
+		case Entity.TYPE_THING:
 			listener.onThingSelected(adapter.getItem(position), position);
 			break;
 			

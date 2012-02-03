@@ -47,7 +47,7 @@ public class CommentListFragment extends ListFragment implements TaskListener<Ar
 	}
 	
 	public void onPostExecute(ArrayList<Entity> entities) {
-		adapter = new EntityAdapter(getActivity(), entities);
+		adapter = new EntityAdapter(entities, getActivity().getLayoutInflater());
 		setEmptyText(getString(entities != null ? R.string.empty : R.string.error));
 		setListAdapter(adapter);
 	}
