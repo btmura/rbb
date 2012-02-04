@@ -16,16 +16,17 @@ import com.btmura.android.reddit.ThingLoaderTask.ThingLoaderResult;
 
 public class ThingListFragment extends ListFragment implements OnScrollListener, TaskListener<ThingLoaderResult> {
 	
-	@SuppressWarnings("unused")
-	private static final String TAG = "ThingListFragment";
-	
 	private static final String ARG_TOPIC = "topic";
-
+	private static final String ARG_SINGLE_CHOICE = "singleChoice";
+	
+	private static final String STATE_POSITION = "position";
+	
 	private OnThingSelectedListener listener;
-	private LayoutInfo layoutInfo;
+	
+	private Topic topic;
+	private boolean singleChoice;
 	
 	private EntityAdapter adapter;
-	private Topic topic;
 	private ThingLoaderTask task;
 	private String pendingAfter;
 	
@@ -35,10 +36,11 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 		void onThingSelected(Entity thing, int position);
 	}
 	
-	public static ThingListFragment newInstance(Topic topic) {
+	public static ThingListFragment newInstance(Topic topic, boolean singleChoice) {
 		ThingListFragment frag = new ThingListFragment();
 		Bundle b = new Bundle(1);
 		b.putParcelable(ARG_TOPIC, topic);
+		b.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
 		frag.setArguments(b);
 		return frag;
 	}
@@ -47,7 +49,6 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		listener = (OnThingSelectedListener) activity;
-		layoutInfo = (LayoutInfo) activity;
 	}
 	
 	@Override
@@ -55,13 +56,14 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 		topic = getArguments().getParcelable(ARG_TOPIC);
+		singleChoice = getArguments().getBoolean(ARG_SINGLE_CHOICE);
 	}
 		
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = super.onCreateView(inflater, container, savedInstanceState);
 		ListView list = (ListView) view.findViewById(android.R.id.list);
-		list.setChoiceMode(layoutInfo.hasThingContainer() ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
+		list.setChoiceMode(singleChoice ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 		list.setOnScrollListener(this);
 		return view;
 	}
@@ -69,10 +71,13 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		setPosition();
 		if (adapter == null) {
 			loadThings(null);
 		}
+		if (savedInstanceState != null) {
+			position = savedInstanceState.getInt(STATE_POSITION);
+		}
+		setItemChecked(position);
 	}
 	
 	private void loadThings(String after) {
@@ -89,6 +94,7 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 		if (adapter == null) {
 			adapter = new EntityAdapter(result.entities, getActivity().getLayoutInflater());
 			setListAdapter(adapter);
+			setItemChecked(position);
 			setEmptyText(getString(result.entities != null ? R.string.empty : R.string.error));
 		} else {
 			if (result.entities != null) {
@@ -101,8 +107,16 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	}
 	
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt(STATE_POSITION, position);
+	}
+	
+	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
+		this.position = position;
+		
 		Entity e = adapter.getItem(position);
 		switch (e.type) {
 		case Entity.TYPE_THING:
@@ -156,15 +170,10 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	}
 	
 	public void setItemChecked(int position) {
-		this.position = position;
-	}
-	
-	private void setPosition() {
 		if (position == ListView.INVALID_POSITION) {
 			getListView().clearChoices();
 		} else {
 			getListView().setItemChecked(position, true);
-			getListView().setSelection(position);
 		}
 	}
 	

@@ -20,7 +20,7 @@ import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.TopicListFragment.OnTopicSelectedListener;
 
 public class MainActivity extends Activity implements OnBackStackChangedListener,
-		OnTopicSelectedListener, OnThingSelectedListener, LayoutInfo {
+		OnTopicSelectedListener, OnThingSelectedListener {
 
 	@SuppressWarnings("unused")
 	private static final String TAG = "MainActivity";
@@ -78,7 +78,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void setupFragments() {
 		if (singleContainer != null) {
 			ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1);
-			TopicListFragment topicFrag = TopicListFragment.newInstance(-1);
+			TopicListFragment topicFrag = TopicListFragment.newInstance(-1, hasThingListContainer());
 			
 			FragmentTransaction trans = manager.beginTransaction();
 			trans.add(controlFrag, CONTROL_TAG);
@@ -90,7 +90,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		
 		if (topicListContainer != null) {
 			ControlFragment controlFrag = ControlFragment.newInstance(topic, 0, null, -1);
-			TopicListFragment topicFrag = TopicListFragment.newInstance(0);
+			TopicListFragment topicFrag = TopicListFragment.newInstance(0, hasThingListContainer());
 			
 			FragmentTransaction trans = manager.beginTransaction();
 			trans.add(controlFrag, CONTROL_TAG);
@@ -124,7 +124,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		ControlFragment controlFrag = ControlFragment.newInstance(topic, position, null, -1);
 		trans.add(controlFrag, CONTROL_TAG);
 		
-		ThingListFragment thingListFrag = ThingListFragment.newInstance(topic);
+		ThingListFragment thingListFrag = ThingListFragment.newInstance(topic, hasThingContainer());
 		trans.replace(thingListContainerId, thingListFrag, THING_LIST_TAG);
 		
 		if (addToBackStack) {
