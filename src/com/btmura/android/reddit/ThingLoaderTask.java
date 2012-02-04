@@ -11,10 +11,11 @@ import java.util.ArrayList;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.text.SpannableStringBuilder;
+import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.ThingLoaderTask.ThingLoaderResult;
-import com.google.gson.stream.JsonReader;
+
 
 public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 	

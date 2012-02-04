@@ -13,9 +13,9 @@ import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
+import android.util.JsonReader;
 import android.util.Log;
 
-import com.google.gson.stream.JsonReader;
 
 public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>> {
 	
