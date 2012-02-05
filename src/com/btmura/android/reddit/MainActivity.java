@@ -27,13 +27,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private static final String CONTROL_TAG = "control";
 	private static final String TOPIC_LIST_TAG = "topicList";
-	private static final String THING_LIST_TAG = "thingList";
-	private static final String THING_TAG = "thing";
+	private static final String THING_SUBREDDIT_TAG = "thingList";
+	private static final String THING_LINK_TAG = "thingLink";
+	private static final String THING_COMMENTS_TAG = "thingComments";
 	
-	private static final String THING_FRAG_TYPE = "type";
-	private static final int THING_FRAG_LINK = 0;
-	private static final int THING_FRAG_COMMENTS = 1;
-
 	private FragmentManager manager;
 	private ActionBar bar;
 	
@@ -116,8 +113,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void replaceThingList(Topic topic, int position, boolean addToBackStack) {
-		manager.popBackStack(THING_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-		manager.popBackStack(THING_LIST_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		manager.popBackStack(THING_COMMENTS_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		manager.popBackStack(THING_LINK_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		manager.popBackStack(THING_SUBREDDIT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		
 		FragmentTransaction trans = manager.beginTransaction();
 
@@ -125,32 +123,29 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		trans.add(controlFrag, CONTROL_TAG);
 		
 		ThingListFragment thingListFrag = ThingListFragment.newInstance(topic, hasThingContainer());
-		trans.replace(thingListContainerId, thingListFrag, THING_LIST_TAG);
+		trans.replace(thingListContainerId, thingListFrag, THING_SUBREDDIT_TAG);
 		
 		if (addToBackStack) {
-			trans.addToBackStack(THING_LIST_TAG);
+			trans.addToBackStack(THING_SUBREDDIT_TAG);
 		}
 		trans.commit();
 	}
 	
 	public void onThingSelected(Entity thing, int position) {
-		replaceThing(thing, position, thing.isSelf ? THING_FRAG_COMMENTS : THING_FRAG_LINK);
+		replaceThing(thing, position, thing.isSelf ? THING_COMMENTS_TAG : THING_LINK_TAG);
 	}
 	
-	private void replaceThing(Entity thing, int position, int thingFragType) {
-		manager.popBackStack(THING_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+	private void replaceThing(Entity thing, int position, String tag) {
+		manager.popBackStack(THING_COMMENTS_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		manager.popBackStack(THING_LINK_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		
 		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
-		Fragment frag = thingFragType == THING_FRAG_COMMENTS ? CommentListFragment.newInstance(thing) : LinkFragment.newInstance(thing);
-		
-		Bundle args = frag.getArguments();
-		args.putInt(THING_FRAG_TYPE, thingFragType);
-		frag.setArguments(args);
+		Fragment frag = THING_COMMENTS_TAG.equals(tag) ? CommentListFragment.newInstance(thing) : LinkFragment.newInstance(thing);
 		
 		FragmentTransaction trans = manager.beginTransaction();
 		trans.add(controlFrag, CONTROL_TAG);
-		trans.replace(thingContainerId, frag, THING_TAG);
-		trans.addToBackStack(THING_TAG);
+		trans.replace(thingContainerId, frag, tag);
+		trans.addToBackStack(tag);
 		trans.commit();		
 	}
 	
@@ -191,13 +186,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private ThingListFragment getThingListFragment() {
-		return (ThingListFragment) manager.findFragmentByTag(THING_LIST_TAG);
+		return (ThingListFragment) manager.findFragmentByTag(THING_SUBREDDIT_TAG);
 	}
 	
-	private Fragment getThingFragment() {
-		return manager.findFragmentByTag(THING_TAG);
-	}
-
 	public void onBackStackChanged() {
 		refreshHome();
 		refreshTitle();
@@ -252,19 +243,19 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		super.onPrepareOptionsMenu(menu);
 		boolean hasThing = getThing() != null;
 		boolean isSelf = hasThing && getThing().isSelf;
-		menu.findItem(R.id.menu_link).setVisible(hasThing && !isSelf && isThingFragmentType(THING_FRAG_COMMENTS));
-		menu.findItem(R.id.menu_comments).setVisible(hasThing && !isSelf && isThingFragmentType(THING_FRAG_LINK));
+		menu.findItem(R.id.menu_link).setVisible(hasThing && !isSelf && isVisible(THING_COMMENTS_TAG));
+		menu.findItem(R.id.menu_comments).setVisible(hasThing && !isSelf && isVisible(THING_LINK_TAG));
 		menu.findItem(R.id.menu_copy_link).setVisible(hasThing && !isSelf);
 		menu.findItem(R.id.menu_copy_reddit_link).setVisible(hasThing);
 		menu.findItem(R.id.menu_view).setVisible(hasThing && !isSelf);
 		return true;
 	}
 	
-	private boolean isThingFragmentType(int type) {
-		Fragment thingFrag = getThingFragment();
-		return thingFrag != null && thingFrag.getArguments().getInt(THING_FRAG_TYPE) == type;
+	private boolean isVisible(String tag) {
+		Fragment f = manager.findFragmentByTag(tag);
+		return f != null && f.isVisible();
 	}
-	
+		
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		super.onOptionsItemSelected(item);
@@ -299,21 +290,19 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void handleHome() {
 		int count = manager.getBackStackEntryCount();
 		if (count > 0) {
-			String name = manager.getBackStackEntryAt(count - 1).getName();
-			if (THING_TAG.equals(name)) {
-				manager.popBackStack(THING_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-			} else if (THING_LIST_TAG.equals(name)) {
-				manager.popBackStack(THING_LIST_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			String tag = manager.getBackStackEntryAt(count - 1).getName();
+			if (THING_COMMENTS_TAG.equals(tag) || THING_LINK_TAG.equals(tag) || THING_SUBREDDIT_TAG.equals(tag)) {
+				manager.popBackStack(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			}
 		}
 	}
 	
 	private void handleLink() {
-		replaceThing(getThing(), getThingPosition(), THING_FRAG_LINK);
+		replaceThing(getThing(), getThingPosition(), THING_LINK_TAG);
 	}
 	
 	private void handleComments() {
-		replaceThing(getThing(), getThingPosition(), THING_FRAG_COMMENTS);
+		replaceThing(getThing(), getThingPosition(), THING_COMMENTS_TAG);
 	}
 	
 	private void handleCopyLink() {
