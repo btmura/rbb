@@ -103,7 +103,7 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			getEntity(index).title = getString(reader);
+			getEntity(index).title = Formatter.format(getString(reader)).toString();
 		}
 		
 		@Override
@@ -153,7 +153,7 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 			Entity e = entities.get(index);
 			switch (e.type) {
 			case Entity.TYPE_THING:
-				e.line1 = Formatter.formatTitle(e.title);
+				e.line1 = e.title;
 				e.line2 = getInfo(e);
 				break;
 			}

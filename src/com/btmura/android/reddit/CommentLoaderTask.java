@@ -95,7 +95,7 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			getEntity(index).title = getString(reader);
+			getEntity(index).title = Formatter.format(getString(reader)).toString();
 		}
 		
 		@Override
@@ -136,7 +136,7 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			Entity e = entities.get(index);
 			switch (e.type) {
 			case Entity.TYPE_HEADER:
-				e.line1 = Formatter.formatTitle(e.title);
+				e.line1 = e.title;
 				e.line2 = Formatter.format(e.selfText);
 				e.line3 = getStatus(e);
 				break;
