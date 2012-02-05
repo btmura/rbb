@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
+import android.text.style.BulletSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
@@ -14,17 +15,23 @@ public class Formatter {
 	private static Pattern ITALIC_PATTERN = Pattern.compile("\\*(.+?)\\*");
 	private static Pattern STRIKE_THROUGH_PATTERN = Pattern.compile("~~(.+?)~~");
 	private static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+?);");
+	private static Pattern BULLET_PATTERN = Pattern.compile("\\* ([^\\n]+)");
 	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\]\\(([^\\)]+?)\\)");
-	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([A-Za-z0-9\\./\\-_#\\?&=;,+%']+)");
+	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([^ \\n]+)");
 	
-	private static final Matcher m = BOLD_PATTERN.matcher("");
+	private static final int SPAN_BOLD = 0;
+	private static final int SPAN_ITALIC = 1;
+	private static final int SPAN_STRIKETHROUGH = 2;
+	private static final int SPAN_BULLET = 3;
 	
+	private static final Matcher MATCHER = BOLD_PATTERN.matcher("");
+		
 	public static CharSequence formatTitle(String text) {
 		if (text.indexOf("&") != -1) {
 			SpannableStringBuilder b = new SpannableStringBuilder(text);
-			m.usePattern(ESCAPED_PATTERN);
-			m.reset(b);
-			formatEscaped(b, m);
+			MATCHER.usePattern(ESCAPED_PATTERN);
+			MATCHER.reset(b);
+			formatEscaped(b, MATCHER);
 			return b;
 		}
 		return text;
@@ -34,97 +41,114 @@ public class Formatter {
 		SpannableStringBuilder b = null;
 	
 		if (text.indexOf("**") != -1) {
-			m.usePattern(BOLD_PATTERN);
+			MATCHER.usePattern(BOLD_PATTERN);
 			if (b == null) {
 				b = new SpannableStringBuilder(text);
 			}
-			m.reset(b);
-			formatBold(b, m);
+			MATCHER.reset(b);
+			formatBold(b, MATCHER);
 		}
 		
 		if (text.indexOf("*") != -1) {
-			m.usePattern(ITALIC_PATTERN);
+			MATCHER.usePattern(ITALIC_PATTERN);
 			if (b == null) {
 				b = new SpannableStringBuilder(text);
 			}
-			m.reset(b);
-			formatItalic(b, m);
+			MATCHER.reset(b);
+			formatItalic(b, MATCHER);
 		}
 		
 		if (text.indexOf("~~") != -1) {
-			m.usePattern(STRIKE_THROUGH_PATTERN);
+			MATCHER.usePattern(STRIKE_THROUGH_PATTERN);
 			if (b == null) {
 				b = new SpannableStringBuilder(text);
 			}
-			m.reset(b);
-			formatStrikeThrough(b, m);
+			MATCHER.reset(b);
+			formatStrikeThrough(b, MATCHER);
 		}
 		
 		if (text.indexOf("&") != -1) {
-			m.usePattern(ESCAPED_PATTERN);
+			MATCHER.usePattern(ESCAPED_PATTERN);
 			if (b == null) {
 				b = new SpannableStringBuilder(text);
 			}
-			m.reset(b);
-			formatEscaped(b, m);
+			MATCHER.reset(b);
+			formatEscaped(b, MATCHER);
+		}
+		
+		if (text.indexOf("*") != -1) {
+			MATCHER.usePattern(BULLET_PATTERN);
+			if (b == null) {
+				b = new SpannableStringBuilder(text);
+			}
+			MATCHER.reset(b);
+			formatBullets(b, MATCHER);
 		}
 		
 		if (text.indexOf("[") != -1) {
-			m.usePattern(NAMED_LINK_PATTERN);
+			MATCHER.usePattern(NAMED_LINK_PATTERN);
 			if (b == null) {
 				b = new SpannableStringBuilder(text);
 			}
-			m.reset(b);
-			formatNamedLinks(b, m);
+			MATCHER.reset(b);
+			formatNamedLinks(b, MATCHER);
 		}
 		
 		if (text.indexOf("http") != -1) {
-			m.usePattern(RAW_LINK_PATTERN);
+			MATCHER.usePattern(RAW_LINK_PATTERN);
 			if (b == null) {
 				b = new SpannableStringBuilder(text);
 			}
-			m.reset(b);
-			formatRawLinks(b, m);
+			MATCHER.reset(b);
+			formatRawLinks(b, MATCHER);
 		}
 		
 		return b != null ? b : text;
 	}
 	
 	private static void formatBold(SpannableStringBuilder b, Matcher m) {
-		for (int deleted = 0; m.find(); ) {
-			int s = m.start() - deleted;
-			int e = m.end() - deleted;
-			String value = m.group(1);
-			b.replace(s, e, value);
-			deleted += 4;			
-			
-			StyleSpan span = new StyleSpan(Typeface.BOLD);
-			b.setSpan(span, s, s + value.length(), 0);
-		}
+		replaceWithSpan(b, m, 4, SPAN_BOLD);
 	}
 	
 	private static void formatItalic(SpannableStringBuilder b, Matcher m) {
-		for (int deleted = 0; m.find(); ) {
-			int s = m.start() - deleted;
-			int e = m.end() - deleted;
-			String value = m.group(1);
-			b.replace(s, e, value);
-			deleted += 2;			
-			
-			StyleSpan span = new StyleSpan(Typeface.ITALIC);
-			b.setSpan(span, s, s + value.length(), 0);
-		}
+		replaceWithSpan(b, m, 2, SPAN_ITALIC);
 	}
 	
 	private static void formatStrikeThrough(SpannableStringBuilder b, Matcher m) {
+		replaceWithSpan(b, m, 4, SPAN_STRIKETHROUGH);
+	}
+	
+	private static void formatBullets(SpannableStringBuilder b, Matcher m) {
+		replaceWithSpan(b, m, 2, SPAN_BULLET);
+	}
+	
+	private static void replaceWithSpan(SpannableStringBuilder b, Matcher m, int charsDeleted, int spanType) {
 		for (int deleted = 0; m.find(); ) {
 			int s = m.start() - deleted;
 			int e = m.end() - deleted;
 			String value = m.group(1);
 			b.replace(s, e, value);
-			deleted += 4;			
+			deleted += charsDeleted;			
 			
-			StrikethroughSpan span = new StrikethroughSpan();
+			Object span = null;
+			switch (spanType) {
+			case SPAN_BOLD:
+				span = new StyleSpan(Typeface.BOLD);
+				break;
+				
+			case SPAN_ITALIC:
+				span = new StyleSpan(Typeface.ITALIC);
+				break;
+				
+			case SPAN_STRIKETHROUGH:
+				span = new StrikethroughSpan();
+				break;
+				
+			case SPAN_BULLET:
+				span = new BulletSpan(10);
+				break;
+			}
+			
 			b.setSpan(span, s, s + value.length(), 0);
 		}
 	}
