@@ -44,7 +44,11 @@ public class TopicListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
-		position = getArguments().getInt(ARG_POSITION);
+		if (savedInstanceState != null) {
+			position = savedInstanceState.getInt(STATE_POSITION);
+		} else {
+			position = getArguments().getInt(ARG_POSITION);
+		}
 		singleChoice = getArguments().getBoolean(ARG_SINGLE_CHOICE);
 		adapter = new TopicAdapter(getActivity());
 	}
@@ -61,9 +65,6 @@ public class TopicListFragment extends ListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		setListAdapter(adapter);
-		if (savedInstanceState != null) {
-			position = savedInstanceState.getInt(STATE_POSITION);
-		}
 		setItemChecked(position);
 	}
 	
