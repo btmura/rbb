@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_link"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/menu_link"/>
+    <item
         android:id="@+id/menu_comments"
         android:showAsAction="ifRoom|withText"
         android:title="@string/menu_comments"/>
