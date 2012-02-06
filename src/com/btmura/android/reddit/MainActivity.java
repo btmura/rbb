@@ -113,8 +113,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void replaceThingList(Topic topic, int position, boolean addToBackStack) {
-		manager.popBackStack(THING_COMMENTS_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-		manager.popBackStack(THING_LINK_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		manager.popBackStack(THING_SUBREDDIT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 		
 		FragmentTransaction trans = manager.beginTransaction();
@@ -136,9 +134,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void replaceThing(Entity thing, int position, String tag) {
-		manager.popBackStack(THING_COMMENTS_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-		manager.popBackStack(THING_LINK_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-		
 		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
 		Fragment frag = THING_COMMENTS_TAG.equals(tag) ? CommentListFragment.newInstance(thing) : LinkFragment.newInstance(thing);
 		
@@ -243,7 +238,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		super.onPrepareOptionsMenu(menu);
 		boolean hasThing = getThing() != null;
 		boolean isSelf = hasThing && getThing().isSelf;
-		menu.findItem(R.id.menu_link).setVisible(hasThing && !isSelf && isVisible(THING_COMMENTS_TAG));
 		menu.findItem(R.id.menu_comments).setVisible(hasThing && !isSelf && isVisible(THING_LINK_TAG));
 		menu.findItem(R.id.menu_copy_link).setVisible(hasThing && !isSelf);
 		menu.findItem(R.id.menu_copy_reddit_link).setVisible(hasThing);
@@ -264,10 +258,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			handleHome();
 			return true;
 
-		case R.id.menu_link:
-			handleLink();
-			return true;
-			
 		case R.id.menu_comments:
 			handleComments();
 			return true;
@@ -295,10 +285,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 				manager.popBackStack(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			}
 		}
-	}
-	
-	private void handleLink() {
-		replaceThing(getThing(), getThingPosition(), THING_LINK_TAG);
 	}
 	
 	private void handleComments() {
