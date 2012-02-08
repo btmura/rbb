@@ -22,7 +22,7 @@ public class Topic implements Parcelable {
 		return new Topic(title, null);
 	}
 	
-	public Topic withTopic(String after) {
+	public Topic withAfter(String after) {
 		return after != null ? new Topic(title, after) : this;
 	}
 	

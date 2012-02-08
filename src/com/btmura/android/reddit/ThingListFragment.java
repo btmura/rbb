@@ -67,7 +67,7 @@ public class ThingListFragment extends EntityListFragment<String> {
 	@Override
 	protected AsyncTask<Void, Void, LoadResult<String>> createLoadTask(String moreKey) {
 		Topic t = getArguments().getParcelable(ARG_TOPIC);
-		return new ThingLoaderTask(t.withTopic(moreKey), this, "all".equals(t.title));
+		return new ThingLoaderTask(t.withAfter(moreKey), this, "all".equals(t.title));
 	}
 	
 	@Override

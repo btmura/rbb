@@ -7,7 +7,7 @@
 
     <FrameLayout
         android:id="@+id/topic_list_container"
-        android:layout_width="150dp"
+        android:layout_width="100dp"
         android:layout_height="match_parent" />
 
     <View
@@ -30,6 +30,6 @@
         android:id="@+id/thing_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="3" />
+        android:layout_weight="1.5" />
 
 </LinearLayout>
