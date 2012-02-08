@@ -24,7 +24,6 @@ public class Entity implements Parcelable {
 	public int score;
 	public int ups;
 	public int downs;
-	public String after;
 	
 	public CharSequence line1;
 	public CharSequence line2;
@@ -59,7 +58,6 @@ public class Entity implements Parcelable {
 		score = parcel.readInt();
 		ups = parcel.readInt();
 		downs = parcel.readInt();
-		after = parcel.readString();
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
@@ -76,7 +74,6 @@ public class Entity implements Parcelable {
 		dest.writeInt(score);
 		dest.writeInt(ups);
 		dest.writeInt(downs);
-		dest.writeString(after);
 	}
 	
 	public String getId() {

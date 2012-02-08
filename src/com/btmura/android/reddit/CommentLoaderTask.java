@@ -8,6 +8,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import com.btmura.android.reddit.EntityListFragment.LoadResult;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.SystemClock;
@@ -17,15 +19,29 @@ import android.util.JsonReader;
 import android.util.Log;
 
 
-public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>> {
+public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
+	
+	static class CommentLoaderResult implements LoadResult<Void> {
+		ArrayList<Entity> entities;
+		
+		public ArrayList<Entity> getEntities() {
+			return entities;
+		}
+		
+		public Void getMoreKey() {
+			return null;
+		}
+	}
 	
 	private static final String TAG = "CommentLoaderTask";
 
 	private final Context context;
-	private final TaskListener<ArrayList<Entity>> listener;
+	private final Entity thing;
+	private final TaskListener<LoadResult<Void>> listener;
 
-	public CommentLoaderTask(Context context, TaskListener<ArrayList<Entity>> listener) {
+	public CommentLoaderTask(Context context, Entity thing, TaskListener<LoadResult<Void>> listener) {
 		this.context = context;
+		this.thing = thing;
 		this.listener = listener;
 	}
 	
@@ -35,14 +51,15 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 	}
 
 	@Override
-	protected void onPostExecute(ArrayList<Entity> comments) {
-		listener.onPostExecute(comments);
+	protected void onPostExecute(LoadResult<Void> result) {
+		listener.onPostExecute(result);
 	}
 
 	@Override
-	protected ArrayList<Entity> doInBackground(Entity... things) {
+	protected LoadResult<Void> doInBackground(Void... intoTheVoid) {
+		CommentLoaderResult result = new CommentLoaderResult();
 		try {
-			URL commentsUrl = new URL("http://www.reddit.com/comments/" + things[0].getId() + ".json");
+			URL commentsUrl = new URL("http://www.reddit.com/comments/" + thing.getId() + ".json");
 			Log.v(TAG, commentsUrl.toString());
 			
 			HttpURLConnection connection = (HttpURLConnection) commentsUrl.openConnection();
@@ -60,14 +77,15 @@ public class CommentLoaderTask extends AsyncTask<Entity, Void, ArrayList<Entity>
 			Log.v(TAG, Long.toString(t2 - t1));
 			Log.v(TAG, Integer.toString(parser.entities.size()));
 			
-			return parser.entities;
+			
+			result.entities = parser.entities;
 			
 		} catch (MalformedURLException e) {
 			Log.e(TAG, "", e);
 		} catch (IOException e) {
 			Log.e(TAG, "", e);
 		}
-		return null;
+		return result;
 	}
 	
 	class EntityParser extends JsonParser {
