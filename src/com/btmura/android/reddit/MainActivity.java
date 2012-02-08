@@ -256,7 +256,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private boolean isVisible(String tag) {
 		Fragment f = manager.findFragmentByTag(tag);
-		return f != null && f.isVisible();
+		return f != null && f.isAdded();
 	}
 		
 	@Override
