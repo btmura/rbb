@@ -23,7 +23,7 @@ public class LinkFragment extends Fragment {
 	
 	public static LinkFragment newInstance(Entity thing) {
 		LinkFragment frag = new LinkFragment();
-		Bundle b = new Bundle(2);
+		Bundle b = new Bundle(1);
 		b.putParcelable(ARG_THING, thing);
 		frag.setArguments(b);
 		return frag;

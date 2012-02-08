@@ -23,9 +23,6 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	
 	private OnThingSelectedListener listener;
 	
-	private Topic topic;
-	private boolean singleChoice;
-	
 	private EntityAdapter adapter;
 	private ThingLoaderTask task;
 	private String pendingAfter;
@@ -38,7 +35,7 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	
 	public static ThingListFragment newInstance(Topic topic, boolean singleChoice) {
 		ThingListFragment frag = new ThingListFragment();
-		Bundle b = new Bundle(1);
+		Bundle b = new Bundle(2);
 		b.putParcelable(ARG_TOPIC, topic);
 		b.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
 		frag.setArguments(b);
@@ -55,14 +52,13 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
-		topic = getArguments().getParcelable(ARG_TOPIC);
-		singleChoice = getArguments().getBoolean(ARG_SINGLE_CHOICE);
 	}
 		
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = super.onCreateView(inflater, container, savedInstanceState);
 		ListView list = (ListView) view.findViewById(android.R.id.list);
+		boolean singleChoice = getArguments().getBoolean(ARG_SINGLE_CHOICE);
 		list.setChoiceMode(singleChoice ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 		list.setOnScrollListener(this);
 		return view;
@@ -78,12 +74,13 @@ public class ThingListFragment extends ListFragment implements OnScrollListener,
 			position = savedInstanceState.getInt(STATE_POSITION);
 		}
 		setItemChecked(position);
+		getListView().setSelection(position);
 	}
 	
 	private void loadThings(String after) {
-		Topic t = topic.withTopic(after);
+		Topic t = getArguments().getParcelable(ARG_TOPIC);
 		task = new ThingLoaderTask(this, "all".equals(t.title));
-		task.execute(t);
+		task.execute(t.withTopic(after));
 	}
 	
 	public void onPreExecute() {

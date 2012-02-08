@@ -10,11 +10,6 @@ public class ControlFragment extends Fragment {
 	private static final String ARG_TOPIC_POSITION = "topicPosition";
 	private static final String ARG_THING_POSITION = "thingPosition";
 	
-	private static final String STATE_TOPIC = "topic";
-	private static final String STATE_THING = "thing";
-	private static final String STATE_TOPIC_POSITION = "topicPosition";
-	private static final String STATE_THING_POSITION = "thingPosition";
-	
 	private Topic topic;
 	private Entity thing;
 	private int topicPosition;
@@ -22,7 +17,7 @@ public class ControlFragment extends Fragment {
 	
 	public static ControlFragment newInstance(Topic topic, int topicPosition, Entity thing, int thingPosition) {
 		ControlFragment frag = new ControlFragment();
-		Bundle b = new Bundle();
+		Bundle b = new Bundle(4);
 		b.putParcelable(ARG_TOPIC, topic);
 		b.putParcelable(ARG_THING, thing);
 		b.putInt(ARG_TOPIC_POSITION, topicPosition);
@@ -51,25 +46,14 @@ public class ControlFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
-        if (savedInstanceState != null) {
-        	topic = savedInstanceState.getParcelable(STATE_TOPIC);
-        	thing = savedInstanceState.getParcelable(STATE_THING);
-        	topicPosition = savedInstanceState.getInt(STATE_TOPIC_POSITION);
-        	thingPosition = savedInstanceState.getInt(STATE_THING_POSITION);
-        } else {
-    		topic = getArguments().getParcelable(ARG_TOPIC);
-    		thing = getArguments().getParcelable(ARG_THING);
-    		topicPosition = getArguments().getInt(ARG_TOPIC_POSITION);
-    		thingPosition = getArguments().getInt(ARG_THING_POSITION);
-        }
 	}
 	
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putParcelable(STATE_TOPIC, topic);
-		outState.putParcelable(STATE_THING, thing);
-		outState.putInt(STATE_TOPIC_POSITION, topicPosition);
-		outState.putInt(STATE_THING_POSITION, thingPosition);
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		topic = getArguments().getParcelable(ARG_TOPIC);
+		thing = getArguments().getParcelable(ARG_THING);
+		topicPosition = getArguments().getInt(ARG_TOPIC_POSITION);
+		thingPosition = getArguments().getInt(ARG_THING_POSITION);
 	}
 }
