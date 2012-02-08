@@ -14,22 +14,32 @@ import android.text.SpannableStringBuilder;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.ThingLoaderTask.ThingLoaderResult;
+import com.btmura.android.reddit.EntityListFragment.LoadResult;
 
 
-public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
+public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 	
-	static class ThingLoaderResult {
+	static class ThingLoaderResult implements LoadResult<String> {
 		ArrayList<Entity> entities;
 		String after;
+		
+		public ArrayList<Entity> getEntities() {
+			return entities;
+		}
+		
+		public String getMoreKey() {
+			return after;
+		}
 	}
 	
 	private static final String TAG = "ThingLoaderTask";
 
-	private final TaskListener<ThingLoaderResult> listener;
+	private final Topic topic;
+	private final TaskListener<LoadResult<String>> listener;
 	private final boolean includeSubreddit;
 
-	public ThingLoaderTask(TaskListener<ThingLoaderResult> listener, boolean includeSubreddit) {
+	public ThingLoaderTask(Topic topic, TaskListener<LoadResult<String>> listener, boolean includeSubreddit) {
+		this.topic = topic;
 		this.listener = listener;
 		this.includeSubreddit = includeSubreddit;
 	}
@@ -40,15 +50,15 @@ public class ThingLoaderTask extends AsyncTask<Topic, Void, ThingLoaderResult> {
 	}
 	
 	@Override
-	protected void onPostExecute(ThingLoaderResult result) {
+	protected void onPostExecute(LoadResult<String> result) {
 		listener.onPostExecute(result);
 	}
 
 	@Override
-	protected ThingLoaderResult doInBackground(Topic... topics) {
+	protected ThingLoaderResult doInBackground(Void... voidRays) {
 		ThingLoaderResult result = new ThingLoaderResult();
 		try {
-			URL url = new URL(topics[0].getUrl().toString());
+			URL url = new URL(topic.getUrl().toString());
 			Log.v(TAG, url.toString());
 			
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
