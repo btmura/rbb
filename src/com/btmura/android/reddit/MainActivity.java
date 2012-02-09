@@ -210,7 +210,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		if (thing != null) {
 			bar.setTitle(thing.title);
 		} else if (topic != null) {
-			bar.setTitle(topic.title);
+			bar.setTitle(topic.name);
 		} else {
 			bar.setTitle(R.string.app_name);
 		}

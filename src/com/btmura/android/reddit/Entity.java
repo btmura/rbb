@@ -1,5 +1,7 @@
 package com.btmura.android.reddit;
 
+import java.util.List;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -24,6 +26,7 @@ public class Entity implements Parcelable {
 	public int score;
 	public int ups;
 	public int downs;
+	public List<String> children;
 	
 	public CharSequence line1;
 	public CharSequence line2;
@@ -53,11 +56,6 @@ public class Entity implements Parcelable {
 		url = parcel.readString();
 		permaLink = parcel.readString();
 		isSelf = parcel.readInt() == 1;
-		selfText = parcel.readString();
-		body = parcel.readString();
-		score = parcel.readInt();
-		ups = parcel.readInt();
-		downs = parcel.readInt();
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
@@ -69,11 +67,6 @@ public class Entity implements Parcelable {
 		dest.writeString(url);
 		dest.writeString(permaLink);
 		dest.writeInt(isSelf ? 1 : 0);
-		dest.writeString(selfText);
-		dest.writeString(body);
-		dest.writeInt(score);
-		dest.writeInt(ups);
-		dest.writeInt(downs);
 	}
 	
 	public String getId() {

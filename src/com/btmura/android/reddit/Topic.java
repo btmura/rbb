@@ -15,38 +15,23 @@ public class Topic implements Parcelable {
 		}
 	};
 	
-	public final String title;
-	public final String after;
+	public final String name;
 	
-	public static Topic newTopic(String title) {
-		return new Topic(title, null);
+	public static Topic newTopic(String name) {
+		return new Topic(name, null);
 	}
-	
-	public Topic withAfter(String after) {
-		return after != null ? new Topic(title, after) : this;
-	}
-	
-	private Topic(String title, String after) {
-		this.title = title;
-		this.after = after;
+		
+	private Topic(String name, String after) {
+		this.name = name;
 	}
 	
 	private Topic(Parcel in) {
-		this.title = in.readString();
-		this.after = in.readString();
-	}
-	
-	public CharSequence getUrl() {
-		StringBuilder b = new StringBuilder("http://www.reddit.com/r/").append(title).append("/.json");
-		if (after != null) {
-			b.append("?count=25&after=").append(after);
-		}
-		return b;
+		this.name = in.readString();
 	}
 	
 	@Override
 	public String toString() {
-		return title;
+		return name;
 	}
 	
 	public int describeContents() {
@@ -54,7 +39,6 @@ public class Topic implements Parcelable {
 	}
 	
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(title);
-		dest.writeString(after);
+		dest.writeString(name);
 	}
 }

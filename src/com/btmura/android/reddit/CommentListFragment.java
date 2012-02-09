@@ -24,6 +24,7 @@ public class CommentListFragment extends EntityListFragment<Void> {
 	@Override
 	protected AsyncTask<Void, Void, LoadResult<Void>> createLoadTask(Void moreKey) {
 		Entity thing = getArguments().getParcelable(ARG_THING);
-		return new CommentLoaderTask(getActivity().getApplicationContext(), thing, this);
+		CharSequence url = Urls.commentsUrl(thing.getId());
+		return new CommentLoaderTask(getActivity().getApplicationContext(), url, this);
 	}
 }

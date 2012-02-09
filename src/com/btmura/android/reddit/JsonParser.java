@@ -100,8 +100,10 @@ public class JsonParser {
 		r.beginObject();
 		while (r.hasNext()) {
 			String name = r.nextName();
-			if ("name".equals(name)) {
+			if ("id".equals(name)) {
 				onId(r, i);
+			} else if ("name".equals(name)) {
+				onName(r, i);
 			} else if ("title".equals(name)) {
 				onTitle(r, i);
 			} else if ("author".equals(name)) {
@@ -124,6 +126,8 @@ public class JsonParser {
 				onUps(r, i);
 			} else if ("downs".equals(name)) {
 				onDowns(r, i);
+			} else if ("children".equals(name)) {
+				onChildren(r, i);
 			} else if ("replies".equals(name)) {
 				if (parseReplies()) {
 					replyNesting++;
@@ -154,6 +158,10 @@ public class JsonParser {
 	}
 	
 	public void onId(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onName(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	
@@ -198,6 +206,10 @@ public class JsonParser {
 	}
 	
 	public void onDowns(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onChildren(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	

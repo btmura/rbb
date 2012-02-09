@@ -34,14 +34,14 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 	
 	private static final String TAG = "ThingLoaderTask";
 
-	private final Topic topic;
+	private final CharSequence subredditUrl;
 	private final TaskListener<LoadResult<String>> listener;
-	private final boolean includeSubreddit;
+	private final boolean displaySubreddit;
 
-	public ThingLoaderTask(Topic topic, TaskListener<LoadResult<String>> listener, boolean includeSubreddit) {
-		this.topic = topic;
+	public ThingLoaderTask(CharSequence subredditUrl, TaskListener<LoadResult<String>> listener, boolean displaySubreddit) {
+		this.subredditUrl = subredditUrl;
 		this.listener = listener;
-		this.includeSubreddit = includeSubreddit;
+		this.displaySubreddit = displaySubreddit;
 	}
 	
 	@Override
@@ -58,7 +58,7 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 	protected ThingLoaderResult doInBackground(Void... voidRays) {
 		ThingLoaderResult result = new ThingLoaderResult();
 		try {
-			URL url = new URL(topic.getUrl().toString());
+			URL url = new URL(subredditUrl.toString());
 			Log.v(TAG, url.toString());
 			
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -68,7 +68,7 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			ThingParser parser = new ThingParser(includeSubreddit);
+			ThingParser parser = new ThingParser(displaySubreddit);
 			parser.parseListingObject(reader);
 			stream.close();
 			
@@ -91,12 +91,12 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 	
 	static class ThingParser extends JsonParser {
 		
-		private final boolean includeSubreddit;
+		private final boolean displaySubreddit;
 		private final ArrayList<Entity> entities = new ArrayList<Entity>(25);
 		private String after;
 		
-		ThingParser(boolean includeSubreddit) {
-			this.includeSubreddit = includeSubreddit;
+		ThingParser(boolean displaySubreddit) {
+			this.displaySubreddit = displaySubreddit;
 		}
 		
 		@Override
@@ -107,7 +107,7 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 		}
 		
 		@Override
-		public void onId(JsonReader reader, int index) throws IOException {
+		public void onName(JsonReader reader, int index) throws IOException {
 			getEntity(index).name = getString(reader);
 		}
 		
@@ -118,11 +118,7 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 		
 		@Override
 		public void onSubreddit(JsonReader reader, int index) throws IOException {
-			if (includeSubreddit) {
-				getEntity(index).subreddit = getString(reader);
-			} else {
-				reader.skipValue();
-			}
+			getEntity(index).subreddit = getString(reader);
 		}
 		
 		@Override
@@ -171,7 +167,7 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 		
 		private CharSequence getInfo(Entity e) {
 			SpannableStringBuilder b = new SpannableStringBuilder();
-			if (includeSubreddit) {
+			if (displaySubreddit) {
 				b.append(e.subreddit).append("  ");
 			}
 			b.append(e.author).append("  ");

@@ -8,8 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import com.btmura.android.reddit.EntityListFragment.LoadResult;
-
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.SystemClock;
@@ -17,6 +15,8 @@ import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
 import android.util.JsonReader;
 import android.util.Log;
+
+import com.btmura.android.reddit.EntityListFragment.LoadResult;
 
 
 public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
@@ -36,12 +36,12 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 	private static final String TAG = "CommentLoaderTask";
 
 	private final Context context;
-	private final Entity thing;
+	private final CharSequence commentUrl;
 	private final TaskListener<LoadResult<Void>> listener;
 
-	public CommentLoaderTask(Context context, Entity thing, TaskListener<LoadResult<Void>> listener) {
+	public CommentLoaderTask(Context context, CharSequence commentUrl, TaskListener<LoadResult<Void>> listener) {
 		this.context = context;
-		this.thing = thing;
+		this.commentUrl = commentUrl;
 		this.listener = listener;
 	}
 	
@@ -59,10 +59,10 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 	protected LoadResult<Void> doInBackground(Void... intoTheVoid) {
 		CommentLoaderResult result = new CommentLoaderResult();
 		try {
-			URL commentsUrl = new URL("http://www.reddit.com/comments/" + thing.getId() + ".json");
-			Log.v(TAG, commentsUrl.toString());
+			URL url = new URL(commentUrl.toString());
+			Log.v(TAG, url.toString());
 			
-			HttpURLConnection connection = (HttpURLConnection) commentsUrl.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.connect();
 			
 			long t1 = SystemClock.currentThreadTimeMillis();
@@ -76,7 +76,6 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 			long t2 = SystemClock.currentThreadTimeMillis();
 			Log.v(TAG, Long.toString(t2 - t1));
 			Log.v(TAG, Integer.toString(parser.entities.size()));
-			
 			
 			result.entities = parser.entities;
 			
@@ -141,6 +140,17 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 			getEntity(index).downs = reader.nextInt();
 		}
 		
+		@Override
+		public void onChildren(JsonReader reader, int index) throws IOException {
+			ArrayList<String> children = new ArrayList<String>();
+			reader.beginArray();
+			while (reader.hasNext()) {
+				children.add(reader.nextString());
+			}
+			reader.endArray();
+			getEntity(index).children = children;
+		}
+		
 		private Entity getEntity(int index) {
 			return entities.get(index);
 		}
@@ -184,6 +194,18 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 			}
 			b.append(Integer.toString(score));
 			return b;
+		}
+		
+		@Override
+		public void onParseEnd() {
+			// Trim off the last "Load more" entry, because there is not sufficient API support yet.
+			int size = entities.size();
+			if (size > 0) {
+				Entity e = entities.get(size - 1);
+				if (e.type == Entity.TYPE_MORE && e.nesting == 0) {
+					entities.remove(size - 1);
+				}
+			}
 		}
 		
 		@Override
