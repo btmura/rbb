@@ -170,9 +170,9 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 		
 		private CharSequence getInfo(Entity e) {
 			if (displaySubreddit) {
-				return context.getString(R.string.entity_info_2, e.subreddit, e.author, e.score, e.numComments);
+				return context.getString(R.string.entity_thing_info_2, e.subreddit, e.author, e.score, e.numComments);
 			} else {
-				return context.getString(R.string.entity_info, e.author, e.score, e.numComments);	
+				return context.getString(R.string.entity_thing_info, e.author, e.score, e.numComments);	
 			}
 		}
 		

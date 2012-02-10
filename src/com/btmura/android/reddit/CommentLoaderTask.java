@@ -178,7 +178,11 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 		}
 
 		private CharSequence getInfo(Entity e) {
-			return context.getString(R.string.entity_info, e.author, e.ups - e.downs, e.numComments);
+			if (e.type == Entity.TYPE_HEADER) {
+				return context.getString(R.string.entity_thing_info, e.author, e.ups - e.downs, e.numComments);
+			} else {
+				return context.getString(R.string.entity_comment_info, e.author, e.ups - e.downs);
+			}
 		}
 		
 		@Override
