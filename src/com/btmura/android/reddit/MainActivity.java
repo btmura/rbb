@@ -1,6 +1,7 @@
 package com.btmura.android.reddit;
 
 import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -19,7 +20,7 @@ import android.widget.Toast;
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.TopicListFragment.OnTopicSelectedListener;
 
-public class MainActivity extends Activity implements OnBackStackChangedListener,
+public class MainActivity extends Activity implements OnBackStackChangedListener, OnNavigationListener,
 		OnTopicSelectedListener, OnThingSelectedListener {
 
 	private static final String FRAG_CONTROL = "control";
@@ -44,6 +45,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
+        bar.setListNavigationCallbacks(new FilterAdapter(this), this);
         
         singleContainer = findViewById(R.id.single_container);        
         thingContainer = findViewById(R.id.thing_container);
@@ -55,7 +57,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
 	private void setupFragments() {
 		if (singleContainer != null) {
-			ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1);
+			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+			
+			ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1, 0);
 			TopicListFragment topicFrag = TopicListFragment.newInstance(-1, false);
 			
 			FragmentTransaction ft = manager.beginTransaction();
@@ -65,11 +69,13 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 		
 		if (thingContainer != null) {
+			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+			
 			Topic topic = Topic.newTopic("all");
 			
-			ControlFragment controlFrag = ControlFragment.newInstance(topic, 0, null, -1);
+			ControlFragment controlFrag = ControlFragment.newInstance(topic, 0, null, -1, 0);
 			TopicListFragment topicFrag = TopicListFragment.newInstance(0, true);
-			ThingListFragment thingListFrag = ThingListFragment.newInstance(topic, true);
+			ThingListFragment thingListFrag = ThingListFragment.newInstance(topic, 0, true);
 			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
@@ -87,10 +93,19 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	    }
 	}
 	
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		if (itemPosition != getFilter()) {
+			onTopicSelected(getTopic(), getTopicPosition());
+		}
+		return true;
+	}
+	
 	public void onTopicSelected(Topic topic, int position) {
+		int filter = bar.getSelectedNavigationIndex();
+		ControlFragment controlFrag = ControlFragment.newInstance(topic, position, null, -1, filter);
+		
 		if (singleContainer != null) {
-			ControlFragment controlFrag = ControlFragment.newInstance(topic, position, null, -1);
-			ThingListFragment thingListFrag = ThingListFragment.newInstance(topic, false);
+			ThingListFragment thingListFrag = ThingListFragment.newInstance(topic, filter, false);
 			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
@@ -100,8 +115,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 		
 		if (thingContainer != null) {
-			ControlFragment controlFrag = ControlFragment.newInstance(topic, position, null, -1);
-			ThingListFragment thingListFrag = ThingListFragment.newInstance(topic, true);
+			ThingListFragment thingListFrag = ThingListFragment.newInstance(topic, filter, true);
 			Fragment linkFrag = getLinkFragment();
 			Fragment commentFrag = getCommentFragment();
 			
@@ -124,7 +138,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void selectThing(Entity thing, String tag, int position) {
-		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position);
+		ControlFragment controlFrag = ControlFragment.newInstance(getTopic(), getTopicPosition(), thing, position, getFilter());
 		Fragment thingFrag;
 		if (FRAG_LINK.equalsIgnoreCase(tag)) {
 			thingFrag = LinkFragment.newInstance(thing);
@@ -167,6 +181,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return getControlFragment().getThingPosition();
 	}
 	
+	private int getFilter() {
+		return getControlFragment().getFilter();
+	}
+	
 	private ControlFragment getControlFragment() {
 		return (ControlFragment) manager.findFragmentByTag(FRAG_CONTROL);
 	}
@@ -188,18 +206,20 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	public void onBackStackChanged() {
-		refreshHome();
-		refreshTitle();
+		refreshActionBar();
 		refreshCheckedItems();
 		refreshThingContainer();
 		invalidateOptionsMenu();
 	}
 	
-	private void refreshHome() {
+	private void refreshActionBar() {
 		bar.setDisplayHomeAsUpEnabled(singleContainer != null && getTopic() != null || getThing() != null);
-	}
-	
-	private void refreshTitle() {
+
+		bar.setNavigationMode(isVisible(FRAG_SUBREDDIT) 
+				? ActionBar.NAVIGATION_MODE_LIST 
+				: ActionBar.NAVIGATION_MODE_STANDARD);
+		bar.setSelectedNavigationItem(getFilter());
+
 		Topic topic = getTopic();
 		Entity thing = getThing();
 		if (thing != null) {

@@ -12,6 +12,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.util.JsonReader;
+import android.util.JsonToken;
 import android.util.Log;
 
 import com.btmura.android.reddit.EntityListFragment.LoadResult;
@@ -177,7 +178,11 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 		
 		@Override
 		public void onAfter(JsonReader reader) throws IOException {
-			after = reader.nextString();
+			if (reader.peek() == JsonToken.NULL) {
+				reader.nextNull();
+			} else {
+				after = reader.nextString();
+			}
 		}
 	}
 }

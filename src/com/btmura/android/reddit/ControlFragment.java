@@ -9,19 +9,22 @@ public class ControlFragment extends Fragment {
 	private static final String ARG_THING = "thing";
 	private static final String ARG_TOPIC_POSITION = "topicPosition";
 	private static final String ARG_THING_POSITION = "thingPosition";
+	private static final String ARG_FILTER = "filter";
 	
 	private Topic topic;
 	private Entity thing;
 	private int topicPosition;
 	private int thingPosition;
+	private int filter;
 	
-	public static ControlFragment newInstance(Topic topic, int topicPosition, Entity thing, int thingPosition) {
+	public static ControlFragment newInstance(Topic topic, int topicPosition, Entity thing, int thingPosition, int filter) {
 		ControlFragment frag = new ControlFragment();
 		Bundle b = new Bundle(4);
 		b.putParcelable(ARG_TOPIC, topic);
 		b.putParcelable(ARG_THING, thing);
 		b.putInt(ARG_TOPIC_POSITION, topicPosition);
 		b.putInt(ARG_THING_POSITION, thingPosition);
+		b.putInt(ARG_FILTER, filter);
 		frag.setArguments(b);
 		return frag;
 	}
@@ -42,6 +45,10 @@ public class ControlFragment extends Fragment {
 		return thingPosition;
 	}
 	
+	public int getFilter() {
+		return filter;
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,5 +62,6 @@ public class ControlFragment extends Fragment {
 		thing = getArguments().getParcelable(ARG_THING);
 		topicPosition = getArguments().getInt(ARG_TOPIC_POSITION);
 		thingPosition = getArguments().getInt(ARG_THING_POSITION);
+		filter = getArguments().getInt(ARG_FILTER);
 	}
 }
