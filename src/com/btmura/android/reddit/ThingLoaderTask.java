@@ -8,9 +8,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.SystemClock;
-import android.text.SpannableStringBuilder;
 import android.util.JsonReader;
 import android.util.Log;
 
@@ -34,11 +34,13 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 	
 	private static final String TAG = "ThingLoaderTask";
 
+	private final Context context;
 	private final CharSequence subredditUrl;
 	private final TaskListener<LoadResult<String>> listener;
 	private final boolean displaySubreddit;
 
-	public ThingLoaderTask(CharSequence subredditUrl, TaskListener<LoadResult<String>> listener, boolean displaySubreddit) {
+	public ThingLoaderTask(Context context, CharSequence subredditUrl, TaskListener<LoadResult<String>> listener, boolean displaySubreddit) {
+		this.context = context;
 		this.subredditUrl = subredditUrl;
 		this.listener = listener;
 		this.displaySubreddit = displaySubreddit;
@@ -166,19 +168,11 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 		}
 		
 		private CharSequence getInfo(Entity e) {
-			SpannableStringBuilder b = new SpannableStringBuilder();
 			if (displaySubreddit) {
-				b.append(e.subreddit).append("  ");
+				return context.getString(R.string.entity_info_2, e.subreddit, e.author, e.score, e.numComments);
+			} else {
+				return context.getString(R.string.entity_info, e.author, e.score, e.numComments);	
 			}
-			b.append(e.author).append("  ");
-			if (e.score > 0) {
-				b.append("+");
-			}
-			b.append(Integer.toString(e.score)).append("  ");
-			if (e.numComments > 0) {
-				b.append(Integer.toString(e.numComments));
-			}
-			return b;
 		}
 		
 		@Override

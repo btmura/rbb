@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.SystemClock;
-import android.text.SpannableStringBuilder;
 import android.text.SpannedString;
 import android.util.JsonReader;
 import android.util.Log;
@@ -160,12 +159,12 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 			case Entity.TYPE_HEADER:
 				e.line1 = e.title;
 				e.line2 = Formatter.format(e.selfText);
-				e.line3 = getStatus(e);
+				e.line3 = getInfo(e);
 				break;
 				
 			case Entity.TYPE_COMMENT:
 				e.line1 = Formatter.format(e.body);
-				e.line2 = getStatus(e);
+				e.line2 = getInfo(e);
 				break;
 				
 			case Entity.TYPE_MORE:
@@ -178,19 +177,8 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 			}
 		}
 
-		private SpannableStringBuilder getStatus(Entity e) {
-			SpannableStringBuilder b = new SpannableStringBuilder();
-			b.append(e.author);
-			b.append("  ");
-			int score = e.ups - e.downs;
-			if (score > 0) {
-				b.append("+");
-			}
-			b.append(Integer.toString(score));
-			if (e.numComments > 0) {
-				b.append("  ").append(Integer.toString(e.numComments));
-			}
-			return b;
+		private CharSequence getInfo(Entity e) {
+			return context.getString(R.string.entity_info, e.author, e.ups - e.downs, e.numComments);
 		}
 		
 		@Override

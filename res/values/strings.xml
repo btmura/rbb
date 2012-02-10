@@ -5,7 +5,8 @@
     <string name="empty">Nothing to see here…</string>
     <string name="error">Something went wrong…</string>
     
-    <string name="x_comments">%d comments</string>
+    <string name="entity_info">%1$s  %2$d points  %3$d comments</string>
+    <string name="entity_info_2">%1$s  %2$s  %3$d points  %4$d comments</string>
     
     <string name="load_more">Load more…</string>
     <string name="loading">Loading…</string>

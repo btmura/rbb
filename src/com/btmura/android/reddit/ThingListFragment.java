@@ -68,7 +68,7 @@ public class ThingListFragment extends EntityListFragment<String> {
 	protected AsyncTask<Void, Void, LoadResult<String>> createLoadTask(String moreKey) {
 		Topic t = getArguments().getParcelable(ARG_TOPIC);
 		CharSequence url = Urls.subredditUrl(t.name, moreKey);
-		return new ThingLoaderTask(url, this, "all".equals(t.name));
+		return new ThingLoaderTask(getActivity().getApplicationContext(), url, this, "all".equals(t.name));
 	}
 	
 	@Override
