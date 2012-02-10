@@ -12,7 +12,7 @@
         android:orientation="horizontal" >
 
         <FrameLayout
-            android:id="@+id/topic_list_container"
+            android:id="@+id/subreddit_list_container"
             android:layout_width="100dp"
             android:layout_height="match_parent" />
 

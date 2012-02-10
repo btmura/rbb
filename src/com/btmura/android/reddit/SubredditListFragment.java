@@ -8,25 +8,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class TopicListFragment extends ListFragment {
+public class SubredditListFragment extends ListFragment {
 	
 	private static final String ARG_SINGLE_CHOICE = "singleChoice";
 	private static final String ARG_POSITION = "position";
 	
 	private static final String STATE_POSITION = "position";
 	
-	interface OnTopicSelectedListener {
-		void onTopicSelected(Topic topic, int position);
+	interface OnSubredditSelectedListener {
+		void onSubredditSelected(Subreddit sr, int position);
 	}
 
 	private int position;
 	private boolean singleChoice;
 	
-	private TopicAdapter adapter;
-	private OnTopicSelectedListener listener;
+	private SubredditListAdapter adapter;
+	private OnSubredditSelectedListener listener;
 
-	public static TopicListFragment newInstance(int position, boolean singleChoice) {
-		TopicListFragment frag = new TopicListFragment();
+	public static SubredditListFragment newInstance(int position, boolean singleChoice) {
+		SubredditListFragment frag = new SubredditListFragment();
 		Bundle b = new Bundle(2);
 		b.putInt(ARG_POSITION, position);
 		b.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
@@ -37,7 +37,7 @@ public class TopicListFragment extends ListFragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		listener = (OnTopicSelectedListener) activity;
+		listener = (OnSubredditSelectedListener) activity;
 	}
 	
 	@Override
@@ -50,7 +50,7 @@ public class TopicListFragment extends ListFragment {
 			position = getArguments().getInt(ARG_POSITION);
 		}
 		singleChoice = getArguments().getBoolean(ARG_SINGLE_CHOICE);
-		adapter = new TopicAdapter(getActivity());
+		adapter = new SubredditListAdapter(getActivity());
 	}
 	
 	@Override
@@ -78,7 +78,7 @@ public class TopicListFragment extends ListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		this.position = position;
-		listener.onTopicSelected(adapter.getItem(position), position);
+		listener.onSubredditSelected(adapter.getItem(position), position);
 	}
 	
 	public void setItemChecked(int position) {

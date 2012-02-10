@@ -11,13 +11,13 @@ public class ControlFragment extends Fragment {
 	private static final String ARG_THING_POSITION = "thingPosition";
 	private static final String ARG_FILTER = "filter";
 	
-	private Topic topic;
+	private Subreddit topic;
 	private Entity thing;
 	private int topicPosition;
 	private int thingPosition;
 	private int filter;
 	
-	public static ControlFragment newInstance(Topic topic, int topicPosition, Entity thing, int thingPosition, int filter) {
+	public static ControlFragment newInstance(Subreddit topic, int topicPosition, Entity thing, int thingPosition, int filter) {
 		ControlFragment frag = new ControlFragment();
 		Bundle b = new Bundle(4);
 		b.putParcelable(ARG_TOPIC, topic);
@@ -29,7 +29,7 @@ public class ControlFragment extends Fragment {
 		return frag;
 	}
 	
-	public Topic getTopic() {
+	public Subreddit getTopic() {
 		return topic;
 	}
 	

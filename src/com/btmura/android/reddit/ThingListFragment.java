@@ -10,7 +10,7 @@ import android.widget.ListView;
 
 public class ThingListFragment extends EntityListFragment<String> {
 	
-	private static final String ARG_TOPIC = "topic";
+	private static final String ARG_SUBREDDIT = "subreddit";
 	private static final String ARG_FILTER = "filter";
 	private static final String ARG_SINGLE_CHOICE = "singleChoice";
 	
@@ -24,10 +24,10 @@ public class ThingListFragment extends EntityListFragment<String> {
 		void onThingSelected(Entity thing, int position);
 	}
 	
-	public static ThingListFragment newInstance(Topic topic, int filter, boolean singleChoice) {
+	public static ThingListFragment newInstance(Subreddit sr, int filter, boolean singleChoice) {
 		ThingListFragment frag = new ThingListFragment();
 		Bundle b = new Bundle(3);
-		b.putParcelable(ARG_TOPIC, topic);
+		b.putParcelable(ARG_SUBREDDIT, sr);
 		b.putInt(ARG_FILTER, filter);
 		b.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
 		frag.setArguments(b);
@@ -68,10 +68,10 @@ public class ThingListFragment extends EntityListFragment<String> {
 	
 	@Override
 	protected AsyncTask<Void, Void, LoadResult<String>> createLoadTask(String moreKey) {
-		Topic t = getArguments().getParcelable(ARG_TOPIC);
+		Subreddit sr = getArguments().getParcelable(ARG_SUBREDDIT);
 		int filter = getArguments().getInt(ARG_FILTER);
-		CharSequence url = Urls.subredditUrl(t.name, filter, moreKey);
-		return new ThingLoaderTask(getActivity().getApplicationContext(), url, this, "all".equals(t.name));
+		CharSequence url = Urls.subredditUrl(sr.name, filter, moreKey);
+		return new ThingLoaderTask(getActivity().getApplicationContext(), url, this, "all".equals(sr.name));
 	}
 	
 	@Override
