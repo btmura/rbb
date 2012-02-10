@@ -95,13 +95,16 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		if (itemPosition != getFilter()) {
-			onTopicSelected(getTopic(), getTopicPosition());
+			selectTopic(getTopic(), getTopicPosition(), itemPosition);
 		}
 		return true;
 	}
 	
 	public void onTopicSelected(Topic topic, int position) {
-		int filter = bar.getSelectedNavigationIndex();
+		selectTopic(topic, position, getFilter());
+	}
+	
+	private void selectTopic(Topic topic, int position, int filter) {
 		ControlFragment controlFrag = ControlFragment.newInstance(topic, position, null, -1, filter);
 		
 		if (singleContainer != null) {
@@ -218,7 +221,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		bar.setNavigationMode(isVisible(FRAG_SUBREDDIT) 
 				? ActionBar.NAVIGATION_MODE_LIST 
 				: ActionBar.NAVIGATION_MODE_STANDARD);
-		bar.setSelectedNavigationItem(getFilter());
+		
+		if (bar.getNavigationMode() == ActionBar.NAVIGATION_MODE_LIST) {
+			bar.setSelectedNavigationItem(getFilter());
+		}
 
 		Topic topic = getTopic();
 		Entity thing = getThing();

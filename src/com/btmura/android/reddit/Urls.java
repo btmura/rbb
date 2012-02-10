@@ -26,8 +26,13 @@ public class Urls {
 		}
 		
 		b.append("/.json");
+		
+		boolean hasSort = filter == FilterAdapter.FILTER_NEW;
+		if (hasSort) {
+			b.append("?sort=new");
+		}
 		if (after != null) {
-			b.append("?count=25&after=").append(after);
+			b.append(hasSort ? "&" : "?").append("count=25&after=").append(after);
 		}
 		return b;
 	}
