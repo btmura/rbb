@@ -145,17 +145,6 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 			getEntity(index).downs = reader.nextInt();
 		}
 		
-		@Override
-		public void onChildren(JsonReader reader, int index) throws IOException {
-			ArrayList<String> children = new ArrayList<String>();
-			reader.beginArray();
-			while (reader.hasNext()) {
-				children.add(reader.nextString());
-			}
-			reader.endArray();
-			getEntity(index).children = children;
-		}
-		
 		private Entity getEntity(int index) {
 			return entities.get(index);
 		}
@@ -206,12 +195,14 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 		
 		@Override
 		public void onParseEnd() {
-			// Trim off the last "Load more" entry, because there is not sufficient API support yet.
 			int size = entities.size();
-			if (size > 0) {
-				Entity e = entities.get(size - 1);
-				if (e.type == Entity.TYPE_MORE && e.nesting == 0) {
-					entities.remove(size - 1);
+			for (int i = 0; i < size; ) {
+				Entity e = entities.get(i);
+				if (e.type == Entity.TYPE_MORE) {
+					entities.remove(i);
+					size--;
+				} else {
+					i++;
 				}
 			}
 		}
