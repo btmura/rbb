@@ -23,6 +23,7 @@ public class Entity implements Parcelable {
 	public boolean isSelf;
 	public String selfText;
 	public String body;
+	public int numComments;
 	public int score;
 	public int ups;
 	public int downs;

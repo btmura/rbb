@@ -120,6 +120,8 @@ public class JsonParser {
 				onSelfText(r, i);
 			} else if ("body".equals(name)) {
 				onBody(r, i);
+			} else if ("num_comments".equals(name)) {
+				onNumComments(r, i);
 			} else if ("score".equals(name)) {
 				onScore(r, i);
 			} else if ("ups".equals(name)) {
@@ -194,6 +196,10 @@ public class JsonParser {
 	}
 	
 	public void onBody(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onNumComments(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	

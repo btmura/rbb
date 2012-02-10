@@ -68,7 +68,7 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 			
 			InputStream stream = connection.getInputStream();
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			ThingParser parser = new ThingParser(displaySubreddit);
+			ThingParser parser = new ThingParser();
 			parser.parseListingObject(reader);
 			stream.close();
 			
@@ -89,15 +89,10 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 		return result;
 	}
 	
-	static class ThingParser extends JsonParser {
+	class ThingParser extends JsonParser {
 		
-		private final boolean displaySubreddit;
 		private final ArrayList<Entity> entities = new ArrayList<Entity>(25);
 		private String after;
-		
-		ThingParser(boolean displaySubreddit) {
-			this.displaySubreddit = displaySubreddit;
-		}
 		
 		@Override
 		public void onEntityStart(int index) {
@@ -142,6 +137,11 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 		}
 		
 		@Override
+		public void onNumComments(JsonReader reader, int index) throws IOException {
+			getEntity(index).numComments = reader.nextInt();
+		}
+		
+		@Override
 		public void onScore(JsonReader reader, int index) throws IOException {
 			getEntity(index).score = reader.nextInt();
 		}
@@ -150,7 +150,7 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 			return entities.get(index);
 		}
 		
-		private static String getString(JsonReader reader) throws IOException {
+		private String getString(JsonReader reader) throws IOException {
 			return reader.nextString().trim();
 		}
 		
@@ -174,7 +174,11 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 			if (e.score > 0) {
 				b.append("+");
 			}
-			return b.append(Integer.toString(e.score));
+			b.append(Integer.toString(e.score)).append("  ");
+			if (e.numComments > 0) {
+				b.append(Integer.toString(e.numComments));
+			}
+			return b;
 		}
 		
 		@Override

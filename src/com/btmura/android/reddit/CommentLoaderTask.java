@@ -131,6 +131,11 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 		}
 		
 		@Override
+		public void onNumComments(JsonReader reader, int index) throws IOException {
+			getEntity(index).numComments = reader.nextInt();
+		}
+		
+		@Override
 		public void onUps(JsonReader reader, int index) throws IOException {
 			getEntity(index).ups = reader.nextInt();
 		}
@@ -193,6 +198,9 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 				b.append("+");
 			}
 			b.append(Integer.toString(score));
+			if (e.numComments > 0) {
+				b.append("  ").append(Integer.toString(e.numComments));
+			}
 			return b;
 		}
 		
