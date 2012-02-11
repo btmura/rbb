@@ -33,6 +33,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private ActionBar bar;
 	
 	private View singleContainer;
+	private View thingListContainer;
 	private View thingContainer;
 
 	@Override
@@ -47,7 +48,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         bar.setDisplayShowHomeEnabled(true);
         bar.setListNavigationCallbacks(new FilterAdapter(this), this);
         
-        singleContainer = findViewById(R.id.single_container);        
+        singleContainer = findViewById(R.id.single_container);    
+        thingListContainer = findViewById(R.id.thing_list_container);
         thingContainer = findViewById(R.id.thing_container);
     
         if (savedInstanceState == null) {
@@ -56,12 +58,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 
 	private void setupFragments() {
-		if (singleContainer != null) {
-			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-			
-			ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1, 0);
+		ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1, 0);
+		
+		if (singleContainer != null) {			
 			SubredditListFragment subredditFrag = SubredditListFragment.newInstance(-1, false);
-			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
 			ft.replace(R.id.single_container, subredditFrag);
@@ -69,18 +69,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 		
 		if (thingContainer != null) {
-			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-			
-			Subreddit sr = Subreddit.newInstance("all");
-			
-			ControlFragment controlFrag = ControlFragment.newInstance(sr, 0, null, -1, 0);
-			SubredditListFragment subredditFrag = SubredditListFragment.newInstance(0, true);
-			ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, 0, true);
-			
+			SubredditListFragment subredditFrag = SubredditListFragment.newInstance(-1, true);
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
 			ft.replace(R.id.subreddit_list_container, subredditFrag, FRAG_SUBREDDIT_LIST);
-			ft.replace(R.id.thing_list_container, thingListFrag, FRAG_THING_LIST);
 			ft.commit();
 		}
 	}
@@ -211,7 +203,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	public void onBackStackChanged() {
 		refreshActionBar();
 		refreshCheckedItems();
-		refreshThingContainer();
+		refreshContainers();
 		invalidateOptionsMenu();
 	}
 	
@@ -249,7 +241,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 	}
 	
-	private void refreshThingContainer() {
+	private void refreshContainers() {
+		if (thingListContainer != null) {
+			thingListContainer.setVisibility(getSubreddit() != null ? View.VISIBLE : View.GONE);
+		}
 		if (thingContainer != null) {
 			thingContainer.setVisibility(getThing() != null ? View.VISIBLE : View.GONE);
 		}

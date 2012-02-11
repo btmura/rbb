@@ -11,26 +11,6 @@ public class SubredditListAdapter extends ArrayAdapter<Subreddit> {
 
 	public SubredditListAdapter(Context context) {
 		super(context, android.R.layout.simple_list_item_activated_1);
-		add(Subreddit.newInstance("all"));
-		add(Subreddit.newInstance("AskReddit"));
-		add(Subreddit.newInstance("android"));
-		add(Subreddit.newInstance("askscience"));
-		add(Subreddit.newInstance("atheism"));
-		add(Subreddit.newInstance("aww"));
-		add(Subreddit.newInstance("funny"));
-		add(Subreddit.newInstance("fitness"));
-		add(Subreddit.newInstance("gaming"));
-		add(Subreddit.newInstance("health"));
-		add(Subreddit.newInstance("humor"));
-		add(Subreddit.newInstance("IAmA"));
-		add(Subreddit.newInstance("pics"));
-		add(Subreddit.newInstance("politics"));
-		add(Subreddit.newInstance("science"));
-		add(Subreddit.newInstance("technology"));
-		add(Subreddit.newInstance("todayilearned"));
-		add(Subreddit.newInstance("videos"));
-		add(Subreddit.newInstance("worldnews"));
-		add(Subreddit.newInstance("WTF"));
 	}
 	
 	@Override

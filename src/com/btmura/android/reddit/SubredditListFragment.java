@@ -1,14 +1,18 @@
 package com.btmura.android.reddit;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.app.ListFragment;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class SubredditListFragment extends ListFragment {
+public class SubredditListFragment extends ListFragment implements LoaderCallbacks<List<Subreddit>> {
 	
 	private static final String ARG_SINGLE_CHOICE = "singleChoice";
 	private static final String ARG_POSITION = "position";
@@ -66,6 +70,20 @@ public class SubredditListFragment extends ListFragment {
 		super.onActivityCreated(savedInstanceState);
 		setListAdapter(adapter);
 		setItemChecked(position);
+		getLoaderManager().initLoader(0, null, this);
+	}
+	
+	public Loader<List<Subreddit>> onCreateLoader(int id, Bundle args) {
+		return new SubredditLoader(getActivity());
+	}
+	
+	public void onLoadFinished(Loader<List<Subreddit>> loader, List<Subreddit> data) {
+		adapter.clear();
+		adapter.addAll(data);
+	}
+	
+	public void onLoaderReset(Loader<List<Subreddit>> loader) {
+		adapter.clear();
 	}
 	
 	@Override
