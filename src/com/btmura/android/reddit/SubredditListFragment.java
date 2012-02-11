@@ -47,7 +47,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
 		if (savedInstanceState != null) {
 			position = savedInstanceState.getInt(STATE_POSITION);
 		} else {
@@ -68,7 +67,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		setListAdapter(adapter);
 		setItemChecked(position);
 		getLoaderManager().initLoader(0, null, this);
 	}
@@ -80,6 +78,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	public void onLoadFinished(Loader<List<Subreddit>> loader, List<Subreddit> data) {
 		adapter.clear();
 		adapter.addAll(data);
+		setListAdapter(adapter);
 	}
 	
 	public void onLoaderReset(Loader<List<Subreddit>> loader) {

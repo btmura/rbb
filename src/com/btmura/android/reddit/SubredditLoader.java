@@ -18,7 +18,9 @@ public class SubredditLoader extends AsyncTaskLoader<List<Subreddit>> {
 	protected void onStartLoading() {
 		if (subreddits != null) {
 			deliverResult(subreddits);
-		} else {
+		}
+		
+		if (takeContentChanged() || subreddits == null) {
 			forceLoad();
 		}
 	}
@@ -52,7 +54,23 @@ public class SubredditLoader extends AsyncTaskLoader<List<Subreddit>> {
 	
 	@Override
 	public void deliverResult(List<Subreddit> data) {
-		super.deliverResult(data);
+		if (isReset()) {
+			return;
+		}
 		subreddits = data;
+		super.deliverResult(data);
+	}
+	
+	@Override
+	protected void onReset() {
+		super.onReset();
+		onStopLoading();
+		subreddits = null;
+	}
+	
+	@Override
+	protected void onStopLoading() {
+		super.onStopLoading();
+		cancelLoad();
 	}
 }

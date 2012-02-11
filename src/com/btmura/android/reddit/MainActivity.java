@@ -53,7 +53,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         
         filterSpinner = new FilterAdapter(this);
         bar.setListNavigationCallbacks(filterSpinner, this);
-        
+
         singleContainer = findViewById(R.id.single_container);
         thingContainer = findViewById(R.id.thing_container);
     
@@ -234,7 +234,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void refreshActionBar() {
 		Subreddit sr = getSubreddit();
 		Entity thing = getThing();
-		if (thing != null) {
+		if (thing != null && !isVisible(FRAG_SUBREDDIT_LIST)) {
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 			bar.setDisplayShowTitleEnabled(true);
 			bar.setTitle(thing.title);
@@ -336,7 +336,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 						break;
 					}
 				}
-			} else if (FRAG_THING_LIST.equals(tag)) {
+			} else if (singleContainer != null && FRAG_THING_LIST.equals(tag)) {
 				manager.popBackStack(FRAG_THING_LIST, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			}
 		}
