@@ -2,8 +2,12 @@ package com.btmura.android.reddit;
 
 public class Urls {
 	
-	public static CharSequence subredditUrl(String name, int filter, String after) {
-		StringBuilder b = new StringBuilder("http://www.reddit.com/r/").append(name);
+	public static CharSequence subredditUrl(Subreddit sr, int filter, String after) {
+		StringBuilder b = new StringBuilder("http://www.reddit.com/");
+		
+		if (!sr.frontPage) {
+			b.append("r/").append(sr.name);
+		}
 		
 		switch (filter) {
 		case FilterAdapter.FILTER_HOT:

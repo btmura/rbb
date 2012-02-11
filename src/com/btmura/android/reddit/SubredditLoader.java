@@ -26,7 +26,8 @@ public class SubredditLoader extends AsyncTaskLoader<List<Subreddit>> {
 	@Override
 	public List<Subreddit> loadInBackground() {
 		ArrayList<Subreddit> subreddits = new ArrayList<Subreddit>();
-		subreddits.add(Subreddit.newInstance("all"));
+		subreddits.add(Subreddit.frontPage(getContext()));
+		subreddits.add(Subreddit.multiSubreddit("all"));
 		subreddits.add(Subreddit.newInstance("AskReddit"));
 		subreddits.add(Subreddit.newInstance("android"));
 		subreddits.add(Subreddit.newInstance("askscience"));

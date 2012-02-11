@@ -70,8 +70,8 @@ public class ThingListFragment extends EntityListFragment<String> {
 	protected AsyncTask<Void, Void, LoadResult<String>> createLoadTask(String moreKey) {
 		Subreddit sr = getArguments().getParcelable(ARG_SUBREDDIT);
 		int filter = getArguments().getInt(ARG_FILTER);
-		CharSequence url = Urls.subredditUrl(sr.name, filter, moreKey);
-		return new ThingLoaderTask(getActivity().getApplicationContext(), url, this, "all".equals(sr.name));
+		CharSequence url = Urls.subredditUrl(sr, filter, moreKey);
+		return new ThingLoaderTask(getActivity().getApplicationContext(), url, this, sr.multiSubreddit);
 	}
 	
 	@Override
