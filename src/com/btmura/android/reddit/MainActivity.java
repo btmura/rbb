@@ -28,9 +28,14 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private static final String FRAG_THING_LIST = "thingList";
 	private static final String FRAG_LINK = "link";
 	private static final String FRAG_COMMENT = "comment";
+
+	private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
 	
 	private FragmentManager manager;
 	private ActionBar bar;
+
+	private FilterAdapter filterSpinner;
+	private int lastSelectedFilter;
 	
 	private View singleContainer;
 	private View thingContainer;
@@ -45,7 +50,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
-        bar.setListNavigationCallbacks(new FilterAdapter(this), this);
+        
+        filterSpinner = new FilterAdapter(this);
+        bar.setListNavigationCallbacks(filterSpinner, this);
         
         singleContainer = findViewById(R.id.single_container);
         thingContainer = findViewById(R.id.thing_container);
@@ -56,7 +63,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 
 	private void setupFragments() {
-		
 		if (singleContainer != null) {			
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 			ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1, 0);	
@@ -69,9 +75,12 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 		
 		if (thingContainer != null) {
+			bar.setDisplayShowTitleEnabled(false);
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 			
 			Subreddit sr = Subreddit.frontPage(this);
+			filterSpinner.setSubreddit(sr.name);
+			
 			ControlFragment controlFrag = ControlFragment.newInstance(sr, 0, null, -1, 0);
 			SubredditListFragment subredditFrag = SubredditListFragment.newInstance(0, true);
 			ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, FilterAdapter.FILTER_HOT, true);
@@ -85,22 +94,30 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt(STATE_LAST_SELECTED_FILTER, lastSelectedFilter);
+	}
+	
+	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 		if (savedInstanceState != null) {
+			lastSelectedFilter = savedInstanceState.getInt(STATE_LAST_SELECTED_FILTER);
 			onBackStackChanged();
 	    }
 	}
 	
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-		if (itemPosition != getFilter()) {
+		lastSelectedFilter = itemPosition;
+		if (itemId != getFilter()) {
 			selectSubreddit(getSubreddit(), getSubredditPosition(), itemPosition);
 		}
 		return true;
 	}
 	
 	public void onSubredditSelected(Subreddit subreddit, int position) {
-		selectSubreddit(subreddit, position, getFilter());
+		selectSubreddit(subreddit, position, lastSelectedFilter);
 	}
 	
 	private void selectSubreddit(Subreddit sr, int position, int filter) {
@@ -215,24 +232,25 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void refreshActionBar() {
-		bar.setDisplayHomeAsUpEnabled(singleContainer != null && getSubreddit() != null || getThing() != null);
-
-		bar.setNavigationMode(isVisible(FRAG_THING_LIST) 
-				? ActionBar.NAVIGATION_MODE_LIST 
-				: ActionBar.NAVIGATION_MODE_STANDARD);
-		
-		if (bar.getNavigationMode() == ActionBar.NAVIGATION_MODE_LIST) {
-			bar.setSelectedNavigationItem(getFilter());
-		}
-
 		Subreddit sr = getSubreddit();
 		Entity thing = getThing();
 		if (thing != null) {
+			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+			bar.setDisplayShowTitleEnabled(true);
 			bar.setTitle(thing.title);
 		} else if (sr != null) {
-			bar.setTitle(sr.name);
+			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+			bar.setDisplayShowTitleEnabled(false);
+			filterSpinner.setSubreddit(sr.name);
 		} else {
+			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+			bar.setDisplayShowTitleEnabled(true);
 			bar.setTitle(R.string.app_name);
+		}
+		
+		bar.setDisplayHomeAsUpEnabled(singleContainer != null && getSubreddit() != null || getThing() != null);
+		if (bar.getNavigationMode() == ActionBar.NAVIGATION_MODE_LIST) {
+			bar.setSelectedNavigationItem(getFilter());
 		}
 	}
 	
