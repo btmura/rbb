@@ -17,11 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
+import com.btmura.android.reddit.AddSubredditFragment.OnSubredditAddedListener;
 import com.btmura.android.reddit.SubredditListFragment.OnSubredditSelectedListener;
+import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
 
 public class MainActivity extends Activity implements OnBackStackChangedListener, OnNavigationListener,
-		OnSubredditSelectedListener, OnThingSelectedListener {
+		OnSubredditAddedListener, OnSubredditSelectedListener, OnThingSelectedListener {
 
 	private static final String FRAG_CONTROL = "control";
 	private static final String FRAG_SUBREDDIT_LIST = "subredditList";
@@ -66,7 +67,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		if (singleContainer != null) {			
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 			ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1, 0);	
-			SubredditListFragment subredditFrag = SubredditListFragment.newInstance(-1, false);
+			SubredditListFragment subredditFrag = SubredditListFragment.newInstance();
 			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
@@ -82,7 +83,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			filterSpinner.setSubreddit(sr.name);
 			
 			ControlFragment controlFrag = ControlFragment.newInstance(sr, 0, null, -1, 0);
-			SubredditListFragment subredditFrag = SubredditListFragment.newInstance(0, true);
+			SubredditListFragment subredditFrag = SubredditListFragment.newInstance();
 			ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, FilterAdapter.FILTER_HOT, true);
 			
 			FragmentTransaction ft = manager.beginTransaction();
@@ -208,10 +209,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return (ControlFragment) manager.findFragmentByTag(FRAG_CONTROL);
 	}
 	
-	private SubredditListFragment getTopicListFragment() {
-		return (SubredditListFragment) manager.findFragmentByTag(FRAG_SUBREDDIT_LIST);
-	}
-	
 	private ThingListFragment getThingListFragment() {
 		return (ThingListFragment) manager.findFragmentByTag(FRAG_THING_LIST);
 	}
@@ -255,11 +252,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void refreshCheckedItems() {
-		SubredditListFragment subredditFrag = getTopicListFragment();
-		if (subredditFrag != null && subredditFrag.isAdded()) {
-			subredditFrag.setItemChecked(getSubredditPosition());
-		}
-		
 		ThingListFragment thingListFrag = getThingListFragment();
 		if (thingListFrag != null && thingListFrag.isAdded()) {
 			thingListFrag.setItemChecked(getThingPosition());
@@ -303,6 +295,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		case android.R.id.home:
 			handleHome();
 			return true;
+			
+		case R.id.menu_add_subreddit:
+			handleAddSubreddit();
+			return true;
 
 		case R.id.menu_link:
 			handleLink();
@@ -321,6 +317,11 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			return true;
 		}
 		return false;
+	}
+	
+	private void handleAddSubreddit() {
+		AddSubredditFragment f = new AddSubredditFragment();
+		f.show(manager, "add");
 	}
 	
 	private void handleHome() {
@@ -368,5 +369,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setData(Uri.parse(getLink()));
 		startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));	
+	}
+	
+	public void onSubredditAdded(String name) {
+		RedditProvider.addSubredditInBackground(this, name);
 	}
 }

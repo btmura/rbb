@@ -17,5 +17,9 @@
         android:id="@+id/menu_view"
         android:showAsAction="withText"
         android:title="@string/menu_view"/>
+    <item
+        android:id="@+id/menu_add_subreddit"
+        android:showAsAction="withText"
+        android:title="@string/menu_add_subreddit"/>
 
 </menu>
