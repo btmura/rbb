@@ -57,20 +57,11 @@ public class SubredditAdapter extends SimpleCursorAdapter {
 		selected = sr;
 	}
 	
-	public Subreddit getSelectedSubreddit() {
-		return selected;
-	}
-	
 	public Subreddit getSubreddit(Context context, int position) {
 		Cursor c = getCursor();
 		if (!c.moveToPosition(position)) {
 			throw new IllegalStateException();
 		}
-		String name = c.getString(1);
-		if (TextUtils.isEmpty(name)) {
-			return Subreddit.frontPage(context);
-		} else {
-			return Subreddit.newInstance(name);
-		}
+		return Subreddit.newInstance(c.getString(1));
 	}
 }

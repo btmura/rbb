@@ -5,7 +5,7 @@ public class Urls {
 	public static CharSequence subredditUrl(Subreddit sr, int filter, String after) {
 		StringBuilder b = new StringBuilder("http://www.reddit.com/");
 		
-		if (!sr.frontPage) {
+		if (!sr.isFrontPage()) {
 			b.append("r/").append(sr.name);
 		}
 		

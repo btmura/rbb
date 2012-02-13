@@ -261,7 +261,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void setNavigationListMode(Subreddit sr) {
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		bar.setDisplayShowTitleEnabled(false);
-		filterSpinner.setSubreddit(sr.name);
+		filterSpinner.setSubreddit(sr.getTitle(this));
 	}
 	
 	private void refreshCheckedItems() {

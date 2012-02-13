@@ -3,6 +3,7 @@ package com.btmura.android.reddit;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 public class Subreddit implements Parcelable {
 	
@@ -17,24 +18,29 @@ public class Subreddit implements Parcelable {
 	};
 	
 	public final String name;
-	public final boolean frontPage;
 	
-	public static Subreddit frontPage(Context context) {
-		return new Subreddit(context.getString(R.string.front_page), true);
+	public static Subreddit frontPage() {
+		return new Subreddit("");
 	}
 
 	public static Subreddit newInstance(String name) {
-		return new Subreddit(name, false);
+		return new Subreddit(name);
 	}
 		
-	private Subreddit(String name, boolean frontPage) {
+	private Subreddit(String name) {
 		this.name = name;
-		this.frontPage = frontPage;
 	}
 	
 	private Subreddit(Parcel in) {
 		this.name = in.readString();
-		this.frontPage = in.readInt() == 1;
+	}
+	
+	public boolean isFrontPage() {
+		return TextUtils.isEmpty(name);
+	}
+	
+	public String getTitle(Context c) {
+		return isFrontPage() ? c.getString(R.string.front_page) : name;
 	}
 	
 	@Override
@@ -48,6 +54,5 @@ public class Subreddit implements Parcelable {
 	
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(name);
-		dest.writeInt(frontPage ? 1 : 0);
 	}
 }

@@ -27,7 +27,7 @@ public class RedditProvider extends ContentProvider {
 	
 	static class Subreddits implements BaseColumns {
 		private static final String TABLE_NAME = "subreddits";
-		static final Uri CONTENT_URI = new Uri.Builder().scheme("content").authority(AUTHORITY).appendPath(TABLE_NAME).build();
+		static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
 		static final String COLUMN_NAME = "name";
 	}
 	
