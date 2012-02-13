@@ -25,8 +25,12 @@ public class SubredditAdapter extends SimpleCursorAdapter {
 		return new CursorLoader(context, Subreddits.CONTENT_URI, PROJECTION, null, null, SORT);
 	}
 	
-	public SubredditAdapter(Context context) {
-		super(context, android.R.layout.simple_list_item_activated_1, null, FROM, TO, 0);
+	private boolean singleChoice;
+	private Subreddit selected;
+
+	public SubredditAdapter(Context context, boolean singleChoice) {
+		super(context, R.layout.entity_one, null, FROM, TO, 0);
+		this.singleChoice = singleChoice;
 	}
 	
 	@Override
@@ -41,6 +45,20 @@ public class SubredditAdapter extends SimpleCursorAdapter {
 		} else {
 			tv.setText(name);
 		}
+		
+		if (singleChoice && selected != null && name.equalsIgnoreCase(selected.name)) {
+			tv.setBackgroundResource(R.drawable.selector_selected);
+		} else {
+			tv.setBackgroundResource(R.drawable.selector_normal);
+		}
+	}
+	
+	public void setSelectedSubreddit(Subreddit sr) {
+		selected = sr;
+	}
+	
+	public Subreddit getSelectedSubreddit() {
+		return selected;
 	}
 	
 	public Subreddit getSubreddit(Context context, int position) {

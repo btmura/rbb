@@ -18,17 +18,22 @@ import android.widget.ListView;
 
 public class SubredditListFragment extends ListFragment implements LoaderCallbacks<Cursor>, MultiChoiceModeListener {
 	
+	private static final String ARGS_SINGLE_CHOICE = "singleChoice";
+
 	interface OnSubredditSelectedListener {
 		static final int FLAG_LOAD_FINISHED = 0;
 		static final int FLAG_ITEM_CLICKED = 1;
-		void onSubredditSelected(Subreddit sr, int position, int event);
+		void onSubredditSelected(Subreddit sr, int event);
 	}
 
 	private SubredditAdapter adapter;
 	private OnSubredditSelectedListener listener;
 
-	public static SubredditListFragment newInstance() {
+	public static SubredditListFragment newInstance(boolean singleChoice) {
 		SubredditListFragment frag = new SubredditListFragment();
+		Bundle args = new Bundle(1);
+		args.putBoolean(ARGS_SINGLE_CHOICE, singleChoice);
+		frag.setArguments(args);
 		return frag;
 	}
 	
@@ -41,7 +46,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		adapter = new SubredditAdapter(getActivity());	
+		adapter = new SubredditAdapter(getActivity(), getArguments().getBoolean(ARGS_SINGLE_CHOICE));	
 	}
 	
 	@Override
@@ -71,7 +76,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 		if (data.getCount() > 0) {
 			getListView().post(new Runnable() {
 				public void run() {
-					listener.onSubredditSelected(adapter.getSubreddit(getActivity(), 0), 0, OnSubredditSelectedListener.FLAG_LOAD_FINISHED);
+					Subreddit sr = adapter.getSubreddit(getActivity(), 0);
+					listener.onSubredditSelected(sr, OnSubredditSelectedListener.FLAG_LOAD_FINISHED);
 				}
 			});
 		}
@@ -84,7 +90,9 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		listener.onSubredditSelected(adapter.getSubreddit(getActivity(), position), position, OnSubredditSelectedListener.FLAG_ITEM_CLICKED);
+		Subreddit sr = adapter.getSubreddit(getActivity(), position);
+		adapter.setSelectedSubreddit(sr);
+		listener.onSubredditSelected(sr, OnSubredditSelectedListener.FLAG_ITEM_CLICKED);
 	}
 	
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -112,5 +120,10 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	}
 	
 	public void onDestroyActionMode(ActionMode mode) {
+	}
+	
+	public void setSelectedSubreddit(Subreddit subreddit) {
+		adapter.setSelectedSubreddit(subreddit);
+		adapter.notifyDataSetChanged();
 	}
 }

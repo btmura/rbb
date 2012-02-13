@@ -67,23 +67,23 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void setupFragments() {
 		if (singleContainer != null) {			
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-			ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1, 0);	
-			SubredditListFragment subredditFrag = SubredditListFragment.newInstance();
+			ControlFragment controlFrag = ControlFragment.newInstance(null, null, -1, 0);	
+			SubredditListFragment srFrag = SubredditListFragment.newInstance(false);
 			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
-			ft.replace(R.id.single_container, subredditFrag);
+			ft.replace(R.id.single_container, srFrag);
 			ft.commit();
 		}
 		
 		if (thingContainer != null) {
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-			ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1, 0);
-			SubredditListFragment subredditFrag = SubredditListFragment.newInstance();
+			ControlFragment controlFrag = ControlFragment.newInstance(null, null, -1, 0);
+			SubredditListFragment srFrag = SubredditListFragment.newInstance(true);
 			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
-			ft.replace(R.id.subreddit_list_container, subredditFrag, FRAG_SUBREDDIT_LIST);
+			ft.replace(R.id.subreddit_list_container, srFrag, FRAG_SUBREDDIT_LIST);
 			ft.commit();
 		}
 	}
@@ -106,29 +106,30 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		lastSelectedFilter = itemPosition;
 		if (itemId != getFilter()) {
-			selectSubreddit(getSubreddit(), getSubredditPosition(), itemPosition, true);
+			selectSubreddit(getSubreddit(), itemPosition, true);
 		}
 		return true;
 	}
 	
-	public void onSubredditSelected(Subreddit sr, int position, int event) {
+	public void onSubredditSelected(Subreddit sr, int event) {
 		switch (event) {
 		
 		case OnSubredditSelectedListener.FLAG_ITEM_CLICKED:
-			selectSubreddit(sr, position, lastSelectedFilter, true);
+			selectSubreddit(sr, lastSelectedFilter, true);
 			break;
 		
 		case OnSubredditSelectedListener.FLAG_LOAD_FINISHED:
 			if (thingContainer != null && !isVisible(FRAG_THING_LIST)) {
 				setNavigationListMode(sr);
-				selectSubreddit(sr, position, lastSelectedFilter, false);
+				getSubredditListFragment().setSelectedSubreddit(sr);
+				selectSubreddit(sr, lastSelectedFilter, false);
 			}
 			break;
 		}		
 	}
 	
-	private void selectSubreddit(Subreddit sr, int position, int filter, boolean addToBackStack) {
-		ControlFragment controlFrag = ControlFragment.newInstance(sr, position, null, -1, filter);
+	private void selectSubreddit(Subreddit sr, int filter, boolean addToBackStack) {
+		ControlFragment controlFrag = ControlFragment.newInstance(sr, null, -1, filter);
 		
 		if (singleContainer != null) {
 			ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, filter, false);
@@ -166,7 +167,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void selectThing(Entity thing, String tag, int position) {
-		ControlFragment controlFrag = ControlFragment.newInstance(getSubreddit(), getSubredditPosition(), thing, position, getFilter());
+		ControlFragment controlFrag = ControlFragment.newInstance(getSubreddit(), thing, position, getFilter());
 		Fragment thingFrag;
 		if (FRAG_LINK.equalsIgnoreCase(tag)) {
 			thingFrag = LinkFragment.newInstance(thing);
@@ -201,10 +202,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return getControlFragment().getThing();
 	}
 
-	private int getSubredditPosition() {
-		return getControlFragment().getTopicPosition();
-	}
-	
 	private int getThingPosition() {
 		return getControlFragment().getThingPosition();
 	}
@@ -215,6 +212,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private ControlFragment getControlFragment() {
 		return (ControlFragment) manager.findFragmentByTag(FRAG_CONTROL);
+	}
+	
+	private SubredditListFragment getSubredditListFragment() {
+		return (SubredditListFragment) manager.findFragmentByTag(FRAG_SUBREDDIT_LIST);
 	}
 	
 	private ThingListFragment getThingListFragment() {
@@ -264,6 +265,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void refreshCheckedItems() {
+		if (isVisible(FRAG_SUBREDDIT_LIST)) {
+			getSubredditListFragment().setSelectedSubreddit(getSubreddit());
+		}
+		
 		ThingListFragment thingListFrag = getThingListFragment();
 		if (thingListFrag != null && thingListFrag.isAdded()) {
 			thingListFrag.setItemChecked(getThingPosition());
