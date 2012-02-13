@@ -36,15 +36,15 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 	private static final String TAG = "ThingLoaderTask";
 
 	private final Context context;
-	private final CharSequence subredditUrl;
+	private final String subreddit;
+	private final CharSequence url;
 	private final TaskListener<LoadResult<String>> listener;
-	private final boolean displaySubreddit;
 
-	public ThingLoaderTask(Context context, CharSequence subredditUrl, TaskListener<LoadResult<String>> listener, boolean displaySubreddit) {
+	public ThingLoaderTask(Context context, String subreddit, CharSequence url, TaskListener<LoadResult<String>> listener) {
 		this.context = context;
-		this.subredditUrl = subredditUrl;
+		this.subreddit = subreddit;
+		this.url = url;
 		this.listener = listener;
-		this.displaySubreddit = displaySubreddit;
 	}
 	
 	@Override
@@ -61,10 +61,10 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 	protected ThingLoaderResult doInBackground(Void... voidRays) {
 		ThingLoaderResult result = new ThingLoaderResult();
 		try {
-			URL url = new URL(subredditUrl.toString());
-			Log.v(TAG, url.toString());
+			URL subredditUrl = new URL(url.toString());
+			Log.v(TAG, subredditUrl.toString());
 			
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) subredditUrl.openConnection();
 			connection.connect();
 			
 			long t1 = SystemClock.currentThreadTimeMillis();
@@ -169,10 +169,10 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 		}
 		
 		private CharSequence getInfo(Entity e) {
-			if (displaySubreddit) {
-				return context.getString(R.string.entity_thing_info_2, e.subreddit, e.author, e.score, e.numComments);
-			} else {
+			if (subreddit.equalsIgnoreCase(e.subreddit)) {
 				return context.getString(R.string.entity_thing_info, e.author, e.score, e.numComments);	
+			} else {
+				return context.getString(R.string.entity_thing_info_2, e.subreddit, e.author, e.score, e.numComments);
 			}
 		}
 		

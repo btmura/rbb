@@ -3,6 +3,7 @@ package com.btmura.android.reddit;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
+import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.view.View;
 import android.widget.SimpleCursorAdapter;
@@ -30,19 +31,28 @@ public class SubredditAdapter extends SimpleCursorAdapter {
 	
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
-		String name = cursor.getString(1);
 		TextView tv = (TextView) view;
 		tv.setSingleLine();
 		tv.setEllipsize(TruncateAt.END);
-		tv.setText(name);
+		
+		String name = cursor.getString(1);
+		if (TextUtils.isEmpty(name)) {
+			tv.setText(R.string.front_page);
+		} else {
+			tv.setText(name);
+		}
 	}
 	
-	public Subreddit getSubreddit(int position) {
+	public Subreddit getSubreddit(Context context, int position) {
 		Cursor c = getCursor();
 		if (!c.moveToPosition(position)) {
 			throw new IllegalStateException();
 		}
 		String name = c.getString(1);
-		return Subreddit.newInstance(name);
+		if (TextUtils.isEmpty(name)) {
+			return Subreddit.frontPage(context);
+		} else {
+			return Subreddit.newInstance(name);
+		}
 	}
 }

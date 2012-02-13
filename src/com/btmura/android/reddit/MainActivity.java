@@ -29,6 +29,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private static final String FRAG_THING_LIST = "thingList";
 	private static final String FRAG_LINK = "link";
 	private static final String FRAG_COMMENT = "comment";
+	private static final String FRAG_ADD_SUBREDDIT = "addSubreddit";
 
 	private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
 	
@@ -76,20 +77,13 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 		
 		if (thingContainer != null) {
-			bar.setDisplayShowTitleEnabled(false);
-			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-			
-			Subreddit sr = Subreddit.frontPage(this);
-			filterSpinner.setSubreddit(sr.name);
-			
-			ControlFragment controlFrag = ControlFragment.newInstance(sr, 0, null, -1, 0);
+			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+			ControlFragment controlFrag = ControlFragment.newInstance(null, -1, null, -1, 0);
 			SubredditListFragment subredditFrag = SubredditListFragment.newInstance();
-			ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, FilterAdapter.FILTER_HOT, true);
 			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
 			ft.replace(R.id.subreddit_list_container, subredditFrag, FRAG_SUBREDDIT_LIST);
-			ft.replace(R.id.thing_list_container, thingListFrag, FRAG_THING_LIST);
 			ft.commit();
 		}
 	}
@@ -112,16 +106,28 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		lastSelectedFilter = itemPosition;
 		if (itemId != getFilter()) {
-			selectSubreddit(getSubreddit(), getSubredditPosition(), itemPosition);
+			selectSubreddit(getSubreddit(), getSubredditPosition(), itemPosition, true);
 		}
 		return true;
 	}
 	
-	public void onSubredditSelected(Subreddit subreddit, int position) {
-		selectSubreddit(subreddit, position, lastSelectedFilter);
+	public void onSubredditSelected(Subreddit sr, int position, int event) {
+		switch (event) {
+		
+		case OnSubredditSelectedListener.FLAG_ITEM_CLICKED:
+			selectSubreddit(sr, position, lastSelectedFilter, true);
+			break;
+		
+		case OnSubredditSelectedListener.FLAG_LOAD_FINISHED:
+			if (thingContainer != null && !isVisible(FRAG_THING_LIST)) {
+				setNavigationListMode(sr);
+				selectSubreddit(sr, position, lastSelectedFilter, false);
+			}
+			break;
+		}		
 	}
 	
-	private void selectSubreddit(Subreddit sr, int position, int filter) {
+	private void selectSubreddit(Subreddit sr, int position, int filter, boolean addToBackStack) {
 		ControlFragment controlFrag = ControlFragment.newInstance(sr, position, null, -1, filter);
 		
 		if (singleContainer != null) {
@@ -148,7 +154,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			if (commentFrag != null) {
 				ft.remove(commentFrag);
 			}
-			ft.addToBackStack(FRAG_THING_LIST);
+			if (addToBackStack) {
+				ft.addToBackStack(FRAG_THING_LIST);
+			}
 			ft.commit();
 		}
 	}
@@ -236,9 +244,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			bar.setDisplayShowTitleEnabled(true);
 			bar.setTitle(thing.title);
 		} else if (sr != null) {
-			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-			bar.setDisplayShowTitleEnabled(false);
-			filterSpinner.setSubreddit(sr.name);
+			setNavigationListMode(sr);
 		} else {
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 			bar.setDisplayShowTitleEnabled(true);
@@ -249,6 +255,12 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		if (bar.getNavigationMode() == ActionBar.NAVIGATION_MODE_LIST) {
 			bar.setSelectedNavigationItem(getFilter());
 		}
+	}
+	
+	private void setNavigationListMode(Subreddit sr) {
+		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		bar.setDisplayShowTitleEnabled(false);
+		filterSpinner.setSubreddit(sr.name);
 	}
 	
 	private void refreshCheckedItems() {
@@ -321,7 +333,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private void handleAddSubreddit() {
 		AddSubredditFragment f = new AddSubredditFragment();
-		f.show(manager, "add");
+		f.show(manager, FRAG_ADD_SUBREDDIT);
 	}
 	
 	private void handleHome() {
@@ -370,7 +382,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		intent.setData(Uri.parse(getLink()));
 		startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));	
 	}
-	
+
 	public void onSubredditAdded(String name) {
 		RedditProvider.addSubredditInBackground(this, name);
 	}

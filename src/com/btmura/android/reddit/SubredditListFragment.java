@@ -17,9 +17,11 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 public class SubredditListFragment extends ListFragment implements LoaderCallbacks<Cursor>, MultiChoiceModeListener {
-		
+	
 	interface OnSubredditSelectedListener {
-		void onSubredditSelected(Subreddit sr, int position);
+		static final int FLAG_LOAD_FINISHED = 0;
+		static final int FLAG_ITEM_CLICKED = 1;
+		void onSubredditSelected(Subreddit sr, int position, int event);
 	}
 
 	private SubredditAdapter adapter;
@@ -54,7 +56,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		setEmptyText(getActivity().getString(R.string.empty));
 		setListAdapter(adapter);
 		setListShown(false);
 		getLoaderManager().initLoader(0, null, this);
@@ -67,6 +68,13 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		adapter.swapCursor(data);
 		setListShown(true);
+		if (data.getCount() > 0) {
+			getListView().post(new Runnable() {
+				public void run() {
+					listener.onSubredditSelected(adapter.getSubreddit(getActivity(), 0), 0, OnSubredditSelectedListener.FLAG_LOAD_FINISHED);
+				}
+			});
+		}
 	}
 	
 	public void onLoaderReset(Loader<Cursor> loader) {
@@ -76,7 +84,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		listener.onSubredditSelected(adapter.getSubreddit(position), position);
+		listener.onSubredditSelected(adapter.getSubreddit(getActivity(), position), position, OnSubredditSelectedListener.FLAG_ITEM_CLICKED);
 	}
 	
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {

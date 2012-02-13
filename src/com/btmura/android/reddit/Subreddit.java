@@ -18,30 +18,23 @@ public class Subreddit implements Parcelable {
 	
 	public final String name;
 	public final boolean frontPage;
-	public final boolean multiSubreddit;
 	
 	public static Subreddit frontPage(Context context) {
-		return new Subreddit(context.getString(R.string.front_page), true, true);
+		return new Subreddit(context.getString(R.string.front_page), true);
 	}
-	
-	public static Subreddit multiSubreddit(String name) {
-		return new Subreddit(name, false, true);
-	}
-	
+
 	public static Subreddit newInstance(String name) {
-		return new Subreddit(name, false, false);
+		return new Subreddit(name, false);
 	}
 		
-	private Subreddit(String name, boolean frontPage, boolean multiSubreddit) {
+	private Subreddit(String name, boolean frontPage) {
 		this.name = name;
 		this.frontPage = frontPage;
-		this.multiSubreddit = multiSubreddit;
 	}
 	
 	private Subreddit(Parcel in) {
 		this.name = in.readString();
 		this.frontPage = in.readInt() == 1;
-		this.multiSubreddit = in.readInt() == 1;
 	}
 	
 	@Override
@@ -56,6 +49,5 @@ public class Subreddit implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(name);
 		dest.writeInt(frontPage ? 1 : 0);
-		dest.writeInt(multiSubreddit ? 1 : 0);
 	}
 }

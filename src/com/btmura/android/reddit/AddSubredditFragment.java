@@ -22,13 +22,14 @@ public class AddSubredditFragment extends DialogFragment {
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		final EditText e = new EditText(getActivity());
+		e.setSingleLine();
 		return new AlertDialog.Builder(getActivity())
 				.setTitle(R.string.dialog_add_subreddit)
 				.setView(e)
 				.setNegativeButton(android.R.string.cancel, null)
 				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
-						((OnSubredditAddedListener) getActivity()).onSubredditAdded(e.getText().toString());
+						((OnSubredditAddedListener) getActivity()).onSubredditAdded(e.getText().toString().trim());
 					}
 				})
 				.create();

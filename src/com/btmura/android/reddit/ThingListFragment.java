@@ -71,7 +71,7 @@ public class ThingListFragment extends EntityListFragment<String> {
 		Subreddit sr = getArguments().getParcelable(ARG_SUBREDDIT);
 		int filter = getArguments().getInt(ARG_FILTER);
 		CharSequence url = Urls.subredditUrl(sr, filter, moreKey);
-		return new ThingLoaderTask(getActivity().getApplicationContext(), url, this, sr.multiSubreddit);
+		return new ThingLoaderTask(getActivity().getApplicationContext(), sr.name, url, this);
 	}
 	
 	@Override
