@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
@@ -39,7 +40,7 @@ public class LinkFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.link_fragment, container, false);
+		View view = inflater.inflate(R.layout.link, container, false);
 		webView = (WebView) view.findViewById(R.id.link);
 		progress = (ProgressBar) view.findViewById(R.id.progress);
 		setupWebView(webView);
@@ -67,6 +68,14 @@ public class LinkFragment extends Fragment {
 			public void onPageFinished(WebView view, String url) {
 				super.onPageFinished(view, url);
 				progress.setVisibility(View.GONE);
+			}
+		});
+		
+		webView.setWebChromeClient(new WebChromeClient() {
+			@Override
+			public void onProgressChanged(WebView view, int newProgress) {
+				super.onProgressChanged(view, newProgress);
+				progress.setProgress(newProgress);
 			}
 		});
 	}
