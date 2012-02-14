@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.AddSubredditFragment.OnSubredditAddedListener;
@@ -41,6 +42,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private View singleContainer;
 	private View thingContainer;
+	
+	private ShareActionProvider shareProvider;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -285,18 +288,22 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.main, menu);
+		shareProvider = (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();
 		return true;
 	}
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-		boolean hasThing = getThing() != null;
-		boolean isSelf = hasThing && getThing().isSelf;
+		Entity thing = getThing();
+		boolean hasThing = thing != null;
+		boolean isSelf = thing != null && thing.isSelf;
 		menu.findItem(R.id.menu_link).setVisible(hasThing && !isSelf && isVisible(FRAG_COMMENT));
 		menu.findItem(R.id.menu_comments).setVisible(hasThing && !isSelf && isVisible(FRAG_LINK));
 		menu.findItem(R.id.menu_copy_link).setVisible(hasThing);
 		menu.findItem(R.id.menu_view).setVisible(hasThing);
+		menu.findItem(R.id.menu_share).setVisible(hasThing);
+		updateShareActionIntent(thing);		
 		return true;
 	}
 	
@@ -369,7 +376,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void handleCopyLink() {
-		clipText(getLink());
+		clipText(getLink(getThing()));
 	}
 	
 	private void clipText(String text) {
@@ -378,14 +385,24 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();		
 	}
 	
-	private String getLink() {
-		return isVisible(FRAG_LINK) ? getThing().url : "http://www.reddit.com" + getThing().permaLink;
+	private String getLink(Entity thing) {
+		return isVisible(FRAG_LINK) ? thing.url : "http://www.reddit.com" + thing.permaLink;
 	}
 	
 	private void handleView() {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setData(Uri.parse(getLink()));
+		intent.setData(Uri.parse(getLink(getThing())));
 		startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));	
+	}
+	
+	private void updateShareActionIntent(Entity thing) {
+		if (thing != null) {
+			Intent intent = new Intent(Intent.ACTION_SEND);
+			intent.setType("text/plain");
+			intent.putExtra(Intent.EXTRA_SUBJECT, Formatter.format(thing.title));
+			intent.putExtra(Intent.EXTRA_TEXT, getLink(thing));
+			shareProvider.setShareIntent(intent);
+		}
 	}
 
 	public void onSubredditAdded(String name) {
