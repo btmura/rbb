@@ -4,5 +4,6 @@
 *.json
 apk
 bin
+hprof
 gen
 project.properties

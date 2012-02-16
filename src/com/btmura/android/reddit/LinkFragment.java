@@ -33,13 +33,11 @@ public class LinkFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
 		thing = getArguments().getParcelable(ARG_THING);
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.link, container, false);
 		webView = (WebView) view.findViewById(R.id.link);
 		progress = (ProgressBar) view.findViewById(R.id.progress);
@@ -99,8 +97,10 @@ public class LinkFragment extends Fragment {
 	}
 	
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
+	public void onDestroyView() {
+		super.onDestroyView();
 		webView.destroy();
+		webView = null;
+		progress = null;
 	}
 }
