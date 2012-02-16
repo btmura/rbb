@@ -11,6 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.btmura.android.reddit.R;
+
 public class EntityAdapter extends BaseAdapter {
 	
 	private final ArrayList<Entity> entities;

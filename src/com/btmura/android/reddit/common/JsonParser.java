@@ -1,4 +1,4 @@
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.common;
 
 import java.io.IOException;
 
@@ -104,6 +104,8 @@ public class JsonParser {
 				onId(r, i);
 			} else if ("name".equals(name)) {
 				onName(r, i);
+			} else if ("display_name".equals(name)) {
+				onDisplayName(r, i);
 			} else if ("title".equals(name)) {
 				onTitle(r, i);
 			} else if ("author".equals(name)) {
@@ -164,6 +166,10 @@ public class JsonParser {
 	}
 	
 	public void onName(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onDisplayName(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	

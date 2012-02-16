@@ -1,5 +1,6 @@
 package com.btmura.android.reddit;
 
+
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;

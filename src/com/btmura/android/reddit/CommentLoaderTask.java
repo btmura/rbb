@@ -16,6 +16,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.EntityListFragment.LoadResult;
+import com.btmura.android.reddit.common.JsonParser;
 
 
 public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {

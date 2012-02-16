@@ -11,12 +11,13 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.EntityListFragment.LoadResult;
 
-abstract class EntityListFragment<M> extends ListFragment
+public abstract class EntityListFragment<M> extends ListFragment
 		implements TaskListener<LoadResult<M>>, OnScrollListener {
 	
-	interface LoadResult<M> {
+	public interface LoadResult<M> {
 		ArrayList<Entity> getEntities();
 		M getMoreKey();
 	}

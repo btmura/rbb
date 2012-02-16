@@ -1,5 +1,6 @@
 package com.btmura.android.reddit;
 
+
 import android.app.Fragment;
 import android.os.Bundle;
 

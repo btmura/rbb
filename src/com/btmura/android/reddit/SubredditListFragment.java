@@ -98,6 +98,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 		MenuInflater inflater = mode.getMenuInflater();
 		inflater.inflate(R.menu.subreddit, menu);
+		menu.findItem(R.id.menu_add_subreddits).setVisible(false);
 		return true;
 	}
 	
@@ -109,7 +110,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 		switch (item.getItemId()) {
 		case R.id.menu_delete_subreddits:
 			long[] ids = getListView().getCheckedItemIds();
-			RedditProvider.deleteSubredditInBackground(getActivity(), ids);
+			Provider.deleteSubredditInBackground(getActivity(), ids);
 			mode.finish();
 			return true;
 		}

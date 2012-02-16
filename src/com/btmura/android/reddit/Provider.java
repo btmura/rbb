@@ -1,5 +1,7 @@
 package com.btmura.android.reddit;
 
+import java.util.List;
+
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -11,9 +13,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.provider.BaseColumns;
 
-public class RedditProvider extends ContentProvider {
+public class Provider extends ContentProvider {
 
 	static final String AUTHORITY = "com.btmura.android.reddit.provider";
 	
@@ -109,14 +112,19 @@ public class RedditProvider extends ContentProvider {
 		return null;
 	}
 	
-	public static void addSubredditInBackground(final Context context, final String name) {
+	public static void addSubredditsInBackground(final Context context, final List<String> names) {
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
+				SystemClock.sleep(10 * 1000);
 				ContentResolver cr = context.getContentResolver();
 				ContentValues values = new ContentValues(1);
-				values.put(Subreddits.COLUMN_NAME, name);
-				cr.insert(Subreddits.CONTENT_URI, values);
+				int size = names.size();
+				for (int i = 0; i < size; i++) {
+					String name = names.get(i);
+					values.put(Subreddits.COLUMN_NAME, name);
+					cr.insert(Subreddits.CONTENT_URI, values);
+				}
 				return null;
 			}
 		}.execute();

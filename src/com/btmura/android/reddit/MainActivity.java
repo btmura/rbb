@@ -18,22 +18,21 @@ import android.view.View;
 import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
-import com.btmura.android.reddit.AddSubredditFragment.OnSubredditAddedListener;
 import com.btmura.android.reddit.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
+import com.btmura.android.reddit.addsubreddits.AddSubredditsActivity;
 
-public class MainActivity extends Activity implements OnBackStackChangedListener, OnNavigationListener,
-		OnSubredditAddedListener, OnSubredditSelectedListener, OnThingSelectedListener {
+public class MainActivity extends Activity implements OnBackStackChangedListener, OnNavigationListener, 
+		OnSubredditSelectedListener, OnThingSelectedListener {
 
 	private static final String FRAG_CONTROL = "control";
 	private static final String FRAG_SUBREDDIT_LIST = "subredditList";
 	private static final String FRAG_THING_LIST = "thingList";
 	private static final String FRAG_LINK = "link";
 	private static final String FRAG_COMMENT = "comment";
-	private static final String FRAG_ADD_SUBREDDIT = "addSubreddit";
 
 	private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
-	
+
 	private FragmentManager manager;
 	private ActionBar bar;
 
@@ -344,8 +343,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void handleAddSubreddit() {
-		AddSubredditFragment f = new AddSubredditFragment();
-		f.show(manager, FRAG_ADD_SUBREDDIT);
+		Intent intent = new Intent(this, AddSubredditsActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+		startActivity(intent);
 	}
 	
 	private void handleHome() {
@@ -403,9 +403,5 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			intent.putExtra(Intent.EXTRA_TEXT, getLink(thing));
 			shareProvider.setShareIntent(intent);
 		}
-	}
-
-	public void onSubredditAdded(String name) {
-		RedditProvider.addSubredditInBackground(this, name);
 	}
 }

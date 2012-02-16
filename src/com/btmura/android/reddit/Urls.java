@@ -1,5 +1,6 @@
 package com.btmura.android.reddit;
 
+
 public class Urls {
 	
 	public static CharSequence subredditUrl(Subreddit sr, int filter, String after) {

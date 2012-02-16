@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.btmura.android.reddit.RedditProvider.Subreddits;
+import com.btmura.android.reddit.Provider.Subreddits;
 
 public class SubredditAdapter extends SimpleCursorAdapter {
 
@@ -19,7 +19,7 @@ public class SubredditAdapter extends SimpleCursorAdapter {
 	};
 	private static final String[] FROM = {};
 	private static final int[] TO = {};
-	private static final String SORT = Subreddits.COLUMN_NAME + " ASC";
+	private static final String SORT = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
 	
 	public static CursorLoader createLoader(Context context) {
 		return new CursorLoader(context, Subreddits.CONTENT_URI, PROJECTION, null, null, SORT);
