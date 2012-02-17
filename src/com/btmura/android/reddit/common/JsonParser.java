@@ -114,6 +114,8 @@ public class JsonParser {
 				onTitle(r, i);
 			} else if ("description".equals(name)) {
 				onDescription(r, i);
+			} else if ("subscribers".equals(name)) {
+				onSubscribers(r, i);
 			} else if ("author".equals(name)) {
 				onAuthor(r, i);
 			} else if ("subreddit".equals(name)) {
@@ -184,6 +186,10 @@ public class JsonParser {
 	}
 	
 	public void onDescription(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onSubscribers(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	

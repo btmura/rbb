@@ -21,7 +21,7 @@ public class DetailsFragment extends ListFragment {
 	
 	private static final String ARGS_SUBREDDIT = "sr";
 
-	public static DetailsFragment newInstance(Subreddit sr) {
+	public static DetailsFragment newInstance(SubredditInfo sr) {
 		DetailsFragment f = new DetailsFragment();
 		Bundle b = new Bundle(1);
 		b.putParcelable(ARGS_SUBREDDIT, sr);
@@ -55,8 +55,8 @@ public class DetailsFragment extends ListFragment {
 	}
 	
 	private void handleAddSubreddit() {
-		List<Subreddit> added = new ArrayList<Subreddit>(1);
-		Subreddit sr = getArguments().getParcelable(ARGS_SUBREDDIT);
+		List<SubredditInfo> added = new ArrayList<SubredditInfo>(1);
+		SubredditInfo sr = getArguments().getParcelable(ARGS_SUBREDDIT);
 		added.add(sr);
 		getListener().onSubredditsAdded(added, OnSubredditAddedListener.EVENT_ACTION_ITEM_CLICKED);
 	}
@@ -81,7 +81,7 @@ public class DetailsFragment extends ListFragment {
 			return 1;
 		}
 
-		public Subreddit getItem(int position) {
+		public SubredditInfo getItem(int position) {
 			return getArguments().getParcelable(ARGS_SUBREDDIT);
 		}
 
@@ -92,7 +92,7 @@ public class DetailsFragment extends ListFragment {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View v = getActivity().getLayoutInflater().inflate(R.layout.details_row, parent, false);
 			
-			Subreddit sr = getItem(position);
+			SubredditInfo sr = getItem(position);
 			
 			TextView title = (TextView) v.findViewById(R.id.title);
 			title.setText(sr.title);

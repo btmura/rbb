@@ -16,22 +16,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 
-public class SubredditListFragment extends ListFragment implements MultiChoiceModeListener, LoaderCallbacks<List<Subreddit>> {
+public class SubredditListFragment extends ListFragment implements MultiChoiceModeListener, LoaderCallbacks<List<SubredditInfo>> {
 
 	interface OnSubredditAddedListener {
 		static final int EVENT_LIST_ITEM_CLICKED = 0;
 		static final int EVENT_ACTION_ITEM_CLICKED = 1;
-		void onSubredditsAdded(List<Subreddit> added, int event);
+		void onSubredditsAdded(List<SubredditInfo> added, int event);
 	}
 	
 	private static final String ARG_QUERY = "query";
 	
-	private ArrayAdapter<Subreddit> adapter;
+	private SubredditInfoAdapter adapter;
 	
 	public static SubredditListFragment newInstance(String query) {
 		SubredditListFragment frag = new SubredditListFragment();
@@ -53,7 +52,7 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		adapter = new ArrayAdapter<Subreddit>(getActivity(), android.R.layout.simple_list_item_activated_1);
+		adapter = new SubredditInfoAdapter(getActivity().getLayoutInflater());
 		setListAdapter(adapter);
 		setEmptyText(getString(R.string.empty));
 		setListShown(false);
@@ -63,22 +62,27 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		ArrayList<Subreddit> subreddits = new ArrayList<Subreddit>(1);
+		ArrayList<SubredditInfo> subreddits = new ArrayList<SubredditInfo>(1);
 		subreddits.add(adapter.getItem(position));
 		getListener().onSubredditsAdded(subreddits, OnSubredditAddedListener.EVENT_LIST_ITEM_CLICKED);
 	}
 	
-	public Loader<List<Subreddit>> onCreateLoader(int id, Bundle args) {
+	public Loader<List<SubredditInfo>> onCreateLoader(int id, Bundle args) {
 		return new SubredditLoader(getActivity(), getArguments().getString(ARG_QUERY));
 	}
 	
-	public void onLoadFinished(Loader<List<Subreddit>> loader, List<Subreddit> data) {
+	public void onLoadFinished(Loader<List<SubredditInfo>> loader, List<SubredditInfo> data) {
 		adapter.clear();
-		adapter.addAll(data);
+		if (data != null) {
+			setEmptyText(getString(R.string.empty));
+			adapter.addAll(data);
+		} else {
+			setEmptyText(getString(R.string.error));
+		}
 		setListShown(true);
 	}
 	
-	public void onLoaderReset(Loader<List<Subreddit>> loader) {
+	public void onLoaderReset(Loader<List<SubredditInfo>> loader) {
 		adapter.clear();
 	}
 	
@@ -105,7 +109,7 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 	
 	private void handleAddSubreddits() {
 		final SparseBooleanArray positions = getListView().getCheckedItemPositions();
-		List<Subreddit> added = new ArrayList<Subreddit>(positions.size());
+		List<SubredditInfo> added = new ArrayList<SubredditInfo>(positions.size());
 		int count = adapter.getCount();
 		for (int i = 0; i < count; i++) {
 			if (positions.get(i)) {

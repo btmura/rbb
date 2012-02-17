@@ -9,6 +9,8 @@
     <string name="entity_thing_info_2">%1$s  %2$s  %3$d points  %4$d comments</string>
     <string name="entity_comment_info">%1$s  %2$d points</string>
     
+    <string name="sr_info_status">%1$s  %2$d subscribers</string>
+    
     <string name="filter_hot">what\'s hot</string>
     <string name="filter_new">new</string>
     <string name="filter_controversial">controversial</string>

@@ -16,13 +16,14 @@ import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.Log;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.common.JsonParser;
 
-class SubredditLoader extends AsyncTaskLoader<List<Subreddit>> {
+class SubredditLoader extends AsyncTaskLoader<List<SubredditInfo>> {
 	
 	private static final String TAG = "SubredditLoader";
 	
-	private List<Subreddit> results;
+	private List<SubredditInfo> results;
 
 	private String query;
 	
@@ -42,7 +43,7 @@ class SubredditLoader extends AsyncTaskLoader<List<Subreddit>> {
 	}
 	
 	@Override
-	public List<Subreddit> loadInBackground() {
+	public List<SubredditInfo> loadInBackground() {
 		try {
 			URL subredditUrl = new URL("http://www.reddit.com/reddits/search.json?q=" + URLEncoder.encode(query));
 			
@@ -75,11 +76,11 @@ class SubredditLoader extends AsyncTaskLoader<List<Subreddit>> {
 	
 	class SearchParser extends JsonParser {
 		
-		private List<Subreddit> results = new ArrayList<Subreddit>();
+		private List<SubredditInfo> results = new ArrayList<SubredditInfo>();
 		
 		@Override
 		public void onEntityStart(int index) {
-			results.add(new Subreddit());
+			results.add(new SubredditInfo());
 		}
 		
 		@Override
@@ -98,7 +99,14 @@ class SubredditLoader extends AsyncTaskLoader<List<Subreddit>> {
 		}
 		
 		@Override
+		public void onSubscribers(JsonReader reader, int index) throws IOException {
+			results.get(index).subscribers = reader.nextInt();
+		}
+		
+		@Override
 		public void onEntityEnd(int index) {
+			SubredditInfo srInfo = results.get(index);
+			srInfo.status = getContext().getString(R.string.sr_info_status, srInfo.displayName, srInfo.subscribers);
 		}
 	}
 }
