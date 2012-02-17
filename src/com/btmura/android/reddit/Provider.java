@@ -13,7 +13,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.provider.BaseColumns;
 
 public class Provider extends ContentProvider {
@@ -116,15 +115,15 @@ public class Provider extends ContentProvider {
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
-				SystemClock.sleep(10 * 1000);
-				ContentResolver cr = context.getContentResolver();
-				ContentValues values = new ContentValues(1);
 				int size = names.size();
+				ContentValues[] values = new ContentValues[size];
 				for (int i = 0; i < size; i++) {
-					String name = names.get(i);
-					values.put(Subreddits.COLUMN_NAME, name);
-					cr.insert(Subreddits.CONTENT_URI, values);
+					values[i] = new ContentValues(1);
+					values[i].put(Subreddits.COLUMN_NAME, names.get(i));
 				}
+				
+				ContentResolver cr = context.getContentResolver();
+				cr.bulkInsert(Subreddits.CONTENT_URI, values);
 				return null;
 			}
 		}.execute();
