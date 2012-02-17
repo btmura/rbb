@@ -21,7 +21,9 @@
     <string name="loading_error">Error occurred. Try again?</string>
     
     <string name="add_subreddits_search">Search subreddits</string>
+    <string name="x_subreddits_added">%d subreddits added.</string>
     
+    <string name="menu_add_subreddit">Add subreddit</string>
     <string name="menu_add_subreddits">Add subreddits</string>
     <string name="menu_delete_subreddits">Delete subreddits</string>
     <string name="menu_link">View link</string>

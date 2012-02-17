@@ -99,6 +99,10 @@ public class JsonParser {
 	private void doParseEntityData(JsonReader r, int i) throws IOException {
 		r.beginObject();
 		while (r.hasNext()) {
+			if (r.peek() == JsonToken.NULL) {
+				r.skipValue();
+				continue;
+			}
 			String name = r.nextName();
 			if ("id".equals(name)) {
 				onId(r, i);
@@ -108,6 +112,8 @@ public class JsonParser {
 				onDisplayName(r, i);
 			} else if ("title".equals(name)) {
 				onTitle(r, i);
+			} else if ("description".equals(name)) {
+				onDescription(r, i);
 			} else if ("author".equals(name)) {
 				onAuthor(r, i);
 			} else if ("subreddit".equals(name)) {
@@ -174,6 +180,10 @@ public class JsonParser {
 	}
 	
 	public void onTitle(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
+	public void onDescription(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
 	

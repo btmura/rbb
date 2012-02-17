@@ -1,7 +1,5 @@
 package com.btmura.android.reddit;
 
-import java.util.List;
-
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -27,10 +25,10 @@ public class Provider extends ContentProvider {
 		MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
 	}
 	
-	static class Subreddits implements BaseColumns {
+	public static class Subreddits implements BaseColumns {
 		private static final String TABLE_NAME = "subreddits";
-		static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
-		static final String COLUMN_NAME = "name";
+		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
+		public static final String COLUMN_NAME = "name";
 	}
 	
 	private DbHelper helper;
@@ -111,17 +109,10 @@ public class Provider extends ContentProvider {
 		return null;
 	}
 	
-	public static void addSubredditsInBackground(final Context context, final List<String> names) {
+	public static void addSubredditsInBackground(final Context context, final ContentValues[] values) {
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
-				int size = names.size();
-				ContentValues[] values = new ContentValues[size];
-				for (int i = 0; i < size; i++) {
-					values[i] = new ContentValues(1);
-					values[i].put(Subreddits.COLUMN_NAME, names.get(i));
-				}
-				
 				ContentResolver cr = context.getContentResolver();
 				cr.bulkInsert(Subreddits.CONTENT_URI, values);
 				return null;

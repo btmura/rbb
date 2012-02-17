@@ -1,4 +1,4 @@
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.common;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

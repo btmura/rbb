@@ -13,15 +13,16 @@ import java.util.List;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.JsonReader;
+import android.util.JsonToken;
 import android.util.Log;
 
 import com.btmura.android.reddit.common.JsonParser;
 
-public class SubredditLoader extends AsyncTaskLoader<List<String>> {
+class SubredditLoader extends AsyncTaskLoader<List<Subreddit>> {
 	
 	private static final String TAG = "SubredditLoader";
 	
-	private List<String> results;
+	private List<Subreddit> results;
 
 	private String query;
 	
@@ -41,7 +42,7 @@ public class SubredditLoader extends AsyncTaskLoader<List<String>> {
 	}
 	
 	@Override
-	public List<String> loadInBackground() {
+	public List<Subreddit> loadInBackground() {
 		try {
 			URL subredditUrl = new URL("http://www.reddit.com/reddits/search.json?q=" + URLEncoder.encode(query));
 			
@@ -74,16 +75,26 @@ public class SubredditLoader extends AsyncTaskLoader<List<String>> {
 	
 	class SearchParser extends JsonParser {
 		
-		private List<String> results = new ArrayList<String>();
+		private List<Subreddit> results = new ArrayList<Subreddit>();
 		
 		@Override
 		public void onEntityStart(int index) {
-			results.add(null);
+			results.add(new Subreddit());
 		}
 		
 		@Override
 		public void onDisplayName(JsonReader reader, int index) throws IOException {
-			results.set(index, reader.nextString());
+			results.get(index).displayName = reader.nextString();
+		}
+		
+		@Override
+		public void onTitle(JsonReader reader, int index) throws IOException {
+			results.get(index).title = reader.nextString();
+		}
+		
+		@Override
+		public void onDescription(JsonReader reader, int index) throws IOException {
+			results.get(index).description = reader.peek() == JsonToken.NULL ? "" : reader.nextString();
 		}
 		
 		@Override

@@ -16,6 +16,7 @@ import android.util.JsonToken;
 import android.util.Log;
 
 import com.btmura.android.reddit.EntityListFragment.LoadResult;
+import com.btmura.android.reddit.common.Formatter;
 import com.btmura.android.reddit.common.JsonParser;
 
 

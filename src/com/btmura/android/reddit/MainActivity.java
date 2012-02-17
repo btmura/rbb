@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.btmura.android.reddit.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.addsubreddits.AddSubredditsActivity;
+import com.btmura.android.reddit.common.Formatter;
 
 public class MainActivity extends Activity implements OnBackStackChangedListener, OnNavigationListener, 
 		OnQueryTextListener, OnFocusChangeListener, OnSubredditSelectedListener, OnThingSelectedListener {
@@ -332,7 +333,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			handleHome();
 			return true;
 			
-		case R.id.menu_add_subreddit:
+		case R.id.menu_add_subreddits:
 			handleAddSubreddit();
 			return true;
 
