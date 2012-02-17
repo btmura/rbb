@@ -17,6 +17,8 @@ import com.btmura.android.reddit.addsubreddits.SubredditListFragment.OnSubreddit
 
 public class AddSubredditsActivity extends Activity implements OnQueryTextListener, OnSubredditAddedListener {
 
+	public static final String EXTRA_QUERY = "query";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -30,6 +32,12 @@ public class AddSubredditsActivity extends Activity implements OnQueryTextListen
 		
 		SearchView sv = (SearchView) bar.getCustomView();
 		sv.setOnQueryTextListener(this);
+		
+		String q = getIntent().getStringExtra(EXTRA_QUERY);
+		if (q != null && !q.trim().isEmpty()) {
+			sv.setQuery(q.trim(), true);
+			sv.setFocusable(false);
+		}
 	}
 	
 	public boolean onQueryTextChange(String newText) {

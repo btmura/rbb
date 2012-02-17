@@ -16,7 +16,7 @@ public class Formatter {
 	private static Pattern STRIKE_THROUGH_PATTERN = Pattern.compile("~~(.+?)~~");
 	private static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+?);");
 	private static Pattern BULLET_PATTERN = Pattern.compile("\\* ([^\\n]+)");
-	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\]\\(([^\\)]+?)\\)");
+	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\][ ]?\\(([^\\)]+?)\\)");
 	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([^ \\n]+)");
 	
 	private static final int SPAN_BOLD = 0;

@@ -15,6 +15,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
@@ -23,19 +26,21 @@ import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.addsubreddits.AddSubredditsActivity;
 
 public class MainActivity extends Activity implements OnBackStackChangedListener, OnNavigationListener, 
-		OnSubredditSelectedListener, OnThingSelectedListener {
+		OnQueryTextListener, OnFocusChangeListener, OnSubredditSelectedListener, OnThingSelectedListener {
 
 	private static final String FRAG_CONTROL = "control";
 	private static final String FRAG_SUBREDDIT_LIST = "subredditList";
 	private static final String FRAG_THING_LIST = "thingList";
 	private static final String FRAG_LINK = "link";
 	private static final String FRAG_COMMENT = "comment";
+	
+	private static final int REQUEST_ADD_SUBREDDITS = 0;
 
 	private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
 
 	private FragmentManager manager;
 	private ActionBar bar;
-
+	private SearchView searchView;
 	private FilterAdapter filterSpinner;
 	private int lastSelectedFilter;
 	
@@ -54,6 +59,11 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
+        bar.setCustomView(R.layout.add_subreddits_search);
+        
+        searchView = (SearchView) bar.getCustomView();
+        searchView.setOnQueryTextListener(this);
+        searchView.setOnQueryTextFocusChangeListener(this);
         
         filterSpinner = new FilterAdapter(this);
         bar.setListNavigationCallbacks(filterSpinner, this);
@@ -245,12 +255,14 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		if (thing != null && !isVisible(FRAG_SUBREDDIT_LIST)) {
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 			bar.setDisplayShowTitleEnabled(true);
+			bar.setDisplayShowCustomEnabled(false);
 			bar.setTitle(thing.title);
 		} else if (sr != null) {
 			setNavigationListMode(sr);
 		} else {
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 			bar.setDisplayShowTitleEnabled(true);
+			bar.setDisplayShowCustomEnabled(false);
 			bar.setTitle(R.string.app_name);
 		}
 		
@@ -263,6 +275,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void setNavigationListMode(Subreddit sr) {
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		bar.setDisplayShowTitleEnabled(false);
+		bar.setDisplayShowCustomEnabled(false);
 		filterSpinner.setSubreddit(sr.getTitle(this));
 	}
 	
@@ -343,9 +356,40 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void handleAddSubreddit() {
+		searchView.setQuery("", false);
+		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		bar.setDisplayShowCustomEnabled(true);
+		bar.getCustomView().requestFocus();
+	}
+	
+	public boolean onQueryTextChange(String newText) {
+		return false;
+	}
+	
+	public boolean onQueryTextSubmit(String query) {
 		Intent intent = new Intent(this, AddSubredditsActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-		startActivity(intent);
+		intent.putExtra(AddSubredditsActivity.EXTRA_QUERY, query);
+		startActivityForResult(intent, REQUEST_ADD_SUBREDDITS);
+		return true;
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case REQUEST_ADD_SUBREDDITS:
+			refreshActionBar();
+			break;
+		
+		default:
+			throw new IllegalStateException("Unexpected request code: " + requestCode);
+		}
+	}
+	
+	public void onFocusChange(View v, boolean hasFocus) {
+		if (v == searchView && !hasFocus) {
+			refreshActionBar();
+		}
 	}
 	
 	private void handleHome() {
