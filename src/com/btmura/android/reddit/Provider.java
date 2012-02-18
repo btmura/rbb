@@ -141,18 +141,59 @@ public class Provider extends ContentProvider {
 	}
 	
 	static class DbHelper extends SQLiteOpenHelper {
+		
 		public DbHelper(Context context) {
 			super(context, "reddit", null, 1);
 		}
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
+			db.beginTransaction();
+			try {
+				createSubreddits(db);
+				db.setTransactionSuccessful();
+			} finally {
+				db.endTransaction();
+			}
+		}
+		
+		private void createSubreddits(SQLiteDatabase db) {
 			db.execSQL("CREATE TABLE " + Subreddits.TABLE_NAME + " (" 
 					+ Subreddits._ID + " INTEGER PRIMARY KEY, "
-					+ Subreddits.COLUMN_NAME + " TEXT UNIQUE)");
+					+ Subreddits.COLUMN_NAME + " TEXT UNIQUE NOT NULL)");
 			db.execSQL("CREATE UNIQUE INDEX " + Subreddits.COLUMN_NAME 
 					+ " ON " + Subreddits.TABLE_NAME + " ("
 					+ Subreddits.COLUMN_NAME + " ASC)");
+			
+			String[] defaultSubreddits = {
+				"",
+				"AdviceAnimals",
+				"announcements",
+				"AskReddit",
+				"askscience",
+				"atheism",
+				"aww",
+				"blog",
+				"funny",
+				"gaming",
+				"IAmA",
+				"movies",
+				"Music",
+				"pics",
+				"politics",
+				"science",
+				"technology",
+				"todayilearned",
+				"videos",
+				"worldnews",
+				"WTF",
+			};
+			
+			for (int i = 0; i < defaultSubreddits.length; i++) {
+				ContentValues values = new ContentValues(1);
+				values.put(Subreddits.COLUMN_NAME, defaultSubreddits[i]);
+				db.insert(Subreddits.TABLE_NAME, null, values);
+			}
 		}
 
 		@Override
