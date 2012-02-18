@@ -15,11 +15,6 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_share"/>
     <item
-        android:id="@+id/menu_copy_link"
-        android:icon="@drawable/ic_action_copy"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_copy_link"/>
-    <item
         android:id="@+id/menu_view"
         android:showAsAction="withText"
         android:title="@string/menu_view"/>

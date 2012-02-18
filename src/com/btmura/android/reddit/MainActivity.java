@@ -7,8 +7,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,7 +17,6 @@ import android.view.View.OnFocusChangeListener;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.ShareActionProvider;
-import android.widget.Toast;
 
 import com.btmura.android.reddit.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
@@ -313,7 +310,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		boolean isSelf = thing != null && thing.isSelf;
 		menu.findItem(R.id.menu_link).setVisible(hasThing && !isSelf && isVisible(FRAG_COMMENT));
 		menu.findItem(R.id.menu_comments).setVisible(hasThing && !isSelf && isVisible(FRAG_LINK));
-		menu.findItem(R.id.menu_copy_link).setVisible(hasThing);
 		menu.findItem(R.id.menu_view).setVisible(hasThing);
 		menu.findItem(R.id.menu_share).setVisible(hasThing);
 		updateShareActionIntent(thing);		
@@ -343,10 +339,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			
 		case R.id.menu_comments:
 			handleComments();
-			return true;
-			
-		case R.id.menu_copy_link:
-			handleCopyLink();
 			return true;
 			
 		case R.id.menu_view:
@@ -419,27 +411,17 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void handleComments() {
 		selectThing(getThing(), FRAG_COMMENT, getThingPosition());
 	}
-	
-	private void handleCopyLink() {
-		clipText(getLink(getThing()));
-	}
-	
-	private void clipText(String text) {
-		ClipboardManager clip = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-		clip.setText(text);
-		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();		
-	}
-	
-	private String getLink(Entity thing) {
-		return isVisible(FRAG_LINK) ? thing.url : "http://www.reddit.com" + thing.permaLink;
-	}
-	
+		
 	private void handleView() {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setData(Uri.parse(getLink(getThing())));
 		startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));	
 	}
 	
+	private String getLink(Entity thing) {
+		return isVisible(FRAG_LINK) ? thing.url : "http://www.reddit.com" + thing.permaLink;
+	}
+
 	private void updateShareActionIntent(Entity thing) {
 		if (thing != null) {
 			Intent intent = new Intent(Intent.ACTION_SEND);

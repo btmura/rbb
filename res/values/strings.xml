@@ -2,6 +2,8 @@
 <resources>
     <string name="app_name">reddit by brian</string>
     
+    <string name="clipboard">Clipboard</string>
+    
     <string name="empty">Nothing to see here…</string>
     <string name="error">Something went wrong…</string>
     
@@ -30,7 +32,6 @@
     <string name="menu_delete_subreddits">Delete subreddits</string>
     <string name="menu_link">View link</string>
     <string name="menu_comments">View comments</string>
-    <string name="menu_copy_link">Copy link</string>
     <string name="menu_view">View in other app</string>
     <string name="menu_share">Share</string>
     
