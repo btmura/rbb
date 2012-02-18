@@ -22,20 +22,25 @@ import com.btmura.android.reddit.R;
 
 public class SubredditListFragment extends ListFragment implements MultiChoiceModeListener, LoaderCallbacks<List<SubredditInfo>> {
 
-	interface OnSubredditAddedListener {
-		static final int EVENT_LIST_ITEM_CLICKED = 0;
-		static final int EVENT_ACTION_ITEM_CLICKED = 1;
-		void onSubredditsAdded(List<SubredditInfo> added, int event);
+	interface OnSelectedListener {
+		static final int EVENT_LIST_LOADED = 0;
+		static final int EVENT_LIST_ITEM_CLICKED = 1;
+		static final int EVENT_ACTION_ITEM_CLICKED = 2;
+		void onSelected(List<SubredditInfo> srInfos, int position, int event);
 	}
 	
-	private static final String ARG_QUERY = "query";
+	private static final String ARG_QUERY = "q";
+	private static final String ARG_SINGLE_CHOICE = "s";
+	
+	private static final String STATE_CHOSEN = "c";
 	
 	private SubredditInfoAdapter adapter;
 	
-	public static SubredditListFragment newInstance(String query) {
+	public static SubredditListFragment newInstance(String query, boolean singleChoice) {
 		SubredditListFragment frag = new SubredditListFragment();
-		Bundle args = new Bundle(1);
+		Bundle args = new Bundle(2);
 		args.putString(ARG_QUERY, query);
+		args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
 		frag.setArguments(args);
 		return frag;
 	}
@@ -52,7 +57,8 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		adapter = new SubredditInfoAdapter(getActivity().getLayoutInflater());
+		adapter = new SubredditInfoAdapter(getActivity().getLayoutInflater(), getArguments().getBoolean(ARG_SINGLE_CHOICE));
+		adapter.setChosenPosition(savedInstanceState != null ? savedInstanceState.getInt(STATE_CHOSEN) : 0);
 		setListAdapter(adapter);
 		setEmptyText(getString(R.string.empty));
 		setListShown(false);
@@ -62,16 +68,17 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
+		adapter.setChosenPosition(position);
 		ArrayList<SubredditInfo> subreddits = new ArrayList<SubredditInfo>(1);
 		subreddits.add(adapter.getItem(position));
-		getListener().onSubredditsAdded(subreddits, OnSubredditAddedListener.EVENT_LIST_ITEM_CLICKED);
+		getListener().onSelected(subreddits, position, OnSelectedListener.EVENT_LIST_ITEM_CLICKED);
 	}
 	
 	public Loader<List<SubredditInfo>> onCreateLoader(int id, Bundle args) {
 		return new SubredditLoader(getActivity(), getArguments().getString(ARG_QUERY));
 	}
 	
-	public void onLoadFinished(Loader<List<SubredditInfo>> loader, List<SubredditInfo> data) {
+	public void onLoadFinished(Loader<List<SubredditInfo>> loader, final List<SubredditInfo> data) {
 		adapter.clear();
 		if (data != null) {
 			setEmptyText(getString(R.string.empty));
@@ -80,6 +87,13 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 			setEmptyText(getString(R.string.error));
 		}
 		setListShown(true);
+		if (!data.isEmpty()) {
+			getListView().post(new Runnable() {
+				public void run() {
+					getListener().onSelected(data, 0, OnSelectedListener.EVENT_LIST_LOADED);
+				}
+			});
+		}
 	}
 	
 	public void onLoaderReset(Loader<List<SubredditInfo>> loader) {
@@ -116,11 +130,24 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 				added.add(adapter.getItem(i));
 			}
 		}
-		getListener().onSubredditsAdded(added, OnSubredditAddedListener.EVENT_ACTION_ITEM_CLICKED);
+		getListener().onSelected(added, -1, OnSelectedListener.EVENT_ACTION_ITEM_CLICKED);
 	}
 	
-	private OnSubredditAddedListener getListener() {
-		return (OnSubredditAddedListener) getActivity();
+	private OnSelectedListener getListener() {
+		return (OnSelectedListener) getActivity();
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt(STATE_CHOSEN, adapter.getChosenPosition());
+	}
+	
+	public void setChosenPosition(int position) {
+		if (position != adapter.getChosenPosition()) {
+			adapter.setChosenPosition(position);
+			adapter.notifyDataSetChanged();
+		}
 	}
 	
 	public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {

@@ -202,7 +202,7 @@ public class CommentLoaderTask extends AsyncTask<Void, Void, LoadResult<Void>> {
 		}
 		
 		@Override
-		public boolean parseReplies() {
+		public boolean shouldParseReplies() {
 			return true;
 		}
 	}

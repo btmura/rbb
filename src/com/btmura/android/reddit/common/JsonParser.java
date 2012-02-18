@@ -141,7 +141,7 @@ public class JsonParser {
 			} else if ("children".equals(name)) {
 				onChildren(r, i);
 			} else if ("replies".equals(name)) {
-				if (parseReplies()) {
+				if (shouldParseReplies()) {
 					replyNesting++;
 					doParseListingObject(r);
 					replyNesting--;
@@ -153,6 +153,10 @@ public class JsonParser {
 			}
 		}
 		r.endObject();
+	}
+	
+	public boolean shouldParseReplies() {
+		return false;
 	}
 	
 	public void onParseStart() {
@@ -247,7 +251,12 @@ public class JsonParser {
 	public void onParseEnd() {
 	}
 	
-	public boolean parseReplies() {
-		return false;
+	protected static String safeReadString(JsonReader reader, String nullValue) throws IOException {
+		if (reader.peek() == JsonToken.NULL) {
+			reader.skipValue();
+			return nullValue;
+		} else {
+			return reader.nextString();
+		}
 	}
 }

@@ -13,10 +13,10 @@ import java.util.List;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.JsonReader;
-import android.util.JsonToken;
 import android.util.Log;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.common.Formatter;
 import com.btmura.android.reddit.common.JsonParser;
 
 class SubredditLoader extends AsyncTaskLoader<List<SubredditInfo>> {
@@ -90,12 +90,12 @@ class SubredditLoader extends AsyncTaskLoader<List<SubredditInfo>> {
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			results.get(index).title = reader.nextString();
+			results.get(index).title = Formatter.formatTitle(safeReadString(reader, "")).toString();
 		}
 		
 		@Override
 		public void onDescription(JsonReader reader, int index) throws IOException {
-			results.get(index).description = reader.peek() == JsonToken.NULL ? "" : reader.nextString();
+			results.get(index).description = safeReadString(reader, "");
 		}
 		
 		@Override

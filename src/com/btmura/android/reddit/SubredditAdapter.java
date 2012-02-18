@@ -47,7 +47,7 @@ public class SubredditAdapter extends SimpleCursorAdapter {
 		}
 		
 		if (singleChoice && selected != null && name.equalsIgnoreCase(selected.name)) {
-			tv.setBackgroundResource(R.drawable.selector_selected);
+			tv.setBackgroundResource(R.drawable.selector_chosen);
 		} else {
 			tv.setBackgroundResource(R.drawable.selector_normal);
 		}

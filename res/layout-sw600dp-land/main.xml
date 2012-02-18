@@ -7,7 +7,7 @@
 
     <FrameLayout
         android:id="@+id/subreddit_list_container"
-        android:layout_width="100dp"
+        android:layout_width="125dp"
         android:layout_height="match_parent" />
 
     <View

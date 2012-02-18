@@ -16,7 +16,6 @@
         android:id="@+id/description"
         style="@android:style/TextAppearance.Holo.Medium"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:autoLink="all" />
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

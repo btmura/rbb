@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.ListFragment;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,17 +15,19 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.addsubreddits.SubredditListFragment.OnSubredditAddedListener;
+import com.btmura.android.reddit.addsubreddits.SubredditListFragment.OnSelectedListener;
 import com.btmura.android.reddit.common.Formatter;
 
 public class DetailsFragment extends ListFragment {
 	
-	private static final String ARGS_SUBREDDIT = "sr";
+	static final String ARGS_SUBREDDIT_INFO = "s";
+	static final String ARGS_POSITION = "p";
 
-	public static DetailsFragment newInstance(SubredditInfo sr) {
+	public static DetailsFragment newInstance(SubredditInfo info, int position) {
 		DetailsFragment f = new DetailsFragment();
-		Bundle b = new Bundle(1);
-		b.putParcelable(ARGS_SUBREDDIT, sr);
+		Bundle b = new Bundle(2);
+		b.putParcelable(ARGS_SUBREDDIT_INFO, info);
+		b.putInt(ARGS_POSITION, position);
 		f.setArguments(b);
 		return f;
 	}
@@ -56,13 +59,13 @@ public class DetailsFragment extends ListFragment {
 	
 	private void handleAddSubreddit() {
 		List<SubredditInfo> added = new ArrayList<SubredditInfo>(1);
-		SubredditInfo sr = getArguments().getParcelable(ARGS_SUBREDDIT);
+		SubredditInfo sr = getArguments().getParcelable(ARGS_SUBREDDIT_INFO);
 		added.add(sr);
-		getListener().onSubredditsAdded(added, OnSubredditAddedListener.EVENT_ACTION_ITEM_CLICKED);
+		getListener().onSelected(added, -1, OnSelectedListener.EVENT_ACTION_ITEM_CLICKED);
 	}
 	
-	private OnSubredditAddedListener getListener() {
-		return (OnSubredditAddedListener) getActivity();
+	private OnSelectedListener getListener() {
+		return (OnSelectedListener) getActivity();
 	}
 	
 	class DetailsAdapter extends BaseAdapter {
@@ -82,7 +85,7 @@ public class DetailsFragment extends ListFragment {
 		}
 
 		public SubredditInfo getItem(int position) {
-			return getArguments().getParcelable(ARGS_SUBREDDIT);
+			return getArguments().getParcelable(ARGS_SUBREDDIT_INFO);
 		}
 
 		public long getItemId(int position) {
@@ -92,13 +95,14 @@ public class DetailsFragment extends ListFragment {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View v = getActivity().getLayoutInflater().inflate(R.layout.details_row, parent, false);
 			
-			SubredditInfo sr = getItem(position);
+			SubredditInfo info = getItem(position);
 			
 			TextView title = (TextView) v.findViewById(R.id.title);
-			title.setText(sr.title);
+			title.setText(info.title);
 			
 			TextView desc = (TextView) v.findViewById(R.id.description);
-			desc.setText(Formatter.format(sr.description));
+			desc.setText(Formatter.format(info.description));
+			desc.setMovementMethod(LinkMovementMethod.getInstance());
 			
 			return v;
 		}

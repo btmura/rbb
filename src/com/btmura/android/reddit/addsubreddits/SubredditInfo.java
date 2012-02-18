@@ -20,23 +20,19 @@ class SubredditInfo implements Parcelable {
 	public String description;
 	public int subscribers;
 	public String status;
-		
+	
 	SubredditInfo() {
 	}
 	
 	SubredditInfo(Parcel parcel) {
-		displayName = parcel.readString();
 		title = parcel.readString();
 		description = parcel.readString();
-		subscribers = parcel.readInt();
 		status = parcel.readString();
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(displayName);
 		dest.writeString(title);
 		dest.writeString(description);
-		dest.writeInt(subscribers);
 		dest.writeString(status);
 	}
 	

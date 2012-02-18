@@ -60,7 +60,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
-        bar.setCustomView(R.layout.add_subreddits_search);
+        bar.setCustomView(R.layout.subreddits_search);
         
         searchView = (SearchView) bar.getCustomView();
         searchView.setOnQueryTextListener(this);

@@ -13,12 +13,14 @@ import com.btmura.android.reddit.R;
 
 public class SubredditInfoAdapter extends BaseAdapter {
 	
-	private final LayoutInflater inflater;
-	
 	private final ArrayList<SubredditInfo> items = new ArrayList<SubredditInfo>();
+	private final LayoutInflater inflater;
+	private final boolean singleChoice;
+	private int chosenPosition = -1;
 	
-	public SubredditInfoAdapter(LayoutInflater inflater) {
+	public SubredditInfoAdapter(LayoutInflater inflater, boolean singleChoice) {
 		this.inflater = inflater;
+		this.singleChoice = singleChoice;
 	}
 	
 	public void clear() {
@@ -29,6 +31,14 @@ public class SubredditInfoAdapter extends BaseAdapter {
 		items.ensureCapacity(items.size() + newItems.size());
 		items.addAll(newItems);
 		notifyDataSetChanged();
+	}
+	
+	public void setChosenPosition(int position) {
+		chosenPosition = position;
+	}
+	
+	public int getChosenPosition() {
+		return chosenPosition;
 	}
 	
 	public int getCount() {
@@ -53,6 +63,9 @@ public class SubredditInfoAdapter extends BaseAdapter {
 		SubredditInfo item = getItem(position);
 		h.title.setText(item.title);
 		h.status.setText(item.status);
+		v.setBackgroundResource(singleChoice && position == chosenPosition 
+				? R.drawable.selector_chosen 
+				: R.drawable.selector_normal);
 		return v;
 	}
 	
