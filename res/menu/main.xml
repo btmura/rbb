@@ -12,11 +12,12 @@
     <item
         android:id="@+id/menu_share"
         android:actionProviderClass="android.widget.ShareActionProvider"
-        android:showAsAction="withText"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_share"/>
     <item
         android:id="@+id/menu_copy_link"
-        android:showAsAction="withText"
+        android:icon="@drawable/ic_action_copy"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_copy_link"/>
     <item
         android:id="@+id/menu_view"
