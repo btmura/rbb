@@ -46,6 +46,12 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 	}
 	
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		adapter = new SubredditInfoAdapter(getActivity().getLayoutInflater(), getArguments().getBoolean(ARG_SINGLE_CHOICE));
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
 		ListView l = (ListView) v.findViewById(android.R.id.list);
@@ -57,7 +63,6 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		adapter = new SubredditInfoAdapter(getActivity().getLayoutInflater(), getArguments().getBoolean(ARG_SINGLE_CHOICE));
 		adapter.setChosenPosition(savedInstanceState != null ? savedInstanceState.getInt(STATE_CHOSEN) : 0);
 		setListAdapter(adapter);
 		setEmptyText(getString(R.string.empty));

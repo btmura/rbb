@@ -31,7 +31,7 @@ public class DetailsFragment extends ListFragment {
 		f.setArguments(b);
 		return f;
 	}
-
+	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);

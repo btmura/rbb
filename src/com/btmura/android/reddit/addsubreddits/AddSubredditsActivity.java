@@ -29,6 +29,8 @@ public class AddSubredditsActivity extends Activity implements OnQueryTextListen
 	private static final String FRAG_SUBREDDITS = "s";
 	private static final String FRAG_DETAILS = "d";
 	
+	private static final String STATE_QUERY = "q";
+	
 	private FragmentManager manager;
 	private SearchView sv;
 	private View singleContainer;
@@ -51,6 +53,7 @@ public class AddSubredditsActivity extends Activity implements OnQueryTextListen
 		
 		sv = (SearchView) bar.getCustomView();
 		sv.setOnQueryTextListener(this);
+		sv.setFocusable(false);
 		
 		singleContainer = findViewById(R.id.single_container);
 
@@ -58,7 +61,6 @@ public class AddSubredditsActivity extends Activity implements OnQueryTextListen
 			String q = getIntent().getStringExtra(EXTRA_QUERY);
 			if (q != null && !q.trim().isEmpty()) {
 				sv.setQuery(q.trim(), true);
-				sv.setFocusable(false);
 			}
 		}
 	}
@@ -183,6 +185,21 @@ public class AddSubredditsActivity extends Activity implements OnQueryTextListen
 				bar.setDisplayShowCustomEnabled(true);
 				bar.setTitle(null);
 			}
+		}
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString(STATE_QUERY, sv.getQuery().toString());
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		if (savedInstanceState != null) {
+			sv.setQuery(savedInstanceState.getString(STATE_QUERY), false);
+			refreshActionBar(getDetailsFragment());
 		}
 	}
 	
