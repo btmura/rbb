@@ -19,6 +19,7 @@ public class Entity implements Parcelable {
 	public String subreddit;
 	public String author;
 	public String url;
+	public String thumbnail;
 	public String permaLink;
 	public boolean isSelf;
 	public String selfText;

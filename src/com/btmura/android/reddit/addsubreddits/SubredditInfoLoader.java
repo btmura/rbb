@@ -19,7 +19,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.common.Formatter;
 import com.btmura.android.reddit.common.JsonParser;
 
-class SubredditLoader extends AsyncTaskLoader<List<SubredditInfo>> {
+class SubredditInfoLoader extends AsyncTaskLoader<List<SubredditInfo>> {
 	
 	private static final String TAG = "SubredditLoader";
 	
@@ -27,7 +27,7 @@ class SubredditLoader extends AsyncTaskLoader<List<SubredditInfo>> {
 
 	private String query;
 	
-	public SubredditLoader(Context context, String query) {
+	public SubredditInfoLoader(Context context, String query) {
 		super(context);
 		this.query = query;
 	}
@@ -73,7 +73,7 @@ class SubredditLoader extends AsyncTaskLoader<List<SubredditInfo>> {
 	protected void onStopLoading() {
 		super.onStopLoading();
 	}
-	
+
 	class SearchParser extends JsonParser {
 		
 		private List<SubredditInfo> results = new ArrayList<SubredditInfo>();
@@ -90,12 +90,12 @@ class SubredditLoader extends AsyncTaskLoader<List<SubredditInfo>> {
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			results.get(index).title = Formatter.formatTitle(safeReadString(reader, "")).toString();
+			results.get(index).title = Formatter.formatTitle(readTrimmedString(reader, "")).toString();
 		}
 		
 		@Override
 		public void onDescription(JsonReader reader, int index) throws IOException {
-			results.get(index).description = safeReadString(reader, "");
+			results.get(index).description = readTrimmedString(reader, "");
 		}
 		
 		@Override

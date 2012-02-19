@@ -182,7 +182,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		if (FRAG_LINK.equalsIgnoreCase(tag)) {
 			thingFrag = LinkFragment.newInstance(thing);
 		} else if (FRAG_COMMENT.equalsIgnoreCase(tag)) {
-			thingFrag = CommentListFragment.newInstance(thing);
+			thingFrag = CommentListFragment.newInstance(thing.getId());
 		} else {
 			throw new IllegalArgumentException(tag);
 		}

@@ -122,6 +122,8 @@ public class JsonParser {
 				onSubreddit(r, i);
 			} else if ("url".equals(name)) {
 				onUrl(r, i);
+			} else if ("thumbnail".equals(name)) {
+				onThumbnail(r, i);
 			} else if ("permalink".equals(name)) {
 				onPermaLink(r, i);
 			} else if ("is_self".equals(name)) {
@@ -209,6 +211,10 @@ public class JsonParser {
 		reader.skipValue();
 	}
 	
+	public void onThumbnail(JsonReader reader, int index) throws IOException {
+		reader.skipValue();
+	}
+	
 	public void onPermaLink(JsonReader reader, int index) throws IOException {
 		reader.skipValue();
 	}
@@ -251,12 +257,12 @@ public class JsonParser {
 	public void onParseEnd() {
 	}
 	
-	protected static String safeReadString(JsonReader reader, String nullValue) throws IOException {
+	protected static String readTrimmedString(JsonReader reader, String nullValue) throws IOException {
 		if (reader.peek() == JsonToken.NULL) {
 			reader.skipValue();
 			return nullValue;
 		} else {
-			return reader.nextString();
+			return reader.nextString().trim();
 		}
 	}
 }

@@ -20,7 +20,7 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 
-public class SubredditListFragment extends ListFragment implements MultiChoiceModeListener, LoaderCallbacks<List<SubredditInfo>> {
+public class SubredditInfoListFragment extends ListFragment implements MultiChoiceModeListener, LoaderCallbacks<List<SubredditInfo>> {
 
 	interface OnSelectedListener {
 		static final int EVENT_LIST_LOADED = 0;
@@ -36,8 +36,8 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 	
 	private SubredditInfoAdapter adapter;
 	
-	public static SubredditListFragment newInstance(String query, boolean singleChoice) {
-		SubredditListFragment frag = new SubredditListFragment();
+	public static SubredditInfoListFragment newInstance(String query, boolean singleChoice) {
+		SubredditInfoListFragment frag = new SubredditInfoListFragment();
 		Bundle args = new Bundle(2);
 		args.putString(ARG_QUERY, query);
 		args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
@@ -65,7 +65,6 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 		super.onActivityCreated(savedInstanceState);
 		adapter.setChosenPosition(savedInstanceState != null ? savedInstanceState.getInt(STATE_CHOSEN) : 0);
 		setListAdapter(adapter);
-		setEmptyText(getString(R.string.empty));
 		setListShown(false);
 		getLoaderManager().initLoader(0, null, this);
 	}
@@ -80,7 +79,7 @@ public class SubredditListFragment extends ListFragment implements MultiChoiceMo
 	}
 	
 	public Loader<List<SubredditInfo>> onCreateLoader(int id, Bundle args) {
-		return new SubredditLoader(getActivity(), getArguments().getString(ARG_QUERY));
+		return new SubredditInfoLoader(getActivity(), getArguments().getString(ARG_QUERY));
 	}
 	
 	public void onLoadFinished(Loader<List<SubredditInfo>> loader, final List<SubredditInfo> data) {

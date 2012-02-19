@@ -132,6 +132,11 @@ public class ThingLoaderTask extends AsyncTask<Void, Void, LoadResult<String>> {
 		}
 		
 		@Override
+		public void onThumbnail(JsonReader reader, int index) throws IOException {
+			getEntity(index).thumbnail = getString(reader);
+		}
+		
+		@Override
 		public void onPermaLink(JsonReader reader, int index) throws IOException {
 			getEntity(index).permaLink = getString(reader);
 		}

@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.addsubreddits.SubredditListFragment.OnSelectedListener;
+import com.btmura.android.reddit.addsubreddits.SubredditInfoListFragment.OnSelectedListener;
 
 public class AddSubredditsActivity extends Activity implements OnQueryTextListener, OnSelectedListener,
 		OnBackStackChangedListener {
@@ -69,9 +69,9 @@ public class AddSubredditsActivity extends Activity implements OnQueryTextListen
 		sv.clearFocus();
 		FragmentTransaction ft = manager.beginTransaction();
 		if (singleContainer != null) {
-			ft.replace(R.id.single_container, SubredditListFragment.newInstance(query, false), FRAG_SUBREDDITS);
+			ft.replace(R.id.single_container, SubredditInfoListFragment.newInstance(query, false), FRAG_SUBREDDITS);
 		} else {
-			ft.replace(R.id.subreddits_container, SubredditListFragment.newInstance(query, true), FRAG_SUBREDDITS);
+			ft.replace(R.id.subreddits_container, SubredditInfoListFragment.newInstance(query, true), FRAG_SUBREDDITS);
 			Fragment details = getDetailsFragment();
 			if (details != null) {
 				ft.remove(details);
@@ -203,8 +203,8 @@ public class AddSubredditsActivity extends Activity implements OnQueryTextListen
 		}
 	}
 	
-	private SubredditListFragment getSubredditListFragment() {
-		return (SubredditListFragment) manager.findFragmentByTag(FRAG_SUBREDDITS);
+	private SubredditInfoListFragment getSubredditListFragment() {
+		return (SubredditInfoListFragment) manager.findFragmentByTag(FRAG_SUBREDDITS);
 	}
 	
 	private DetailsFragment getDetailsFragment() {

@@ -15,7 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.addsubreddits.SubredditListFragment.OnSelectedListener;
+import com.btmura.android.reddit.addsubreddits.SubredditInfoListFragment.OnSelectedListener;
 import com.btmura.android.reddit.common.Formatter;
 
 public class DetailsFragment extends ListFragment {
