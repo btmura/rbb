@@ -3,23 +3,23 @@ package com.btmura.android.reddit;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class CommentAdapter extends BaseAdapter {
+public class ThingAdapter extends BaseAdapter {
 	
-	private final ArrayList<Comment> items = new ArrayList<Comment>();
+	private final ArrayList<Thing> items = new ArrayList<Thing>();
 	private final LayoutInflater inflater;
 
-	public CommentAdapter(LayoutInflater inflater) {
+	public ThingAdapter(LayoutInflater inflater) {
 		this.inflater = inflater;
 	}
-	
-	public void swapData(List<Comment> newItems) {
+
+	public void swapData(List<Thing> newItems) {
 		items.clear();
 		if (newItems != null) {
 			items.ensureCapacity(items.size() + newItems.size());
@@ -34,7 +34,7 @@ public class CommentAdapter extends BaseAdapter {
 		return items.size();
 	}
 
-	public Comment getItem(int position) {
+	public Thing getItem(int position) {
 		return items.get(position);
 	}
 
@@ -63,14 +63,14 @@ public class CommentAdapter extends BaseAdapter {
 	
 	private View createView(int position, ViewGroup parent) {
 		switch (getItemViewType(position)) {
-		case Comment.TYPE_HEADER:
-			return makeView(R.layout.comment_header_row, parent);
-			
-		case Comment.TYPE_COMMENT:
-			return makeView(R.layout.comment_row, parent);
-			
+		case Thing.TYPE_THING:
+			return makeView(R.layout.thing_row, parent);
+	
+		case Thing.TYPE_MORE:
+			return makeView(R.layout.thing_more_row, parent);
+
 		default:
-			throw new IllegalArgumentException("Unexpected view type: " + getItemViewType(position));
+			throw new IllegalArgumentException();
 		}
 	}
 	
@@ -83,50 +83,39 @@ public class CommentAdapter extends BaseAdapter {
 	private static ViewHolder createViewHolder(View v) {
 		ViewHolder holder = new ViewHolder();
 		holder.title = (TextView) v.findViewById(R.id.title);
-		holder.body= (TextView) v.findViewById(R.id.body);
 		holder.status = (TextView) v.findViewById(R.id.status);
+		holder.progress = (ProgressBar) v.findViewById(R.id.progress);
 		return holder;
 	}
 	
 	static class ViewHolder {
 		TextView title;
-		TextView body;
 		TextView status;
+		ProgressBar progress;
 	}
 
 	private void setView(int position, View v) {
-		Comment c = getItem(position);
+		Thing e = getItem(position);
 		ViewHolder h = (ViewHolder) v.getTag();
-		switch (c.type) {
-		case Comment.TYPE_HEADER:
-			setHeader(h, c);
+		switch (e.type) {
+		case Thing.TYPE_THING:
+			setTitle(h, e);
+			break;
+						
+		case Thing.TYPE_MORE:
+			setMore(h, e);
 			break;
 			
-		case Comment.TYPE_COMMENT:
-			setComment(h, c);
-			break;
-
 		default:
-			throw new IllegalArgumentException("Unsupported view type: " + c.type);
+			throw new IllegalArgumentException("Unsupported view type: " + getItemViewType(position));
 		}
 	}
-
-	private void setHeader(ViewHolder h, Comment c) {
-		h.title.setText(c.title);
-		h.body.setMovementMethod(LinkMovementMethod.getInstance());
-		h.body.setText(c.body);
-		h.status.setText(c.status);
-	}
-
-	private void setComment(ViewHolder h, Comment c) {
-		h.body.setMovementMethod(LinkMovementMethod.getInstance());
-		h.body.setText(c.body);
-		h.status.setText(c.status);
-		setPadding(h.body, c.nesting);
-		setPadding(h.status, c.nesting);
+	
+	private void setTitle(ViewHolder h, Thing t) {
+		h.title.setText(t.title);
+		h.status.setText(t.status);
 	}
 	
-	private static void setPadding(View v, int nesting) {
-		v.setPadding(v.getPaddingRight() + nesting * 20, v.getPaddingTop(), v.getPaddingRight(), v.getPaddingBottom());
+	private void setMore(ViewHolder h, Thing e) {
 	}
 }

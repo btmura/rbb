@@ -7,12 +7,11 @@
     <string name="empty">Nothing to see here…</string>
     <string name="error">Something went wrong…</string>
     
+    <string name="thing_status">%1$s  %2$d points  %3$d comments</string>
+    <string name="thing_status_2">%1$s  %2$s  %3$d points  %4$d comments</string>
+    
     <string name="comment_header_status">%1$s  %2$d points  %3$d comments</string>
     <string name="comment_comment_status">%1$s  %2$d points</string>
-    
-    <string name="entity_thing_info">%1$s  %2$d points  %3$d comments</string>
-    <string name="entity_thing_info_2">%1$s  %2$s  %3$d points  %4$d comments</string>
-    <string name="entity_comment_info">%1$s  %2$d points</string>
     
     <string name="sr_info_status">%1$s  %2$d subscribers</string>
     

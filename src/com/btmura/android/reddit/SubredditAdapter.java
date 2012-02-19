@@ -29,7 +29,7 @@ public class SubredditAdapter extends SimpleCursorAdapter {
 	private Subreddit selected;
 
 	public SubredditAdapter(Context context, boolean singleChoice) {
-		super(context, R.layout.entity_one, null, FROM, TO, 0);
+		super(context, R.layout.sr_row, null, FROM, TO, 0);
 		this.singleChoice = singleChoice;
 	}
 	

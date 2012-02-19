@@ -48,16 +48,27 @@ public class FilterAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v = convertView;
 		if (v == null) {
-			v = inflater.inflate(R.layout.spinner_item, parent, false);
+			v = makeView(parent);
 		}
 		
-		TextView tv1 = (TextView) v.findViewById(R.id.line1);
-		tv1.setText(subreddit);
-		
-		TextView tv2 = (TextView) v.findViewById(R.id.line2);
-		tv2.setText(getItem(position));
-		
+		ViewHolder h = (ViewHolder) v.getTag();
+		h.line1.setText(subreddit);
+		h.line2.setText(getItem(position));
 		return v;
+	}
+	
+	private View makeView(ViewGroup parent) {
+		View v = inflater.inflate(R.layout.filter_spinner, parent, false);
+		ViewHolder h = new ViewHolder();
+		h.line1 = (TextView) v.findViewById(R.id.line1);
+		h.line2 = (TextView) v.findViewById(R.id.line2);
+		v.setTag(h);
+		return v;
+	}
+	
+	static class ViewHolder {
+		TextView line1;
+		TextView line2;
 	}
 	
 	@Override

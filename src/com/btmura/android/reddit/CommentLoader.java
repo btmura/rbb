@@ -31,7 +31,6 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 	
 	@Override
 	protected void onStartLoading() {
-		Log.v(TAG, "onStartLoading");
 		super.onStartLoading();
 		if (comments != null) {
 			deliverResult(comments);
@@ -42,27 +41,8 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 	
 	@Override
 	public void deliverResult(List<Comment> comments) {
-		Log.v(TAG, "deliverResult");
 		this.comments = comments;
 		super.deliverResult(comments);
-	}
-	
-	@Override
-	protected void onAbandon() {
-		Log.v(TAG, "onAbandon");
-		super.onAbandon();
-	}
-	
-	@Override
-	public void onCanceled(List<Comment> data) {
-		Log.v(TAG, "onCancelled");
-		super.onCanceled(data);
-	}
-	
-	@Override
-	protected void onReset() {
-		Log.v(TAG, "onReset");
-		super.onReset();
 	}
 	
 	@Override

@@ -1,30 +1,30 @@
 package com.btmura.android.reddit;
 
+import java.util.List;
 
-import android.app.Activity;
-import android.os.AsyncTask;
+import android.app.ListFragment;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
-public class ThingListFragment extends EntityListFragment<String> {
+public class ThingListFragment extends ListFragment implements LoaderCallbacks<List<Thing>>, OnScrollListener {
 	
-	private static final String ARG_SUBREDDIT = "subreddit";
-	private static final String ARG_FILTER = "filter";
-	private static final String ARG_SINGLE_CHOICE = "singleChoice";
+	private static final String ARG_SUBREDDIT = "s";
+	private static final String ARG_FILTER = "f";
+	private static final String ARG_SINGLE_CHOICE = "c";
 	
-	private static final String STATE_POSITION = "position";
-	
-	private OnThingSelectedListener listener;
-
-	private int position = ListView.INVALID_POSITION;
-
 	interface OnThingSelectedListener {
-		void onThingSelected(Entity thing, int position);
+		void onThingSelected(Thing thing, int position);
 	}
 	
+	private ThingAdapter adapter;
+
 	public static ThingListFragment newInstance(Subreddit sr, int filter, boolean singleChoice) {
 		ThingListFragment frag = new ThingListFragment();
 		Bundle b = new Bundle(3);
@@ -34,19 +34,13 @@ public class ThingListFragment extends EntityListFragment<String> {
 		frag.setArguments(b);
 		return frag;
 	}
-	
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		listener = (OnThingSelectedListener) activity;
-	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
+		adapter = new ThingAdapter(getActivity().getLayoutInflater());
 	}
-		
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = super.onCreateView(inflater, container, savedInstanceState);
@@ -60,46 +54,47 @@ public class ThingListFragment extends EntityListFragment<String> {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		if (savedInstanceState != null) {
-			position = savedInstanceState.getInt(STATE_POSITION);
-		}
-		setItemChecked(position);
-		getListView().setSelection(position);
+		setListAdapter(adapter);
+		setListShown(false);
+		getLoaderManager().initLoader(0, null, this);
 	}
 	
-	@Override
-	protected AsyncTask<Void, Void, LoadResult<String>> createLoadTask(String moreKey) {
+	public Loader<List<Thing>> onCreateLoader(int id, Bundle args) {
 		Subreddit sr = getArguments().getParcelable(ARG_SUBREDDIT);
 		int filter = getArguments().getInt(ARG_FILTER);
-		CharSequence url = Urls.subredditUrl(sr, filter, moreKey);
-		return new ThingLoaderTask(getActivity().getApplicationContext(), sr.name, url, this);
+		CharSequence url = Urls.subredditUrl(sr, filter, null);
+		return new ThingLoader(getActivity(), url);
 	}
 	
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putInt(STATE_POSITION, position);
+	public void onLoadFinished(Loader<List<Thing>> loader, List<Thing> things) {
+		adapter.swapData(things);
+		setEmptyText(getString(things != null ? R.string.empty : R.string.error));
+		setListShown(true);
 	}
 	
+	public void onLoaderReset(Loader<List<Thing>> loader) {
+		adapter.swapData(null);
+	}
+
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		this.position = position;
-		
-		Entity e = adapter.getItem(position);
+		Thing e = adapter.getItem(position);
 		switch (e.type) {
-		case Entity.TYPE_THING:
-			listener.onThingSelected(adapter.getItem(position), position);
+		case Thing.TYPE_THING:
+			getListener().onThingSelected(adapter.getItem(position), position);
 			break;
 		}
 	}
 
-	public void setItemChecked(int position) {
-		if (position == ListView.INVALID_POSITION) {
-			getListView().clearChoices();
-		} else {
-			getListView().setItemChecked(position, true);
-		}
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+	}
+	
+	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+	}
+	
+	private OnThingSelectedListener getListener() {
+		return (OnThingSelectedListener) getActivity();
 	}
 }
 

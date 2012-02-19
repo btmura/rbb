@@ -12,11 +12,11 @@ public class ControlFragment extends Fragment {
 	private static final String ARG_FILTER = "filter";
 	
 	private Subreddit topic;
-	private Entity thing;
+	private Thing thing;
 	private int thingPosition;
 	private int filter;
 	
-	public static ControlFragment newInstance(Subreddit sr, Entity thing, int thingPosition, int filter) {
+	public static ControlFragment newInstance(Subreddit sr, Thing thing, int thingPosition, int filter) {
 		ControlFragment frag = new ControlFragment();
 		Bundle b = new Bundle(4);
 		b.putParcelable(ARG_SUBREDDIT, sr);
@@ -31,7 +31,7 @@ public class ControlFragment extends Fragment {
 		return topic;
 	}
 	
-	public Entity getThing() {
+	public Thing getThing() {
 		return thing;
 	}
 

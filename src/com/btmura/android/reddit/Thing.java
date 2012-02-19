@@ -1,17 +1,12 @@
 package com.btmura.android.reddit;
 
-import java.util.List;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Entity implements Parcelable {
+public class Thing implements Parcelable {
 	
-	public static final int NUM_TYPES = 4;
 	public static final int TYPE_THING = 0;
-	public static final int TYPE_HEADER = 1;
-	public static final int TYPE_COMMENT = 2;
-	public static final int TYPE_MORE = 3;
+	public static final int TYPE_MORE = 1;
 	
 	public int type;
 	public String name;
@@ -23,33 +18,25 @@ public class Entity implements Parcelable {
 	public String permaLink;
 	public boolean isSelf;
 	public String selfText;
-	public String body;
 	public int numComments;
 	public int score;
-	public int ups;
-	public int downs;
-	public List<String> children;
+	public String status;
+	public String moreKey;
 	
-	public CharSequence line1;
-	public CharSequence line2;
-	public CharSequence line3;
-	public boolean progress;
-	public int nesting;
-	
-	public Entity() {
+	public Thing() {
 	}
 	
-	public static final Parcelable.Creator<Entity> CREATOR = new Parcelable.Creator<Entity>() {
-		public Entity createFromParcel(Parcel source) {
-			return new Entity(source);
+	public static final Parcelable.Creator<Thing> CREATOR = new Parcelable.Creator<Thing>() {
+		public Thing createFromParcel(Parcel source) {
+			return new Thing(source);
 		}
 		
-		public Entity[] newArray(int size) {
-			return new Entity[size];
+		public Thing[] newArray(int size) {
+			return new Thing[size];
 		}
 	};
 	
-	Entity(Parcel parcel) {
+	Thing(Parcel parcel) {
 		type = parcel.readInt();
 		name = parcel.readString();
 		title = parcel.readString();

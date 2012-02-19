@@ -18,12 +18,12 @@ public class LinkFragment extends Fragment {
 	
 	private static final String ARG_THING = "thing";
 
-	private Entity thing;
+	private Thing thing;
 
 	private WebView webView;
 	private ProgressBar progress;
 	
-	public static LinkFragment newInstance(Entity thing) {
+	public static LinkFragment newInstance(Thing thing) {
 		LinkFragment frag = new LinkFragment();
 		Bundle b = new Bundle(1);
 		b.putParcelable(ARG_THING, thing);

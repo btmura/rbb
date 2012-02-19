@@ -172,11 +172,11 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 	}
 	
-	public void onThingSelected(Entity thing, int position) {
+	public void onThingSelected(Thing thing, int position) {
 		selectThing(thing, thing.isSelf ? FRAG_COMMENT : FRAG_LINK, position);
 	}
 	
-	private void selectThing(Entity thing, String tag, int position) {
+	private void selectThing(Thing thing, String tag, int position) {
 		ControlFragment controlFrag = ControlFragment.newInstance(getSubreddit(), thing, position, getFilter());
 		Fragment thingFrag;
 		if (FRAG_LINK.equalsIgnoreCase(tag)) {
@@ -208,7 +208,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return getControlFragment().getTopic();
 	}
 
-	private Entity getThing() {
+	private Thing getThing() {
 		return getControlFragment().getThing();
 	}
 
@@ -228,10 +228,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return (SubredditListFragment) manager.findFragmentByTag(FRAG_SUBREDDIT_LIST);
 	}
 	
-	private ThingListFragment getThingListFragment() {
-		return (ThingListFragment) manager.findFragmentByTag(FRAG_THING_LIST);
-	}
-	
 	private Fragment getLinkFragment() {
 		return manager.findFragmentByTag(FRAG_LINK);
 	}
@@ -249,7 +245,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private void refreshActionBar() {
 		Subreddit sr = getSubreddit();
-		Entity thing = getThing();
+		Thing thing = getThing();
 		if (thing != null && !isVisible(FRAG_SUBREDDIT_LIST)) {
 			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 			bar.setDisplayShowTitleEnabled(true);
@@ -281,11 +277,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		if (isVisible(FRAG_SUBREDDIT_LIST)) {
 			getSubredditListFragment().setSelectedSubreddit(getSubreddit());
 		}
-		
-		ThingListFragment thingListFrag = getThingListFragment();
-		if (thingListFrag != null && thingListFrag.isAdded()) {
-			thingListFrag.setItemChecked(getThingPosition());
-		}
 	}
 	
 	private void refreshContainers() {
@@ -305,7 +296,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-		Entity thing = getThing();
+		Thing thing = getThing();
 		boolean hasThing = thing != null;
 		boolean isSelf = thing != null && thing.isSelf;
 		menu.findItem(R.id.menu_link).setVisible(hasThing && !isSelf && isVisible(FRAG_COMMENT));
@@ -418,11 +409,11 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));	
 	}
 	
-	private String getLink(Entity thing) {
+	private String getLink(Thing thing) {
 		return isVisible(FRAG_LINK) ? thing.url : "http://www.reddit.com" + thing.permaLink;
 	}
 
-	private void updateShareActionIntent(Entity thing) {
+	private void updateShareActionIntent(Thing thing) {
 		if (thing != null) {
 			Intent intent = new Intent(Intent.ACTION_SEND);
 			intent.setType("text/plain");
