@@ -23,8 +23,9 @@ import com.btmura.android.reddit.R;
 public class SubredditInfoListFragment extends ListFragment implements MultiChoiceModeListener, LoaderCallbacks<List<SubredditInfo>> {
 
 	interface OnSelectedListener {
-		static final int EVENT_LIST_ITEM_CLICKED = 0;
-		static final int EVENT_ACTION_ITEM_CLICKED = 1;
+		static final int EVENT_LIST_LOADED = 0;
+		static final int EVENT_LIST_ITEM_CLICKED = 1;
+		static final int EVENT_ACTION_ITEM_CLICKED = 2;
 		void onSelected(List<SubredditInfo> srInfos, int position, int event);
 	}
 	
@@ -62,7 +63,7 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		adapter.setChosenPosition(savedInstanceState != null ? savedInstanceState.getInt(STATE_CHOSEN) : -1);
+		adapter.setChosenPosition(savedInstanceState != null ? savedInstanceState.getInt(STATE_CHOSEN) : 0);
 		setListAdapter(adapter);
 		setListShown(false);
 		getLoaderManager().initLoader(0, null, this);
@@ -85,6 +86,13 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 		adapter.swapData(data);
 		setEmptyText(getString(data != null ? R.string.empty : R.string.error));
 		setListShown(true);
+		if (!data.isEmpty()) {
+			getListView().post(new Runnable() {
+				public void run() {
+					getListener().onSelected(data, 0, OnSelectedListener.EVENT_LIST_LOADED);
+				}
+			});
+		}
 	}
 	
 	public void onLoaderReset(Loader<List<SubredditInfo>> loader) {

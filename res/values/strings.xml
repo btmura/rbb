@@ -26,9 +26,8 @@
     <string name="loading">Loading…</string>
     <string name="loading_error">Error occurred. Try again?</string>
     
-    <string name="sr_search">Search for subreddits</string>
-    <string name="sr_search_instructions">Choose a subreddit from the left.</string>
-    <string name="sr_num_added">%d subreddits added.</string>
+    <string name="subreddits_search">Search for subreddits</string>
+    <string name="subreddits_added">%d subreddits added.</string>
     
     <string name="menu_add_subreddit">Add subreddit</string>
     <string name="menu_add_subreddits">Add subreddits</string>

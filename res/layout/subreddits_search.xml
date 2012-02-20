@@ -3,4 +3,4 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:iconifiedByDefault="false"
-    android:queryHint="@string/sr_search" />
+    android:queryHint="@string/subreddits_search" />
