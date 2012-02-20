@@ -38,7 +38,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		adapter = new ThingAdapter(getActivity().getLayoutInflater());
+		adapter = new ThingAdapter(getActivity(), getActivity().getLayoutInflater());
 	}
 	
 	@Override

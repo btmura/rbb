@@ -10,6 +10,7 @@
         style="@android:style/TextAppearance.Holo.Medium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:drawablePadding="10dp"
         android:paddingBottom="10dp" />
 
     <TextView

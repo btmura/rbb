@@ -3,6 +3,7 @@ package com.btmura.android.reddit;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +13,13 @@ import android.widget.TextView;
 
 public class ThingAdapter extends BaseAdapter {
 	
+	private final ThumbnailLoader thumbnailLoader = ThumbnailLoader.getInstance();
 	private final ArrayList<Thing> items = new ArrayList<Thing>();
+	private final Context context;
 	private final LayoutInflater inflater;
 
-	public ThingAdapter(LayoutInflater inflater) {
+	public ThingAdapter(Context context, LayoutInflater inflater) {
+		this.context = context;
 		this.inflater = inflater;
 	}
 
@@ -114,8 +118,10 @@ public class ThingAdapter extends BaseAdapter {
 	private void setTitle(ViewHolder h, Thing t) {
 		h.title.setText(t.title);
 		h.status.setText(t.status);
+		thumbnailLoader.load(t.thumbnail, h, context.getResources());
 	}
 	
 	private void setMore(ViewHolder h, Thing e) {
+		h.title.setCompoundDrawables(null, null, null, null);
 	}
 }
