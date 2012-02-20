@@ -1,4 +1,4 @@
-package com.btmura.android.reddit.addsubreddits;
+package com.btmura.android.reddit.subredditsearch;
 
 import java.util.List;
 
@@ -19,9 +19,9 @@ import android.widget.Toast;
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.addsubreddits.SubredditInfoListFragment.OnSelectedListener;
+import com.btmura.android.reddit.subredditsearch.SubredditInfoListFragment.OnSelectedListener;
 
-public class AddSubredditsActivity extends Activity implements OnQueryTextListener, OnSelectedListener,
+public class SubredditSearchActivity extends Activity implements OnQueryTextListener, OnSelectedListener,
 		OnBackStackChangedListener {
 
 	public static final String EXTRA_QUERY = "q";

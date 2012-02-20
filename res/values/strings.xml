@@ -26,15 +26,18 @@
     <string name="loading">Loading…</string>
     <string name="loading_error">Error occurred. Try again?</string>
     
-    <string name="subreddits_search">Search subreddits</string>
+    <string name="subreddits_search">Search for subreddits</string>
     <string name="subreddits_added">%d subreddits added.</string>
     
     <string name="menu_add_subreddit">Add subreddit</string>
     <string name="menu_add_subreddits">Add subreddits</string>
     <string name="menu_delete_subreddits">Delete subreddits</string>
+    <string name="menu_search_for_subreddits">Search for subreddits</string>
+    
     <string name="menu_link">View link</string>
     <string name="menu_comments">View comments</string>
-    <string name="menu_view">View in other app</string>
     <string name="menu_share">Share</string>
+    <string name="menu_copy_url">Copy url</string>
+    <string name="menu_view">View in another app</string>
     
 </resources>

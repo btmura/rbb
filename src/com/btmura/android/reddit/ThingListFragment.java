@@ -69,7 +69,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 		int filter = getArguments().getInt(ARG_FILTER);
 		String moreKey = args != null ? args.getString(LOADER_ARG_MORE_KEY) : null;
 		CharSequence url = Urls.subredditUrl(sr, filter, moreKey);
-		return new ThingLoader(getActivity(), url, args != null ? adapter.getItems() : null);
+		return new ThingLoader(getActivity(), sr.name, url, args != null ? adapter.getItems() : null);
 	}
 	
 	public void onLoadFinished(Loader<List<Thing>> loader, List<Thing> things) {

@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,11 +18,12 @@ import android.view.View.OnFocusChangeListener;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.ShareActionProvider;
+import android.widget.Toast;
 
 import com.btmura.android.reddit.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.addsubreddits.AddSubredditsActivity;
 import com.btmura.android.reddit.common.Formatter;
+import com.btmura.android.reddit.subredditsearch.SubredditSearchActivity;
 
 public class MainActivity extends Activity implements OnBackStackChangedListener, OnNavigationListener, 
 		OnQueryTextListener, OnFocusChangeListener, OnSubredditSelectedListener, OnThingSelectedListener {
@@ -309,8 +311,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		boolean isSelf = thing != null && thing.isSelf;
 		menu.findItem(R.id.menu_link).setVisible(hasThing && !isSelf && isVisible(FRAG_COMMENT));
 		menu.findItem(R.id.menu_comments).setVisible(hasThing && !isSelf && isVisible(FRAG_LINK));
-		menu.findItem(R.id.menu_view).setVisible(hasThing);
 		menu.findItem(R.id.menu_share).setVisible(hasThing);
+		menu.findItem(R.id.menu_copy_url).setVisible(hasThing);
+		menu.findItem(R.id.menu_view).setVisible(hasThing);		
 		updateShareActionIntent(thing);		
 		return true;
 	}
@@ -328,8 +331,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			handleHome();
 			return true;
 			
-		case R.id.menu_add_subreddits:
-			handleAddSubreddit();
+		case R.id.menu_search_for_subreddits:
+			handleSearchForSubreddits();
 			return true;
 
 		case R.id.menu_link:
@@ -340,6 +343,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			handleComments();
 			return true;
 			
+		case R.id.menu_copy_url:
+			handleCopyUrl();
+			return true;
+			
 		case R.id.menu_view:
 			handleView();
 			return true;
@@ -347,7 +354,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return false;
 	}
 	
-	private void handleAddSubreddit() {
+	private void handleSearchForSubreddits() {
 		searchView.setQuery("", false);
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		bar.setDisplayShowCustomEnabled(true);
@@ -359,9 +366,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	public boolean onQueryTextSubmit(String query) {
-		Intent intent = new Intent(this, AddSubredditsActivity.class);
+		Intent intent = new Intent(this, SubredditSearchActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-		intent.putExtra(AddSubredditsActivity.EXTRA_QUERY, query);
+		intent.putExtra(SubredditSearchActivity.EXTRA_QUERY, query);
 		startActivityForResult(intent, REQUEST_ADD_SUBREDDITS);
 		return true;
 	}
@@ -410,7 +417,14 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void handleComments() {
 		selectThing(getThing(), FRAG_COMMENT, getThingPosition());
 	}
-		
+	
+	private void handleCopyUrl() {
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		String text = getLink(getThing());
+		clipboard.setText(text);
+		Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+	}
+	
 	private void handleView() {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setData(Uri.parse(getLink(getThing())));

@@ -21,12 +21,14 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
 
 	private static final String TAG = "ThingLoader";
 	
+	private final String subreddit;
 	private final CharSequence url;
 	private List<Thing> things;
 	private List<Thing> initThings;
 	
-	public ThingLoader(Context context, CharSequence url, List<Thing> initThings) {
+	public ThingLoader(Context context, String subreddit, CharSequence url, List<Thing> initThings) {
 		super(context);
+		this.subreddit = subreddit;
 		this.url = url;
 		this.initThings = initThings;
 	}
@@ -144,7 +146,7 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
 		}
 		
 		private String getStatus(Thing t) {
-			if (t.subreddit.equalsIgnoreCase(t.subreddit)) {
+			if (subreddit.equalsIgnoreCase(t.subreddit)) {
 				return getContext().getString(R.string.thing_status, t.author, t.score, t.numComments);
 			} else {
 				return getContext().getString(R.string.thing_status_2, t.subreddit, t.author, t.score, t.numComments);

@@ -3,23 +3,24 @@
 
     <item
         android:id="@+id/menu_link"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_link"/>
     <item
         android:id="@+id/menu_comments"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_comments"/>
     <item
         android:id="@+id/menu_share"
         android:actionProviderClass="android.widget.ShareActionProvider"
         android:title="@string/menu_share"/>
     <item
+        android:id="@+id/menu_copy_url"
+        android:title="@string/menu_copy_url"/>
+    <item
         android:id="@+id/menu_view"
-        android:showAsAction="withText"
         android:title="@string/menu_view"/>
     <item
-        android:id="@+id/menu_add_subreddits"
-        android:showAsAction="withText"
-        android:title="@string/menu_add_subreddits"/>
+        android:id="@+id/menu_search_for_subreddits"
+        android:title="@string/menu_search_for_subreddits"/>
 
 </menu>
