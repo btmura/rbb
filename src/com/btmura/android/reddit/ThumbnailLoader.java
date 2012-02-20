@@ -6,16 +6,15 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.btmura.android.reddit.ThingAdapter.ViewHolder;
-
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.View;
+
+import com.btmura.android.reddit.ThingAdapter.ViewHolder;
 
 public class ThumbnailLoader {
 	
@@ -32,39 +31,37 @@ public class ThumbnailLoader {
 	private ThumbnailLoader() {
 	}
 
-	public void load(String url, ThingAdapter.ViewHolder holder, Resources res) {
+	public void cancelTasks() {
+		taskCache.evictAll();
+	}
+	
+	public void setThumbnail(String url, ThingAdapter.ViewHolder holder, Resources res) {
 		if (url == null || url.isEmpty() || "default".equals(url) || "self".equals(url) || "nsfw".equals(url)) {
-			holder.title.setCompoundDrawables(null, null, null, null);
+			holder.thumbnail.setVisibility(View.GONE);
+			holder.thumbnail.setContentDescription(null);
+			holder.thumbnail.setTag(null);
 		} else {
-			holder.title.setTag(url);
+			holder.thumbnail.setVisibility(View.VISIBLE);
+			holder.thumbnail.setContentDescription(url);
+			holder.thumbnail.setTag(url);
 			Bitmap b = bitmapCache.get(url);
 			if (b != null) {
-				setThumbnail(holder, res, b);
+				holder.thumbnail.setImageBitmap(b);
 			} else {
-				Drawable d = res.getDrawable(R.drawable.ic_launcher);
-				d.setBounds(0, 0, 70, 70);
-				holder.title.setCompoundDrawables(d, null, null, null);
+				holder.thumbnail.setImageResource(R.drawable.ic_launcher);
 				if (taskCache.get(url) == null) {
 					LoadTask task = new LoadTask(url, holder, res);
 					taskCache.put(url, task);
-					task.execute();
+					task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[]) null);
 				}
 			}
 		}
 	}
 	
-	public void cancelTasks() {
-		taskCache.evictAll();
-	}
-	
-	static void setThumbnail(ThingAdapter.ViewHolder holder, Resources res, Bitmap b) {
-		Drawable d = null;
+	static void replaceThumbnail(ThingAdapter.ViewHolder holder, Resources res, Bitmap b) {
 		if (b != null) {
-			d = new BitmapDrawable(res, b);
-			d.setBounds(0, 0, b.getWidth(), b.getHeight());
-			
+			holder.thumbnail.setImageBitmap(b);
 		}
-		holder.title.setCompoundDrawables(d, null, null, null);
 	}
 
 	static class BitmapCache extends LruCache<String, Bitmap> {
@@ -127,11 +124,13 @@ public class ThumbnailLoader {
 		@Override
 		protected void onPostExecute(Bitmap b) {
 			taskCache.remove(url);
-			bitmapCache.put(url, b);
-			ViewHolder h = holder.get();
-			Resources r = res.get();
-			if (h != null && r != null && url.equals(h.title.getTag())) {
-				setThumbnail(h, r, b);
+			if (b != null) {
+				bitmapCache.put(url, b);
+				ViewHolder h = holder.get();
+				Resources r = res.get();
+				if (h != null && r != null && url.equals(h.thumbnail.getTag())) {
+					h.thumbnail.setImageBitmap(b);
+				}
 			}
 		}
 	}

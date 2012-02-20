@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -105,6 +106,7 @@ public class ThingAdapter extends BaseAdapter {
 	
 	private static ViewHolder createViewHolder(View v) {
 		ViewHolder holder = new ViewHolder();
+		holder.thumbnail = (ImageView) v.findViewById(R.id.thumbnail);
 		holder.title = (TextView) v.findViewById(R.id.title);
 		holder.status = (TextView) v.findViewById(R.id.status);
 		holder.progress = (ProgressBar) v.findViewById(R.id.progress);
@@ -112,6 +114,7 @@ public class ThingAdapter extends BaseAdapter {
 	}
 	
 	static class ViewHolder {
+		ImageView thumbnail;
 		TextView title;
 		TextView status;
 		ProgressBar progress;
@@ -140,7 +143,7 @@ public class ThingAdapter extends BaseAdapter {
 				: R.drawable.selector_normal);
 		h.title.setText(t.title);
 		h.status.setText(t.status);
-		thumbnailLoader.load(t.thumbnail, h, context.getResources());
+		thumbnailLoader.setThumbnail(t.thumbnail, h, context.getResources());
 	}
 	
 	private void setMore(ViewHolder h, Thing e) {
