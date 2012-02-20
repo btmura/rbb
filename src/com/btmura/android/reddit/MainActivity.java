@@ -228,6 +228,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return (SubredditListFragment) manager.findFragmentByTag(FRAG_SUBREDDIT_LIST);
 	}
 	
+	private ThingListFragment getThingListFragment() {
+		return (ThingListFragment) manager.findFragmentByTag(FRAG_THING_LIST);
+	}
+	
 	private Fragment getLinkFragment() {
 		return manager.findFragmentByTag(FRAG_LINK);
 	}
@@ -276,6 +280,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void refreshCheckedItems() {
 		if (isVisible(FRAG_SUBREDDIT_LIST)) {
 			getSubredditListFragment().setSelectedSubreddit(getSubreddit());
+		}
+		
+		if (isVisible(FRAG_THING_LIST)) {
+			getThingListFragment().setChosenPosition(getThingPosition());
 		}
 	}
 	

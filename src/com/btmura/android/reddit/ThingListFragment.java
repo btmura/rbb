@@ -6,7 +6,6 @@ import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,8 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	private static final String ARG_SUBREDDIT = "s";
 	private static final String ARG_FILTER = "f";
 	private static final String ARG_SINGLE_CHOICE = "c";
+	
+	private static final String STATE_CHOSEN = "s";
 	
 	private static final String LOADER_ARG_MORE_KEY = "m";
 	
@@ -42,15 +43,14 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		adapter = new ThingAdapter(getActivity(), getActivity().getLayoutInflater());
+		adapter = new ThingAdapter(getActivity(), getActivity().getLayoutInflater(),
+				getArguments().getBoolean(ARG_SINGLE_CHOICE));
 	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = super.onCreateView(inflater, container, savedInstanceState);
 		ListView list = (ListView) view.findViewById(android.R.id.list);
-		boolean singleChoice = getArguments().getBoolean(ARG_SINGLE_CHOICE);
-		list.setChoiceMode(singleChoice ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 		list.setOnScrollListener(this);
 		return view;
 	}
@@ -58,6 +58,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		adapter.setChosenPosition(savedInstanceState != null ? savedInstanceState.getInt(STATE_CHOSEN) : -1);
 		setListAdapter(adapter);
 		setListShown(false);
 		getLoaderManager().initLoader(0, null, this);
@@ -85,6 +86,8 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
+		adapter.setChosenPosition(position);
+		adapter.notifyDataSetChanged();
 		Thing t = adapter.getItem(position);
 		switch (t.type) {
 		case Thing.TYPE_THING:
@@ -107,7 +110,6 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 				if (!adapter.isEmpty()) {
 					Thing t = adapter.getItem(adapter.getCount() - 1);
 					if (t.type == Thing.TYPE_MORE) {
-						Log.v("ThingList", "loading...");
 						scrollLoading = true;
 						Bundle b = new Bundle(1);
 						b.putString(LOADER_ARG_MORE_KEY, t.moreKey);
@@ -115,6 +117,19 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 					}
 				}
 			}
+		}
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt(STATE_CHOSEN, adapter.getChosenPosition());
+	}
+	
+	public void setChosenPosition(int position) {
+		if (position != adapter.getChosenPosition()) {
+			adapter.setChosenPosition(position);
+			adapter.notifyDataSetChanged();
 		}
 	}
 	

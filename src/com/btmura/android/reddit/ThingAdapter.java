@@ -17,10 +17,13 @@ public class ThingAdapter extends BaseAdapter {
 	private final ArrayList<Thing> items = new ArrayList<Thing>();
 	private final Context context;
 	private final LayoutInflater inflater;
+	private final boolean singleChoice;
+	private int chosenPosition = -1;
 
-	public ThingAdapter(Context context, LayoutInflater inflater) {
+	public ThingAdapter(Context context, LayoutInflater inflater, boolean singleChoice) {
 		this.context = context;
 		this.inflater = inflater;
+		this.singleChoice = singleChoice;
 	}
 
 	public void swapData(List<Thing> newItems) {
@@ -32,6 +35,14 @@ public class ThingAdapter extends BaseAdapter {
 		} else {
 			notifyDataSetInvalidated();
 		}
+	}
+	
+	public void setChosenPosition(int position) {
+		chosenPosition = position;
+	}
+	
+	public int getChosenPosition() {
+		return chosenPosition;
 	}
 	
 	public List<Thing> getItems() {
@@ -103,15 +114,15 @@ public class ThingAdapter extends BaseAdapter {
 	}
 
 	private void setView(int position, View v) {
-		Thing e = getItem(position);
+		Thing t = getItem(position);
 		ViewHolder h = (ViewHolder) v.getTag();
-		switch (e.type) {
+		switch (t.type) {
 		case Thing.TYPE_THING:
-			setTitle(h, e);
+			setThing(v, h, t, position);
 			break;
 						
 		case Thing.TYPE_MORE:
-			setMore(h, e);
+			setMore(h, t);
 			break;
 			
 		default:
@@ -119,7 +130,10 @@ public class ThingAdapter extends BaseAdapter {
 		}
 	}
 	
-	private void setTitle(ViewHolder h, Thing t) {
+	private void setThing(View v, ViewHolder h, Thing t, int position) {
+		v.setBackgroundResource(singleChoice && position == chosenPosition
+				? R.drawable.selector_chosen
+				: R.drawable.selector_normal);
 		h.title.setText(t.title);
 		h.status.setText(t.status);
 		thumbnailLoader.load(t.thumbnail, h, context.getResources());

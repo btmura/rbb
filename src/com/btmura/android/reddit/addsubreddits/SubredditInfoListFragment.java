@@ -137,10 +137,6 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 		getListener().onSelected(added, -1, OnSelectedListener.EVENT_ACTION_ITEM_CLICKED);
 	}
 	
-	private OnSelectedListener getListener() {
-		return (OnSelectedListener) getActivity();
-	}
-	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -152,6 +148,10 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 			adapter.setChosenPosition(position);
 			adapter.notifyDataSetChanged();
 		}
+	}
+	
+	private OnSelectedListener getListener() {
+		return (OnSelectedListener) getActivity();
 	}
 	
 	public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
