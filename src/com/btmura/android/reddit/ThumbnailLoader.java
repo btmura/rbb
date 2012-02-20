@@ -21,7 +21,9 @@ public class ThumbnailLoader {
 	
 	private static final ThumbnailLoader INSTANCE = new ThumbnailLoader();
 	
-	private final ThumbnailCache cache = new ThumbnailCache(30);
+	private final BitmapCache bitmapCache = new BitmapCache(30);
+	
+	private final LoadTaskCache taskCache = new LoadTaskCache(10);
 	
 	public static final ThumbnailLoader getInstance() {
 		return INSTANCE;
@@ -35,16 +37,24 @@ public class ThumbnailLoader {
 			holder.title.setCompoundDrawables(null, null, null, null);
 		} else {
 			holder.title.setTag(url);
-			Bitmap b = cache.get(url);
+			Bitmap b = bitmapCache.get(url);
 			if (b != null) {
 				setThumbnail(holder, res, b);
 			} else {
 				Drawable d = res.getDrawable(R.drawable.ic_launcher);
 				d.setBounds(0, 0, 70, 70);
 				holder.title.setCompoundDrawables(d, null, null, null);
-				new LoadThumbnailTask(url, holder, res).execute();
+				if (taskCache.get(url) == null) {
+					LoadTask task = new LoadTask(url, holder, res);
+					taskCache.put(url, task);
+					task.execute();
+				}
 			}
 		}
+	}
+	
+	public void cancelTasks() {
+		taskCache.evictAll();
 	}
 	
 	static void setThumbnail(ThingAdapter.ViewHolder holder, Resources res, Bitmap b) {
@@ -57,8 +67,8 @@ public class ThumbnailLoader {
 		holder.title.setCompoundDrawables(d, null, null, null);
 	}
 
-	static class ThumbnailCache extends LruCache<String, Bitmap> {
-		public ThumbnailCache(int size) {
+	static class BitmapCache extends LruCache<String, Bitmap> {
+		public BitmapCache(int size) {
 			super(size);
 		}
 		
@@ -69,15 +79,27 @@ public class ThumbnailLoader {
 		}
 	}
 	
-	class LoadThumbnailTask extends AsyncTask<Void, Void, Bitmap> {
+	static class LoadTaskCache extends LruCache<String, LoadTask> {
+		public LoadTaskCache(int size) {
+			super(size);
+		}
 		
-		private static final String TAG = "LoadThumbnailTask";
+		@Override
+		protected void entryRemoved(boolean evicted, String key, LoadTask oldValue, LoadTask newValue) {
+			super.entryRemoved(evicted, key, oldValue, newValue);
+			oldValue.cancel(true);
+		}
+	}
+	
+	class LoadTask extends AsyncTask<Void, Void, Bitmap> {
+		
+		private static final String TAG = "LoadTask";
 		
 		private final String url;
 		private final WeakReference<ThingAdapter.ViewHolder> holder;
 		private final WeakReference<Resources> res;
 		
-		LoadThumbnailTask(String url, ThingAdapter.ViewHolder holder, Resources res) {
+		LoadTask(String url, ThingAdapter.ViewHolder holder, Resources res) {
 			this.url = url;
 			this.holder = new WeakReference<ThingAdapter.ViewHolder>(holder);
 			this.res = new WeakReference<Resources>(res);
@@ -101,10 +123,11 @@ public class ThumbnailLoader {
 			}
 			return null;
 		}
-		
+
 		@Override
 		protected void onPostExecute(Bitmap b) {
-			cache.put(url, b);
+			taskCache.remove(url);
+			bitmapCache.put(url, b);
 			ViewHolder h = holder.get();
 			Resources r = res.get();
 			if (h != null && r != null && url.equals(h.title.getTag())) {

@@ -23,14 +23,15 @@ public class SubredditInfoAdapter extends BaseAdapter {
 		this.singleChoice = singleChoice;
 	}
 	
-	public void clear() {
+	public void swapData(List<SubredditInfo> newItems) {
 		items.clear();
-	}
-	
-	public void addAll(List<SubredditInfo> newItems) {
-		items.ensureCapacity(items.size() + newItems.size());
-		items.addAll(newItems);
-		notifyDataSetChanged();
+		if (newItems != null) {
+			items.ensureCapacity(items.size() + newItems.size());
+			items.addAll(newItems);
+			notifyDataSetChanged();
+		} else {
+			notifyDataSetInvalidated();
+		}
 	}
 	
 	public void setChosenPosition(int position) {

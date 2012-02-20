@@ -37,6 +37,10 @@ public class ThingAdapter extends BaseAdapter {
 		}
 	}
 	
+	public void cancelThumbnailTasks() {
+		thumbnailLoader.cancelTasks();
+	}
+	
 	public void setChosenPosition(int position) {
 		chosenPosition = position;
 	}

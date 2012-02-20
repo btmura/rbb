@@ -83,13 +83,8 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 	}
 	
 	public void onLoadFinished(Loader<List<SubredditInfo>> loader, final List<SubredditInfo> data) {
-		adapter.clear();
-		if (data != null) {
-			setEmptyText(getString(R.string.empty));
-			adapter.addAll(data);
-		} else {
-			setEmptyText(getString(R.string.error));
-		}
+		adapter.swapData(data);
+		setEmptyText(getString(data != null ? R.string.empty : R.string.error));
 		setListShown(true);
 		if (!data.isEmpty()) {
 			getListView().post(new Runnable() {
@@ -101,7 +96,7 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 	}
 	
 	public void onLoaderReset(Loader<List<SubredditInfo>> loader) {
-		adapter.clear();
+		adapter.swapData(null);
 	}
 	
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {

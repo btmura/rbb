@@ -133,6 +133,12 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 		}
 	}
 	
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		adapter.cancelThumbnailTasks();
+	}
+	
 	private OnThingSelectedListener getListener() {
 		return (OnThingSelectedListener) getActivity();
 	}
