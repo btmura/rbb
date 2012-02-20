@@ -52,6 +52,7 @@ public class ThumbnailLoader {
 		if (b != null) {
 			d = new BitmapDrawable(res, b);
 			d.setBounds(0, 0, b.getWidth(), b.getHeight());
+			
 		}
 		holder.title.setCompoundDrawables(d, null, null, null);
 	}
