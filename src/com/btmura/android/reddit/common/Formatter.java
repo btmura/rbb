@@ -16,7 +16,7 @@ public class Formatter {
 	private static Pattern STRIKE_THROUGH_PATTERN = Pattern.compile("~~(.+?)~~");
 	private static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+?);");
 	private static Pattern BULLET_PATTERN = Pattern.compile("\\* ([^\\n]+)");
-	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\][ ]?\\(([^\\)]+?)\\)");
+	private static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\]([ ]?)\\(([^\\)]+?)\\)");
 	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([^ \\n]+)");
 	
 	private static final int SPAN_BOLD = 0;
@@ -187,9 +187,10 @@ public class Formatter {
 			int s = m.start() - deleted;
 			int e = m.end() - deleted;
 			String name = m.group(1);
-			String url = m.group(2);
+			String spacing = m.group(2);
+			String url = m.group(3);
 			b.replace(s, e, name);
-			deleted += 4 + url.length();
+			deleted += 4 + spacing.length() + url.length();
 			
 			if (url.startsWith("/r/")) {
 				url = "http://www.reddit.com" + url;
