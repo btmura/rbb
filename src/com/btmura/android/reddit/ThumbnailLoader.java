@@ -88,8 +88,6 @@ public class ThumbnailLoader {
 			HttpURLConnection conn = null;
 			try {
 				URL u = new URL(url);
-				Log.v(TAG, url);			
-				
 				conn = (HttpURLConnection) u.openConnection();
 				return BitmapFactory.decodeStream(conn.getInputStream());
 			} catch (MalformedURLException e) {

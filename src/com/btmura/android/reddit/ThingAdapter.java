@@ -34,6 +34,10 @@ public class ThingAdapter extends BaseAdapter {
 		}
 	}
 	
+	public List<Thing> getItems() {
+		return items;
+	}
+	
 	public int getCount() {
 		return items.size();
 	}

@@ -6,6 +6,7 @@ import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +20,14 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	private static final String ARG_FILTER = "f";
 	private static final String ARG_SINGLE_CHOICE = "c";
 	
+	private static final String LOADER_ARG_MORE_KEY = "m";
+	
 	interface OnThingSelectedListener {
 		void onThingSelected(Thing thing, int position);
 	}
 	
 	private ThingAdapter adapter;
+	private boolean scrollLoading;
 
 	public static ThingListFragment newInstance(Subreddit sr, int filter, boolean singleChoice) {
 		ThingListFragment frag = new ThingListFragment();
@@ -62,11 +66,13 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	public Loader<List<Thing>> onCreateLoader(int id, Bundle args) {
 		Subreddit sr = getArguments().getParcelable(ARG_SUBREDDIT);
 		int filter = getArguments().getInt(ARG_FILTER);
-		CharSequence url = Urls.subredditUrl(sr, filter, null);
-		return new ThingLoader(getActivity(), url);
+		String moreKey = args != null ? args.getString(LOADER_ARG_MORE_KEY) : null;
+		CharSequence url = Urls.subredditUrl(sr, filter, moreKey);
+		return new ThingLoader(getActivity(), url, args != null ? adapter.getItems() : null);
 	}
 	
 	public void onLoadFinished(Loader<List<Thing>> loader, List<Thing> things) {
+		scrollLoading = false;
 		adapter.swapData(things);
 		setEmptyText(getString(things != null ? R.string.empty : R.string.error));
 		setListShown(true);
@@ -79,8 +85,8 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		Thing e = adapter.getItem(position);
-		switch (e.type) {
+		Thing t = adapter.getItem(position);
+		switch (t.type) {
 		case Thing.TYPE_THING:
 			getListener().onThingSelected(adapter.getItem(position), position);
 			break;
@@ -88,9 +94,28 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	}
 
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		
 	}
 	
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		if (scrollLoading) {
+			return;
+		}
+		if (firstVisibleItem + visibleItemCount >= totalItemCount) {
+			Loader<List<Thing>> loader = getLoaderManager().getLoader(0);
+			if (loader != null) {
+				if (!adapter.isEmpty()) {
+					Thing t = adapter.getItem(adapter.getCount() - 1);
+					if (t.type == Thing.TYPE_MORE) {
+						Log.v("ThingList", "loading...");
+						scrollLoading = true;
+						Bundle b = new Bundle(1);
+						b.putString(LOADER_ARG_MORE_KEY, t.moreKey);
+						getLoaderManager().restartLoader(0, b, this);
+					}
+				}
+			}
+		}
 	}
 	
 	private OnThingSelectedListener getListener() {

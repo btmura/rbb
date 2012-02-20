@@ -23,10 +23,12 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
 	
 	private final CharSequence url;
 	private List<Thing> things;
+	private List<Thing> initThings;
 	
-	public ThingLoader(Context context, CharSequence url) {
+	public ThingLoader(Context context, CharSequence url, List<Thing> initThings) {
 		super(context);
 		this.url = url;
+		this.initThings = initThings;
 	}
 	
 	@Override
@@ -61,7 +63,7 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
 			stream.close();
 			
 			conn.disconnect();
-		
+
 			return parser.things;
 			
 		} catch (MalformedURLException e) {
@@ -75,7 +77,7 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
 	
 	class ThingParser extends JsonParser {
 		
-		private final List<Thing> things = new ArrayList<Thing>(25);
+		private final ArrayList<Thing> things = new ArrayList<Thing>(30);
 		private String moreKey;
 		
 		@Override
@@ -161,6 +163,12 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
 				t.type = Thing.TYPE_MORE;
 				t.moreKey = moreKey;
 				things.add(t);
+			}
+			
+			if (initThings != null) {
+				int size = initThings.size() - 1;
+				things.ensureCapacity(size + 30);
+				things.addAll(0, initThings.subList(0, size));
 			}
 		}
 	}
