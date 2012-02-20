@@ -4,10 +4,9 @@ import java.util.List;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.FragmentManager.OnBackStackChangedListener;
+import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -60,33 +59,34 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 		if (savedInstanceState == null) {
 			String q = getIntent().getStringExtra(EXTRA_QUERY);
 			if (q != null && !q.trim().isEmpty()) {
-				sv.setQuery(q.trim(), true);
+				sv.setQuery(q.trim(), false);
+				submitQuery(q.trim(), false);
 			}
 		}
 	}
 	
 	public boolean onQueryTextSubmit(String query) {
+		submitQuery(query, true);
+		return true;
+	}
+	
+	private void submitQuery(String query, boolean addToBackStack) {
 		sv.clearFocus();
 		FragmentTransaction ft = manager.beginTransaction();
 		if (singleContainer != null) {
 			ft.replace(R.id.single_container, SubredditInfoListFragment.newInstance(query, false), FRAG_SUBREDDITS);
 		} else {
 			ft.replace(R.id.subreddits_container, SubredditInfoListFragment.newInstance(query, true), FRAG_SUBREDDITS);
-			Fragment details = getDetailsFragment();
-			if (details != null) {
-				ft.remove(details);
-			}
+			ft.replace(R.id.details_container, DetailsFragment.newInstance(null, -1), FRAG_DETAILS);
+		}
+		if (addToBackStack) {
+			ft.addToBackStack(null);
 		}
 		ft.commit();
-		return true;
 	}
 	
 	public void onSelected(List<SubredditInfo> infos, int position, int event) {
-		switch (event) {
-		case OnSelectedListener.EVENT_LIST_LOADED:
-			handleListLoaded(infos, position);
-			break;
-			
+		switch (event) {			
 		case OnSelectedListener.EVENT_LIST_ITEM_CLICKED:
 			handleListItemClicked(infos, position);
 			break;
@@ -99,28 +99,13 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 			throw new IllegalArgumentException("Unexpected event: " + event);
 		}
 	}
-	
-	private void handleListLoaded(List<SubredditInfo> infos, int position) {
-		if (singleContainer == null && getDetailsFragment() == null) {
-			DetailsFragment frag = replaceDetails(infos.get(0), position, false);
-			refreshActionBar(frag);
-		}
-	}
-	
+
 	private void handleListItemClicked(List<SubredditInfo> infos, int position) {
-		replaceDetails(infos.get(0), position, true);
-	}
-	
-	private DetailsFragment replaceDetails(SubredditInfo info, int position, boolean addToBackStack) {
 		FragmentTransaction ft = manager.beginTransaction();
 		int containerId = singleContainer != null ? R.id.single_container : R.id.details_container; 
-		DetailsFragment frag = DetailsFragment.newInstance(info, position);
-		ft.replace(containerId, frag, FRAG_DETAILS);
-		if (addToBackStack) {
-			ft.addToBackStack(null);
-		}
-		ft.commit();	
-		return frag;
+		ft.replace(containerId, DetailsFragment.newInstance(infos.get(0), position), FRAG_DETAILS);
+		ft.addToBackStack(null);
+		ft.commit();
 	}
 	
 	private void handleActionItemClicked(List<SubredditInfo> infos) {
@@ -132,7 +117,7 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 		}
 		
 		Provider.addSubredditsInBackground(getApplicationContext(), values);
-		Toast.makeText(getApplicationContext(), getString(R.string.subreddits_added, infos.size()), 
+		Toast.makeText(getApplicationContext(), getString(R.string.sr_num_added, infos.size()), 
 				Toast.LENGTH_SHORT).show();
 	}
 	
@@ -161,24 +146,24 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 	}
 	
 	public void onBackStackChanged() {
-		Fragment detailsFrag = getDetailsFragment();
-		refreshPosition(detailsFrag);
-		refreshActionBar(detailsFrag);
+		DetailsFragment f = getDetailsFragment();
+		refreshPosition(f);
+		refreshActionBar(f);
 	}
 	
-	private void refreshPosition(Fragment detailsFrag) {
+	private void refreshPosition(DetailsFragment detailsFrag) {
 		if (singleContainer == null) {
-			int position = detailsFrag.getArguments().getInt(DetailsFragment.ARGS_POSITION);
+			int position = detailsFrag != null ? detailsFrag.getPosition() : -1;
 			getSubredditListFragment().setChosenPosition(position);
 		}
 	}
 	
-	private void refreshActionBar(Fragment detailsFrag) {
+	private void refreshActionBar(DetailsFragment detailsFrag) {
 		if (singleContainer != null) {
 			if (detailsFrag != null) {
 				bar.setDisplayShowTitleEnabled(true);
 				bar.setDisplayShowCustomEnabled(false);
-				SubredditInfo info = detailsFrag.getArguments().getParcelable(DetailsFragment.ARGS_SUBREDDIT_INFO);
+				SubredditInfo info = detailsFrag.getSubredditInfo();
 				bar.setTitle(info.title);
 			} else {
 				bar.setDisplayShowTitleEnabled(false);
