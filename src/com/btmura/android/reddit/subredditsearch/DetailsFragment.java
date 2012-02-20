@@ -20,8 +20,8 @@ import com.btmura.android.reddit.subredditsearch.SubredditInfoListFragment.OnSel
 
 public class DetailsFragment extends ListFragment {
 	
-	static final String ARGS_SUBREDDIT_INFO = "s";
-	static final String ARGS_POSITION = "p";
+	private static final String ARGS_SUBREDDIT_INFO = "s";
+	private static final String ARGS_POSITION = "p";
 
 	public static DetailsFragment newInstance(SubredditInfo info, int position) {
 		DetailsFragment f = new DetailsFragment();
@@ -35,8 +35,10 @@ public class DetailsFragment extends ListFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		setHasOptionsMenu(true);
-		setListAdapter(new DetailsAdapter());
+		SubredditInfo info = getSubredditInfo();
+		setHasOptionsMenu(info != null);
+		setEmptyText(getString(R.string.sr_search_instructions));
+		setListAdapter(new DetailsAdapter(info));
 	}
 	
 	@Override
@@ -59,17 +61,18 @@ public class DetailsFragment extends ListFragment {
 	
 	private void handleAddSubreddit() {
 		List<SubredditInfo> added = new ArrayList<SubredditInfo>(1);
-		SubredditInfo sr = getArguments().getParcelable(ARGS_SUBREDDIT_INFO);
-		added.add(sr);
+		added.add(getSubredditInfo());
 		getListener().onSelected(added, -1, OnSelectedListener.EVENT_ACTION_ITEM_CLICKED);
-	}
-	
-	private OnSelectedListener getListener() {
-		return (OnSelectedListener) getActivity();
 	}
 	
 	class DetailsAdapter extends BaseAdapter {
 
+		private SubredditInfo info;
+		
+		DetailsAdapter(SubredditInfo info) {
+			this.info = info;
+		}
+		
 		@Override
 		public boolean areAllItemsEnabled() {
 			return false;
@@ -81,11 +84,11 @@ public class DetailsFragment extends ListFragment {
 		}
 		
 		public int getCount() {
-			return 1;
+			return info != null ? 1 : 0;
 		}
 
 		public SubredditInfo getItem(int position) {
-			return getArguments().getParcelable(ARGS_SUBREDDIT_INFO);
+			return info;
 		}
 
 		public long getItemId(int position) {
@@ -106,5 +109,17 @@ public class DetailsFragment extends ListFragment {
 			
 			return v;
 		}
+	}
+	
+	public SubredditInfo getSubredditInfo() {
+		return getArguments().getParcelable(ARGS_SUBREDDIT_INFO);
+	}
+	
+	public int getPosition() {
+		return getArguments().getInt(ARGS_POSITION);
+	}
+	
+	private OnSelectedListener getListener() {
+		return (OnSelectedListener) getActivity();
 	}
 }
