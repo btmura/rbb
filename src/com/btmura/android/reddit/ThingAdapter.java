@@ -3,7 +3,6 @@ package com.btmura.android.reddit;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +13,13 @@ import android.widget.TextView;
 
 public class ThingAdapter extends BaseAdapter {
 	
-	private final ThumbnailLoader thumbnailLoader = ThumbnailLoader.getInstance();
+	private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader(30);
 	private final ArrayList<Thing> items = new ArrayList<Thing>();
-	private final Context context;
 	private final LayoutInflater inflater;
 	private final boolean singleChoice;
 	private int chosenPosition = -1;
 
-	public ThingAdapter(Context context, LayoutInflater inflater, boolean singleChoice) {
-		this.context = context;
+	public ThingAdapter(LayoutInflater inflater, boolean singleChoice) {
 		this.inflater = inflater;
 		this.singleChoice = singleChoice;
 	}
@@ -38,8 +35,8 @@ public class ThingAdapter extends BaseAdapter {
 		}
 	}
 	
-	public void cancelThumbnailTasks() {
-		thumbnailLoader.cancelTasks();
+	public void clearCache() {
+		thumbnailLoader.clearCache();
 	}
 	
 	public void setChosenPosition(int position) {
@@ -143,7 +140,15 @@ public class ThingAdapter extends BaseAdapter {
 				: R.drawable.selector_normal);
 		h.title.setText(t.title);
 		h.status.setText(t.status);
-		thumbnailLoader.setThumbnail(t.thumbnail, h, context.getResources());
+		setThumbnail(v, h, t);
+	}
+	
+	private void setThumbnail(View v, ViewHolder h, Thing t) {
+		if (t.hasThumbnail()) {
+			thumbnailLoader.setThumbnail(h.thumbnail, t.thumbnail);
+		} else {
+			thumbnailLoader.clearThumbnail(h.thumbnail);
+		}
 	}
 	
 	private void setMore(ViewHolder h, Thing e) {

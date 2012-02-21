@@ -62,6 +62,14 @@ public class Thing implements Parcelable {
 		int sepIndex = name.indexOf('_');
 		return name.substring(sepIndex + 1);
 	}
+	
+	public boolean hasThumbnail() {
+		return thumbnail != null 
+				&& !thumbnail.isEmpty() 
+				&& !"default".equals(thumbnail) 
+				&& !"self".equals(thumbnail) 
+				&& !"nsfw".equals(thumbnail);
+	}
 
 	public int describeContents() {
 		return 0;

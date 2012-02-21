@@ -43,7 +43,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		adapter = new ThingAdapter(getActivity(), getActivity().getLayoutInflater(),
+		adapter = new ThingAdapter(getActivity().getLayoutInflater(),
 				getArguments().getBoolean(ARG_SINGLE_CHOICE));
 	}
 	
@@ -136,7 +136,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		adapter.cancelThumbnailTasks();
+		adapter.clearCache();
 	}
 	
 	private OnThingSelectedListener getListener() {
