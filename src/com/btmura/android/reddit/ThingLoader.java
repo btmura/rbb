@@ -169,8 +169,10 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
 			
 			if (initThings != null) {
 				int size = initThings.size() - 1;
-				things.ensureCapacity(size + 30);
-				things.addAll(0, initThings.subList(0, size));
+				if (size > 0) {
+					things.ensureCapacity(things.size() + size);
+					things.addAll(0, initThings.subList(0, size));
+				}
 			}
 		}
 	}

@@ -46,6 +46,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private View singleContainer;
 	private View thingContainer;
+	private View navContainer;
 	
 	private ShareActionProvider shareProvider;
 
@@ -70,7 +71,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
         singleContainer = findViewById(R.id.single_container);
         thingContainer = findViewById(R.id.thing_container);
-    
+        navContainer = findViewById(R.id.nav_container);
+        
         if (savedInstanceState == null) {
         	setupFragments();
         }
@@ -291,7 +293,11 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private void refreshContainers() {
 		if (thingContainer != null) {
-			thingContainer.setVisibility(getThing() != null ? View.VISIBLE : View.GONE);
+			Thing t = getThing();
+			thingContainer.setVisibility(t != null ? View.VISIBLE : View.GONE);
+			if (navContainer != null) {
+				navContainer.setVisibility(t != null ? View.GONE : View.VISIBLE);
+			}
 		}
 	}
 	
