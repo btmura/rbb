@@ -29,8 +29,8 @@ public class ThumbnailLoader {
 		if (b != null) {
 			v.setImageBitmap(b);
 		} else {						
-			v.setMinimumWidth(70);
-			v.setMaxHeight(70);
+			v.setMinimumWidth(69);
+			v.setMinimumHeight(69);
 			v.setImageResource(R.drawable.ic_launcher);
 			
 			LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
