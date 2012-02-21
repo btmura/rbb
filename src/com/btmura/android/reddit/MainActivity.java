@@ -84,7 +84,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
-			ft.replace(R.id.single_container, srFrag);
+			ft.replace(R.id.single_container, srFrag, FRAG_SUBREDDIT_LIST);
 			ft.commit();
 		}
 		
@@ -314,6 +314,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		menu.findItem(R.id.menu_share).setVisible(hasThing);
 		menu.findItem(R.id.menu_copy_url).setVisible(hasThing);
 		menu.findItem(R.id.menu_view).setVisible(hasThing);		
+		menu.findItem(R.id.menu_search_for_subreddits).setVisible(singleContainer == null || isVisible(FRAG_SUBREDDIT_LIST));
 		updateShareActionIntent(thing);		
 		return true;
 	}
