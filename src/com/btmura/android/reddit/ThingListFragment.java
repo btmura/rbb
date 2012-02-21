@@ -104,7 +104,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 		if (scrollLoading) {
 			return;
 		}
-		if (firstVisibleItem + visibleItemCount >= totalItemCount) {
+		if (firstVisibleItem + visibleItemCount * 2 >= totalItemCount) {
 			Loader<List<Thing>> loader = getLoaderManager().getLoader(0);
 			if (loader != null) {
 				if (!adapter.isEmpty()) {
