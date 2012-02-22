@@ -25,10 +25,7 @@ public class ThumbnailLoader {
 		if (b != null) {
 			v.setImageBitmap(b);
 		} else {						
-			int dps = (int) (70 * v.getResources().getDisplayMetrics().density);
-			v.setMinimumWidth(dps);
-			v.setMinimumHeight(dps);
-			v.setImageResource(R.drawable.ic_launcher);
+			v.setImageResource(R.drawable.ic_thumbnail);
 			
 			LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
 			if (task == null || !url.equals(task.url)) {
