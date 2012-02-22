@@ -7,6 +7,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -43,6 +44,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 		adapter = new ThingAdapter(getActivity().getLayoutInflater(),
 				getArguments().getBoolean(ARG_SINGLE_CHOICE));
 	}
@@ -97,7 +99,6 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	}
 
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		
 	}
 	
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
@@ -134,9 +135,15 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	}
 	
 	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		adapter.clearCache();
+	public boolean onOptionsItemSelected(MenuItem item) {
+		super.onOptionsItemSelected(item);
+		switch (item.getItemId()) {
+		case R.id.menu_refresh:
+			setListShown(false);
+			getLoaderManager().restartLoader(0, null, this);
+			return true;
+		}
+		return false;
 	}
 	
 	private OnThingSelectedListener getListener() {

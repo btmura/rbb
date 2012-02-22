@@ -18,14 +18,10 @@ public class ThumbnailLoader {
 	
 	private static final String TAG = "ThumbnailLoader";
 
-	private final BitmapCache bitmapCache;
-	
-	public ThumbnailLoader(int size) {
-		bitmapCache = new BitmapCache(30);
-	}
-	
+	private static final BitmapCache BITMAP_CACHE = new BitmapCache(45);
+
 	public void setThumbnail(ImageView v, String url) {
-		Bitmap b = bitmapCache.get(url);
+		Bitmap b = BITMAP_CACHE.get(url);
 		if (b != null) {
 			v.setImageBitmap(b);
 		} else {						
@@ -54,10 +50,6 @@ public class ThumbnailLoader {
 			v.setTag(null);
 		}
 		v.setVisibility(View.GONE);
-	}
-	
-	public void clearCache() {
-		bitmapCache.evictAll();
 	}
 	
 	static class BitmapCache extends LruCache<String, Bitmap> {
@@ -98,7 +90,7 @@ public class ThumbnailLoader {
 		@Override
 		protected void onPostExecute(Bitmap b) {
 			if (b != null) {
-				bitmapCache.put(url, b);
+				BITMAP_CACHE.put(url, b);
 			}
 			ImageView v = ref.get();
 			if (v != null && equals(v.getTag())) {

@@ -6,6 +6,7 @@ import java.util.List;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -13,7 +14,7 @@ import android.widget.TextView;
 
 public class ThingAdapter extends BaseAdapter {
 	
-	private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader(30);
+	private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
 	private final ArrayList<Thing> items = new ArrayList<Thing>();
 	private final LayoutInflater inflater;
 	private final boolean singleChoice;
@@ -33,10 +34,6 @@ public class ThingAdapter extends BaseAdapter {
 		} else {
 			notifyDataSetInvalidated();
 		}
-	}
-	
-	public void clearCache() {
-		thumbnailLoader.clearCache();
 	}
 	
 	public void setChosenPosition(int position) {
@@ -103,6 +100,7 @@ public class ThingAdapter extends BaseAdapter {
 	
 	private static ViewHolder createViewHolder(View v) {
 		ViewHolder holder = new ViewHolder();
+		holder.thumbnailStub = (ViewStub) v.findViewById(R.id.thumbnail_stub);
 		holder.thumbnail = (ImageView) v.findViewById(R.id.thumbnail);
 		holder.title = (TextView) v.findViewById(R.id.title);
 		holder.status = (TextView) v.findViewById(R.id.status);
@@ -111,6 +109,7 @@ public class ThingAdapter extends BaseAdapter {
 	}
 	
 	static class ViewHolder {
+		ViewStub thumbnailStub;
 		ImageView thumbnail;
 		TextView title;
 		TextView status;
@@ -145,9 +144,15 @@ public class ThingAdapter extends BaseAdapter {
 	
 	private void setThumbnail(View v, ViewHolder h, Thing t) {
 		if (t.hasThumbnail()) {
+			if (h.thumbnail == null) {
+				h.thumbnail = (ImageView) h.thumbnailStub.inflate();
+				h.thumbnailStub = null;
+			}
 			thumbnailLoader.setThumbnail(h.thumbnail, t.thumbnail);
 		} else {
-			thumbnailLoader.clearThumbnail(h.thumbnail);
+			if (h.thumbnail != null) {
+				thumbnailLoader.clearThumbnail(h.thumbnail);
+			}
 		}
 	}
 	

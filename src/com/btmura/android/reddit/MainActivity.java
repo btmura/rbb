@@ -315,6 +315,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		Thing thing = getThing();
 		boolean hasThing = thing != null;
 		boolean isSelf = thing != null && thing.isSelf;
+		menu.findItem(R.id.menu_refresh).setVisible(singleContainer != null && isVisible(FRAG_THING_LIST));
 		menu.findItem(R.id.menu_link).setVisible(hasThing && !isSelf && isVisible(FRAG_COMMENT));
 		menu.findItem(R.id.menu_comments).setVisible(hasThing && !isSelf && isVisible(FRAG_LINK));
 		menu.findItem(R.id.menu_share).setVisible(hasThing);

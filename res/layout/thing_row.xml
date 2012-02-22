@@ -5,12 +5,12 @@
     android:columnCount="2"
     android:padding="10dp" >
 
-    <ImageView
-        android:id="@+id/thumbnail"
+    <ViewStub
+        android:id="@+id/thumbnail_stub"
         android:layout_marginRight="10dp"
         android:layout_rowSpan="2"
-        android:minHeight="70dp"
-        android:minWidth="70dp" />
+        android:inflatedId="@+id/thumbnail"
+        android:layout="@layout/thumbnail" />
 
     <TextView
         android:id="@+id/title"
