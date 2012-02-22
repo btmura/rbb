@@ -102,10 +102,10 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 	}
 	
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-		if (scrollLoading) {
+		if (visibleItemCount <= 0 || scrollLoading) {
 			return;
 		}
-		if (firstVisibleItem + visibleItemCount * 2 >= totalItemCount) {
+		if (firstVisibleItem + visibleItemCount >= totalItemCount) {
 			Loader<List<Thing>> loader = getLoaderManager().getLoader(0);
 			if (loader != null) {
 				if (!adapter.isEmpty()) {

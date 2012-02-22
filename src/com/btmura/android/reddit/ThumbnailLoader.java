@@ -25,7 +25,7 @@ public class ThumbnailLoader {
 		if (b != null) {
 			v.setImageBitmap(b);
 		} else {						
-			v.setImageResource(R.drawable.ic_thumbnail);
+			v.setImageResource(R.drawable.thumbnail);
 			
 			LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
 			if (task == null || !url.equals(task.url)) {
