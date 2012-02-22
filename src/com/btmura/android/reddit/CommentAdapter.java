@@ -114,6 +114,7 @@ public class CommentAdapter extends BaseAdapter {
 	private void setHeader(ViewHolder h, Comment c) {
 		h.title.setText(c.title);
 		h.body.setMovementMethod(LinkMovementMethod.getInstance());
+		h.body.setVisibility(c.body != null && c.body.length() > 0 ? View.VISIBLE : View.GONE);
 		h.body.setText(c.body);
 		h.status.setText(c.status);
 	}
