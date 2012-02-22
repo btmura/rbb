@@ -5,5 +5,8 @@
         android:id="@+id/menu_add_subreddit"
         android:showAsAction="ifRoom|withText"
         android:title="@string/menu_add_subreddit"/>
+    <item
+        android:id="@+id/menu_add_front_page"
+        android:title="@string/menu_add_front_page"/>
 
 </menu>

@@ -9,6 +9,7 @@ import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
@@ -122,10 +123,30 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 	}
 	
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		getMenuInflater().inflate(R.menu.subreddit_search, menu);
+		return true;
+	}
+	
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+		DetailsFragment f = getDetailsFragment();
+		menu.findItem(R.id.menu_add_subreddit).setVisible(f != null && f.getSubredditInfo() != null);
+		return true;
+	}
+	
+	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			handleHome();
+			return true;
+			
+		case R.id.menu_add_front_page:
+			handleAddFrontPage();
 			return true;
 			
 		default:
@@ -143,6 +164,16 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 		} else {
 			finish();
 		}
+	}
+	
+	private void handleAddFrontPage() {
+		ContentValues[] values = new ContentValues[1];
+		values[0] = new ContentValues(1);
+		values[0].put(Subreddits.COLUMN_NAME, "");
+		
+		Provider.addSubredditsInBackground(getApplicationContext(), values);
+		Toast.makeText(getApplicationContext(), getString(R.string.sr_num_added, 1), 
+				Toast.LENGTH_SHORT).show();
 	}
 	
 	public void onBackStackChanged() {

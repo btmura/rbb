@@ -6,8 +6,6 @@ import java.util.List;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,12 +37,6 @@ public class DetailsFragment extends ListFragment {
 		setHasOptionsMenu(info != null);
 		setEmptyText(getString(R.string.sr_search_instructions));
 		setListAdapter(new DetailsAdapter(info));
-	}
-	
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.details, menu);
 	}
 	
 	@Override
