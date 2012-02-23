@@ -120,7 +120,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		lastSelectedFilter = itemPosition;
 		if (itemId != getFilter()) {
-			selectSubreddit(getSubreddit(), itemPosition, true);
+			selectSubreddit(getSubreddit(), itemPosition);
 		}
 		return true;
 	}
@@ -129,23 +129,27 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		switch (event) {
 		
 		case OnSubredditSelectedListener.FLAG_ITEM_CLICKED:
-			selectSubreddit(sr, lastSelectedFilter, true);
+			selectSubreddit(sr, lastSelectedFilter);
 			break;
 		
 		case OnSubredditSelectedListener.FLAG_LOAD_FINISHED:
 			if (thingContainer != null && !isVisible(FRAG_THING_LIST)) {
-				setNavigationListMode(sr);
+				setThingListNavigationMode(sr);
 				getSubredditListFragment().setSelectedSubreddit(sr);
-				selectSubreddit(sr, lastSelectedFilter, false);
+				selectSubreddit(sr, lastSelectedFilter);
 			}
 			break;
 		}		
 	}
 	
-	private void selectSubreddit(Subreddit sr, int filter, boolean addToBackStack) {
+	private void selectSubreddit(Subreddit sr, int filter) {
 		ControlFragment controlFrag = ControlFragment.newInstance(sr, null, -1, filter);
 		
 		if (singleContainer != null) {
+			manager.removeOnBackStackChangedListener(this);
+			manager.popBackStackImmediate(FRAG_THING_LIST, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			manager.addOnBackStackChangedListener(this);
+			
 			ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, filter, false);
 			
 			FragmentTransaction ft = manager.beginTransaction();
@@ -156,22 +160,18 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 		
 		if (thingContainer != null) {
+			manager.removeOnBackStackChangedListener(this);
+			manager.popBackStackImmediate();
+			manager.addOnBackStackChangedListener(this);
+			
+			setThingListNavigationMode(sr);
+			refreshContainers(null);
+			
 			ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, filter, true);
-			Fragment linkFrag = getLinkFragment();
-			Fragment commentFrag = getCommentFragment();
 			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
 			ft.replace(R.id.thing_list_container, thingListFrag, FRAG_THING_LIST);
-			if (linkFrag != null) {
-				ft.remove(linkFrag);
-			}
-			if (commentFrag != null) {
-				ft.remove(commentFrag);
-			}
-			if (addToBackStack) {
-				ft.addToBackStack(FRAG_THING_LIST);
-			}
 			ft.commit();
 		}
 	}
@@ -183,15 +183,22 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void selectThing(Thing thing, String tag, int position) {
 		ControlFragment controlFrag = ControlFragment.newInstance(getSubreddit(), thing, position, getFilter());
 		Fragment thingFrag;
+		String popTag;
 		if (FRAG_LINK.equalsIgnoreCase(tag)) {
 			thingFrag = LinkFragment.newInstance(thing);
+			popTag = FRAG_COMMENT;
 		} else if (FRAG_COMMENT.equalsIgnoreCase(tag)) {
 			thingFrag = CommentListFragment.newInstance(thing.getId());
+			popTag = FRAG_LINK;
 		} else {
 			throw new IllegalArgumentException(tag);
 		}
 		
 		if (singleContainer != null) {
+			manager.removeOnBackStackChangedListener(this);
+			manager.popBackStackImmediate(popTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			manager.addOnBackStackChangedListener(this);
+			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
 			ft.replace(R.id.single_container, thingFrag, tag);
@@ -200,6 +207,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 		
 		if (thingContainer != null) {
+			manager.removeOnBackStackChangedListener(this);
+			manager.popBackStackImmediate();
+			manager.addOnBackStackChangedListener(this);
+			
 			FragmentTransaction ft = manager.beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
 			ft.replace(R.id.thing_container, thingFrag, tag);
@@ -236,49 +247,49 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return (ThingListFragment) manager.findFragmentByTag(FRAG_THING_LIST);
 	}
 	
-	private Fragment getLinkFragment() {
-		return manager.findFragmentByTag(FRAG_LINK);
-	}
-	
-	private Fragment getCommentFragment() {
-		return manager.findFragmentByTag(FRAG_COMMENT);
-	}
-	
 	public void onBackStackChanged() {
 		refreshActionBar();
 		refreshCheckedItems();
-		refreshContainers();
+		refreshContainers(getThing());
 		invalidateOptionsMenu();
 	}
 	
 	private void refreshActionBar() {
 		Subreddit sr = getSubreddit();
-		Thing thing = getThing();
-		if (thing != null && !isVisible(FRAG_SUBREDDIT_LIST)) {
-			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-			bar.setDisplayShowTitleEnabled(true);
-			bar.setDisplayShowCustomEnabled(false);
-			bar.setTitle(thing.title);
+		Thing t = getThing();
+		if (t != null && !isVisible(FRAG_SUBREDDIT_LIST)) {
+			setThingNavigationMode(t);
 		} else if (sr != null) {
-			setNavigationListMode(sr);
+			setThingListNavigationMode(sr);
 		} else {
-			bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-			bar.setDisplayShowTitleEnabled(true);
-			bar.setDisplayShowCustomEnabled(false);
-			bar.setTitle(R.string.app_name);
+			setSubredditListNavigationMode();
 		}
 		
-		bar.setDisplayHomeAsUpEnabled(singleContainer != null && getSubreddit() != null || getThing() != null);
+		bar.setDisplayHomeAsUpEnabled(singleContainer != null && sr != null || t != null);
 		if (bar.getNavigationMode() == ActionBar.NAVIGATION_MODE_LIST) {
 			bar.setSelectedNavigationItem(getFilter());
 		}
 	}
 	
-	private void setNavigationListMode(Subreddit sr) {
+	private void setThingNavigationMode(Thing t) {
+		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		bar.setDisplayShowTitleEnabled(true);
+		bar.setDisplayShowCustomEnabled(false);
+		bar.setTitle(t.title);
+	}
+	
+	private void setThingListNavigationMode(Subreddit sr) {
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		bar.setDisplayShowTitleEnabled(false);
 		bar.setDisplayShowCustomEnabled(false);
 		filterSpinner.setSubreddit(sr.getTitle(this));
+	}
+	
+	private void setSubredditListNavigationMode() {
+		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		bar.setDisplayShowTitleEnabled(true);
+		bar.setDisplayShowCustomEnabled(false);
+		bar.setTitle(R.string.app_name);
 	}
 	
 	private void refreshCheckedItems() {
@@ -291,9 +302,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}
 	}
 	
-	private void refreshContainers() {
+	private void refreshContainers(Thing t) {
 		if (thingContainer != null) {
-			Thing t = getThing();
 			thingContainer.setVisibility(t != null ? View.VISIBLE : View.GONE);
 			if (navContainer != null) {
 				navContainer.setVisibility(t != null ? View.GONE : View.VISIBLE);
