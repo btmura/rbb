@@ -18,7 +18,7 @@ public class ThumbnailLoader {
 	
 	private static final String TAG = "ThumbnailLoader";
 
-	private static final BitmapCache BITMAP_CACHE = new BitmapCache(45);
+	private static final BitmapCache BITMAP_CACHE = new BitmapCache(2 * 1024 * 1024);
 
 	public void setThumbnail(ImageView v, String url) {
 		Bitmap b = BITMAP_CACHE.get(url);
@@ -52,6 +52,11 @@ public class ThumbnailLoader {
 	static class BitmapCache extends LruCache<String, Bitmap> {
 		BitmapCache(int size) {
 			super(size);
+		}
+		
+		@Override
+		protected int sizeOf(String key, Bitmap value) {
+			return value.getByteCount();
 		}
 	}
 	
