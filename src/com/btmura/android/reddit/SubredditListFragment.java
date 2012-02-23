@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class SubredditListFragment extends ListFragment implements LoaderCallbacks<Cursor>, MultiChoiceModeListener {
 	
@@ -111,6 +112,9 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 		case R.id.menu_delete_subreddits:
 			long[] ids = getListView().getCheckedItemIds();
 			Provider.deleteSubredditInBackground(getActivity(), ids);
+			Toast.makeText(getActivity().getApplicationContext(), 
+					getString(R.string.num_subreddits_deleted, ids.length), 
+					Toast.LENGTH_SHORT).show();
 			mode.finish();
 			return true;
 		}

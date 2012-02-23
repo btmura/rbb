@@ -18,7 +18,8 @@
     <string name="thumbnail">Thumbnail</string>
     <string name="sr_search">Search for subreddits</string>
     <string name="sr_search_instructions">Choose a subreddit from the left.</string>
-    <string name="sr_num_added">%d subreddits added.</string>
+    <string name="num_subreddits_added">%d subreddits added.</string>
+    <string name="num_subreddits_deleted">%d subreddits deleted.</string>
     <string name="menu_add_front_page">Add front page</string>
     <string name="menu_add_subreddit">Add subreddit</string>
     <string name="menu_add_subreddits">Add subreddits</string>

@@ -118,7 +118,7 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 		}
 		
 		Provider.addSubredditsInBackground(getApplicationContext(), values);
-		Toast.makeText(getApplicationContext(), getString(R.string.sr_num_added, infos.size()), 
+		Toast.makeText(getApplicationContext(), getString(R.string.num_subreddits_added, infos.size()), 
 				Toast.LENGTH_SHORT).show();
 	}
 	
@@ -172,7 +172,7 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 		values[0].put(Subreddits.COLUMN_NAME, "");
 		
 		Provider.addSubredditsInBackground(getApplicationContext(), values);
-		Toast.makeText(getApplicationContext(), getString(R.string.sr_num_added, 1), 
+		Toast.makeText(getApplicationContext(), getString(R.string.num_subreddits_added, 1), 
 				Toast.LENGTH_SHORT).show();
 	}
 	
