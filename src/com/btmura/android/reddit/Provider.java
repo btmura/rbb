@@ -1,21 +1,31 @@
 package com.btmura.android.reddit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentProvider;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.RemoteException;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 public class Provider extends ContentProvider {
 
 	static final String AUTHORITY = "com.btmura.android.reddit.provider";
+
+	private static final String TAG = "Provider";
 	
 	private static final UriMatcher MATCHER = new UriMatcher(0);
 	private static final int MATCH_ALL_SUBREDDITS = 1;
@@ -138,6 +148,58 @@ public class Provider extends ContentProvider {
 				return null;
 			}
 		}.execute();		
+	}
+	
+	public static void combineSubredditsInBackground(final Context context, final List<String> names, final long[] ids) {
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				int size = names.size();
+				StringBuilder combined = new StringBuilder();
+				for (int i = 0; i < size; i++) {
+					combined.append(names.get(i));
+					if (i + 1 < size) {
+						combined.append("+");
+					}
+				}
+				
+				ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(ids.length + 1);
+				ops.add(ContentProviderOperation
+						.newInsert(Subreddits.CONTENT_URI)
+						.withValue(Subreddits.COLUMN_NAME, combined.toString())
+						.build());
+				
+				size = ids.length;
+				for (int i = 0; i < size; i++) {
+					ops.add(ContentProviderOperation
+							.newDelete(ContentUris.withAppendedId(Subreddits.CONTENT_URI, ids[i]))
+							.build());
+				}
+								
+				ContentResolver cr = context.getContentResolver();
+				try {
+					cr.applyBatch(Provider.AUTHORITY, ops);
+				} catch (RemoteException e) {
+					Log.e(TAG, "combineSubredditsInBackground", e);
+				} catch (OperationApplicationException e) {
+					Log.e(TAG, "combineSubredditsInBackground", e);
+				}
+				return null;
+			}
+		}.execute();
+	}
+	
+	@Override
+	public ContentProviderResult[] applyBatch(ArrayList<ContentProviderOperation> operations) throws OperationApplicationException {
+		SQLiteDatabase db = helper.getWritableDatabase();
+		db.beginTransaction();
+		try {
+			ContentProviderResult[] results = super.applyBatch(operations);		
+			db.setTransactionSuccessful();
+			return results;
+		} finally {
+			db.endTransaction();
+		}
 	}
 	
 	static class DbHelper extends SQLiteOpenHelper {

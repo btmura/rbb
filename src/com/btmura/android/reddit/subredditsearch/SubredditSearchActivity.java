@@ -128,13 +128,12 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 		getMenuInflater().inflate(R.menu.subreddit_search, menu);
 		return true;
 	}
-	
-	
+		
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 		DetailsFragment f = getDetailsFragment();
-		menu.findItem(R.id.menu_add_subreddit).setVisible(f != null && f.getSubredditInfo() != null);
+		menu.findItem(R.id.menu_add).setVisible(f != null && f.getSubredditInfo() != null);
 		return true;
 	}
 	

@@ -2,12 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_add_subreddits"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/menu_add_subreddits"/>
+        android:id="@+id/menu_combine"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_combine"/>
     <item
-        android:id="@+id/menu_delete_subreddits"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/menu_delete_subreddits"/>
+        android:id="@+id/menu_add"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_add"/>
+    <item
+        android:id="@+id/menu_delete"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_delete"/>
 
 </menu>

@@ -1,11 +1,14 @@
 package com.btmura.android.reddit;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -77,7 +80,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 		if (data.getCount() > 0) {
 			getListView().post(new Runnable() {
 				public void run() {
-					Subreddit sr = adapter.getSubreddit(getActivity(), 0);
+					Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), 0));
 					listener.onSubredditSelected(sr, OnSubredditSelectedListener.FLAG_LOAD_FINISHED);
 				}
 			});
@@ -91,7 +94,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		Subreddit sr = adapter.getSubreddit(getActivity(), position);
+		Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), position));
 		adapter.setSelectedSubreddit(sr);
 		listener.onSubredditSelected(sr, OnSubredditSelectedListener.FLAG_ITEM_CLICKED);
 	}
@@ -99,29 +102,69 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 		MenuInflater inflater = mode.getMenuInflater();
 		inflater.inflate(R.menu.subreddit, menu);
-		menu.findItem(R.id.menu_add_subreddits).setVisible(false);
+		menu.findItem(R.id.menu_add).setVisible(false);
 		return true;
 	}
 	
 	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-		return false;
+		menu.findItem(R.id.menu_combine).setVisible(getListView().getCheckedItemCount() > 1);
+		return true;
 	}
 	
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_delete_subreddits:
-			long[] ids = getListView().getCheckedItemIds();
-			Provider.deleteSubredditInBackground(getActivity(), ids);
-			Toast.makeText(getActivity().getApplicationContext(), 
-					getString(R.string.num_subreddits_deleted, ids.length), 
-					Toast.LENGTH_SHORT).show();
-			mode.finish();
+		case R.id.menu_combine:
+			handleCombined(mode);
+			return true;
+			
+		case R.id.menu_delete:
+			handleDelete(mode);
 			return true;
 		}
 		return false;
 	}
 	
+	private void handleCombined(ActionMode mode) {
+		ArrayList<String> names = new ArrayList<String>();
+		SparseBooleanArray checked = getListView().getCheckedItemPositions();
+		int count = adapter.getCount();
+		for (int i = 0; i < count; i++) {
+			if (checked.get(i)) {
+				String name = adapter.getName(getActivity(), i);
+				if (!name.isEmpty()) {
+					names.add(name);
+				}
+			}
+		}
+		
+		if (names.size() <= 1) {
+			Toast.makeText(getActivity().getApplicationContext(), 
+					getString(R.string.num_subreddits_added, 0), 
+					Toast.LENGTH_SHORT).show();
+			mode.finish();
+			return;
+		}
+	
+		long[] ids = getListView().getCheckedItemIds();
+		
+		Provider.combineSubredditsInBackground(getActivity(), names, ids);
+		Toast.makeText(getActivity().getApplicationContext(), 
+				getString(R.string.num_subreddits_added, 1), 
+				Toast.LENGTH_SHORT).show();
+		mode.finish();
+	}
+	
+	private void handleDelete(ActionMode mode) {
+		long[] ids = getListView().getCheckedItemIds();
+		Provider.deleteSubredditInBackground(getActivity(), ids);
+		Toast.makeText(getActivity().getApplicationContext(), 
+				getString(R.string.num_subreddits_deleted, ids.length), 
+				Toast.LENGTH_SHORT).show();
+		mode.finish();
+	}
+	
 	public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+		mode.invalidate();
 	}
 	
 	public void onDestroyActionMode(ActionMode mode) {

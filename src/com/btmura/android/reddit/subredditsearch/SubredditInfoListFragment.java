@@ -17,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.R;
 
 public class SubredditInfoListFragment extends ListFragment implements MultiChoiceModeListener, LoaderCallbacks<List<SubredditInfo>> {
@@ -94,25 +96,29 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 		MenuInflater inflater = mode.getMenuInflater();
 		inflater.inflate(R.menu.subreddit, menu);
-		menu.findItem(R.id.menu_delete_subreddits).setVisible(false);
+		menu.findItem(R.id.menu_delete).setVisible(false);
 		return true;
 	}
 	
 	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-		return false;
+		menu.findItem(R.id.menu_combine).setVisible(getListView().getCheckedItemCount() > 1);
+		return true;
 	}
 	
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_add_subreddits:
-			handleAddSubreddits();
-			mode.finish();
+		case R.id.menu_add:
+			handleAdd(mode);
+			return true;
+			
+		case R.id.menu_combine:
+			handleCombine(mode);
 			return true;
 		}
 		return false;
 	}
 	
-	private void handleAddSubreddits() {
+	private void handleAdd(ActionMode mode) {
 		final SparseBooleanArray positions = getListView().getCheckedItemPositions();
 		List<SubredditInfo> added = new ArrayList<SubredditInfo>(positions.size());
 		int count = adapter.getCount();
@@ -122,6 +128,27 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 			}
 		}
 		getListener().onSelected(added, -1, OnSelectedListener.EVENT_ACTION_ITEM_CLICKED);
+		mode.finish();
+	}
+	
+	private void handleCombine(ActionMode mode) {
+		ArrayList<String> names = new ArrayList<String>();
+		SparseBooleanArray checked = getListView().getCheckedItemPositions();
+		int count = adapter.getCount();
+		for (int i = 0; i < count; i++) {
+			if (checked.get(i)) {
+				String name = adapter.getItem(i).displayName;
+				if (!name.isEmpty()) {
+					names.add(name);
+				}
+			}
+		}
+	
+		Provider.combineSubredditsInBackground(getActivity(), names, new long[0]);
+		Toast.makeText(getActivity().getApplicationContext(), 
+				getString(R.string.num_subreddits_added, 1), 
+				Toast.LENGTH_SHORT).show();
+		mode.finish();
 	}
 	
 	@Override
@@ -142,6 +169,7 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 	}
 	
 	public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+		mode.invalidate();
 	}
 	
 	public void onDestroyActionMode(ActionMode mode) {

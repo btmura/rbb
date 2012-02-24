@@ -42,7 +42,7 @@ public class DetailsFragment extends ListFragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_add_subreddit:
+		case R.id.menu_add:
 			handleAddSubreddit();
 			return true;
 			

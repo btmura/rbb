@@ -21,11 +21,11 @@
     <string name="num_subreddits_added">%d subreddits added.</string>
     <string name="num_subreddits_deleted">%d subreddits deleted.</string>
     <string name="menu_add_front_page">Add front page</string>
-    <string name="menu_add_subreddit">Add subreddit</string>
-    <string name="menu_add_subreddits">Add subreddits</string>
+    <string name="menu_combine">Combine</string>
+    <string name="menu_add">Add</string>
     <string name="menu_comments">View comments</string>
     <string name="menu_copy_url">Copy url</string>
-    <string name="menu_delete_subreddits">Delete subreddits</string>
+    <string name="menu_delete">Delete</string>
     <string name="menu_link">View link</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_search_for_subreddits">Search for subreddits</string>
