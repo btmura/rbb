@@ -31,7 +31,6 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 	
 	private static final String STATE_QUERY = "q";
 	
-	private FragmentManager manager;
 	private SearchView sv;
 	private View singleContainer;
 
@@ -42,7 +41,7 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.add_subreddits);
 	
-		manager = getFragmentManager();
+		FragmentManager manager = getFragmentManager();
 		manager.addOnBackStackChangedListener(this);
 		
 		bar = getActionBar();
@@ -73,7 +72,7 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 	
 	private void submitQuery(String query, boolean addToBackStack) {
 		sv.clearFocus();
-		FragmentTransaction ft = manager.beginTransaction();
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		if (singleContainer != null) {
 			ft.replace(R.id.single_container, SubredditInfoListFragment.newInstance(query, false), FRAG_SUBREDDITS);
 		} else {
@@ -102,7 +101,7 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 	}
 
 	private void handleListItemClicked(List<SubredditInfo> infos, int position) {
-		FragmentTransaction ft = manager.beginTransaction();
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		int containerId = singleContainer != null ? R.id.single_container : R.id.details_container; 
 		ft.replace(containerId, DetailsFragment.newInstance(infos.get(0), position), FRAG_DETAILS);
 		ft.addToBackStack(null);
@@ -156,7 +155,7 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 	private void handleHome() {
 		if (singleContainer != null) {
 			if (getDetailsFragment() != null) {
-				manager.popBackStack();
+				getFragmentManager().popBackStack();
 			} else {
 				finish();
 			}
@@ -219,11 +218,11 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 	}
 	
 	private SubredditInfoListFragment getSubredditListFragment() {
-		return (SubredditInfoListFragment) manager.findFragmentByTag(FRAG_SUBREDDITS);
+		return (SubredditInfoListFragment) getFragmentManager().findFragmentByTag(FRAG_SUBREDDITS);
 	}
 	
 	private DetailsFragment getDetailsFragment() {
-		return (DetailsFragment) manager.findFragmentByTag(FRAG_DETAILS);
+		return (DetailsFragment) getFragmentManager().findFragmentByTag(FRAG_DETAILS);
 	}
 	
 	public boolean onQueryTextChange(String newText) {

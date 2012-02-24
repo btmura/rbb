@@ -38,7 +38,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
 	private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
 
-	private FragmentManager manager;
 	private ActionBar bar;
 	private SearchView searchView;
 	private FilterAdapter filterSpinner;
@@ -55,8 +54,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        manager = getFragmentManager();
-        manager.addOnBackStackChangedListener(this);
+        getFragmentManager().addOnBackStackChangedListener(this);
 
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
@@ -84,7 +82,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			ControlFragment controlFrag = ControlFragment.newInstance(null, null, -1, 0);	
 			SubredditListFragment srFrag = SubredditListFragment.newInstance(false);
 			
-			FragmentTransaction ft = manager.beginTransaction();
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
 			ft.replace(R.id.single_container, srFrag, FRAG_SUBREDDIT_LIST);
 			ft.commit();
@@ -95,7 +93,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			ControlFragment controlFrag = ControlFragment.newInstance(null, null, -1, 0);
 			SubredditListFragment srFrag = SubredditListFragment.newInstance(true);
 			
-			FragmentTransaction ft = manager.beginTransaction();
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.add(controlFrag, FRAG_CONTROL);
 			ft.replace(R.id.subreddit_list_container, srFrag, FRAG_SUBREDDIT_LIST);
 			ft.commit();
@@ -144,6 +142,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private void selectSubreddit(Subreddit sr, int filter) {
 		ControlFragment controlFrag = ControlFragment.newInstance(sr, null, -1, filter);
+		
+		FragmentManager manager = getFragmentManager();
 		
 		if (singleContainer != null) {
 			manager.removeOnBackStackChangedListener(this);
@@ -194,6 +194,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			throw new IllegalArgumentException(tag);
 		}
 		
+		FragmentManager manager = getFragmentManager();
+		
 		if (singleContainer != null) {
 			manager.removeOnBackStackChangedListener(this);
 			manager.popBackStackImmediate(popTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -236,15 +238,15 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private ControlFragment getControlFragment() {
-		return (ControlFragment) manager.findFragmentByTag(FRAG_CONTROL);
+		return (ControlFragment) getFragmentManager().findFragmentByTag(FRAG_CONTROL);
 	}
 	
 	private SubredditListFragment getSubredditListFragment() {
-		return (SubredditListFragment) manager.findFragmentByTag(FRAG_SUBREDDIT_LIST);
+		return (SubredditListFragment) getFragmentManager().findFragmentByTag(FRAG_SUBREDDIT_LIST);
 	}
 	
 	private ThingListFragment getThingListFragment() {
-		return (ThingListFragment) manager.findFragmentByTag(FRAG_THING_LIST);
+		return (ThingListFragment) getFragmentManager().findFragmentByTag(FRAG_THING_LIST);
 	}
 	
 	public void onBackStackChanged() {
@@ -337,7 +339,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private boolean isVisible(String tag) {
-		Fragment f = manager.findFragmentByTag(tag);
+		Fragment f = getFragmentManager().findFragmentByTag(tag);
 		return f != null && f.isAdded();
 	}
 		
@@ -410,6 +412,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void handleHome() {
+		FragmentManager manager = getFragmentManager();
 		int count = manager.getBackStackEntryCount();
 		if (count > 0) {
 			String tag = manager.getBackStackEntryAt(count - 1).getName();
