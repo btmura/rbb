@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:columnCount="2"
+    android:minHeight="90dp"
     android:padding="10dp" >
 
     <ViewStub
@@ -16,14 +17,14 @@
         android:id="@+id/title"
         style="@android:style/TextAppearance.Holo.Medium"
         android:layout_width="0dp"
-        android:layout_gravity="fill_horizontal"
+        android:layout_gravity="fill_horizontal|top"
         android:paddingBottom="10dp" />
 
     <TextView
         android:id="@+id/status"
         style="@android:style/TextAppearance.Holo.Small"
         android:layout_width="0dp"
-        android:layout_gravity="fill_horizontal"
+        android:layout_gravity="fill_horizontal|bottom"
         android:singleLine="true" />
 
 </GridLayout>
