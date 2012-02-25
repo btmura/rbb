@@ -96,6 +96,7 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 		MenuInflater inflater = mode.getMenuInflater();
 		inflater.inflate(R.menu.subreddit, menu);
+		menu.findItem(R.id.menu_split).setVisible(false);
 		menu.findItem(R.id.menu_delete).setVisible(false);
 		return true;
 	}

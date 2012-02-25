@@ -30,6 +30,7 @@
     <string name="menu_refresh">Refresh</string>
     <string name="menu_search_for_subreddits">Search for subreddits</string>
     <string name="menu_share">Share</string>
+    <string name="menu_split">Split</string>
     <string name="menu_view">View in another app</string>
 
 </resources>

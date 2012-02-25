@@ -2,13 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_combine"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_combine"/>
-    <item
         android:id="@+id/menu_add"
         android:showAsAction="ifRoom"
         android:title="@string/menu_add"/>
+    <item
+        android:id="@+id/menu_combine"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_combine"/>
+        <item
+        android:id="@+id/menu_split"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_split"/>
     <item
         android:id="@+id/menu_delete"
         android:showAsAction="ifRoom"

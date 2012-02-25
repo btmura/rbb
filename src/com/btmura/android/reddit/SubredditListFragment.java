@@ -99,22 +99,36 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 		listener.onSubredditSelected(sr, OnSubredditSelectedListener.FLAG_ITEM_CLICKED);
 	}
 	
+	class CheckedInfo {
+		int checkedCount;
+		int numSplittable;
+	}
+	
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 		MenuInflater inflater = mode.getMenuInflater();
 		inflater.inflate(R.menu.subreddit, menu);
 		menu.findItem(R.id.menu_add).setVisible(false);
+		if (mode.getTag() == null) {
+			mode.setTag(new CheckedInfo());
+		}
 		return true;
 	}
 	
 	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-		menu.findItem(R.id.menu_combine).setVisible(getListView().getCheckedItemCount() > 1);
+		CheckedInfo info = (CheckedInfo) mode.getTag();
+		menu.findItem(R.id.menu_combine).setVisible(info.checkedCount > 1);
+		menu.findItem(R.id.menu_split).setVisible(info.checkedCount == 1 && info.numSplittable > 0);	
 		return true;
 	}
-	
+		
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_combine:
 			handleCombined(mode);
+			return true;
+			
+		case R.id.menu_split:
+			handleSplit(mode);
 			return true;
 			
 		case R.id.menu_delete:
@@ -125,19 +139,9 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	}
 	
 	private void handleCombined(ActionMode mode) {
-		ArrayList<String> names = new ArrayList<String>();
-		SparseBooleanArray checked = getListView().getCheckedItemPositions();
-		int count = adapter.getCount();
-		for (int i = 0; i < count; i++) {
-			if (checked.get(i)) {
-				String name = adapter.getName(getActivity(), i);
-				if (!name.isEmpty()) {
-					names.add(name);
-				}
-			}
-		}
-		
-		if (names.size() <= 1) {
+		ArrayList<String> names = getCheckedNames();
+		int size = names.size();
+		if (size <= 1) {
 			Toast.makeText(getActivity().getApplicationContext(), 
 					getString(R.string.num_subreddits_added, 0), 
 					Toast.LENGTH_SHORT).show();
@@ -148,22 +152,31 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 		long[] ids = getListView().getCheckedItemIds();
 		
 		Provider.combineSubredditsInBackground(getActivity(), names, ids);
-		Toast.makeText(getActivity().getApplicationContext(), 
-				getString(R.string.num_subreddits_added, 1), 
-				Toast.LENGTH_SHORT).show();
+		showToast(size - 1, false);
+		mode.finish();
+	}
+	
+	private void handleSplit(ActionMode mode) {
+		ArrayList<String> names = getCheckedNames();
+		long[] ids = getListView().getCheckedItemIds();
+		Provider.splitSubredditInBackground(getActivity(), names.get(0), ids[0]);
+		showToast(1, false);
 		mode.finish();
 	}
 	
 	private void handleDelete(ActionMode mode) {
 		long[] ids = getListView().getCheckedItemIds();
 		Provider.deleteSubredditInBackground(getActivity(), ids);
-		Toast.makeText(getActivity().getApplicationContext(), 
-				getString(R.string.num_subreddits_deleted, ids.length), 
-				Toast.LENGTH_SHORT).show();
+		showToast(ids.length, false);
 		mode.finish();
 	}
 	
 	public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+		CheckedInfo info = (CheckedInfo) mode.getTag();
+		info.checkedCount = getListView().getCheckedItemCount();		
+		if (adapter.getName(getActivity(), position).indexOf('+') != -1) {
+			info.numSplittable = info.numSplittable + (checked ? 1 : -1);
+		}
 		mode.invalidate();
 	}
 	
@@ -173,5 +186,27 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 	public void setSelectedSubreddit(Subreddit subreddit) {
 		adapter.setSelectedSubreddit(subreddit);
 		adapter.notifyDataSetChanged();
+	}
+	
+	private ArrayList<String> getCheckedNames() {
+		int checkedCount = getListView().getCheckedItemCount();
+		SparseBooleanArray checked = getListView().getCheckedItemPositions();
+		ArrayList<String> names = new ArrayList<String>(checkedCount);
+		int count = adapter.getCount();
+		for (int i = 0; i < count; i++) {
+			if (checked.get(i)) {
+				String name = adapter.getName(getActivity(), i);
+				if (!name.isEmpty()) {
+					names.add(name);
+				}
+			}
+		}
+		return names;
+	}
+	
+	private void showToast(int count, boolean added) {
+		Toast.makeText(getActivity().getApplicationContext(), 
+				getString(added ? R.string.num_subreddits_added : R.string.num_subreddits_deleted, count), 
+				Toast.LENGTH_SHORT).show();
 	}
 }

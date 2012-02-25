@@ -189,6 +189,39 @@ public class Provider extends ContentProvider {
 		}.execute();
 	}
 	
+	public static void splitSubredditInBackground(final Context context, final String name, final long id) {
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				String[] parts = name.split("\\+");
+				int numParts = parts.length;
+				
+				ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(numParts + 1);
+				for (int i = 0; i < numParts; i++) {
+					ops.add(ContentProviderOperation
+							.newInsert(Subreddits.CONTENT_URI)
+							.withValue(Subreddits.COLUMN_NAME, parts[i])
+							.build());
+				}
+				
+				ops.add(ContentProviderOperation
+						.newDelete(ContentUris.withAppendedId(Subreddits.CONTENT_URI, id))
+						.build());
+				
+				ContentResolver cr = context.getContentResolver();
+				try {
+					cr.applyBatch(Provider.AUTHORITY, ops);
+				} catch (RemoteException e) {
+					Log.e(TAG, "splitSubredditInBackground", e);
+				} catch (OperationApplicationException e) {
+					Log.e(TAG, "splitSubredditInBackground", e);
+				}
+				
+				return null;
+			}
+		}.execute();
+	}
+	
 	@Override
 	public ContentProviderResult[] applyBatch(ArrayList<ContentProviderOperation> operations) throws OperationApplicationException {
 		SQLiteDatabase db = helper.getWritableDatabase();
