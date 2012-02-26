@@ -317,7 +317,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.main, menu);
-		shareProvider = (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();
+		shareProvider = (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();		
 		return true;
 	}
 	
