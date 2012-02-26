@@ -8,18 +8,23 @@ public class FormatterTest extends AndroidTestCase {
 	
 	public void testFormatNamedLinks() {
 		SpannableStringBuilder b = formatNamedLinks("[Link](/abc) is here");
-		assertEquals("Link is here", b.toString());
+		assertEquals(b.toString(), "Link is here", b.toString());
 		assertUrlSpan(b, 0, 4, "http://www.reddit.com/abc");
 	}
 	
 	public void testFormatNamedLinks_nestedParens() {
 		SpannableStringBuilder b = formatNamedLinks("Here is a [link](/abc (123) (456)).");
-		assertEquals("Here is a link.", b.toString());
+		assertEquals(b.toString(), "Here is a link.", b.toString());
+	}
+	
+	public void testFormatNamedLinks_multipleLinks() {
+		SpannableStringBuilder b = formatNamedLinks("[Link 1](/a (123)) and [Link 2](/b (456))");
+		assertEquals(b.toString(), "Link 1 and Link 2", b.toString());
 	}
 	
 	public void testFormatNamedLinks_nestedParensMultipleLines() {
 		SpannableStringBuilder b = formatNamedLinks("[Link 1](/a (123))\n[Link 2](/b (456))");
-		assertEquals("Link 1\nLink 2", b.toString());
+		assertEquals(b.toString(), "Link 1\nLink 2", b.toString());
 	}
 	
 	private SpannableStringBuilder formatNamedLinks(String text) {
