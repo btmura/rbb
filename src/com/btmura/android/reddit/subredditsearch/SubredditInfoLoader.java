@@ -16,8 +16,8 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.common.Formatter;
-import com.btmura.android.reddit.common.JsonParser;
+import com.btmura.android.reddit.data.Formatter;
+import com.btmura.android.reddit.data.JsonParser;
 
 class SubredditInfoLoader extends AsyncTaskLoader<List<SubredditInfo>> {
 	

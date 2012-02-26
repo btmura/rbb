@@ -1,4 +1,4 @@
-package com.btmura.android.reddit.common;
+package com.btmura.android.reddit.data;
 
 import java.io.IOException;
 

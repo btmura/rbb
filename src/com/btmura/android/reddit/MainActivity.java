@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.common.Formatter;
+import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.subredditsearch.SubredditSearchActivity;
 
 public class MainActivity extends Activity implements OnBackStackChangedListener, OnNavigationListener, 

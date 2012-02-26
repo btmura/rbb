@@ -14,8 +14,8 @@ import android.content.Context;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.common.Formatter;
-import com.btmura.android.reddit.common.JsonParser;
+import com.btmura.android.reddit.data.Formatter;
+import com.btmura.android.reddit.data.JsonParser;
 
 public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
 

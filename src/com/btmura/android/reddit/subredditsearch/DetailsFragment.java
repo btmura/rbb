@@ -13,7 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.common.Formatter;
+import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.subredditsearch.SubredditInfoListFragment.OnSelectedListener;
 
 public class DetailsFragment extends ListFragment {

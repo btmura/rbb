@@ -1,4 +1,4 @@
-package com.btmura.android.reddit.common;
+package com.btmura.android.reddit.data;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +12,7 @@ import android.text.style.URLSpan;
 
 public class Formatter {
 	private static Pattern BOLD_PATTERN = Pattern.compile("\\*\\*(.+?)\\*\\*");
+	private static Pattern BOLD2_PATTERN = Pattern.compile("###(.+?)###");
 	private static Pattern ITALIC_PATTERN = Pattern.compile("\\*(.+?)\\*");
 	private static Pattern STRIKE_THROUGH_PATTERN = Pattern.compile("~~(.+?)~~");
 	private static Pattern ESCAPED_PATTERN = Pattern.compile("&([A-Za-z]+?);");
@@ -47,6 +48,15 @@ public class Formatter {
 			}
 			MATCHER.reset(b);
 			formatBold(b, MATCHER);
+		}
+		
+		if (text.indexOf("###") != -1) {
+			MATCHER.usePattern(BOLD2_PATTERN);
+			if (b == null) {
+				b = new SpannableStringBuilder(text);
+			}
+			MATCHER.reset(b);
+			formatBold2(b, MATCHER);
 		}
 		
 		if (text.indexOf("*") != -1) {
@@ -108,6 +118,10 @@ public class Formatter {
 	
 	private static void formatBold(SpannableStringBuilder b, Matcher m) {
 		replaceWithSpan(b, m, 4, SPAN_BOLD);
+	}
+	
+	private static void formatBold2(SpannableStringBuilder b, Matcher m) {
+		replaceWithSpan(b, m, 6, SPAN_BOLD);
 	}
 	
 	private static void formatItalic(SpannableStringBuilder b, Matcher m) {
@@ -191,6 +205,11 @@ public class Formatter {
 			String url = m.group(3);
 			b.replace(s, e, name);
 			deleted += 4 + spacing.length() + url.length();
+			
+			int space = url.indexOf(" ");
+			if (space != -1) {
+				url = url.substring(0, space);
+			}
 			
 			if (url.startsWith("/r/")) {
 				url = "http://www.reddit.com" + url;
