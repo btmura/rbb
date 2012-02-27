@@ -10,6 +10,7 @@ import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.content.ClipboardManager;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.widget.SearchView.OnQueryTextListener;
 import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
+import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.data.Formatter;
@@ -342,6 +344,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.main, menu);
+		menu.findItem(R.id.menu_add).setVisible(intentSubreddit != null);
+		menu.findItem(R.id.menu_search_for_subreddits).setVisible(intentSubreddit == null);
 		shareProvider = (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();		
 		return true;
 	}
@@ -375,6 +379,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			handleHome();
 			return true;
 			
+		case R.id.menu_add:
+			handleAdd();
+			return true;
+			
 		case R.id.menu_search_for_subreddits:
 			handleSearchForSubreddits();
 			return true;
@@ -396,6 +404,12 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			return true;
 		}
 		return false;
+	}
+	
+	private void handleAdd() {
+		ContentValues values = new ContentValues(1);
+		values.put(Subreddits.COLUMN_NAME, intentSubreddit.name);
+		Provider.addSubredditInBackground(getApplicationContext(), values);
 	}
 	
 	private void handleSearchForSubreddits() {

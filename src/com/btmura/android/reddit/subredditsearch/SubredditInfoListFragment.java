@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.R;
@@ -146,9 +145,6 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
 		}
 	
 		Provider.combineSubredditsInBackground(getActivity(), names, new long[0]);
-		Toast.makeText(getActivity().getApplicationContext(), 
-				getString(R.string.num_subreddits_added, 1), 
-				Toast.LENGTH_SHORT).show();
 		mode.finish();
 	}
 	

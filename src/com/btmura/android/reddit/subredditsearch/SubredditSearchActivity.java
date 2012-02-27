@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
-import android.widget.Toast;
 
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
@@ -115,10 +114,7 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 			values[i] = new ContentValues(1);
 			values[i].put(Subreddits.COLUMN_NAME, infos.get(i).displayName);
 		}
-		
-		Provider.addSubredditsInBackground(getApplicationContext(), values);
-		Toast.makeText(getApplicationContext(), getString(R.string.num_subreddits_added, infos.size()), 
-				Toast.LENGTH_SHORT).show();
+		Provider.addMultipleSubredditsInBackground(getApplicationContext(), values);
 	}
 	
 	@Override
@@ -167,13 +163,9 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 	}
 	
 	private void handleAddFrontPage() {
-		ContentValues[] values = new ContentValues[1];
-		values[0] = new ContentValues(1);
-		values[0].put(Subreddits.COLUMN_NAME, "");
-		
-		Provider.addSubredditsInBackground(getApplicationContext(), values);
-		Toast.makeText(getApplicationContext(), getString(R.string.num_subreddits_added, 1), 
-				Toast.LENGTH_SHORT).show();
+		ContentValues values = new ContentValues(1);
+		values.put(Subreddits.COLUMN_NAME, "");
+		Provider.addSubredditInBackground(getApplicationContext(), values);
 	}
 	
 	public void onBackStackChanged() {

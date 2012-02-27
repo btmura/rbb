@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.provider.BaseColumns;
 import android.util.Log;
+import android.widget.Toast;
 
 public class Provider extends ContentProvider {
 
@@ -119,13 +120,34 @@ public class Provider extends ContentProvider {
 		return null;
 	}
 	
-	public static void addSubredditsInBackground(final Context context, final ContentValues[] values) {
+	public static void addSubredditInBackground(final Context context, final ContentValues values) {
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				ContentResolver cr = context.getContentResolver();
+				cr.insert(Subreddits.CONTENT_URI, values);
+				return null;
+			}
+			
+			@Override
+			protected void onPostExecute(Void result) {
+				showChangeToast(context, 1, true);
+			}
+		}.execute();
+	}
+	
+	public static void addMultipleSubredditsInBackground(final Context context, final ContentValues[] values) {
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
 				ContentResolver cr = context.getContentResolver();
 				cr.bulkInsert(Subreddits.CONTENT_URI, values);
 				return null;
+			}
+			
+			@Override
+			protected void onPostExecute(Void result) {
+				showChangeToast(context, values.length, true);
 			}
 		}.execute();
 	}
@@ -147,8 +169,19 @@ public class Provider extends ContentProvider {
 				cr.delete(Subreddits.CONTENT_URI, s.toString(), null);
 				return null;
 			}
+			
+			@Override
+			protected void onPostExecute(Void result) {
+				showChangeToast(context, ids.length, false);
+			}
 		}.execute();		
 	}
+	
+	private static void showChangeToast(Context context, int count, boolean added) {
+		Toast.makeText(context, 
+				context.getString(added ? R.string.num_subreddits_added : R.string.num_subreddits_deleted, count), 
+				Toast.LENGTH_SHORT).show();
+	}	
 	
 	public static void combineSubredditsInBackground(final Context context, final List<String> names, final long[] ids) {
 		new AsyncTask<Void, Void, Void>() {

@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class SubredditListFragment extends ListFragment implements LoaderCallbacks<Cursor>, MultiChoiceModeListener {
 	
@@ -142,32 +141,26 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 		ArrayList<String> names = getCheckedNames();
 		int size = names.size();
 		if (size <= 1) {
-			Toast.makeText(getActivity().getApplicationContext(), 
-					getString(R.string.num_subreddits_added, 0), 
-					Toast.LENGTH_SHORT).show();
 			mode.finish();
 			return;
 		}
 	
 		long[] ids = getListView().getCheckedItemIds();
 		
-		Provider.combineSubredditsInBackground(getActivity(), names, ids);
-		showToast(size - 1, false);
+		Provider.combineSubredditsInBackground(getActivity().getApplicationContext(), names, ids);
 		mode.finish();
 	}
 	
 	private void handleSplit(ActionMode mode) {
 		ArrayList<String> names = getCheckedNames();
 		long[] ids = getListView().getCheckedItemIds();
-		Provider.splitSubredditInBackground(getActivity(), names.get(0), ids[0]);
-		showToast(1, false);
+		Provider.splitSubredditInBackground(getActivity().getApplicationContext(), names.get(0), ids[0]);
 		mode.finish();
 	}
 	
 	private void handleDelete(ActionMode mode) {
 		long[] ids = getListView().getCheckedItemIds();
-		Provider.deleteSubredditInBackground(getActivity(), ids);
-		showToast(ids.length, false);
+		Provider.deleteSubredditInBackground(getActivity().getApplicationContext(), ids);
 		mode.finish();
 	}
 	
@@ -202,11 +195,5 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 			}
 		}
 		return names;
-	}
-	
-	private void showToast(int count, boolean added) {
-		Toast.makeText(getActivity().getApplicationContext(), 
-				getString(added ? R.string.num_subreddits_added : R.string.num_subreddits_deleted, count), 
-				Toast.LENGTH_SHORT).show();
 	}
 }
