@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:baselineAligned="false" >
+  >
 
     <RelativeLayout
         android:id="@+id/nav_container"
@@ -20,6 +20,7 @@
             android:layout_width="2dp"
             android:layout_height="match_parent"
             android:layout_toRightOf="@+id/subreddit_list_container"
+            android:layout_alignWithParentIfMissing="true"
             android:background="@android:color/darker_gray" />
 
         <FrameLayout
@@ -33,6 +34,7 @@
     <FrameLayout
         android:id="@+id/thing_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 </FrameLayout>
