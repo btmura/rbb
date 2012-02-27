@@ -357,8 +357,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		menu.findItem(R.id.menu_comments).setVisible(hasThing && !isSelf && isVisible(FRAG_LINK));
 		menu.findItem(R.id.menu_share).setVisible(hasThing);
 		menu.findItem(R.id.menu_copy_url).setVisible(hasThing);
-		menu.findItem(R.id.menu_view).setVisible(hasThing);		
-		menu.findItem(R.id.menu_search_for_subreddits).setVisible(singleContainer == null || isVisible(FRAG_SUBREDDIT_LIST));
+		menu.findItem(R.id.menu_view).setVisible(hasThing);
 		updateShareActionIntent(thing);		
 		return true;
 	}
