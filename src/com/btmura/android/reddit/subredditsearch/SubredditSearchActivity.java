@@ -132,7 +132,9 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 		DetailsFragment f = getDetailsFragment();
-		menu.findItem(R.id.menu_add).setVisible(f != null && f.getSubredditInfo() != null);
+		boolean showDetails = f != null && f.getSubredditInfo() != null;
+		menu.findItem(R.id.menu_add).setVisible(showDetails);
+		menu.findItem(R.id.menu_view).setVisible(showDetails);
 		return true;
 	}
 	

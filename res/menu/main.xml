@@ -21,7 +21,7 @@
         android:title="@string/menu_copy_url"/>
     <item
         android:id="@+id/menu_view"
-        android:title="@string/menu_view"/>
+        android:title="@string/menu_view_in_another_app"/>
     <item
         android:id="@+id/menu_refresh"
         android:title="@string/menu_refresh"/>

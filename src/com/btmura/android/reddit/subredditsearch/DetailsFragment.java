@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListFragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.btmura.android.reddit.MainActivity;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.subredditsearch.SubredditInfoListFragment.OnSelectedListener;
@@ -46,6 +48,10 @@ public class DetailsFragment extends ListFragment {
 			handleAddSubreddit();
 			return true;
 			
+		case R.id.menu_view:
+			handleViewSubreddit();
+			return true;
+			
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -55,6 +61,12 @@ public class DetailsFragment extends ListFragment {
 		List<SubredditInfo> added = new ArrayList<SubredditInfo>(1);
 		added.add(getSubredditInfo());
 		getListener().onSelected(added, -1, OnSelectedListener.EVENT_ACTION_ITEM_CLICKED);
+	}
+	
+	private void handleViewSubreddit() {
+		Intent intent = new Intent(getActivity(), MainActivity.class);
+		intent.putExtra(MainActivity.EXTRA_SUBREDDIT, getSubredditInfo().displayName);
+		startActivity(intent);
 	}
 	
 	class DetailsAdapter extends BaseAdapter {
