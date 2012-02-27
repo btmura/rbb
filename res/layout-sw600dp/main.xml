@@ -2,8 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-  >
+    android:animateLayoutChanges="true" >
 
     <RelativeLayout
         android:id="@+id/nav_container"
@@ -16,11 +15,10 @@
             android:layout_height="match_parent" />
 
         <View
-            android:id="@+id/vertical_separator"
+            android:id="@+id/nav_separator"
             android:layout_width="2dp"
             android:layout_height="match_parent"
             android:layout_toRightOf="@+id/subreddit_list_container"
-            android:layout_alignWithParentIfMissing="true"
             android:background="@android:color/darker_gray" />
 
         <FrameLayout
@@ -28,7 +26,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:layout_toRightOf="@+id/vertical_separator" />
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_toRightOf="@+id/nav_separator" />
     </RelativeLayout>
 
     <FrameLayout

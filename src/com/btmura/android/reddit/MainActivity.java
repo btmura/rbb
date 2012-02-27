@@ -49,8 +49,15 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private View subredditListContainer;
 	private View thingContainer;
 	private View navContainer;
+	private View navSeparator;
+	
+	private Subreddit intentSubreddit;
 	
 	private ShareActionProvider shareProvider;
+	private boolean singleChoice;
+	private int tlfContainerId;
+	private int slfContainerId;
+	private int tContainerId;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,60 +81,22 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         subredditListContainer = findViewById(R.id.subreddit_list_container);
         thingContainer = findViewById(R.id.thing_container);
         navContainer = findViewById(R.id.nav_container);
+        navSeparator = findViewById(R.id.nav_separator);
+     
+		singleChoice = singleContainer == null;
+		if (singleContainer != null) {
+			tlfContainerId = slfContainerId = tContainerId = R.id.single_container;
+		} else {
+			tlfContainerId = R.id.thing_list_container;
+			slfContainerId = R.id.subreddit_list_container;
+			tContainerId = R.id.thing_container;
+		}
+		 
+        intentSubreddit = getIntentSubreddit();
         
         if (savedInstanceState == null) {
         	setupFragments();
         }
-	}
-	
-	private void setupFragments() {
-		Subreddit sr = getIntentSubreddit();
-		
-		if (singleContainer != null) {
-			if (sr != null) {
-				setThingListNavigationMode(sr);
-				ControlFragment controlFrag = ControlFragment.newInstance(sr, null, -1, 0);
-				ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, 0, false);
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
-				ft.add(controlFrag, FRAG_CONTROL);
-				ft.replace(R.id.single_container, thingListFrag, FRAG_THING_LIST);
-				ft.commit();
-			} else {
-				bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-				ControlFragment controlFrag = ControlFragment.newInstance(null, null, -1, 0);	
-				SubredditListFragment srFrag = SubredditListFragment.newInstance(false);
-				
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
-				ft.add(controlFrag, FRAG_CONTROL);
-				ft.replace(R.id.single_container, srFrag, FRAG_SUBREDDIT_LIST);
-				ft.commit();
-			}
-		}
-		
-		if (thingContainer != null) {
-			if (sr != null) {
-				subredditListContainer.setVisibility(View.GONE);
-				setThingListNavigationMode(sr);
-				refreshContainers(null);
-				
-				ControlFragment controlFrag = ControlFragment.newInstance(sr, null, -1, 0);
-				ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, 0, true);
-				
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
-				ft.add(controlFrag, FRAG_CONTROL);
-				ft.replace(R.id.thing_list_container, thingListFrag, FRAG_THING_LIST);
-				ft.commit();				
-			} else {
-				bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-				ControlFragment controlFrag = ControlFragment.newInstance(null, null, -1, 0);
-				SubredditListFragment srFrag = SubredditListFragment.newInstance(true);
-				
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
-				ft.add(controlFrag, FRAG_CONTROL);
-				ft.replace(R.id.subreddit_list_container, srFrag, FRAG_SUBREDDIT_LIST);
-				ft.commit();
-			}
-		}
 	}
 	
 	private Subreddit getIntentSubreddit() {
@@ -143,9 +112,28 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		return null;
 	}
 	
-	private boolean hasIntentSubreddit() {
-		Intent intent = getIntent();
-		return intent.getData() != null;
+	private void setupFragments() {	
+		refreshActionBar(intentSubreddit, null, 0);
+		refreshContainers(null);
+		
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ControlFragment cf = ControlFragment.newInstance(intentSubreddit, null, -1, 0);
+		ft.add(cf, FRAG_CONTROL);
+		
+		Fragment f;
+		int containerId;
+		String tag;
+		if (intentSubreddit != null) {
+			f = ThingListFragment.newInstance(intentSubreddit, 0, singleChoice);
+			containerId = tlfContainerId;
+			tag = FRAG_THING_LIST;
+		} else {
+			f = SubredditListFragment.newInstance(singleChoice);
+			containerId = slfContainerId;
+			tag = FRAG_SUBREDDIT_LIST;
+		}
+		ft.replace(containerId, f, tag);
+		ft.commit();
 	}
 	
 	@Override
@@ -180,7 +168,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		
 		case OnSubredditSelectedListener.FLAG_LOAD_FINISHED:
 			if (thingContainer != null && !isVisible(FRAG_THING_LIST)) {
-				setThingListNavigationMode(sr);
 				getSubredditListFragment().setSelectedSubreddit(sr);
 				selectSubreddit(sr, lastSelectedFilter);
 			}
@@ -188,40 +175,28 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		}		
 	}
 	
-	private void selectSubreddit(Subreddit sr, int filter) {
-		ControlFragment controlFrag = ControlFragment.newInstance(sr, null, -1, filter);
-		
+	private void selectSubreddit(Subreddit sr, int filter) {		
 		FragmentManager manager = getFragmentManager();
-		
+		manager.removeOnBackStackChangedListener(this);
 		if (singleContainer != null) {
-			manager.removeOnBackStackChangedListener(this);
 			manager.popBackStackImmediate(FRAG_THING_LIST, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-			manager.addOnBackStackChangedListener(this);
-			
-			ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, filter, false);
-			
-			FragmentTransaction ft = manager.beginTransaction();
-			ft.add(controlFrag, FRAG_CONTROL);
-			ft.replace(R.id.single_container, thingListFrag, FRAG_THING_LIST);
-			ft.addToBackStack(FRAG_THING_LIST);
-			ft.commit();
-		}
-		
-		if (thingContainer != null) {
-			manager.removeOnBackStackChangedListener(this);
+		} else {
 			manager.popBackStackImmediate();
-			manager.addOnBackStackChangedListener(this);
-			
-			setThingListNavigationMode(sr);
-			refreshContainers(null);
-			
-			ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, filter, true);
-			
-			FragmentTransaction ft = manager.beginTransaction();
-			ft.add(controlFrag, FRAG_CONTROL);
-			ft.replace(R.id.thing_list_container, thingListFrag, FRAG_THING_LIST);
-			ft.commit();
 		}
+		manager.addOnBackStackChangedListener(this);
+		
+		refreshActionBar(sr, null, filter);
+		refreshContainers(null);
+		
+		FragmentTransaction ft = manager.beginTransaction();		
+		ControlFragment controlFrag = ControlFragment.newInstance(sr, null, -1, filter);
+		ft.add(controlFrag, FRAG_CONTROL);
+		ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, filter, singleChoice);
+		ft.replace(tlfContainerId, thingListFrag, FRAG_THING_LIST);
+		if (singleContainer != null) {
+			ft.addToBackStack(FRAG_THING_LIST);
+		}
+		ft.commit();
 	}
 	
 	public void onThingSelected(Thing thing, int position) {
@@ -229,44 +204,33 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	private void selectThing(Thing thing, String tag, int position) {
-		ControlFragment controlFrag = ControlFragment.newInstance(getSubreddit(), thing, position, getFilter());
-		Fragment thingFrag;
+		Fragment tf;
 		String popTag;
 		if (FRAG_LINK.equalsIgnoreCase(tag)) {
-			thingFrag = LinkFragment.newInstance(thing);
+			tf = LinkFragment.newInstance(thing);
 			popTag = FRAG_COMMENT;
 		} else if (FRAG_COMMENT.equalsIgnoreCase(tag)) {
-			thingFrag = CommentListFragment.newInstance(thing.getId());
+			tf = CommentListFragment.newInstance(thing.getId());
 			popTag = FRAG_LINK;
 		} else {
 			throw new IllegalArgumentException(tag);
 		}
 		
 		FragmentManager manager = getFragmentManager();
-		
+		manager.removeOnBackStackChangedListener(this);
 		if (singleContainer != null) {
-			manager.removeOnBackStackChangedListener(this);
 			manager.popBackStackImmediate(popTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-			manager.addOnBackStackChangedListener(this);
-			
-			FragmentTransaction ft = manager.beginTransaction();
-			ft.add(controlFrag, FRAG_CONTROL);
-			ft.replace(R.id.single_container, thingFrag, tag);
-			ft.addToBackStack(tag);
-			ft.commit();
+		} else {
+			manager.popBackStackImmediate();			
 		}
-		
-		if (thingContainer != null) {
-			manager.removeOnBackStackChangedListener(this);
-			manager.popBackStackImmediate();
-			manager.addOnBackStackChangedListener(this);
-			
-			FragmentTransaction ft = manager.beginTransaction();
-			ft.add(controlFrag, FRAG_CONTROL);
-			ft.replace(R.id.thing_container, thingFrag, tag);
-			ft.addToBackStack(tag);
-			ft.commit();		
-		}
+		manager.addOnBackStackChangedListener(this);
+	
+		FragmentTransaction ft = manager.beginTransaction();
+		ControlFragment cf = ControlFragment.newInstance(getSubreddit(), thing, position, getFilter());
+		ft.add(cf, FRAG_CONTROL);
+		ft.replace(tContainerId, tf, tag);		
+		ft.addToBackStack(tag);
+		ft.commit();
 	}
 	
 	private Subreddit getSubreddit() {
@@ -298,15 +262,15 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	}
 	
 	public void onBackStackChanged() {
-		refreshActionBar();
+		Subreddit sr = getSubreddit();
+		Thing t = getThing();
+		refreshActionBar(sr, t, getFilter());
 		refreshCheckedItems();
-		refreshContainers(getThing());
+		refreshContainers(t);
 		invalidateOptionsMenu();
 	}
 	
-	private void refreshActionBar() {
-		Subreddit sr = getSubreddit();
-		Thing t = getThing();
+	private void refreshActionBar(Subreddit sr, Thing t, int filter) {
 		if (t != null && singleContainer != null) {
 			setThingNavigationMode(t);
 		} else if (sr != null) {
@@ -315,9 +279,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 			setSubredditListNavigationMode();
 		}
 		
-		bar.setDisplayHomeAsUpEnabled(singleContainer != null && sr != null || t != null);
+		bar.setDisplayHomeAsUpEnabled(singleContainer != null && sr != null || t != null || intentSubreddit != null);
 		if (bar.getNavigationMode() == ActionBar.NAVIGATION_MODE_LIST) {
-			bar.setSelectedNavigationItem(getFilter());
+			bar.setSelectedNavigationItem(filter);
 		}
 	}
 	
@@ -330,7 +294,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private void setThingListNavigationMode(Subreddit sr) {
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		bar.setDisplayHomeAsUpEnabled(singleContainer != null);
 		bar.setDisplayShowTitleEnabled(false);
 		bar.setDisplayShowCustomEnabled(false);
 		filterSpinner.setSubreddit(sr.getTitle(this));
@@ -355,7 +318,9 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	private void refreshContainers(Thing t) {
 		if (subredditListContainer != null) {
-			subredditListContainer.setVisibility(hasIntentSubreddit() ? View.GONE : View.VISIBLE);
+			int v = intentSubreddit != null ? View.GONE : View.VISIBLE;
+			subredditListContainer.setVisibility(v);
+			navSeparator.setVisibility(v);
 		}
 		if (thingContainer != null) {
 			thingContainer.setVisibility(t != null ? View.VISIBLE : View.GONE);
@@ -429,6 +394,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	private void handleSearchForSubreddits() {
 		searchView.setQuery("", false);
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		bar.setDisplayShowTitleEnabled(false);
 		bar.setDisplayShowCustomEnabled(true);
 		bar.getCustomView().requestFocus();
 	}
@@ -449,7 +415,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 		case REQUEST_ADD_SUBREDDITS:
-			refreshActionBar();
+			refreshActionBar(getSubreddit(), getThing(), getFilter());
 			break;
 		
 		default:
@@ -459,7 +425,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 	
 	public void onFocusChange(View v, boolean hasFocus) {
 		if (v == searchView && !hasFocus) {
-			refreshActionBar();
+			refreshActionBar(getSubreddit(), getThing(), getFilter());
 		}
 	}
 	
@@ -467,19 +433,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		FragmentManager manager = getFragmentManager();
 		int count = manager.getBackStackEntryCount();
 		if (count > 0) {
-			String tag = manager.getBackStackEntryAt(count - 1).getName();
-			if (FRAG_COMMENT.equals(tag) || FRAG_LINK.equals(tag)) {
-				for (int i = manager.getBackStackEntryCount() - 1; i >= 0; i--) {
-					String name = manager.getBackStackEntryAt(i).getName();
-					if (!FRAG_THING_LIST.equals(name)) {
-						manager.popBackStack();
-					} else {
-						break;
-					}
-				}
-			} else if (singleContainer != null && FRAG_THING_LIST.equals(tag)) {
-				manager.popBackStack(FRAG_THING_LIST, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-			}
+			manager.popBackStack();
 		} else {
 			finish();
 		}

@@ -11,6 +11,7 @@
         android:layout_height="match_parent" />
 
     <View
+        android:id="@+id/nav_separator"
         android:layout_width="2dp"
         android:layout_height="match_parent"
         android:background="@android:color/darker_gray" />
