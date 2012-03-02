@@ -11,6 +11,7 @@ import java.util.List;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.JsonReader;
 import android.util.Log;
 
@@ -54,10 +55,16 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 			HttpURLConnection conn = (HttpURLConnection) u.openConnection();
 			conn.connect();
 			
+			long t1 = SystemClock.currentThreadTimeMillis();
 			InputStream stream = conn.getInputStream();
+			
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
 			CommentParser parser = new CommentParser();
 			parser.parseListingArray(reader);
+			
+			long t2 = SystemClock.currentThreadTimeMillis();
+			Log.v(TAG, String.valueOf(t2 - t1));
+			
 			stream.close();
 			
 			return parser.comments;

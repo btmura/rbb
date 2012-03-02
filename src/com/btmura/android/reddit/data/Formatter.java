@@ -19,14 +19,19 @@ public class Formatter {
 	private static Pattern BULLET_PATTERN = Pattern.compile("\\* ([^\\n]+)");
 	static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\]([ ]?)\\(([^\\[]*)\\)");
 	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([^ \\n]+)");
+	private static Pattern SUBREDDIT_PATTERN = Pattern.compile("/r/[0-9A-Za-z]+");
 	
 	private static final int SPAN_BOLD = 0;
 	private static final int SPAN_ITALIC = 1;
 	private static final int SPAN_STRIKETHROUGH = 2;
 	private static final int SPAN_BULLET = 3;
+
+	private static final String REDDIT_URL = "http://www.reddit.com";
 	
-	private static final Matcher MATCHER = BOLD_PATTERN.matcher("");
-		
+	private static final Matcher MATCHER = BOLD_PATTERN.matcher("");	
+	private static final StringBuilder TMP = new StringBuilder();
+
+	
 	public static CharSequence formatTitle(String text) {
 		if (text.indexOf("&") != -1) {
 			SpannableStringBuilder b = new SpannableStringBuilder(text);
@@ -38,7 +43,7 @@ public class Formatter {
 		return text;
 	}
 	
-	public static CharSequence format(String text) {
+	public static CharSequence format(String text) {		
 		SpannableStringBuilder b = null;
 	
 		if (text.indexOf("**") != -1) {
@@ -93,6 +98,15 @@ public class Formatter {
 			}
 			MATCHER.reset(b);
 			formatBullets(b, MATCHER);
+		}
+		
+		if (text.indexOf("/r/") != -1) {
+			MATCHER.usePattern(SUBREDDIT_PATTERN);
+			if (b == null) {
+				b = new SpannableStringBuilder(text);
+			}
+			MATCHER.reset(b);
+			formatSubreddits(b, MATCHER);
 		}
 		
 		if (text.indexOf("[") != -1) {
@@ -196,6 +210,16 @@ public class Formatter {
 		}
 	}
 	
+	
+	static void formatSubreddits(SpannableStringBuilder b, Matcher m) {
+		TMP.delete(0, TMP.length()).append(REDDIT_URL);
+		while (m.find()) {
+			URLSpan span = new URLSpan(TMP.append(m.group()).toString());
+			b.setSpan(span, m.start(), m.end(), 0);
+			TMP.delete(REDDIT_URL.length(), TMP.length());
+		}
+	}
+	
 	static void formatNamedLinks(SpannableStringBuilder b, Matcher m) {
 		for (int deleted = 0; m.find(); ) {
 			int s = m.start() - deleted;
@@ -212,9 +236,9 @@ public class Formatter {
 			}
 			
 			if (url.startsWith("/")) {
-				url = "http://www.reddit.com" + url;
+				url = TMP.delete(0, TMP.length()).append(REDDIT_URL).append(url).toString();
 			} else if (!url.startsWith("http://") && !url.startsWith("https://")) {
-				url = "http://" + url;
+				url = TMP.delete(0, TMP.length()).append("http://").append(url).toString();
 			}
 			
 			URLSpan span = new URLSpan(url);
