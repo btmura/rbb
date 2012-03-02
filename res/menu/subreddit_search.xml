@@ -8,6 +8,7 @@
         android:title="@string/menu_add"/>
     <item
         android:id="@+id/menu_view"
+        android:icon="@drawable/ic_action_view"
         android:showAsAction="ifRoom"
         android:title="@string/menu_view"/>
     <item
