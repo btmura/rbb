@@ -19,7 +19,7 @@ public class Formatter {
 	private static Pattern BULLET_PATTERN = Pattern.compile("\\* ([^\\n]+)");
 	static Pattern NAMED_LINK_PATTERN = Pattern.compile("\\[([^\\]]*?)\\]([ ]?)\\(([^\\[]*)\\)");
 	private static Pattern RAW_LINK_PATTERN = Pattern.compile("http[s]?://([^ \\n]+)");
-	private static Pattern SUBREDDIT_PATTERN = Pattern.compile("/r/[0-9A-Za-z]+");
+	private static Pattern SUBREDDIT_PATTERN = Pattern.compile("/r/([0-9A-Za-z_]+)");
 	
 	private static final int SPAN_BOLD = 0;
 	private static final int SPAN_ITALIC = 1;
@@ -210,13 +210,10 @@ public class Formatter {
 		}
 	}
 	
-	
 	static void formatSubreddits(SpannableStringBuilder b, Matcher m) {
-		TMP.delete(0, TMP.length()).append(REDDIT_URL);
 		while (m.find()) {
-			URLSpan span = new URLSpan(TMP.append(m.group()).toString());
-			b.setSpan(span, m.start(), m.end(), 0);
-			TMP.delete(REDDIT_URL.length(), TMP.length());
+			SubredditSpan s = new SubredditSpan(m.group(1));
+			b.setSpan(s, m.start(), m.end(), 0);
 		}
 	}
 	
@@ -235,21 +232,44 @@ public class Formatter {
 				url = url.substring(0, space);
 			}
 			
-			if (url.startsWith("/")) {
-				url = TMP.delete(0, TMP.length()).append(REDDIT_URL).append(url).toString();
-			} else if (!url.startsWith("http://") && !url.startsWith("https://")) {
-				url = TMP.delete(0, TMP.length()).append("http://").append(url).toString();
+			Object span = getLinkSpan(url);
+			if (span != null) {
+				b.setSpan(span, s, s + name.length(), 0);
 			}
-			
-			URLSpan span = new URLSpan(url);
-			b.setSpan(span, s, s + name.length(), 0);
 		}
 	}
 	
-	private static void formatRawLinks(SpannableStringBuilder b, Matcher m) {
+	static void formatRawLinks(SpannableStringBuilder b, Matcher m) {
 		while (m.find()) {
-			URLSpan span = new URLSpan(m.group());
-			b.setSpan(span, m.start(), m.end(), 0);
+			Object span = getLinkSpan(m.group());
+			if (span != null) {
+				b.setSpan(span, m.start(), m.end(), 0);
+			}
 		}
+	}
+	
+	private static Object getLinkSpan(String url) {
+		int srIndex = url.indexOf("/r/");
+		if (srIndex != -1 && srIndex + 3 < url.length()) {
+			int slash = url.indexOf('/', srIndex + 3);
+			if (slash == -1) {
+				return new SubredditSpan(url.substring(srIndex + 3));
+			} else if (slash + 1 == url.length()) {
+				return new SubredditSpan(url.substring(srIndex + 3, slash));
+			}
+		}
+		
+		Object span = null;
+		if (url.startsWith("/")) {
+			url = TMP.delete(0, TMP.length()).append(REDDIT_URL).append(url).toString();
+			span = new URLSpan(url);
+		} else if (!url.startsWith("http://") && !url.startsWith("https://")) {
+			url = TMP.delete(0, TMP.length()).append("http://").append(url).toString();
+			span = new URLSpan(url);
+		} else {
+			url = TMP.delete(0, TMP.length()).append(url).toString();
+			span = new URLSpan(url);
+		}
+		return span;
 	}
 }
