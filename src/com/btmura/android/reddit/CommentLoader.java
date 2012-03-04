@@ -107,7 +107,7 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			comments.get(index).title = Formatter.format(readTrimmedString(reader, "")).toString();
+			comments.get(index).title = Formatter.formatTitle(readTrimmedString(reader, "")).toString();
 		}
 		
 		@Override
@@ -117,12 +117,12 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 		
 		@Override
 		public void onSelfText(JsonReader reader, int index) throws IOException {
-			comments.get(index).body = Formatter.format(readTrimmedString(reader, ""));
+			comments.get(index).body = Formatter.formatComment(getContext(), readTrimmedString(reader, ""));
 		}
 		
 		@Override
 		public void onBody(JsonReader reader, int index) throws IOException {
-			comments.get(index).body = Formatter.format(readTrimmedString(reader, ""));
+			comments.get(index).body = Formatter.formatComment(getContext(), readTrimmedString(reader, ""));
 		}
 		
 		@Override

@@ -30,7 +30,7 @@ import com.btmura.android.reddit.subredditsearch.SubredditSearchActivity;
 public class MainActivity extends Activity implements OnBackStackChangedListener, OnNavigationListener, 
 		OnQueryTextListener, OnFocusChangeListener, OnSubredditSelectedListener, OnThingSelectedListener {
 
-	public static final String EXTRA_SUBREDDIT = "sr";
+	public static final String EXTRA_SUBREDDIT = "subreddit";
 	
 	private static final String FRAG_CONTROL = "control";
 	private static final String FRAG_SUBREDDIT_LIST = "subredditList";
@@ -473,7 +473,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		if (thing != null) {
 			Intent intent = new Intent(Intent.ACTION_SEND);
 			intent.setType("text/plain");
-			intent.putExtra(Intent.EXTRA_SUBJECT, Formatter.format(thing.title));
+			intent.putExtra(Intent.EXTRA_SUBJECT, Formatter.formatTitle(thing.title));
 			intent.putExtra(Intent.EXTRA_TEXT, getLink(thing));
 			shareProvider.setShareIntent(intent);
 		}
