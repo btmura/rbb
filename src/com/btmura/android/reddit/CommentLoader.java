@@ -107,7 +107,7 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			comments.get(index).title = Formatter.formatTitle(readTrimmedString(reader, "")).toString();
+			comments.get(index).title = Formatter.formatTitle(getContext(), readTrimmedString(reader, ""));
 		}
 		
 		@Override

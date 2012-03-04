@@ -17,8 +17,10 @@ import com.btmura.android.reddit.R;
 
 public class Formatter {
 
-    public static CharSequence formatTitle(CharSequence title) {
-        return Escaped.format(title);
+    public static CharSequence formatTitle(Context context, CharSequence title) {
+        CharSequence c = Escaped.format(title);
+        c = Disapproval.format(context, c);
+        return c;
     }
 
     public static CharSequence formatComment(Context context, CharSequence comment) {

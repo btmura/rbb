@@ -90,7 +90,7 @@ class SubredditInfoLoader extends AsyncTaskLoader<List<SubredditInfo>> {
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			results.get(index).title = Formatter.formatTitle(readTrimmedString(reader, "")).toString();
+			results.get(index).title = Formatter.formatTitle(getContext(), readTrimmedString(reader, ""));
 		}
 		
 		@Override

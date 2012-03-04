@@ -473,7 +473,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 		if (thing != null) {
 			Intent intent = new Intent(Intent.ACTION_SEND);
 			intent.setType("text/plain");
-			intent.putExtra(Intent.EXTRA_SUBJECT, Formatter.formatTitle(thing.title));
+			intent.putExtra(Intent.EXTRA_SUBJECT, Formatter.formatTitle(this, thing.title));
 			intent.putExtra(Intent.EXTRA_TEXT, getLink(thing));
 			shareProvider.setShareIntent(intent);
 		}

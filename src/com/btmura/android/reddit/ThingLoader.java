@@ -96,7 +96,7 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			things.get(index).title = Formatter.formatTitle(readTrimmedString(reader, "")).toString();
+			things.get(index).title = Formatter.formatTitle(getContext(), readTrimmedString(reader, ""));
 		}
 
 		@Override

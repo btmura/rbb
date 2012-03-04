@@ -7,7 +7,7 @@ public class Comment {
 	static final int TYPE_MORE = 2;
 	
 	public int type;
-	public String title;
+	public CharSequence title;
 	public CharSequence body;
 	public CharSequence status;
 	public int nesting;
