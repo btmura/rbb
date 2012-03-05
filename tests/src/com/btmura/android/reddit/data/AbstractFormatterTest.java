@@ -54,6 +54,13 @@ abstract class AbstractFormatterTest extends AndroidTestCase {
         return cs;
     }
 
+    static CharSequence assertHeadingFormat(String input, String expected) {
+        CharSequence cs = Formatter.Heading.format(input);
+        String actual = cs.toString();
+        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
+        return cs;
+    }
+
     static void assertStyleSpan(CharSequence cs, int start, int end, int expectedStyle) {
         SpannableStringBuilder b = (SpannableStringBuilder) cs;
         StyleSpan[] spans = b.getSpans(start, end, StyleSpan.class);

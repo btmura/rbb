@@ -108,7 +108,7 @@ public class DetailsFragment extends ListFragment {
 			title.setText(info.title);
 			
 			TextView desc = (TextView) v.findViewById(R.id.description);
-			desc.setText(Formatter.formatComment(getActivity(), info.description));
+			desc.setText(Formatter.formatInfo(getActivity(), info.description));
 			desc.setMovementMethod(LinkMovementMethod.getInstance());
 			
 			return v;

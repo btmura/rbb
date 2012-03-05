@@ -36,6 +36,12 @@ public class Formatter {
         return c;
     }
 
+    public static CharSequence formatInfo(Context context, CharSequence info) {
+        CharSequence c = formatComment(context, info);
+        c = Heading.format(c);
+        return c;
+    }
+
     static class Escaped {
 
         private static final Pattern PATTERN = Pattern.compile("&(gt|lt|amp|quot|apos|nbsp);");
@@ -145,7 +151,7 @@ public class Formatter {
 
     static class Bullets {
 
-        private static Pattern PATTERN = Pattern.compile("^\\* (.+)$", Pattern.MULTILINE);
+        private static Pattern PATTERN = Pattern.compile("^( *\\* )(.+)$", Pattern.MULTILINE);
 
         static CharSequence format(CharSequence text) {
             CharSequence s = text;
@@ -153,11 +159,11 @@ public class Formatter {
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
-                String value = m.group(1);
+                deleted += m.group(1).length();
+                String value = m.group(2);
 
                 s = Formatter.setSpan(s, start, end, new BulletSpan(20));
                 s = Formatter.replace(s, start, end, value);
-                deleted += 2;
             }
             return s;
         }
@@ -297,6 +303,26 @@ public class Formatter {
                 ImageSpan span = new ImageSpan(context, R.drawable.disapproval_face,
                         ImageSpan.ALIGN_BOTTOM);
                 s = setSpan(s, m.start(), m.end(), span);
+            }
+            return s;
+        }
+    }
+
+    static class Heading {
+
+        private static Pattern PATTERN = Pattern.compile("^(#{1,} ?)(.+?)(#*)$", Pattern.MULTILINE);
+
+        static CharSequence format(CharSequence text) {
+            CharSequence s = text;
+            Matcher m = PATTERN.matcher(text);
+            for (int deleted = 0; m.find();) {
+                int start = m.start() - deleted;
+                int end = m.end() - deleted;
+                deleted += m.group(1).length() + m.group(3).length();
+                String value = m.group(2);
+
+                s = Formatter.setSpan(s, start, end, new StyleSpan(Typeface.BOLD_ITALIC));
+                s = Formatter.replace(s, start, end, value);
             }
             return s;
         }
