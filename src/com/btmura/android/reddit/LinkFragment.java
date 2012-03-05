@@ -16,25 +16,17 @@ import android.widget.ProgressBar;
 
 public class LinkFragment extends Fragment {
 	
-	private static final String ARG_THING = "thing";
-
-	private Thing thing;
+	private static final String ARG_URL = "url";
 
 	private WebView webView;
 	private ProgressBar progress;
 	
-	public static LinkFragment newInstance(Thing thing) {
+	public static LinkFragment newInstance(String url) {
 		LinkFragment frag = new LinkFragment();
 		Bundle b = new Bundle(1);
-		b.putParcelable(ARG_THING, thing);
+		b.putString(ARG_URL, url);
 		frag.setArguments(b);
 		return frag;
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		thing = getArguments().getParcelable(ARG_THING);
 	}
 	
 	@Override
@@ -82,7 +74,7 @@ public class LinkFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		webView.loadUrl(thing.url);
+		webView.loadUrl(getArguments().getString(ARG_URL));
 	}
 	
 	@Override
