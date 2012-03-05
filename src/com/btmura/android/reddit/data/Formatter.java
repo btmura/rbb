@@ -190,7 +190,7 @@ public class Formatter {
                     break;
                 }
 
-                int endBrack = findNextInLine(s, ']', startBrack + 1);
+                int endBrack = findClosingMarker(s, '[', ']', startBrack + 1);
                 if (endBrack == -1) {
                     i = moveToNextLine(s, startBrack + 1);
                     continue;
@@ -202,7 +202,7 @@ public class Formatter {
                     continue;
                 }
 
-                int endParen = findClosingParen(s, startParen + 1);
+                int endParen = findClosingMarker(s, '(', ')', startParen + 1);
                 if (endParen == -1) {
                     i = moveToNextLine(s, startParen + 1);
                     continue;
@@ -242,16 +242,16 @@ public class Formatter {
             return -1;
         }
 
-        private static int findClosingParen(CharSequence s, int start) {
+        private static int findClosingMarker(CharSequence s, char open, char close, int start) {
             int nesting = 0;
             int len = s.length();
             for (int i = start; i < len; i++) {
                 char ch = s.charAt(i);
                 if (ch == '\n') {
                     break;
-                } else if (ch == '(') {
+                } else if (ch == open) {
                     nesting++;
-                } else if (ch == ')') {
+                } else if (ch == close) {
                     if (nesting == 0) {
                         return i;
                     }
@@ -260,20 +260,6 @@ public class Formatter {
             }
             return -1;
         }
-
-        private static int findNextInLine(CharSequence s, char c, int start) {
-            int len = s.length();
-            for (int i = start; i < len; i++) {
-                char ch = s.charAt(i);
-                if (ch == '\n') {
-                    break;
-                } else if (ch == c) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
         private static int moveToNextLine(CharSequence s, int start) {
             int len = s.length();
             if (start < len) {
