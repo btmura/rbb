@@ -76,16 +76,16 @@ abstract class AbstractFormatterTest extends AndroidTestCase {
         SpannableStringBuilder b = (SpannableStringBuilder) cs;
         SubredditSpan[] spans = b.getSpans(start, end, SubredditSpan.class);
         assertEquals(1, spans.length);
-        assertEquals("Expected: " + expectedUrl + " Actual: " + spans[0].subreddit, expectedUrl,
-                spans[0].subreddit);
+        assertEquals("assertSubredditSpan expected: " + expectedUrl + " actual: "
+                + spans[0].subreddit, expectedUrl, spans[0].subreddit);
     }
 
     static void assertUrlSpan(CharSequence cs, int start, int end, String expectedUrl) {
         SpannableStringBuilder b = (SpannableStringBuilder) cs;
         URLSpan[] spans = b.getSpans(start, end, URLSpan.class);
         assertEquals(1, spans.length);
-        assertEquals("Expected: " + expectedUrl + " Actual: " + spans[0].getURL(), expectedUrl,
-                spans[0].getURL());
+        assertEquals("assertUrlSpan expected: " + expectedUrl + " actual: " + spans[0].getURL(),
+                expectedUrl, spans[0].getURL());
     }
 
     static void assertImageSpan(CharSequence cs, int start, int end) {

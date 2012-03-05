@@ -165,8 +165,7 @@ public class Formatter {
 
     static class RawLinks {
 
-        private static final Pattern PATTERN = Pattern
-                .compile("https?://[^ $]+", Pattern.MULTILINE);
+        private static final Pattern PATTERN = Pattern.compile("https?://[^ \n]+");
 
         static CharSequence format(CharSequence text) {
             CharSequence s = text;
@@ -260,6 +259,7 @@ public class Formatter {
             }
             return -1;
         }
+
         private static int moveToNextLine(CharSequence s, int start) {
             int len = s.length();
             if (start < len) {
@@ -356,5 +356,4 @@ public class Formatter {
         }
         return span;
     }
-
 }
