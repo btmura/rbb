@@ -1,5 +1,8 @@
 package com.btmura.android.reddit;
 
+import com.btmura.android.reddit.data.Formatter;
+
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -10,7 +13,7 @@ public class Thing implements Parcelable {
 
     public int type;
     public String name;
-    public CharSequence title;
+    public String rawTitle;
     public String subreddit;
     public String author;
     public String url;
@@ -23,6 +26,8 @@ public class Thing implements Parcelable {
     public String status;
     public String moreKey;
 
+    public CharSequence title;
+    
     public Thing() {
     }
 
@@ -39,8 +44,7 @@ public class Thing implements Parcelable {
     Thing(Parcel parcel) {
         type = parcel.readInt();
         name = parcel.readString();
-        subreddit = parcel.readString();
-        author = parcel.readString();
+        rawTitle = parcel.readString();
         url = parcel.readString();
         permaLink = parcel.readString();
         isSelf = parcel.readInt() == 1;
@@ -49,8 +53,7 @@ public class Thing implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(type);
         dest.writeString(name);
-        dest.writeString(subreddit);
-        dest.writeString(author);
+        dest.writeString(rawTitle);
         dest.writeString(url);
         dest.writeString(permaLink);
         dest.writeInt(isSelf ? 1 : 0);
@@ -64,6 +67,13 @@ public class Thing implements Parcelable {
     public boolean hasThumbnail() {
         return thumbnail != null && !thumbnail.isEmpty() && !"default".equals(thumbnail)
                 && !"self".equals(thumbnail) && !"nsfw".equals(thumbnail);
+    }
+    
+    public Thing assureTitle(Context context) {
+        if (title == null) {
+            title = Formatter.formatTitle(context, rawTitle);
+        }
+        return this;
     }
 
     public int describeContents() {

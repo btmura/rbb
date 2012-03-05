@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -205,7 +204,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
             fm.popBackStackImmediate();
             fm.addOnBackStackChangedListener(this);
         }
-        
+
         updateThingPager(thing);
 
         FragmentTransaction ft = fm.beginTransaction();
@@ -283,7 +282,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         bar.setDisplayShowTitleEnabled(true);
         bar.setDisplayShowCustomEnabled(false);
-        bar.setTitle(t.title);
+        bar.setTitle(t.assureTitle(this).title);
     }
 
     private void setThingListNavigationMode(Subreddit sr) {
@@ -407,7 +406,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         bar.setDisplayShowCustomEnabled(true);
         bar.getCustomView().requestFocus();
     }
-        
+
     public void onPageSelected(int position) {
         invalidateOptionsMenu();
     }
@@ -478,7 +477,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         if (thing != null) {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_SUBJECT, Formatter.formatTitle(this, thing.title));
+            intent.putExtra(Intent.EXTRA_SUBJECT,
+                    Formatter.formatTitle(this, thing.assureTitle(this).title));
             intent.putExtra(Intent.EXTRA_TEXT, getLink(thing));
             shareProvider.setShareIntent(intent);
         }
@@ -488,13 +488,13 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         int position = thingPager.getCurrentItem();
         return ThingPagerAdapter.getType(t, position) == ThingPagerAdapter.TYPE_LINK;
     }
-    
+
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
     }
-    
+
     public void onPageScrollStateChanged(int state) {
     }
-    
+
     public boolean onQueryTextChange(String newText) {
         return false;
     }

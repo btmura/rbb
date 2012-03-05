@@ -14,7 +14,6 @@ import android.content.Context;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 
 public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
@@ -96,7 +95,8 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>>  {
 		
 		@Override
 		public void onTitle(JsonReader reader, int index) throws IOException {
-			things.get(index).title = Formatter.formatTitle(getContext(), readTrimmedString(reader, ""));
+		    things.get(index).rawTitle = readTrimmedString(reader, "");
+			things.get(index).assureTitle(getContext());
 		}
 
 		@Override
