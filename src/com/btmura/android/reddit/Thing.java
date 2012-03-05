@@ -27,7 +27,7 @@ public class Thing implements Parcelable {
     public String moreKey;
 
     public CharSequence title;
-    
+
     public Thing() {
     }
 
@@ -68,7 +68,7 @@ public class Thing implements Parcelable {
         return thumbnail != null && !thumbnail.isEmpty() && !"default".equals(thumbnail)
                 && !"self".equals(thumbnail) && !"nsfw".equals(thumbnail);
     }
-    
+
     public Thing assureTitle(Context context) {
         if (title == null) {
             title = Formatter.formatTitle(context, rawTitle);

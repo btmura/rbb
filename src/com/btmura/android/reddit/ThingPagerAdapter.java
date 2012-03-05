@@ -34,7 +34,7 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
                 throw new IllegalStateException();
         }
     }
-    
+
     public static int getType(Thing t, int position) {
         switch (position) {
             case 0:

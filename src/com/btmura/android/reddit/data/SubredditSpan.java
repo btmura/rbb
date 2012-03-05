@@ -9,17 +9,17 @@ import com.btmura.android.reddit.MainActivity;
 
 public class SubredditSpan extends ClickableSpan {
 
-	public final String subreddit;
-	
-	public SubredditSpan(String subreddit) {
-		this.subreddit = subreddit;
-	}
-	
-	@Override
-	public void onClick(View widget) {
-		Context c = widget.getContext();
-		Intent i = new Intent(c, MainActivity.class);
-		i.putExtra(MainActivity.EXTRA_SUBREDDIT, subreddit);
-		c.startActivity(i);
-	}
+    public final String subreddit;
+
+    public SubredditSpan(String subreddit) {
+        this.subreddit = subreddit;
+    }
+
+    @Override
+    public void onClick(View widget) {
+        Context c = widget.getContext();
+        Intent i = new Intent(c, MainActivity.class);
+        i.putExtra(MainActivity.EXTRA_SUBREDDIT, subreddit);
+        c.startActivity(i);
+    }
 }
