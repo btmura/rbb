@@ -2,11 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_add"
-        android:icon="@drawable/ic_action_add"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_add"/>
-    <item
         android:id="@+id/menu_share"
         android:actionProviderClass="android.widget.ShareActionProvider"
         android:showAsAction="ifRoom"
@@ -14,12 +9,12 @@
     <item
         android:id="@+id/menu_link"
         android:icon="@drawable/ic_action_link"
-        android:showAsAction="ifRoom"
+        android:showAsAction="always"
         android:title="@string/menu_link"/>
     <item
         android:id="@+id/menu_comments"
         android:icon="@drawable/ic_action_comments"
-        android:showAsAction="ifRoom"
+        android:showAsAction="always"
         android:title="@string/menu_comments"/>
     <item
         android:id="@+id/menu_copy_url"
@@ -27,6 +22,11 @@
     <item
         android:id="@+id/menu_view"
         android:title="@string/menu_view_in_another_app"/>
+    <item
+        android:id="@+id/menu_add"
+        android:icon="@drawable/ic_action_add"
+        android:showAsAction="always"
+        android:title="@string/menu_add"/>
     <item
         android:id="@+id/menu_refresh"
         android:title="@string/menu_refresh"/>

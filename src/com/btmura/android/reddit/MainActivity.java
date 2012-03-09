@@ -52,15 +52,14 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
     private View subredditListContainer;
     private View navContainer;
     private View navSeparator;
-
-    private Subreddit targetSubreddit;
+    private ViewPager thingPager;
 
     private ShareActionProvider shareProvider;
     private boolean singleChoice;
     private int tlfContainerId;
     private int slfContainerId;
 
-    private ViewPager thingPager;
+    private boolean insertSlfToBackStack;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,11 +95,14 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
             slfContainerId = R.id.subreddit_list_container;
         }
 
-        targetSubreddit = getTargetSubreddit();
-
+        insertSlfToBackStack = isSubredditPreview();
         if (savedInstanceState == null) {
-            initFragments(targetSubreddit);
+            initFragments(getTargetSubreddit());
         }
+    }
+
+    private boolean isSubredditPreview() {
+        return getIntent().hasExtra(EXTRA_SUBREDDIT);
     }
 
     private Subreddit getTargetSubreddit() {
@@ -204,6 +206,14 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         ControlFragment cf = ControlFragment.newInstance(getSubreddit(), thing, position,
                 getFilter());
         ft.add(cf, FRAG_CONTROL);
+
+        if (singleContainer != null) {
+            ThingListFragment tf = getThingListFragment();
+            if (tf != null) {
+                ft.remove(tf);
+            }
+        }
+
         ft.addToBackStack(null);
         ft.commit();
     }
@@ -213,6 +223,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
             FragmentManager fm = getFragmentManager();
             ThingPagerAdapter adapter = new ThingPagerAdapter(fm, thing);
             thingPager.setAdapter(adapter);
+            thingPager.setCurrentItem(0);
         } else {
             thingPager.setAdapter(null);
         }
@@ -304,7 +315,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
 
     private void refreshContainers(Thing t) {
         if (subredditListContainer != null) {
-            int v = targetSubreddit != null ? View.GONE : View.VISIBLE;
+            int v = isSubredditPreview() ? View.GONE : View.VISIBLE;
             subredditListContainer.setVisibility(v);
             navSeparator.setVisibility(v);
         }
@@ -331,21 +342,20 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
+        boolean isThingList = isVisible(FRAG_THING_LIST);
         Thing thing = getThing();
-        boolean hasThing = thing != null;
-        boolean hasLink = hasThing && !thing.isSelf;
+        boolean isThing = thing != null;
+        boolean isLink = isThing && !thing.isSelf;
 
-        menu.findItem(R.id.menu_add).setVisible(
-                isVisible(FRAG_THING_LIST) && targetSubreddit != null);
-        menu.findItem(R.id.menu_refresh).setVisible(
-                isVisible(FRAG_THING_LIST) && singleContainer != null);
+        menu.findItem(R.id.menu_add).setVisible((isThingList || isThing) && isSubredditPreview());
+        menu.findItem(R.id.menu_refresh).setVisible(isThingList && singleContainer != null);
 
-        menu.findItem(R.id.menu_link).setVisible(hasLink && !isShowingLink(thing));
-        menu.findItem(R.id.menu_comments).setVisible(hasLink && isShowingLink(thing));
+        menu.findItem(R.id.menu_link).setVisible(isLink && !isShowingLink(thing));
+        menu.findItem(R.id.menu_comments).setVisible(isLink && isShowingLink(thing));
 
-        menu.findItem(R.id.menu_share).setVisible(hasThing);
-        menu.findItem(R.id.menu_copy_url).setVisible(hasThing);
-        menu.findItem(R.id.menu_view).setVisible(hasThing);
+        menu.findItem(R.id.menu_share).setVisible(isThing);
+        menu.findItem(R.id.menu_copy_url).setVisible(isThing);
+        menu.findItem(R.id.menu_view).setVisible(isThing);
 
         updateShareActionIntent(thing);
         return true;
@@ -392,9 +402,12 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
     }
 
     private void handleAdd() {
-        ContentValues values = new ContentValues(1);
-        values.put(Subreddits.COLUMN_NAME, targetSubreddit.name);
-        Provider.addSubredditInBackground(getApplicationContext(), values);
+        Subreddit sr = getSubreddit();
+        if (sr != null) {
+            ContentValues values = new ContentValues(1);
+            values.put(Subreddits.COLUMN_NAME, sr.name);
+            Provider.addSubredditInBackground(getApplicationContext(), values);
+        }
     }
 
     private void handleSearchForSubreddits() {
@@ -441,8 +454,8 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         int count = fm.getBackStackEntryCount();
         if (count > 0) {
             fm.popBackStack();
-        } else if (singleContainer != null && targetSubreddit != null) {
-            targetSubreddit = null;
+        } else if (singleContainer != null && insertSlfToBackStack) {
+            insertSlfToBackStack = false;
             initFragments(null);
         } else {
             finish();
