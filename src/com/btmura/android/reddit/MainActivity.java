@@ -49,9 +49,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
     private int lastSelectedFilter;
 
     private View singleContainer;
-    private View subredditListContainer;
     private View navContainer;
-    private View navSeparator;
     private ViewPager thingPager;
 
     private ShareActionProvider shareProvider;
@@ -80,9 +78,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         bar.setListNavigationCallbacks(filterSpinner, this);
 
         singleContainer = findViewById(R.id.single_container);
-        subredditListContainer = findViewById(R.id.subreddit_list_container);
         navContainer = findViewById(R.id.nav_container);
-        navSeparator = findViewById(R.id.nav_separator);
 
         thingPager = (ViewPager) findViewById(R.id.thing_pager);
         thingPager.setOnPageChangeListener(this);
@@ -117,10 +113,11 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ControlFragment cf = ControlFragment.newInstance(sr, null, -1, lastSelectedFilter);
         ft.add(cf, FRAG_CONTROL);
-        if (sr == null) {
+        if (singleContainer == null || sr == null) {
             ft.replace(slfContainerId, SubredditListFragment.newInstance(singleChoice),
                     FRAG_SUBREDDIT_LIST);
-        } else {
+        }
+        if (sr != null) {
             ft.replace(tlfContainerId,
                     ThingListFragment.newInstance(sr, lastSelectedFilter, singleChoice),
                     FRAG_THING_LIST);
@@ -314,11 +311,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
     }
 
     private void refreshContainers(Thing t) {
-        if (subredditListContainer != null) {
-            int v = isSubredditPreview() ? View.GONE : View.VISIBLE;
-            subredditListContainer.setVisibility(v);
-            navSeparator.setVisibility(v);
-        }
         if (thingPager != null) {
             thingPager.setVisibility(t != null ? View.VISIBLE : View.GONE);
         }
