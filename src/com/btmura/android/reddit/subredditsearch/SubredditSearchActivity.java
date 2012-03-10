@@ -59,17 +59,17 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
             String q = getIntent().getStringExtra(EXTRA_QUERY);
             if (q != null && !q.trim().isEmpty()) {
                 sv.setQuery(q.trim(), false);
-                submitQuery(q.trim(), false);
+                submitQuery(q.trim());
             }
         }
     }
 
     public boolean onQueryTextSubmit(String query) {
-        submitQuery(query, true);
+        submitQuery(query);
         return true;
     }
 
-    private void submitQuery(String query, boolean addToBackStack) {
+    private void submitQuery(String query) {
         sv.clearFocus();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (singleContainer != null) {
@@ -79,9 +79,6 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
             ft.replace(R.id.subreddits_container,
                     SubredditInfoListFragment.newInstance(query, true), FRAG_SUBREDDITS);
             ft.replace(R.id.details_container, DetailsFragment.newInstance(null, -1), FRAG_DETAILS);
-        }
-        if (addToBackStack) {
-            ft.addToBackStack(null);
         }
         ft.commit();
     }
@@ -105,7 +102,9 @@ public class SubredditSearchActivity extends Activity implements OnQueryTextList
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         int containerId = singleContainer != null ? R.id.single_container : R.id.details_container;
         ft.replace(containerId, DetailsFragment.newInstance(infos.get(0), position), FRAG_DETAILS);
-        ft.addToBackStack(null);
+        if (singleContainer != null) {
+            ft.addToBackStack(null);
+        }
         ft.commit();
     }
 
