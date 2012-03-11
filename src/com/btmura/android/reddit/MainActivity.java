@@ -197,7 +197,7 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
             fm.addOnBackStackChangedListener(this);
         }
 
-        updateThingPager(thing);
+        updateThingPager(thing);  
 
         FragmentTransaction ft = fm.beginTransaction();
         ControlFragment cf = ControlFragment.newInstance(getSubreddit(), thing, position,
@@ -220,7 +220,6 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
             FragmentManager fm = getFragmentManager();
             ThingPagerAdapter adapter = new ThingPagerAdapter(fm, thing);
             thingPager.setAdapter(adapter);
-            thingPager.setCurrentItem(0);
         } else {
             thingPager.setAdapter(null);
         }
