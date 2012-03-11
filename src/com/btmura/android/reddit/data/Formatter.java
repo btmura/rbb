@@ -28,6 +28,7 @@ public class Formatter {
         c = Styles.format(c, Styles.STYLE_BOLD);
         c = Styles.format(c, Styles.STYLE_ITALIC);
         c = Styles.format(c, Styles.STYLE_STRIKETHROUGH);
+        c = Heading.format(c);
         c = Bullets.format(c);
         c = NamedLinks.format(c);
         c = RawLinks.format(c);
@@ -37,9 +38,7 @@ public class Formatter {
     }
 
     public static CharSequence formatInfo(Context context, CharSequence info) {
-        CharSequence c = formatComment(context, info);
-        c = Heading.format(c);
-        return c;
+        return formatComment(context, info);        
     }
 
     static class Escaped {
