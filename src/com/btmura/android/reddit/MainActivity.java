@@ -312,6 +312,14 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
     private void refreshContainers(Thing t) {
         if (thingPager != null) {
             thingPager.setVisibility(t != null ? View.VISIBLE : View.GONE);
+            if (t == null) {
+                // Avoid nested executePendingTransactions that would occur by doing popBackStack.
+                thingPager.post(new Runnable() {
+                   public void run() {
+                       updateThingPager(null);
+                   } 
+                });
+            }
         }
         if (singleContainer != null) {
             singleContainer.setVisibility(t != null ? View.GONE : View.VISIBLE);
