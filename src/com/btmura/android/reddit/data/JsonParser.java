@@ -116,6 +116,8 @@ public class JsonParser {
                 onDescription(r, i);
             } else if ("subscribers".equals(name)) {
                 onSubscribers(r, i);
+            } else if ("created_utc".equals(name)) {
+                onCreatedUtc(r, i);
             } else if ("author".equals(name)) {
                 onAuthor(r, i);
             } else if ("subreddit".equals(name)) {
@@ -196,6 +198,10 @@ public class JsonParser {
     }
 
     public void onSubscribers(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+    
+    public void onCreatedUtc(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 

@@ -25,6 +25,7 @@ public class Thing implements Parcelable {
     public int score;
     public String status;
     public String moreKey;
+    public long createdUtc;
 
     public CharSequence title;
 

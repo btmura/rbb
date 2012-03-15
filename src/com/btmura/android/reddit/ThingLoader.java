@@ -80,6 +80,13 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
 
         private final ArrayList<Thing> things = new ArrayList<Thing>(30);
         private String moreKey;
+        private long nowUtc;
+
+        @Override
+        public void onParseStart() {
+            super.onParseStart();
+            nowUtc = System.currentTimeMillis() / 1000;
+        }
 
         @Override
         public void onEntityStart(int index) {
@@ -107,6 +114,11 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
         @Override
         public void onAuthor(JsonReader reader, int index) throws IOException {
             things.get(index).author = readTrimmedString(reader, "");
+        }
+
+        @Override
+        public void onCreatedUtc(JsonReader reader, int index) throws IOException {
+            things.get(index).createdUtc = reader.nextLong();
         }
 
         @Override
@@ -143,16 +155,53 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
         public void onEntityEnd(int index) {
             Thing t = things.get(index);
             t.status = getStatus(t);
+            Log.v(TAG, getContext().getString(R.string.thing_status));
+            Log.v(TAG, "Status: " + t.status);
         }
 
         private String getStatus(Thing t) {
             if (subreddit.equalsIgnoreCase(t.subreddit)) {
-                return getContext().getString(R.string.thing_status, t.author, t.score,
-                        t.numComments);
+                return getContext().getString(R.string.thing_status, t.author,
+                        getRelativeTimeString(t), t.score, t.numComments);
             } else {
                 return getContext().getString(R.string.thing_status_2, t.subreddit, t.author,
-                        t.score, t.numComments);
+                        getRelativeTimeString(t), t.score, t.numComments);
             }
+        }
+        
+        private static final int MINUTE_SECONDS = 60;
+        private static final int HOUR_SECONDS = MINUTE_SECONDS * 60;
+        private static final int DAY_SECONDS = HOUR_SECONDS * 24;
+        private static final int MONTH_SECONDS = DAY_SECONDS * 30;
+        private static final int YEAR_SECONDS = MONTH_SECONDS * 12;
+
+        private String getRelativeTimeString(Thing t) {
+            long ago = nowUtc - t.createdUtc;
+            int format;
+            int divisor;
+            
+            if (ago > YEAR_SECONDS * 2) {
+                format = R.string.x_years_ago;
+                divisor = YEAR_SECONDS;
+            } else if (ago > MONTH_SECONDS * 2) {
+                format = R.string.x_months_ago;
+                divisor = MONTH_SECONDS;
+            } else if (ago > DAY_SECONDS * 2) {
+                format = R.string.x_days_ago;
+                divisor = DAY_SECONDS;
+            } else if (ago > HOUR_SECONDS * 2) {
+                format = R.string.x_hours_ago;
+                divisor = HOUR_SECONDS;
+            } else if (ago > MINUTE_SECONDS * 2) {
+                format = R.string.x_minutes_ago;
+                divisor = MINUTE_SECONDS;
+            } else {
+                format = R.string.x_seconds_ago;
+                divisor = 1;
+            }
+            
+            long value = Math.round(Math.floor((double) ago / divisor));
+            return getContext().getString(format, value);
         }
 
         @Override
