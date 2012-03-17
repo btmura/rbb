@@ -14,6 +14,7 @@ public class Comment {
 
     // Temporary values used to create status
     public String author;
+    public long createdUtc;
     public int numComments;
     public int ups;
     public int downs;

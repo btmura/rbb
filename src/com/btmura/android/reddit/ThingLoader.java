@@ -15,6 +15,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.data.JsonParser;
+import com.btmura.android.reddit.data.RelativeTime;
 
 public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
 
@@ -101,6 +102,26 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
         }
 
         @Override
+        public void onIsSelf(JsonReader reader, int index) throws IOException {
+            things.get(index).isSelf = reader.nextBoolean();
+        }
+
+        @Override
+        public void onUrl(JsonReader reader, int index) throws IOException {
+            things.get(index).url = readTrimmedString(reader, "");
+        }
+
+        @Override
+        public void onPermaLink(JsonReader reader, int index) throws IOException {
+            things.get(index).permaLink = readTrimmedString(reader, "");
+        }
+
+        @Override
+        public void onThumbnail(JsonReader reader, int index) throws IOException {
+            things.get(index).thumbnail = readTrimmedString(reader, "");
+        }
+
+        @Override
         public void onTitle(JsonReader reader, int index) throws IOException {
             things.get(index).rawTitle = readTrimmedString(reader, "");
             things.get(index).assureTitle(getContext());
@@ -122,23 +143,8 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
         }
 
         @Override
-        public void onUrl(JsonReader reader, int index) throws IOException {
-            things.get(index).url = readTrimmedString(reader, "");
-        }
-
-        @Override
-        public void onThumbnail(JsonReader reader, int index) throws IOException {
-            things.get(index).thumbnail = readTrimmedString(reader, "");
-        }
-
-        @Override
-        public void onPermaLink(JsonReader reader, int index) throws IOException {
-            things.get(index).permaLink = readTrimmedString(reader, "");
-        }
-
-        @Override
-        public void onIsSelf(JsonReader reader, int index) throws IOException {
-            things.get(index).isSelf = reader.nextBoolean();
+        public void onScore(JsonReader reader, int index) throws IOException {
+            things.get(index).score = reader.nextInt();
         }
 
         @Override
@@ -147,61 +153,16 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
         }
 
         @Override
-        public void onScore(JsonReader reader, int index) throws IOException {
-            things.get(index).score = reader.nextInt();
-        }
-
-        @Override
         public void onEntityEnd(int index) {
             Thing t = things.get(index);
             t.status = getStatus(t);
-            Log.v(TAG, getContext().getString(R.string.thing_status));
-            Log.v(TAG, "Status: " + t.status);
         }
 
         private String getStatus(Thing t) {
-            if (subreddit.equalsIgnoreCase(t.subreddit)) {
-                return getContext().getString(R.string.thing_status, t.author,
-                        getRelativeTimeString(t), t.score, t.numComments);
-            } else {
-                return getContext().getString(R.string.thing_status_2, t.subreddit, t.author,
-                        getRelativeTimeString(t), t.score, t.numComments);
-            }
-        }
-        
-        private static final int MINUTE_SECONDS = 60;
-        private static final int HOUR_SECONDS = MINUTE_SECONDS * 60;
-        private static final int DAY_SECONDS = HOUR_SECONDS * 24;
-        private static final int MONTH_SECONDS = DAY_SECONDS * 30;
-        private static final int YEAR_SECONDS = MONTH_SECONDS * 12;
-
-        private String getRelativeTimeString(Thing t) {
-            long ago = nowUtc - t.createdUtc;
-            int format;
-            int divisor;
-            
-            if (ago > YEAR_SECONDS * 2) {
-                format = R.string.x_years_ago;
-                divisor = YEAR_SECONDS;
-            } else if (ago > MONTH_SECONDS * 2) {
-                format = R.string.x_months_ago;
-                divisor = MONTH_SECONDS;
-            } else if (ago > DAY_SECONDS * 2) {
-                format = R.string.x_days_ago;
-                divisor = DAY_SECONDS;
-            } else if (ago > HOUR_SECONDS * 2) {
-                format = R.string.x_hours_ago;
-                divisor = HOUR_SECONDS;
-            } else if (ago > MINUTE_SECONDS * 2) {
-                format = R.string.x_minutes_ago;
-                divisor = MINUTE_SECONDS;
-            } else {
-                format = R.string.x_seconds_ago;
-                divisor = 1;
-            }
-            
-            long value = Math.round(Math.floor((double) ago / divisor));
-            return getContext().getString(format, value);
+            boolean matchesSubreddit = subreddit.equalsIgnoreCase(t.subreddit);
+            int resId = matchesSubreddit ?R.string.thing_status :  R.string.thing_status_subreddit;
+            String rt = RelativeTime.format(getContext(), nowUtc - t.createdUtc);
+            return getContext().getString(resId, t.subreddit, t.author, rt, t.score, t.numComments);
         }
 
         @Override

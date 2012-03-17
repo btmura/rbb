@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
+import com.btmura.android.reddit.data.RelativeTime;
 
 public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 
@@ -80,10 +81,17 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
     class CommentParser extends JsonParser {
 
         private final List<Comment> comments = new ArrayList<Comment>(360);
+        private long nowUtc;
 
         @Override
         public boolean shouldParseReplies() {
             return true;
+        }
+
+        @Override
+        public void onParseStart() {
+            super.onParseStart();
+            nowUtc = System.currentTimeMillis() / 1000;
         }
 
         @Override
@@ -112,11 +120,6 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
         }
 
         @Override
-        public void onAuthor(JsonReader reader, int index) throws IOException {
-            comments.get(index).author = readTrimmedString(reader, "");
-        }
-
-        @Override
         public void onSelfText(JsonReader reader, int index) throws IOException {
             comments.get(index).body = Formatter.formatComment(getContext(),
                     readTrimmedString(reader, ""));
@@ -126,6 +129,16 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
         public void onBody(JsonReader reader, int index) throws IOException {
             comments.get(index).body = Formatter.formatComment(getContext(),
                     readTrimmedString(reader, ""));
+        }
+
+        @Override
+        public void onAuthor(JsonReader reader, int index) throws IOException {
+            comments.get(index).author = readTrimmedString(reader, "");
+        }
+
+        @Override
+        public void onCreatedUtc(JsonReader reader, int index) throws IOException {
+            comments.get(index).createdUtc = reader.nextLong();
         }
 
         @Override
@@ -148,12 +161,12 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
             Comment c = comments.get(index);
             switch (c.type) {
                 case Comment.TYPE_HEADER:
-                    c.status = getHeaderStatus(c);
+                    c.status = getStatus(c, true);
                     c.author = null;
                     break;
 
                 case Comment.TYPE_COMMENT:
-                    c.status = getCommentStatus(c);
+                    c.status = getStatus(c, false);
                     c.author = null;
                     break;
 
@@ -165,14 +178,10 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
             }
         }
 
-        private CharSequence getHeaderStatus(Comment c) {
-            return getContext().getString(R.string.comment_header_status, c.author,
-                    c.ups - c.downs, c.numComments);
-        }
-
-        private CharSequence getCommentStatus(Comment c) {
-            return getContext().getString(R.string.comment_comment_status, c.author,
-                    c.ups - c.downs);
+        private CharSequence getStatus(Comment c, boolean isHeader) {
+            int resId = isHeader ? R.string.comment_header_status : R.string.comment_comment_status;
+            String rt = RelativeTime.format(getContext(), nowUtc - c.createdUtc);
+            return getContext().getString(resId, c.author, rt, c.ups - c.downs, c.numComments);
         }
 
         @Override
