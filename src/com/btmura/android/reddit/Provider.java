@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.btmura.android.reddit.R;
 
+import android.app.backup.BackupManager;
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
@@ -43,6 +44,7 @@ public class Provider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri
                 .parse("content://" + AUTHORITY + "/" + TABLE_NAME);
         public static final String COLUMN_NAME = "name";
+        public static final String SORT = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
     }
 
     private DbHelper helper;
@@ -137,6 +139,7 @@ public class Provider extends ContentProvider {
             @Override
             protected void onPostExecute(Void result) {
                 showChangeToast(context, 1);
+                scheduleBackup(context);
             }
         }.execute();
     }
@@ -154,6 +157,7 @@ public class Provider extends ContentProvider {
             @Override
             protected void onPostExecute(Void result) {
                 showChangeToast(context, values.length);
+                scheduleBackup(context);
             }
         }.execute();
     }
@@ -179,6 +183,7 @@ public class Provider extends ContentProvider {
             @Override
             protected void onPostExecute(Void result) {
                 showChangeToast(context, -ids.length);
+                scheduleBackup(context);
             }
         }.execute();
     }
@@ -222,6 +227,7 @@ public class Provider extends ContentProvider {
             @Override
             protected void onPostExecute(Integer deleted) {
                 showChangeToast(context, 1);
+                scheduleBackup(context);
             }
         }.execute();
     }
@@ -258,6 +264,7 @@ public class Provider extends ContentProvider {
             @Override
             protected void onPostExecute(Integer added) {
                 showChangeToast(context, added);
+                scheduleBackup(context);
             }
         }.execute();
     }
@@ -266,6 +273,10 @@ public class Provider extends ContentProvider {
         int resId = count >= 0 ? R.string.x_subreddits_added : R.string.x_subreddits_deleted;
         Toast.makeText(context, context.getString(resId, Math.abs(count)), Toast.LENGTH_SHORT)
                 .show();
+    }
+
+    private static void scheduleBackup(Context context) {
+        new BackupManager(context).dataChanged();
     }
 
     @Override

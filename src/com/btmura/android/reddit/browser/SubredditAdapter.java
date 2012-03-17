@@ -17,10 +17,9 @@ public class SubredditAdapter extends SimpleCursorAdapter {
     private static final String[] PROJECTION = { Subreddits._ID, Subreddits.COLUMN_NAME, };
     private static final String[] FROM = {};
     private static final int[] TO = {};
-    private static final String SORT = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
 
     public static CursorLoader createLoader(Context context) {
-        return new CursorLoader(context, Subreddits.CONTENT_URI, PROJECTION, null, null, SORT);
+        return new CursorLoader(context, Subreddits.CONTENT_URI, PROJECTION, null, null, Subreddits.SORT);
     }
 
     private boolean singleChoice;
