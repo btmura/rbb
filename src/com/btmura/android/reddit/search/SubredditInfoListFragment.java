@@ -1,4 +1,4 @@
-package com.btmura.android.reddit.subredditsearch;
+package com.btmura.android.reddit.search;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.btmura.android.reddit.subredditsearch;
+package com.btmura.android.reddit.search;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.btmura.android.reddit.MainActivity;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.browser.BrowserActivity;
 import com.btmura.android.reddit.data.Formatter;
-import com.btmura.android.reddit.subredditsearch.SubredditInfoListFragment.OnSelectedListener;
+import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedListener;
 
 public class DetailsFragment extends ListFragment {
 
@@ -64,8 +64,8 @@ public class DetailsFragment extends ListFragment {
     }
 
     private void handleViewSubreddit() {
-        Intent intent = new Intent(getActivity(), MainActivity.class);
-        intent.putExtra(MainActivity.EXTRA_SUBREDDIT, getSubredditInfo().displayName);
+        Intent intent = new Intent(getActivity(), BrowserActivity.class);
+        intent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getSubredditInfo().displayName);
         startActivity(intent);
     }
 

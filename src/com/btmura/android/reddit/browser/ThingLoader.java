@@ -1,4 +1,4 @@
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.browser;
 
 import java.io.IOException;
 import java.io.InputStream;

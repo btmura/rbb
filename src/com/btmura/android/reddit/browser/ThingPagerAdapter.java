@@ -1,4 +1,4 @@
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.browser;
 
 import android.app.Fragment;
 import android.app.FragmentManager;

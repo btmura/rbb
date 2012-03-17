@@ -1,4 +1,6 @@
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.browser;
+
+import com.btmura.android.reddit.R;
 
 import android.app.Fragment;
 import android.graphics.Bitmap;

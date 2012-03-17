@@ -1,10 +1,12 @@
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.browser;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import com.btmura.android.reddit.R;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

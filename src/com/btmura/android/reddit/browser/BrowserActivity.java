@@ -1,4 +1,4 @@
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.browser;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
@@ -23,13 +23,15 @@ import android.widget.SearchView.OnQueryTextListener;
 import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
+import com.btmura.android.reddit.Provider;
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.Provider.Subreddits;
-import com.btmura.android.reddit.SubredditListFragment.OnSubredditSelectedListener;
-import com.btmura.android.reddit.ThingListFragment.OnThingSelectedListener;
+import com.btmura.android.reddit.browser.SubredditListFragment.OnSubredditSelectedListener;
+import com.btmura.android.reddit.browser.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.data.Formatter;
-import com.btmura.android.reddit.subredditsearch.SubredditSearchActivity;
+import com.btmura.android.reddit.search.SearchActivity;
 
-public class MainActivity extends Activity implements OnBackStackChangedListener,
+public class BrowserActivity extends Activity implements OnBackStackChangedListener,
         OnNavigationListener, OnQueryTextListener, OnFocusChangeListener, OnPageChangeListener,
         OnSubredditSelectedListener, OnThingSelectedListener {
 
@@ -422,10 +424,10 @@ public class MainActivity extends Activity implements OnBackStackChangedListener
     }
 
     public boolean onQueryTextSubmit(String query) {
-        Intent intent = new Intent(this, SubredditSearchActivity.class);
+        Intent intent = new Intent(this, SearchActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
                 | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        intent.putExtra(SubredditSearchActivity.EXTRA_QUERY, query);
+        intent.putExtra(SearchActivity.EXTRA_QUERY, query);
         startActivityForResult(intent, REQUEST_ADD_SUBREDDITS);
         return true;
     }

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.text.style.ClickableSpan;
 import android.view.View;
 
-import com.btmura.android.reddit.MainActivity;
+import com.btmura.android.reddit.browser.BrowserActivity;
 
 public class SubredditSpan extends ClickableSpan {
 
@@ -18,8 +18,8 @@ public class SubredditSpan extends ClickableSpan {
     @Override
     public void onClick(View widget) {
         Context c = widget.getContext();
-        Intent i = new Intent(c, MainActivity.class);
-        i.putExtra(MainActivity.EXTRA_SUBREDDIT, subreddit);
+        Intent i = new Intent(c, BrowserActivity.class);
+        i.putExtra(BrowserActivity.EXTRA_SUBREDDIT, subreddit);
         c.startActivity(i);
     }
 }

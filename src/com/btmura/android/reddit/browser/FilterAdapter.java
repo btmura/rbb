@@ -1,6 +1,8 @@
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.browser;
 
 import java.util.ArrayList;
+
+import com.btmura.android.reddit.R;
 
 import android.content.Context;
 import android.view.LayoutInflater;

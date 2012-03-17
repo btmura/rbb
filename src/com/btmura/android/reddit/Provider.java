@@ -3,6 +3,8 @@ package com.btmura.android.reddit;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.btmura.android.reddit.R;
+
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;

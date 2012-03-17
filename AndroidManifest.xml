@@ -13,16 +13,28 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light" >
         <activity
-            android:name=".MainActivity"
+            android:name=".browser.BrowserActivity"
             android:clearTaskOnLaunch="true"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".subredditsearch.SubredditSearchActivity" >
+
+        <activity-alias
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:targetActivity=".browser.BrowserActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity android:name=".search.SearchActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

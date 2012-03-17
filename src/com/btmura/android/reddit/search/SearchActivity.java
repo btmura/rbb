@@ -1,4 +1,4 @@
-package com.btmura.android.reddit.subredditsearch;
+package com.btmura.android.reddit.search;
 
 import java.util.List;
 
@@ -16,11 +16,11 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.subredditsearch.SubredditInfoListFragment.OnSelectedListener;
+import com.btmura.android.reddit.Provider.Subreddits;
+import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedListener;
 
-public class SubredditSearchActivity extends Activity implements OnQueryTextListener,
+public class SearchActivity extends Activity implements OnQueryTextListener,
         OnSelectedListener, OnBackStackChangedListener {
 
     public static final String EXTRA_QUERY = "q";

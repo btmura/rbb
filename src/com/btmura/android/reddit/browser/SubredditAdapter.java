@@ -1,4 +1,4 @@
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.browser;
 
 import android.content.Context;
 import android.content.CursorLoader;
@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.Provider.Subreddits;
 
 public class SubredditAdapter extends SimpleCursorAdapter {

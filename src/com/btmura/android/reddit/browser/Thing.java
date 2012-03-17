@@ -1,5 +1,6 @@
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.browser;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.RelativeTime;
 

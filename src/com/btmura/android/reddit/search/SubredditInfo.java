@@ -1,4 +1,4 @@
-package com.btmura.android.reddit.subredditsearch;
+package com.btmura.android.reddit.search;
 
 import android.os.Parcel;
 import android.os.Parcelable;

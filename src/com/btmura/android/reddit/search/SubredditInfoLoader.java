@@ -1,4 +1,4 @@
-package com.btmura.android.reddit.subredditsearch;
+package com.btmura.android.reddit.search;
 
 import java.io.IOException;
 import java.io.InputStream;
