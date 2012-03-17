@@ -12,7 +12,8 @@ public class RelativeTime {
     private static final int MONTH_SECONDS = DAY_SECONDS * 30;
     private static final int YEAR_SECONDS = MONTH_SECONDS * 12;
 
-    public static String format(Context context, long diff) {
+    public static String format(Context context, long now, long time) {
+        long diff = now - time;
         int resId;
         int divisor;
         if (diff > YEAR_SECONDS * 2) {
@@ -34,7 +35,7 @@ public class RelativeTime {
             resId = R.string.x_seconds_ago;
             divisor = 1;
         }
-        
+
         long value = Math.round(Math.floor((double) diff / divisor));
         return context.getString(resId, value);
     }

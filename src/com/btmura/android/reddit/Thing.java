@@ -1,6 +1,7 @@
 package com.btmura.android.reddit;
 
 import com.btmura.android.reddit.data.Formatter;
+import com.btmura.android.reddit.data.RelativeTime;
 
 import android.content.Context;
 import android.os.Parcel;
@@ -70,10 +71,23 @@ public class Thing implements Parcelable {
                 && !"self".equals(thumbnail) && !"nsfw".equals(thumbnail);
     }
 
-    public Thing assureTitle(Context context) {
-        if (title == null) {
-            title = Formatter.formatTitle(context, rawTitle);
+    public Thing assureTitle(Context c) {
+        if (type == TYPE_MORE || title != null) {
+            return this;
         }
+        title = Formatter.formatTitle(c, rawTitle);
+        return this;
+    }
+
+    public Thing assureFormat(Context c, String parentSubreddit, long now) {
+        if (type == TYPE_MORE || status != null) {
+            return this;
+        }
+        assureTitle(c);
+        boolean showSubreddit = !parentSubreddit.equalsIgnoreCase(subreddit);
+        int resId = showSubreddit ? R.string.thing_status_subreddit : R.string.thing_status;
+        String rt = RelativeTime.format(c, now, createdUtc);
+        status = c.getString(resId, subreddit, author, rt, score, numComments);
         return this;
     }
 

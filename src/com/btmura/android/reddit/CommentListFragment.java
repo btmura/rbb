@@ -24,7 +24,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new CommentAdapter(getActivity().getLayoutInflater());
+        adapter = new CommentAdapter(getActivity(), getActivity().getLayoutInflater());
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.btmura.android.reddit;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +14,12 @@ import android.widget.TextView;
 public class CommentAdapter extends BaseAdapter {
 
     private final ArrayList<Comment> items = new ArrayList<Comment>();
+    private final Context context;
     private final LayoutInflater inflater;
+    private final long now = System.currentTimeMillis() / 1000;
 
-    public CommentAdapter(LayoutInflater inflater) {
+    public CommentAdapter(Context context, LayoutInflater inflater) {
+        this.context = context;
         this.inflater = inflater;
     }
 
@@ -96,7 +100,7 @@ public class CommentAdapter extends BaseAdapter {
     }
 
     private void setView(int position, View v) {
-        Comment c = getItem(position);
+        Comment c = getItem(position).assureFormat(context, now);
         ViewHolder h = (ViewHolder) v.getTag();
         switch (c.type) {
             case Comment.TYPE_HEADER:

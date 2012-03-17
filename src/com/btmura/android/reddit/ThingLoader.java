@@ -11,24 +11,22 @@ import java.util.List;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.data.JsonParser;
-import com.btmura.android.reddit.data.RelativeTime;
 
 public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
 
     private static final String TAG = "ThingLoader";
 
-    private final String subreddit;
     private final CharSequence url;
     private List<Thing> things;
     private List<Thing> initThings;
 
-    public ThingLoader(Context context, String subreddit, CharSequence url, List<Thing> initThings) {
+    public ThingLoader(Context context, CharSequence url, List<Thing> initThings) {
         super(context);
-        this.subreddit = subreddit;
         this.url = url;
         this.initThings = initThings;
     }
@@ -52,9 +50,8 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
     @Override
     public List<Thing> loadInBackground() {
         try {
+            long t1 = SystemClock.currentThreadTimeMillis();
             URL u = new URL(url.toString());
-            Log.v(TAG, url.toString());
-
             HttpURLConnection conn = (HttpURLConnection) u.openConnection();
             conn.connect();
 
@@ -63,8 +60,10 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
             ThingParser parser = new ThingParser();
             parser.parseListingObject(reader);
             stream.close();
-
             conn.disconnect();
+
+            long t2 = SystemClock.currentThreadTimeMillis();
+            Log.v(TAG, String.valueOf(t2 - t1));
 
             return parser.things;
 
@@ -81,13 +80,6 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
 
         private final ArrayList<Thing> things = new ArrayList<Thing>(30);
         private String moreKey;
-        private long nowUtc;
-
-        @Override
-        public void onParseStart() {
-            super.onParseStart();
-            nowUtc = System.currentTimeMillis() / 1000;
-        }
 
         @Override
         public void onEntityStart(int index) {
@@ -124,7 +116,6 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
         @Override
         public void onTitle(JsonReader reader, int index) throws IOException {
             things.get(index).rawTitle = readTrimmedString(reader, "");
-            things.get(index).assureTitle(getContext());
         }
 
         @Override
@@ -150,19 +141,6 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
         @Override
         public void onNumComments(JsonReader reader, int index) throws IOException {
             things.get(index).numComments = reader.nextInt();
-        }
-
-        @Override
-        public void onEntityEnd(int index) {
-            Thing t = things.get(index);
-            t.status = getStatus(t);
-        }
-
-        private String getStatus(Thing t) {
-            boolean matchesSubreddit = subreddit.equalsIgnoreCase(t.subreddit);
-            int resId = matchesSubreddit ?R.string.thing_status :  R.string.thing_status_subreddit;
-            String rt = RelativeTime.format(getContext(), nowUtc - t.createdUtc);
-            return getContext().getString(resId, t.subreddit, t.author, rt, t.score, t.numComments);
         }
 
         @Override

@@ -15,9 +15,7 @@ import android.os.SystemClock;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
-import com.btmura.android.reddit.data.RelativeTime;
 
 public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 
@@ -50,23 +48,20 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
     @Override
     public List<Comment> loadInBackground() {
         try {
+            long t1 = SystemClock.currentThreadTimeMillis();
             URL u = new URL(url.toString());
-            Log.v(TAG, url.toString());
-
             HttpURLConnection conn = (HttpURLConnection) u.openConnection();
             conn.connect();
 
-            long t1 = SystemClock.currentThreadTimeMillis();
             InputStream stream = conn.getInputStream();
-
             JsonReader reader = new JsonReader(new InputStreamReader(stream));
             CommentParser parser = new CommentParser();
             parser.parseListingArray(reader);
+            stream.close();
+            conn.disconnect();
 
             long t2 = SystemClock.currentThreadTimeMillis();
             Log.v(TAG, String.valueOf(t2 - t1));
-
-            stream.close();
 
             return parser.comments;
 
@@ -81,17 +76,10 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
     class CommentParser extends JsonParser {
 
         private final List<Comment> comments = new ArrayList<Comment>(360);
-        private long nowUtc;
 
         @Override
         public boolean shouldParseReplies() {
             return true;
-        }
-
-        @Override
-        public void onParseStart() {
-            super.onParseStart();
-            nowUtc = System.currentTimeMillis() / 1000;
         }
 
         @Override
@@ -115,20 +103,17 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 
         @Override
         public void onTitle(JsonReader reader, int index) throws IOException {
-            comments.get(index).title = Formatter.formatTitle(getContext(),
-                    readTrimmedString(reader, ""));
+            comments.get(index).rawTitle = readTrimmedString(reader, "");
         }
 
         @Override
         public void onSelfText(JsonReader reader, int index) throws IOException {
-            comments.get(index).body = Formatter.formatComment(getContext(),
-                    readTrimmedString(reader, ""));
+            comments.get(index).rawBody = readTrimmedString(reader, "");
         }
 
         @Override
         public void onBody(JsonReader reader, int index) throws IOException {
-            comments.get(index).body = Formatter.formatComment(getContext(),
-                    readTrimmedString(reader, ""));
+            comments.get(index).rawBody = readTrimmedString(reader, "");
         }
 
         @Override
@@ -154,34 +139,6 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
         @Override
         public void onDowns(JsonReader reader, int index) throws IOException {
             comments.get(index).downs = reader.nextInt();
-        }
-
-        @Override
-        public void onEntityEnd(int index) {
-            Comment c = comments.get(index);
-            switch (c.type) {
-                case Comment.TYPE_HEADER:
-                    c.status = getStatus(c, true);
-                    c.author = null;
-                    break;
-
-                case Comment.TYPE_COMMENT:
-                    c.status = getStatus(c, false);
-                    c.author = null;
-                    break;
-
-                case Comment.TYPE_MORE:
-                    break;
-
-                default:
-                    throw new IllegalArgumentException("Unsupported type: " + c.type);
-            }
-        }
-
-        private CharSequence getStatus(Comment c, boolean isHeader) {
-            int resId = isHeader ? R.string.comment_header_status : R.string.comment_comment_status;
-            String rt = RelativeTime.format(getContext(), nowUtc - c.createdUtc);
-            return getContext().getString(resId, c.author, rt, c.ups - c.downs, c.numComments);
         }
 
         @Override

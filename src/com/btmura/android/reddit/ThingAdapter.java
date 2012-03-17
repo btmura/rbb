@@ -3,6 +3,7 @@ package com.btmura.android.reddit;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,18 @@ public class ThingAdapter extends BaseAdapter {
 
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final ArrayList<Thing> items = new ArrayList<Thing>();
+    private final Context context;
     private final LayoutInflater inflater;
+    private final String parentSubreddit;
     private final boolean singleChoice;
+    private final long now = System.currentTimeMillis() / 1000;
     private int chosenPosition = -1;
 
-    public ThingAdapter(LayoutInflater inflater, boolean singleChoice) {
+    public ThingAdapter(Context context, LayoutInflater inflater, Subreddit subreddit,
+            boolean singleChoice) {
+        this.context = context;
         this.inflater = inflater;
+        this.parentSubreddit = subreddit.name;
         this.singleChoice = singleChoice;
     }
 
@@ -117,7 +124,7 @@ public class ThingAdapter extends BaseAdapter {
     }
 
     private void setView(int position, View v) {
-        Thing t = getItem(position);
+        Thing t = getItem(position).assureFormat(context, parentSubreddit, now);
         ViewHolder h = (ViewHolder) v.getTag();
         switch (t.type) {
             case Thing.TYPE_THING:

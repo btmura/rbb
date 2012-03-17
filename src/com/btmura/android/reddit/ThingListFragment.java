@@ -46,8 +46,8 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        adapter = new ThingAdapter(getActivity().getLayoutInflater(), getArguments().getBoolean(
-                ARG_SINGLE_CHOICE));
+        adapter = new ThingAdapter(getActivity(), getActivity().getLayoutInflater(),
+                getSubreddit(), isSingleChoice());
     }
 
     @Override
@@ -69,12 +69,9 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     }
 
     public Loader<List<Thing>> onCreateLoader(int id, Bundle args) {
-        Subreddit sr = getArguments().getParcelable(ARG_SUBREDDIT);
-        int filter = getArguments().getInt(ARG_FILTER);
         String moreKey = args != null ? args.getString(LOADER_ARG_MORE_KEY) : null;
-        CharSequence url = Urls.subredditUrl(sr, filter, moreKey);
-        return new ThingLoader(getActivity(), sr.name, url, args != null ? adapter.getItems()
-                : null);
+        CharSequence url = Urls.subredditUrl(getSubreddit(), getFilter(), moreKey);
+        return new ThingLoader(getActivity(), url, args != null ? adapter.getItems() : null);
     }
 
     public void onLoadFinished(Loader<List<Thing>> loader, List<Thing> things) {
@@ -152,5 +149,17 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 
     private OnThingSelectedListener getListener() {
         return (OnThingSelectedListener) getActivity();
+    }
+
+    private Subreddit getSubreddit() {
+        return getArguments().getParcelable(ARG_SUBREDDIT);
+    }
+
+    private int getFilter() {
+        return getArguments().getInt(ARG_FILTER);
+    }
+
+    private boolean isSingleChoice() {
+        return getArguments().getBoolean(ARG_SINGLE_CHOICE);
     }
 }
