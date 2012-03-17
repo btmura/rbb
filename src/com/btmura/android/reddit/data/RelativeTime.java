@@ -17,22 +17,22 @@ public class RelativeTime {
         int resId;
         int divisor;
         if (diff > YEAR_SECONDS * 2) {
-            resId = R.string.x_years_ago;
+            resId = R.string.x_time_years;
             divisor = YEAR_SECONDS;
         } else if (diff > MONTH_SECONDS * 2) {
-            resId = R.string.x_months_ago;
+            resId = R.string.x_time_months;
             divisor = MONTH_SECONDS;
         } else if (diff > DAY_SECONDS * 2) {
-            resId = R.string.x_days_ago;
+            resId = R.string.x_time_days;
             divisor = DAY_SECONDS;
         } else if (diff > HOUR_SECONDS * 2) {
-            resId = R.string.x_hours_ago;
+            resId = R.string.x_time_hours;
             divisor = HOUR_SECONDS;
         } else if (diff > MINUTE_SECONDS * 2) {
-            resId = R.string.x_minutes_ago;
+            resId = R.string.x_time_minutes;
             divisor = MINUTE_SECONDS;
         } else {
-            resId = R.string.x_seconds_ago;
+            resId = R.string.x_time_seconds;
             divisor = 1;
         }
 

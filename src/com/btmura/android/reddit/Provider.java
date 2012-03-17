@@ -134,7 +134,7 @@ public class Provider extends ContentProvider {
 
             @Override
             protected void onPostExecute(Void result) {
-                showChangeToast(context, 1, true);
+                showChangeToast(context, 1);
             }
         }.execute();
     }
@@ -151,7 +151,7 @@ public class Provider extends ContentProvider {
 
             @Override
             protected void onPostExecute(Void result) {
-                showChangeToast(context, values.length, true);
+                showChangeToast(context, values.length);
             }
         }.execute();
     }
@@ -176,23 +176,16 @@ public class Provider extends ContentProvider {
 
             @Override
             protected void onPostExecute(Void result) {
-                showChangeToast(context, ids.length, false);
+                showChangeToast(context, -ids.length);
             }
         }.execute();
     }
 
-    private static void showChangeToast(Context context, int count, boolean added) {
-        Toast.makeText(
-                context,
-                context.getString(added ? R.string.num_subreddits_added
-                        : R.string.num_subreddits_deleted, count), Toast.LENGTH_SHORT).show();
-    }
-
     public static void combineSubredditsInBackground(final Context context,
             final List<String> names, final long[] ids) {
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Integer>() {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Integer doInBackground(Void... params) {
                 int size = names.size();
                 StringBuilder combined = new StringBuilder();
                 for (int i = 0; i < size; i++) {
@@ -221,16 +214,21 @@ public class Provider extends ContentProvider {
                 } catch (OperationApplicationException e) {
                     Log.e(TAG, "combineSubredditsInBackground", e);
                 }
-                return null;
+                return size;
+            }
+
+            @Override
+            protected void onPostExecute(Integer deleted) {
+                showChangeToast(context, 1);
             }
         }.execute();
     }
 
     public static void splitSubredditInBackground(final Context context, final String name,
             final long id) {
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Integer>() {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Integer doInBackground(Void... params) {
                 String[] parts = name.split("\\+");
                 int numParts = parts.length;
 
@@ -252,10 +250,20 @@ public class Provider extends ContentProvider {
                 } catch (OperationApplicationException e) {
                     Log.e(TAG, "splitSubredditInBackground", e);
                 }
+                return numParts;
+            }
 
-                return null;
+            @Override
+            protected void onPostExecute(Integer added) {
+                showChangeToast(context, added);
             }
         }.execute();
+    }
+
+    private static void showChangeToast(Context context, int count) {
+        int resId = count >= 0 ? R.string.x_subreddits_added : R.string.x_subreddits_deleted;
+        Toast.makeText(context, context.getString(resId, Math.abs(count)), Toast.LENGTH_SHORT)
+                .show();
     }
 
     @Override

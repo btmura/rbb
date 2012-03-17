@@ -2,27 +2,19 @@
 <resources>
 
     <string name="app_name">reddit by brian</string>
-    <string name="empty">Nothing to see here…</string>
-    <string name="error">Something went wrong…</string>
-    <string name="thing_status">%2$s&#160; %3$s ago&#160; %4$d points&#160; %5$d comments</string>
-    <string name="thing_status_subreddit">%1$s&#160; %2$s&#160; %3$s ago&#160; %4$d points&#160; %5$d comments</string>
     <string name="comment_header_status">%1$s&#160; %2$s ago&#160; %3$d points&#160; %4$d comments</string>
     <string name="comment_comment_status">%1$s&#160; %2$s ago&#160; %3$d points</string>
-    <string name="sr_info_status">%1$s&#160; %2$d subscribers</string>
+    <string name="empty">Nothing to see here…</string>
+    <string name="error">Something went wrong…</string>
     <string name="filter_hot">what\'s hot</string>
     <string name="filter_new">new</string>
     <string name="filter_controversial">controversial</string>
     <string name="filter_top">top</string>
     <string name="front_page">front page</string>
     <string name="loading">Loading…</string>
-    <string name="thumbnail">Thumbnail</string>
-    <string name="sr_search">Search for subreddits</string>
-    <string name="sr_search_instructions">Choose a subreddit from the left.</string>
-    <string name="num_subreddits_added">%d subreddits added.</string>
-    <string name="num_subreddits_deleted">%d subreddits deleted.</string>
+    <string name="menu_add">Add</string>
     <string name="menu_add_front_page">Add front page</string>
     <string name="menu_combine">Combine</string>
-    <string name="menu_add">Add</string>
     <string name="menu_comments">View comments</string>
     <string name="menu_copy_url">Copy url</string>
     <string name="menu_delete">Delete</string>
@@ -33,11 +25,19 @@
     <string name="menu_split">Split</string>
     <string name="menu_view">View</string>
     <string name="menu_view_in_another_app">View in another app</string>
-    <string name="x_seconds_ago">%1$d seconds</string>
-    <string name="x_minutes_ago">%1$d minutes</string>
-    <string name="x_hours_ago">%1$d hours</string>
-    <string name="x_days_ago">%1$d days</string>
-    <string name="x_months_ago">%1$d months</string>
-    <string name="x_years_ago">%1$d years</string>
+    <string name="sr_info_status">%1$s&#160; %2$d subscribers</string>
+    <string name="sr_search">Search for subreddits</string>
+    <string name="sr_search_instructions">Choose a subreddit from the left.</string>
+    <string name="thing_status">%2$s&#160; %3$s ago&#160; %4$d points&#160; %5$d comments</string>
+    <string name="thing_status_subreddit">%1$s&#160; %2$s&#160; %3$s ago&#160; %4$d points&#160; %5$d comments</string>
+    <string name="thumbnail"></string>
+    <string name="x_subreddits_added">%d added.</string>
+    <string name="x_subreddits_deleted">%d deleted.</string>
+    <string name="x_time_seconds">%1$d seconds</string>
+    <string name="x_time_minutes">%1$d minutes</string>
+    <string name="x_time_hours">%1$d hours</string>
+    <string name="x_time_days">%1$d days</string>
+    <string name="x_time_months">%1$d months</string>
+    <string name="x_time_years">%1$d years</string>
 
 </resources>
