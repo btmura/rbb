@@ -59,11 +59,16 @@ public class Formatter {
 
     static class Escaped {
 
-        private static final Pattern PATTERN = Pattern.compile("&(gt|lt|amp|quot|apos|nbsp);");
+        private static final Pattern AMP_PATTERN = Pattern.compile("&(amp);");
+        private static final Pattern FULL_PATTERN = Pattern.compile("&(gt|lt|amp|quot|apos|nbsp);");
 
         static CharSequence format(CharSequence text) {
+            return format(FULL_PATTERN, format(AMP_PATTERN, text));
+        }
+        
+        static CharSequence format(Pattern pattern, CharSequence text) {
             CharSequence s = text;
-            Matcher m = PATTERN.matcher(text);
+            Matcher m = pattern.matcher(text);
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;

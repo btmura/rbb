@@ -50,5 +50,9 @@ public class Formatter_EscapedTest extends AbstractFormatterTest {
     public void testFormat_multipleEscapes() {
         assertEscapedFormat("gt &gt; lt &lt;", "gt > lt <");
         assertEscapedFormat("&lt;3 &apos;Quote&apos;", "<3 'Quote'");
-    } 
+    }
+    
+    public void testFormat_escapedEscapes() {
+        assertEscapedFormat("&amp;gt;", ">");
+    }
 }
