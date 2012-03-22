@@ -31,28 +31,20 @@ public class RelativeTime {
     public static String format(Context context, long now, long time) {
         long diff = now - time;
         int resId;
-        int divisor;
-        if (diff > YEAR_SECONDS * 2) {
-            resId = R.string.x_time_years;
-            divisor = YEAR_SECONDS;
-        } else if (diff > MONTH_SECONDS * 2) {
-            resId = R.string.x_time_months;
-            divisor = MONTH_SECONDS;
-        } else if (diff > DAY_SECONDS * 2) {
-            resId = R.string.x_time_days;
-            divisor = DAY_SECONDS;
-        } else if (diff > HOUR_SECONDS * 2) {
-            resId = R.string.x_time_hours;
-            divisor = HOUR_SECONDS;
-        } else if (diff > MINUTE_SECONDS * 2) {
-            resId = R.string.x_time_minutes;
-            divisor = MINUTE_SECONDS;
+        double value;
+        if ((value = diff / YEAR_SECONDS) > 0) {
+            resId = value == 1 ? R.string.time_one_year : R.string.time_x_years;
+        } else if ((value = diff / MONTH_SECONDS) > 0) {
+            resId = value == 1 ? R.string.time_one_month : R.string.time_x_months;
+        } else if ((value = diff / DAY_SECONDS) > 0) {
+            resId = value == 1 ? R.string.time_one_day : R.string.time_x_days;
+        } else if ((value = diff / HOUR_SECONDS) > 0) {
+            resId = value == 1 ? R.string.time_one_hour : R.string.time_x_hours;
+        } else if ((value = diff / MINUTE_SECONDS) > 0) {
+            resId = value == 1 ? R.string.time_one_minute : R.string.time_x_minutes;
         } else {
-            resId = R.string.x_time_seconds;
-            divisor = 1;
+            resId = (value = diff) == 1 ? R.string.time_one_second : R.string.time_x_seconds;
         }
-
-        long value = Math.round(Math.floor((double) diff / divisor));
-        return context.getString(resId, value);
+        return context.getString(resId, Math.round(value));
     }
 }

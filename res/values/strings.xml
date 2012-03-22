@@ -47,11 +47,19 @@
     <string name="thumbnail"></string>
     <string name="x_subreddits_added">%d added.</string>
     <string name="x_subreddits_deleted">%d deleted.</string>
-    <string name="x_time_seconds">%1$d seconds</string>
-    <string name="x_time_minutes">%1$d minutes</string>
-    <string name="x_time_hours">%1$d hours</string>
-    <string name="x_time_days">%1$d days</string>
-    <string name="x_time_months">%1$d months</string>
-    <string name="x_time_years">%1$d years</string>
+
+    <string name="time_one_second">1 second</string>
+    <string name="time_one_minute">1 minute</string>    
+    <string name="time_one_hour">1 hour</string>
+    <string name="time_one_day">1 day</string>
+    <string name="time_one_month">1 month</string>        
+    <string name="time_one_year">1 year</string>
+    
+    <string name="time_x_seconds">%1$d seconds</string>    
+    <string name="time_x_minutes">%1$d minutes</string>
+    <string name="time_x_hours">%1$d hours</string>    
+    <string name="time_x_days">%1$d days</string>
+    <string name="time_x_months">%1$d months</string>
+    <string name="time_x_years">%1$d years</string>
 
 </resources>
