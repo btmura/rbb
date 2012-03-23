@@ -22,15 +22,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.btmura.android.reddit.R;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.View;
-import android.widget.ImageView;
 
 public class ThumbnailLoader {
 
@@ -38,13 +35,10 @@ public class ThumbnailLoader {
 
     private static final BitmapCache BITMAP_CACHE = new BitmapCache(2 * 1024 * 1024);
 
-    public void setThumbnail(ImageView v, String url) {
+    public void setThumbnail(ThingView v, String url) {
         Bitmap b = BITMAP_CACHE.get(url);
-        if (b != null) {
-            v.setImageBitmap(b);
-        } else {
-            v.setImageResource(R.drawable.thumbnail);
-
+        v.setThumbnailBitmap(b);
+        if (b == null) {
             LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
             if (task == null || !url.equals(task.url)) {
                 if (task != null) {
@@ -58,13 +52,13 @@ public class ThumbnailLoader {
         v.setVisibility(View.VISIBLE);
     }
 
-    public void clearThumbnail(ImageView v) {
+    public void clearThumbnail(ThingView v) {
         LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
         if (task != null) {
             task.cancel(true);
             v.setTag(null);
         }
-        v.setVisibility(View.GONE);
+        v.removeThumbnail();
     }
 
     static class BitmapCache extends LruCache<String, Bitmap> {
@@ -80,11 +74,11 @@ public class ThumbnailLoader {
 
     class LoadThumbnailTask extends AsyncTask<Void, Void, Bitmap> {
 
-        private final WeakReference<ImageView> ref;
+        private final WeakReference<ThingView> ref;
         private final String url;
 
-        LoadThumbnailTask(ImageView v, String url) {
-            this.ref = new WeakReference<ImageView>(v);
+        LoadThumbnailTask(ThingView v, String url) {
+            this.ref = new WeakReference<ThingView>(v);
             this.url = url;
         }
 
@@ -112,10 +106,10 @@ public class ThumbnailLoader {
             if (b != null) {
                 BITMAP_CACHE.put(url, b);
             }
-            ImageView v = ref.get();
+            ThingView v = ref.get();
             if (v != null && equals(v.getTag())) {
                 if (b != null) {
-                    v.setImageBitmap(b);
+                    v.setThumbnailBitmap(b);
                 }
                 v.setTag(null);
             }

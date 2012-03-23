@@ -19,17 +19,15 @@ package com.btmura.android.reddit.browser;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.btmura.android.reddit.R;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.btmura.android.reddit.R;
 
 public class ThingAdapter extends BaseAdapter {
 
@@ -107,7 +105,7 @@ public class ThingAdapter extends BaseAdapter {
     private View createView(int position, ViewGroup parent) {
         switch (getItemViewType(position)) {
             case Thing.TYPE_THING:
-                return makeView(R.layout.thing_row, parent);
+                return new ThingView(context);
 
             case Thing.TYPE_MORE:
                 return makeView(R.layout.thing_more_row, parent);
@@ -125,8 +123,6 @@ public class ThingAdapter extends BaseAdapter {
 
     private static ViewHolder createViewHolder(View v) {
         ViewHolder holder = new ViewHolder();
-        holder.thumbnailStub = (ViewStub) v.findViewById(R.id.thumbnail_stub);
-        holder.thumbnail = (ImageView) v.findViewById(R.id.thumbnail);
         holder.title = (TextView) v.findViewById(R.id.title);
         holder.status = (TextView) v.findViewById(R.id.status);
         holder.progress = (ProgressBar) v.findViewById(R.id.progress);
@@ -134,8 +130,6 @@ public class ThingAdapter extends BaseAdapter {
     }
 
     static class ViewHolder {
-        ViewStub thumbnailStub;
-        ImageView thumbnail;
         TextView title;
         TextView status;
         ProgressBar progress;
@@ -143,13 +137,13 @@ public class ThingAdapter extends BaseAdapter {
 
     private void setView(int position, View v) {
         Thing t = getItem(position).assureFormat(context, parentSubreddit, now);
-        ViewHolder h = (ViewHolder) v.getTag();
         switch (t.type) {
             case Thing.TYPE_THING:
-                setThing(v, h, t, position);
+                setThing((ThingView) v, t, position);
                 break;
 
             case Thing.TYPE_MORE:
+                ViewHolder h = (ViewHolder) v.getTag();
                 setMore(h, t);
                 break;
 
@@ -159,25 +153,15 @@ public class ThingAdapter extends BaseAdapter {
         }
     }
 
-    private void setThing(View v, ViewHolder h, Thing t, int position) {
+    private void setThing(ThingView v, Thing t, int position) {
         v.setBackgroundResource(singleChoice && position == chosenPosition ? R.drawable.selector_chosen
                 : R.drawable.selector_normal);
-        h.title.setText(t.title);
-        h.status.setText(t.status);
-        setThumbnail(v, h, t);
-    }
-
-    private void setThumbnail(View v, ViewHolder h, Thing t) {
+        v.setTitle(t.title);
+        v.setStatus(t.status);
         if (t.hasThumbnail()) {
-            if (h.thumbnail == null) {
-                h.thumbnail = (ImageView) h.thumbnailStub.inflate();
-                h.thumbnailStub = null;
-            }
-            thumbnailLoader.setThumbnail(h.thumbnail, t.thumbnail);
+            thumbnailLoader.setThumbnail(v, t.thumbnail);
         } else {
-            if (h.thumbnail != null) {
-                thumbnailLoader.clearThumbnail(h.thumbnail);
-            }
+            thumbnailLoader.clearThumbnail(v);
         }
     }
 
