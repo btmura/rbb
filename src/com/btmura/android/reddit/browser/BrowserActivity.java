@@ -40,8 +40,8 @@ import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.Provider.Subreddits;
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.browser.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.browser.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.data.Formatter;
@@ -86,7 +86,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
-        bar.setCustomView(R.layout.subreddits_search);
+        bar.setCustomView(R.layout.search_view);
 
         searchView = (SearchView) bar.getCustomView();
         searchView.setOnQueryTextListener(this);
@@ -428,11 +428,11 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     }
 
     private void handleSearchForSubreddits() {
-        searchView.setQuery("", false);
+        searchView.setQuery("", false);        
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         bar.setDisplayShowTitleEnabled(false);
         bar.setDisplayShowCustomEnabled(true);
-        bar.getCustomView().requestFocus();
+        searchView.requestFocus();
     }
 
     public void onPageSelected(int position) {

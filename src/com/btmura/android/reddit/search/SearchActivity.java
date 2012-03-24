@@ -63,7 +63,7 @@ public class SearchActivity extends Activity implements OnQueryTextListener,
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
         bar.setDisplayShowCustomEnabled(true);
-        bar.setCustomView(R.layout.subreddits_search);
+        bar.setCustomView(R.layout.search_view);
 
         sv = (SearchView) bar.getCustomView();
         sv.setOnQueryTextListener(this);
