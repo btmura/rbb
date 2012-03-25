@@ -129,7 +129,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         refreshContainers(null);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ControlFragment cf = ControlFragment.newInstance(sr, null, -1, lastSelectedFilter);
+        ControlFragment cf = ControlFragment.newInstance(sr, null, lastSelectedFilter);
         ft.add(cf, FRAG_CONTROL);
         if (singleContainer == null || sr == null) {
             ft.replace(slfContainerId, SubredditListFragment.newInstance(singleChoice),
@@ -197,7 +197,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         refreshContainers(null);
 
         FragmentTransaction ft = fm.beginTransaction();
-        ControlFragment controlFrag = ControlFragment.newInstance(sr, null, -1, filter);
+        ControlFragment controlFrag = ControlFragment.newInstance(sr, null, filter);
         ft.add(controlFrag, FRAG_CONTROL);
         ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, filter, singleChoice);
         ft.replace(tlfContainerId, thingListFrag, FRAG_THING_LIST);
@@ -215,11 +215,10 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             fm.addOnBackStackChangedListener(this);
         }
 
-        updateThingPager(thing);  
+        updateThingPager(thing);
 
         FragmentTransaction ft = fm.beginTransaction();
-        ControlFragment cf = ControlFragment.newInstance(getSubreddit(), thing, position,
-                getFilter());
+        ControlFragment cf = ControlFragment.newInstance(getSubreddit(), thing, getFilter());
         ft.add(cf, FRAG_CONTROL);
 
         if (singleContainer != null) {
@@ -249,10 +248,6 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
     private Thing getThing() {
         return getControlFragment().getThing();
-    }
-
-    private int getThingPosition() {
-        return getControlFragment().getThingPosition();
     }
 
     private int getFilter() {
@@ -323,7 +318,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         }
 
         if (isVisible(FRAG_THING_LIST)) {
-            getThingListFragment().setChosenPosition(getThingPosition());
+            getThingListFragment().setChosenThing(getThing());
         }
     }
 
@@ -331,11 +326,12 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         if (thingPager != null) {
             thingPager.setVisibility(t != null ? View.VISIBLE : View.GONE);
             if (t == null) {
-                // Avoid nested executePendingTransactions that would occur by doing popBackStack.
+                // Avoid nested executePendingTransactions that would occur by
+                // doing popBackStack.
                 thingPager.post(new Runnable() {
-                   public void run() {
-                       updateThingPager(null);
-                   } 
+                    public void run() {
+                        updateThingPager(null);
+                    }
                 });
             }
         }
@@ -428,7 +424,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     }
 
     private void handleSearchForSubreddits() {
-        searchView.setQuery("", false);        
+        searchView.setQuery("", false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         bar.setDisplayShowTitleEnabled(false);
         bar.setDisplayShowCustomEnabled(true);

@@ -38,7 +38,7 @@ public class ThingAdapter extends BaseAdapter {
     private final String parentSubreddit;
     private final boolean singleChoice;
     private final long now = System.currentTimeMillis() / 1000;
-    private int chosenPosition = -1;
+    private String chosenName;
 
     public ThingAdapter(Context context, LayoutInflater inflater, Subreddit subreddit,
             boolean singleChoice) {
@@ -59,14 +59,21 @@ public class ThingAdapter extends BaseAdapter {
         }
     }
 
-    public void setChosenPosition(int position) {
-        chosenPosition = position;
+    public void setChosenName(String name) {
+        chosenName = name;
+    }
+    
+    public String getChosenName() {
+        return chosenName;
     }
 
-    public int getChosenPosition() {
-        return chosenPosition;
+    public boolean isChosenName(String name) {
+        if (chosenName != null) {
+            return chosenName.equals(name);
+        }
+        return name == null;
     }
-
+    
     public List<Thing> getItems() {
         return items;
     }
@@ -154,8 +161,13 @@ public class ThingAdapter extends BaseAdapter {
     }
 
     private void setThing(ThingView v, Thing t, int position) {
-        v.setBackgroundResource(singleChoice && position == chosenPosition ? R.drawable.selector_chosen
-                : R.drawable.selector_normal);
+        int resId;
+        if (singleChoice && t.name.equals(chosenName)) {
+            resId = R.drawable.selector_chosen;
+        } else {
+            resId = R.drawable.selector_normal;
+        }
+        v.setBackgroundResource(resId);
         v.setTitle(t.title);
         v.setStatus(t.status);
         if (t.hasThumbnail()) {

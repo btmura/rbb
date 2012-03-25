@@ -39,7 +39,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     private static final String ARG_FILTER = "f";
     private static final String ARG_SINGLE_CHOICE = "c";
 
-    private static final String STATE_CHOSEN = "s";
+    private static final String STATE_CHOSEN_NAME = "s";
 
     private static final String LOADER_ARG_MORE_KEY = "m";
 
@@ -79,8 +79,11 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        adapter.setChosenPosition(savedInstanceState != null ? savedInstanceState
-                .getInt(STATE_CHOSEN) : -1);
+        String name = null;
+        if (savedInstanceState != null) {
+            name = savedInstanceState.getString(STATE_CHOSEN_NAME);            
+        }        
+        adapter.setChosenName(name);        
         setListAdapter(adapter);
         setListShown(false);
         getLoaderManager().initLoader(0, null, this);
@@ -106,9 +109,10 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        adapter.setChosenPosition(position);
-        adapter.notifyDataSetChanged();
         Thing t = adapter.getItem(position);
+        adapter.setChosenName(t.name);
+        adapter.notifyDataSetChanged();
+        
         switch (t.type) {
             case Thing.TYPE_THING:
                 getListener().onThingSelected(adapter.getItem(position), position);
@@ -143,12 +147,13 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_CHOSEN, adapter.getChosenPosition());
+        outState.putString(STATE_CHOSEN_NAME, adapter.getChosenName());
     }
 
-    public void setChosenPosition(int position) {
-        if (position != adapter.getChosenPosition()) {
-            adapter.setChosenPosition(position);
+    public void setChosenThing(Thing t) {   
+        String name = t != null ? t.name : null;        
+        if (!adapter.isChosenName(name)) {
+            adapter.setChosenName(name);
             adapter.notifyDataSetChanged();
         }
     }

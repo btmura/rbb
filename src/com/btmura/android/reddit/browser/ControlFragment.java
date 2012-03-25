@@ -23,21 +23,17 @@ public class ControlFragment extends Fragment {
 
     private static final String ARG_SUBREDDIT = "subreddit";
     private static final String ARG_THING = "thing";
-    private static final String ARG_THING_POSITION = "thingPosition";
     private static final String ARG_FILTER = "filter";
 
     private Subreddit topic;
     private Thing thing;
-    private int thingPosition;
     private int filter;
 
-    public static ControlFragment newInstance(Subreddit sr, Thing thing, int thingPosition,
-            int filter) {
+    public static ControlFragment newInstance(Subreddit sr, Thing thing, int filter) {
         ControlFragment frag = new ControlFragment();
-        Bundle b = new Bundle(4);
+        Bundle b = new Bundle(3);
         b.putParcelable(ARG_SUBREDDIT, sr);
         b.putParcelable(ARG_THING, thing);
-        b.putInt(ARG_THING_POSITION, thingPosition);
         b.putInt(ARG_FILTER, filter);
         frag.setArguments(b);
         return frag;
@@ -49,10 +45,6 @@ public class ControlFragment extends Fragment {
 
     public Thing getThing() {
         return thing;
-    }
-
-    public int getThingPosition() {
-        return thingPosition;
     }
 
     public int getFilter() {
@@ -70,7 +62,6 @@ public class ControlFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         topic = getArguments().getParcelable(ARG_SUBREDDIT);
         thing = getArguments().getParcelable(ARG_THING);
-        thingPosition = getArguments().getInt(ARG_THING_POSITION);
         filter = getArguments().getInt(ARG_FILTER);
     }
 }
