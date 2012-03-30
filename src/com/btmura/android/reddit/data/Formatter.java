@@ -217,19 +217,19 @@ public class Formatter {
 
                 int endBrack = findClosingMarker(s, '[', ']', startBrack + 1);
                 if (endBrack == -1) {
-                    i = moveToNextLine(s, startBrack + 1);
+                    i = startBrack + 1;
                     continue;
                 }
 
                 int startParen = findOpeningParen(s, '(', endBrack + 1);
                 if (startParen == -1) {
-                    i = moveToNextLine(s, endBrack + 1);
+                    i = endBrack + 1;
                     continue;
                 }
 
                 int endParen = findClosingMarker(s, '(', ')', startParen + 1);
                 if (endParen == -1) {
-                    i = moveToNextLine(s, startParen + 1);
+                    i = startParen + 1;
                     continue;
                 }
 
@@ -255,7 +255,7 @@ public class Formatter {
                 char ch = s.charAt(i);
                 if (ch == c) {
                     return i;
-                } else if (ch == ' ') {
+                } else if (ch == ' ' || ch == '\n') {
                     if (spaceFound) {
                         break;
                     }
@@ -284,16 +284,6 @@ public class Formatter {
                 }
             }
             return -1;
-        }
-
-        private static int moveToNextLine(CharSequence s, int start) {
-            int len = s.length();
-            if (start < len) {
-                int eol = TextUtils.indexOf(s, '\n', start);
-                return eol == -1 ? len : eol + 1;
-            } else {
-                return len;
-            }
         }
     }
 
