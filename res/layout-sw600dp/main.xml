@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 Brian Muramatsu
+<!--
+     Copyright (C) 2012 Brian Muramatsu
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,25 +16,26 @@
 -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:animateLayoutChanges="true" >
+    android:layout_height="match_parent" >
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/thing_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/nav_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/padding_sides"
+        android:paddingRight="@dimen/padding_sides" >
 
         <FrameLayout
             android:id="@+id/subreddit_list_container"
-            android:layout_width="125dp"
-            android:layout_height="match_parent" />
-
-        <View
-            android:id="@+id/nav_separator"
-            android:layout_width="2dp"
+            android:layout_width="@dimen/subreddit_list_width"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/subreddit_list_container"
-            android:background="@android:color/darker_gray" />
+            android:paddingRight="@dimen/padding_middle" />
 
         <FrameLayout
             android:id="@+id/thing_list_container"
@@ -41,13 +43,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_alignWithParentIfMissing="true"
-            android:layout_toRightOf="@+id/nav_separator" />
+            android:layout_toRightOf="@+id/subreddit_list_container" />
     </RelativeLayout>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/thing_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
 
 </merge>

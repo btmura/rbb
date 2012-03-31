@@ -120,6 +120,8 @@ public class SearchActivity extends Activity implements OnQueryTextListener,
         ft.replace(containerId, DetailsFragment.newInstance(infos.get(0), position), FRAG_DETAILS);
         if (singleContainer != null) {
             ft.addToBackStack(null);
+        } else {
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         }
         ft.commit();
     }

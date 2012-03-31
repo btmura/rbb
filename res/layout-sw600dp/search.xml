@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 Brian Muramatsu
+<!--
+     Copyright (C) 2012 Brian Muramatsu
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -16,23 +17,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" >
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/padding_sides"
+    android:paddingRight="@dimen/padding_sides" >
 
     <FrameLayout
         android:id="@+id/subreddits_container"
-        android:layout_width="0dp"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
-
-    <View
-        android:layout_width="2dp"
-        android:layout_height="match_parent"
-        android:background="@android:color/darker_gray" />
+        android:paddingRight="@dimen/padding_middle" />
 
     <FrameLayout
         android:id="@+id/details_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2" />
+        android:layout_weight="1" />
 
 </LinearLayout>

@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.browser;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
@@ -203,6 +205,8 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         ft.replace(tlfContainerId, thingListFrag, FRAG_THING_LIST);
         if (singleContainer != null) {
             ft.addToBackStack(FRAG_THING_LIST);
+        } else {
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         }
         ft.commit();
     }
@@ -335,12 +339,36 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
                 });
             }
         }
+        if (navContainer != null) {
+            int newVisibility = t != null ? View.GONE : View.VISIBLE;
+            if (navContainer.getVisibility() != newVisibility) {
+                animateNavContainer(newVisibility);
+            }
+        }
         if (singleContainer != null) {
             singleContainer.setVisibility(t != null ? View.GONE : View.VISIBLE);
         }
-        if (navContainer != null) {
-            navContainer.setVisibility(t != null ? View.GONE : View.VISIBLE);
-        }
+    }
+    
+    private void animateNavContainer(final int visibility) {
+        float x = visibility == View.VISIBLE ? 0 : -100;
+        float alpha = visibility == View.VISIBLE ? 1 : 0;
+        navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        navContainer.animate().x(x).alpha(alpha).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                if (visibility == View.VISIBLE) {
+                    navContainer.setVisibility(View.VISIBLE);
+                }
+            }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (visibility == View.GONE) {
+                    navContainer.setVisibility(View.GONE);
+                }
+                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+            }
+        });
     }
 
     @Override
