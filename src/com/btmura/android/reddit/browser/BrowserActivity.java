@@ -17,7 +17,10 @@
 package com.btmura.android.reddit.browser;
 
 import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
@@ -36,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
+import android.widget.FrameLayout;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.ShareActionProvider;
@@ -63,6 +67,9 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
     private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
 
+    private static final int NAV_CONTAINER_ORIGINAL = 0;
+    private static final int NAV_CONTAINER_SIDENAV = 1;
+
     private ActionBar bar;
     private SearchView searchView;
     private FilterAdapter filterSpinner;
@@ -70,12 +77,19 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
     private View singleContainer;
     private View navContainer;
+    private View subredditListContainer;
     private ViewPager thingPager;
 
     private ShareActionProvider shareProvider;
     private boolean singleChoice;
     private int tlfContainerId;
     private int slfContainerId;
+
+    private int sideNavWidth;
+    private AnimatorSet showNavContainer;
+    private AnimatorSet hideNavContainer;
+    private AnimatorSet showSideNav;
+    private AnimatorSet hideSideNav;
 
     private boolean insertSlfToBackStack;
 
@@ -99,6 +113,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
         singleContainer = findViewById(R.id.single_container);
         navContainer = findViewById(R.id.nav_container);
+        subredditListContainer = findViewById(R.id.subreddit_list_container);
 
         thingPager = (ViewPager) findViewById(R.id.thing_pager);
         thingPager.setOnPageChangeListener(this);
@@ -109,6 +124,15 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         } else {
             tlfContainerId = R.id.thing_list_container;
             slfContainerId = R.id.subreddit_list_container;
+        }
+
+        if (navContainer != null) {
+            sideNavWidth = getResources().getDisplayMetrics().widthPixels / 2;
+            int duration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+            showNavContainer = getNavContainerAnimator(true, duration);
+            hideNavContainer = getNavContainerAnimator(false, duration);
+            showSideNav = getSideNavAnimator(true, duration);
+            hideSideNav = getSideNavAnimator(false, duration);
         }
 
         insertSlfToBackStack = isSubredditPreview();
@@ -211,7 +235,21 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         ft.commit();
     }
 
-    public void onThingSelected(Thing thing, int position) {
+    public void onThingSelected(final Thing thing, final int position) {
+        if (navContainer != null && isSideNavShowing()) {
+            animateSideNav(false, new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    selectThing(thing, position);
+                    animation.removeListener(this);
+                }
+            });
+        } else {
+            selectThing(thing, position);
+        }
+    }
+
+    private void selectThing(Thing thing, int position) {
         FragmentManager fm = getFragmentManager();
         if (singleContainer == null) {
             fm.removeOnBackStackChangedListener(this);
@@ -340,35 +378,18 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             }
         }
         if (navContainer != null) {
-            int newVisibility = t != null ? View.GONE : View.VISIBLE;
-            if (navContainer.getVisibility() != newVisibility) {
-                animateNavContainer(newVisibility);
+            if (isSideNavShowing() && t == null) {
+                animateNavContainer(true);
+            } else {
+                int newVisibility = t != null ? View.GONE : View.VISIBLE;
+                if (navContainer.getVisibility() != newVisibility) {
+                    animateNavContainer(t == null);
+                }
             }
         }
         if (singleContainer != null) {
             singleContainer.setVisibility(t != null ? View.GONE : View.VISIBLE);
         }
-    }
-    
-    private void animateNavContainer(final int visibility) {
-        float x = visibility == View.VISIBLE ? 0 : -100;
-        float alpha = visibility == View.VISIBLE ? 1 : 0;
-        navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        navContainer.animate().x(x).alpha(alpha).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                if (visibility == View.VISIBLE) {
-                    navContainer.setVisibility(View.VISIBLE);
-                }
-            }
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (visibility == View.GONE) {
-                    navContainer.setVisibility(View.GONE);
-                }
-                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-            }
-        });
     }
 
     @Override
@@ -494,7 +515,11 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         FragmentManager fm = getFragmentManager();
         int count = fm.getBackStackEntryCount();
         if (count > 0) {
-            fm.popBackStack();
+            if (navContainer != null && !isSideNavShowing()) {
+                animateSideNav(true, null);
+            } else {
+                fm.popBackStack();
+            }
         } else if (singleContainer != null && insertSlfToBackStack) {
             insertSlfToBackStack = false;
             initFragments(null);
@@ -542,6 +567,112 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private boolean isShowingLink(Thing t) {
         int position = thingPager.getCurrentItem();
         return ThingPagerAdapter.getType(t, position) == ThingPagerAdapter.TYPE_LINK;
+    }
+
+    private boolean isSideNavShowing() {
+        return navContainer.getWidth() == sideNavWidth
+                && navContainer.getVisibility() == View.VISIBLE;
+    }
+
+    private void animateNavContainer(final boolean show) {
+        changeNavContainerLayout(NAV_CONTAINER_ORIGINAL);
+        AnimatorSet as = show ? showNavContainer : hideNavContainer;
+        navContainer.setVisibility(View.VISIBLE);
+        navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        thingPager.setTranslationX(0);
+        as.start();
+    }
+
+    private void animateSideNav(final boolean show, AnimatorListener listener) {
+        changeNavContainerLayout(NAV_CONTAINER_SIDENAV);
+        AnimatorSet as = show ? showSideNav : hideSideNav;
+        navContainer.setVisibility(View.VISIBLE);
+        navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        if (listener != null) {
+            as.addListener(listener);
+        }
+        as.start();
+    }
+
+    private void changeNavContainerLayout(int layout) {
+        int subredditListVisibility;
+        int navWidth;
+        switch (layout) {
+            case NAV_CONTAINER_ORIGINAL:
+                subredditListVisibility = View.VISIBLE;
+                navWidth = FrameLayout.LayoutParams.MATCH_PARENT;
+                break;
+
+            case NAV_CONTAINER_SIDENAV:
+                subredditListVisibility = View.GONE;
+                navWidth = sideNavWidth;
+                break;
+
+            default:
+                throw new IllegalStateException();
+        }
+
+        subredditListContainer.setVisibility(subredditListVisibility);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                navContainer.getLayoutParams());
+        params.width = navWidth;
+        navContainer.setLayoutParams(params);
+    }
+
+    private AnimatorSet getNavContainerAnimator(final boolean show, int duration) {
+        int width = getResources().getDimensionPixelSize(R.dimen.subreddit_list_width);
+
+        ObjectAnimator ncTransX;
+        if (show) {
+            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", -width, 0);
+        } else {
+            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0, -width);
+        }
+        ncTransX.setDuration(duration);
+
+        AnimatorSet as = new AnimatorSet();
+        as.play(ncTransX);
+        as.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                if (!show) {
+                    navContainer.setVisibility(View.GONE);
+                }
+            }
+        });
+        return as;
+    }
+
+    private AnimatorSet getSideNavAnimator(final boolean show, int duration) {
+        ObjectAnimator ncTransX;
+        ObjectAnimator tpTransX;
+
+        if (show) {
+            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", -sideNavWidth, 0);
+            tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", 0, sideNavWidth);
+        } else {
+            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0, -sideNavWidth);
+            tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", sideNavWidth, 0);
+        }
+
+        ncTransX.setDuration(duration);
+        tpTransX.setDuration(duration);
+
+        AnimatorSet as = new AnimatorSet();
+        as.play(ncTransX).with(tpTransX);
+        as.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
+                if (!show) {
+                    navContainer.setVisibility(View.GONE);
+                }
+            }
+        });
+        return as;
     }
 
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
