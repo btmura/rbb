@@ -38,8 +38,8 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
-import android.widget.FrameLayout;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.ShareActionProvider;
@@ -63,12 +63,12 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private static final String FRAG_SUBREDDIT_LIST = "subredditList";
     private static final String FRAG_THING_LIST = "thingList";
 
+    private static final int NAVLAYOUT_ORIGINAL = 0;
+    private static final int NAVLAYOUT_SIDENAV = 1;
+
     private static final int REQUEST_ADD_SUBREDDITS = 0;
 
     private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
-
-    private static final int NAV_CONTAINER_ORIGINAL = 0;
-    private static final int NAV_CONTAINER_SIDENAV = 1;
 
     private ActionBar bar;
     private SearchView searchView;
@@ -78,6 +78,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private View singleContainer;
     private View navContainer;
     private View subredditListContainer;
+    private View thingClickAbsorber;
     private ViewPager thingPager;
 
     private ShareActionProvider shareProvider;
@@ -85,11 +86,11 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private int tlfContainerId;
     private int slfContainerId;
 
-    private int sideNavWidth;
     private AnimatorSet showNavContainer;
     private AnimatorSet hideNavContainer;
-    private AnimatorSet showSideNav;
-    private AnimatorSet hideSideNav;
+    private AnimatorSet openSideNav;
+    private AnimatorSet closeSideNav;
+    private int sideNavWidth;
 
     private boolean insertSlfToBackStack;
 
@@ -112,9 +113,6 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         bar.setListNavigationCallbacks(filterSpinner, this);
 
         singleContainer = findViewById(R.id.single_container);
-        navContainer = findViewById(R.id.nav_container);
-        subredditListContainer = findViewById(R.id.subreddit_list_container);
-
         thingPager = (ViewPager) findViewById(R.id.thing_pager);
         thingPager.setOnPageChangeListener(this);
 
@@ -124,6 +122,16 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         } else {
             tlfContainerId = R.id.thing_list_container;
             slfContainerId = R.id.subreddit_list_container;
+            navContainer = findViewById(R.id.nav_container);
+            subredditListContainer = findViewById(R.id.subreddit_list_container);
+            thingClickAbsorber = findViewById(R.id.thing_click_absorber);
+            if (thingClickAbsorber != null) {
+                thingClickAbsorber.setOnClickListener(new OnClickListener() {
+                    public void onClick(View v) {
+                        animateSideNav(false, null);
+                    }
+                });
+            }
         }
 
         if (navContainer != null) {
@@ -131,8 +139,8 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             int duration = getResources().getInteger(android.R.integer.config_shortAnimTime);
             showNavContainer = getNavContainerAnimator(true, duration);
             hideNavContainer = getNavContainerAnimator(false, duration);
-            showSideNav = getSideNavAnimator(true, duration);
-            hideSideNav = getSideNavAnimator(false, duration);
+            openSideNav = getSideNavAnimator(true, duration);
+            closeSideNav = getSideNavAnimator(false, duration);
         }
 
         insertSlfToBackStack = isSubredditPreview();
@@ -570,12 +578,11 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     }
 
     private boolean isSideNavShowing() {
-        return navContainer.getWidth() == sideNavWidth
-                && navContainer.getVisibility() == View.VISIBLE;
+        return thingClickAbsorber.isShown();
     }
 
     private void animateNavContainer(final boolean show) {
-        changeNavContainerLayout(NAV_CONTAINER_ORIGINAL);
+        changeNavContainerLayout(NAVLAYOUT_ORIGINAL);
         AnimatorSet as = show ? showNavContainer : hideNavContainer;
         navContainer.setVisibility(View.VISIBLE);
         navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -584,8 +591,8 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     }
 
     private void animateSideNav(final boolean show, AnimatorListener listener) {
-        changeNavContainerLayout(NAV_CONTAINER_SIDENAV);
-        AnimatorSet as = show ? showSideNav : hideSideNav;
+        changeNavContainerLayout(NAVLAYOUT_SIDENAV);
+        AnimatorSet as = show ? openSideNav : closeSideNav;
         navContainer.setVisibility(View.VISIBLE);
         navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -597,16 +604,16 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
     private void changeNavContainerLayout(int layout) {
         int subredditListVisibility;
-        int navWidth;
+        int clickAbsorberVisibility;
         switch (layout) {
-            case NAV_CONTAINER_ORIGINAL:
+            case NAVLAYOUT_ORIGINAL:
                 subredditListVisibility = View.VISIBLE;
-                navWidth = FrameLayout.LayoutParams.MATCH_PARENT;
+                clickAbsorberVisibility = View.GONE;
                 break;
 
-            case NAV_CONTAINER_SIDENAV:
+            case NAVLAYOUT_SIDENAV:
                 subredditListVisibility = View.GONE;
-                navWidth = sideNavWidth;
+                clickAbsorberVisibility = View.VISIBLE;
                 break;
 
             default:
@@ -614,10 +621,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         }
 
         subredditListContainer.setVisibility(subredditListVisibility);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                navContainer.getLayoutParams());
-        params.width = navWidth;
-        navContainer.setLayoutParams(params);
+        thingClickAbsorber.setVisibility(clickAbsorberVisibility);
     }
 
     private AnimatorSet getNavContainerAnimator(final boolean show, int duration) {

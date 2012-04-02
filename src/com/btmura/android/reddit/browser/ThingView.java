@@ -126,6 +126,7 @@ public class ThingView extends View {
         if (drawable != null) {
             textWidth -= thumbWidth + padding;
         }
+        textWidth = Math.max(0, textWidth);
         titleLayout = makeTitleLayout(textWidth);
         statusLayout = makeStatusLayout(textWidth);
 
