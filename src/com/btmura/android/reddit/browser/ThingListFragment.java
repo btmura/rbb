@@ -18,12 +18,11 @@ package com.btmura.android.reddit.browser;
 
 import java.util.List;
 
-import com.btmura.android.reddit.R;
-
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +30,9 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
+
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.browser.ThingView.ThingViewSpecs;
 
 public class ThingListFragment extends ListFragment implements LoaderCallbacks<List<Thing>>,
         OnScrollListener {
@@ -52,7 +54,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 
     public static ThingListFragment newInstance(Subreddit sr, int filter, boolean singleChoice) {
         ThingListFragment frag = new ThingListFragment();
-        Bundle b = new Bundle(3);
+        Bundle b = new Bundle(4);
         b.putParcelable(ARG_SUBREDDIT, sr);
         b.putInt(ARG_FILTER, filter);
         b.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
@@ -81,9 +83,10 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
         super.onActivityCreated(savedInstanceState);
         String name = null;
         if (savedInstanceState != null) {
-            name = savedInstanceState.getString(STATE_CHOSEN_NAME);            
-        }        
-        adapter.setChosenName(name);        
+            name = savedInstanceState.getString(STATE_CHOSEN_NAME);
+        }
+        adapter.setChosenName(name);
+        adapter.setThingBodyWidth(getThingBodyWidth());
         setListAdapter(adapter);
         setListShown(false);
         getLoaderManager().initLoader(0, null, this);
@@ -112,7 +115,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
         Thing t = adapter.getItem(position);
         adapter.setChosenName(t.name);
         adapter.notifyDataSetChanged();
-        
+
         switch (t.type) {
             case Thing.TYPE_THING:
                 getListener().onThingSelected(adapter.getItem(position), position);
@@ -150,8 +153,8 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
         outState.putString(STATE_CHOSEN_NAME, adapter.getChosenName());
     }
 
-    public void setChosenThing(Thing t) {   
-        String name = t != null ? t.name : null;        
+    public void setChosenThing(Thing t) {
+        String name = t != null ? t.name : null;
         if (!adapter.isChosenName(name)) {
             adapter.setChosenName(name);
             adapter.notifyDataSetChanged();
@@ -184,5 +187,10 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 
     private boolean isSingleChoice() {
         return getArguments().getBoolean(ARG_SINGLE_CHOICE);
+    }
+
+    private int getThingBodyWidth() {
+        Log.v("TLF", "getting tbw!");
+        return ((ThingViewSpecs) getActivity()).getThingBodyWidth();
     }
 }

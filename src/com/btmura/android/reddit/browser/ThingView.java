@@ -31,12 +31,17 @@ public class ThingView extends View {
     private float density;
     private int padding;
     private int thumbWidth;
+    private int bodyWidth;
 
     private CharSequence title = "";
     private CharSequence status = "";
     private Drawable drawable;
     private Layout titleLayout;
     private Layout statusLayout;
+
+    interface ThingViewSpecs {
+        int getThingBodyWidth();
+    }
 
     public ThingView(Context context) {
         this(context, null);
@@ -75,6 +80,10 @@ public class ThingView extends View {
                 a.recycle();
             }
         }
+    }
+
+    public void setBodyWidth(int bodyWidth) {
+        this.bodyWidth = bodyWidth;
     }
 
     public void setTitle(CharSequence title) {
@@ -122,13 +131,22 @@ public class ThingView extends View {
                 break;
         }
 
-        int textWidth = measuredWidth - padding * 2;
-        if (drawable != null) {
-            textWidth -= thumbWidth + padding;
+        int titleWidth = measuredWidth;
+        int statusWidth = measuredWidth;
+        if (bodyWidth > 0) {
+            titleWidth = Math.min(titleWidth, bodyWidth);
         }
-        textWidth = Math.max(0, textWidth);
-        titleLayout = makeTitleLayout(textWidth);
-        statusLayout = makeStatusLayout(textWidth);
+        titleWidth -= padding * 2;
+        statusWidth -= padding * 2;
+        if (drawable != null) {
+            titleWidth -= thumbWidth + padding;
+            statusWidth -= thumbWidth + padding;
+        }
+        titleWidth = Math.max(0, titleWidth);
+        statusWidth = Math.max(0, statusWidth);
+
+        titleLayout = makeTitleLayout(titleWidth);
+        statusLayout = makeStatusLayout(statusWidth);
 
         int thumbHeight = thumbWidth;
         int textHeight = titleLayout.getHeight() + padding + statusLayout.getHeight();

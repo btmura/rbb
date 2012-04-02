@@ -2,7 +2,6 @@
 <resources>
 
     <dimen name="subreddit_list_width">150dp</dimen>
-    <dimen name="padding_sides">10dp</dimen>
-    <dimen name="padding_middle">10dp</dimen>
+    <dimen name="padding">10dp</dimen>
 
 </resources>

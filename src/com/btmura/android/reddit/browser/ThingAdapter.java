@@ -38,6 +38,8 @@ public class ThingAdapter extends BaseAdapter {
     private final String parentSubreddit;
     private final boolean singleChoice;
     private final long now = System.currentTimeMillis() / 1000;
+
+    private int thingBodyWidth;
     private String chosenName;
 
     public ThingAdapter(Context context, LayoutInflater inflater, Subreddit subreddit,
@@ -59,10 +61,14 @@ public class ThingAdapter extends BaseAdapter {
         }
     }
 
+    public void setThingBodyWidth(int thingBodyWidth) {
+        this.thingBodyWidth = thingBodyWidth;
+    }
+
     public void setChosenName(String name) {
         chosenName = name;
     }
-    
+
     public String getChosenName() {
         return chosenName;
     }
@@ -73,7 +79,7 @@ public class ThingAdapter extends BaseAdapter {
         }
         return name == null;
     }
-    
+
     public List<Thing> getItems() {
         return items;
     }
@@ -168,6 +174,7 @@ public class ThingAdapter extends BaseAdapter {
             resId = R.drawable.selector_normal;
         }
         v.setBackgroundResource(resId);
+        v.setBodyWidth(thingBodyWidth);
         v.setTitle(t.title);
         v.setStatus(t.status);
         if (t.hasThumbnail()) {

@@ -31,10 +31,12 @@ import android.app.FragmentTransaction;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,12 +52,13 @@ import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.browser.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.browser.ThingListFragment.OnThingSelectedListener;
+import com.btmura.android.reddit.browser.ThingView.ThingViewSpecs;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.search.SearchActivity;
 
 public class BrowserActivity extends Activity implements OnBackStackChangedListener,
         OnNavigationListener, OnQueryTextListener, OnFocusChangeListener, OnPageChangeListener,
-        OnSubredditSelectedListener, OnThingSelectedListener {
+        OnSubredditSelectedListener, OnThingSelectedListener, ThingViewSpecs {
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
 
@@ -91,6 +94,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private AnimatorSet openSideNav;
     private AnimatorSet closeSideNav;
     private int sideNavWidth;
+    private int thingBodyWidth;
 
     private boolean insertSlfToBackStack;
 
@@ -115,13 +119,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         singleContainer = findViewById(R.id.single_container);
         thingPager = (ViewPager) findViewById(R.id.thing_pager);
         thingPager.setOnPageChangeListener(this);
-
-        singleChoice = singleContainer == null;
-        if (singleContainer != null) {
-            tlfContainerId = slfContainerId = R.id.single_container;
-        } else {
-            tlfContainerId = R.id.thing_list_container;
-            slfContainerId = R.id.subreddit_list_container;
+        if (singleContainer == null) {
             navContainer = findViewById(R.id.nav_container);
             subredditListContainer = findViewById(R.id.subreddit_list_container);
             thingClickAbsorber = findViewById(R.id.thing_click_absorber);
@@ -134,18 +132,44 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             }
         }
 
-        if (navContainer != null) {
-            sideNavWidth = getResources().getDisplayMetrics().widthPixels / 2;
-            int duration = getResources().getInteger(android.R.integer.config_shortAnimTime);
-            showNavContainer = getNavContainerAnimator(true, duration);
-            hideNavContainer = getNavContainerAnimator(false, duration);
-            openSideNav = getSideNavAnimator(true, duration);
-            closeSideNav = getSideNavAnimator(false, duration);
+        singleChoice = singleContainer == null;
+        if (singleContainer != null) {
+            tlfContainerId = slfContainerId = R.id.single_container;
+        } else {
+            tlfContainerId = R.id.thing_list_container;
+            slfContainerId = R.id.subreddit_list_container;
         }
+
+        if (navContainer != null) {
+            initNavContainerAnimators();
+        }
+        initThingBodyWidth();
 
         insertSlfToBackStack = isSubredditPreview();
         if (savedInstanceState == null) {
             initFragments(getTargetSubreddit());
+        }
+    }
+    
+    private void initNavContainerAnimators() {
+        Resources r = getResources();
+        int duration = r.getInteger(android.R.integer.config_shortAnimTime);
+        sideNavWidth = r.getDisplayMetrics().widthPixels / 2;        
+        showNavContainer = getNavContainerAnimator(true, duration);
+        hideNavContainer = getNavContainerAnimator(false, duration);
+        openSideNav = getSideNavAnimator(true, duration);
+        closeSideNav = getSideNavAnimator(false, duration);
+    }
+    
+    private void initThingBodyWidth() {
+        Resources r = getResources();
+        DisplayMetrics dm = r.getDisplayMetrics();
+        int padding = r.getDimensionPixelSize(R.dimen.padding);
+        if (navContainer != null) {
+            thingBodyWidth = dm.widthPixels / 2 - padding * 2;
+        } else if (singleContainer == null) {
+            int subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
+            thingBodyWidth = dm.widthPixels / 2 - padding * 2 - subredditListWidth;
         }
     }
 
@@ -677,6 +701,10 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             }
         });
         return as;
+    }
+
+    public int getThingBodyWidth() {
+        return thingBodyWidth;
     }
 
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

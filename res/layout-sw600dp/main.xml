@@ -27,21 +27,21 @@
     <LinearLayout
         android:id="@+id/nav_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="@dimen/padding_sides" >
+        android:layout_height="match_parent" >
 
         <FrameLayout
             android:id="@+id/subreddit_list_container"
             android:layout_width="@dimen/subreddit_list_width"
             android:layout_height="match_parent"
-            android:paddingRight="@dimen/padding_middle" />
+            android:paddingLeft="@dimen/padding" />
 
         <FrameLayout
             android:id="@+id/thing_list_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:paddingRight="@dimen/padding_sides" />
+            android:paddingLeft="@dimen/padding"
+            android:paddingRight="@dimen/padding" />
 
         <View
             android:id="@+id/thing_click_absorber"
