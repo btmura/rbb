@@ -28,8 +28,7 @@
         android:id="@+id/nav_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="@dimen/padding_sides"
-        android:paddingRight="@dimen/padding_sides" >
+        android:paddingLeft="@dimen/padding_sides" >
 
         <FrameLayout
             android:id="@+id/subreddit_list_container"
@@ -41,7 +40,8 @@
             android:id="@+id/thing_list_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:paddingRight="@dimen/padding_sides" />
 
         <View
             android:id="@+id/thing_click_absorber"
