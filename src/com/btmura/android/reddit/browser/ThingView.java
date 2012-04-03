@@ -23,23 +23,27 @@ public class ThingView extends View {
 
     private static final int MAX_THUMB_WIDTH_DP = 70;
     private static final int PADDING_DP = 10;
+    private static final int DETAILS_WIDTH_DP = 100;
 
-    private static final int PAINT_SMALL = 0;
-    private static final int PAINT_MEDIUM = 1;
     private static TextPaint[] PAINTS;
+    private static final int SMALL = 0;
+    private static final int MEDIUM = 1;
 
     private float density;
     private int padding;
     private int thumbWidth;
+    private int detailsWidth;
     private int bodyWidth;
 
     private CharSequence title = "";
     private CharSequence status = "";
+    private CharSequence details = "";
     private Drawable drawable;
     private Layout titleLayout;
     private Layout statusLayout;
+    private Layout detailsLayout;
 
-    interface ThingViewSpecs {
+    interface ThingViewSpecProvider {
         int getThingBodyWidth();
     }
 
@@ -57,6 +61,7 @@ public class ThingView extends View {
         density = context.getResources().getDisplayMetrics().density;
         padding = (int) (PADDING_DP * density);
         thumbWidth = (int) (MAX_THUMB_WIDTH_DP * density);
+        detailsWidth = (int) (DETAILS_WIDTH_DP * density);
     }
 
     private void init(Context context) {
@@ -93,6 +98,11 @@ public class ThingView extends View {
 
     public void setStatus(CharSequence status) {
         this.status = status;
+        requestLayout();
+    }
+
+    public void setDetails(CharSequence details) {
+        this.details = details;
         requestLayout();
     }
 
@@ -133,8 +143,10 @@ public class ThingView extends View {
 
         int titleWidth = measuredWidth;
         int statusWidth = measuredWidth;
+        boolean includeDetails = false;
         if (bodyWidth > 0) {
             titleWidth = Math.min(titleWidth, bodyWidth);
+            includeDetails = measuredWidth - bodyWidth - padding * 2 > detailsWidth;
         }
         titleWidth -= padding * 2;
         statusWidth -= padding * 2;
@@ -142,11 +154,15 @@ public class ThingView extends View {
             titleWidth -= thumbWidth + padding;
             statusWidth -= thumbWidth + padding;
         }
+        if (includeDetails) {
+            statusWidth -= detailsWidth + padding;
+        }
         titleWidth = Math.max(0, titleWidth);
         statusWidth = Math.max(0, statusWidth);
 
         titleLayout = makeTitleLayout(titleWidth);
         statusLayout = makeStatusLayout(statusWidth);
+        detailsLayout = includeDetails ? makeDetailsLayout(detailsWidth) : null;
 
         int thumbHeight = thumbWidth;
         int textHeight = titleLayout.getHeight() + padding + statusLayout.getHeight();
@@ -169,19 +185,32 @@ public class ThingView extends View {
     }
 
     private Layout makeTitleLayout(int width) {
-        return new StaticLayout(title, PAINTS[PAINT_MEDIUM], width, Alignment.ALIGN_NORMAL, 1f, 0f,
-                true);
+        return new StaticLayout(title, PAINTS[MEDIUM], width, Alignment.ALIGN_NORMAL, 1f, 0f, true);
     }
 
     private Layout makeStatusLayout(int width) {
-        BoringLayout.Metrics m = BoringLayout.isBoring(status, PAINTS[PAINT_SMALL]);
-        return BoringLayout.make(status, PAINTS[PAINT_SMALL], width, Alignment.ALIGN_NORMAL, 1f,
-                0f, m, true, TruncateAt.END, width);
+        BoringLayout.Metrics m = BoringLayout.isBoring(status, PAINTS[SMALL]);
+        return BoringLayout.make(status, PAINTS[SMALL], width, Alignment.ALIGN_NORMAL, 1f, 0f, m,
+                true, TruncateAt.END, width);
+    }
+
+    private Layout makeDetailsLayout(int width) {
+        BoringLayout.Metrics m = BoringLayout.isBoring(details, PAINTS[SMALL]);
+        return BoringLayout.make(details, PAINTS[SMALL], width, Alignment.ALIGN_OPPOSITE, 1f, 0f, m,
+                true, TruncateAt.END, width);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
+        
+        if (detailsLayout != null) {
+            int x = canvas.getWidth() - padding - detailsLayout.getWidth();
+            int y = (canvas.getHeight() - detailsLayout.getHeight()) / 2;
+            canvas.translate(x, y);
+            detailsLayout.draw(canvas);
+            canvas.translate(-x, -y);
+        }
 
         canvas.translate(padding, padding);
         if (drawable != null) {

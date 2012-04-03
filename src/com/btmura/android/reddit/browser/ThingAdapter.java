@@ -177,6 +177,7 @@ public class ThingAdapter extends BaseAdapter {
         v.setBodyWidth(thingBodyWidth);
         v.setTitle(t.title);
         v.setStatus(t.status);
+        v.setDetails(t.details);
         if (t.hasThumbnail()) {
             thumbnailLoader.setThumbnail(v, t.thumbnail);
         } else {

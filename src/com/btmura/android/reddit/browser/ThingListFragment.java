@@ -32,7 +32,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.browser.ThingView.ThingViewSpecs;
+import com.btmura.android.reddit.browser.ThingView.ThingViewSpecProvider;
 
 public class ThingListFragment extends ListFragment implements LoaderCallbacks<List<Thing>>,
         OnScrollListener {
@@ -191,6 +191,6 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 
     private int getThingBodyWidth() {
         Log.v("TLF", "getting tbw!");
-        return ((ThingViewSpecs) getActivity()).getThingBodyWidth();
+        return ((ThingViewSpecProvider) getActivity()).getThingBodyWidth();
     }
 }

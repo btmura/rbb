@@ -158,6 +158,8 @@ public class JsonParser {
                 onUps(r, i);
             } else if ("downs".equals(name)) {
                 onDowns(r, i);
+            } else if ("domain".equals(name)) {
+                onDomain(r, i);
             } else if ("children".equals(name)) {
                 onChildren(r, i);
             } else if ("replies".equals(name)) {
@@ -266,6 +268,10 @@ public class JsonParser {
     }
 
     public void onDowns(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+    
+    public void onDomain(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 

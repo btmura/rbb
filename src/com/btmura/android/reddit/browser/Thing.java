@@ -42,6 +42,7 @@ public class Thing implements Parcelable {
     public int numComments;
     public int score;
     public String status;
+    public String details;
     public String moreKey;
     public long createdUtc;
 
