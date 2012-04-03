@@ -36,8 +36,8 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedListener;
 
-public class SearchActivity extends Activity implements OnQueryTextListener,
-        OnSelectedListener, OnBackStackChangedListener {
+public class SearchActivity extends Activity implements OnQueryTextListener, OnSelectedListener,
+        OnBackStackChangedListener {
 
     public static final String EXTRA_QUERY = "q";
 

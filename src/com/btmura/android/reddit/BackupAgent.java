@@ -37,7 +37,9 @@ public class BackupAgent extends android.app.backup.BackupAgent {
 
     private static final String KEY_SUBREDDITS = "subreddits";
 
-    private static final String[] PROJECTION = { Subreddits.COLUMN_NAME, };
+    private static final String[] PROJECTION = {
+        Subreddits.COLUMN_NAME,
+    };
 
     @Override
     public void onBackup(ParcelFileDescriptor oldState, BackupDataOutput data,

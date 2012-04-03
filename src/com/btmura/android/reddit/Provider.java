@@ -80,7 +80,9 @@ public class Provider extends ContentProvider {
 
             case MATCH_ONE_SUBREDDIT:
                 selection = Subreddits._ID + "= ?";
-                selectionArgs = new String[] { Long.toString(ContentUris.parseId(uri)) };
+                selectionArgs = new String[] {
+                    Long.toString(ContentUris.parseId(uri))
+                };
                 break;
 
             default:
@@ -123,7 +125,9 @@ public class Provider extends ContentProvider {
 
             case MATCH_ONE_SUBREDDIT:
                 selection = Subreddits._ID + "= ?";
-                selectionArgs = new String[] { Long.toString(ContentUris.parseId(uri)) };
+                selectionArgs = new String[] {
+                    Long.toString(ContentUris.parseId(uri))
+                };
                 break;
 
             default:
@@ -332,10 +336,29 @@ public class Provider extends ContentProvider {
             db.execSQL("CREATE UNIQUE INDEX " + Subreddits.COLUMN_NAME + " ON "
                     + Subreddits.TABLE_NAME + " (" + Subreddits.COLUMN_NAME + " ASC)");
 
-            String[] defaultSubreddits = { "", "AdviceAnimals", "announcements", "AskReddit",
-                    "askscience", "atheism", "aww", "blog", "funny", "gaming", "IAmA", "movies",
-                    "Music", "pics", "politics", "science", "technology", "todayilearned",
-                    "videos", "worldnews", "WTF", };
+            String[] defaultSubreddits = {
+                    "",
+                    "AdviceAnimals",
+                    "announcements",
+                    "AskReddit",
+                    "askscience",
+                    "atheism",
+                    "aww",
+                    "blog",
+                    "funny",
+                    "gaming",
+                    "IAmA",
+                    "movies",
+                    "Music",
+                    "pics",
+                    "politics",
+                    "science",
+                    "technology",
+                    "todayilearned",
+                    "videos",
+                    "worldnews",
+                    "WTF",
+            };
 
             for (int i = 0; i < defaultSubreddits.length; i++) {
                 ContentValues values = new ContentValues(1);

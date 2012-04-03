@@ -218,7 +218,7 @@ public class JsonParser {
     public void onSubscribers(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
-    
+
     public void onCreatedUtc(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
@@ -270,7 +270,7 @@ public class JsonParser {
     public void onDowns(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
-    
+
     public void onDomain(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }

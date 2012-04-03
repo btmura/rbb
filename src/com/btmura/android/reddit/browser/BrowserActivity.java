@@ -150,17 +150,17 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             initFragments(getTargetSubreddit());
         }
     }
-    
+
     private void initNavContainerAnimators() {
         Resources r = getResources();
         int duration = r.getInteger(android.R.integer.config_shortAnimTime);
-        sideNavWidth = r.getDisplayMetrics().widthPixels / 2;        
+        sideNavWidth = r.getDisplayMetrics().widthPixels / 2;
         showNavContainer = getNavContainerAnimator(true, duration);
         hideNavContainer = getNavContainerAnimator(false, duration);
         openSideNav = getSideNavAnimator(true, duration);
         closeSideNav = getSideNavAnimator(false, duration);
     }
-    
+
     private void initThingBodyWidth() {
         Resources r = getResources();
         DisplayMetrics dm = r.getDisplayMetrics();

@@ -196,14 +196,14 @@ public class ThingView extends View {
 
     private Layout makeDetailsLayout(int width) {
         BoringLayout.Metrics m = BoringLayout.isBoring(details, PAINTS[SMALL]);
-        return BoringLayout.make(details, PAINTS[SMALL], width, Alignment.ALIGN_OPPOSITE, 1f, 0f, m,
-                true, TruncateAt.END, width);
+        return BoringLayout.make(details, PAINTS[SMALL], width, Alignment.ALIGN_OPPOSITE, 1f, 0f,
+                m, true, TruncateAt.END, width);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
-        
+
         if (detailsLayout != null) {
             int x = canvas.getWidth() - padding - detailsLayout.getWidth();
             int y = (canvas.getHeight() - detailsLayout.getHeight()) / 2;

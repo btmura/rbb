@@ -54,7 +54,7 @@ public class Formatter {
     }
 
     public static CharSequence formatInfo(Context context, CharSequence info) {
-        return formatComment(context, info);        
+        return formatComment(context, info);
     }
 
     static class Escaped {
@@ -65,7 +65,7 @@ public class Formatter {
         static CharSequence format(CharSequence text) {
             return format(FULL_PATTERN, format(AMP_PATTERN, text));
         }
-        
+
         static CharSequence format(Pattern pattern, CharSequence text) {
             CharSequence s = text;
             Matcher m = pattern.matcher(text);
