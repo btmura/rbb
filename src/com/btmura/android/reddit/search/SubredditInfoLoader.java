@@ -62,7 +62,7 @@ class SubredditInfoLoader extends AsyncTaskLoader<List<SubredditInfo>> {
     public List<SubredditInfo> loadInBackground() {
         try {
             URL subredditUrl = new URL("http://www.reddit.com/reddits/search.json?q="
-                    + URLEncoder.encode(query));
+                    + URLEncoder.encode(query, "UTF-8"));
 
             HttpURLConnection connection = (HttpURLConnection) subredditUrl.openConnection();
             connection.connect();

@@ -28,6 +28,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
+import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -571,7 +572,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private void handleCopyUrl() {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         String text = getLink(getThing());
-        clipboard.setText(text);
+        clipboard.setPrimaryClip(ClipData.newPlainText(text, text));
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
 

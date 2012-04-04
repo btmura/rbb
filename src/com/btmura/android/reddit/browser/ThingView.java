@@ -108,7 +108,7 @@ public class ThingView extends View {
 
     public void setThumbnailBitmap(Bitmap bitmap) {
         if (bitmap != null) {
-            drawable = new BitmapDrawable(bitmap);
+            drawable = new BitmapDrawable(getResources(), bitmap);
             drawable.setBounds(0, 0, (int) (bitmap.getWidth() * density),
                     (int) (bitmap.getHeight() * density));
         } else {
