@@ -23,7 +23,7 @@ public class ThingView extends View {
 
     private static final int MAX_THUMB_WIDTH_DP = 70;
     private static final int PADDING_DP = 10;
-    private static final int DETAILS_WIDTH_DP = 100;
+    private static final int DETAILS_WIDTH_DP = 300;
 
     private static TextPaint[] PAINTS;
     private static final int SMALL = 0;

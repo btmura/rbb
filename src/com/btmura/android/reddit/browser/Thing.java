@@ -35,12 +35,15 @@ public class Thing implements Parcelable {
     public String subreddit;
     public String author;
     public String url;
+    public String domain;
     public String thumbnail;
     public String permaLink;
     public boolean isSelf;
     public String selfText;
     public int numComments;
     public int score;
+    public int ups;
+    public int downs;
     public String status;
     public String details;
     public String moreKey;
@@ -106,6 +109,7 @@ public class Thing implements Parcelable {
         int resId = showSubreddit ? R.string.thing_status_subreddit : R.string.thing_status;
         String rt = RelativeTime.format(c, now, createdUtc);
         status = c.getString(resId, subreddit, author, rt, score, numComments);
+        details = c.getString(R.string.thing_details, ups, downs, domain);
         return this;
     }
 

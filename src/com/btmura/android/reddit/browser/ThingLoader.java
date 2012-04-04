@@ -155,8 +155,18 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
         }
 
         @Override
+        public void onUps(JsonReader reader, int index) throws IOException {
+            things.get(index).ups = reader.nextInt();
+        }
+
+        @Override
+        public void onDowns(JsonReader reader, int index) throws IOException {
+            things.get(index).downs = reader.nextInt();
+        }
+
+        @Override
         public void onDomain(JsonReader reader, int index) throws IOException {
-            things.get(index).details = readTrimmedString(reader, "");
+            things.get(index).domain = readTrimmedString(reader, "");
         }
 
         @Override
