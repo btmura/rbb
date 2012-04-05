@@ -21,31 +21,30 @@ import com.btmura.android.reddit.R;
 
 public class ThingView extends View {
 
+    private static float DENSITY;
+
     private static final int MAX_THUMB_WIDTH_DP = 70;
     private static final int PADDING_DP = 10;
-    private static final int DETAILS_WIDTH_DP = 300;
+    private static final int MIN_DETAILS_WIDTH_DP = 100;
+    private static final int MAX_DETAILS_WIDTH_DP = 400;
+
+    private static int THUMB_WIDTH;
+    private static int PADDING;
+    private static int MIN_DETAILS_WIDTH;
+    private static int MAX_DETAILS_WIDTH;
 
     private static TextPaint[] PAINTS;
     private static final int SMALL = 0;
     private static final int MEDIUM = 1;
 
-    private float density;
-    private int padding;
-    private int thumbWidth;
-    private int detailsWidth;
     private int bodyWidth;
 
-    private CharSequence title = "";
-    private CharSequence status = "";
-    private CharSequence details = "";
+    private Thing thing;
     private Drawable drawable;
+
     private Layout titleLayout;
     private Layout statusLayout;
     private Layout detailsLayout;
-
-    interface ThingViewSpecProvider {
-        int getThingBodyWidth();
-    }
 
     public ThingView(Context context) {
         this(context, null);
@@ -58,14 +57,16 @@ public class ThingView extends View {
     public ThingView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
-        density = context.getResources().getDisplayMetrics().density;
-        padding = (int) (PADDING_DP * density);
-        thumbWidth = (int) (MAX_THUMB_WIDTH_DP * density);
-        detailsWidth = (int) (DETAILS_WIDTH_DP * density);
     }
 
     private void init(Context context) {
         if (PAINTS == null) {
+            DENSITY = context.getResources().getDisplayMetrics().density;
+            PADDING = (int) (PADDING_DP * DENSITY);
+            THUMB_WIDTH = (int) (MAX_THUMB_WIDTH_DP * DENSITY);
+            MIN_DETAILS_WIDTH = (int) (MIN_DETAILS_WIDTH_DP * DENSITY);
+            MAX_DETAILS_WIDTH = (int) (MAX_DETAILS_WIDTH_DP * DENSITY);
+
             Theme t = context.getTheme();
             int[] styles = new int[] {
                     android.R.style.TextAppearance_Holo_Small,
@@ -91,29 +92,19 @@ public class ThingView extends View {
         this.bodyWidth = bodyWidth;
     }
 
-    public void setTitle(CharSequence title) {
-        this.title = title;
+    public void setThing(Thing thing) {
+        this.thing = thing;
         requestLayout();
     }
 
-    public void setStatus(CharSequence status) {
-        this.status = status;
-        requestLayout();
-    }
-
-    public void setDetails(CharSequence details) {
-        this.details = details;
-        requestLayout();
-    }
-
-    public void setThumbnailBitmap(Bitmap bitmap) {
-        if (bitmap != null) {
-            drawable = new BitmapDrawable(getResources(), bitmap);
-            drawable.setBounds(0, 0, (int) (bitmap.getWidth() * density),
-                    (int) (bitmap.getHeight() * density));
+    public void setThumbnail(Bitmap thumb) {
+        if (thumb != null) {
+            drawable = new BitmapDrawable(getResources(), thumb);
+            drawable.setBounds(0, 0, (int) (thumb.getWidth() * DENSITY),
+                    (int) (thumb.getHeight() * DENSITY));
         } else {
             drawable = getResources().getDrawable(R.drawable.thumbnail);
-            drawable.setBounds(0, 0, thumbWidth, thumbWidth);
+            drawable.setBounds(0, 0, THUMB_WIDTH, THUMB_WIDTH);
         }
         invalidate();
     }
@@ -141,32 +132,53 @@ public class ThingView extends View {
                 break;
         }
 
-        int titleWidth = measuredWidth;
-        int statusWidth = measuredWidth;
-        boolean includeDetails = false;
+        int titleWidth;
+        int detailsWidth;
+        CharSequence detailsText;
+
         if (bodyWidth > 0) {
-            titleWidth = Math.min(titleWidth, bodyWidth);
-            includeDetails = measuredWidth - bodyWidth - padding * 2 > detailsWidth;
+            titleWidth = Math.min(measuredWidth, bodyWidth) - PADDING * 2;
+            int remainingWidth = measuredWidth - bodyWidth - PADDING * 2;
+            if (remainingWidth > MAX_DETAILS_WIDTH) {
+                detailsWidth = MAX_DETAILS_WIDTH;
+                detailsText = thing.details;
+            } else if (remainingWidth > MIN_DETAILS_WIDTH) {
+                detailsWidth = MIN_DETAILS_WIDTH;
+                detailsText = thing.domain;
+            } else {
+                detailsWidth = 0;
+                detailsText = "";
+            }
+        } else {
+            titleWidth = measuredWidth - PADDING * 2;
+            detailsWidth = 0;
+            detailsText = "";
         }
-        titleWidth -= padding * 2;
-        statusWidth -= padding * 2;
+
+        int statusWidth = measuredWidth - PADDING * 2;
         if (drawable != null) {
-            titleWidth -= thumbWidth + padding;
-            statusWidth -= thumbWidth + padding;
+            titleWidth -= THUMB_WIDTH + PADDING;
+            statusWidth -= THUMB_WIDTH + PADDING;
         }
-        if (includeDetails) {
-            statusWidth -= detailsWidth + padding;
+        if (detailsWidth > 0) {
+            statusWidth -= detailsWidth + PADDING;
         }
+
         titleWidth = Math.max(0, titleWidth);
         statusWidth = Math.max(0, statusWidth);
+        detailsWidth = Math.max(0, detailsWidth);
 
         titleLayout = makeTitleLayout(titleWidth);
-        statusLayout = makeStatusLayout(statusWidth);
-        detailsLayout = includeDetails ? makeDetailsLayout(detailsWidth) : null;
+        statusLayout = makeLayout(thing.status, statusWidth, Alignment.ALIGN_NORMAL);
+        if (detailsWidth > 0) {
+            detailsLayout = makeLayout(detailsText, detailsWidth, Alignment.ALIGN_OPPOSITE);
+        } else {
+            detailsLayout = null;
+        }
 
-        int thumbHeight = thumbWidth;
-        int textHeight = titleLayout.getHeight() + padding + statusLayout.getHeight();
-        int minHeight = padding + Math.max(thumbHeight, textHeight) + padding;
+        int thumbHeight = THUMB_WIDTH;
+        int textHeight = titleLayout.getHeight() + PADDING + statusLayout.getHeight();
+        int minHeight = PADDING + Math.max(thumbHeight, textHeight) + PADDING;
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -185,19 +197,14 @@ public class ThingView extends View {
     }
 
     private Layout makeTitleLayout(int width) {
-        return new StaticLayout(title, PAINTS[MEDIUM], width, Alignment.ALIGN_NORMAL, 1f, 0f, true);
+        return new StaticLayout(thing.title, PAINTS[MEDIUM], width, Alignment.ALIGN_NORMAL, 1f, 0f,
+                true);
     }
 
-    private Layout makeStatusLayout(int width) {
-        BoringLayout.Metrics m = BoringLayout.isBoring(status, PAINTS[SMALL]);
-        return BoringLayout.make(status, PAINTS[SMALL], width, Alignment.ALIGN_NORMAL, 1f, 0f, m,
-                true, TruncateAt.END, width);
-    }
-
-    private Layout makeDetailsLayout(int width) {
-        BoringLayout.Metrics m = BoringLayout.isBoring(details, PAINTS[SMALL]);
-        return BoringLayout.make(details, PAINTS[SMALL], width, Alignment.ALIGN_OPPOSITE, 1f, 0f,
-                m, true, TruncateAt.END, width);
+    private static Layout makeLayout(CharSequence text, int width, Alignment alignment) {
+        BoringLayout.Metrics m = BoringLayout.isBoring(text, PAINTS[SMALL]);
+        return BoringLayout.make(text, PAINTS[SMALL], width, alignment, 1f, 0f, m, true,
+                TruncateAt.END, width);
     }
 
     @Override
@@ -205,21 +212,21 @@ public class ThingView extends View {
         canvas.save();
 
         if (detailsLayout != null) {
-            int x = canvas.getWidth() - padding - detailsLayout.getWidth();
+            int x = canvas.getWidth() - PADDING - detailsLayout.getWidth();
             int y = (canvas.getHeight() - detailsLayout.getHeight()) / 2;
             canvas.translate(x, y);
             detailsLayout.draw(canvas);
             canvas.translate(-x, -y);
         }
 
-        canvas.translate(padding, padding);
+        canvas.translate(PADDING, PADDING);
         if (drawable != null) {
             drawable.draw(canvas);
-            canvas.translate(thumbWidth + padding, 0);
+            canvas.translate(THUMB_WIDTH + PADDING, 0);
         }
         titleLayout.draw(canvas);
 
-        canvas.translate(0, canvas.getHeight() - padding * 2 - statusLayout.getHeight());
+        canvas.translate(0, canvas.getHeight() - PADDING * 2 - statusLayout.getHeight());
         statusLayout.draw(canvas);
 
         canvas.restore();

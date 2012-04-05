@@ -22,7 +22,6 @@ import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +31,6 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.browser.ThingView.ThingViewSpecProvider;
 
 public class ThingListFragment extends ListFragment implements LoaderCallbacks<List<Thing>>,
         OnScrollListener {
@@ -47,6 +45,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 
     interface OnThingSelectedListener {
         void onThingSelected(Thing thing, int position);
+        int getThingBodyWidth();
     }
 
     private ThingAdapter adapter;
@@ -190,7 +189,6 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     }
 
     private int getThingBodyWidth() {
-        Log.v("TLF", "getting tbw!");
-        return ((ThingViewSpecProvider) getActivity()).getThingBodyWidth();
+        return getListener().getThingBodyWidth();
     }
 }

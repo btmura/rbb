@@ -53,13 +53,12 @@ import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.browser.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.browser.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.browser.ThingView.ThingViewSpecProvider;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.search.SearchActivity;
 
 public class BrowserActivity extends Activity implements OnBackStackChangedListener,
         OnNavigationListener, OnQueryTextListener, OnFocusChangeListener, OnPageChangeListener,
-        OnSubredditSelectedListener, OnThingSelectedListener, ThingViewSpecProvider {
+        OnSubredditSelectedListener, OnThingSelectedListener {
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
 

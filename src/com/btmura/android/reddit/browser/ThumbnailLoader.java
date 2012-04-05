@@ -37,7 +37,7 @@ public class ThumbnailLoader {
 
     public void setThumbnail(ThingView v, String url) {
         Bitmap b = BITMAP_CACHE.get(url);
-        v.setThumbnailBitmap(b);
+        v.setThumbnail(b);
         if (b == null) {
             LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
             if (task == null || !url.equals(task.url)) {
@@ -109,7 +109,7 @@ public class ThumbnailLoader {
             ThingView v = ref.get();
             if (v != null && equals(v.getTag())) {
                 if (b != null) {
-                    v.setThumbnailBitmap(b);
+                    v.setThumbnail(b);
                 }
                 v.setTag(null);
             }
