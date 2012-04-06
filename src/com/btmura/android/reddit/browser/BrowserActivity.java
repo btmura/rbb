@@ -187,7 +187,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         refreshContainers(null);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ControlFragment cf = ControlFragment.newInstance(sr, null, lastSelectedFilter);
+        ControlFragment cf = ControlFragment.newInstance(sr, null, -1, lastSelectedFilter);
         ft.add(cf, FRAG_CONTROL);
         if (singleContainer == null || sr == null) {
             ft.replace(slfContainerId, SubredditListFragment.newInstance(singleChoice),
@@ -255,7 +255,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         refreshContainers(null);
 
         FragmentTransaction ft = fm.beginTransaction();
-        ControlFragment controlFrag = ControlFragment.newInstance(sr, null, filter);
+        ControlFragment controlFrag = ControlFragment.newInstance(sr, null, -1, filter);
         ft.add(controlFrag, FRAG_CONTROL);
         ThingListFragment thingListFrag = ThingListFragment.newInstance(sr, filter, singleChoice);
         ft.replace(tlfContainerId, thingListFrag, FRAG_THING_LIST);
@@ -292,7 +292,8 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         updateThingPager(thing);
 
         FragmentTransaction ft = fm.beginTransaction();
-        ControlFragment cf = ControlFragment.newInstance(getSubreddit(), thing, getFilter());
+        ControlFragment cf = ControlFragment.newInstance(getSubreddit(), thing, position,
+                getFilter());
         ft.add(cf, FRAG_CONTROL);
 
         if (singleContainer != null) {
@@ -317,7 +318,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     }
 
     private Subreddit getSubreddit() {
-        return getControlFragment().getTopic();
+        return getControlFragment().getSubreddit();
     }
 
     private Thing getThing() {
@@ -392,7 +393,8 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         }
 
         if (isVisible(FRAG_THING_LIST)) {
-            getThingListFragment().setChosenThing(getThing());
+            ControlFragment f = getControlFragment();
+            getThingListFragment().setSelectedThing(f.getThing(), f.getThingPosition());
         }
     }
 

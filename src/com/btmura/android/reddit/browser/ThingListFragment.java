@@ -37,14 +37,16 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
-    private static final String ARG_SINGLE_CHOICE = "c";
+    private static final String ARG_SINGLE_CHOICE = "sc";
 
-    private static final String STATE_CHOSEN_NAME = "s";
+    private static final String STATE_THING_NAME = "tn";
+    private static final String STATE_THING_POSITION = "tp";
 
     private static final String LOADER_ARG_MORE_KEY = "m";
 
     interface OnThingSelectedListener {
         void onThingSelected(Thing thing, int position);
+
         int getThingBodyWidth();
     }
 
@@ -53,7 +55,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 
     public static ThingListFragment newInstance(Subreddit sr, int filter, boolean singleChoice) {
         ThingListFragment frag = new ThingListFragment();
-        Bundle b = new Bundle(4);
+        Bundle b = new Bundle(3);
         b.putParcelable(ARG_SUBREDDIT, sr);
         b.putInt(ARG_FILTER, filter);
         b.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
@@ -80,11 +82,16 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        String name = null;
+        String name;
+        int position;
         if (savedInstanceState != null) {
-            name = savedInstanceState.getString(STATE_CHOSEN_NAME);
+            name = savedInstanceState.getString(STATE_THING_NAME);
+            position = savedInstanceState.getInt(STATE_THING_POSITION);
+        } else {
+            name = null;
+            position = -1;
         }
-        adapter.setChosenName(name);
+        adapter.setSelectedThing(name, position);
         adapter.setThingBodyWidth(getThingBodyWidth());
         setListAdapter(adapter);
         setListShown(false);
@@ -112,7 +119,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         Thing t = adapter.getItem(position);
-        adapter.setChosenName(t.name);
+        adapter.setSelectedThing(t.name, position);
         adapter.notifyDataSetChanged();
 
         switch (t.type) {
@@ -149,13 +156,14 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_CHOSEN_NAME, adapter.getChosenName());
+        outState.putString(STATE_THING_NAME, adapter.getSelectedThingName());
+        outState.putInt(STATE_THING_POSITION, adapter.getSelectedThingPosition());
     }
 
-    public void setChosenThing(Thing t) {
+    public void setSelectedThing(Thing t, int position) {
         String name = t != null ? t.name : null;
-        if (!adapter.isChosenName(name)) {
-            adapter.setChosenName(name);
+        if (!adapter.isSelectedThing(name, position)) {
+            adapter.setSelectedThing(name, position);
             adapter.notifyDataSetChanged();
         }
     }

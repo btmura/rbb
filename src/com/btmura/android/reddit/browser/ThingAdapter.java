@@ -39,8 +39,9 @@ public class ThingAdapter extends BaseAdapter {
     private final boolean singleChoice;
     private final long now = System.currentTimeMillis() / 1000;
 
-    private int thingBodyWidth;
-    private String chosenName;
+    private String selectedName;
+    private int selectedPosition;
+    private int bodyWidth;
 
     public ThingAdapter(Context context, LayoutInflater inflater, Subreddit subreddit,
             boolean singleChoice) {
@@ -61,23 +62,31 @@ public class ThingAdapter extends BaseAdapter {
         }
     }
 
-    public void setThingBodyWidth(int thingBodyWidth) {
-        this.thingBodyWidth = thingBodyWidth;
+    public void setSelectedThing(String name, int position) {
+        selectedName = name;
+        selectedPosition = position;
     }
 
-    public void setChosenName(String name) {
-        chosenName = name;
+    public String getSelectedThingName() {
+        return selectedName;
     }
 
-    public String getChosenName() {
-        return chosenName;
+    public int getSelectedThingPosition() {
+        return selectedPosition;
     }
 
-    public boolean isChosenName(String name) {
-        if (chosenName != null) {
-            return chosenName.equals(name);
+    public boolean isSelectedThing(String name, int position) {
+        if (position != selectedPosition) {
+            return false;
+        }
+        if (selectedName != null) {
+            return selectedName.equals(name);
         }
         return name == null;
+    }
+
+    public void setThingBodyWidth(int bodyWidth) {
+        this.bodyWidth = bodyWidth;
     }
 
     public List<Thing> getItems() {
@@ -168,13 +177,13 @@ public class ThingAdapter extends BaseAdapter {
 
     private void setThing(ThingView v, Thing t, int position) {
         int resId;
-        if (singleChoice && t.name.equals(chosenName)) {
+        if (singleChoice && position == selectedPosition && t.name.equals(selectedName)) {
             resId = R.drawable.selector_chosen;
         } else {
             resId = R.drawable.selector_normal;
         }
         v.setBackgroundResource(resId);
-        v.setBodyWidth(thingBodyWidth);
+        v.setBodyWidth(bodyWidth);
         v.setThing(t);
         if (t.hasThumbnail()) {
             thumbnailLoader.setThumbnail(v, t.thumbnail);
