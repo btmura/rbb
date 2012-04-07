@@ -290,7 +290,16 @@ public class Provider extends ContentProvider {
     }
 
     private static void showChangeToast(Context context, int count) {
-        int resId = count >= 0 ? R.string.x_subreddits_added : R.string.x_subreddits_deleted;
+        int resId;
+        if (count == 1) {
+            resId = R.string.subreddit_one_added;
+        } else if (count == -1) {
+            resId = R.string.subreddit_one_deleted;
+        } else if (count >= 0) {
+            resId = R.string.subreddit_x_added;
+        } else {
+            resId = R.string.subreddit_x_deleted;
+        }
         Toast.makeText(context, context.getString(resId, Math.abs(count)), Toast.LENGTH_SHORT)
                 .show();
     }

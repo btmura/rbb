@@ -115,13 +115,14 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.subreddit, menu);
+        menu.findItem(R.id.menu_combine).setVisible(false);
         menu.findItem(R.id.menu_split).setVisible(false);
         menu.findItem(R.id.menu_delete).setVisible(false);
         return true;
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        menu.findItem(R.id.menu_combine).setVisible(getListView().getCheckedItemCount() > 1);
+        menu.findItem(R.id.menu_add_combined).setVisible(getListView().getCheckedItemCount() > 1);
         return true;
     }
 
@@ -131,8 +132,8 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
                 handleAdd(mode);
                 return true;
 
-            case R.id.menu_combine:
-                handleCombine(mode);
+            case R.id.menu_add_combined:
+                handleAddCombined(mode);
                 return true;
         }
         return false;
@@ -151,7 +152,7 @@ public class SubredditInfoListFragment extends ListFragment implements MultiChoi
         mode.finish();
     }
 
-    private void handleCombine(ActionMode mode) {
+    private void handleAddCombined(ActionMode mode) {
         ArrayList<String> names = new ArrayList<String>();
         SparseBooleanArray checked = getListView().getCheckedItemPositions();
         int count = adapter.getCount();

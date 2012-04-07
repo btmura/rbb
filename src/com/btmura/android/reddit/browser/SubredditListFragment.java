@@ -136,6 +136,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         CheckedInfo info = (CheckedInfo) mode.getTag();
+        menu.findItem(R.id.menu_add_combined).setVisible(false);
         menu.findItem(R.id.menu_combine).setVisible(info.checkedCount > 1);
         menu.findItem(R.id.menu_split).setVisible(info.checkedCount == 1 && info.numSplittable > 0);
         return true;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 Brian Muramatsu
+<!--
+     Copyright (C) 2012 Brian Muramatsu
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -20,10 +21,14 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_add"/>
     <item
+        android:id="@+id/menu_add_combined"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_add_combined"/>
+    <item
         android:id="@+id/menu_combine"
         android:showAsAction="ifRoom"
         android:title="@string/menu_combine"/>
-        <item
+    <item
         android:id="@+id/menu_split"
         android:showAsAction="ifRoom"
         android:title="@string/menu_split"/>
