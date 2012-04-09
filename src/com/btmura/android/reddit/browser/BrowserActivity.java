@@ -62,16 +62,22 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
 
+    private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
+
     private static final String FRAG_CONTROL = "control";
     private static final String FRAG_SUBREDDIT_LIST = "subredditList";
     private static final String FRAG_THING_LIST = "thingList";
 
-    private static final int NAVLAYOUT_ORIGINAL = 0;
-    private static final int NAVLAYOUT_SIDENAV = 1;
-
     private static final int REQUEST_ADD_SUBREDDITS = 0;
 
-    private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
+    private static final int NAV_LAYOUT_ORIGINAL = 0;
+    private static final int NAV_LAYOUT_SIDENAV = 1;
+
+    private static final int ANIMATION_OPEN_NAV = 0;
+    private static final int ANIMATION_CLOSE_NAV = 1;
+    private static final int ANIMATION_OPEN_SIDE_NAV = 2;
+    private static final int ANIMATION_CLOSE_SIDE_NAV = 3;
+    private static final int ANIMATION_EXPAND_NAV = 4;
 
     private ActionBar bar;
     private SearchView searchView;
@@ -89,12 +95,17 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private int tlfContainerId;
     private int slfContainerId;
 
-    private AnimatorSet showNavContainer;
-    private AnimatorSet hideNavContainer;
-    private AnimatorSet openSideNav;
-    private AnimatorSet closeSideNav;
+    private int duration;
+    private int fullNavWidth;
     private int sideNavWidth;
+    private int subredditListWidth;
     private int thingBodyWidth;
+
+    private AnimatorSet openNavAnimator;
+    private AnimatorSet closeNavAnimator;
+    private AnimatorSet openSideNavAnimator;
+    private AnimatorSet closeSideNavAnimator;
+    private AnimatorSet expandNavAnimator;
 
     private boolean insertSlfToBackStack;
 
@@ -126,7 +137,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             if (thingClickAbsorber != null) {
                 thingClickAbsorber.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
-                        animateSideNav(false, null);
+                        runAnimation(ANIMATION_CLOSE_SIDE_NAV, null);
                     }
                 });
             }
@@ -152,13 +163,16 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     }
 
     private void initNavContainerAnimators() {
-        Resources r = getResources();
-        int duration = r.getInteger(android.R.integer.config_shortAnimTime);
-        sideNavWidth = r.getDisplayMetrics().widthPixels / 2;
-        showNavContainer = getNavContainerAnimator(true, duration);
-        hideNavContainer = getNavContainerAnimator(false, duration);
-        openSideNav = getSideNavAnimator(true, duration);
-        closeSideNav = getSideNavAnimator(false, duration);
+        duration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        fullNavWidth = getResources().getDisplayMetrics().widthPixels;
+        sideNavWidth = fullNavWidth / 2;
+        subredditListWidth = getResources().getDimensionPixelSize(R.dimen.subreddit_list_width);
+
+        openNavAnimator = createOpenNavAnimator();
+        closeNavAnimator = createCloseNavAnimator();
+        openSideNavAnimator = createSideNavAnimator(true);
+        closeSideNavAnimator = createSideNavAnimator(false);
+        expandNavAnimator = createExpandNavAnimator();
     }
 
     private void initThingBodyWidth() {
@@ -269,11 +283,11 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
     public void onThingSelected(final Thing thing, final int position) {
         if (navContainer != null && isSideNavShowing()) {
-            animateSideNav(false, new AnimatorListenerAdapter() {
+            runAnimation(ANIMATION_CLOSE_SIDE_NAV, new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    selectThing(thing, position);
                     animation.removeListener(this);
+                    selectThing(thing, position);
                 }
             });
         } else {
@@ -399,7 +413,19 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     }
 
     private void refreshContainers(Thing t) {
-        if (thingPager != null) {
+        if (navContainer != null) {
+            int currVisibility = navContainer.getVisibility();
+            int nextVisibility = t == null ? View.VISIBLE : View.GONE;
+            if (currVisibility != nextVisibility) {
+                if (nextVisibility == View.VISIBLE) {
+                    runAnimation(ANIMATION_OPEN_NAV, null);
+                } else {
+                    runAnimation(ANIMATION_CLOSE_NAV, null);
+                }
+            } else if (isSideNavShowing()) {
+                runAnimation(ANIMATION_EXPAND_NAV, null);
+            }
+        } else {
             thingPager.setVisibility(t != null ? View.VISIBLE : View.GONE);
             if (t == null) {
                 // Avoid nested executePendingTransactions that would occur by
@@ -411,16 +437,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
                 });
             }
         }
-        if (navContainer != null) {
-            if (isSideNavShowing() && t == null) {
-                animateNavContainer(true);
-            } else {
-                int newVisibility = t != null ? View.GONE : View.VISIBLE;
-                if (navContainer.getVisibility() != newVisibility) {
-                    animateNavContainer(t == null);
-                }
-            }
-        }
+
         if (singleContainer != null) {
             singleContainer.setVisibility(t != null ? View.GONE : View.VISIBLE);
         }
@@ -550,7 +567,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         int count = fm.getBackStackEntryCount();
         if (count > 0) {
             if (navContainer != null && !isSideNavShowing()) {
-                animateSideNav(true, null);
+                runAnimation(ANIMATION_OPEN_SIDE_NAV, null);
             } else {
                 fm.popBackStack();
             }
@@ -603,41 +620,154 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         return ThingPagerAdapter.getType(t, position) == ThingPagerAdapter.TYPE_LINK;
     }
 
-    private boolean isSideNavShowing() {
-        return thingClickAbsorber.isShown();
-    }
-
-    private void animateNavContainer(final boolean show) {
-        changeNavContainerLayout(NAVLAYOUT_ORIGINAL);
-        AnimatorSet as = show ? showNavContainer : hideNavContainer;
-        navContainer.setVisibility(View.VISIBLE);
+    private void runAnimation(int type, AnimatorListener listener) {
         navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        thingPager.setTranslationX(0);
-        as.start();
-    }
-
-    private void animateSideNav(final boolean show, AnimatorListener listener) {
-        changeNavContainerLayout(NAVLAYOUT_SIDENAV);
-        AnimatorSet as = show ? openSideNav : closeSideNav;
         navContainer.setVisibility(View.VISIBLE);
-        navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        thingPager.setVisibility(View.VISIBLE);
+        AnimatorSet as = getAnimator(type);
         if (listener != null) {
             as.addListener(listener);
         }
         as.start();
     }
 
+    private AnimatorSet getAnimator(int type) {
+        switch (type) {
+            case ANIMATION_OPEN_NAV:
+                return openNavAnimator;
+            case ANIMATION_CLOSE_NAV:
+                return closeNavAnimator;
+            case ANIMATION_OPEN_SIDE_NAV:
+                return openSideNavAnimator;
+            case ANIMATION_CLOSE_SIDE_NAV:
+                return closeSideNavAnimator;
+            case ANIMATION_EXPAND_NAV:
+                return expandNavAnimator;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private AnimatorSet createOpenNavAnimator() {
+        ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX",
+                -fullNavWidth, 0).setDuration(duration);
+        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", 0,
+                fullNavWidth).setDuration(duration);
+
+        AnimatorSet as = new AnimatorSet();
+        as.play(ncTransX).with(tpTransX);
+        as.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                changeNavContainerLayout(NAV_LAYOUT_ORIGINAL);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
+                thingPager.setVisibility(View.GONE);
+            }
+        });
+        return as;
+    }
+
+    private AnimatorSet createCloseNavAnimator() {
+        ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0,
+                -subredditListWidth).setDuration(duration);
+
+        AnimatorSet as = new AnimatorSet();
+        as.play(ncTransX);
+        as.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                thingPager.setVisibility(View.GONE);
+                thingPager.setTranslationX(0);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                navContainer.setVisibility(View.GONE);
+                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
+                thingPager.setVisibility(View.VISIBLE);
+            }
+        });
+        return as;
+    }
+
+    private AnimatorSet createSideNavAnimator(final boolean open) {
+        ObjectAnimator ncTransX;
+        ObjectAnimator tpTransX;
+        if (open) {
+            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", -sideNavWidth, 0);
+            tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", 0, sideNavWidth);
+        } else {
+            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0, -sideNavWidth);
+            tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", sideNavWidth, 0);
+        }
+        ncTransX.setDuration(duration);
+        tpTransX.setDuration(duration);
+
+        AnimatorSet as = new AnimatorSet();
+        as.play(ncTransX).with(tpTransX);
+        as.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                changeNavContainerLayout(NAV_LAYOUT_SIDENAV);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
+                if (!open) {
+                    navContainer.setVisibility(View.GONE);
+                }
+            }
+        });
+        return as;
+    }
+
+    private AnimatorSet createExpandNavAnimator() {
+        ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0,
+                subredditListWidth);
+        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", sideNavWidth,
+                fullNavWidth);
+        ncTransX.setDuration(duration);
+        tpTransX.setDuration(duration);
+
+        AnimatorSet as = new AnimatorSet();
+        as.play(ncTransX).with(tpTransX);
+        as.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                changeNavContainerLayout(NAV_LAYOUT_ORIGINAL);
+                navContainer.setTranslationX(0);
+
+                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
+                thingPager.setVisibility(View.GONE);
+            }
+        });
+        return as;
+    }
+
+    private boolean isSideNavShowing() {
+        return thingClickAbsorber.isShown();
+    }
+
     private void changeNavContainerLayout(int layout) {
         int subredditListVisibility;
         int clickAbsorberVisibility;
         switch (layout) {
-            case NAVLAYOUT_ORIGINAL:
+            case NAV_LAYOUT_ORIGINAL:
                 subredditListVisibility = View.VISIBLE;
                 clickAbsorberVisibility = View.GONE;
                 break;
 
-            case NAVLAYOUT_SIDENAV:
+            case NAV_LAYOUT_SIDENAV:
                 subredditListVisibility = View.GONE;
                 clickAbsorberVisibility = View.VISIBLE;
                 break;
@@ -648,61 +778,6 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
         subredditListContainer.setVisibility(subredditListVisibility);
         thingClickAbsorber.setVisibility(clickAbsorberVisibility);
-    }
-
-    private AnimatorSet getNavContainerAnimator(final boolean show, int duration) {
-        int width = getResources().getDimensionPixelSize(R.dimen.subreddit_list_width);
-
-        ObjectAnimator ncTransX;
-        if (show) {
-            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", -width, 0);
-        } else {
-            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0, -width);
-        }
-        ncTransX.setDuration(duration);
-
-        AnimatorSet as = new AnimatorSet();
-        as.play(ncTransX);
-        as.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-                if (!show) {
-                    navContainer.setVisibility(View.GONE);
-                }
-            }
-        });
-        return as;
-    }
-
-    private AnimatorSet getSideNavAnimator(final boolean show, int duration) {
-        ObjectAnimator ncTransX;
-        ObjectAnimator tpTransX;
-
-        if (show) {
-            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", -sideNavWidth, 0);
-            tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", 0, sideNavWidth);
-        } else {
-            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0, -sideNavWidth);
-            tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", sideNavWidth, 0);
-        }
-
-        ncTransX.setDuration(duration);
-        tpTransX.setDuration(duration);
-
-        AnimatorSet as = new AnimatorSet();
-        as.play(ncTransX).with(tpTransX);
-        as.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
-                if (!show) {
-                    navContainer.setVisibility(View.GONE);
-                }
-            }
-        });
-        return as;
     }
 
     public int getThingBodyWidth() {
