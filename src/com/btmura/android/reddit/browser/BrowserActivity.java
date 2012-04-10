@@ -668,6 +668,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
                 navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingPager.setVisibility(View.GONE);
+                updateThingPager(null);
             }
         });
         return as;
@@ -749,6 +750,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
                 thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingPager.setVisibility(View.GONE);
+                updateThingPager(null);
             }
         });
         return as;
