@@ -21,8 +21,11 @@ import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.RelativeTime;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 
 public class Thing implements Parcelable {
 
@@ -32,6 +35,7 @@ public class Thing implements Parcelable {
     public int type;
     public String name;
     public String rawTitle;
+    public boolean over18;
     public String subreddit;
     public String author;
     public String url;
@@ -44,7 +48,7 @@ public class Thing implements Parcelable {
     public int score;
     public int ups;
     public int downs;
-    public String status;
+    public CharSequence status;
     public String details;
     public String moreKey;
     public long createdUtc;
@@ -107,8 +111,15 @@ public class Thing implements Parcelable {
         assureTitle(c);
         boolean showSubreddit = !parentSubreddit.equalsIgnoreCase(subreddit);
         int resId = showSubreddit ? R.string.thing_status_subreddit : R.string.thing_status;
+
+        String nsfw = over18 ? c.getString(R.string.thing_nsfw) : "";
         String rt = RelativeTime.format(c, now, createdUtc);
-        status = c.getString(resId, subreddit, author, rt, score, numComments);
+        status = c.getString(resId, subreddit, author, rt, score, numComments, nsfw);
+        if (!nsfw.isEmpty()) {
+            SpannableStringBuilder b = new SpannableStringBuilder(status);
+            b.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);
+            status = b;
+        }
         details = c.getString(R.string.thing_details, ups, downs, domain);
         return this;
     }

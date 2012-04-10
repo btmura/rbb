@@ -124,42 +124,44 @@ public class JsonParser {
                 onId(r, i);
             } else if ("name".equals(name)) {
                 onName(r, i);
-            } else if ("display_name".equals(name)) {
-                onDisplayName(r, i);
             } else if ("title".equals(name)) {
                 onTitle(r, i);
-            } else if ("description".equals(name)) {
-                onDescription(r, i);
-            } else if ("subscribers".equals(name)) {
-                onSubscribers(r, i);
-            } else if ("created_utc".equals(name)) {
-                onCreatedUtc(r, i);
+            } else if ("over_18".equals(name)) {
+                onOver18(r, i);
             } else if ("author".equals(name)) {
                 onAuthor(r, i);
             } else if ("subreddit".equals(name)) {
                 onSubreddit(r, i);
-            } else if ("url".equals(name)) {
-                onUrl(r, i);
-            } else if ("thumbnail".equals(name)) {
-                onThumbnail(r, i);
-            } else if ("permalink".equals(name)) {
-                onPermaLink(r, i);
-            } else if ("is_self".equals(name)) {
-                onIsSelf(r, i);
-            } else if ("selftext".equals(name)) {
-                onSelfText(r, i);
-            } else if ("body".equals(name)) {
-                onBody(r, i);
-            } else if ("num_comments".equals(name)) {
-                onNumComments(r, i);
+            } else if ("created_utc".equals(name)) {
+                onCreatedUtc(r, i);
             } else if ("score".equals(name)) {
                 onScore(r, i);
             } else if ("ups".equals(name)) {
                 onUps(r, i);
             } else if ("downs".equals(name)) {
                 onDowns(r, i);
+            } else if ("num_comments".equals(name)) {
+                onNumComments(r, i);
+            } else if ("thumbnail".equals(name)) {
+                onThumbnail(r, i);
+            } else if ("is_self".equals(name)) {
+                onIsSelf(r, i);
             } else if ("domain".equals(name)) {
                 onDomain(r, i);
+            } else if ("url".equals(name)) {
+                onUrl(r, i);
+            } else if ("permalink".equals(name)) {
+                onPermaLink(r, i);
+            } else if ("selftext".equals(name)) {
+                onSelfText(r, i);
+            } else if ("body".equals(name)) {
+                onBody(r, i);
+            } else if ("display_name".equals(name)) {
+                onDisplayName(r, i);
+            } else if ("description".equals(name)) {
+                onDescription(r, i);
+            } else if ("subscribers".equals(name)) {
+                onSubscribers(r, i);
             } else if ("children".equals(name)) {
                 onChildren(r, i);
             } else if ("replies".equals(name)) {
@@ -208,6 +210,10 @@ public class JsonParser {
     }
 
     public void onTitle(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onOver18(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 

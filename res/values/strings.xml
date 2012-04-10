@@ -30,7 +30,7 @@
     
     <string name="front_page">front page</string>
     <string name="loading">Loading…</string>
-    
+
     <string name="menu_add">Add</string>
     <string name="menu_add_combined">Add combined</string>
     <string name="menu_add_front_page">Add front page</string>
@@ -46,13 +46,15 @@
     <string name="menu_view">View</string>
     <string name="menu_view_in_another_app">View in another app</string>
     
+
     <string name="sr_info_status">%1$s&#160; %2$d subscribers</string>
     <string name="sr_search">Search for subreddits</string>
     <string name="sr_search_instructions">Choose a subreddit from the left.</string>
     
     <string name="thing_details">%1$d ups &#160; %2$d downs &#160; %3$s</string>
-    <string name="thing_status">%2$s&#160; %3$s ago&#160; %4$d points&#160; %5$d comments</string>
-    <string name="thing_status_subreddit">%1$s&#160; %2$s&#160; %3$s ago&#160; %4$d points&#160; %5$d comments</string>
+    <string name="thing_nsfw">NSFW&#160;&#160;</string>
+    <string name="thing_status">%6$s%2$s&#160; %3$s ago&#160; %4$d points&#160; %5$d comments</string>
+    <string name="thing_status_subreddit">%6$s%1$s&#160; %2$s&#160; %3$s ago&#160; %4$d points&#160; %5$d comments</string>
 
     <string name="subreddit_one_added">%s subreddit added.</string>
     <string name="subreddit_one_deleted">%s subreddit deleted.</string>

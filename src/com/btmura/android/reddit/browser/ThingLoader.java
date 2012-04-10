@@ -135,6 +135,11 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
         }
 
         @Override
+        public void onOver18(JsonReader reader, int index) throws IOException {
+            things.get(index).over18 = reader.nextBoolean();
+        }
+
+        @Override
         public void onSubreddit(JsonReader reader, int index) throws IOException {
             things.get(index).subreddit = readTrimmedString(reader, "");
         }
