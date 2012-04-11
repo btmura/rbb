@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.data;
 
-
 public class Formatter_BulletsTest extends AbstractFormatterTest {
 
     public void testFormat_bullet() {

@@ -27,22 +27,24 @@ public class Formatter_NamedLinksTest extends AbstractFormatterTest {
 
         cs = assertNamedLinksFormat("[foo] (abc desc)", "foo");
         assertUrlSpan(cs, 0, 3, "http://abc");
-        
+
         cs = assertNamedLinksFormat("[foo]\n(abc desc)", "foo");
         assertUrlSpan(cs, 0, 3, "http://abc");
-    }
 
-    public void testFormat_badFormat() {
-        assertNamedLinksFormat("[foo] bar (abc)", "[foo] bar (abc)");
+        cs = assertNamedLinksFormat("[foo\n](abc desc)", "foo\n");
+        assertUrlSpan(cs, 0, 3, "http://abc");
     }
 
     public void testFormat_nestedBrackets() {
         CharSequence cs = assertNamedLinksFormat("[[link]](/abc)", "[link]");
         assertUrlSpan(cs, 0, 6, "http://www.reddit.com/abc");
-        
+
         cs = assertNamedLinksFormat("[[a]](/a) [[b]](/b)", "[a] [b]");
         assertUrlSpan(cs, 0, 3, "http://www.reddit.com/a");
         assertUrlSpan(cs, 4, 7, "http://www.reddit.com/b");
+
+        cs = assertNamedLinksFormat("[[a](/a)]", "[a]");
+        assertUrlSpan(cs, 0, 3, "http://www.reddit.com/a");
     }
 
     public void testFormat_nestedParens() {

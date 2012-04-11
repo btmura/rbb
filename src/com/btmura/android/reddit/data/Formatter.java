@@ -215,7 +215,7 @@ public class Formatter {
                     break;
                 }
 
-                int endBrack = findClosingMarker(s, '[', ']', startBrack + 1);
+                int endBrack = findClosingMarker(s, '[', ']', '(', startBrack + 1);
                 if (endBrack == -1) {
                     i = startBrack + 1;
                     continue;
@@ -227,7 +227,7 @@ public class Formatter {
                     continue;
                 }
 
-                int endParen = findClosingMarker(s, '(', ')', startParen + 1);
+                int endParen = findClosingMarker(s, '(', ')', '\n', startParen + 1);
                 if (endParen == -1) {
                     i = startParen + 1;
                     continue;
@@ -267,12 +267,13 @@ public class Formatter {
             return -1;
         }
 
-        private static int findClosingMarker(CharSequence s, char open, char close, int start) {
+        private static int findClosingMarker(CharSequence s, char open, char close, char breaker,
+                int start) {
             int nesting = 0;
             int len = s.length();
             for (int i = start; i < len; i++) {
                 char ch = s.charAt(i);
-                if (ch == '\n') {
+                if (ch == breaker) {
                     break;
                 } else if (ch == open) {
                     nesting++;
