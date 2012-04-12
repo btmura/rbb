@@ -290,7 +290,7 @@ public class Formatter {
 
     static class Subreddits {
 
-        static Pattern SUBREDDIT_PATTERN = Pattern.compile("/r/([0-9A-Za-z_]+)/?");
+        static Pattern SUBREDDIT_PATTERN = Pattern.compile("/r/([0-9A-Za-z_+]+)/?");
 
         static CharSequence format(CharSequence text) {
             CharSequence s = text;
