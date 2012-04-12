@@ -38,12 +38,16 @@ public class Formatter_NamedLinksTest extends AbstractFormatterTest {
     public void testFormat_nestedBrackets() {
         CharSequence cs = assertNamedLinksFormat("[[link]](/abc)", "[link]");
         assertUrlSpan(cs, 0, 6, "http://www.reddit.com/abc");
+    }
 
-        cs = assertNamedLinksFormat("[[a]](/a) [[b]](/b)", "[a] [b]");
+    public void testFormat_nestedBrackets2() {
+        CharSequence cs = assertNamedLinksFormat("[[a]](/a) [[b]](/b)", "[a] [b]");
         assertUrlSpan(cs, 0, 3, "http://www.reddit.com/a");
         assertUrlSpan(cs, 4, 7, "http://www.reddit.com/b");
+    }
 
-        cs = assertNamedLinksFormat("[[a](/a)]", "[a]");
+    public void testFormat_nestedBrackets3() {
+        CharSequence cs = assertNamedLinksFormat("[[a](/a)]", "[a]");
         assertUrlSpan(cs, 0, 3, "http://www.reddit.com/a");
     }
 
@@ -51,6 +55,11 @@ public class Formatter_NamedLinksTest extends AbstractFormatterTest {
         CharSequence cs = assertNamedLinksFormat("Here is a [link](/abc (123) (456)).",
                 "Here is a link.");
         assertUrlSpan(cs, 10, 14, "http://www.reddit.com/abc");
+    }
+
+    public void testFormat_nestedParens2() {
+        CharSequence cs = assertNamedLinksFormat("[abc (def)](/abc (123) (456))", "abc (def)");
+        assertUrlSpan(cs, 0, 9, "http://www.reddit.com/abc");
     }
 
     public void testFormat_multiple() {
