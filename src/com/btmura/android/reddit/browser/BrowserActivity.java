@@ -68,7 +68,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private static final String FRAG_SUBREDDIT_LIST = "subredditList";
     private static final String FRAG_THING_LIST = "thingList";
 
-    private static final int REQUEST_ADD_SUBREDDITS = 0;
+    private static final int REQUEST_SEARCH = 0;
 
     private static final int NAV_LAYOUT_ORIGINAL = 0;
     private static final int NAV_LAYOUT_SIDENAV = 1;
@@ -265,8 +265,10 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         }
         fm.addOnBackStackChangedListener(this);
 
-        refreshActionBar(sr, null, filter);
-        refreshContainers(null);
+        if (singleContainer == null) {
+            refreshActionBar(sr, null, filter);
+            refreshContainers(null);
+        }
 
         FragmentTransaction ft = fm.beginTransaction();
         ControlFragment controlFrag = ControlFragment.newInstance(sr, null, -1, filter);
@@ -491,8 +493,8 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
                 handleAdd();
                 return true;
 
-            case R.id.menu_search_for_subreddits:
-                handleSearchForSubreddits();
+            case R.id.menu_search:
+                handleSearch();
                 return true;
 
             case R.id.menu_link:
@@ -523,7 +525,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         }
     }
 
-    private void handleSearchForSubreddits() {
+    private void handleSearch() {
         searchView.setQuery("", false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         bar.setDisplayShowTitleEnabled(false);
@@ -540,14 +542,14 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
                 | Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(SearchActivity.EXTRA_QUERY, query);
-        startActivityForResult(intent, REQUEST_ADD_SUBREDDITS);
+        startActivityForResult(intent, REQUEST_SEARCH);
         return true;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case REQUEST_ADD_SUBREDDITS:
+            case REQUEST_SEARCH:
                 refreshActionBar(getSubreddit(), getThing(), getFilter());
                 break;
 

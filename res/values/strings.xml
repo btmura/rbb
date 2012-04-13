@@ -40,15 +40,14 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_link">View link</string>
     <string name="menu_refresh">Refresh</string>
-    <string name="menu_search_for_subreddits">Search for subreddits</string>
+    <string name="menu_search">Search</string>
     <string name="menu_share">Share</string>
     <string name="menu_split">Split</string>
     <string name="menu_view">View</string>
     <string name="menu_view_in_another_app">View in another app</string>
     
-
     <string name="sr_info_status">%1$s&#160; %2$d subscribers</string>
-    <string name="sr_search">Search for subreddits</string>
+    <string name="sr_search"></string>
     <string name="sr_search_instructions">Choose a subreddit from the left.</string>
     
     <string name="thing_details">%1$d ups &#160; %2$d downs &#160; %3$s</string>
