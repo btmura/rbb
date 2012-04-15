@@ -19,12 +19,15 @@ package com.btmura.android.reddit.search;
 import java.util.List;
 
 import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,12 +35,12 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.Provider.Subreddits;
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedListener;
 
 public class SearchActivity extends Activity implements OnQueryTextListener, OnSelectedListener,
-        OnBackStackChangedListener {
+        OnBackStackChangedListener, TabListener {
 
     public static final String EXTRA_QUERY = "q";
 
@@ -65,6 +68,10 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
         bar.setDisplayShowCustomEnabled(true);
         bar.setCustomView(R.layout.search_view);
 
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
+        bar.addTab(bar.newTab().setText(R.string.tab_posts).setTabListener(this));
+
         sv = (SearchView) bar.getCustomView();
         sv.setOnQueryTextListener(this);
         sv.setFocusable(false);
@@ -78,6 +85,16 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
                 submitQuery(q.trim());
             }
         }
+    }
+
+    public void onTabSelected(Tab tab, FragmentTransaction ft) {
+        Log.v("SearchActivity", "onTabSelected");
+    }
+
+    public void onTabReselected(Tab tab, FragmentTransaction ft) {
+    }
+
+    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
     }
 
     public boolean onQueryTextSubmit(String query) {
