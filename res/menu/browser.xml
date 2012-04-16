@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 Brian Muramatsu
+<!--
+     Copyright (C) 2012 Brian Muramatsu
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -34,8 +35,8 @@
         android:id="@+id/menu_copy_url"
         android:title="@string/menu_copy_url"/>
     <item
-        android:id="@+id/menu_view"
-        android:title="@string/menu_view_in_another_app"/>
+        android:id="@+id/menu_open"
+        android:title="@string/menu_open"/>
     <item
         android:id="@+id/menu_add"
         android:icon="@drawable/ic_action_add"
@@ -44,6 +45,9 @@
     <item
         android:id="@+id/menu_refresh"
         android:title="@string/menu_refresh"/>
+    <item
+        android:id="@+id/menu_view_sidebar"
+        android:title="@string/menu_view_sidebar"/>
     <item
         android:id="@+id/menu_search"
         android:title="@string/menu_search"/>

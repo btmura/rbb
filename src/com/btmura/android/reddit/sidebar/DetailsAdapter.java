@@ -1,4 +1,4 @@
-package com.btmura.android.reddit.search;
+package com.btmura.android.reddit.sidebar;
 
 import android.content.Context;
 import android.text.method.LinkMovementMethod;
@@ -12,8 +12,8 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
 
 public class DetailsAdapter extends BaseAdapter {
- 
-    private SubredditInfo item;
+
+    private Details item;
     private final Context context;
     private final LayoutInflater inflater;
 
@@ -21,9 +21,9 @@ public class DetailsAdapter extends BaseAdapter {
         this.context = context;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
-    
-    public void swapData(SubredditInfo item) {
-        this.item = item;        
+
+    public void swapData(Details item) {
+        this.item = item;
         notifyDataSetChanged();
     }
 
@@ -41,7 +41,7 @@ public class DetailsAdapter extends BaseAdapter {
         return item != null ? 1 : 0;
     }
 
-    public SubredditInfo getItem(int position) {
+    public Details getItem(int position) {
         return item;
     }
 
@@ -52,7 +52,7 @@ public class DetailsAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = inflater.inflate(R.layout.details_row, parent, false);
 
-        SubredditInfo info = getItem(position);
+        Details info = getItem(position);
 
         TextView title = (TextView) v.findViewById(R.id.title);
         title.setText(info.title);

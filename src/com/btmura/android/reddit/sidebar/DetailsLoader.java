@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.search;
+package com.btmura.android.reddit.sidebar;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,11 +32,11 @@ import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
 
-class DetailsLoader extends AsyncTaskLoader<SubredditInfo> {
+class DetailsLoader extends AsyncTaskLoader<Details> {
 
     private static final String TAG = "DetailsLoader";
 
-    private SubredditInfo results;
+    private Details results;
 
     private String subreddit;
 
@@ -56,7 +56,7 @@ class DetailsLoader extends AsyncTaskLoader<SubredditInfo> {
     }
 
     @Override
-    public SubredditInfo loadInBackground() {
+    public Details loadInBackground() {
         try {
             URL subredditUrl = new URL(Urls.aboutUrl(subreddit).toString());
 
@@ -89,11 +89,11 @@ class DetailsLoader extends AsyncTaskLoader<SubredditInfo> {
 
     class DetailsParser extends JsonParser {
 
-        private SubredditInfo results;
+        private Details results;
 
         @Override
         public void onEntityStart(int index) {
-            results = new SubredditInfo();
+            results = new Details();
         }
 
         @Override

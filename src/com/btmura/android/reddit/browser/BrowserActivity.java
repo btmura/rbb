@@ -55,6 +55,7 @@ import com.btmura.android.reddit.browser.SubredditListFragment.OnSubredditSelect
 import com.btmura.android.reddit.browser.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.search.SearchActivity;
+import com.btmura.android.reddit.sidebar.SidebarActivity;
 
 public class BrowserActivity extends Activity implements OnBackStackChangedListener,
         OnNavigationListener, OnQueryTextListener, OnFocusChangeListener, OnPageChangeListener,
@@ -112,7 +113,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.browser);
 
         getFragmentManager().addOnBackStackChangedListener(this);
 
@@ -333,30 +334,6 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         }
     }
 
-    private Subreddit getSubreddit() {
-        return getControlFragment().getSubreddit();
-    }
-
-    private Thing getThing() {
-        return getControlFragment().getThing();
-    }
-
-    private int getFilter() {
-        return getControlFragment().getFilter();
-    }
-
-    private ControlFragment getControlFragment() {
-        return (ControlFragment) getFragmentManager().findFragmentByTag(FRAG_CONTROL);
-    }
-
-    private SubredditListFragment getSubredditListFragment() {
-        return (SubredditListFragment) getFragmentManager().findFragmentByTag(FRAG_SUBREDDIT_LIST);
-    }
-
-    private ThingListFragment getThingListFragment() {
-        return (ThingListFragment) getFragmentManager().findFragmentByTag(FRAG_THING_LIST);
-    }
-
     public void onBackStackChanged() {
         Subreddit sr = getSubreddit();
         Thing t = getThing();
@@ -448,7 +425,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.browser, menu);
         shareProvider = (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();
         return true;
     }
@@ -470,7 +447,11 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
         menu.findItem(R.id.menu_share).setVisible(isThing);
         menu.findItem(R.id.menu_copy_url).setVisible(isThing);
-        menu.findItem(R.id.menu_view).setVisible(isThing);
+        menu.findItem(R.id.menu_open).setVisible(isThing);
+        
+        Subreddit subreddit = getSubreddit();
+        boolean hasSidebar = subreddit != null && !subreddit.isFrontPage();
+        menu.findItem(R.id.menu_view_sidebar).setVisible(hasSidebar);
 
         updateShareActionIntent(thing);
         return true;
@@ -509,8 +490,12 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
                 handleCopyUrl();
                 return true;
 
-            case R.id.menu_view:
-                handleView();
+            case R.id.menu_open:
+                handleOpen();
+                return true;
+                
+            case R.id.menu_view_sidebar:
+                handleViewSidebar();
                 return true;
         }
         return false;
@@ -596,12 +581,12 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
 
-    private void handleView() {
+    private void handleOpen() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(getLink(getThing())));
-        startActivity(Intent.createChooser(intent, getString(R.string.menu_view)));
+        startActivity(Intent.createChooser(intent, getString(R.string.menu_open)));
     }
-
+    
     private String getLink(Thing thing) {
         return isShowingLink(thing) ? thing.url : "http://www.reddit.com" + thing.permaLink;
     }
@@ -620,6 +605,12 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private boolean isShowingLink(Thing t) {
         int position = thingPager.getCurrentItem();
         return ThingPagerAdapter.getType(t, position) == ThingPagerAdapter.TYPE_LINK;
+    }
+    
+    private void handleViewSidebar() {
+        Intent intent = new Intent(this, SidebarActivity.class);
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getSubreddit().name);
+        startActivity(intent);
     }
 
     private void runAnimation(int type, AnimatorListener listener) {
@@ -786,6 +777,30 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
     public int getThingBodyWidth() {
         return thingBodyWidth;
+    }
+    
+    private Subreddit getSubreddit() {
+        return getControlFragment().getSubreddit();
+    }
+
+    private Thing getThing() {
+        return getControlFragment().getThing();
+    }
+
+    private int getFilter() {
+        return getControlFragment().getFilter();
+    }
+
+    private ControlFragment getControlFragment() {
+        return (ControlFragment) getFragmentManager().findFragmentByTag(FRAG_CONTROL);
+    }
+
+    private SubredditListFragment getSubredditListFragment() {
+        return (SubredditListFragment) getFragmentManager().findFragmentByTag(FRAG_SUBREDDIT_LIST);
+    }
+
+    private ThingListFragment getThingListFragment() {
+        return (ThingListFragment) getFragmentManager().findFragmentByTag(FRAG_THING_LIST);
     }
 
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

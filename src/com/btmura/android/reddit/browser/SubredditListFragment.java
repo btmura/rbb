@@ -43,7 +43,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     private static final String ARGS_SINGLE_CHOICE = "singleChoice";
 
-    interface OnSubredditSelectedListener {
+    public interface OnSubredditSelectedListener {
         static final int FLAG_LOAD_FINISHED = 0;
         static final int FLAG_ITEM_CLICKED = 1;
 

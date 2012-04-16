@@ -14,31 +14,24 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.search;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.btmura.android.reddit.sidebar;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.browser.BrowserActivity;
-import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedListener;
 
-public class DetailsFragment extends ListFragment implements LoaderCallbacks<SubredditInfo> {
+public class SidebarFragment extends ListFragment implements LoaderCallbacks<Details> {
 
     private static final String ARGS_NAME = "n";
     private static final String ARGS_POSITION = "p";
-    
+
     private DetailsAdapter adapter;
 
-    public static DetailsFragment newInstance(String name, int position) {
-        DetailsFragment f = new DetailsFragment();
+    public static SidebarFragment newInstance(String name, int position) {
+        SidebarFragment f = new SidebarFragment();
         Bundle b = new Bundle(2);
         b.putString(ARGS_NAME, name);
         b.putInt(ARGS_POSITION, position);
@@ -60,58 +53,25 @@ public class DetailsFragment extends ListFragment implements LoaderCallbacks<Sub
         getLoaderManager().initLoader(0, null, this);
     }
        
-    public Loader<SubredditInfo> onCreateLoader(int id, Bundle args) {
+    public Loader<Details> onCreateLoader(int id, Bundle args) {
         return new DetailsLoader(getActivity(), getName());
     }
     
-    public void onLoadFinished(Loader<SubredditInfo> loader, SubredditInfo data) {
+    public void onLoadFinished(Loader<Details> loader, Details data) {
         adapter.swapData(data);
         setEmptyText(getString(data != null ? R.string.empty : R.string.error));
-        setHasOptionsMenu(true);
         setListShown(true);
     }
     
-    public void onLoaderReset(Loader<SubredditInfo> loader) {
+    public void onLoaderReset(Loader<Details> loader) {
         adapter.swapData(null);
     }
     
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_add:
-                handleAddSubreddit();
-                return true;
-
-            case R.id.menu_view:
-                handleViewSubreddit();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void handleAddSubreddit() {
-        List<SubredditInfo> added = new ArrayList<SubredditInfo>(1);
-        added.add(adapter.getItem(0));
-        getListener().onSelected(added, -1, OnSelectedListener.EVENT_ACTION_ITEM_CLICKED);
-    }
-
-    private void handleViewSubreddit() {
-        Intent intent = new Intent(getActivity(), BrowserActivity.class);
-        intent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getName());
-        startActivity(intent);
-    }
-
     public String getName() {
         return getArguments().getString(ARGS_NAME);
     }
 
     public int getPosition() {
         return getArguments().getInt(ARGS_POSITION);
-    }
-
-    private OnSelectedListener getListener() {
-        return (OnSelectedListener) getActivity();
     }
 }

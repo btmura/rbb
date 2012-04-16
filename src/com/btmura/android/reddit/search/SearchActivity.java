@@ -38,6 +38,7 @@ import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedListener;
+import com.btmura.android.reddit.sidebar.SidebarFragment;
 
 public class SearchActivity extends Activity implements OnQueryTextListener, OnSelectedListener,
         OnBackStackChangedListener, TabListener {
@@ -88,7 +89,7 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
         bar.setDisplayHomeAsUpEnabled(true);
         bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
         bar.addTab(bar.newTab().setText(R.string.tab_posts).setTabListener(this));
-        
+
         refreshTitle();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
     }
@@ -124,7 +125,7 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
         submitQuery();
         return true;
     }
-    
+
     private void refreshTitle() {
         bar.setTitle(getString(R.string.search_title, query));
     }
@@ -138,7 +139,7 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
         ft.replace(slfContainerId, SubredditInfoListFragment.newInstance(query, singleChoice),
                 FRAG_SUBREDDITS);
 
-        DetailsFragment df = getDetailsFragment();
+        SidebarFragment df = getDetailsFragment();
         if (df != null) {
             ft.remove(df);
         }
@@ -164,14 +165,14 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
     private void handleListItemClicked(List<SubredditInfo> infos, int position) {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         int containerId = singleContainer != null ? R.id.single_container : R.id.details_container;
-        DetailsFragment df = DetailsFragment.newInstance(infos.get(0).displayName, position);
+        SidebarFragment df = SidebarFragment.newInstance(infos.get(0).displayName, position);
         ft.replace(containerId, df, FRAG_DETAILS);
         if (singleContainer != null) {
             ft.addToBackStack(null);
         } else {
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         }
-        ft.commit();        
+        ft.commit();
     }
 
     private void handleActionItemClicked(List<SubredditInfo> infos) {
@@ -198,7 +199,7 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        DetailsFragment f = getDetailsFragment();
+        SidebarFragment f = getDetailsFragment();
         boolean showDetails = f != null;
         menu.findItem(R.id.menu_add).setVisible(showDetails);
         menu.findItem(R.id.menu_view).setVisible(showDetails);
@@ -240,20 +241,19 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
     }
 
     public void onBackStackChanged() {
-        DetailsFragment f = getDetailsFragment();
+        SidebarFragment f = getDetailsFragment();
         refreshPosition(f);
         refreshActionBar(f);
     }
 
-    private void refreshPosition(DetailsFragment detailsFrag) {
+    private void refreshPosition(SidebarFragment detailsFrag) {
         if (singleContainer == null) {
             int position = detailsFrag != null ? detailsFrag.getPosition() : -1;
             getSubredditListFragment().setChosenPosition(position);
         }
     }
 
-    private void refreshActionBar(DetailsFragment detailsFrag) {
-        Log.v("S", "refreshActionBar: " + detailsFrag);
+    private void refreshActionBar(SidebarFragment detailsFrag) {
     }
 
     @Override
@@ -266,8 +266,8 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
         return (SubredditInfoListFragment) getFragmentManager().findFragmentByTag(FRAG_SUBREDDITS);
     }
 
-    private DetailsFragment getDetailsFragment() {
-        return (DetailsFragment) getFragmentManager().findFragmentByTag(FRAG_DETAILS);
+    private SidebarFragment getDetailsFragment() {
+        return (SidebarFragment) getFragmentManager().findFragmentByTag(FRAG_DETAILS);
     }
 
     public boolean onQueryTextChange(String newText) {
