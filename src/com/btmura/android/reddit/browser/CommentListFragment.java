@@ -19,6 +19,7 @@ package com.btmura.android.reddit.browser;
 import java.util.List;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.data.Urls;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;

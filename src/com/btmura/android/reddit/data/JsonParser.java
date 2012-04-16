@@ -40,6 +40,13 @@ public class JsonParser {
         doParseListingObject(reader);
         onParseEnd();
     }
+    
+    public void parseEntity(JsonReader reader) throws IOException {
+        reset();
+        onParseStart();
+        doParseEntityObject(reader);
+        onParseEnd();
+    }
 
     private void reset() {
         entityIndex = -1;

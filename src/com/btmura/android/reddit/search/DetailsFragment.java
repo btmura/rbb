@@ -20,43 +20,61 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListFragment;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
+import android.content.Loader;
 import android.os.Bundle;
-import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.browser.BrowserActivity;
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedListener;
 
-public class DetailsFragment extends ListFragment {
+public class DetailsFragment extends ListFragment implements LoaderCallbacks<SubredditInfo> {
 
-    private static final String ARGS_SUBREDDIT_INFO = "s";
+    private static final String ARGS_NAME = "n";
     private static final String ARGS_POSITION = "p";
+    
+    private DetailsAdapter adapter;
 
-    public static DetailsFragment newInstance(SubredditInfo info, int position) {
+    public static DetailsFragment newInstance(String name, int position) {
         DetailsFragment f = new DetailsFragment();
         Bundle b = new Bundle(2);
-        b.putParcelable(ARGS_SUBREDDIT_INFO, info);
+        b.putString(ARGS_NAME, name);
         b.putInt(ARGS_POSITION, position);
         f.setArguments(b);
         return f;
+    }
+    
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        adapter = new DetailsAdapter(getActivity());
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        SubredditInfo info = getSubredditInfo();
-        setHasOptionsMenu(info != null);
-        setEmptyText(getString(R.string.sr_search_instructions));
-        setListAdapter(new DetailsAdapter(info));
+        setListAdapter(adapter);
+        setListShown(false);
+        getLoaderManager().initLoader(0, null, this);
     }
-
+       
+    public Loader<SubredditInfo> onCreateLoader(int id, Bundle args) {
+        return new DetailsLoader(getActivity(), getName());
+    }
+    
+    public void onLoadFinished(Loader<SubredditInfo> loader, SubredditInfo data) {
+        adapter.swapData(data);
+        setEmptyText(getString(data != null ? R.string.empty : R.string.error));
+        setHasOptionsMenu(true);
+        setListShown(true);
+    }
+    
+    public void onLoaderReset(Loader<SubredditInfo> loader) {
+        adapter.swapData(null);
+    }
+    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -75,64 +93,18 @@ public class DetailsFragment extends ListFragment {
 
     private void handleAddSubreddit() {
         List<SubredditInfo> added = new ArrayList<SubredditInfo>(1);
-        added.add(getSubredditInfo());
+        added.add(adapter.getItem(0));
         getListener().onSelected(added, -1, OnSelectedListener.EVENT_ACTION_ITEM_CLICKED);
     }
 
     private void handleViewSubreddit() {
         Intent intent = new Intent(getActivity(), BrowserActivity.class);
-        intent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getSubredditInfo().displayName);
+        intent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getName());
         startActivity(intent);
     }
 
-    class DetailsAdapter extends BaseAdapter {
-
-        private SubredditInfo info;
-
-        DetailsAdapter(SubredditInfo info) {
-            this.info = info;
-        }
-
-        @Override
-        public boolean areAllItemsEnabled() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnabled(int position) {
-            return false;
-        }
-
-        public int getCount() {
-            return info != null ? 1 : 0;
-        }
-
-        public SubredditInfo getItem(int position) {
-            return info;
-        }
-
-        public long getItemId(int position) {
-            return position;
-        }
-
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View v = getActivity().getLayoutInflater().inflate(R.layout.details_row, parent, false);
-
-            SubredditInfo info = getItem(position);
-
-            TextView title = (TextView) v.findViewById(R.id.title);
-            title.setText(info.title);
-
-            TextView desc = (TextView) v.findViewById(R.id.description);
-            desc.setText(Formatter.formatInfo(getActivity(), info.description));
-            desc.setMovementMethod(LinkMovementMethod.getInstance());
-
-            return v;
-        }
-    }
-
-    public SubredditInfo getSubredditInfo() {
-        return getArguments().getParcelable(ARGS_SUBREDDIT_INFO);
+    public String getName() {
+        return getArguments().getString(ARGS_NAME);
     }
 
     public int getPosition() {

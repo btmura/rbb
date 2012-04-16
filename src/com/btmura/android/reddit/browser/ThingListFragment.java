@@ -31,6 +31,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.data.Urls;
 
 public class ThingListFragment extends ListFragment implements LoaderCallbacks<List<Thing>>,
         OnScrollListener {

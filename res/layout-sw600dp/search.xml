@@ -23,8 +23,8 @@
     android:paddingRight="@dimen/padding" >
 
     <FrameLayout
-        android:id="@+id/subreddits_container"
-        android:layout_width="300dp"
+        android:id="@+id/subreddit_list_container"
+        android:layout_width="150dp"
         android:layout_height="match_parent"
         android:paddingRight="@dimen/padding" />
 

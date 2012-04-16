@@ -45,9 +45,10 @@
     <string name="menu_split">Split</string>
     <string name="menu_view">View</string>
     <string name="menu_view_in_another_app">View in another app</string>
-    
-    <string name="sr_info_status">%1$s&#160; %2$d subscribers</string>
-    <string name="sr_search"></string>
+        
+    <string name="search_title">Results for \"%1$s\"</string>
+    <string name="sr_info_status">%1$d subscribers</string>
+    <string name="sr_search">Search reddit</string>
     <string name="sr_search_instructions">Choose a subreddit from the left.</string>
     
     <string name="tab_posts">Posts</string>

@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.browser;
 
+
 import android.app.Fragment;
 import android.os.Bundle;
 

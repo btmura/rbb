@@ -78,7 +78,7 @@ public class SubredditInfoAdapter extends BaseAdapter {
         }
         ViewHolder h = (ViewHolder) v.getTag();
         SubredditInfo item = getItem(position);
-        h.title.setText(item.title);
+        h.title.setText(item.displayName);
         h.status.setText(item.status);
         v.setBackgroundResource(singleChoice && position == chosenPosition ? R.drawable.selector_chosen
                 : R.drawable.selector_normal);

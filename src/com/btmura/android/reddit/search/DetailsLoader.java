@@ -22,30 +22,27 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
+import com.btmura.android.reddit.data.Urls;
 
-class SubredditInfoLoader extends AsyncTaskLoader<List<SubredditInfo>> {
+class DetailsLoader extends AsyncTaskLoader<SubredditInfo> {
 
-    private static final String TAG = "SubredditLoader";
+    private static final String TAG = "DetailsLoader";
 
-    private List<SubredditInfo> results;
+    private SubredditInfo results;
 
-    private String query;
+    private String subreddit;
 
-    public SubredditInfoLoader(Context context, String query) {
+    public DetailsLoader(Context context, String subreddit) {
         super(context);
-        this.query = query;
+        this.subreddit = subreddit;
     }
 
     @Override
@@ -59,18 +56,17 @@ class SubredditInfoLoader extends AsyncTaskLoader<List<SubredditInfo>> {
     }
 
     @Override
-    public List<SubredditInfo> loadInBackground() {
+    public SubredditInfo loadInBackground() {
         try {
-            URL subredditUrl = new URL("http://www.reddit.com/reddits/search.json?q="
-                    + URLEncoder.encode(query, "UTF-8"));
+            URL subredditUrl = new URL(Urls.aboutUrl(subreddit).toString());
 
             HttpURLConnection connection = (HttpURLConnection) subredditUrl.openConnection();
             connection.connect();
 
             InputStream stream = connection.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(stream));
-            SearchParser parser = new SearchParser();
-            parser.parseListingObject(reader);
+            DetailsParser parser = new DetailsParser();
+            parser.parseEntity(reader);
             stream.close();
 
             connection.disconnect();
@@ -91,35 +87,29 @@ class SubredditInfoLoader extends AsyncTaskLoader<List<SubredditInfo>> {
         super.onStopLoading();
     }
 
-    class SearchParser extends JsonParser {
+    class DetailsParser extends JsonParser {
 
-        private List<SubredditInfo> results = new ArrayList<SubredditInfo>();
+        private SubredditInfo results;
 
         @Override
         public void onEntityStart(int index) {
-            results.add(new SubredditInfo());
+            results = new SubredditInfo();
         }
 
         @Override
         public void onDisplayName(JsonReader reader, int index) throws IOException {
-            results.get(index).displayName = reader.nextString();
+            results.displayName = reader.nextString();
         }
 
         @Override
-        public void onSubscribers(JsonReader reader, int index) throws IOException {
-            results.get(index).subscribers = reader.nextInt();
+        public void onTitle(JsonReader reader, int index) throws IOException {
+            results.title = Formatter.formatTitle(getContext(),
+                    readTrimmedString(reader, ""));
         }
 
         @Override
-        public void onEntityEnd(int index) {
-            SubredditInfo srInfo = results.get(index);
-            srInfo.status = getContext().getString(R.string.sr_info_status, 
-                    srInfo.subscribers);
-        }
-        
-        @Override
-        public void onParseEnd() {
-            Collections.sort(results);
+        public void onDescription(JsonReader reader, int index) throws IOException {
+            results.description = readTrimmedString(reader, "");
         }
     }
 }

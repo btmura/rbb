@@ -19,7 +19,7 @@ package com.btmura.android.reddit.search;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class SubredditInfo implements Parcelable {
+class SubredditInfo implements Parcelable, Comparable<SubredditInfo> {
 
     public static final Parcelable.Creator<SubredditInfo> CREATOR = new Parcelable.Creator<SubredditInfo>() {
         public SubredditInfo createFromParcel(Parcel source) {
@@ -54,5 +54,9 @@ class SubredditInfo implements Parcelable {
 
     public int describeContents() {
         return 0;
+    }
+    
+    public int compareTo(SubredditInfo another) {
+        return displayName.compareToIgnoreCase(another.displayName);
     }
 }

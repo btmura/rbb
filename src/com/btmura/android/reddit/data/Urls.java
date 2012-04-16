@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.data;
+
+import com.btmura.android.reddit.browser.FilterAdapter;
+import com.btmura.android.reddit.browser.Subreddit;
 
 public class Urls {
 
@@ -57,6 +60,10 @@ public class Urls {
         return b;
     }
 
+    public static CharSequence aboutUrl(String name) {
+        return new StringBuilder("http://www.reddit.com/r/").append(name).append("/about.json");
+    }
+    
     public static CharSequence commentsUrl(String id) {
         return new StringBuilder("http://www.reddit.com/comments/").append(id).append(".json");
     }
