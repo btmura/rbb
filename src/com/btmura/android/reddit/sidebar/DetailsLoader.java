@@ -103,8 +103,7 @@ class DetailsLoader extends AsyncTaskLoader<Details> {
 
         @Override
         public void onTitle(JsonReader reader, int index) throws IOException {
-            results.title = Formatter.formatTitle(getContext(),
-                    readTrimmedString(reader, ""));
+            results.title = Formatter.formatTitle(getContext(), readTrimmedString(reader, ""));
         }
 
         @Override

@@ -113,10 +113,9 @@ class SubredditInfoLoader extends AsyncTaskLoader<List<SubredditInfo>> {
         @Override
         public void onEntityEnd(int index) {
             SubredditInfo srInfo = results.get(index);
-            srInfo.status = getContext().getString(R.string.sr_info_status, 
-                    srInfo.subscribers);
+            srInfo.status = getContext().getString(R.string.sr_info_status, srInfo.subscribers);
         }
-        
+
         @Override
         public void onParseEnd() {
             Collections.sort(results);

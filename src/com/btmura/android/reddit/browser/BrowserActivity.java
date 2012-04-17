@@ -435,8 +435,10 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
+        ControlFragment cf = getControlFragment();
+
         boolean isThingList = isVisible(FRAG_THING_LIST);
-        Thing thing = getThing();
+        Thing thing = cf.getThing();
         boolean isThing = thing != null;
         boolean isLink = isThing && !thing.isSelf;
 
@@ -449,13 +451,25 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         menu.findItem(R.id.menu_share).setVisible(isThing);
         menu.findItem(R.id.menu_copy_url).setVisible(isThing);
         menu.findItem(R.id.menu_open).setVisible(isThing);
-        
-        Subreddit subreddit = getSubreddit();
-        boolean hasSidebar = subreddit != null && !subreddit.isFrontPage();
-        menu.findItem(R.id.menu_view_sidebar).setVisible(hasSidebar);
+
+        menu.findItem(R.id.menu_view_sidebar).setVisible(getSidebar(cf) != null);
 
         updateShareActionIntent(thing);
         return true;
+    }
+
+    private String getSidebar(ControlFragment cf) {
+        Thing t = getThing();
+        if (t != null) {
+            return t.subreddit;
+        }
+
+        Subreddit sr = getSubreddit();
+        if (sr != null && !sr.isFrontPage()) {
+            return sr.name;
+        }
+
+        return null;
     }
 
     private boolean isVisible(String tag) {
@@ -494,7 +508,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             case R.id.menu_open:
                 handleOpen();
                 return true;
-                
+
             case R.id.menu_view_sidebar:
                 handleViewSidebar();
                 return true;
@@ -518,20 +532,20 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         bar.setDisplayShowCustomEnabled(true);
         searchView.requestFocus();
     }
-    
+
     public void onFocusChange(View v, boolean hasFocus) {
         if (v == searchView && !hasFocus) {
             refreshActionBar(getSubreddit(), getThing(), getFilter());
-        }        
+        }
     }
-    
+
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_SEARCH:
                 handleSearch();
                 return true;
-                
+
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -599,7 +613,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         intent.setData(Uri.parse(getLink(getThing())));
         startActivity(Intent.createChooser(intent, getString(R.string.menu_open)));
     }
-    
+
     private String getLink(Thing thing) {
         return isShowingLink(thing) ? thing.url : "http://www.reddit.com" + thing.permaLink;
     }
@@ -619,10 +633,10 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         int position = thingPager.getCurrentItem();
         return ThingPagerAdapter.getType(t, position) == ThingPagerAdapter.TYPE_LINK;
     }
-    
+
     private void handleViewSidebar() {
         Intent intent = new Intent(this, SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getSubreddit().name);
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getSidebar(getControlFragment()));
         startActivity(intent);
     }
 
@@ -791,7 +805,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     public int getThingBodyWidth() {
         return thingBodyWidth;
     }
-    
+
     private Subreddit getSubreddit() {
         return getControlFragment().getSubreddit();
     }

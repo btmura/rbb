@@ -40,7 +40,7 @@ public class JsonParser {
         doParseListingObject(reader);
         onParseEnd();
     }
-    
+
     public void parseEntity(JsonReader reader) throws IOException {
         reset();
         onParseStart();

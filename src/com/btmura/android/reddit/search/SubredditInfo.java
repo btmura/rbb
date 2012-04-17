@@ -55,7 +55,7 @@ class SubredditInfo implements Parcelable, Comparable<SubredditInfo> {
     public int describeContents() {
         return 0;
     }
-    
+
     public int compareTo(SubredditInfo another) {
         return displayName.compareToIgnoreCase(another.displayName);
     }

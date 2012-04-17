@@ -88,7 +88,6 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
         bar = getActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
         bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
-        bar.addTab(bar.newTab().setText(R.string.tab_posts).setTabListener(this));
 
         refreshTitle();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);

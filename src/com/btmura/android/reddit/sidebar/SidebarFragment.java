@@ -38,7 +38,7 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Det
         f.setArguments(b);
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,21 +52,21 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Det
         setListShown(false);
         getLoaderManager().initLoader(0, null, this);
     }
-       
+
     public Loader<Details> onCreateLoader(int id, Bundle args) {
         return new DetailsLoader(getActivity(), getName());
     }
-    
+
     public void onLoadFinished(Loader<Details> loader, Details data) {
         adapter.swapData(data);
         setEmptyText(getString(data != null ? R.string.empty : R.string.error));
         setListShown(true);
     }
-    
+
     public void onLoaderReset(Loader<Details> loader) {
         adapter.swapData(null);
     }
-    
+
     public String getName() {
         return getArguments().getString(ARGS_NAME);
     }

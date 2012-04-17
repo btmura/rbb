@@ -47,7 +47,7 @@
         </activity>
         <activity
             android:name=".sidebar.SidebarActivity"
-            android:theme="@android:style/Theme.Holo.Light.DialogWhenLarge" />
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar" />
 
         <activity-alias
             android:name=".MainActivity"

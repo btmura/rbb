@@ -63,7 +63,7 @@ public class Urls {
     public static CharSequence aboutUrl(String name) {
         return new StringBuilder("http://www.reddit.com/r/").append(name).append("/about.json");
     }
-    
+
     public static CharSequence commentsUrl(String id) {
         return new StringBuilder("http://www.reddit.com/comments/").append(id).append(".json");
     }

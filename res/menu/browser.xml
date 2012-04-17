@@ -32,22 +32,22 @@
         android:showAsAction="always"
         android:title="@string/menu_comments"/>
     <item
+        android:id="@+id/menu_add"
+        android:icon="@drawable/ic_action_add"
+        android:showAsAction="always"
+        android:title="@string/menu_add"/>
+    <item
         android:id="@+id/menu_copy_url"
         android:title="@string/menu_copy_url"/>
     <item
         android:id="@+id/menu_open"
         android:title="@string/menu_open"/>
     <item
-        android:id="@+id/menu_add"
-        android:icon="@drawable/ic_action_add"
-        android:showAsAction="always"
-        android:title="@string/menu_add"/>
+        android:id="@+id/menu_view_sidebar"
+        android:title="@string/menu_view_sidebar"/>
     <item
         android:id="@+id/menu_refresh"
         android:title="@string/menu_refresh"/>
-    <item
-        android:id="@+id/menu_view_sidebar"
-        android:title="@string/menu_view_sidebar"/>
     <item
         android:id="@+id/menu_search"
         android:title="@string/menu_search"/>
