@@ -38,6 +38,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -517,6 +518,24 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         bar.setDisplayShowCustomEnabled(true);
         searchView.requestFocus();
     }
+    
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (v == searchView && !hasFocus) {
+            refreshActionBar(getSubreddit(), getThing(), getFilter());
+        }        
+    }
+    
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_SEARCH:
+                handleSearch();
+                return true;
+                
+            default:
+                return super.onKeyUp(keyCode, event);
+        }
+    }
 
     public void onPageSelected(int position) {
         invalidateOptionsMenu();
@@ -540,12 +559,6 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
             default:
                 throw new IllegalStateException("Unexpected request code: " + requestCode);
-        }
-    }
-
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (v == searchView && !hasFocus) {
-            refreshActionBar(getSubreddit(), getThing(), getFilter());
         }
     }
 
