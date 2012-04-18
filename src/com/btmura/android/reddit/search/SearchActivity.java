@@ -28,9 +28,11 @@ import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
@@ -41,7 +43,7 @@ import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedList
 import com.btmura.android.reddit.sidebar.SidebarFragment;
 
 public class SearchActivity extends Activity implements OnQueryTextListener, OnSelectedListener,
-        OnBackStackChangedListener, TabListener {
+        OnFocusChangeListener, OnBackStackChangedListener, TabListener {
 
     public static final String EXTRA_QUERY = "q";
 
@@ -124,9 +126,27 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
         submitQuery();
         return true;
     }
+    
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_SEARCH:
+                searchItem.expandActionView();
+                return true;
+
+            default:
+                return super.onKeyUp(keyCode, event);
+        }
+    }
+    
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            searchItem.collapseActionView();
+        }
+    }
 
     private void refreshTitle() {
-        bar.setTitle(getString(R.string.search_title, query));
+        bar.setTitle(query);
     }
 
     private void submitQuery() {
@@ -190,8 +210,8 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
         getMenuInflater().inflate(R.menu.search, menu);
         searchItem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) searchItem.getActionView();
-        searchView.setQueryHint(getString(R.string.sr_search));
         searchView.setOnQueryTextListener(this);
+        searchView.setOnQueryTextFocusChangeListener(this);
         return true;
     }
 

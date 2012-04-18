@@ -50,6 +50,8 @@
         android:title="@string/menu_refresh"/>
     <item
         android:id="@+id/menu_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:showAsAction="never|collapseActionView"
         android:title="@string/menu_search"/>
 
 </menu>

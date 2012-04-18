@@ -82,7 +82,10 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private static final int ANIMATION_EXPAND_NAV = 4;
 
     private ActionBar bar;
+    
+    private MenuItem searchItem;
     private SearchView searchView;
+    
     private FilterAdapter filterSpinner;
     private int lastSelectedFilter;
 
@@ -120,13 +123,10 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
-        bar.setCustomView(R.layout.search_view);
-
-        searchView = (SearchView) bar.getCustomView();
-        searchView.setOnQueryTextListener(this);
-        searchView.setOnQueryTextFocusChangeListener(this);
+        bar.setDisplayShowTitleEnabled(false);
 
         filterSpinner = new FilterAdapter(this);
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         bar.setListNavigationCallbacks(filterSpinner, this);
 
         singleContainer = findViewById(R.id.single_container);
@@ -345,40 +345,8 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     }
 
     private void refreshActionBar(Subreddit sr, Thing t, int filter) {
-        if (t != null && singleContainer != null) {
-            setThingNavigationMode(t);
-        } else if (sr != null) {
-            setThingListNavigationMode(sr);
-        } else {
-            setSubredditListNavigationMode();
-        }
-
         bar.setDisplayHomeAsUpEnabled(singleContainer != null && sr != null || t != null
                 || getIntent().hasExtra(EXTRA_SUBREDDIT));
-        if (bar.getNavigationMode() == ActionBar.NAVIGATION_MODE_LIST) {
-            bar.setSelectedNavigationItem(filter);
-        }
-    }
-
-    private void setThingNavigationMode(Thing t) {
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        bar.setDisplayShowTitleEnabled(true);
-        bar.setDisplayShowCustomEnabled(false);
-        bar.setTitle(t.assureTitle(this).title);
-    }
-
-    private void setThingListNavigationMode(Subreddit sr) {
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        bar.setDisplayShowTitleEnabled(false);
-        bar.setDisplayShowCustomEnabled(false);
-        filterSpinner.setSubreddit(sr.getTitle(this));
-    }
-
-    private void setSubredditListNavigationMode() {
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        bar.setDisplayShowTitleEnabled(true);
-        bar.setDisplayShowCustomEnabled(false);
-        bar.setTitle(R.string.app_name);
     }
 
     private void refreshCheckedItems() {
@@ -428,6 +396,12 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser, menu);
         shareProvider = (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();
+
+        searchItem = menu.findItem(R.id.menu_search);
+        searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+        searchView.setOnQueryTextFocusChangeListener(this);
+
         return true;
     }
 
@@ -526,16 +500,12 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     }
 
     private void handleSearch() {
-        searchView.setQuery("", false);
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        bar.setDisplayShowTitleEnabled(false);
-        bar.setDisplayShowCustomEnabled(true);
-        searchView.requestFocus();
+        searchItem.expandActionView();
     }
 
     public void onFocusChange(View v, boolean hasFocus) {
-        if (v == searchView && !hasFocus) {
-            refreshActionBar(getSubreddit(), getThing(), getFilter());
+        if (!hasFocus) {
+            searchItem.collapseActionView();
         }
     }
 
@@ -568,7 +538,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_SEARCH:
-                refreshActionBar(getSubreddit(), getThing(), getFilter());
+                searchItem.collapseActionView();
                 break;
 
             default:

@@ -49,7 +49,6 @@
     
     <string name="search_title">Results for \"%1$s\"</string>
     <string name="sr_info_status">%1$d subscribers</string>
-    <string name="sr_search">Search reddit</string>
     <string name="sr_search_instructions">Choose a subreddit from the left.</string>
     
     <string name="tab_posts">Posts</string>
