@@ -76,7 +76,7 @@ public class FilterAdapter extends BaseAdapter {
     }
 
     private View makeView(ViewGroup parent) {
-        View v = inflater.inflate(R.layout.filter_spinner, parent, false);
+        View v = inflater.inflate(R.layout.filter_row, parent, false);
         ViewHolder h = new ViewHolder();
         h.line1 = (TextView) v.findViewById(R.id.line1);
         h.line2 = (TextView) v.findViewById(R.id.line2);

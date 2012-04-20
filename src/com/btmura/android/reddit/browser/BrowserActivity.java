@@ -22,7 +22,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar;
-import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -44,9 +43,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.ShareActionProvider;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.Provider;
@@ -59,7 +61,7 @@ import com.btmura.android.reddit.search.SearchActivity;
 import com.btmura.android.reddit.sidebar.SidebarActivity;
 
 public class BrowserActivity extends Activity implements OnBackStackChangedListener,
-        OnNavigationListener, OnQueryTextListener, OnFocusChangeListener, OnPageChangeListener,
+        OnItemSelectedListener, OnQueryTextListener, OnFocusChangeListener, OnPageChangeListener,
         OnSubredditSelectedListener, OnThingSelectedListener {
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
@@ -82,11 +84,12 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     private static final int ANIMATION_EXPAND_NAV = 4;
 
     private ActionBar bar;
-    
+
     private MenuItem searchItem;
     private SearchView searchView;
-    
-    private FilterAdapter filterSpinner;
+
+    private Spinner filterSpinner;
+    private FilterAdapter filterAdapter;
     private int lastSelectedFilter;
 
     private View singleContainer;
@@ -114,6 +117,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
     private boolean insertSlfToBackStack;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,12 +127,13 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
-        bar.setDisplayShowTitleEnabled(false);
-
-        filterSpinner = new FilterAdapter(this);
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        bar.setListNavigationCallbacks(filterSpinner, this);
-
+        bar.setCustomView(R.layout.filter_spinner);
+        
+        filterAdapter = new FilterAdapter(this);
+        filterSpinner = (Spinner) bar.getCustomView();
+        filterSpinner.setAdapter(filterAdapter);
+        filterSpinner.setOnItemSelectedListener(this);
+        
         singleContainer = findViewById(R.id.single_container);
         thingPager = (ViewPager) findViewById(R.id.thing_pager);
         thingPager.setOnPageChangeListener(this);
@@ -232,13 +237,12 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             onBackStackChanged();
         }
     }
-
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+    
+    public void onItemSelected(AdapterView<?> adapter, View view, int itemPosition, long itemId) {    
         lastSelectedFilter = itemPosition;
         if (itemId != getFilter()) {
             selectSubreddit(getSubreddit(), itemPosition);
         }
-        return true;
     }
 
     public void onSubredditSelected(Subreddit sr, int event) {
@@ -345,6 +349,13 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     }
 
     private void refreshActionBar(Subreddit sr, Thing t, int filter) {
+        if (t != null) {
+            bar.setTitle(t.assureTitle(this).title);
+        } else if (sr != null) {
+            bar.setTitle(sr.getTitle(this));
+        } else {
+            bar.setTitle(R.string.app_name);
+        }
         bar.setDisplayHomeAsUpEnabled(singleContainer != null && sr != null || t != null
                 || getIntent().hasExtra(EXTRA_SUBREDDIT));
     }
@@ -808,5 +819,8 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
     public boolean onQueryTextChange(String newText) {
         return false;
+    }
+    
+    public void onNothingSelected(android.widget.AdapterView<?> adapter) {
     }
 }
