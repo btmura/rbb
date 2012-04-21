@@ -25,15 +25,15 @@ public class Urls {
     public static CharSequence commentsUrl(String id) {
         return new StringBuilder("http://www.reddit.com/comments/").append(id).append(".json");
     }
-    
+
     public static CharSequence permaUrl(Thing thing) {
         return new StringBuilder("http://www.reddit.com").append(thing.permaLink);
     }
-    
+
     public static CharSequence sidebarUrl(String name) {
         return new StringBuilder("http://www.reddit.com/r/").append(name).append("/about.json");
     }
-    
+
     public static CharSequence subredditUrl(Subreddit sr, int filter, String after) {
         StringBuilder b = new StringBuilder("http://www.reddit.com/");
 

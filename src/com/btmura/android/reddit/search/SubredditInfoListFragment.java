@@ -37,7 +37,8 @@ import android.widget.ListView;
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.R;
 
-public class SubredditInfoListFragment extends ListFragment implements MultiChoiceModeListener,
+public class SubredditInfoListFragment extends ListFragment implements
+        MultiChoiceModeListener,
         LoaderCallbacks<List<SubredditInfo>> {
 
     interface OnSelectedListener {

@@ -47,7 +47,7 @@ public class ThingMenuFragment extends Fragment {
 
         boolean isShowingLink();
     }
-    
+
     private Thing thing;
     private ShareActionProvider shareProvider;
 
@@ -83,7 +83,7 @@ public class ThingMenuFragment extends Fragment {
 
         menu.findItem(R.id.menu_link).setVisible(showLink);
         menu.findItem(R.id.menu_comments).setVisible(showComments);
-        
+
         updateShareProvider();
     }
 
@@ -101,7 +101,7 @@ public class ThingMenuFragment extends Fragment {
             case R.id.menu_copy_url:
                 handleCopyUrl();
                 return true;
-                
+
             case R.id.menu_open:
                 handleOpen();
                 return true;
@@ -110,7 +110,7 @@ public class ThingMenuFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
     }
-    
+
     private void updateShareProvider() {
         CharSequence title = thing.assureTitle(getActivity()).title;
         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -136,7 +136,7 @@ public class ThingMenuFragment extends Fragment {
         clipboard.setPrimaryClip(ClipData.newPlainText(label, text));
         Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
     }
-    
+
     private void handleOpen() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(getLink().toString()));

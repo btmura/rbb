@@ -36,7 +36,7 @@ public class SidebarActivity extends Activity {
 
         Subreddit subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
         setTitle(subreddit.getTitle(this));
-        
+
         String[] subreddits = subreddit.name.split("\\+");
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new SidebarPagerAdapter(getFragmentManager(), subreddits));

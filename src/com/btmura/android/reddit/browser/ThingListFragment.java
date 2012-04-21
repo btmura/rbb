@@ -40,7 +40,7 @@ import com.btmura.android.reddit.data.Urls;
 public class ThingListFragment extends ListFragment implements
         LoaderCallbacks<List<Thing>>,
         OnScrollListener {
-    
+
     public static final String TAG = "ThingListFragment";
 
     private static final String ARG_SUBREDDIT = "s";

@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
@@ -36,8 +37,8 @@ public class ThingListActivity extends Activity implements
 
     public static final String EXTRA_SUBREDDIT = "s";
 
-    private static final String STATE_FILTER = "f";    
-    
+    private static final String STATE_FILTER = "f";
+
     private ActionBar bar;
     private Subreddit subreddit;
     private boolean restoringState;
@@ -52,11 +53,11 @@ public class ThingListActivity extends Activity implements
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
-        
+
         FilterAdapter adapter = new FilterAdapter(this);
         adapter.setTitle(subreddit.getTitle(this));
         bar.setListNavigationCallbacks(adapter, this);
-        
+
         if (savedInstanceState != null) {
             restoringState = true;
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_FILTER));
@@ -70,6 +71,18 @@ public class ThingListActivity extends Activity implements
     }
 
     @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_SEARCH:
+                getGlobalMenuFragment().handleSearch();
+                return true;
+
+            default:
+                return super.onKeyUp(keyCode, event);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -80,17 +93,17 @@ public class ThingListActivity extends Activity implements
                 return super.onOptionsItemSelected(item);
         }
     }
-    
+
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         if (restoringState) {
             restoringState = false;
             return true;
         }
-        
+
         GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
         ThingListFragment tlf = ThingListFragment.newInstance(subreddit, (int) itemId, false);
-        
-        FragmentTransaction ft = getFragmentManager().beginTransaction();        
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.single_container, tlf, ThingListFragment.TAG);
         ft.add(gmf, GlobalMenuFragment.TAG);
         ft.commit();
@@ -105,5 +118,9 @@ public class ThingListActivity extends Activity implements
 
     public int getThingBodyWidth() {
         return 0;
-    }    
+    }
+
+    private GlobalMenuFragment getGlobalMenuFragment() {
+        return (GlobalMenuFragment) getFragmentManager().findFragmentByTag(GlobalMenuFragment.TAG);
+    }
 }

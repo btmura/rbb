@@ -42,8 +42,12 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedListener;
 import com.btmura.android.reddit.sidebar.SidebarFragment;
 
-public class SearchActivity extends Activity implements OnQueryTextListener, OnSelectedListener,
-        OnFocusChangeListener, OnBackStackChangedListener, TabListener {
+public class SearchActivity extends Activity implements
+        OnQueryTextListener,
+        OnSelectedListener,
+        OnFocusChangeListener,
+        OnBackStackChangedListener,
+        TabListener {
 
     public static final String EXTRA_QUERY = "q";
 
@@ -126,7 +130,7 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
         submitQuery();
         return true;
     }
-    
+
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -138,7 +142,7 @@ public class SearchActivity extends Activity implements OnQueryTextListener, OnS
                 return super.onKeyUp(keyCode, event);
         }
     }
-    
+
     public void onFocusChange(View v, boolean hasFocus) {
         if (!hasFocus) {
             searchItem.collapseActionView();

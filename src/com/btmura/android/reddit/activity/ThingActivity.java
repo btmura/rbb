@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
@@ -65,6 +66,18 @@ public class ThingActivity extends Activity implements
     }
 
     @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_SEARCH:
+                getGlobalMenuFragment().handleSearch();
+                return true;
+
+            default:
+                return super.onKeyUp(keyCode, event);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -96,5 +109,9 @@ public class ThingActivity extends Activity implements
     }
 
     public void onPageScrollStateChanged(int state) {
+    }
+
+    private GlobalMenuFragment getGlobalMenuFragment() {
+        return (GlobalMenuFragment) getFragmentManager().findFragmentByTag(GlobalMenuFragment.TAG);
     }
 }

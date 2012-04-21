@@ -66,9 +66,14 @@ import com.btmura.android.reddit.browser.ThingListFragment.OnThingSelectedListen
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.search.SearchActivity;
 
-public class BrowserActivity extends Activity implements OnBackStackChangedListener,
-        OnItemSelectedListener, OnQueryTextListener, OnFocusChangeListener, OnPageChangeListener,
-        OnSubredditSelectedListener, OnThingSelectedListener {
+public class BrowserActivity extends Activity implements
+        OnBackStackChangedListener,
+        OnItemSelectedListener,
+        OnQueryTextListener,
+        OnFocusChangeListener,
+        OnPageChangeListener,
+        OnSubredditSelectedListener,
+        OnThingSelectedListener {
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
 
@@ -251,7 +256,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         if (singleContainer != null) {
             return;
         }
-        
+
         if (savedInstanceState != null) {
             lastSelectedFilter = savedInstanceState.getInt(STATE_LAST_SELECTED_FILTER);
             updateThingPager(getThing());
@@ -429,14 +434,14 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser, menu);
-        
-//        shareProvider = (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();
-//
-//        searchItem = menu.findItem(R.id.menu_search);
-//        searchView = (SearchView) searchItem.getActionView();
-//        searchView.setOnQueryTextListener(this);
-//        searchView.setOnQueryTextFocusChangeListener(this);
-    
+
+        // shareProvider = (ShareActionProvider)
+        // menu.findItem(R.id.menu_share).getActionProvider();
+        //
+        // searchItem = menu.findItem(R.id.menu_search);
+        // searchView = (SearchView) searchItem.getActionView();
+        // searchView.setOnQueryTextListener(this);
+        // searchView.setOnQueryTextFocusChangeListener(this);
 
         return true;
     }
@@ -456,7 +461,8 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         boolean isLink = isThing && !thing.isSelf;
 
         menu.findItem(R.id.menu_add).setVisible((isThingList || isThing) && isSubredditPreview());
-//        menu.findItem(R.id.menu_refresh).setVisible(isThingList && singleContainer != null);
+        // menu.findItem(R.id.menu_refresh).setVisible(isThingList &&
+        // singleContainer != null);
 
         menu.findItem(R.id.menu_link).setVisible(isLink && !isShowingLink(thing));
         menu.findItem(R.id.menu_comments).setVisible(isLink && isShowingLink(thing));
@@ -465,7 +471,8 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         menu.findItem(R.id.menu_copy_url).setVisible(isThing);
         menu.findItem(R.id.menu_open).setVisible(isThing);
 
-//        menu.findItem(R.id.menu_view_sidebar).setVisible(getSidebar(cf) != null);
+        // menu.findItem(R.id.menu_view_sidebar).setVisible(getSidebar(cf) !=
+        // null);
 
         updateShareActionIntent(thing);
         return true;
@@ -521,10 +528,10 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             case R.id.menu_open:
                 handleOpen();
                 return true;
-//
-//            case R.id.menu_view_sidebar:
-//                handleViewSidebar();
-//                return true;
+                //
+                // case R.id.menu_view_sidebar:
+                // handleViewSidebar();
+                // return true;
         }
         return false;
     }

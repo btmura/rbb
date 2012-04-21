@@ -38,13 +38,15 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
-public class SubredditListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
+public class SubredditListFragment extends ListFragment implements
+        LoaderCallbacks<Cursor>,
         MultiChoiceModeListener {
 
     private static final String ARGS_SINGLE_CHOICE = "singleChoice";
 
     public interface OnSubredditSelectedListener {
         void onSubredditLoaded(Subreddit sr);
+
         void onSubredditSelected(Subreddit s);
     }
 
