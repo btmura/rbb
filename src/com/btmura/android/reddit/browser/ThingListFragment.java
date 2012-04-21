@@ -20,6 +20,7 @@ import java.util.List;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
@@ -33,7 +34,9 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.data.Urls;
 
@@ -195,6 +198,12 @@ public class ThingListFragment extends ListFragment implements
                 return true;
         }
         return false;
+    }
+
+    private void handleAdd() {
+        ContentValues values = new ContentValues(1);
+        values.put(Subreddits.COLUMN_NAME, getSubreddit().name);
+        Provider.addSubredditInBackground(getActivity(), values);
     }
 
     private void handleViewSidebar() {

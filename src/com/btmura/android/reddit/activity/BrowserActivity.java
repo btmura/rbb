@@ -27,50 +27,34 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
-import android.widget.ShareActionProvider;
 import android.widget.Spinner;
-import android.widget.Toast;
 
-import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.browser.ControlFragment;
 import com.btmura.android.reddit.browser.FilterAdapter;
 import com.btmura.android.reddit.browser.Subreddit;
 import com.btmura.android.reddit.browser.SubredditListFragment;
+import com.btmura.android.reddit.browser.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.browser.Thing;
 import com.btmura.android.reddit.browser.ThingListFragment;
-import com.btmura.android.reddit.browser.ThingPagerAdapter;
-import com.btmura.android.reddit.browser.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.browser.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.data.Formatter;
-import com.btmura.android.reddit.search.SearchActivity;
+import com.btmura.android.reddit.browser.ThingPagerAdapter;
+import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 
 public class BrowserActivity extends Activity implements
         OnBackStackChangedListener,
-        OnItemSelectedListener,
-        OnQueryTextListener,
-        OnFocusChangeListener,
+        OnItemSelectedListener,        
         OnPageChangeListener,
         OnSubredditSelectedListener,
         OnThingSelectedListener {
@@ -83,8 +67,6 @@ public class BrowserActivity extends Activity implements
     private static final String FRAG_SUBREDDIT_LIST = "subredditList";
     private static final String FRAG_THING_LIST = "thingList";
 
-    private static final int REQUEST_SEARCH = 0;
-
     private static final int NAV_LAYOUT_ORIGINAL = 0;
     private static final int NAV_LAYOUT_SIDENAV = 1;
 
@@ -96,9 +78,6 @@ public class BrowserActivity extends Activity implements
 
     private ActionBar bar;
 
-    private MenuItem searchItem;
-    private SearchView searchView;
-
     private Spinner filterSpinner;
     private FilterAdapter filterAdapter;
     private int lastSelectedFilter;
@@ -109,7 +88,6 @@ public class BrowserActivity extends Activity implements
     private View thingClickAbsorber;
     private ViewPager thingPager;
 
-    private ShareActionProvider shareProvider;
     private boolean singleChoice;
     private int tlfContainerId;
     private int slfContainerId;
@@ -221,7 +199,11 @@ public class BrowserActivity extends Activity implements
     private void initSingleContainer(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             SubredditListFragment slf = SubredditListFragment.newInstance(false);
-            getFragmentManager().beginTransaction().replace(R.id.single_container, slf).commit();
+            GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(gmf, GlobalMenuFragment.TAG);
+            ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
+            ft.commit();            
         }
     }
 
@@ -430,136 +412,15 @@ public class BrowserActivity extends Activity implements
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.browser, menu);
-
-        // shareProvider = (ShareActionProvider)
-        // menu.findItem(R.id.menu_share).getActionProvider();
-        //
-        // searchItem = menu.findItem(R.id.menu_search);
-        // searchView = (SearchView) searchItem.getActionView();
-        // searchView.setOnQueryTextListener(this);
-        // searchView.setOnQueryTextFocusChangeListener(this);
-
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-
-        ControlFragment cf = getControlFragment();
-        if (cf == null) {
-            return true;
-        }
-
-        boolean isThingList = isVisible(FRAG_THING_LIST);
-        Thing thing = cf.getThing();
-        boolean isThing = thing != null;
-        boolean isLink = isThing && !thing.isSelf;
-
-        menu.findItem(R.id.menu_add).setVisible((isThingList || isThing) && isSubredditPreview());
-        // menu.findItem(R.id.menu_refresh).setVisible(isThingList &&
-        // singleContainer != null);
-
-        menu.findItem(R.id.menu_link).setVisible(isLink && !isShowingLink(thing));
-        menu.findItem(R.id.menu_comments).setVisible(isLink && isShowingLink(thing));
-
-        menu.findItem(R.id.menu_share).setVisible(isThing);
-        menu.findItem(R.id.menu_copy_url).setVisible(isThing);
-        menu.findItem(R.id.menu_open).setVisible(isThing);
-
-        // menu.findItem(R.id.menu_view_sidebar).setVisible(getSidebar(cf) !=
-        // null);
-
-        updateShareActionIntent(thing);
-        return true;
-    }
-
-    private String getSidebar(ControlFragment cf) {
-        Thing t = getThing();
-        if (t != null) {
-            return t.subreddit;
-        }
-
-        Subreddit sr = getSubreddit();
-        if (sr != null && !sr.isFrontPage()) {
-            return sr.name;
-        }
-
-        return null;
-    }
-
     private boolean isVisible(String tag) {
         Fragment f = getFragmentManager().findFragmentByTag(tag);
         return f != null && f.isAdded();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                handleHome();
-                return true;
-
-            case R.id.menu_add:
-                handleAdd();
-                return true;
-
-            case R.id.menu_search:
-                handleSearch();
-                return true;
-
-            case R.id.menu_link:
-                handleLink();
-                return true;
-
-            case R.id.menu_comments:
-                handleComments();
-                return true;
-
-            case R.id.menu_copy_url:
-                handleCopyUrl();
-                return true;
-
-            case R.id.menu_open:
-                handleOpen();
-                return true;
-                //
-                // case R.id.menu_view_sidebar:
-                // handleViewSidebar();
-                // return true;
-        }
-        return false;
-    }
-
-    private void handleAdd() {
-        Subreddit sr = getSubreddit();
-        if (sr != null) {
-            ContentValues values = new ContentValues(1);
-            values.put(Subreddits.COLUMN_NAME, sr.name);
-            Provider.addSubredditInBackground(getApplicationContext(), values);
-        }
-    }
-
-    private void handleSearch() {
-        searchItem.expandActionView();
-    }
-
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            searchItem.collapseActionView();
-        }
-    }
-
-    @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_SEARCH:
-                handleSearch();
                 return true;
 
             default:
@@ -569,27 +430,6 @@ public class BrowserActivity extends Activity implements
 
     public void onPageSelected(int position) {
         invalidateOptionsMenu();
-    }
-
-    public boolean onQueryTextSubmit(String query) {
-        Intent intent = new Intent(this, SearchActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
-                | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        intent.putExtra(SearchActivity.EXTRA_QUERY, query);
-        startActivityForResult(intent, REQUEST_SEARCH);
-        return true;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_SEARCH:
-                searchItem.collapseActionView();
-                break;
-
-            default:
-                throw new IllegalStateException("Unexpected request code: " + requestCode);
-        }
     }
 
     private void handleHome() {
@@ -607,53 +447,6 @@ public class BrowserActivity extends Activity implements
         } else {
             finish();
         }
-    }
-
-    private void handleLink() {
-        thingPager.setCurrentItem(0);
-    }
-
-    private void handleComments() {
-        thingPager.setCurrentItem(1);
-    }
-
-    private void handleCopyUrl() {
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        String text = getLink(getThing());
-        clipboard.setPrimaryClip(ClipData.newPlainText(text, text));
-        Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
-    }
-
-    private void handleOpen() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(getLink(getThing())));
-        startActivity(Intent.createChooser(intent, getString(R.string.menu_open)));
-    }
-
-    private String getLink(Thing thing) {
-        return isShowingLink(thing) ? thing.url : "http://www.reddit.com" + thing.permaLink;
-    }
-
-    private void updateShareActionIntent(Thing thing) {
-        if (thing != null) {
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_SUBJECT,
-                    Formatter.formatTitle(this, thing.assureTitle(this).title));
-            intent.putExtra(Intent.EXTRA_TEXT, getLink(thing));
-            shareProvider.setShareIntent(intent);
-        }
-    }
-
-    private boolean isShowingLink(Thing t) {
-        int position = thingPager.getCurrentItem();
-        return ThingPagerAdapter.getType(t, position) == ThingPagerAdapter.TYPE_LINK;
-    }
-
-    private void handleViewSidebar() {
-        Intent intent = new Intent(this, SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getSidebar(getControlFragment()));
-        startActivity(intent);
     }
 
     private void runAnimation(int type, AnimatorListener listener) {

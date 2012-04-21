@@ -41,6 +41,8 @@ import android.widget.ListView;
 public class SubredditListFragment extends ListFragment implements
         LoaderCallbacks<Cursor>,
         MultiChoiceModeListener {
+    
+    public static final String TAG = "SubredditListFragment";
 
     private static final String ARGS_SINGLE_CHOICE = "singleChoice";
 
