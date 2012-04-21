@@ -20,9 +20,12 @@ import java.util.List;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,10 +34,14 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.data.Urls;
 
-public class ThingListFragment extends ListFragment implements LoaderCallbacks<List<Thing>>,
+public class ThingListFragment extends ListFragment implements
+        LoaderCallbacks<List<Thing>>,
         OnScrollListener {
+    
+    public static final String TAG = "ThingListFragment";
 
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
@@ -45,7 +52,7 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
 
     private static final String LOADER_ARG_MORE_KEY = "m";
 
-    interface OnThingSelectedListener {
+    public interface OnThingSelectedListener {
         void onThingSelected(Thing thing, int position);
 
         int getThingBodyWidth();
@@ -170,15 +177,35 @@ public class ThingListFragment extends ListFragment implements LoaderCallbacks<L
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.thing_list_menu, menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
+            case R.id.menu_view_sidebar:
+                handleViewSidebar();
+                return true;
+
             case R.id.menu_refresh:
-                setListShown(false);
-                getLoaderManager().restartLoader(0, null, this);
+                handleRefresh();
                 return true;
         }
         return false;
+    }
+
+    private void handleViewSidebar() {
+        Intent intent = new Intent(getActivity(), SidebarActivity.class);
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getSubreddit());
+        startActivity(intent);
+    }
+
+    private void handleRefresh() {
+        setListShown(false);
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     private OnThingSelectedListener getListener() {

@@ -44,10 +44,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private static final String ARGS_SINGLE_CHOICE = "singleChoice";
 
     public interface OnSubredditSelectedListener {
-        static final int FLAG_LOAD_FINISHED = 0;
-        static final int FLAG_ITEM_CLICKED = 1;
-
-        void onSubredditSelected(Subreddit sr, int event);
+        void onSubredditLoaded(Subreddit sr);
+        void onSubredditSelected(Subreddit s);
     }
 
     private SubredditAdapter adapter;
@@ -101,7 +99,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
             getListView().post(new Runnable() {
                 public void run() {
                     Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), 0));
-                    listener.onSubredditSelected(sr, OnSubredditSelectedListener.FLAG_LOAD_FINISHED);
+                    listener.onSubredditLoaded(sr);
                 }
             });
         }
@@ -116,7 +114,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         super.onListItemClick(l, v, position, id);
         Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), position));
         adapter.setSelectedSubreddit(sr);
-        listener.onSubredditSelected(sr, OnSubredditSelectedListener.FLAG_ITEM_CLICKED);
+        listener.onSubredditSelected(sr);
     }
 
     class CheckedInfo {

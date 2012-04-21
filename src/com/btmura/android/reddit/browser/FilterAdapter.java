@@ -36,7 +36,7 @@ public class FilterAdapter extends BaseAdapter {
 
     private final LayoutInflater inflater;
     private final ArrayList<String> names = new ArrayList<String>(4);
-    private String subreddit;
+    private String title;
 
     public FilterAdapter(Context context) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -58,8 +58,8 @@ public class FilterAdapter extends BaseAdapter {
         return position;
     }
 
-    public void setSubreddit(String subreddit) {
-        this.subreddit = subreddit;
+    public void setTitle(String title) {
+        this.title = title;
         notifyDataSetChanged();
     }
 
@@ -70,7 +70,7 @@ public class FilterAdapter extends BaseAdapter {
         }
 
         ViewHolder h = (ViewHolder) v.getTag();
-        h.line1.setText(subreddit);
+        h.line1.setText(title);
         h.line2.setText(getItem(position));
         return v;
     }

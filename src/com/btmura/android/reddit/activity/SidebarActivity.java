@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.sidebar;
+package com.btmura.android.reddit.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -22,6 +22,8 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.browser.Subreddit;
+import com.btmura.android.reddit.sidebar.SidebarPagerAdapter;
 
 public class SidebarActivity extends Activity {
 
@@ -32,9 +34,10 @@ public class SidebarActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sidebar);
 
-        String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
-        String[] subreddits = subreddit.split("\\+");
-
+        Subreddit subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
+        setTitle(subreddit.getTitle(this));
+        
+        String[] subreddits = subreddit.name.split("\\+");
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new SidebarPagerAdapter(getFragmentManager(), subreddits));
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.activity;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -54,11 +54,17 @@ import android.widget.Toast;
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.browser.ControlFragment;
+import com.btmura.android.reddit.browser.FilterAdapter;
+import com.btmura.android.reddit.browser.Subreddit;
+import com.btmura.android.reddit.browser.SubredditListFragment;
+import com.btmura.android.reddit.browser.Thing;
+import com.btmura.android.reddit.browser.ThingListFragment;
+import com.btmura.android.reddit.browser.ThingPagerAdapter;
 import com.btmura.android.reddit.browser.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.browser.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.search.SearchActivity;
-import com.btmura.android.reddit.sidebar.SidebarActivity;
 
 public class BrowserActivity extends Activity implements OnBackStackChangedListener,
         OnItemSelectedListener, OnQueryTextListener, OnFocusChangeListener, OnPageChangeListener,
@@ -117,24 +123,28 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
 
     private boolean insertSlfToBackStack;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.browser);
+
+        singleContainer = findViewById(R.id.single_container);
+        if (singleContainer != null) {
+            initSingleContainer(savedInstanceState);
+            return;
+        }
 
         getFragmentManager().addOnBackStackChangedListener(this);
 
         bar = getActionBar();
         bar.setDisplayShowHomeEnabled(true);
         bar.setCustomView(R.layout.filter_spinner);
-        
+
         filterAdapter = new FilterAdapter(this);
         filterSpinner = (Spinner) bar.getCustomView();
         filterSpinner.setAdapter(filterAdapter);
         filterSpinner.setOnItemSelectedListener(this);
-        
-        singleContainer = findViewById(R.id.single_container);
+
         thingPager = (ViewPager) findViewById(R.id.thing_pager);
         thingPager.setOnPageChangeListener(this);
         if (singleContainer == null) {
@@ -203,6 +213,13 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         return name != null ? Subreddit.newInstance(name) : null;
     }
 
+    private void initSingleContainer(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            SubredditListFragment slf = SubredditListFragment.newInstance(false);
+            getFragmentManager().beginTransaction().replace(R.id.single_container, slf).commit();
+        }
+    }
+
     private void initFragments(Subreddit sr) {
         refreshActionBar(sr, null, 0);
         refreshContainers(null);
@@ -231,32 +248,38 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        if (singleContainer != null) {
+            return;
+        }
+        
         if (savedInstanceState != null) {
             lastSelectedFilter = savedInstanceState.getInt(STATE_LAST_SELECTED_FILTER);
             updateThingPager(getThing());
             onBackStackChanged();
         }
     }
-    
-    public void onItemSelected(AdapterView<?> adapter, View view, int itemPosition, long itemId) {    
+
+    public void onItemSelected(AdapterView<?> adapter, View view, int itemPosition, long itemId) {
         lastSelectedFilter = itemPosition;
         if (itemId != getFilter()) {
             selectSubreddit(getSubreddit(), itemPosition);
         }
     }
 
-    public void onSubredditSelected(Subreddit sr, int event) {
-        switch (event) {
-            case OnSubredditSelectedListener.FLAG_ITEM_CLICKED:
-                selectSubreddit(sr, lastSelectedFilter);
-                break;
+    public void onSubredditLoaded(Subreddit sr) {
+        if (singleContainer == null && !isVisible(FRAG_THING_LIST)) {
+            getSubredditListFragment().setSelectedSubreddit(sr);
+            selectSubreddit(sr, lastSelectedFilter);
+        }
+    }
 
-            case OnSubredditSelectedListener.FLAG_LOAD_FINISHED:
-                if (singleContainer == null && !isVisible(FRAG_THING_LIST)) {
-                    getSubredditListFragment().setSelectedSubreddit(sr);
-                    selectSubreddit(sr, lastSelectedFilter);
-                }
-                break;
+    public void onSubredditSelected(Subreddit sr) {
+        if (singleContainer != null) {
+            Intent intent = new Intent(this, ThingListActivity.class);
+            intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, sr);
+            startActivity(intent);
+        } else {
+            selectSubreddit(sr, lastSelectedFilter);
         }
     }
 
@@ -406,12 +429,14 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser, menu);
-        shareProvider = (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();
-
-        searchItem = menu.findItem(R.id.menu_search);
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(this);
-        searchView.setOnQueryTextFocusChangeListener(this);
+        
+//        shareProvider = (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();
+//
+//        searchItem = menu.findItem(R.id.menu_search);
+//        searchView = (SearchView) searchItem.getActionView();
+//        searchView.setOnQueryTextListener(this);
+//        searchView.setOnQueryTextFocusChangeListener(this);
+    
 
         return true;
     }
@@ -421,6 +446,9 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         super.onPrepareOptionsMenu(menu);
 
         ControlFragment cf = getControlFragment();
+        if (cf == null) {
+            return true;
+        }
 
         boolean isThingList = isVisible(FRAG_THING_LIST);
         Thing thing = cf.getThing();
@@ -428,7 +456,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         boolean isLink = isThing && !thing.isSelf;
 
         menu.findItem(R.id.menu_add).setVisible((isThingList || isThing) && isSubredditPreview());
-        menu.findItem(R.id.menu_refresh).setVisible(isThingList && singleContainer != null);
+//        menu.findItem(R.id.menu_refresh).setVisible(isThingList && singleContainer != null);
 
         menu.findItem(R.id.menu_link).setVisible(isLink && !isShowingLink(thing));
         menu.findItem(R.id.menu_comments).setVisible(isLink && isShowingLink(thing));
@@ -437,7 +465,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
         menu.findItem(R.id.menu_copy_url).setVisible(isThing);
         menu.findItem(R.id.menu_open).setVisible(isThing);
 
-        menu.findItem(R.id.menu_view_sidebar).setVisible(getSidebar(cf) != null);
+//        menu.findItem(R.id.menu_view_sidebar).setVisible(getSidebar(cf) != null);
 
         updateShareActionIntent(thing);
         return true;
@@ -493,10 +521,10 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
             case R.id.menu_open:
                 handleOpen();
                 return true;
-
-            case R.id.menu_view_sidebar:
-                handleViewSidebar();
-                return true;
+//
+//            case R.id.menu_view_sidebar:
+//                handleViewSidebar();
+//                return true;
         }
         return false;
     }
@@ -820,7 +848,7 @@ public class BrowserActivity extends Activity implements OnBackStackChangedListe
     public boolean onQueryTextChange(String newText) {
         return false;
     }
-    
+
     public void onNothingSelected(android.widget.AdapterView<?> adapter) {
     }
 }

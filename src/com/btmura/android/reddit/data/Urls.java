@@ -18,9 +18,22 @@ package com.btmura.android.reddit.data;
 
 import com.btmura.android.reddit.browser.FilterAdapter;
 import com.btmura.android.reddit.browser.Subreddit;
+import com.btmura.android.reddit.browser.Thing;
 
 public class Urls {
 
+    public static CharSequence commentsUrl(String id) {
+        return new StringBuilder("http://www.reddit.com/comments/").append(id).append(".json");
+    }
+    
+    public static CharSequence permaUrl(Thing thing) {
+        return new StringBuilder("http://www.reddit.com").append(thing.permaLink);
+    }
+    
+    public static CharSequence sidebarUrl(String name) {
+        return new StringBuilder("http://www.reddit.com/r/").append(name).append("/about.json");
+    }
+    
     public static CharSequence subredditUrl(Subreddit sr, int filter, String after) {
         StringBuilder b = new StringBuilder("http://www.reddit.com/");
 
@@ -58,13 +71,5 @@ public class Urls {
             b.append(hasSort ? "&" : "?").append("count=25&after=").append(after);
         }
         return b;
-    }
-
-    public static CharSequence aboutUrl(String name) {
-        return new StringBuilder("http://www.reddit.com/r/").append(name).append("/about.json");
-    }
-
-    public static CharSequence commentsUrl(String id) {
-        return new StringBuilder("http://www.reddit.com/comments/").append(id).append(".json");
     }
 }

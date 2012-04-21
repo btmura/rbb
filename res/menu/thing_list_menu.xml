@@ -14,13 +14,13 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <FrameLayout
-        android:id="@+id/single_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <item
+        android:id="@+id/menu_view_sidebar"
+        android:title="@string/menu_view_sidebar"/>
+    <item
+        android:id="@+id/menu_refresh"
+        android:title="@string/menu_refresh"/>
 
-</merge>
+</menu>

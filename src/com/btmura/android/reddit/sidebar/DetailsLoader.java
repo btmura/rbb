@@ -58,7 +58,7 @@ class DetailsLoader extends AsyncTaskLoader<Details> {
     @Override
     public Details loadInBackground() {
         try {
-            URL subredditUrl = new URL(Urls.aboutUrl(subreddit).toString());
+            URL subredditUrl = new URL(Urls.sidebarUrl(subreddit).toString());
 
             HttpURLConnection connection = (HttpURLConnection) subredditUrl.openConnection();
             connection.connect();

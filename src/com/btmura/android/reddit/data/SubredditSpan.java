@@ -21,7 +21,7 @@ import android.content.Intent;
 import android.text.style.ClickableSpan;
 import android.view.View;
 
-import com.btmura.android.reddit.browser.BrowserActivity;
+import com.btmura.android.reddit.activity.BrowserActivity;
 
 public class SubredditSpan extends ClickableSpan {
 
