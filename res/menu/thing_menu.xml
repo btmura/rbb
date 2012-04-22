@@ -15,7 +15,10 @@
      limitations under the License.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
+    
+    <item
+        android:id="@+id/menu_view_thing_sidebar"
+        android:title="@string/menu_view_sidebar"/>
     <item
         android:id="@+id/menu_share"
         android:actionProviderClass="android.widget.ShareActionProvider"

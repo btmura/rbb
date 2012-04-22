@@ -21,6 +21,8 @@ import android.os.Bundle;
 
 public class ControlFragment extends Fragment {
 
+    public static final String TAG = "ControlFragment";
+
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_THING = "t";
     private static final String ARG_THING_POSITION = "tp";

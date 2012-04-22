@@ -17,10 +17,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_view_sidebar"
-        android:title="@string/menu_view_sidebar"/>
-    <item
         android:id="@+id/menu_refresh"
         android:title="@string/menu_refresh"/>
+    <item
+        android:id="@+id/menu_view_subreddit_sidebar"
+        android:title="@string/menu_view_sidebar"/>
 
 </menu>

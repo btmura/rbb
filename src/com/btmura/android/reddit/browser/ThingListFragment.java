@@ -35,8 +35,8 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.Provider.Subreddits;
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.data.Urls;
 
@@ -61,6 +61,7 @@ public class ThingListFragment extends ListFragment implements
         int getThingBodyWidth();
     }
 
+    private Subreddit subreddit;
     private ThingAdapter adapter;
     private boolean scrollLoading;
 
@@ -77,9 +78,10 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        subreddit = getArguments().getParcelable(ARG_SUBREDDIT);
         adapter = new ThingAdapter(getActivity(), getActivity().getLayoutInflater(),
                 getSubreddit(), isSingleChoice());
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -183,13 +185,14 @@ public class ThingListFragment extends ListFragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_list_menu, menu);
+        menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(!subreddit.isFrontPage());
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
-            case R.id.menu_view_sidebar:
+            case R.id.menu_view_subreddit_sidebar:
                 handleViewSidebar();
                 return true;
 

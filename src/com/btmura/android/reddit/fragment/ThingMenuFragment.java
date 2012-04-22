@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,7 +31,10 @@ import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.activity.SidebarActivity;
+import com.btmura.android.reddit.browser.Subreddit;
 import com.btmura.android.reddit.browser.Thing;
+import com.btmura.android.reddit.browser.ThingPagerAdapter;
 import com.btmura.android.reddit.data.Urls;
 
 public class ThingMenuFragment extends Fragment {
@@ -39,13 +43,8 @@ public class ThingMenuFragment extends Fragment {
 
     private static final String ARGS_THING = "thing";
 
-    public interface ThingMenuListener {
-
-        void onLinkSelected();
-
-        void onCommentsSelected();
-
-        boolean isShowingLink();
+    public interface ThingPagerHolder {
+        ViewPager getPager();
     }
 
     private Thing thing;
@@ -62,8 +61,8 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         thing = getArguments().getParcelable(ARGS_THING);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class ThingMenuFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        boolean showingLink = getListener().isShowingLink();
+        boolean showingLink = isShowingLink();
         boolean showLink = !thing.isSelf && !showingLink;
         boolean showComments = !thing.isSelf && showingLink;
 
@@ -90,6 +89,10 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_view_thing_sidebar:
+                handleViewSidebar();
+                return true;
+
             case R.id.menu_link:
                 handleLink();
                 return true;
@@ -120,12 +123,19 @@ public class ThingMenuFragment extends Fragment {
         shareProvider.setShareIntent(intent);
     }
 
+    private void handleViewSidebar() {
+        Subreddit subreddit = Subreddit.newInstance(thing.subreddit);
+        Intent intent = new Intent(getActivity(), SidebarActivity.class);
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, subreddit);
+        startActivity(intent);
+    }
+
     private void handleLink() {
-        getListener().onLinkSelected();
+        getHolder().getPager().setCurrentItem(0);
     }
 
     private void handleComments() {
-        getListener().onCommentsSelected();
+        getHolder().getPager().setCurrentItem(1);
     }
 
     private void handleCopyUrl() {
@@ -143,11 +153,16 @@ public class ThingMenuFragment extends Fragment {
         startActivity(Intent.createChooser(intent, getString(R.string.menu_open)));
     }
 
-    private CharSequence getLink() {
-        return getListener().isShowingLink() ? thing.url : Urls.permaUrl(thing);
+    private boolean isShowingLink() {
+        int position = getHolder().getPager().getCurrentItem();
+        return ThingPagerAdapter.getType(thing, position) == ThingPagerAdapter.TYPE_LINK;
     }
 
-    private ThingMenuListener getListener() {
-        return (ThingMenuListener) getActivity();
+    private CharSequence getLink() {
+        return isShowingLink() ? thing.url : Urls.permaUrl(thing);
+    }
+
+    private ThingPagerHolder getHolder() {
+        return (ThingPagerHolder) getActivity();
     }
 }

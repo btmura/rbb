@@ -104,8 +104,8 @@ public class ThingListActivity extends Activity implements
         ThingListFragment tlf = ThingListFragment.newInstance(subreddit, (int) itemId, false);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.single_container, tlf, ThingListFragment.TAG);
         ft.add(gmf, GlobalMenuFragment.TAG);
+        ft.replace(R.id.single_container, tlf, ThingListFragment.TAG);
         ft.commit();
         return false;
     }

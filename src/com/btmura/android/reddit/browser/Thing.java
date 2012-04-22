@@ -72,6 +72,7 @@ public class Thing implements Parcelable {
         type = parcel.readInt();
         name = parcel.readString();
         rawTitle = parcel.readString();
+        subreddit = parcel.readString();
         url = parcel.readString();
         permaLink = parcel.readString();
         isSelf = parcel.readInt() == 1;
@@ -81,6 +82,7 @@ public class Thing implements Parcelable {
         dest.writeInt(type);
         dest.writeString(name);
         dest.writeString(rawTitle);
+        dest.writeString(subreddit);
         dest.writeString(url);
         dest.writeString(permaLink);
         dest.writeInt(isSelf ? 1 : 0);

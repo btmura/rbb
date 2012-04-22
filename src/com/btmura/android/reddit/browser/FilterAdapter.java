@@ -36,7 +36,7 @@ public class FilterAdapter extends BaseAdapter {
 
     private final LayoutInflater inflater;
     private final ArrayList<String> names = new ArrayList<String>(4);
-    private String title;
+    private CharSequence title;
 
     public FilterAdapter(Context context) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -58,7 +58,7 @@ public class FilterAdapter extends BaseAdapter {
         return position;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(CharSequence title) {
         this.title = title;
         notifyDataSetChanged();
     }

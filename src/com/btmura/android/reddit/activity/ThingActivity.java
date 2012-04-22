@@ -31,7 +31,7 @@ import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
 
 public class ThingActivity extends Activity implements
-        ThingMenuFragment.ThingMenuListener,
+        ThingMenuFragment.ThingPagerHolder,
         ViewPager.OnPageChangeListener {
 
     public static final String EXTRA_THING = "t";
@@ -59,8 +59,8 @@ public class ThingActivity extends Activity implements
             ThingMenuFragment tmf = ThingMenuFragment.newInstance(thing);
 
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(tmf, ThingMenuFragment.TAG);
             ft.add(gmf, GlobalMenuFragment.TAG);
+            ft.add(tmf, ThingMenuFragment.TAG);
             ft.commit();
         }
     }
@@ -89,16 +89,8 @@ public class ThingActivity extends Activity implements
         }
     }
 
-    public void onLinkSelected() {
-        pager.setCurrentItem(0);
-    }
-
-    public void onCommentsSelected() {
-        pager.setCurrentItem(1);
-    }
-
-    public boolean isShowingLink() {
-        return ThingPagerAdapter.getType(thing, pager.getCurrentItem()) == ThingPagerAdapter.TYPE_LINK;
+    public ViewPager getPager() {
+        return pager;
     }
 
     public void onPageSelected(int position) {
