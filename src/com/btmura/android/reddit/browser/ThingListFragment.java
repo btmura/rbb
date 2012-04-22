@@ -190,17 +190,14 @@ public class ThingListFragment extends ListFragment implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case R.id.menu_view_subreddit_sidebar:
                 handleViewSidebar();
                 return true;
-
-            case R.id.menu_refresh:
-                handleRefresh();
-                return true;
+                
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return false;
     }
 
     private void handleAdd() {
@@ -213,11 +210,6 @@ public class ThingListFragment extends ListFragment implements
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
         intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getSubreddit());
         startActivity(intent);
-    }
-
-    private void handleRefresh() {
-        setListShown(false);
-        getLoaderManager().restartLoader(0, null, this);
     }
 
     private OnThingSelectedListener getListener() {
