@@ -48,10 +48,11 @@ public class ThingListFragment extends ListFragment implements
 
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
-    private static final String ARG_SINGLE_CHOICE = "sc";
+    private static final String ARG_SHOW_ADD = "a";
+    private static final String ARG_SINGLE_CHOICE = "c";
 
-    private static final String STATE_THING_NAME = "tn";
-    private static final String STATE_THING_POSITION = "tp";
+    private static final String STATE_THING_NAME = "n";
+    private static final String STATE_THING_POSITION = "p";
 
     private static final String LOADER_ARG_MORE_KEY = "m";
 
@@ -65,11 +66,13 @@ public class ThingListFragment extends ListFragment implements
     private ThingAdapter adapter;
     private boolean scrollLoading;
 
-    public static ThingListFragment newInstance(Subreddit sr, int filter, boolean singleChoice) {
+    public static ThingListFragment newInstance(Subreddit sr, int filter, boolean showAdd,
+            boolean singleChoice) {
         ThingListFragment frag = new ThingListFragment();
-        Bundle b = new Bundle(3);
+        Bundle b = new Bundle(4);
         b.putParcelable(ARG_SUBREDDIT, sr);
         b.putInt(ARG_FILTER, filter);
+        b.putBoolean(ARG_SHOW_ADD, showAdd);
         b.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
         frag.setArguments(b);
         return frag;
@@ -185,16 +188,21 @@ public class ThingListFragment extends ListFragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_list_menu, menu);
+        menu.findItem(R.id.menu_add).setVisible(showAdd());
         menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(!subreddit.isFrontPage());
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_add:
+                handleAdd();
+                return true;
+
             case R.id.menu_view_subreddit_sidebar:
                 handleViewSidebar();
                 return true;
-                
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -222,6 +230,10 @@ public class ThingListFragment extends ListFragment implements
 
     private int getFilter() {
         return getArguments().getInt(ARG_FILTER);
+    }
+
+    private boolean showAdd() {
+        return getArguments().getBoolean(ARG_SHOW_ADD);
     }
 
     private boolean isSingleChoice() {

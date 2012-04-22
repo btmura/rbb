@@ -58,8 +58,9 @@ public class BrowserActivity extends GlobalMenuActivity implements
 
     public static final String EXTRA_SUBREDDIT_NAME = "s";
     public static final String EXTRA_HOME_UP_ENABLED = "h";
+    public static final String EXTRA_SHOW_ADD_BUTTON = "a";
 
-    private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
+    private static final String STATE_LAST_SELECTED_FILTER = "lastFilter";
 
     private static final int NAV_LAYOUT_ORIGINAL = 0;
     private static final int NAV_LAYOUT_SIDENAV = 1;
@@ -72,7 +73,7 @@ public class BrowserActivity extends GlobalMenuActivity implements
 
     private ActionBar bar;
     private FilterAdapter filterAdapter;
-    private int lastSelectedFilter;
+    private int lastFilter;
 
     private View singleContainer;
     private View navContainer;
@@ -92,10 +93,16 @@ public class BrowserActivity extends GlobalMenuActivity implements
     private AnimatorSet closeSideNavAnimator;
     private AnimatorSet expandNavAnimator;
 
+    private boolean homeUpEnabled;
+    private boolean showAddButton;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.browser);
+
+        homeUpEnabled = getIntent().getBooleanExtra(EXTRA_HOME_UP_ENABLED, false);
+        showAddButton = getIntent().getBooleanExtra(EXTRA_SHOW_ADD_BUTTON, false);
 
         singleContainer = findViewById(R.id.single_container);
         if (singleContainer != null) {
@@ -106,14 +113,14 @@ public class BrowserActivity extends GlobalMenuActivity implements
     }
 
     private void initSingleContainer(Bundle savedInstanceState) {
-        Intent i = getIntent();
-        getActionBar().setDisplayHomeAsUpEnabled(i.getBooleanExtra(EXTRA_HOME_UP_ENABLED, false));
-        if (i.hasExtra(EXTRA_SUBREDDIT_NAME)) {
+        getActionBar().setDisplayHomeAsUpEnabled(homeUpEnabled);
+        if (getIntent().hasExtra(EXTRA_SUBREDDIT_NAME)) {
             finish();
-            Subreddit s = Subreddit.newInstance(i.getStringExtra(EXTRA_SUBREDDIT_NAME));
+            Subreddit s = Subreddit.newInstance(getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME));
             Intent intent = new Intent(this, ThingListActivity.class);
             intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, s);
             intent.putExtra(ThingListActivity.EXTRA_INSERT_HOME_ACTIVITY, true);
+            intent.putExtra(ThingListActivity.EXTRA_SHOW_ADD_BUTTON, showAddButton);
             startActivity(intent);
         } else if (savedInstanceState == null) {
             SubredditListFragment slf = SubredditListFragment.newInstance(null, false);
@@ -192,7 +199,7 @@ public class BrowserActivity extends GlobalMenuActivity implements
             s = Subreddit.newInstance(getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME));
         }
 
-        ControlFragment cf = ControlFragment.newInstance(s, null, -1, lastSelectedFilter);
+        ControlFragment cf = ControlFragment.newInstance(s, null, -1, lastFilter);
         GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
         SubredditListFragment slf = SubredditListFragment.newInstance(s, true);
 
@@ -202,8 +209,8 @@ public class BrowserActivity extends GlobalMenuActivity implements
         ft.replace(R.id.subreddit_list_container, slf, SubredditListFragment.TAG);
 
         if (s != null) {
-            refreshActionBar(s, null, lastSelectedFilter);
-            ThingListFragment tlf = ThingListFragment.newInstance(s, lastSelectedFilter, true);
+            refreshActionBar(s, null, lastFilter);
+            Fragment tlf = ThingListFragment.newInstance(s, lastFilter, showAddButton, true);
             ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
         }
 
@@ -212,9 +219,9 @@ public class BrowserActivity extends GlobalMenuActivity implements
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         int newFilter = (int) itemId;
-        if (lastSelectedFilter != newFilter) {
-            lastSelectedFilter = newFilter;
-            selectSubreddit(getSubreddit(), lastSelectedFilter);
+        if (lastFilter != newFilter) {
+            lastFilter = newFilter;
+            selectSubreddit(getSubreddit(), lastFilter);
         }
         return true;
     }
@@ -222,7 +229,7 @@ public class BrowserActivity extends GlobalMenuActivity implements
     public void onSubredditLoaded(Subreddit subreddit) {
         if (singleContainer == null && !hasFragment(ThingListFragment.TAG)) {
             getSubredditListFragment().setSelectedSubreddit(subreddit);
-            selectSubreddit(subreddit, lastSelectedFilter);
+            selectSubreddit(subreddit, lastFilter);
         }
     }
 
@@ -233,7 +240,7 @@ public class BrowserActivity extends GlobalMenuActivity implements
             intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
             startActivity(intent);
         } else {
-            selectSubreddit(subreddit, lastSelectedFilter);
+            selectSubreddit(subreddit, lastFilter);
         }
     }
 
@@ -247,7 +254,7 @@ public class BrowserActivity extends GlobalMenuActivity implements
         refreshContainers(null);
 
         ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, filter);
-        ThingListFragment tlf = ThingListFragment.newInstance(subreddit, filter, true);
+        Fragment tlf = ThingListFragment.newInstance(subreddit, filter, showAddButton, true);
 
         FragmentTransaction ft = fm.beginTransaction();
         ft.add(cf, ControlFragment.TAG);
@@ -265,7 +272,7 @@ public class BrowserActivity extends GlobalMenuActivity implements
             filterAdapter.setTitle(getString(R.string.app_name));
         }
 
-        bar.setDisplayHomeAsUpEnabled(getIntent().hasExtra(EXTRA_HOME_UP_ENABLED)
+        bar.setDisplayHomeAsUpEnabled(homeUpEnabled
                 || getFragmentManager().getBackStackEntryCount() > 0);
     }
 
@@ -316,8 +323,7 @@ public class BrowserActivity extends GlobalMenuActivity implements
         fm.popBackStackImmediate();
         fm.addOnBackStackChangedListener(this);
 
-        ControlFragment cf = ControlFragment.newInstance(getSubreddit(), thing, position,
-                getFilter());
+        Fragment cf = ControlFragment.newInstance(getSubreddit(), thing, position, getFilter());
         ThingMenuFragment tmf = ThingMenuFragment.newInstance(thing);
 
         FragmentTransaction ft = fm.beginTransaction();
@@ -374,7 +380,7 @@ public class BrowserActivity extends GlobalMenuActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_LAST_SELECTED_FILTER, lastSelectedFilter);
+        outState.putInt(STATE_LAST_SELECTED_FILTER, lastFilter);
     }
 
     @Override
@@ -385,7 +391,7 @@ public class BrowserActivity extends GlobalMenuActivity implements
         }
 
         if (savedInstanceState != null) {
-            lastSelectedFilter = savedInstanceState.getInt(STATE_LAST_SELECTED_FILTER);
+            lastFilter = savedInstanceState.getInt(STATE_LAST_SELECTED_FILTER);
             updateThingPager(getThing());
             onBackStackChanged();
         }

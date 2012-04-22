@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.activity;
 
 import android.app.ActionBar;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,12 +36,14 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public static final String EXTRA_SUBREDDIT = "s";
     public static final String EXTRA_INSERT_HOME_ACTIVITY = "i";
+    public static final String EXTRA_SHOW_ADD_BUTTON = "a";
 
     private static final String STATE_FILTER = "f";
 
     private ActionBar bar;
     private Subreddit subreddit;
     private boolean insertHomeActivity;
+    private boolean showAddButton;
     private boolean restoringState;
 
     @Override
@@ -54,6 +57,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
         subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
         insertHomeActivity = getIntent().getBooleanExtra(EXTRA_INSERT_HOME_ACTIVITY, false);
+        showAddButton = getIntent().getBooleanExtra(EXTRA_SHOW_ADD_BUTTON, false);
 
         FilterAdapter adapter = new FilterAdapter(this);
         adapter.setTitle(subreddit.getTitle(this));
@@ -99,7 +103,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         }
 
         GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
-        ThingListFragment tlf = ThingListFragment.newInstance(subreddit, (int) itemId, false);
+        Fragment tlf = ThingListFragment.newInstance(subreddit, (int) itemId, showAddButton, false);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(gmf, GlobalMenuFragment.TAG);
