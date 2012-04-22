@@ -22,7 +22,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -31,7 +30,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +46,7 @@ import com.btmura.android.reddit.browser.ThingPagerAdapter;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
 
-public class BrowserActivity extends Activity implements
+public class BrowserActivity extends GlobalMenuActivity implements
         ActionBar.OnNavigationListener,
         SubredditListFragment.OnSubredditSelectedListener,
         ThingListFragment.OnThingSelectedListener,
@@ -199,6 +197,7 @@ public class BrowserActivity extends Activity implements
     public void onSubredditSelected(Subreddit subreddit) {
         if (singleContainer != null) {
             Intent intent = new Intent(this, ThingListActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
             startActivity(intent);
         } else {
@@ -355,17 +354,6 @@ public class BrowserActivity extends Activity implements
     private boolean isVisible(String tag) {
         Fragment f = getFragmentManager().findFragmentByTag(tag);
         return f != null && f.isAdded();
-    }
-
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_SEARCH:
-                return true;
-
-            default:
-                return super.onKeyUp(keyCode, event);
-        }
     }
 
     public void onPageSelected(int position) {
