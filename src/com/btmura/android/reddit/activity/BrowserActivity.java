@@ -70,7 +70,6 @@ public class BrowserActivity extends GlobalMenuActivity implements
     private static final int ANIMATION_EXPAND_NAV = 4;
 
     private ActionBar bar;
-
     private FilterAdapter filterAdapter;
     private int lastSelectedFilter;
 
@@ -241,79 +240,8 @@ public class BrowserActivity extends GlobalMenuActivity implements
         } else {
             filterAdapter.setTitle(getString(R.string.app_name));
         }
-    }
 
-    public void onThingSelected(final Thing thing, final int position) {
-        if (navContainer != null && isSideNavShowing()) {
-            runAnimation(ANIMATION_CLOSE_SIDE_NAV, new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    animation.removeListener(this);
-                    selectThing(thing, position);
-                }
-            });
-        } else {
-            selectThing(thing, position);
-        }
-    }
-
-    private void selectThing(Thing thing, int position) {
-        FragmentManager fm = getFragmentManager();
-        fm.removeOnBackStackChangedListener(this);
-        fm.popBackStackImmediate();
-        fm.addOnBackStackChangedListener(this);
-
-        ControlFragment cf = ControlFragment.newInstance(getSubreddit(), thing, position,
-                getFilter());
-        ThingMenuFragment tmf = ThingMenuFragment.newInstance(thing);
-
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.add(cf, ControlFragment.TAG);
-        ft.add(tmf, ThingMenuFragment.TAG);
-        ft.addToBackStack(null);
-        ft.commit();
-
-        updateThingPager(thing);
-    }
-
-    private void updateThingPager(Thing thing) {
-        if (thing != null) {
-            FragmentManager fm = getFragmentManager();
-            ThingPagerAdapter adapter = new ThingPagerAdapter(fm, thing);
-            thingPager.setAdapter(adapter);
-        } else {
-            thingPager.setAdapter(null);
-        }
-    }
-
-    public void onLinkSelected() {
-    }
-
-    public void onCommentsSelected() {
-    }
-
-    public boolean isShowingLink() {
-        return false;
-    }
-
-    public void onBackStackChanged() {
-        Subreddit sr = getSubreddit();
-        Thing t = getThing();
-        refreshActionBar(sr, t, getFilter());
-        refreshCheckedItems();
-        refreshContainers(t);
-        invalidateOptionsMenu();
-    }
-
-    private void refreshCheckedItems() {
-        if (isVisible(SubredditListFragment.TAG)) {
-            getSubredditListFragment().setSelectedSubreddit(getSubreddit());
-        }
-
-        if (isVisible(ThingListFragment.TAG)) {
-            ControlFragment f = getControlFragment();
-            getThingListFragment().setSelectedThing(f.getThing(), f.getThingPosition());
-        }
+        bar.setDisplayHomeAsUpEnabled(getFragmentManager().getBackStackEntryCount() > 0);
     }
 
     private void refreshContainers(Thing t) {
@@ -347,6 +275,69 @@ public class BrowserActivity extends GlobalMenuActivity implements
         }
     }
 
+    public void onThingSelected(final Thing thing, final int position) {
+        if (navContainer != null && isSideNavShowing()) {
+            runAnimation(ANIMATION_CLOSE_SIDE_NAV, new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    animation.removeListener(this);
+                    selectThing(thing, position);
+                }
+            });
+        } else {
+            selectThing(thing, position);
+        }
+    }
+
+    private void selectThing(Thing thing, int position) {
+        FragmentManager fm = getFragmentManager();
+        fm.removeOnBackStackChangedListener(this);
+        fm.popBackStackImmediate();
+        fm.addOnBackStackChangedListener(this);
+
+        ControlFragment cf = ControlFragment.newInstance(getSubreddit(), thing, position,
+                getFilter());
+        ThingMenuFragment tmf = ThingMenuFragment.newInstance(thing);
+
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.add(cf, ControlFragment.TAG);
+        ft.add(tmf, ThingMenuFragment.TAG);
+        ft.addToBackStack(null);
+        ft.commit();
+
+        updateThingPager(thing);
+
+    }
+
+    private void updateThingPager(Thing thing) {
+        if (thing != null) {
+            FragmentManager fm = getFragmentManager();
+            ThingPagerAdapter adapter = new ThingPagerAdapter(fm, thing);
+            thingPager.setAdapter(adapter);
+        } else {
+            thingPager.setAdapter(null);
+        }
+    }
+
+    public void onBackStackChanged() {
+        ControlFragment cf = getControlFragment();
+        refreshActionBar(cf.getSubreddit(), cf.getThing(), getFilter());
+        refreshCheckedItems();
+        refreshContainers(cf.getThing());
+        invalidateOptionsMenu();
+    }
+
+    private void refreshCheckedItems() {
+        if (isVisible(SubredditListFragment.TAG)) {
+            getSubredditListFragment().setSelectedSubreddit(getSubreddit());
+        }
+
+        if (isVisible(ThingListFragment.TAG)) {
+            ControlFragment f = getControlFragment();
+            getThingListFragment().setSelectedThing(f.getThing(), f.getThingPosition());
+        }
+    }
+
     private boolean hasFragment(String tag) {
         return getFragmentManager().findFragmentByTag(tag) != null;
     }
@@ -359,23 +350,6 @@ public class BrowserActivity extends GlobalMenuActivity implements
     public void onPageSelected(int position) {
         invalidateOptionsMenu();
     }
-
-    // private void handleHome() {
-    // FragmentManager fm = getFragmentManager();
-    // int count = fm.getBackStackEntryCount();
-    // if (count > 0) {
-    // if (navContainer != null && !isSideNavShowing()) {
-    // runAnimation(ANIMATION_OPEN_SIDE_NAV, null);
-    // } else {
-    // fm.popBackStack();
-    // }
-    // } else if (singleContainer != null && insertSlfToBackStack) {
-    // insertSlfToBackStack = false;
-    // initFragments(null);
-    // } else {
-    // finish();
-    // }
-    // }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -416,7 +390,28 @@ public class BrowserActivity extends GlobalMenuActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                handleHome();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void handleHome() {
+        FragmentManager fm = getFragmentManager();
+        int count = fm.getBackStackEntryCount();
+        if (count > 0) {
+            if (navContainer != null && !isSideNavShowing()) {
+                runAnimation(ANIMATION_OPEN_SIDE_NAV, null);
+            } else {
+                fm.popBackStack();
+            }
+        } else {
+            finish();
+        }
     }
 
     private void runAnimation(int type, AnimatorListener listener) {
