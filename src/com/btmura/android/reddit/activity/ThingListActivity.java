@@ -34,11 +34,13 @@ public class ThingListActivity extends GlobalMenuActivity implements
         ThingListFragment.OnThingSelectedListener {
 
     public static final String EXTRA_SUBREDDIT = "s";
+    public static final String EXTRA_INSERT_HOME_ACTIVITY = "i";
 
     private static final String STATE_FILTER = "f";
 
     private ActionBar bar;
     private Subreddit subreddit;
+    private boolean insertHomeActivity;
     private boolean restoringState;
 
     @Override
@@ -51,6 +53,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
+        insertHomeActivity = getIntent().getBooleanExtra(EXTRA_INSERT_HOME_ACTIVITY, false);
 
         FilterAdapter adapter = new FilterAdapter(this);
         adapter.setTitle(subreddit.getTitle(this));
@@ -72,11 +75,20 @@ public class ThingListActivity extends GlobalMenuActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                handleHome();
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void handleHome() {
+        finish();
+        if (insertHomeActivity) {
+            Intent intent = new Intent(this, BrowserActivity.class);
+            intent.putExtra(BrowserActivity.EXTRA_HOME_UP_FINISHES, true);
+            startActivity(intent);
         }
     }
 

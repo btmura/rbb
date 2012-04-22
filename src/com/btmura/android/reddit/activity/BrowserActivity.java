@@ -56,7 +56,8 @@ public class BrowserActivity extends GlobalMenuActivity implements
 
     public static final String TAG = "BrowserActivity";
 
-    public static final String EXTRA_SUBREDDIT = "subreddit";
+    public static final String EXTRA_SUBREDDIT_NAME = "s";
+    public static final String EXTRA_HOME_UP_FINISHES = "h";
 
     private static final String STATE_LAST_SELECTED_FILTER = "lastSelectedFilter";
 
@@ -105,7 +106,18 @@ public class BrowserActivity extends GlobalMenuActivity implements
     }
 
     private void initSingleContainer(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
+        Intent i = getIntent();
+        if (i.hasExtra(EXTRA_SUBREDDIT_NAME)) {
+            finish();
+            Subreddit s = Subreddit.newInstance(i.getStringExtra(EXTRA_SUBREDDIT_NAME));
+            Intent intent = new Intent(this, ThingListActivity.class);
+            intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, s);
+            intent.putExtra(ThingListActivity.EXTRA_INSERT_HOME_ACTIVITY, true);
+            startActivity(intent);
+        } else if (savedInstanceState == null) {
+            if (i.getBooleanExtra(EXTRA_HOME_UP_FINISHES, false)) {
+                getActionBar().setDisplayHomeAsUpEnabled(true);
+            }
             SubredditListFragment slf = SubredditListFragment.newInstance(false);
             GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
             FragmentTransaction ft = getFragmentManager().beginTransaction();
