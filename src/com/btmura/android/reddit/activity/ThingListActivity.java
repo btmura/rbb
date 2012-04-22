@@ -87,7 +87,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         finish();
         if (insertHomeActivity) {
             Intent intent = new Intent(this, BrowserActivity.class);
-            intent.putExtra(BrowserActivity.EXTRA_HOME_UP_FINISHES, true);
+            intent.putExtra(BrowserActivity.EXTRA_HOME_UP_ENABLED, true);
             startActivity(intent);
         }
     }

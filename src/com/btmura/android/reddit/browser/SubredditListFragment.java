@@ -44,7 +44,8 @@ public class SubredditListFragment extends ListFragment implements
 
     public static final String TAG = "SubredditListFragment";
 
-    private static final String ARGS_SINGLE_CHOICE = "singleChoice";
+    private static final String ARGS_SELECTED_SUBREDDIT = "s";
+    private static final String ARGS_SINGLE_CHOICE = "c";
 
     public interface OnSubredditSelectedListener {
         void onSubredditLoaded(Subreddit sr);
@@ -55,9 +56,11 @@ public class SubredditListFragment extends ListFragment implements
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
 
-    public static SubredditListFragment newInstance(boolean singleChoice) {
+    public static SubredditListFragment newInstance(Subreddit selectedSubreddit,
+            boolean singleChoice) {
         SubredditListFragment frag = new SubredditListFragment();
-        Bundle args = new Bundle(1);
+        Bundle args = new Bundle(2);
+        args.putParcelable(ARGS_SELECTED_SUBREDDIT, selectedSubreddit);
         args.putBoolean(ARGS_SINGLE_CHOICE, singleChoice);
         frag.setArguments(args);
         return frag;
@@ -72,7 +75,8 @@ public class SubredditListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new SubredditAdapter(getActivity(), getArguments().getBoolean(ARGS_SINGLE_CHOICE));
+        adapter = new SubredditAdapter(getActivity(), isSingleChoice());
+        adapter.setSelectedSubreddit(getSelectedSubreddit());
     }
 
     @Override
@@ -220,5 +224,13 @@ public class SubredditListFragment extends ListFragment implements
             }
         }
         return names;
+    }
+
+    private Subreddit getSelectedSubreddit() {
+        return getArguments().getParcelable(ARGS_SELECTED_SUBREDDIT);
+    }
+
+    private boolean isSingleChoice() {
+        return getArguments().getBoolean(ARGS_SINGLE_CHOICE);
     }
 }
