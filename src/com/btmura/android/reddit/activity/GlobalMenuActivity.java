@@ -21,7 +21,7 @@ import android.view.KeyEvent;
 
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 
-public class GlobalMenuActivity extends Activity {
+class GlobalMenuActivity extends Activity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {

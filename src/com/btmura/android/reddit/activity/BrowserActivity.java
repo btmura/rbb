@@ -116,6 +116,8 @@ public class BrowserActivity extends GlobalMenuActivity implements
     }
 
     private void initContainers(Bundle savedInstanceState) {
+        getFragmentManager().addOnBackStackChangedListener(this);
+
         filterAdapter = new FilterAdapter(this);
 
         bar = getActionBar();
@@ -244,10 +246,10 @@ public class BrowserActivity extends GlobalMenuActivity implements
         bar.setDisplayHomeAsUpEnabled(getFragmentManager().getBackStackEntryCount() > 0);
     }
 
-    private void refreshContainers(Thing t) {
+    private void refreshContainers(Thing thing) {
         if (navContainer != null) {
             int currVisibility = navContainer.getVisibility();
-            int nextVisibility = t == null ? View.VISIBLE : View.GONE;
+            int nextVisibility = thing == null ? View.VISIBLE : View.GONE;
             if (currVisibility != nextVisibility) {
                 if (nextVisibility == View.VISIBLE) {
                     runAnimation(ANIMATION_OPEN_NAV, null);
@@ -258,8 +260,8 @@ public class BrowserActivity extends GlobalMenuActivity implements
                 runAnimation(ANIMATION_EXPAND_NAV, null);
             }
         } else {
-            thingPager.setVisibility(t != null ? View.VISIBLE : View.GONE);
-            if (t == null) {
+            thingPager.setVisibility(thing != null ? View.VISIBLE : View.GONE);
+            if (thing == null) {
                 // Avoid nested executePendingTransactions that would occur by
                 // doing popBackStack.
                 thingPager.post(new Runnable() {
@@ -268,10 +270,6 @@ public class BrowserActivity extends GlobalMenuActivity implements
                     }
                 });
             }
-        }
-
-        if (singleContainer != null) {
-            singleContainer.setVisibility(t != null ? View.GONE : View.VISIBLE);
         }
     }
 
