@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.browser;
 
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.fragment.LinkFragment;
 
 import android.app.Fragment;
 import android.app.FragmentManager;

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.fragment;
 
-import com.btmura.android.reddit.R;
+import java.util.regex.Pattern;
 
 import android.app.Fragment;
 import android.graphics.Bitmap;
@@ -31,9 +31,16 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import com.btmura.android.reddit.R;
+
 public class LinkFragment extends Fragment {
 
+    public static final String TAG = "LinkFragment";
+
     private static final String ARG_URL = "url";
+
+    private static final Pattern PATTERN_IMAGE = Pattern.compile(".*\\.(jpg|png|gif)$",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
     private WebView webView;
     private ProgressBar progress;
@@ -91,7 +98,13 @@ public class LinkFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        webView.loadUrl(getArguments().getString(ARG_URL));
+        String url = getArguments().getString(ARG_URL);
+        if (PATTERN_IMAGE.matcher(url).matches()) {
+            String img = String.format("<img src=\"%s\" width=\"100%%\" />", url);
+            webView.loadData(img, "text/html", null);
+        } else {
+            webView.loadUrl(url);
+        }
     }
 
     @Override
