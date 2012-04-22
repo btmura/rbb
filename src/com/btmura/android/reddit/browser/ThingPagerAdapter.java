@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.browser;
 
+import com.btmura.android.reddit.entity.Thing;
+
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.support.v13.app.FragmentStatePagerAdapter;

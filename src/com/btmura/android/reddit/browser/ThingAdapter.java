@@ -28,6 +28,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.entity.Thing;
 
 public class ThingAdapter extends BaseAdapter {
 

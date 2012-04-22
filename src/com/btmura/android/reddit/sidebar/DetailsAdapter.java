@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
+import com.btmura.android.reddit.entity.Details;
 
 public class DetailsAdapter extends BaseAdapter {
 

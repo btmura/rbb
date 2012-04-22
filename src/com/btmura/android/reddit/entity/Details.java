@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.sidebar;
+package com.btmura.android.reddit.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class Details implements Parcelable, Comparable<Details> {
+public class Details implements Parcelable, Comparable<Details> {
 
     public static final Parcelable.Creator<Details> CREATOR = new Parcelable.Creator<Details>() {
         public Details createFromParcel(Parcel source) {
@@ -37,7 +37,7 @@ class Details implements Parcelable, Comparable<Details> {
     public int subscribers;
     public String status;
 
-    Details() {
+    public Details() {
     }
 
     Details(Parcel parcel) {

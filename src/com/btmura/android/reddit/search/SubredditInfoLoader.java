@@ -34,6 +34,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.JsonParser;
+import com.btmura.android.reddit.entity.SubredditInfo;
 
 class SubredditInfoLoader extends AsyncTaskLoader<List<SubredditInfo>> {
 

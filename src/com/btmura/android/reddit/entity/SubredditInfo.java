@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.search;
+package com.btmura.android.reddit.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-class SubredditInfo implements Parcelable, Comparable<SubredditInfo> {
+public class SubredditInfo implements Parcelable, Comparable<SubredditInfo> {
 
     public static final Parcelable.Creator<SubredditInfo> CREATOR = new Parcelable.Creator<SubredditInfo>() {
         public SubredditInfo createFromParcel(Parcel source) {
@@ -37,7 +37,7 @@ class SubredditInfo implements Parcelable, Comparable<SubredditInfo> {
     public int subscribers;
     public String status;
 
-    SubredditInfo() {
+    public SubredditInfo() {
     }
 
     SubredditInfo(Parcel parcel) {

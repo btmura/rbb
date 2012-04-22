@@ -24,10 +24,9 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.browser.FilterAdapter;
-import com.btmura.android.reddit.browser.Subreddit;
-import com.btmura.android.reddit.browser.Thing;
 import com.btmura.android.reddit.browser.ThingListFragment;
+import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 
 public class ThingListActivity extends GlobalMenuActivity implements
@@ -49,7 +48,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.thing_list_activity);
+        setContentView(R.layout.thing_list);
 
         bar = getActionBar();
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);

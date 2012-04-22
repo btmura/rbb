@@ -32,10 +32,10 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
-import com.btmura.android.reddit.browser.Subreddit;
-import com.btmura.android.reddit.browser.Thing;
 import com.btmura.android.reddit.browser.ThingPagerAdapter;
 import com.btmura.android.reddit.data.Urls;
+import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.entity.Thing;
 
 public class ThingMenuFragment extends Fragment {
 

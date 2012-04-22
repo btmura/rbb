@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.search;
+package com.btmura.android.reddit.activity;
 
 import java.util.List;
 
@@ -39,6 +39,8 @@ import android.widget.SearchView.OnQueryTextListener;
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.SubredditInfo;
+import com.btmura.android.reddit.search.SubredditInfoListFragment;
 import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedListener;
 import com.btmura.android.reddit.sidebar.SidebarFragment;
 

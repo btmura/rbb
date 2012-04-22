@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.entity;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;

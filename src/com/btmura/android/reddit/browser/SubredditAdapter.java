@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.Provider.Subreddits;
+import com.btmura.android.reddit.entity.Subreddit;
 
 public class SubredditAdapter extends SimpleCursorAdapter {
 

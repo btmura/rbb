@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.activity;
 
 import java.util.ArrayList;
 

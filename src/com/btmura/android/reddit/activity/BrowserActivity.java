@@ -37,12 +37,11 @@ import android.view.View.OnClickListener;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.browser.ControlFragment;
-import com.btmura.android.reddit.browser.FilterAdapter;
-import com.btmura.android.reddit.browser.Subreddit;
 import com.btmura.android.reddit.browser.SubredditListFragment;
-import com.btmura.android.reddit.browser.Thing;
 import com.btmura.android.reddit.browser.ThingListFragment;
 import com.btmura.android.reddit.browser.ThingPagerAdapter;
+import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
 

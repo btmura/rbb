@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.Subreddit;
 
 import android.app.Activity;
 import android.app.ListFragment;

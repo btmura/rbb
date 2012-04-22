@@ -22,7 +22,7 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.browser.Subreddit;
+import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.sidebar.SidebarPagerAdapter;
 
 public class SidebarActivity extends Activity {

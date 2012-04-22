@@ -31,6 +31,7 @@ import android.util.Log;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
+import com.btmura.android.reddit.entity.Details;
 
 class DetailsLoader extends AsyncTaskLoader<Details> {
 

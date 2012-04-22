@@ -26,6 +26,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.SubredditInfo;
 
 public class SubredditInfoAdapter extends BaseAdapter {
 

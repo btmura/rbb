@@ -36,12 +36,13 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.SubredditInfo;
 
 public class SubredditInfoListFragment extends ListFragment implements
         MultiChoiceModeListener,
         LoaderCallbacks<List<SubredditInfo>> {
 
-    interface OnSelectedListener {
+    public interface OnSelectedListener {
         static final int EVENT_LIST_ITEM_CLICKED = 0;
         static final int EVENT_ACTION_ITEM_CLICKED = 1;
 

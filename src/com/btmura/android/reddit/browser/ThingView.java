@@ -18,6 +18,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.Thing;
 
 public class ThingView extends View {
 

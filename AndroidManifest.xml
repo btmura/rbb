@@ -38,7 +38,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".search.SearchActivity" >
+        <activity android:name=".activity.SearchActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

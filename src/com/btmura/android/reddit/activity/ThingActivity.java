@@ -23,8 +23,8 @@ import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.browser.Thing;
 import com.btmura.android.reddit.browser.ThingPagerAdapter;
+import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
 
@@ -40,7 +40,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.thing_activity);
+        setContentView(R.layout.thing);
 
         thing = getIntent().getParcelableExtra(EXTRA_THING);
         pager = (ViewPager) findViewById(R.id.pager);

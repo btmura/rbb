@@ -22,6 +22,7 @@ import android.content.Loader;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.Details;
 
 public class SidebarFragment extends ListFragment implements LoaderCallbacks<Details> {
 
