@@ -23,10 +23,10 @@ import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.browser.ThingPagerAdapter;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
+import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class ThingActivity extends GlobalMenuActivity implements
         ThingMenuFragment.ThingPagerHolder,

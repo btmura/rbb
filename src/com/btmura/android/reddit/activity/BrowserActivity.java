@@ -36,14 +36,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.browser.ControlFragment;
-import com.btmura.android.reddit.browser.SubredditListFragment;
-import com.btmura.android.reddit.browser.ThingListFragment;
-import com.btmura.android.reddit.browser.ThingPagerAdapter;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.fragment.ControlFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
+import com.btmura.android.reddit.fragment.SubredditListFragment;
+import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
+import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class BrowserActivity extends GlobalMenuActivity implements
         ActionBar.OnNavigationListener,

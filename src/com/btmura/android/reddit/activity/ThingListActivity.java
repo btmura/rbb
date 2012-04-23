@@ -24,10 +24,10 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.browser.ThingListFragment;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
+import com.btmura.android.reddit.fragment.ThingListFragment;
 
 public class ThingListActivity extends GlobalMenuActivity implements
         ActionBar.OnNavigationListener,

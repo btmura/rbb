@@ -16,11 +16,17 @@
 
 package com.btmura.android.reddit.data;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import com.btmura.android.reddit.activity.FilterAdapter;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 
 public class Urls {
+
+    private static final String BASE_SEARCH_URL = "http://www.reddit.com/search.json?q=";
+    private static final String BASE_SUBREDDIT_SEARCH_URL = "http://www.reddit.com/reddits/search.json?q=";
 
     public static CharSequence commentsUrl(String id) {
         return new StringBuilder("http://www.reddit.com/comments/").append(id).append(".json");
@@ -71,5 +77,21 @@ public class Urls {
             b.append(hasSort ? "&" : "?").append("count=25&after=").append(after);
         }
         return b;
+    }
+
+    public static CharSequence searchUrl(String query) {
+        return getSearchUrl(BASE_SEARCH_URL, query);
+    }
+
+    public static CharSequence subredditSearchUrl(String query) {
+        return getSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query);
+    }
+
+    private static CharSequence getSearchUrl(String base, String query) {
+        try {
+            return new StringBuilder(base).append(URLEncoder.encode(query, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

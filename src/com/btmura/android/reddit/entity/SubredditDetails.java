@@ -19,15 +19,15 @@ package com.btmura.android.reddit.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Details implements Parcelable, Comparable<Details> {
+public class SubredditDetails implements Parcelable, Comparable<SubredditDetails> {
 
-    public static final Parcelable.Creator<Details> CREATOR = new Parcelable.Creator<Details>() {
-        public Details createFromParcel(Parcel source) {
-            return new Details(source);
+    public static final Parcelable.Creator<SubredditDetails> CREATOR = new Parcelable.Creator<SubredditDetails>() {
+        public SubredditDetails createFromParcel(Parcel source) {
+            return new SubredditDetails(source);
         }
 
-        public Details[] newArray(int size) {
-            return new Details[size];
+        public SubredditDetails[] newArray(int size) {
+            return new SubredditDetails[size];
         }
     };
 
@@ -35,28 +35,25 @@ public class Details implements Parcelable, Comparable<Details> {
     public CharSequence title;
     public String description;
     public int subscribers;
-    public String status;
 
-    public Details() {
+    public SubredditDetails() {
     }
 
-    Details(Parcel parcel) {
+    SubredditDetails(Parcel parcel) {
         displayName = parcel.readString();
         description = parcel.readString();
-        status = parcel.readString();
     }
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(displayName);
         dest.writeString(description);
-        dest.writeString(status);
     }
 
     public int describeContents() {
         return 0;
     }
 
-    public int compareTo(Details another) {
+    public int compareTo(SubredditDetails another) {
         return displayName.compareToIgnoreCase(another.displayName);
     }
 }

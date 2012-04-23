@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.sidebar;
+package com.btmura.android.reddit.content;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,28 +22,30 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
-import com.btmura.android.reddit.entity.Details;
+import com.btmura.android.reddit.entity.SubredditDetails;
 
-class DetailsLoader extends AsyncTaskLoader<Details> {
+public class SubredditDetailsLoader extends AsyncTaskLoader<List<SubredditDetails>> {
 
-    private static final String TAG = "DetailsLoader";
+    private static final String TAG = "SubredditDetailsLoader";
 
-    private Details results;
+    private List<SubredditDetails> results;
 
-    private String subreddit;
+    private String query;
 
-    public DetailsLoader(Context context, String subreddit) {
+    public SubredditDetailsLoader(Context context, String query) {
         super(context);
-        this.subreddit = subreddit;
+        this.query = query;
     }
 
     @Override
@@ -57,17 +59,17 @@ class DetailsLoader extends AsyncTaskLoader<Details> {
     }
 
     @Override
-    public Details loadInBackground() {
+    public List<SubredditDetails> loadInBackground() {
         try {
-            URL subredditUrl = new URL(Urls.sidebarUrl(subreddit).toString());
+            URL subredditUrl = new URL(Urls.subredditSearchUrl(query).toString());
 
             HttpURLConnection connection = (HttpURLConnection) subredditUrl.openConnection();
             connection.connect();
 
             InputStream stream = connection.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(stream));
-            DetailsParser parser = new DetailsParser();
-            parser.parseEntity(reader);
+            SearchParser parser = new SearchParser();
+            parser.parseListingObject(reader);
             stream.close();
 
             connection.disconnect();
@@ -83,33 +85,28 @@ class DetailsLoader extends AsyncTaskLoader<Details> {
         return null;
     }
 
-    @Override
-    protected void onStopLoading() {
-        super.onStopLoading();
-    }
+    class SearchParser extends JsonParser {
 
-    class DetailsParser extends JsonParser {
-
-        private Details results;
+        private List<SubredditDetails> results = new ArrayList<SubredditDetails>();
 
         @Override
         public void onEntityStart(int index) {
-            results = new Details();
+            results.add(new SubredditDetails());
         }
 
         @Override
         public void onDisplayName(JsonReader reader, int index) throws IOException {
-            results.displayName = reader.nextString();
+            results.get(index).displayName = reader.nextString();
         }
 
         @Override
-        public void onTitle(JsonReader reader, int index) throws IOException {
-            results.title = Formatter.formatTitle(getContext(), readTrimmedString(reader, ""));
+        public void onSubscribers(JsonReader reader, int index) throws IOException {
+            results.get(index).subscribers = reader.nextInt();
         }
 
         @Override
-        public void onDescription(JsonReader reader, int index) throws IOException {
-            results.description = readTrimmedString(reader, "");
+        public void onParseEnd() {
+            Collections.sort(results);
         }
     }
 }

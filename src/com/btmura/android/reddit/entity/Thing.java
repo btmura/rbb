@@ -111,7 +111,8 @@ public class Thing implements Parcelable {
             return this;
         }
         assureTitle(c);
-        boolean showSubreddit = !parentSubreddit.equalsIgnoreCase(subreddit);
+        boolean showSubreddit = parentSubreddit == null
+                || !parentSubreddit.equalsIgnoreCase(subreddit);
         int resId = showSubreddit ? R.string.thing_status_subreddit : R.string.thing_status;
 
         String nsfw = over18 ? c.getString(R.string.thing_nsfw) : "";

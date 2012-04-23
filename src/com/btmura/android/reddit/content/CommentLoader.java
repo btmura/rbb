@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.content;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +32,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.data.JsonParser;
+import com.btmura.android.reddit.entity.Comment;
 
 public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 

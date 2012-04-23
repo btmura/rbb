@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.widget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 
 public class ThingAdapter extends BaseAdapter {
@@ -37,7 +36,7 @@ public class ThingAdapter extends BaseAdapter {
     private final ArrayList<Thing> items = new ArrayList<Thing>();
     private final Context context;
     private final LayoutInflater inflater;
-    private final String parentSubreddit;
+    private final String subredditName;
     private final boolean singleChoice;
     private final long now = System.currentTimeMillis() / 1000;
 
@@ -45,11 +44,10 @@ public class ThingAdapter extends BaseAdapter {
     private int selectedPosition;
     private int bodyWidth;
 
-    public ThingAdapter(Context context, LayoutInflater inflater, Subreddit subreddit,
-            boolean singleChoice) {
+    public ThingAdapter(Context context, String subredditName, boolean singleChoice) {
         this.context = context;
-        this.inflater = inflater;
-        this.parentSubreddit = subreddit.name;
+        this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.subredditName = subredditName;
         this.singleChoice = singleChoice;
     }
 
@@ -160,7 +158,7 @@ public class ThingAdapter extends BaseAdapter {
     }
 
     private void setView(int position, View v) {
-        Thing t = getItem(position).assureFormat(context, parentSubreddit, now);
+        Thing t = getItem(position).assureFormat(context, subredditName, now);
         switch (t.type) {
             case Thing.TYPE_THING:
                 setThing((ThingView) v, t, position);

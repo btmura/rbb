@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.widget;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.Comment;
 
 import android.content.Context;
 import android.text.method.LinkMovementMethod;
@@ -72,6 +73,11 @@ public class CommentAdapter extends BaseAdapter {
     @Override
     public int getViewTypeCount() {
         return 2;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return false;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {

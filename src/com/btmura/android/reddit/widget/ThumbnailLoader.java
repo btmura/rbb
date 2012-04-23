@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.widget;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;

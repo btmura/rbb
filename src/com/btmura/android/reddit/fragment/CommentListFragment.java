@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.fragment;
 
 import java.util.List;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.data.Urls;
+import com.btmura.android.reddit.entity.Comment;
+import com.btmura.android.reddit.widget.CommentAdapter;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;

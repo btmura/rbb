@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.content;
 
 import java.io.IOException;
 import java.io.InputStream;

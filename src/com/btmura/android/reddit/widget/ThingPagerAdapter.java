@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.widget;
 
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.fragment.CommentListFragment;
 import com.btmura.android.reddit.fragment.LinkFragment;
 
 import android.app.Fragment;

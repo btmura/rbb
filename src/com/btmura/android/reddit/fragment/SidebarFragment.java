@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.sidebar;
+package com.btmura.android.reddit.fragment;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -22,14 +22,16 @@ import android.content.Loader;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Details;
+import com.btmura.android.reddit.content.SidebarLoader;
+import com.btmura.android.reddit.entity.SubredditDetails;
+import com.btmura.android.reddit.widget.SidebarAdapter;
 
-public class SidebarFragment extends ListFragment implements LoaderCallbacks<Details> {
+public class SidebarFragment extends ListFragment implements LoaderCallbacks<SubredditDetails> {
 
     private static final String ARGS_NAME = "n";
     private static final String ARGS_POSITION = "p";
 
-    private DetailsAdapter adapter;
+    private SidebarAdapter adapter;
 
     public static SidebarFragment newInstance(String name, int position) {
         SidebarFragment f = new SidebarFragment();
@@ -43,7 +45,7 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Det
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new DetailsAdapter(getActivity());
+        adapter = new SidebarAdapter(getActivity());
     }
 
     @Override
@@ -54,17 +56,17 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Det
         getLoaderManager().initLoader(0, null, this);
     }
 
-    public Loader<Details> onCreateLoader(int id, Bundle args) {
-        return new DetailsLoader(getActivity(), getName());
+    public Loader<SubredditDetails> onCreateLoader(int id, Bundle args) {
+        return new SidebarLoader(getActivity(), getName());
     }
 
-    public void onLoadFinished(Loader<Details> loader, Details data) {
+    public void onLoadFinished(Loader<SubredditDetails> loader, SubredditDetails data) {
         adapter.swapData(data);
         setEmptyText(getString(data != null ? R.string.empty : R.string.error));
         setListShown(true);
     }
 
-    public void onLoaderReset(Loader<Details> loader) {
+    public void onLoaderReset(Loader<SubredditDetails> loader) {
         adapter.swapData(null);
     }
 

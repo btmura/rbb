@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.search;
+package com.btmura.android.reddit.widget;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,21 +27,23 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.SubredditInfo;
+import com.btmura.android.reddit.entity.SubredditDetails;
 
-public class SubredditInfoAdapter extends BaseAdapter {
+public class SubredditDetailsAdapter extends BaseAdapter {
 
-    private final ArrayList<SubredditInfo> items = new ArrayList<SubredditInfo>();
+    private final Context context;
     private final LayoutInflater inflater;
     private final boolean singleChoice;
+    private final ArrayList<SubredditDetails> items = new ArrayList<SubredditDetails>();
     private int chosenPosition = -1;
 
-    public SubredditInfoAdapter(LayoutInflater inflater, boolean singleChoice) {
-        this.inflater = inflater;
+    public SubredditDetailsAdapter(Context context, boolean singleChoice) {
+        this.context = context;
+        this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.singleChoice = singleChoice;
     }
 
-    public void swapData(List<SubredditInfo> newItems) {
+    public void swapData(List<SubredditDetails> newItems) {
         items.clear();
         if (newItems != null) {
             items.ensureCapacity(items.size() + newItems.size());
@@ -63,7 +66,7 @@ public class SubredditInfoAdapter extends BaseAdapter {
         return items.size();
     }
 
-    public SubredditInfo getItem(int position) {
+    public SubredditDetails getItem(int position) {
         return items.get(position);
     }
 
@@ -74,13 +77,13 @@ public class SubredditInfoAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
-            v = inflater.inflate(R.layout.sr_info_row, parent, false);
+            v = inflater.inflate(R.layout.sd_row, parent, false);
             v.setTag(createViewHolder(v));
         }
         ViewHolder h = (ViewHolder) v.getTag();
-        SubredditInfo item = getItem(position);
+        SubredditDetails item = getItem(position);
         h.title.setText(item.displayName);
-        h.status.setText(item.status);
+        h.status.setText(context.getString(R.string.sd_status, item.subscribers));
         v.setBackgroundResource(singleChoice && position == chosenPosition ? R.drawable.selector_chosen
                 : R.drawable.selector_normal);
         return v;
@@ -94,7 +97,7 @@ public class SubredditInfoAdapter extends BaseAdapter {
     private static ViewHolder createViewHolder(View v) {
         ViewHolder h = new ViewHolder();
         h.title = (TextView) v.findViewById(R.id.title);
-        h.status = (TextView) v.findViewById(R.id.info);
+        h.status = (TextView) v.findViewById(R.id.status);
         return h;
     }
 }

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.search;
+package com.btmura.android.reddit.fragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentValues;
 import android.content.Loader;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
@@ -35,18 +36,20 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.Provider;
+import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.SubredditInfo;
+import com.btmura.android.reddit.content.SubredditDetailsLoader;
+import com.btmura.android.reddit.entity.SubredditDetails;
+import com.btmura.android.reddit.widget.SubredditDetailsAdapter;
 
-public class SubredditInfoListFragment extends ListFragment implements
+public class SubredditDetailsListFragment extends ListFragment implements
         MultiChoiceModeListener,
-        LoaderCallbacks<List<SubredditInfo>> {
+        LoaderCallbacks<List<SubredditDetails>> {
 
-    public interface OnSelectedListener {
-        static final int EVENT_LIST_ITEM_CLICKED = 0;
-        static final int EVENT_ACTION_ITEM_CLICKED = 1;
+    public static final String TAG = "SubredditDetailsListFragment";
 
-        void onSelected(List<SubredditInfo> srInfos, int position, int event);
+    public interface OnSubredditDetailsSelectedListener {
+        void onSubredditDetailsSelected(SubredditDetails details, int position);
     }
 
     private static final String ARG_QUERY = "q";
@@ -54,10 +57,10 @@ public class SubredditInfoListFragment extends ListFragment implements
 
     private static final String STATE_CHOSEN = "c";
 
-    private SubredditInfoAdapter adapter;
+    private SubredditDetailsAdapter adapter;
 
-    public static SubredditInfoListFragment newInstance(String query, boolean singleChoice) {
-        SubredditInfoListFragment frag = new SubredditInfoListFragment();
+    public static SubredditDetailsListFragment newInstance(String query, boolean singleChoice) {
+        SubredditDetailsListFragment frag = new SubredditDetailsListFragment();
         Bundle args = new Bundle(2);
         args.putString(ARG_QUERY, query);
         args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
@@ -68,8 +71,7 @@ public class SubredditInfoListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new SubredditInfoAdapter(getActivity().getLayoutInflater(), getArguments()
-                .getBoolean(ARG_SINGLE_CHOICE));
+        adapter = new SubredditDetailsAdapter(getActivity(), isSingleChoice());
     }
 
     @Override
@@ -95,28 +97,27 @@ public class SubredditInfoListFragment extends ListFragment implements
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         adapter.setChosenPosition(position);
-        ArrayList<SubredditInfo> subreddits = new ArrayList<SubredditInfo>(1);
-        subreddits.add(adapter.getItem(position));
-        getListener().onSelected(subreddits, position, OnSelectedListener.EVENT_LIST_ITEM_CLICKED);
+        getListener().onSubredditDetailsSelected(adapter.getItem(position), position);
     }
 
-    public Loader<List<SubredditInfo>> onCreateLoader(int id, Bundle args) {
-        return new SubredditInfoLoader(getActivity(), getArguments().getString(ARG_QUERY));
+    public Loader<List<SubredditDetails>> onCreateLoader(int id, Bundle args) {
+        return new SubredditDetailsLoader(getActivity(), getArguments().getString(ARG_QUERY));
     }
 
-    public void onLoadFinished(Loader<List<SubredditInfo>> loader, final List<SubredditInfo> data) {
+    public void onLoadFinished(Loader<List<SubredditDetails>> loader,
+            final List<SubredditDetails> data) {
         adapter.swapData(data);
         setEmptyText(getString(data != null ? R.string.empty : R.string.error));
         setListShown(true);
     }
 
-    public void onLoaderReset(Loader<List<SubredditInfo>> loader) {
+    public void onLoaderReset(Loader<List<SubredditDetails>> loader) {
         adapter.swapData(null);
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.subreddit, menu);
+        inflater.inflate(R.menu.sr_action_menu, menu);
         menu.findItem(R.id.menu_combine).setVisible(false);
         menu.findItem(R.id.menu_split).setVisible(false);
         menu.findItem(R.id.menu_delete).setVisible(false);
@@ -131,42 +132,43 @@ public class SubredditInfoListFragment extends ListFragment implements
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
-                handleAdd(mode);
+                handleActionAdd(mode);
                 return true;
 
             case R.id.menu_add_combined:
-                handleAddCombined(mode);
+                handleActionAddCombined(mode);
                 return true;
         }
         return false;
     }
 
-    private void handleAdd(ActionMode mode) {
-        final SparseBooleanArray positions = getListView().getCheckedItemPositions();
-        List<SubredditInfo> added = new ArrayList<SubredditInfo>(positions.size());
+    private void handleActionAdd(ActionMode mode) {
+        SparseBooleanArray positions = getListView().getCheckedItemPositions();
+        ContentValues[] values = new ContentValues[positions.size()];
         int count = adapter.getCount();
-        for (int i = 0; i < count; i++) {
+        int i, j;
+        for (i = 0, j = 0; i < count; i++) {
             if (positions.get(i)) {
-                added.add(adapter.getItem(i));
+                values[j] = new ContentValues(1);
+                values[j++].put(Subreddits.COLUMN_NAME, adapter.getItem(i).displayName);
             }
         }
-        getListener().onSelected(added, -1, OnSelectedListener.EVENT_ACTION_ITEM_CLICKED);
+        Provider.addMultipleSubredditsInBackground(getActivity(), values);
         mode.finish();
     }
 
-    private void handleAddCombined(ActionMode mode) {
+    private void handleActionAddCombined(ActionMode mode) {
+        SparseBooleanArray positions = getListView().getCheckedItemPositions();
         ArrayList<String> names = new ArrayList<String>();
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
         int count = adapter.getCount();
         for (int i = 0; i < count; i++) {
-            if (checked.get(i)) {
+            if (positions.get(i)) {
                 String name = adapter.getItem(i).displayName;
                 if (!name.isEmpty()) {
                     names.add(name);
                 }
             }
         }
-
         Provider.combineSubredditsInBackground(getActivity(), names, new long[0]);
         mode.finish();
     }
@@ -184,8 +186,8 @@ public class SubredditInfoListFragment extends ListFragment implements
         }
     }
 
-    private OnSelectedListener getListener() {
-        return (OnSelectedListener) getActivity();
+    private OnSubredditDetailsSelectedListener getListener() {
+        return (OnSubredditDetailsSelectedListener) getActivity();
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
@@ -193,5 +195,9 @@ public class SubredditInfoListFragment extends ListFragment implements
     }
 
     public void onDestroyActionMode(ActionMode mode) {
+    }
+
+    private boolean isSingleChoice() {
+        return getArguments().getBoolean(ARG_SINGLE_CHOICE, false);
     }
 }

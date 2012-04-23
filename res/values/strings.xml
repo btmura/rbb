@@ -47,9 +47,7 @@
     <string name="menu_view">View</string>
     <string name="menu_view_sidebar">View sidebar</string>
     
-    <string name="search_title">Results for \"%1$s\"</string>
-    <string name="sr_info_status">%1$d subscribers</string>
-    <string name="sr_search_instructions">Choose a subreddit from the left.</string>
+    <string name="sd_status">%1$d subscribers</string>
     
     <string name="tab_posts">Posts</string>
     <string name="tab_subreddits">Subreddits</string>

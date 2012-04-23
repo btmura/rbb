@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.fragment;
 
 import java.util.ArrayList;
 
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.widget.SubredditAdapter;
 
 import android.app.Activity;
 import android.app.ListFragment;
@@ -133,7 +134,7 @@ public class SubredditListFragment extends ListFragment implements
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.subreddit, menu);
+        inflater.inflate(R.menu.sr_action_menu, menu);
         menu.findItem(R.id.menu_add).setVisible(false);
         if (mode.getTag() == null) {
             mode.setTag(new CheckedInfo());

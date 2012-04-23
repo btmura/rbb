@@ -14,33 +14,40 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.sidebar;
+package com.btmura.android.reddit.widget;
+
+import com.btmura.android.reddit.fragment.SubredditDetailsListFragment;
+import com.btmura.android.reddit.fragment.ThingListFragment;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.support.v13.app.FragmentPagerAdapter;
 
-public class SidebarPagerAdapter extends FragmentPagerAdapter {
+public class SearchPagerAdapter extends FragmentPagerAdapter {
 
-    private final String[] subreddits;
+    private final String query;
 
-    public SidebarPagerAdapter(FragmentManager fm, String[] subreddits) {
+    public SearchPagerAdapter(FragmentManager fm, String query) {
         super(fm);
-        this.subreddits = subreddits;
+        this.query = query;
     }
 
     @Override
     public int getCount() {
-        return subreddits.length;
+        return 2;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return SidebarFragment.newInstance(subreddits[position], -1);
-    }
+        switch (position) {
+            case 0:
+                return SubredditDetailsListFragment.newInstance(query, false);
 
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return subreddits[position];
+            case 1:
+                return ThingListFragment.newSearchInstance(query, false);
+
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 }

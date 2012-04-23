@@ -16,121 +16,158 @@
 
 package com.btmura.android.reddit.activity;
 
-import java.util.List;
-
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.app.ActionBar.TabListener;
 import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
-import android.content.ContentValues;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
 import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
 
-import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.SubredditInfo;
-import com.btmura.android.reddit.search.SubredditInfoListFragment;
-import com.btmura.android.reddit.search.SubredditInfoListFragment.OnSelectedListener;
-import com.btmura.android.reddit.sidebar.SidebarFragment;
+import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.entity.SubredditDetails;
+import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.fragment.SubredditDetailsListFragment;
+import com.btmura.android.reddit.fragment.ThingListFragment;
+import com.btmura.android.reddit.widget.SearchPagerAdapter;
 
 public class SearchActivity extends Activity implements
-        OnQueryTextListener,
-        OnSelectedListener,
-        OnFocusChangeListener,
-        OnBackStackChangedListener,
-        TabListener {
+        ActionBar.TabListener,
+        SearchView.OnQueryTextListener,
+        SubredditDetailsListFragment.OnSubredditDetailsSelectedListener,
+        ThingListFragment.OnThingSelectedListener,
+        ViewPager.OnPageChangeListener,
+        View.OnFocusChangeListener {
+
+    public static final String TAG = "SearchActivity";
 
     public static final String EXTRA_QUERY = "q";
 
-    private static final String FRAG_SUBREDDITS = "s";
-    private static final String FRAG_DETAILS = "d";
-
     private static final String STATE_QUERY = "q";
 
-    private boolean singleChoice;
-    private int slfContainerId;
-
+    private ActionBar bar;
+    private ViewPager pager;
     private String query;
-    private boolean restoringState;
 
     private MenuItem searchItem;
     private SearchView searchView;
-    private View singleContainer;
-
-    private ActionBar bar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search);
 
-        singleContainer = findViewById(R.id.single_container);
-        singleChoice = singleContainer == null;
-        if (singleContainer != null) {
-            slfContainerId = R.id.single_container;
-        } else {
-            slfContainerId = R.id.subreddit_list_container;
-        }
+        bar = getActionBar();
+        bar.setDisplayHomeAsUpEnabled(true);
+        bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
+        bar.addTab(bar.newTab().setText(R.string.tab_posts).setTabListener(this));
 
-        restoringState = savedInstanceState != null;
         if (savedInstanceState == null) {
             query = getIntentQuery();
         } else {
             query = savedInstanceState.getString(STATE_QUERY, "");
         }
 
-        FragmentManager manager = getFragmentManager();
-        manager.addOnBackStackChangedListener(this);
+        pager = (ViewPager) findViewById(R.id.pager);
+        if (pager != null) {
+            pager.setOnPageChangeListener(this);
+            pager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
+        }
 
-        bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
-        bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
-
-        refreshTitle();
+        bar.setTitle(query);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
     }
 
     private String getIntentQuery() {
         String q = getIntent().getStringExtra(EXTRA_QUERY);
         if (q == null) {
-            q = "";
+            q = "android";
         }
         return q.trim();
     }
 
     public void onTabSelected(Tab tab, FragmentTransaction ft) {
-        Log.v("S", "onTabSelected");
-        if (restoringState) {
-            restoringState = false;
-        } else {
-            submitQuery();
+        if (pager != null) {
+            pager.setCurrentItem(tab.getPosition());
         }
     }
 
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
-        if (singleContainer != null) {
-            FragmentManager fm = getFragmentManager();
-            if (fm.getBackStackEntryCount() > 0) {
-                fm.popBackStack();
-            }
-        }
+    }
+
+    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
     }
 
     public boolean onQueryTextSubmit(String query) {
         this.query = query;
         submitQuery();
         return true;
+    }
+
+    private void submitQuery() {
+        if (query != null && !query.isEmpty()) {
+            bar.setTitle(query);
+            if (searchItem != null) {
+                searchItem.collapseActionView();
+            }
+            if (pager != null) {
+                pager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
+            }
+        }
+    }
+
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
+
+    public void onSubredditDetailsSelected(SubredditDetails details, int position) {
+        if (pager != null) {
+            Subreddit s = Subreddit.newInstance(details.displayName);
+            Intent intent = new Intent(this, ThingListActivity.class);
+            intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, s);
+            intent.putExtra(ThingListActivity.EXTRA_SHOW_ADD_BUTTON, true);
+            startActivity(intent);
+        }
+    }
+
+    public void onThingSelected(Thing thing, int position) {
+        if (pager != null) {
+            Intent intent = new Intent(this, ThingActivity.class);
+            intent.putExtra(ThingActivity.EXTRA_THING, thing);
+            startActivity(intent);
+        }
+    }
+
+    public int getThingBodyWidth() {
+        return 0;
+    }
+
+    public void onPageSelected(int position) {
+        bar.setSelectedNavigationItem(position);
+    }
+
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    public void onPageScrollStateChanged(int state) {
+    }
+
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            searchItem.collapseActionView();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_QUERY, query);
     }
 
     @Override
@@ -145,89 +182,14 @@ public class SearchActivity extends Activity implements
         }
     }
 
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            searchItem.collapseActionView();
-        }
-    }
-
-    private void refreshTitle() {
-        bar.setTitle(query);
-    }
-
-    private void submitQuery() {
-        refreshTitle();
-        if (searchItem != null) {
-            searchItem.collapseActionView();
-        }
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(slfContainerId, SubredditInfoListFragment.newInstance(query, singleChoice),
-                FRAG_SUBREDDITS);
-
-        SidebarFragment df = getDetailsFragment();
-        if (df != null) {
-            ft.remove(df);
-        }
-
-        ft.commit();
-    }
-
-    public void onSelected(List<SubredditInfo> infos, int position, int event) {
-        switch (event) {
-            case OnSelectedListener.EVENT_LIST_ITEM_CLICKED:
-                handleListItemClicked(infos, position);
-                break;
-
-            case OnSelectedListener.EVENT_ACTION_ITEM_CLICKED:
-                handleActionItemClicked(infos);
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unexpected event: " + event);
-        }
-    }
-
-    private void handleListItemClicked(List<SubredditInfo> infos, int position) {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        int containerId = singleContainer != null ? R.id.single_container : R.id.details_container;
-        SidebarFragment df = SidebarFragment.newInstance(infos.get(0).displayName, position);
-        ft.replace(containerId, df, FRAG_DETAILS);
-        if (singleContainer != null) {
-            ft.addToBackStack(null);
-        } else {
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        }
-        ft.commit();
-    }
-
-    private void handleActionItemClicked(List<SubredditInfo> infos) {
-        int size = infos.size();
-        ContentValues[] values = new ContentValues[size];
-        for (int i = 0; i < size; i++) {
-            values[i] = new ContentValues(1);
-            values[i].put(Subreddits.COLUMN_NAME, infos.get(i).displayName);
-        }
-        Provider.addMultipleSubredditsInBackground(getApplicationContext(), values);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.search, menu);
+        getMenuInflater().inflate(R.menu.search_menu, menu);
         searchItem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
         searchView.setOnQueryTextFocusChangeListener(this);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        SidebarFragment f = getDetailsFragment();
-        boolean showDetails = f != null;
-        menu.findItem(R.id.menu_add).setVisible(showDetails);
-        menu.findItem(R.id.menu_view).setVisible(showDetails);
         return true;
     }
 
@@ -238,67 +200,12 @@ public class SearchActivity extends Activity implements
                 handleHome();
                 return true;
 
-            case R.id.menu_add_front_page:
-                handleAddFrontPage();
-                return true;
-
             default:
                 return super.onMenuItemSelected(featureId, item);
         }
     }
 
     private void handleHome() {
-        if (singleContainer != null) {
-            if (getDetailsFragment() != null) {
-                getFragmentManager().popBackStack();
-            } else {
-                finish();
-            }
-        } else {
-            finish();
-        }
-    }
-
-    private void handleAddFrontPage() {
-        ContentValues values = new ContentValues(1);
-        values.put(Subreddits.COLUMN_NAME, "");
-        Provider.addSubredditInBackground(getApplicationContext(), values);
-    }
-
-    public void onBackStackChanged() {
-        SidebarFragment f = getDetailsFragment();
-        refreshPosition(f);
-        refreshActionBar(f);
-    }
-
-    private void refreshPosition(SidebarFragment detailsFrag) {
-        if (singleContainer == null) {
-            int position = detailsFrag != null ? detailsFrag.getPosition() : -1;
-            getSubredditListFragment().setChosenPosition(position);
-        }
-    }
-
-    private void refreshActionBar(SidebarFragment detailsFrag) {
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(STATE_QUERY, query);
-    }
-
-    private SubredditInfoListFragment getSubredditListFragment() {
-        return (SubredditInfoListFragment) getFragmentManager().findFragmentByTag(FRAG_SUBREDDITS);
-    }
-
-    private SidebarFragment getDetailsFragment() {
-        return (SidebarFragment) getFragmentManager().findFragmentByTag(FRAG_DETAILS);
-    }
-
-    public boolean onQueryTextChange(String newText) {
-        return false;
-    }
-
-    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+        finish();
     }
 }

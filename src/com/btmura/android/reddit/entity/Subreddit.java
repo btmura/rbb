@@ -73,4 +73,8 @@ public class Subreddit implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
     }
+
+    public static String getName(Subreddit subreddit) {
+        return subreddit != null ? subreddit.name : null;
+    }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.fragment;
 
 import java.util.List;
 
@@ -38,9 +38,11 @@ import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
+import com.btmura.android.reddit.content.ThingLoader;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.widget.ThingAdapter;
 
 public class ThingListFragment extends ListFragment implements
         LoaderCallbacks<List<Thing>>,
@@ -50,6 +52,7 @@ public class ThingListFragment extends ListFragment implements
 
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
+    private static final String ARG_SEARCH_QUERY = "q";
     private static final String ARG_SHOW_ADD = "a";
     private static final String ARG_SINGLE_CHOICE = "c";
 
@@ -65,27 +68,38 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private Subreddit subreddit;
+    private String query;
+
     private ThingAdapter adapter;
     private boolean scrollLoading;
 
     public static ThingListFragment newInstance(Subreddit sr, int filter, boolean showAdd,
             boolean singleChoice) {
-        ThingListFragment frag = new ThingListFragment();
-        Bundle b = new Bundle(4);
-        b.putParcelable(ARG_SUBREDDIT, sr);
-        b.putInt(ARG_FILTER, filter);
-        b.putBoolean(ARG_SHOW_ADD, showAdd);
-        b.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
-        frag.setArguments(b);
-        return frag;
+        ThingListFragment f = new ThingListFragment();
+        Bundle args = new Bundle(4);
+        args.putParcelable(ARG_SUBREDDIT, sr);
+        args.putInt(ARG_FILTER, filter);
+        args.putBoolean(ARG_SHOW_ADD, showAdd);
+        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        f.setArguments(args);
+        return f;
+    }
+
+    public static ThingListFragment newSearchInstance(String query, boolean singleChoice) {
+        ThingListFragment f = new ThingListFragment();
+        Bundle args = new Bundle(2);
+        args.putString(ARG_SEARCH_QUERY, query);
+        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        f.setArguments(args);
+        return f;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        subreddit = getArguments().getParcelable(ARG_SUBREDDIT);
-        adapter = new ThingAdapter(getActivity(), getActivity().getLayoutInflater(),
-                getSubreddit(), isSingleChoice());
+        subreddit = getSubreddit();
+        query = getSearchQuery();
+        adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), isSingleChoice());
         setHasOptionsMenu(true);
     }
 
@@ -118,7 +132,12 @@ public class ThingListFragment extends ListFragment implements
 
     public Loader<List<Thing>> onCreateLoader(int id, Bundle args) {
         String moreKey = args != null ? args.getString(LOADER_ARG_MORE_KEY) : null;
-        CharSequence url = Urls.subredditUrl(getSubreddit(), getFilter(), moreKey);
+        CharSequence url;
+        if (subreddit != null) {
+            url = Urls.subredditUrl(subreddit, getFilter(), moreKey);
+        } else {
+            url = Urls.searchUrl(query);
+        }
         return new ThingLoader(getActivity(), url, args != null ? adapter.getItems() : null);
     }
 
@@ -191,7 +210,8 @@ public class ThingListFragment extends ListFragment implements
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_list_menu, menu);
         menu.findItem(R.id.menu_add).setVisible(showAdd());
-        menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(!subreddit.isFrontPage());
+        menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(
+                subreddit != null && !subreddit.isFrontPage());
     }
 
     @Override
@@ -232,6 +252,10 @@ public class ThingListFragment extends ListFragment implements
 
     private int getFilter() {
         return getArguments().getInt(ARG_FILTER);
+    }
+
+    private String getSearchQuery() {
+        return getArguments().getString(ARG_SEARCH_QUERY);
     }
 
     private boolean showAdd() {

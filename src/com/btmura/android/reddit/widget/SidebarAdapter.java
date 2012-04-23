@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.sidebar;
+package com.btmura.android.reddit.widget;
 
 import android.content.Context;
 import android.text.method.LinkMovementMethod;
@@ -26,20 +26,20 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
-import com.btmura.android.reddit.entity.Details;
+import com.btmura.android.reddit.entity.SubredditDetails;
 
-public class DetailsAdapter extends BaseAdapter {
+public class SidebarAdapter extends BaseAdapter {
 
-    private Details item;
+    private SubredditDetails item;
     private final Context context;
     private final LayoutInflater inflater;
 
-    public DetailsAdapter(Context context) {
+    public SidebarAdapter(Context context) {
         this.context = context;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void swapData(Details item) {
+    public void swapData(SubredditDetails item) {
         this.item = item;
         notifyDataSetChanged();
     }
@@ -58,7 +58,7 @@ public class DetailsAdapter extends BaseAdapter {
         return item != null ? 1 : 0;
     }
 
-    public Details getItem(int position) {
+    public SubredditDetails getItem(int position) {
         return item;
     }
 
@@ -69,7 +69,7 @@ public class DetailsAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = inflater.inflate(R.layout.details_row, parent, false);
 
-        Details info = getItem(position);
+        SubredditDetails info = getItem(position);
 
         TextView title = (TextView) v.findViewById(R.id.title);
         title.setText(info.title);

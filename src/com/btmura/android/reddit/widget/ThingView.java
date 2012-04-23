@@ -1,4 +1,4 @@
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.widget;
 
 import android.content.Context;
 import android.content.res.Resources.Theme;

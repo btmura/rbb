@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.browser;
+package com.btmura.android.reddit.entity;
 
 import android.content.Context;
 
@@ -24,9 +24,9 @@ import com.btmura.android.reddit.data.RelativeTime;
 
 public class Comment {
 
-    static final int TYPE_HEADER = 0;
-    static final int TYPE_COMMENT = 1;
-    static final int TYPE_MORE = 2;
+    public static final int TYPE_HEADER = 0;
+    public static final int TYPE_COMMENT = 1;
+    public static final int TYPE_MORE = 2;
 
     public int type;
     public int nesting;
