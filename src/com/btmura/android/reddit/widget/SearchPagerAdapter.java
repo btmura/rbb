@@ -16,14 +16,14 @@
 
 package com.btmura.android.reddit.widget;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.support.v13.app.FragmentStatePagerAdapter;
+
 import com.btmura.android.reddit.fragment.SubredditDetailsListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.support.v13.app.FragmentPagerAdapter;
-
-public class SearchPagerAdapter extends FragmentPagerAdapter {
+public class SearchPagerAdapter extends FragmentStatePagerAdapter {
 
     private final String query;
 

@@ -118,6 +118,7 @@ public class SearchActivity extends Activity implements
             }
             if (pager != null) {
                 pager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
+                pager.setCurrentItem(bar.getSelectedNavigationIndex());
             }
         }
     }
