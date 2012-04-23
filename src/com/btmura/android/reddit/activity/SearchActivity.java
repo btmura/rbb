@@ -65,8 +65,8 @@ public class SearchActivity extends Activity implements
 
         bar = getActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
-        bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
         bar.addTab(bar.newTab().setText(R.string.tab_posts).setTabListener(this));
+        bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
 
         if (savedInstanceState == null) {
             query = getIntentQuery();
