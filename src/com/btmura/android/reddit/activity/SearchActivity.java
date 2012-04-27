@@ -18,9 +18,9 @@ package com.btmura.android.reddit.activity;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
@@ -31,17 +31,15 @@ import android.widget.SearchView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.entity.SubredditDetails;
 import com.btmura.android.reddit.entity.Thing;
-import com.btmura.android.reddit.fragment.SubredditDetailsListFragment;
+import com.btmura.android.reddit.fragment.ControlFragment;
+import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.widget.SearchPagerAdapter;
 
-public class SearchActivity extends Activity implements
+public class SearchActivity extends AbstractBrowserActivity implements
         ActionBar.TabListener,
         SearchView.OnQueryTextListener,
-        SubredditDetailsListFragment.OnSubredditDetailsSelectedListener,
-        ThingListFragment.OnThingSelectedListener,
         ViewPager.OnPageChangeListener,
         View.OnFocusChangeListener {
 
@@ -50,6 +48,10 @@ public class SearchActivity extends Activity implements
     public static final String EXTRA_QUERY = "q";
 
     private static final String STATE_QUERY = "q";
+    private static final String STATE_TAB_POSITION = "t";
+
+    private static final int TAB_POSTS = 0;
+    private static final int TAB_SUBREDDITS = 1;
 
     private ActionBar bar;
     private ViewPager pager;
@@ -58,16 +60,14 @@ public class SearchActivity extends Activity implements
     private MenuItem searchItem;
     private SearchView searchView;
 
+    private boolean tabListenerDisabled;
+
+    public SearchActivity() {
+        super(R.layout.search);
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.search);
-
-        bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
-        bar.addTab(bar.newTab().setText(R.string.tab_posts).setTabListener(this));
-        bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
-
+    protected void initPrereqs(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             query = getIntentQuery();
         } else {
@@ -75,13 +75,19 @@ public class SearchActivity extends Activity implements
         }
 
         pager = (ViewPager) findViewById(R.id.pager);
-        if (pager != null) {
-            pager.setOnPageChangeListener(this);
-            pager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
-        }
 
+        bar = getActionBar();
+        bar.setDisplayHomeAsUpEnabled(true);
         bar.setTitle(query);
+
+        tabListenerDisabled = true;
+        bar.addTab(bar.newTab().setText(R.string.tab_posts).setTabListener(this));
+        bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        if (savedInstanceState != null) {
+            bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_TAB_POSITION));
+        }
+        tabListenerDisabled = false;
     }
 
     private String getIntentQuery() {
@@ -92,9 +98,32 @@ public class SearchActivity extends Activity implements
         return q.trim();
     }
 
+    @Override
+    protected boolean isSinglePane() {
+        return pager != null;
+    }
+
+    @Override
+    protected void initSinglePaneLayout(Bundle savedInstanceState) {
+        pager.setOnPageChangeListener(this);
+        pager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
+    }
+
+    @Override
+    protected void initMultiPaneLayout(Bundle savedInstanceState, int filter) {
+        if (savedInstanceState == null) {
+            submitQuery();
+        }
+    }
+
     public void onTabSelected(Tab tab, FragmentTransaction ft) {
+        if (tabListenerDisabled) {
+            return;
+        }
         if (pager != null) {
             pager.setCurrentItem(tab.getPosition());
+        } else {
+            updateFragments();
         }
     }
 
@@ -110,6 +139,10 @@ public class SearchActivity extends Activity implements
         return true;
     }
 
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
+
     private void submitQuery() {
         if (query != null && !query.isEmpty()) {
             bar.setTitle(query);
@@ -119,44 +152,82 @@ public class SearchActivity extends Activity implements
             if (pager != null) {
                 pager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
                 pager.setCurrentItem(bar.getSelectedNavigationIndex());
+            } else {
+                updateFragments();
             }
         }
     }
 
-    public boolean onQueryTextChange(String newText) {
-        return false;
-    }
+    private void updateFragments() {
+        switch (bar.getSelectedNavigationIndex()) {
+            case TAB_POSTS:
+                updatePostResultsFragments();
+                break;
 
-    public void onSubredditDetailsSelected(SubredditDetails details, int position) {
-        if (pager != null) {
-            Subreddit s = Subreddit.newInstance(details.displayName);
-            Intent intent = new Intent(this, ThingListActivity.class);
-            intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, s);
-            intent.putExtra(ThingListActivity.EXTRA_SHOW_ADD_BUTTON, true);
-            startActivity(intent);
+            case TAB_SUBREDDITS:
+                updateSubredditResultsFragemnts();
+                break;
         }
     }
 
-    public void onThingSelected(Thing thing, int position) {
-        if (pager != null) {
-            Intent intent = new Intent(this, ThingActivity.class);
-            intent.putExtra(ThingActivity.EXTRA_THING, thing);
-            startActivity(intent);
+    private void updatePostResultsFragments() {
+        FragmentManager fm = getFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.removeOnBackStackChangedListener(this);
+            fm.popBackStackImmediate();
+            fm.addOnBackStackChangedListener(this);
         }
+
+        refreshContainers(null);
+
+        Fragment cf = ControlFragment.newInstance(null, null, -1, 0);
+        Fragment slf = getFragmentManager().findFragmentByTag(SubredditListFragment.TAG);
+        Fragment tlf = ThingListFragment.newSearchInstance(query, true);
+
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.add(cf, ControlFragment.TAG);
+        if (slf != null) {
+            ft.remove(slf);
+        }
+        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+        ft.commit();
     }
 
-    public int getThingBodyWidth() {
-        return 0;
+    private void updateSubredditResultsFragemnts() {
+        FragmentManager fm = getFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.removeOnBackStackChangedListener(this);
+            fm.popBackStackImmediate();
+            fm.addOnBackStackChangedListener(this);
+        }
+
+        refreshContainers(null);
+
+        Fragment cf = ControlFragment.newInstance(null, null, -1, 0);
+        Fragment slf = SubredditListFragment.newSearchInstance(query, true);
+        Fragment tlf = getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
+
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.add(cf, ControlFragment.TAG);
+        ft.replace(R.id.subreddit_list_container, slf, SubredditListFragment.TAG);
+        if (tlf != null) {
+            ft.remove(tlf);
+        }
+        ft.commit();
     }
 
+    @Override
+    protected void refreshActionBar(Subreddit subreddit, Thing thing, int filter) {
+        bar.setTitle(query);
+    }
+
+    @Override
     public void onPageSelected(int position) {
-        bar.setSelectedNavigationItem(position);
-    }
-
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    }
-
-    public void onPageScrollStateChanged(int state) {
+        if (pager != null) {
+            bar.setSelectedNavigationItem(position);
+        } else {
+            super.onPageSelected(position);
+        }
     }
 
     public void onFocusChange(View v, boolean hasFocus) {
@@ -169,6 +240,7 @@ public class SearchActivity extends Activity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_QUERY, query);
+        outState.putInt(STATE_TAB_POSITION, bar.getSelectedNavigationIndex());
     }
 
     @Override
@@ -192,21 +264,5 @@ public class SearchActivity extends Activity implements
         searchView.setOnQueryTextListener(this);
         searchView.setOnQueryTextFocusChangeListener(this);
         return true;
-    }
-
-    @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                handleHome();
-                return true;
-
-            default:
-                return super.onMenuItemSelected(featureId, item);
-        }
-    }
-
-    private void handleHome() {
-        finish();
     }
 }

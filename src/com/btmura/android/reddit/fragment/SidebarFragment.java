@@ -23,10 +23,10 @@ import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SidebarLoader;
-import com.btmura.android.reddit.entity.SubredditDetails;
+import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.widget.SidebarAdapter;
 
-public class SidebarFragment extends ListFragment implements LoaderCallbacks<SubredditDetails> {
+public class SidebarFragment extends ListFragment implements LoaderCallbacks<Subreddit> {
 
     private static final String ARGS_NAME = "n";
     private static final String ARGS_POSITION = "p";
@@ -56,17 +56,17 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sub
         getLoaderManager().initLoader(0, null, this);
     }
 
-    public Loader<SubredditDetails> onCreateLoader(int id, Bundle args) {
+    public Loader<Subreddit> onCreateLoader(int id, Bundle args) {
         return new SidebarLoader(getActivity(), getName());
     }
 
-    public void onLoadFinished(Loader<SubredditDetails> loader, SubredditDetails data) {
+    public void onLoadFinished(Loader<Subreddit> loader, Subreddit data) {
         adapter.swapData(data);
         setEmptyText(getString(data != null ? R.string.empty : R.string.error));
         setListShown(true);
     }
 
-    public void onLoaderReset(Loader<SubredditDetails> loader) {
+    public void onLoaderReset(Loader<Subreddit> loader) {
         adapter.swapData(null);
     }
 

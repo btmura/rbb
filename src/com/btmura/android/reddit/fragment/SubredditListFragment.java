@@ -18,14 +18,10 @@ package com.btmura.android.reddit.fragment;
 
 import java.util.ArrayList;
 
-import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.widget.SubredditAdapter;
-
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentValues;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -40,32 +36,42 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.Provider;
+import com.btmura.android.reddit.Provider.Subreddits;
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.widget.SubredditAdapter;
+
 public class SubredditListFragment extends ListFragment implements
         LoaderCallbacks<Cursor>,
         MultiChoiceModeListener {
 
     public static final String TAG = "SubredditListFragment";
 
-    private static final String ARGS_SELECTED_SUBREDDIT = "s";
-    private static final String ARGS_SINGLE_CHOICE = "c";
-
-    public interface OnSubredditSelectedListener {
-        void onSubredditLoaded(Subreddit sr);
-
-        void onSubredditSelected(Subreddit s);
-    }
+    private static final String ARG_SELECTED_SUBREDDIT = "s";
+    private static final String ARG_QUERY = "q";
+    private static final String ARG_SINGLE_CHOICE = "c";
 
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
 
     public static SubredditListFragment newInstance(Subreddit selectedSubreddit,
             boolean singleChoice) {
-        SubredditListFragment frag = new SubredditListFragment();
+        SubredditListFragment f = new SubredditListFragment();
         Bundle args = new Bundle(2);
-        args.putParcelable(ARGS_SELECTED_SUBREDDIT, selectedSubreddit);
-        args.putBoolean(ARGS_SINGLE_CHOICE, singleChoice);
-        frag.setArguments(args);
-        return frag;
+        args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
+        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        f.setArguments(args);
+        return f;
+    }
+
+    public static SubredditListFragment newSearchInstance(String query, boolean singleChoice) {
+        SubredditListFragment f = new SubredditListFragment();
+        Bundle args = new Bundle(2);
+        args.putString(ARG_QUERY, query);
+        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        f.setArguments(args);
+        return f;
     }
 
     @Override
@@ -77,7 +83,7 @@ public class SubredditListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new SubredditAdapter(getActivity(), isSingleChoice());
+        adapter = new SubredditAdapter(getActivity(), getQuery(), isSingleChoice());
         adapter.setSelectedSubreddit(getSelectedSubreddit());
     }
 
@@ -99,7 +105,7 @@ public class SubredditListFragment extends ListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return SubredditAdapter.createLoader(getActivity());
+        return SubredditAdapter.createLoader(getActivity(), getQuery());
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -144,7 +150,7 @@ public class SubredditListFragment extends ListFragment implements
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         CheckedInfo info = (CheckedInfo) mode.getTag();
-        menu.findItem(R.id.menu_add_combined).setVisible(false);
+        menu.findItem(R.id.menu_add_combined).setVisible(getListView().getCheckedItemCount() > 1);
         menu.findItem(R.id.menu_combine).setVisible(info.checkedCount > 1);
         menu.findItem(R.id.menu_split).setVisible(info.checkedCount == 1 && info.numSplittable > 0);
         return true;
@@ -152,8 +158,16 @@ public class SubredditListFragment extends ListFragment implements
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_add:
+                handleActionAdd(mode);
+                return true;
+
+            case R.id.menu_add_combined:
+                handleActionAddCombined(mode);
+                return true;
+
             case R.id.menu_combine:
-                handleCombined(mode);
+                handleCombine(mode);
                 return true;
 
             case R.id.menu_split:
@@ -167,7 +181,38 @@ public class SubredditListFragment extends ListFragment implements
         return false;
     }
 
-    private void handleCombined(ActionMode mode) {
+    private void handleActionAdd(ActionMode mode) {
+        SparseBooleanArray positions = getListView().getCheckedItemPositions();
+        ContentValues[] values = new ContentValues[positions.size()];
+        int count = adapter.getCount();
+        int i, j;
+        for (i = 0, j = 0; i < count; i++) {
+            if (positions.get(i)) {
+                values[j] = new ContentValues(1);
+                values[j++].put(Subreddits.COLUMN_NAME, adapter.getName(getActivity(), i));
+            }
+        }
+        Provider.addMultipleSubredditsInBackground(getActivity(), values);
+        mode.finish();
+    }
+
+    private void handleActionAddCombined(ActionMode mode) {
+        SparseBooleanArray positions = getListView().getCheckedItemPositions();
+        ArrayList<String> names = new ArrayList<String>();
+        int count = adapter.getCount();
+        for (int i = 0; i < count; i++) {
+            if (positions.get(i)) {
+                String name = adapter.getName(getActivity(), i);
+                if (!name.isEmpty()) {
+                    names.add(name);
+                }
+            }
+        }
+        Provider.combineSubredditsInBackground(getActivity(), names, new long[0]);
+        mode.finish();
+    }
+
+    private void handleCombine(ActionMode mode) {
         ArrayList<String> names = getCheckedNames();
         int size = names.size();
         if (size <= 1) {
@@ -229,10 +274,14 @@ public class SubredditListFragment extends ListFragment implements
     }
 
     private Subreddit getSelectedSubreddit() {
-        return getArguments().getParcelable(ARGS_SELECTED_SUBREDDIT);
+        return getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
+    }
+
+    private String getQuery() {
+        return getArguments().getString(ARG_QUERY);
     }
 
     private boolean isSingleChoice() {
-        return getArguments().getBoolean(ARGS_SINGLE_CHOICE);
+        return getArguments().getBoolean(ARG_SINGLE_CHOICE);
     }
 }

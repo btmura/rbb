@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 Brian Muramatsu
+<!--
+     Copyright (C) 2012 Brian Muramatsu
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,16 +16,17 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="10dp" >
+    android:padding="@dimen/padding" >
 
     <TextView
         android:id="@+id/title"
         style="@android:style/TextAppearance.Holo.Medium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
+        android:ellipsize="end"
+        android:paddingBottom="@dimen/padding"
         android:singleLine="true" />
 
     <TextView
@@ -32,6 +34,7 @@
         style="@android:style/TextAppearance.Holo.Small"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:singleLine="true" />
 
 </LinearLayout>

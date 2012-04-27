@@ -26,11 +26,11 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
-import com.btmura.android.reddit.entity.SubredditDetails;
+import com.btmura.android.reddit.entity.Subreddit;
 
 public class SidebarAdapter extends BaseAdapter {
 
-    private SubredditDetails item;
+    private Subreddit item;
     private final Context context;
     private final LayoutInflater inflater;
 
@@ -39,7 +39,7 @@ public class SidebarAdapter extends BaseAdapter {
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void swapData(SubredditDetails item) {
+    public void swapData(Subreddit item) {
         this.item = item;
         notifyDataSetChanged();
     }
@@ -58,7 +58,7 @@ public class SidebarAdapter extends BaseAdapter {
         return item != null ? 1 : 0;
     }
 
-    public SubredditDetails getItem(int position) {
+    public Subreddit getItem(int position) {
         return item;
     }
 
@@ -69,7 +69,7 @@ public class SidebarAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = inflater.inflate(R.layout.details_row, parent, false);
 
-        SubredditDetails info = getItem(position);
+        Subreddit info = getItem(position);
 
         TextView title = (TextView) v.findViewById(R.id.title);
         title.setText(info.title);

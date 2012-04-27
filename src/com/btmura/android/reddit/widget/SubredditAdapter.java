@@ -18,15 +18,16 @@ package com.btmura.android.reddit.widget;
 
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
 import android.text.TextUtils;
-import android.text.TextUtils.TruncateAt;
 import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.Provider.Subreddits;
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.entity.Subreddit;
 
 public class SubredditAdapter extends SimpleCursorAdapter {
@@ -37,37 +38,61 @@ public class SubredditAdapter extends SimpleCursorAdapter {
     private static final String[] FROM = {};
     private static final int[] TO = {};
 
-    public static CursorLoader createLoader(Context context) {
-        return new CursorLoader(context, Subreddits.CONTENT_URI, PROJECTION, null, null,
-                Subreddits.SORT);
+    public static Loader<Cursor> createLoader(Context context, String query) {
+        if (query != null) {
+            return new SubredditSearchLoader(context, query);
+        } else {
+            return new CursorLoader(context, Subreddits.CONTENT_URI, PROJECTION, null, null,
+                    Subreddits.SORT);
+        }
     }
 
+    private String query;
     private boolean singleChoice;
     private Subreddit selected;
 
-    public SubredditAdapter(Context context, boolean singleChoice) {
-        super(context, R.layout.sr_row, null, FROM, TO, 0);
+    public SubredditAdapter(Context context, String query, boolean singleChoice) {
+        super(context, getLayout(query), null, FROM, TO, 0);
+        this.query = query;
         this.singleChoice = singleChoice;
+    }
+
+    private static int getLayout(String query) {
+        return query != null ? R.layout.sr_search_row : R.layout.sr_db_row;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        TextView tv = (TextView) view;
-        tv.setSingleLine();
-        tv.setEllipsize(TruncateAt.END);
+        ViewHolder h = (ViewHolder) view.getTag();
+        if (h == null) {
+            h = new ViewHolder();
+            h.title = (TextView) view.findViewById(R.id.title);
+            h.status = (TextView) view.findViewById(R.id.status);
+            view.setTag(h);
+        }
 
         String name = cursor.getString(1);
         if (TextUtils.isEmpty(name)) {
-            tv.setText(R.string.front_page);
+            h.title.setText(R.string.front_page);
         } else {
-            tv.setText(name);
+            h.title.setText(name);
+        }
+
+        if (query != null) {
+            String status = context.getString(R.string.sr_search_status, cursor.getInt(2));
+            h.status.setText(status);
         }
 
         if (singleChoice && selected != null && name.equalsIgnoreCase(selected.name)) {
-            tv.setBackgroundResource(R.drawable.selector_chosen);
+            view.setBackgroundResource(R.drawable.selector_chosen);
         } else {
-            tv.setBackgroundResource(R.drawable.selector_normal);
+            view.setBackgroundResource(R.drawable.selector_normal);
         }
+    }
+
+    static class ViewHolder {
+        TextView title;
+        TextView status;
     }
 
     public void setSelectedSubreddit(Subreddit sr) {

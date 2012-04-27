@@ -31,13 +31,13 @@ import android.util.Log;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
-import com.btmura.android.reddit.entity.SubredditDetails;
+import com.btmura.android.reddit.entity.Subreddit;
 
-public class SidebarLoader extends AsyncTaskLoader<SubredditDetails> {
+public class SidebarLoader extends AsyncTaskLoader<Subreddit> {
 
     private static final String TAG = "SidebarLoader";
 
-    private SubredditDetails results;
+    private Subreddit results;
 
     private String subreddit;
 
@@ -57,7 +57,7 @@ public class SidebarLoader extends AsyncTaskLoader<SubredditDetails> {
     }
 
     @Override
-    public SubredditDetails loadInBackground() {
+    public Subreddit loadInBackground() {
         try {
             URL subredditUrl = new URL(Urls.sidebarUrl(subreddit).toString());
 
@@ -90,16 +90,16 @@ public class SidebarLoader extends AsyncTaskLoader<SubredditDetails> {
 
     class DetailsParser extends JsonParser {
 
-        private SubredditDetails results;
+        private Subreddit results;
 
         @Override
         public void onEntityStart(int index) {
-            results = new SubredditDetails();
+            results = Subreddit.emptyInstance();
         }
 
         @Override
         public void onDisplayName(JsonReader reader, int index) throws IOException {
-            results.displayName = reader.nextString();
+            results.name = reader.nextString();
         }
 
         @Override

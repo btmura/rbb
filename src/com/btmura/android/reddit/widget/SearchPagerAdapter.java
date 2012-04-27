@@ -20,7 +20,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.support.v13.app.FragmentStatePagerAdapter;
 
-import com.btmura.android.reddit.fragment.SubredditDetailsListFragment;
+import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 
 public class SearchPagerAdapter extends FragmentStatePagerAdapter {
@@ -44,7 +44,7 @@ public class SearchPagerAdapter extends FragmentStatePagerAdapter {
                 return ThingListFragment.newSearchInstance(query, false);
 
             case 1:
-                return SubredditDetailsListFragment.newInstance(query, false);
+                return SubredditListFragment.newSearchInstance(query, false);
 
             default:
                 throw new IllegalArgumentException();

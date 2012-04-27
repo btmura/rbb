@@ -16,14 +16,14 @@
 
 package com.btmura.android.reddit.entity;
 
-import com.btmura.android.reddit.R;
-
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
-public class Subreddit implements Parcelable {
+import com.btmura.android.reddit.R;
+
+public class Subreddit implements Parcelable, Comparable<Subreddit> {
 
     public static final Parcelable.Creator<Subreddit> CREATOR = new Parcelable.Creator<Subreddit>() {
         public Subreddit createFromParcel(Parcel source) {
@@ -35,18 +35,26 @@ public class Subreddit implements Parcelable {
         }
     };
 
-    public final String name;
+    public String name;
+    public CharSequence title;
+    public CharSequence description;
+    public int subscribers;
 
     public static Subreddit frontPage() {
-        return new Subreddit("");
+        return newInstance("");
+    }
+
+    public static Subreddit emptyInstance() {
+        return newInstance(null);
     }
 
     public static Subreddit newInstance(String name) {
-        return new Subreddit(name);
+        Subreddit s = new Subreddit();
+        s.name = name;
+        return s;
     }
 
-    private Subreddit(String name) {
-        this.name = name;
+    private Subreddit() {
     }
 
     private Subreddit(Parcel in) {
@@ -72,6 +80,10 @@ public class Subreddit implements Parcelable {
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
+    }
+
+    public int compareTo(Subreddit another) {
+        return name.compareToIgnoreCase(another.name);
     }
 
     public static String getName(Subreddit subreddit) {
