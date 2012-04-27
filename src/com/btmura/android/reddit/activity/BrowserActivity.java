@@ -99,11 +99,11 @@ public class BrowserActivity extends AbstractBrowserActivity {
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         if (savedInstanceState == null) {
-            initFragments(filter);
+            initMultiPaneFragments(filter);
         }
     }
 
-    private void initFragments(int lastFilter) {
+    private void initMultiPaneFragments(int lastFilter) {
         Subreddit s = null;
         if (getIntent().hasExtra(EXTRA_SUBREDDIT_NAME)) {
             s = Subreddit.newInstance(getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME));

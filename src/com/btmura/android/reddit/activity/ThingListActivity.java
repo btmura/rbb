@@ -43,7 +43,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private Subreddit subreddit;
     private boolean insertHomeActivity;
     private boolean showAddButton;
-    private boolean restoringState;
+    private boolean navigationListenerDisabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +58,48 @@ public class ThingListActivity extends GlobalMenuActivity implements
         insertHomeActivity = getIntent().getBooleanExtra(EXTRA_INSERT_HOME_ACTIVITY, false);
         showAddButton = getIntent().getBooleanExtra(EXTRA_SHOW_ADD_BUTTON, false);
 
+        navigationListenerDisabled = true;
         FilterAdapter adapter = new FilterAdapter(this);
         adapter.setTitle(subreddit.getTitle(this));
         bar.setListNavigationCallbacks(adapter, this);
-
-        if (savedInstanceState != null) {
-            restoringState = true;
+        if (savedInstanceState != null) {            
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_FILTER));
         }
+        navigationListenerDisabled = false;
+        
+        if (savedInstanceState == null) {
+            updateFragments(FilterAdapter.FILTER_HOT, true);
+        }
+    }
+    
+    private void updateFragments(int filter, boolean addGlobalMenuFragment) {        
+        Fragment tlf = ThingListFragment.newInstance(subreddit, filter, showAddButton, false);
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (addGlobalMenuFragment) {
+            ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
+        }
+        ft.replace(R.id.single_container, tlf, ThingListFragment.TAG);
+        ft.commit();
+    }
+    
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        if (navigationListenerDisabled) {
+            return true;
+        }        
+        updateFragments((int) itemId, false);
+        return true;
+    }
+
+    public void onThingSelected(Thing thing, int position) {
+        Intent intent = new Intent(this, ThingActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.putExtra(ThingActivity.EXTRA_THING, thing);
+        startActivity(intent);
+    }
+    
+    public int getThingBodyWidth() {
+        return 0;
     }
 
     @Override
@@ -93,32 +127,5 @@ public class ThingListActivity extends GlobalMenuActivity implements
             intent.putExtra(BrowserActivity.EXTRA_HOME_UP_ENABLED, true);
             startActivity(intent);
         }
-    }
-
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        if (restoringState) {
-            restoringState = false;
-            return true;
-        }
-
-        GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
-        Fragment tlf = ThingListFragment.newInstance(subreddit, (int) itemId, showAddButton, false);
-
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(gmf, GlobalMenuFragment.TAG);
-        ft.replace(R.id.single_container, tlf, ThingListFragment.TAG);
-        ft.commit();
-        return false;
-    }
-
-    public void onThingSelected(Thing thing, int position) {
-        Intent intent = new Intent(this, ThingActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        intent.putExtra(ThingActivity.EXTRA_THING, thing);
-        startActivity(intent);
-    }
-
-    public int getThingBodyWidth() {
-        return 0;
     }
 }
