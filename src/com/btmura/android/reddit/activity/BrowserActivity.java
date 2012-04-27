@@ -64,6 +64,11 @@ public class BrowserActivity extends AbstractBrowserActivity {
     }
 
     @Override
+    protected boolean hasSubredditList() {
+        return true;
+    }
+
+    @Override
     protected void initSinglePaneLayout(Bundle savedInstanceState) {
         getActionBar().setDisplayHomeAsUpEnabled(homeUpEnabled);
         if (getIntent().hasExtra(EXTRA_SUBREDDIT_NAME)) {

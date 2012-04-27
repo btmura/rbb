@@ -61,7 +61,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private static final int ANIMATION_CLOSE_NAV = 1;
     private static final int ANIMATION_OPEN_SIDE_NAV = 2;
     private static final int ANIMATION_CLOSE_SIDE_NAV = 3;
-    private static final int ANIMATION_EXPAND_NAV = 4;
+    private static final int ANIMATION_EXPAND_SUBREDDIT_NAV = 4;
+    private static final int ANIMATION_EXPAND_THING_NAV = 5;
 
     private static final int NAV_LAYOUT_ORIGINAL = 0;
     private static final int NAV_LAYOUT_SIDENAV = 1;
@@ -84,7 +85,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private AnimatorSet closeNavAnimator;
     private AnimatorSet openSideNavAnimator;
     private AnimatorSet closeSideNavAnimator;
-    private AnimatorSet expandNavAnimator;
+    private AnimatorSet expandSubredditNavAnimator;
+    private AnimatorSet expandThingNavAnimator;
 
     protected AbstractBrowserActivity(int layout) {
         this.layout = layout;
@@ -107,6 +109,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract boolean isSinglePane();
 
+    protected abstract boolean hasSubredditList();
+
     protected abstract void initSinglePaneLayout(Bundle savedInstanceState);
 
     protected abstract void initMultiPaneLayout(Bundle savedInstanceState, int filter);
@@ -115,8 +119,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void initMultiPanePrereqs() {
         getFragmentManager().addOnBackStackChangedListener(this);
-
-        subredditListContainer = findViewById(R.id.subreddit_list_container);
 
         thingPager = (ViewPager) findViewById(R.id.thing_pager);
         thingPager.setOnPageChangeListener(this);
@@ -135,7 +137,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             initNavContainerAnimators();
         }
 
-        initThingBodyWidth();
+        subredditListContainer = findViewById(R.id.subreddit_list_container);
+
+        refreshSubredditListVisibility();
     }
 
     private void initNavContainerAnimators() {
@@ -148,17 +152,24 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         closeNavAnimator = createCloseNavAnimator();
         openSideNavAnimator = createSideNavAnimator(true);
         closeSideNavAnimator = createSideNavAnimator(false);
-        expandNavAnimator = createExpandNavAnimator();
+        expandSubredditNavAnimator = createExpandNavAnimator(true);
+        expandThingNavAnimator = createExpandNavAnimator(false);
     }
 
-    private void initThingBodyWidth() {
+    protected void refreshSubredditListVisibility() {
+        subredditListContainer.setVisibility(hasSubredditList() ? View.VISIBLE : View.GONE);
         Resources r = getResources();
         DisplayMetrics dm = r.getDisplayMetrics();
         int padding = r.getDimensionPixelSize(R.dimen.padding);
         if (navContainer != null) {
             thingBodyWidth = dm.widthPixels / 2 - padding * 2;
         } else {
-            int subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
+            int subredditListWidth;
+            if (subredditListContainer.getVisibility() == View.VISIBLE) {
+                subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
+            } else {
+                subredditListWidth = 0;
+            }
             thingBodyWidth = dm.widthPixels / 2 - padding * 2 - subredditListWidth;
         }
     }
@@ -299,7 +310,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                     runAnimation(ANIMATION_CLOSE_NAV, null);
                 }
             } else if (isSideNavShowing()) {
-                runAnimation(ANIMATION_EXPAND_NAV, null);
+                if (hasSubredditList()) {
+                    runAnimation(ANIMATION_EXPAND_SUBREDDIT_NAV, null);
+                } else {
+                    runAnimation(ANIMATION_EXPAND_THING_NAV, null);
+                }
             }
         } else {
             thingPager.setVisibility(thing != null ? View.VISIBLE : View.GONE);
@@ -406,8 +421,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 return openSideNavAnimator;
             case ANIMATION_CLOSE_SIDE_NAV:
                 return closeSideNavAnimator;
-            case ANIMATION_EXPAND_NAV:
-                return expandNavAnimator;
+            case ANIMATION_EXPAND_SUBREDDIT_NAV:
+                return expandSubredditNavAnimator;
+            case ANIMATION_EXPAND_THING_NAV:
+                return expandThingNavAnimator;
             default:
                 throw new IllegalArgumentException();
         }
@@ -495,7 +512,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         return as;
     }
 
-    private AnimatorSet createExpandNavAnimator() {
+    private AnimatorSet createExpandNavAnimator(boolean showSubreddits) {
         ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0,
                 subredditListWidth);
         ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", sideNavWidth,
@@ -504,7 +521,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         tpTransX.setDuration(duration);
 
         AnimatorSet as = new AnimatorSet();
-        as.play(ncTransX).with(tpTransX);
+        if (showSubreddits) {
+            as.play(ncTransX).with(tpTransX);
+        } else {
+            as.play(tpTransX);
+        }
+
         as.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -529,7 +551,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         int clickAbsorberVisibility;
         switch (layout) {
             case NAV_LAYOUT_ORIGINAL:
-                subredditListVisibility = View.VISIBLE;
+                subredditListVisibility = hasSubredditList() ? View.VISIBLE : View.GONE;
                 clickAbsorberVisibility = View.GONE;
                 break;
 

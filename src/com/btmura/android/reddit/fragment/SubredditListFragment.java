@@ -110,6 +110,7 @@ public class SubredditListFragment extends ListFragment implements
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         adapter.swapCursor(data);
+        setEmptyText(getString(data != null ? R.string.empty : R.string.error));
         setListShown(true);
         if (data.getCount() > 0) {
             getListView().post(new Runnable() {

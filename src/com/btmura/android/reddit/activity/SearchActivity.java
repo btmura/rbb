@@ -104,6 +104,11 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     @Override
+    protected boolean hasSubredditList() {
+        return bar.getSelectedNavigationIndex() == TAB_SUBREDDITS;
+    }
+
+    @Override
     protected void initSinglePaneLayout(Bundle savedInstanceState) {
         pager.setOnPageChangeListener(this);
         pager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
@@ -159,6 +164,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     private void updateFragments() {
+        refreshSubredditListVisibility();
         switch (bar.getSelectedNavigationIndex()) {
             case TAB_POSTS:
                 updatePostResultsFragments();
