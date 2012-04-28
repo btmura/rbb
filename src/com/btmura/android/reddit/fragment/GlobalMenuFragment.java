@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.fragment;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -78,9 +79,23 @@ public class GlobalMenuFragment extends Fragment implements
                 handleSearch();
                 return true;
 
+            case R.id.menu_add_subreddit:
+                handleAddSubreddits();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void handleSearch() {
+        searchItem.expandActionView();
+    }
+
+    private void handleAddSubreddits() {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.add(AddSubredditFragment.newInstance(""), AddSubredditFragment.TAG);
+        ft.commit();
     }
 
     public void onFocusChange(View v, boolean hasFocus) {
@@ -100,9 +115,5 @@ public class GlobalMenuFragment extends Fragment implements
 
     public boolean onQueryTextChange(String newText) {
         return false;
-    }
-
-    public void handleSearch() {
-        searchItem.expandActionView();
     }
 }

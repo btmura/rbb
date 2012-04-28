@@ -17,12 +17,14 @@
 
     <string name="app_name">reddit by brian</string>
     
+    <string name="add_subreddit">Add Subreddit</string>
+    
     <string name="comment_header_status">%1$s&#160; %2$s ago&#160; %3$d points&#160; %4$d comments</string>
     <string name="comment_comment_status">%1$s&#160; %2$s ago&#160; %3$d points</string>
     
     <string name="empty">Nothing to see here…</string>    
     <string name="error">Something went wrong…</string>
-    
+
     <string name="filter_hot">what\'s hot</string>
     <string name="filter_new">new</string>
     <string name="filter_controversial">controversial</string>
@@ -34,6 +36,7 @@
     <string name="menu_add">Add</string>
     <string name="menu_add_combined">Add combined</string>
     <string name="menu_add_front_page">Add front page</string>
+    <string name="menu_add_subreddit">Add subreddit</string>
     <string name="menu_combine">Combine</string>
     <string name="menu_comments">View comments</string>
     <string name="menu_copy_url">Copy URL</string>

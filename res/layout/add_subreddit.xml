@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:columnCount="2"
+    android:padding="@dimen/padding" >
+
+    <RadioButton
+        android:id="@+id/custom_button"
+        android:checked="true" />
+
+    <EditText
+        android:id="@+id/custom_text"
+        android:layout_gravity="fill_horizontal"
+        android:inputType="text"
+        android:singleLine="true" />
+
+    <RadioButton android:id="@+id/front_page_button" />
+
+    <TextView
+        android:id="@+id/front_page_text"
+        android:layout_gravity="fill_horizontal"
+        android:text="@string/front_page" />
+
+</GridLayout>

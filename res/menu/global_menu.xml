@@ -22,5 +22,8 @@
         android:icon="@drawable/ic_action_search"
         android:showAsAction="never|collapseActionView"
         android:title="@string/menu_search"/>
+    <item
+        android:id="@+id/menu_add_subreddit"
+        android:title="@string/menu_add_subreddit"/>
 
 </menu>
