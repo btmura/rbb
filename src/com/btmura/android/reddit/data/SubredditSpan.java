@@ -36,8 +36,8 @@ public class SubredditSpan extends ClickableSpan {
         Context c = widget.getContext();
         Intent i = new Intent(c, BrowserActivity.class);
         i.putExtra(BrowserActivity.EXTRA_SUBREDDIT_NAME, subreddit);
-        i.putExtra(BrowserActivity.EXTRA_HOME_UP_ENABLED, true);
-        i.putExtra(BrowserActivity.EXTRA_SHOW_ADD_BUTTON, true);
+        i.putExtra(BrowserActivity.EXTRA_FLAGS, BrowserActivity.FLAG_HOME_UP_ENABLED
+                | BrowserActivity.FLAG_SHOW_ADD_BUTTON);
         c.startActivity(i);
     }
 }

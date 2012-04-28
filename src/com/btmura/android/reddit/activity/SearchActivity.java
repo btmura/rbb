@@ -68,6 +68,9 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void initPrereqs(Bundle savedInstanceState) {
+        setThingListActivityFlags(ThingListActivity.FLAG_SHOW_ADD_ACTION);
+        setThingListFragmentFlags(ThingListFragment.FLAG_SHOW_ADD_ACTION);
+
         if (savedInstanceState == null) {
             query = getIntentQuery();
         } else {
@@ -121,6 +124,82 @@ public class SearchActivity extends AbstractBrowserActivity implements
         }
     }
 
+    private void submitQuery() {
+        if (query != null && !query.isEmpty()) {
+            bar.setTitle(query);
+            if (searchItem != null) {
+                searchItem.collapseActionView();
+            }
+            if (pager != null) {
+                pager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
+                pager.setCurrentItem(bar.getSelectedNavigationIndex());
+            } else {
+                updateFragments();
+            }
+        }
+    }
+
+    private void updateFragments() {
+        refreshSubredditListVisibility();
+        switch (bar.getSelectedNavigationIndex()) {
+            case TAB_POSTS:
+                updatePostResultsFragments();
+                break;
+
+            case TAB_SUBREDDITS:
+                updateSubredditResultsFragments();
+                break;
+        }
+    }
+
+    private void updatePostResultsFragments() {
+        FragmentManager fm = getFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.removeOnBackStackChangedListener(this);
+            fm.popBackStackImmediate();
+            fm.addOnBackStackChangedListener(this);
+        }
+
+        refreshContainers(null);
+
+        Fragment cf = ControlFragment.newInstance(null, null, -1, 0);
+        Fragment slf = getFragmentManager().findFragmentByTag(SubredditListFragment.TAG);
+        Fragment tlf = ThingListFragment.newSearchInstance(query,
+                ThingListFragment.FLAG_SINGLE_CHOICE);
+
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.add(cf, ControlFragment.TAG);
+        if (slf != null) {
+            ft.remove(slf);
+        }
+        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+        ft.commit();
+    }
+
+    private void updateSubredditResultsFragments() {
+        FragmentManager fm = getFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.removeOnBackStackChangedListener(this);
+            fm.popBackStackImmediate();
+            fm.addOnBackStackChangedListener(this);
+        }
+
+        refreshContainers(null);
+
+        Fragment cf = ControlFragment.newInstance(null, null, -1, 0);
+        Fragment slf = SubredditListFragment.newSearchInstance(query,
+                SubredditListFragment.FLAG_SINGLE_CHOICE);
+        Fragment tlf = getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
+
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.add(cf, ControlFragment.TAG);
+        ft.replace(R.id.subreddit_list_container, slf, SubredditListFragment.TAG);
+        if (tlf != null) {
+            ft.remove(tlf);
+        }
+        ft.commit();
+    }
+
     public void onTabSelected(Tab tab, FragmentTransaction ft) {
         if (tabListenerDisabled) {
             return;
@@ -146,80 +225,6 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     public boolean onQueryTextChange(String newText) {
         return false;
-    }
-
-    private void submitQuery() {
-        if (query != null && !query.isEmpty()) {
-            bar.setTitle(query);
-            if (searchItem != null) {
-                searchItem.collapseActionView();
-            }
-            if (pager != null) {
-                pager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
-                pager.setCurrentItem(bar.getSelectedNavigationIndex());
-            } else {
-                updateFragments();
-            }
-        }
-    }
-
-    private void updateFragments() {
-        refreshSubredditListVisibility();
-        switch (bar.getSelectedNavigationIndex()) {
-            case TAB_POSTS:
-                updatePostResultsFragments();
-                break;
-
-            case TAB_SUBREDDITS:
-                updateSubredditResultsFragemnts();
-                break;
-        }
-    }
-
-    private void updatePostResultsFragments() {
-        FragmentManager fm = getFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-            fm.removeOnBackStackChangedListener(this);
-            fm.popBackStackImmediate();
-            fm.addOnBackStackChangedListener(this);
-        }
-
-        refreshContainers(null);
-
-        Fragment cf = ControlFragment.newInstance(null, null, -1, 0);
-        Fragment slf = getFragmentManager().findFragmentByTag(SubredditListFragment.TAG);
-        Fragment tlf = ThingListFragment.newSearchInstance(query, true);
-
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.add(cf, ControlFragment.TAG);
-        if (slf != null) {
-            ft.remove(slf);
-        }
-        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
-        ft.commit();
-    }
-
-    private void updateSubredditResultsFragemnts() {
-        FragmentManager fm = getFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-            fm.removeOnBackStackChangedListener(this);
-            fm.popBackStackImmediate();
-            fm.addOnBackStackChangedListener(this);
-        }
-
-        refreshContainers(null);
-
-        Fragment cf = ControlFragment.newInstance(null, null, -1, 0);
-        Fragment slf = SubredditListFragment.newSearchInstance(query, true);
-        Fragment tlf = getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
-
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.add(cf, ControlFragment.TAG);
-        ft.replace(R.id.subreddit_list_container, slf, SubredditListFragment.TAG);
-        if (tlf != null) {
-            ft.remove(tlf);
-        }
-        ft.commit();
     }
 
     @Override

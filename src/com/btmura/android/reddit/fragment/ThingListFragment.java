@@ -39,6 +39,7 @@ import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.content.ThingLoader;
+import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
@@ -50,11 +51,13 @@ public class ThingListFragment extends ListFragment implements
 
     public static final String TAG = "ThingListFragment";
 
+    public static final int FLAG_SHOW_ADD_ACTION = 0x1;
+    public static final int FLAG_SINGLE_CHOICE = 0x2;
+
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
     private static final String ARG_SEARCH_QUERY = "q";
-    private static final String ARG_SHOW_ADD_ACTION = "a";
-    private static final String ARG_SINGLE_CHOICE = "c";
+    private static final String ARG_FLAGS = "fl";
 
     private static final String STATE_THING_NAME = "n";
     private static final String STATE_THING_POSITION = "p";
@@ -73,23 +76,21 @@ public class ThingListFragment extends ListFragment implements
     private ThingAdapter adapter;
     private boolean scrollLoading;
 
-    public static ThingListFragment newInstance(Subreddit sr, int filter, boolean showAddButton,
-            boolean singleChoice) {
+    public static ThingListFragment newInstance(Subreddit sr, int filter, int flags) {
         ThingListFragment f = new ThingListFragment();
         Bundle args = new Bundle(4);
         args.putParcelable(ARG_SUBREDDIT, sr);
         args.putInt(ARG_FILTER, filter);
-        args.putBoolean(ARG_SHOW_ADD_ACTION, showAddButton);
-        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        args.putInt(ARG_FLAGS, flags);
         f.setArguments(args);
         return f;
     }
 
-    public static ThingListFragment newSearchInstance(String query, boolean singleChoice) {
+    public static ThingListFragment newSearchInstance(String query, int flags) {
         ThingListFragment f = new ThingListFragment();
         Bundle args = new Bundle(2);
         args.putString(ARG_SEARCH_QUERY, query);
-        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        args.putInt(ARG_FLAGS, flags);
         f.setArguments(args);
         return f;
     }
@@ -247,6 +248,10 @@ public class ThingListFragment extends ListFragment implements
         startActivity(intent);
     }
 
+    private int getThingBodyWidth() {
+        return getListener().getThingBodyWidth();
+    }
+
     private OnThingSelectedListener getListener() {
         return (OnThingSelectedListener) getActivity();
     }
@@ -263,15 +268,15 @@ public class ThingListFragment extends ListFragment implements
         return getArguments().getString(ARG_SEARCH_QUERY);
     }
 
+    private int getFlags() {
+        return getArguments().getInt(ARG_FLAGS);
+    }
+
     private boolean showAddAction() {
-        return getArguments().getBoolean(ARG_SHOW_ADD_ACTION);
+        return Flag.isEnabled(getFlags(), FLAG_SHOW_ADD_ACTION);
     }
 
     private boolean isSingleChoice() {
-        return getArguments().getBoolean(ARG_SINGLE_CHOICE);
-    }
-
-    private int getThingBodyWidth() {
-        return getListener().getThingBodyWidth();
+        return Flag.isEnabled(getFlags(), FLAG_SINGLE_CHOICE);
     }
 }

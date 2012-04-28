@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.ControlFragment;
@@ -35,9 +36,11 @@ public class BrowserActivity extends AbstractBrowserActivity {
 
     public static final String TAG = "BrowserActivity";
 
-    public static final String EXTRA_SUBREDDIT_NAME = "s";
-    public static final String EXTRA_HOME_UP_ENABLED = "h";
-    public static final String EXTRA_SHOW_ADD_BUTTON = "a";
+    public static final String EXTRA_SUBREDDIT_NAME = "es";
+    public static final String EXTRA_FLAGS = "ef";
+
+    public static final int FLAG_HOME_UP_ENABLED = 0x1;
+    public static final int FLAG_SHOW_ADD_BUTTON = 0x2;
 
     private ActionBar bar;
     private FilterAdapter filterAdapter;
@@ -45,7 +48,6 @@ public class BrowserActivity extends AbstractBrowserActivity {
     private View singleContainer;
 
     private boolean homeUpEnabled;
-    private boolean showAddButton;
 
     public BrowserActivity() {
         super(R.layout.browser);
@@ -53,8 +55,15 @@ public class BrowserActivity extends AbstractBrowserActivity {
 
     @Override
     protected void initPrereqs(Bundle savedInstanceState) {
-        homeUpEnabled = getIntent().getBooleanExtra(EXTRA_HOME_UP_ENABLED, false);
-        showAddButton = getIntent().getBooleanExtra(EXTRA_SHOW_ADD_BUTTON, false);
+        int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
+        homeUpEnabled = Flag.isEnabled(flags, FLAG_HOME_UP_ENABLED);
+
+        int tlfFlags = ThingListFragment.FLAG_SINGLE_CHOICE;
+        if (Flag.isEnabled(flags, FLAG_SHOW_ADD_BUTTON)) {
+            tlfFlags |= ThingListFragment.FLAG_SHOW_ADD_ACTION;
+        }
+        setThingListFragmentFlags(tlfFlags);
+
         singleContainer = findViewById(R.id.single_container);
     }
 
@@ -76,11 +85,10 @@ public class BrowserActivity extends AbstractBrowserActivity {
             Subreddit s = Subreddit.newInstance(getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME));
             Intent intent = new Intent(this, ThingListActivity.class);
             intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, s);
-            intent.putExtra(ThingListActivity.EXTRA_INSERT_HOME_ACTIVITY, true);
-            intent.putExtra(ThingListActivity.EXTRA_SHOW_ADD_BUTTON, showAddButton);
+            intent.putExtra(ThingListActivity.EXTRA_FLAGS, ThingListActivity.FLAG_INSERT_HOME);
             startActivity(intent);
         } else if (savedInstanceState == null) {
-            SubredditListFragment slf = SubredditListFragment.newInstance(null, false);
+            SubredditListFragment slf = SubredditListFragment.newInstance(null, 0);
             GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(gmf, GlobalMenuFragment.TAG);
@@ -111,7 +119,8 @@ public class BrowserActivity extends AbstractBrowserActivity {
 
         ControlFragment cf = ControlFragment.newInstance(s, null, -1, lastFilter);
         GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
-        SubredditListFragment slf = SubredditListFragment.newInstance(s, true);
+        SubredditListFragment slf = SubredditListFragment.newInstance(s,
+                SubredditListFragment.FLAG_SINGLE_CHOICE);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(gmf, GlobalMenuFragment.TAG);
@@ -120,7 +129,8 @@ public class BrowserActivity extends AbstractBrowserActivity {
 
         if (s != null) {
             refreshActionBar(s, null, lastFilter);
-            Fragment tlf = ThingListFragment.newInstance(s, lastFilter, showAddButton, true);
+            Fragment tlf = ThingListFragment
+                    .newInstance(s, lastFilter, getThingListFragmentFlags());
             ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
         }
 

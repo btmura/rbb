@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
@@ -33,16 +34,18 @@ public class ThingListActivity extends GlobalMenuActivity implements
         ActionBar.OnNavigationListener,
         ThingListFragment.OnThingSelectedListener {
 
-    public static final String EXTRA_SUBREDDIT = "s";
-    public static final String EXTRA_INSERT_HOME_ACTIVITY = "i";
-    public static final String EXTRA_SHOW_ADD_BUTTON = "a";
+    public static final String EXTRA_SUBREDDIT = "es";
+    public static final String EXTRA_FLAGS = "ef";
+
+    public static final int FLAG_INSERT_HOME = 0x1;
+    public static final int FLAG_SHOW_ADD_ACTION = 0x2;
 
     private static final String STATE_FILTER = "f";
 
     private ActionBar bar;
     private Subreddit subreddit;
-    private boolean insertHomeActivity;
-    private boolean showAddButton;
+    private boolean insertHome;
+    private int tlfFlags;
     private boolean navigationListenerDisabled;
 
     @Override
@@ -55,8 +58,12 @@ public class ThingListActivity extends GlobalMenuActivity implements
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
-        insertHomeActivity = getIntent().getBooleanExtra(EXTRA_INSERT_HOME_ACTIVITY, false);
-        showAddButton = getIntent().getBooleanExtra(EXTRA_SHOW_ADD_BUTTON, false);
+
+        int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
+        insertHome = Flag.isEnabled(flags, FLAG_INSERT_HOME);
+        if (Flag.isEnabled(flags, FLAG_SHOW_ADD_ACTION)) {
+            tlfFlags |= ThingListFragment.FLAG_SHOW_ADD_ACTION;
+        }
 
         navigationListenerDisabled = true;
         FilterAdapter adapter = new FilterAdapter(this);
@@ -73,7 +80,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     private void updateFragments(int filter, boolean addGlobalMenuFragment) {
-        Fragment tlf = ThingListFragment.newInstance(subreddit, filter, showAddButton, false);
+        Fragment tlf = ThingListFragment.newInstance(subreddit, filter, tlfFlags);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (addGlobalMenuFragment) {
@@ -122,9 +129,9 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     private void handleHome() {
         finish();
-        if (insertHomeActivity) {
+        if (insertHome) {
             Intent intent = new Intent(this, BrowserActivity.class);
-            intent.putExtra(BrowserActivity.EXTRA_HOME_UP_ENABLED, true);
+            intent.putExtra(BrowserActivity.EXTRA_FLAGS, BrowserActivity.FLAG_HOME_UP_ENABLED);
             startActivity(intent);
         }
     }

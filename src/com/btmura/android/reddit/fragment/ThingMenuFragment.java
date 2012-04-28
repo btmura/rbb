@@ -41,7 +41,7 @@ public class ThingMenuFragment extends Fragment {
 
     public static final String TAG = "ThingMenuFragment";
 
-    private static final String ARGS_THING = "thing";
+    private static final String ARGS_THING = "at";
 
     public interface ThingPagerHolder {
         ViewPager getPager();

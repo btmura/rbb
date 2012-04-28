@@ -39,6 +39,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
@@ -48,28 +49,29 @@ public class SubredditListFragment extends ListFragment implements
 
     public static final String TAG = "SubredditListFragment";
 
+    public static final int FLAG_SINGLE_CHOICE = 0x1;
+
     private static final String ARG_SELECTED_SUBREDDIT = "s";
     private static final String ARG_QUERY = "q";
-    private static final String ARG_SINGLE_CHOICE = "c";
+    private static final String ARG_FLAGS = "f";
 
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
 
-    public static SubredditListFragment newInstance(Subreddit selectedSubreddit,
-            boolean singleChoice) {
+    public static SubredditListFragment newInstance(Subreddit selectedSubreddit, int flags) {
         SubredditListFragment f = new SubredditListFragment();
         Bundle args = new Bundle(2);
         args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
-        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        args.putInt(ARG_FLAGS, flags);
         f.setArguments(args);
         return f;
     }
 
-    public static SubredditListFragment newSearchInstance(String query, boolean singleChoice) {
+    public static SubredditListFragment newSearchInstance(String query, int flags) {
         SubredditListFragment f = new SubredditListFragment();
         Bundle args = new Bundle(2);
         args.putString(ARG_QUERY, query);
-        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        args.putInt(ARG_FLAGS, flags);
         f.setArguments(args);
         return f;
     }
@@ -290,7 +292,11 @@ public class SubredditListFragment extends ListFragment implements
         return getQuery() != null;
     }
 
+    private int getFlags() {
+        return getArguments().getInt(ARG_FLAGS);
+    }
+
     private boolean isSingleChoice() {
-        return getArguments().getBoolean(ARG_SINGLE_CHOICE);
+        return Flag.isEnabled(getFlags(), FLAG_SINGLE_CHOICE);
     }
 }

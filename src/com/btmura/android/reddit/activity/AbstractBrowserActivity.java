@@ -68,6 +68,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private static final int NAV_LAYOUT_SIDENAV = 1;
 
     private final int layout;
+    private int tlActivityFlags;
+    private int tlFragmentFlags;
 
     private View navContainer;
     private View subredditListContainer;
@@ -90,6 +92,18 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected AbstractBrowserActivity(int layout) {
         this.layout = layout;
+    }
+
+    protected void setThingListActivityFlags(int flags) {
+        this.tlActivityFlags = flags;
+    }
+
+    protected void setThingListFragmentFlags(int flags) {
+        this.tlFragmentFlags = flags;
+    }
+
+    protected int getThingListFragmentFlags() {
+        return tlFragmentFlags;
     }
 
     @Override
@@ -195,10 +209,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     public void onSubredditSelected(Subreddit subreddit) {
         if (isSinglePane()) {
-            Intent intent = new Intent(this, ThingListActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
-            startActivity(intent);
+            startThingListActivity(subreddit);
         } else {
             selectSubreddit(subreddit, lastFilter);
         }
@@ -206,6 +217,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private boolean hasFragment(String tag) {
         return getFragmentManager().findFragmentByTag(tag) != null;
+    }
+
+    protected void startThingListActivity(Subreddit subreddit) {
+        Intent intent = new Intent(this, ThingListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
+        intent.putExtra(ThingListActivity.EXTRA_FLAGS, tlActivityFlags);
+        startActivity(intent);
     }
 
     public void onThingSelected(final Thing thing, final int position) {
@@ -337,7 +356,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshContainers(null);
 
         ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, filter);
-        Fragment tlf = ThingListFragment.newInstance(subreddit, filter, false, true);
+        Fragment tlf = ThingListFragment.newInstance(subreddit, filter, tlFragmentFlags
+                | ThingListFragment.FLAG_SINGLE_CHOICE);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);

@@ -41,10 +41,10 @@ public class SearchPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return ThingListFragment.newSearchInstance(query, false);
+                return ThingListFragment.newSearchInstance(query, 0);
 
             case 1:
-                return SubredditListFragment.newSearchInstance(query, false);
+                return SubredditListFragment.newSearchInstance(query, 0);
 
             default:
                 throw new IllegalArgumentException();
