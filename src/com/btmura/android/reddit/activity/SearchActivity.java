@@ -118,7 +118,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected void initMultiPaneLayout(Bundle savedInstanceState, int filter) {
+    protected void initMultiPaneLayout(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             submitQuery();
         }

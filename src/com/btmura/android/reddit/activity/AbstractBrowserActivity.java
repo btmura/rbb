@@ -21,7 +21,6 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -46,7 +45,6 @@ import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
-        ActionBar.OnNavigationListener,
         OnSubredditSelectedListener,
         ThingListFragment.OnThingSelectedListener,
         ViewPager.OnPageChangeListener,
@@ -54,8 +52,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ThingMenuFragment.ThingPagerHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
-
-    private static final String STATE_LAST_SELECTED_FILTER = "lastFilter";
 
     private static final int ANIMATION_OPEN_NAV = 0;
     private static final int ANIMATION_CLOSE_NAV = 1;
@@ -76,7 +72,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private View thingClickAbsorber;
     private ViewPager thingPager;
 
-    private int lastFilter;
     private int duration;
     private int fullNavWidth;
     private int sideNavWidth;
@@ -115,7 +110,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             initSinglePaneLayout(savedInstanceState);
         } else {
             initMultiPanePrereqs();
-            initMultiPaneLayout(savedInstanceState, lastFilter);
+            initMultiPaneLayout(savedInstanceState);
         }
     }
 
@@ -127,7 +122,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract void initSinglePaneLayout(Bundle savedInstanceState);
 
-    protected abstract void initMultiPaneLayout(Bundle savedInstanceState, int filter);
+    protected abstract void initMultiPaneLayout(Bundle savedInstanceState);
 
     protected abstract void refreshActionBar(Subreddit subreddit, Thing thing, int filter);
 
@@ -188,22 +183,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        int newFilter = (int) itemId;
-        if (lastFilter != newFilter) {
-            lastFilter = newFilter;
-            selectSubreddit(getSubreddit(), lastFilter);
-        }
-        return true;
-    }
-
     public void onSubredditLoaded(Subreddit subreddit) {
         if (!isSinglePane() && !hasFragment(ThingListFragment.TAG)) {
             SubredditListFragment slf = getSubredditListFragment();
             if (slf != null) {
                 slf.setSelectedSubreddit(subreddit);
             }
-            selectSubreddit(subreddit, lastFilter);
+            selectSubreddit(subreddit, FilterAdapter.FILTER_HOT);
         }
     }
 
@@ -211,7 +197,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (isSinglePane()) {
             startThingListActivity(subreddit);
         } else {
-            selectSubreddit(subreddit, lastFilter);
+            selectSubreddit(subreddit, FilterAdapter.FILTER_HOT);
+        }
+    }
+
+    public void setFilter(int filter) {
+        if (filter != getFilter()) {
+            selectSubreddit(getSubreddit(), filter);
         }
     }
 
@@ -225,6 +217,23 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
         intent.putExtra(ThingListActivity.EXTRA_FLAGS, tlActivityFlags);
         startActivity(intent);
+    }
+
+    private void selectSubreddit(Subreddit subreddit, int filter) {
+        safePopBackStackImmediate();
+
+        refreshActionBar(subreddit, null, filter);
+        refreshContainers(null);
+
+        ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, filter);
+        Fragment tlf = ThingListFragment.newInstance(subreddit, filter, tlFragmentFlags
+                | ThingListFragment.FLAG_SINGLE_CHOICE);
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.add(cf, ControlFragment.TAG);
+        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.commit();
     }
 
     public void onThingSelected(final Thing thing, final int position) {
@@ -283,12 +292,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(STATE_LAST_SELECTED_FILTER, lastFilter);
-    }
-
-    @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (isSinglePane()) {
@@ -296,7 +299,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
 
         if (savedInstanceState != null) {
-            lastFilter = savedInstanceState.getInt(STATE_LAST_SELECTED_FILTER);
             updateThingPager(getThing());
             refreshAll();
         }
@@ -347,23 +349,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 });
             }
         }
-    }
-
-    private void selectSubreddit(Subreddit subreddit, int filter) {
-        safePopBackStackImmediate();
-
-        refreshActionBar(subreddit, null, filter);
-        refreshContainers(null);
-
-        ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, filter);
-        Fragment tlf = ThingListFragment.newInstance(subreddit, filter, tlFragmentFlags
-                | ThingListFragment.FLAG_SINGLE_CHOICE);
-
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(cf, ControlFragment.TAG);
-        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.commit();
     }
 
     private void updateThingPager(Thing thing) {
@@ -597,6 +582,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
+    public ViewPager getPager() {
+        return thingPager;
+    }
+
+    public int getThingBodyWidth() {
+        return thingBodyWidth;
+    }
+
     private Subreddit getSubreddit() {
         return getControlFragment().getSubreddit();
     }
@@ -620,13 +613,5 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private ThingListFragment getThingListFragment() {
         return (ThingListFragment) getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
-    }
-
-    public ViewPager getPager() {
-        return thingPager;
-    }
-
-    public int getThingBodyWidth() {
-        return thingBodyWidth;
     }
 }

@@ -32,7 +32,8 @@ import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 
-public class BrowserActivity extends AbstractBrowserActivity {
+public class BrowserActivity extends AbstractBrowserActivity implements
+        ActionBar.OnNavigationListener {
 
     public static final String TAG = "BrowserActivity";
 
@@ -42,12 +43,15 @@ public class BrowserActivity extends AbstractBrowserActivity {
     public static final int FLAG_HOME_UP_ENABLED = 0x1;
     public static final int FLAG_SHOW_ADD_BUTTON = 0x2;
 
+    private static final String STATE_NAVIGATION_INDEX = "i";
+
     private ActionBar bar;
     private FilterAdapter filterAdapter;
 
     private View singleContainer;
 
     private boolean homeUpEnabled;
+    private boolean navigationListenerDisabled;
 
     public BrowserActivity() {
         super(R.layout.browser);
@@ -98,26 +102,33 @@ public class BrowserActivity extends AbstractBrowserActivity {
     }
 
     @Override
-    protected void initMultiPaneLayout(Bundle savedInstanceState, int filter) {
+    protected void initMultiPaneLayout(Bundle savedInstanceState) {
         filterAdapter = new FilterAdapter(this);
 
+        navigationListenerDisabled = true;
         bar = getActionBar();
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME);
         bar.setListNavigationCallbacks(filterAdapter, this);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        if (savedInstanceState != null) {
+            bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_NAVIGATION_INDEX));
+        }
+        navigationListenerDisabled = false;
 
         if (savedInstanceState == null) {
-            initMultiPaneFragments(filter);
+            initMultiPaneFragments();
         }
     }
 
-    private void initMultiPaneFragments(int lastFilter) {
+    private void initMultiPaneFragments() {
         Subreddit s = null;
         if (getIntent().hasExtra(EXTRA_SUBREDDIT_NAME)) {
             s = Subreddit.newInstance(getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME));
         }
 
-        ControlFragment cf = ControlFragment.newInstance(s, null, -1, lastFilter);
+        int filter = FilterAdapter.FILTER_HOT;
+
+        ControlFragment cf = ControlFragment.newInstance(s, null, -1, filter);
         GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
         SubredditListFragment slf = SubredditListFragment.newInstance(s,
                 SubredditListFragment.FLAG_SINGLE_CHOICE);
@@ -128,13 +139,20 @@ public class BrowserActivity extends AbstractBrowserActivity {
         ft.replace(R.id.subreddit_list_container, slf, SubredditListFragment.TAG);
 
         if (s != null) {
-            refreshActionBar(s, null, lastFilter);
-            Fragment tlf = ThingListFragment
-                    .newInstance(s, lastFilter, getThingListFragmentFlags());
+            refreshActionBar(s, null, filter);
+            Fragment tlf = ThingListFragment.newInstance(s, filter, getThingListFragmentFlags());
             ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
         }
 
         ft.commit();
+    }
+
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        if (navigationListenerDisabled) {
+            return true;
+        }
+        setFilter((int) itemId);
+        return true;
     }
 
     @Override
@@ -147,7 +165,19 @@ public class BrowserActivity extends AbstractBrowserActivity {
             filterAdapter.setTitle(getString(R.string.app_name));
         }
 
+        navigationListenerDisabled = true;
+        bar.setSelectedNavigationItem(filter);
+        navigationListenerDisabled = false;
+
         bar.setDisplayHomeAsUpEnabled(homeUpEnabled
                 || getFragmentManager().getBackStackEntryCount() > 0);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (!isSinglePane()) {
+            outState.putInt(STATE_NAVIGATION_INDEX, bar.getSelectedNavigationIndex());
+        }
     }
 }
