@@ -16,9 +16,7 @@
 <resources>
 
     <string name="app_name">reddit by brian</string>
-    
-    <string name="add_subreddit">Add Subreddit</string>
-    
+
     <string name="comment_header_status">%1$s&#160; %2$s ago&#160; %3$d points&#160; %4$d comments</string>
     <string name="comment_comment_status">%1$s&#160; %2$s ago&#160; %3$d points</string>
     

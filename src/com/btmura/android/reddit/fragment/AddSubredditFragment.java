@@ -92,7 +92,7 @@ public class AddSubredditFragment extends DialogFragment {
             }
         });
 
-        return new AlertDialog.Builder(getActivity()).setTitle(R.string.add_subreddit).setView(v)
+        return new AlertDialog.Builder(getActivity()).setTitle(R.string.menu_add_subreddit).setView(v)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         ContentValues values = new ContentValues();

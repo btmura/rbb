@@ -15,11 +15,15 @@
         android:inputType="text"
         android:singleLine="true" />
 
-    <RadioButton android:id="@+id/front_page_button" />
+    <RadioButton
+        android:id="@+id/front_page_button"
+        android:layout_gravity="center_vertical" />
 
     <TextView
         android:id="@+id/front_page_text"
-        android:layout_gravity="fill_horizontal"
+        style="@android:style/TextAppearance.Holo.Medium"
+        android:gravity="center_vertical"
+        android:layout_gravity="fill"
         android:text="@string/front_page" />
 
 </GridLayout>
