@@ -62,17 +62,17 @@ public class ThingListActivity extends GlobalMenuActivity implements
         FilterAdapter adapter = new FilterAdapter(this);
         adapter.setTitle(subreddit.getTitle(this));
         bar.setListNavigationCallbacks(adapter, this);
-        if (savedInstanceState != null) {            
+        if (savedInstanceState != null) {
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_FILTER));
         }
         navigationListenerDisabled = false;
-        
+
         if (savedInstanceState == null) {
             updateFragments(FilterAdapter.FILTER_HOT, true);
         }
     }
-    
-    private void updateFragments(int filter, boolean addGlobalMenuFragment) {        
+
+    private void updateFragments(int filter, boolean addGlobalMenuFragment) {
         Fragment tlf = ThingListFragment.newInstance(subreddit, filter, showAddButton, false);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -82,11 +82,11 @@ public class ThingListActivity extends GlobalMenuActivity implements
         ft.replace(R.id.single_container, tlf, ThingListFragment.TAG);
         ft.commit();
     }
-    
+
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         if (navigationListenerDisabled) {
             return true;
-        }        
+        }
         updateFragments((int) itemId, false);
         return true;
     }
@@ -97,7 +97,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         intent.putExtra(ThingActivity.EXTRA_THING, thing);
         startActivity(intent);
     }
-    
+
     public int getThingBodyWidth() {
         return 0;
     }

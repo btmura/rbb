@@ -53,7 +53,7 @@ public class ThingListFragment extends ListFragment implements
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
     private static final String ARG_SEARCH_QUERY = "q";
-    private static final String ARG_SHOW_ADD = "a";
+    private static final String ARG_SHOW_ADD_ACTION = "a";
     private static final String ARG_SINGLE_CHOICE = "c";
 
     private static final String STATE_THING_NAME = "n";
@@ -73,13 +73,13 @@ public class ThingListFragment extends ListFragment implements
     private ThingAdapter adapter;
     private boolean scrollLoading;
 
-    public static ThingListFragment newInstance(Subreddit sr, int filter, boolean showAdd,
+    public static ThingListFragment newInstance(Subreddit sr, int filter, boolean showAddButton,
             boolean singleChoice) {
         ThingListFragment f = new ThingListFragment();
         Bundle args = new Bundle(4);
         args.putParcelable(ARG_SUBREDDIT, sr);
         args.putInt(ARG_FILTER, filter);
-        args.putBoolean(ARG_SHOW_ADD, showAdd);
+        args.putBoolean(ARG_SHOW_ADD_ACTION, showAddButton);
         args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
         f.setArguments(args);
         return f;
@@ -209,9 +209,14 @@ public class ThingListFragment extends ListFragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_list_menu, menu);
-        menu.findItem(R.id.menu_add).setVisible(showAdd());
+        menu.findItem(R.id.menu_add).setVisible(showAddAction());
         menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(
                 subreddit != null && !subreddit.isFrontPage());
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -258,8 +263,8 @@ public class ThingListFragment extends ListFragment implements
         return getArguments().getString(ARG_SEARCH_QUERY);
     }
 
-    private boolean showAdd() {
-        return getArguments().getBoolean(ARG_SHOW_ADD);
+    private boolean showAddAction() {
+        return getArguments().getBoolean(ARG_SHOW_ADD_ACTION);
     }
 
     private boolean isSingleChoice() {

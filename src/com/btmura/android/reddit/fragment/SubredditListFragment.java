@@ -134,15 +134,9 @@ public class SubredditListFragment extends ListFragment implements
         listener.onSubredditSelected(sr);
     }
 
-    class CheckedInfo {
-        int checkedCount;
-        int numSplittable;
-    }
-
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.sr_action_menu, menu);
-        menu.findItem(R.id.menu_add).setVisible(false);
         if (mode.getTag() == null) {
             mode.setTag(new CheckedInfo());
         }
@@ -151,10 +145,22 @@ public class SubredditListFragment extends ListFragment implements
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         CheckedInfo info = (CheckedInfo) mode.getTag();
-        menu.findItem(R.id.menu_add_combined).setVisible(getListView().getCheckedItemCount() > 1);
-        menu.findItem(R.id.menu_combine).setVisible(info.checkedCount > 1);
-        menu.findItem(R.id.menu_split).setVisible(info.checkedCount == 1 && info.numSplittable > 0);
+        menu.findItem(R.id.menu_add).setVisible(isQuery());
+        menu.findItem(R.id.menu_add_combined).setVisible(isQuery() && info.checkedCount > 1);
+        menu.findItem(R.id.menu_combine).setVisible(!isQuery() && info.checkedCount > 1);
+        menu.findItem(R.id.menu_split).setVisible(
+                !isQuery() && info.checkedCount == 1 && info.numSplittable > 0);
+        menu.findItem(R.id.menu_delete).setVisible(!isQuery());
         return true;
+    }
+
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        CheckedInfo info = (CheckedInfo) mode.getTag();
+        info.checkedCount = getListView().getCheckedItemCount();
+        if (adapter.getName(getActivity(), position).indexOf('+') != -1) {
+            info.numSplittable = info.numSplittable + (checked ? 1 : -1);
+        }
+        mode.invalidate();
     }
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -178,8 +184,18 @@ public class SubredditListFragment extends ListFragment implements
             case R.id.menu_delete:
                 handleDelete(mode);
                 return true;
+
+            default:
+                return false;
         }
-        return false;
+    }
+
+    public void onDestroyActionMode(ActionMode mode) {
+    }
+
+    static class CheckedInfo {
+        int checkedCount;
+        int numSplittable;
     }
 
     private void handleActionAdd(ActionMode mode) {
@@ -241,23 +257,6 @@ public class SubredditListFragment extends ListFragment implements
         mode.finish();
     }
 
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        CheckedInfo info = (CheckedInfo) mode.getTag();
-        info.checkedCount = getListView().getCheckedItemCount();
-        if (adapter.getName(getActivity(), position).indexOf('+') != -1) {
-            info.numSplittable = info.numSplittable + (checked ? 1 : -1);
-        }
-        mode.invalidate();
-    }
-
-    public void onDestroyActionMode(ActionMode mode) {
-    }
-
-    public void setSelectedSubreddit(Subreddit subreddit) {
-        adapter.setSelectedSubreddit(subreddit);
-        adapter.notifyDataSetChanged();
-    }
-
     private ArrayList<String> getCheckedNames() {
         int checkedCount = getListView().getCheckedItemCount();
         SparseBooleanArray checked = getListView().getCheckedItemPositions();
@@ -274,12 +273,21 @@ public class SubredditListFragment extends ListFragment implements
         return names;
     }
 
+    public void setSelectedSubreddit(Subreddit subreddit) {
+        adapter.setSelectedSubreddit(subreddit);
+        adapter.notifyDataSetChanged();
+    }
+
     private Subreddit getSelectedSubreddit() {
         return getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
     }
 
     private String getQuery() {
         return getArguments().getString(ARG_QUERY);
+    }
+
+    private boolean isQuery() {
+        return getQuery() != null;
     }
 
     private boolean isSingleChoice() {
