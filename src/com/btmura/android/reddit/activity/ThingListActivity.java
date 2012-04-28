@@ -33,6 +33,8 @@ import com.btmura.android.reddit.fragment.ThingListFragment;
 public class ThingListActivity extends GlobalMenuActivity implements
         ActionBar.OnNavigationListener,
         ThingListFragment.OnThingSelectedListener {
+    
+    public static final String TAG = "ThingListActivity";
 
     public static final String EXTRA_SUBREDDIT = "es";
     public static final String EXTRA_FLAGS = "ef";
@@ -46,7 +48,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private Subreddit subreddit;
     private boolean insertHome;
     private int tlfFlags;
-    private boolean navigationListenerDisabled;
+    private boolean restoringState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,21 +67,25 @@ public class ThingListActivity extends GlobalMenuActivity implements
             tlfFlags |= ThingListFragment.FLAG_SHOW_ADD_ACTION;
         }
 
-        navigationListenerDisabled = true;
         FilterAdapter adapter = new FilterAdapter(this);
         adapter.setTitle(subreddit.getTitle(this));
         bar.setListNavigationCallbacks(adapter, this);
         if (savedInstanceState != null) {
+            restoringState = true;
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_FILTER));
         }
-        navigationListenerDisabled = false;
-
-        if (savedInstanceState == null) {
-            updateFragments(FilterAdapter.FILTER_HOT, true);
+    }
+    
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        if (restoringState) {
+            restoringState = false;
+            return true;
         }
+        replaceFragments((int) itemId, false);
+        return true;
     }
 
-    private void updateFragments(int filter, boolean addGlobalMenuFragment) {
+    private void replaceFragments(int filter, boolean addGlobalMenuFragment) {
         Fragment tlf = ThingListFragment.newInstance(subreddit, filter, tlfFlags);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -88,14 +94,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
         }
         ft.replace(R.id.single_container, tlf, ThingListFragment.TAG);
         ft.commit();
-    }
-
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        if (navigationListenerDisabled) {
-            return true;
-        }
-        updateFragments((int) itemId, false);
-        return true;
     }
 
     public void onThingSelected(Thing thing, int position) {
