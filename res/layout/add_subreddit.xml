@@ -2,31 +2,15 @@
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnCount="2"
+    android:columnCount="1"
     android:padding="@dimen/padding" >
-
-    <RadioButton
-        android:id="@+id/custom_button"
-        android:checked="true" />
 
     <EditText
         android:id="@+id/custom_text"
         android:layout_gravity="fill_horizontal"
+        android:hint="@string/add_subreddit_hint"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
-
-    <RadioButton
-        android:id="@+id/front_page_button"
-        android:layout_gravity="center_vertical" />
-
-    <TextView
-        android:id="@+id/front_page_text"
-        style="@android:style/TextAppearance.Holo.Medium"
-        android:layout_gravity="fill"
-        android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:singleLine="true"
-        android:text="@string/front_page" />
 
 </GridLayout>

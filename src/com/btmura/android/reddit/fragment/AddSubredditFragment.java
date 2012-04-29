@@ -27,12 +27,7 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.TextView;
 
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
@@ -67,52 +62,19 @@ public class AddSubredditFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.add_subreddit, null, false);
 
-        final RadioButton customButton = (RadioButton) v.findViewById(R.id.custom_button);
-        final RadioButton frontPageButton = (RadioButton) v.findViewById(R.id.front_page_button);
-
         final EditText customText = (EditText) v.findViewById(R.id.custom_text);
-        final TextView frontPageText = (TextView) v.findViewById(R.id.front_page_text);
-
         customText.setText(nameHolder.getSubredditName());
         customText.setFilters(INPUT_FILTERS);
-        customText.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                customButton.setChecked(true);
-            }
-        });
-
-        frontPageText.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                frontPageButton.setChecked(true);
-            }
-        });
-
-        customButton.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                frontPageButton.setChecked(!isChecked);
-            }
-        });
-
-        frontPageButton.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                customButton.setChecked(!isChecked);
-            }
-        });
 
         return new AlertDialog.Builder(getActivity())
                 .setView(v)
                 .setTitle(R.string.add_subreddit_title)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.add_subreddit_button,
+                .setPositiveButton(R.string.button_add,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                ContentValues values = new ContentValues();
-                                if (customButton.isChecked()) {
-                                    values.put(Subreddits.COLUMN_NAME, customText.getText()
-                                            .toString());
-                                } else {
-                                    values.put(Subreddits.COLUMN_NAME, "");
-                                }
+                                ContentValues values = new ContentValues(1);
+                                values.put(Subreddits.COLUMN_NAME, customText.getText().toString());
                                 Provider.addSubredditInBackground(getActivity(), values);
                             }
                         }).create();
