@@ -6,9 +6,10 @@
     android:padding="@dimen/padding"
     android:useDefaultMargins="true" >
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/subreddit_name"
         android:layout_gravity="fill_horizontal"
+        android:completionThreshold="3"
         android:hint="@string/type_subreddit_name"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
