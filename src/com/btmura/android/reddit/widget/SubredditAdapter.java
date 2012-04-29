@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SubredditSearchLoader;
+import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 
 public class SubredditAdapter extends SimpleCursorAdapter {
@@ -40,7 +41,7 @@ public class SubredditAdapter extends SimpleCursorAdapter {
 
     public static Loader<Cursor> createLoader(Context context, String query) {
         if (query != null) {
-            return new SubredditSearchLoader(context, query);
+            return new SubredditSearchLoader(context, Urls.subredditSearchUrl(query, null));
         } else {
             return new CursorLoader(context, Subreddits.CONTENT_URI, PROJECTION, null, null,
                     Subreddits.SORT);

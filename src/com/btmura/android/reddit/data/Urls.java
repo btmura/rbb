@@ -40,7 +40,7 @@ public class Urls {
         return new StringBuilder("http://www.reddit.com/r/").append(name).append("/about.json");
     }
 
-    public static CharSequence subredditUrl(Subreddit sr, int filter, String after) {
+    public static CharSequence subredditUrl(Subreddit sr, int filter, String more) {
         StringBuilder b = new StringBuilder("http://www.reddit.com/");
 
         if (!sr.isFrontPage()) {
@@ -73,23 +73,27 @@ public class Urls {
         if (hasSort) {
             b.append("?sort=new");
         }
-        if (after != null) {
-            b.append(hasSort ? "&" : "?").append("count=25&after=").append(after);
+        if (more != null) {
+            b.append(hasSort ? "&" : "?").append("count=25&after=").append(more);
         }
         return b;
     }
 
-    public static CharSequence searchUrl(String query) {
-        return getSearchUrl(BASE_SEARCH_URL, query);
+    public static CharSequence searchUrl(String query, String more) {
+        return getSearchUrl(BASE_SEARCH_URL, query, more);
     }
 
-    public static CharSequence subredditSearchUrl(String query) {
-        return getSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query);
+    public static CharSequence subredditSearchUrl(String query, String more) {
+        return getSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, more);
     }
 
-    private static CharSequence getSearchUrl(String base, String query) {
+    private static CharSequence getSearchUrl(String base, String query, String more) {
         try {
-            return new StringBuilder(base).append(URLEncoder.encode(query, "UTF-8"));
+            StringBuilder b = new StringBuilder(base).append(URLEncoder.encode(query, "UTF-8"));
+            if (more != null) {
+                b.append("&count=25&after=").append(more);
+            }
+            return b;
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

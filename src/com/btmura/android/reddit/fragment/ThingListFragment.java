@@ -136,7 +136,7 @@ public class ThingListFragment extends ListFragment implements
         if (subreddit != null) {
             url = Urls.subredditUrl(subreddit, getFilter(), moreKey);
         } else {
-            url = Urls.searchUrl(query);
+            url = Urls.searchUrl(query, moreKey);
         }
         return new ThingLoader(getActivity(), url, args != null ? adapter.getItems() : null);
     }

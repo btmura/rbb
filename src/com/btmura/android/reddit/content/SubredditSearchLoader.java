@@ -35,7 +35,6 @@ import android.util.Log;
 
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.data.JsonParser;
-import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 
 public class SubredditSearchLoader extends AsyncTaskLoader<Cursor> {
@@ -44,11 +43,11 @@ public class SubredditSearchLoader extends AsyncTaskLoader<Cursor> {
 
     private Cursor results;
 
-    private String query;
+    private CharSequence url;
 
-    public SubredditSearchLoader(Context context, String query) {
+    public SubredditSearchLoader(Context context, CharSequence url) {
         super(context);
-        this.query = query;
+        this.url = url;
     }
 
     @Override
@@ -64,7 +63,7 @@ public class SubredditSearchLoader extends AsyncTaskLoader<Cursor> {
     @Override
     public Cursor loadInBackground() {
         try {
-            URL subredditUrl = new URL(Urls.subredditSearchUrl(query).toString());
+            URL subredditUrl = new URL(url.toString());
 
             HttpURLConnection connection = (HttpURLConnection) subredditUrl.openConnection();
             connection.connect();
