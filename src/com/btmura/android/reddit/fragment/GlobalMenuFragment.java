@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -25,9 +26,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SearchActivity;
+import com.btmura.android.reddit.data.Flag;
 
 public class GlobalMenuFragment extends Fragment implements
         SearchView.OnFocusChangeListener,
@@ -35,13 +38,30 @@ public class GlobalMenuFragment extends Fragment implements
 
     public static final String TAG = "GlobalMenuFragment";
 
+    public static final int FLAG_SHOW_SEARCH_ACTION = 0x1;
+
+    private static final String ARG_FLAGS = "af";
+
     private static final int REQUEST_SEARCH = 0;
 
+    private OnQueryTextListener queryListener;
     private MenuItem searchItem;
     private SearchView searchView;
 
-    public static GlobalMenuFragment newInstance() {
-        return new GlobalMenuFragment();
+    public static GlobalMenuFragment newInstance(int flags) {
+        GlobalMenuFragment f = new GlobalMenuFragment();
+        Bundle args = new Bundle(1);
+        args.putInt(ARG_FLAGS, flags);
+        f.setArguments(args);
+        return f;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnQueryTextListener) {
+            queryListener = (OnQueryTextListener) activity;
+        }
     }
 
     @Override
@@ -55,6 +75,10 @@ public class GlobalMenuFragment extends Fragment implements
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.global_menu, menu);
         searchItem = menu.findItem(R.id.menu_search);
+        if (showSearchAction()) {
+            searchItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS
+                    | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+        }
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextFocusChangeListener(this);
         searchView.setOnQueryTextListener(this);
@@ -94,7 +118,7 @@ public class GlobalMenuFragment extends Fragment implements
 
     private void handleAddSubreddits() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(AddSubredditFragment.newInstance(""), AddSubredditFragment.TAG);
+        ft.add(AddSubredditFragment.newInstance(), AddSubredditFragment.TAG);
         ft.commit();
     }
 
@@ -105,15 +129,32 @@ public class GlobalMenuFragment extends Fragment implements
     }
 
     public boolean onQueryTextSubmit(String query) {
-        Intent intent = new Intent(getActivity(), SearchActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
-                | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        intent.putExtra(SearchActivity.EXTRA_QUERY, query);
-        startActivityForResult(intent, REQUEST_SEARCH);
-        return true;
+        if (queryListener != null) {
+            searchItem.collapseActionView();
+            return queryListener.onQueryTextSubmit(query);
+        } else {
+            Intent intent = new Intent(getActivity(), SearchActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
+                    | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            intent.putExtra(SearchActivity.EXTRA_QUERY, query);
+            startActivityForResult(intent, REQUEST_SEARCH);
+            return true;
+        }
     }
 
     public boolean onQueryTextChange(String newText) {
-        return false;
+        if (queryListener != null) {
+            return queryListener.onQueryTextChange(newText);
+        } else {
+            return false;
+        }
+    }
+
+    private int getFlags() {
+        return getArguments().getInt(ARG_FLAGS);
+    }
+
+    private boolean showSearchAction() {
+        return Flag.isEnabled(getFlags(), FLAG_SHOW_SEARCH_ACTION);
     }
 }

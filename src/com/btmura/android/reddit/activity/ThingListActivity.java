@@ -27,20 +27,21 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.fragment.AddSubredditFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 
 public class ThingListActivity extends GlobalMenuActivity implements
         ActionBar.OnNavigationListener,
-        ThingListFragment.OnThingSelectedListener {
-    
+        ThingListFragment.OnThingSelectedListener,
+        AddSubredditFragment.SubredditNameHolder {
+
     public static final String TAG = "ThingListActivity";
 
     public static final String EXTRA_SUBREDDIT = "es";
     public static final String EXTRA_FLAGS = "ef";
 
     public static final int FLAG_INSERT_HOME = 0x1;
-    public static final int FLAG_SHOW_ADD_ACTION = 0x2;
 
     private static final String STATE_FILTER = "f";
 
@@ -63,9 +64,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
         int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
         insertHome = Flag.isEnabled(flags, FLAG_INSERT_HOME);
-        if (Flag.isEnabled(flags, FLAG_SHOW_ADD_ACTION)) {
-            tlfFlags |= ThingListFragment.FLAG_SHOW_ADD_ACTION;
-        }
 
         FilterAdapter adapter = new FilterAdapter(this);
         adapter.setTitle(subreddit.getTitle(this));
@@ -74,24 +72,26 @@ public class ThingListActivity extends GlobalMenuActivity implements
             restoringState = true;
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_FILTER));
         }
+
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(GlobalMenuFragment.newInstance(0), GlobalMenuFragment.TAG);
+            ft.commit();
+        }
     }
-    
+
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         if (restoringState) {
             restoringState = false;
             return true;
         }
-        replaceFragments((int) itemId, false);
+        replaceFragments((int) itemId);
         return true;
     }
 
-    private void replaceFragments(int filter, boolean addGlobalMenuFragment) {
+    private void replaceFragments(int filter) {
         Fragment tlf = ThingListFragment.newInstance(subreddit, filter, tlfFlags);
-
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        if (addGlobalMenuFragment) {
-            ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
-        }
         ft.replace(R.id.single_container, tlf, ThingListFragment.TAG);
         ft.commit();
     }
@@ -105,6 +105,10 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public int getThingBodyWidth() {
         return 0;
+    }
+
+    public String getSubredditName() {
+        return subreddit.name;
     }
 
     @Override

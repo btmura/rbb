@@ -23,16 +23,13 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.SearchView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.ControlFragment;
+import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.widget.SearchPagerAdapter;
@@ -40,8 +37,7 @@ import com.btmura.android.reddit.widget.SearchPagerAdapter;
 public class SearchActivity extends AbstractBrowserActivity implements
         ActionBar.TabListener,
         SearchView.OnQueryTextListener,
-        ViewPager.OnPageChangeListener,
-        View.OnFocusChangeListener {
+        ViewPager.OnPageChangeListener {
 
     public static final String TAG = "SearchActivity";
 
@@ -57,9 +53,6 @@ public class SearchActivity extends AbstractBrowserActivity implements
     private ViewPager pager;
     private String query;
 
-    private MenuItem searchItem;
-    private SearchView searchView;
-
     private boolean tabListenerDisabled;
 
     public SearchActivity() {
@@ -68,8 +61,8 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void initPrereqs(Bundle savedInstanceState) {
-        setThingListActivityFlags(ThingListActivity.FLAG_SHOW_ADD_ACTION);
-        setThingListFragmentFlags(ThingListFragment.FLAG_SHOW_ADD_ACTION);
+        setThingListActivityFlags(0);
+        setThingListFragmentFlags(0);
 
         if (savedInstanceState == null) {
             query = getIntentQuery();
@@ -91,6 +84,13 @@ public class SearchActivity extends AbstractBrowserActivity implements
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_TAB_POSITION));
         }
         tabListenerDisabled = false;
+
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(GlobalMenuFragment.newInstance(GlobalMenuFragment.FLAG_SHOW_SEARCH_ACTION),
+                    GlobalMenuFragment.TAG);
+            ft.commit();
+        }
     }
 
     private String getIntentQuery() {
@@ -127,9 +127,6 @@ public class SearchActivity extends AbstractBrowserActivity implements
     private void submitQuery() {
         if (query != null && !query.isEmpty()) {
             bar.setTitle(query);
-            if (searchItem != null) {
-                searchItem.collapseActionView();
-            }
             if (pager != null) {
                 pager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
                 pager.setCurrentItem(bar.getSelectedNavigationIndex());
@@ -241,39 +238,10 @@ public class SearchActivity extends AbstractBrowserActivity implements
         }
     }
 
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            searchItem.collapseActionView();
-        }
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_QUERY, query);
         outState.putInt(STATE_TAB_POSITION, bar.getSelectedNavigationIndex());
-    }
-
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_SEARCH:
-                searchItem.expandActionView();
-                return true;
-
-            default:
-                return super.onKeyUp(keyCode, event);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.search_menu, menu);
-        searchItem = menu.findItem(R.id.menu_search);
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(this);
-        searchView.setOnQueryTextFocusChangeListener(this);
-        return true;
     }
 }

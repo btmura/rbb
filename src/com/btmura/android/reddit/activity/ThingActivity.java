@@ -24,12 +24,14 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.fragment.AddSubredditFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class ThingActivity extends GlobalMenuActivity implements
         ThingMenuFragment.ThingPagerHolder,
+        AddSubredditFragment.SubredditNameHolder,
         ViewPager.OnPageChangeListener {
 
     public static final String EXTRA_THING = "t";
@@ -53,12 +55,9 @@ public class ThingActivity extends GlobalMenuActivity implements
         bar.setTitle(thing.assureTitle(this).title);
 
         if (savedInstanceState == null) {
-            GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
-            ThingMenuFragment tmf = ThingMenuFragment.newInstance(thing);
-
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(gmf, GlobalMenuFragment.TAG);
-            ft.add(tmf, ThingMenuFragment.TAG);
+            ft.add(GlobalMenuFragment.newInstance(0), GlobalMenuFragment.TAG);
+            ft.add(ThingMenuFragment.newInstance(thing), ThingMenuFragment.TAG);
             ft.commit();
         }
     }
@@ -77,6 +76,10 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     public ViewPager getPager() {
         return pager;
+    }
+
+    public String getSubredditName() {
+        return thing.subreddit;
     }
 
     public void onPageSelected(int position) {

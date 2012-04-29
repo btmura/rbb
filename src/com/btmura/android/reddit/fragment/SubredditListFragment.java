@@ -55,6 +55,12 @@ public class SubredditListFragment extends ListFragment implements
     private static final String ARG_QUERY = "q";
     private static final String ARG_FLAGS = "f";
 
+    public interface OnSubredditSelectedListener {
+        void onSubredditLoaded(Subreddit subreddit);
+
+        void onSubredditSelected(Subreddit subreddit);
+    }
+
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
 

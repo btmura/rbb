@@ -29,6 +29,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,18 +38,19 @@ import android.view.View.OnClickListener;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.fragment.AddSubredditFragment;
 import com.btmura.android.reddit.fragment.ControlFragment;
-import com.btmura.android.reddit.fragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
-        OnSubredditSelectedListener,
+        SubredditListFragment.OnSubredditSelectedListener,
         ThingListFragment.OnThingSelectedListener,
         ViewPager.OnPageChangeListener,
         FragmentManager.OnBackStackChangedListener,
+        AddSubredditFragment.SubredditNameHolder,
         ThingMenuFragment.ThingPagerHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
@@ -224,6 +226,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         refreshActionBar(subreddit, null, filter);
         refreshContainers(null);
+
+        Log.v(TAG, "selectSubreddit: " + subreddit);
 
         ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, filter);
         Fragment tlf = ThingListFragment.newInstance(subreddit, filter, tlFragmentFlags
@@ -582,12 +586,28 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public ViewPager getPager() {
-        return thingPager;
-    }
-
     public int getThingBodyWidth() {
         return thingBodyWidth;
+    }
+
+    public String getSubredditName() {
+        ControlFragment f = getControlFragment();
+        if (f != null) {
+            Thing t = f.getThing();
+            if (t != null) {
+                return t.subreddit;
+            } else {
+                Subreddit s = f.getSubreddit();
+                if (s != null) {
+                    return s.name;
+                }
+            }
+        }
+        return null;
+    }
+
+    public ViewPager getPager() {
+        return thingPager;
     }
 
     private Subreddit getSubreddit() {

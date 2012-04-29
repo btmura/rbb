@@ -93,7 +93,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
             startActivity(intent);
         } else if (savedInstanceState == null) {
             SubredditListFragment slf = SubredditListFragment.newInstance(null, 0);
-            GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
+            GlobalMenuFragment gmf = GlobalMenuFragment.newInstance(0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(gmf, GlobalMenuFragment.TAG);
             ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
@@ -129,7 +129,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
         int filter = FilterAdapter.FILTER_HOT;
 
         ControlFragment cf = ControlFragment.newInstance(s, null, -1, filter);
-        GlobalMenuFragment gmf = GlobalMenuFragment.newInstance();
+        GlobalMenuFragment gmf = GlobalMenuFragment.newInstance(0);
         SubredditListFragment slf = SubredditListFragment.newInstance(s,
                 SubredditListFragment.FLAG_SINGLE_CHOICE);
 

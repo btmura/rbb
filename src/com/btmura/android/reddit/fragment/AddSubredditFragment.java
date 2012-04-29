@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -45,14 +46,20 @@ public class AddSubredditFragment extends DialogFragment {
         new SubredditInputFilter(),
     };
 
-    private static final String ARG_HINT = "ah";
+    public interface SubredditNameHolder {
+        String getSubredditName();
+    }
 
-    public static AddSubredditFragment newInstance(String hint) {
-        AddSubredditFragment f = new AddSubredditFragment();
-        Bundle args = new Bundle(1);
-        args.putString(ARG_HINT, hint);
-        f.setArguments(args);
-        return f;
+    private SubredditNameHolder nameHolder;
+
+    public static AddSubredditFragment newInstance() {
+        return new AddSubredditFragment();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        nameHolder = (SubredditNameHolder) activity;
     }
 
     @Override
@@ -66,7 +73,7 @@ public class AddSubredditFragment extends DialogFragment {
         final EditText customText = (EditText) v.findViewById(R.id.custom_text);
         final TextView frontPageText = (TextView) v.findViewById(R.id.front_page_text);
 
-        customText.setHint(getHint());
+        customText.setText(nameHolder.getSubredditName());
         customText.setFilters(INPUT_FILTERS);
         customText.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -92,7 +99,8 @@ public class AddSubredditFragment extends DialogFragment {
             }
         });
 
-        return new AlertDialog.Builder(getActivity()).setTitle(R.string.menu_add_subreddit).setView(v)
+        return new AlertDialog.Builder(getActivity()).setTitle(R.string.menu_add_subreddit)
+                .setView(v)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         ContentValues values = new ContentValues();
@@ -117,9 +125,5 @@ public class AddSubredditFragment extends DialogFragment {
             }
             return null;
         }
-    }
-
-    private String getHint() {
-        return getArguments().getString(ARG_HINT);
     }
 }

@@ -12,7 +12,7 @@
     <EditText
         android:id="@+id/custom_text"
         android:layout_gravity="fill_horizontal"
-        android:inputType="text"
+        android:inputType="textNoSuggestions"
         android:singleLine="true" />
 
     <RadioButton
@@ -22,8 +22,8 @@
     <TextView
         android:id="@+id/front_page_text"
         style="@android:style/TextAppearance.Holo.Medium"
-        android:gravity="center_vertical"
         android:layout_gravity="fill"
+        android:gravity="center_vertical"
         android:text="@string/front_page" />
 
 </GridLayout>
