@@ -63,21 +63,24 @@ public class AddSubredditFragment extends DialogFragment {
         View v = inflater.inflate(R.layout.add_subreddit, null, false);
 
         final EditText customText = (EditText) v.findViewById(R.id.custom_text);
-        customText.setText(nameHolder.getSubredditName());
         customText.setFilters(INPUT_FILTERS);
-
-        return new AlertDialog.Builder(getActivity())
-                .setView(v)
+        customText.requestFocus();
+        
+        String name = nameHolder.getSubredditName();
+        int length = name != null ? name.length() : 0;
+        customText.setText(name);
+        customText.setSelection(length, length);
+        
+        return new AlertDialog.Builder(getActivity()).setView(v)
                 .setTitle(R.string.add_subreddit_title)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.button_add,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                ContentValues values = new ContentValues(1);
-                                values.put(Subreddits.COLUMN_NAME, customText.getText().toString());
-                                Provider.addSubredditInBackground(getActivity(), values);
-                            }
-                        }).create();
+                .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        ContentValues values = new ContentValues(1);
+                        values.put(Subreddits.COLUMN_NAME, customText.getText().toString());
+                        Provider.addSubredditInBackground(getActivity(), values);
+                    }
+                }).create();
     }
 
     static class SubredditInputFilter implements InputFilter {

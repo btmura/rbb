@@ -29,7 +29,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -226,8 +225,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         refreshActionBar(subreddit, null, filter);
         refreshContainers(null);
-
-        Log.v(TAG, "selectSubreddit: " + subreddit);
 
         ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, filter);
         Fragment tlf = ThingListFragment.newInstance(subreddit, filter, tlFragmentFlags

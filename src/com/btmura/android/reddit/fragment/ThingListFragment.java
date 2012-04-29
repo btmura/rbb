@@ -56,7 +56,7 @@ public class ThingListFragment extends ListFragment implements
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
     private static final String ARG_SEARCH_QUERY = "q";
-    private static final String ARG_FLAGS = "fl";
+    private static final String ARG_FLAGS = "l";
 
     private static final String STATE_THING_NAME = "n";
     private static final String STATE_THING_POSITION = "p";
