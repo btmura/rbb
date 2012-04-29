@@ -51,8 +51,7 @@ public class ThingListFragment extends ListFragment implements
 
     public static final String TAG = "ThingListFragment";
 
-    public static final int FLAG_SHOW_ADD_ACTION = 0x1;
-    public static final int FLAG_SINGLE_CHOICE = 0x2;
+    public static final int FLAG_SINGLE_CHOICE = 0x1;
 
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
@@ -210,7 +209,6 @@ public class ThingListFragment extends ListFragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_list_menu, menu);
-        menu.findItem(R.id.menu_add).setVisible(showAddAction());
         menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(
                 subreddit != null && !subreddit.isFrontPage());
     }
@@ -270,10 +268,6 @@ public class ThingListFragment extends ListFragment implements
 
     private int getFlags() {
         return getArguments().getInt(ARG_FLAGS);
-    }
-
-    private boolean showAddAction() {
-        return Flag.isEnabled(getFlags(), FLAG_SHOW_ADD_ACTION);
     }
 
     private boolean isSingleChoice() {

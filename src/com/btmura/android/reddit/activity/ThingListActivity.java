@@ -38,8 +38,8 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public static final String TAG = "ThingListActivity";
 
-    public static final String EXTRA_SUBREDDIT = "es";
-    public static final String EXTRA_FLAGS = "ef";
+    public static final String EXTRA_SUBREDDIT = "s";
+    public static final String EXTRA_FLAGS = "f";
 
     public static final int FLAG_INSERT_HOME = 0x1;
 

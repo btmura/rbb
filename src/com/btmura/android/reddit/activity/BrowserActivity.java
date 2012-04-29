@@ -41,7 +41,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     public static final String EXTRA_FLAGS = "ef";
 
     public static final int FLAG_HOME_UP_ENABLED = 0x1;
-    public static final int FLAG_SHOW_ADD_BUTTON = 0x2;
+    public static final int FLAG_SUGGEST_SUBREDDIT = 0x2;
 
     private static final String STATE_NAVIGATION_INDEX = "i";
 
@@ -61,13 +61,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     protected void initPrereqs(Bundle savedInstanceState) {
         int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
         homeUpEnabled = Flag.isEnabled(flags, FLAG_HOME_UP_ENABLED);
-
-        int tlfFlags = ThingListFragment.FLAG_SINGLE_CHOICE;
-        if (Flag.isEnabled(flags, FLAG_SHOW_ADD_BUTTON)) {
-            tlfFlags |= ThingListFragment.FLAG_SHOW_ADD_ACTION;
-        }
-        setThingListFragmentFlags(tlfFlags);
-
+        setThingListFragmentFlags(ThingListFragment.FLAG_SINGLE_CHOICE);
         singleContainer = findViewById(R.id.single_container);
     }
 

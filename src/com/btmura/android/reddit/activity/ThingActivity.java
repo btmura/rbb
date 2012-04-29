@@ -35,6 +35,7 @@ public class ThingActivity extends GlobalMenuActivity implements
         ViewPager.OnPageChangeListener {
 
     public static final String EXTRA_THING = "t";
+    public static final String EXTRA_FLAGS = "f";
 
     private Thing thing;
     private ViewPager pager;

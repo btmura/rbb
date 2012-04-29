@@ -12,6 +12,7 @@
     <EditText
         android:id="@+id/custom_text"
         android:layout_gravity="fill_horizontal"
+        android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
 
@@ -23,7 +24,9 @@
         android:id="@+id/front_page_text"
         style="@android:style/TextAppearance.Holo.Medium"
         android:layout_gravity="fill"
+        android:ellipsize="end"
         android:gravity="center_vertical"
+        android:singleLine="true"
         android:text="@string/front_page" />
 
 </GridLayout>

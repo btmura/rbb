@@ -99,19 +99,23 @@ public class AddSubredditFragment extends DialogFragment {
             }
         });
 
-        return new AlertDialog.Builder(getActivity()).setTitle(R.string.menu_add_subreddit)
+        return new AlertDialog.Builder(getActivity())
                 .setView(v)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        ContentValues values = new ContentValues();
-                        if (customButton.isChecked()) {
-                            values.put(Subreddits.COLUMN_NAME, customText.getText().toString());
-                        } else {
-                            values.put(Subreddits.COLUMN_NAME, "");
-                        }
-                        Provider.addSubredditInBackground(getActivity(), values);
-                    }
-                }).setNegativeButton(android.R.string.cancel, null).create();
+                .setTitle(R.string.add_subreddit_title)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.add_subreddit_button,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                ContentValues values = new ContentValues();
+                                if (customButton.isChecked()) {
+                                    values.put(Subreddits.COLUMN_NAME, customText.getText()
+                                            .toString());
+                                } else {
+                                    values.put(Subreddits.COLUMN_NAME, "");
+                                }
+                                Provider.addSubredditInBackground(getActivity(), values);
+                            }
+                        }).create();
     }
 
     static class SubredditInputFilter implements InputFilter {
