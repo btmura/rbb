@@ -67,7 +67,7 @@ public class SidebarAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.details_row, parent, false);
+        View v = inflater.inflate(R.layout.sidebar_row, parent, false);
 
         Subreddit info = getItem(position);
 
