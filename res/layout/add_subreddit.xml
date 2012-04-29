@@ -6,11 +6,15 @@
     android:padding="@dimen/padding" >
 
     <EditText
-        android:id="@+id/custom_text"
+        android:id="@+id/subreddit_name"
         android:layout_gravity="fill_horizontal"
-        android:hint="@string/add_subreddit_hint"
+        android:hint="@string/type_subreddit_name"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
+
+    <CheckBox
+        android:id="@+id/add_front_page"
+        android:text="@string/add_front_page" />
 
 </GridLayout>

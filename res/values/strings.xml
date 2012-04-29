@@ -17,8 +17,8 @@
 
     <string name="app_name">reddit by brian</string>
     
-    <string name="add_subreddit_hint">Leave empty for front page</string>    
-    <string name="add_subreddit_title">Add subreddit</string>
+    <string name="add_front_page">Add front page</string>
+    <string name="add_subreddit">Add subreddit</string>    
     
     <string name="button_add">Add</string>
 
@@ -81,5 +81,7 @@
     <string name="time_x_days">%1$d days</string>
     <string name="time_x_months">%1$d months</string>
     <string name="time_x_years">%1$d years</string>
+    
+    <string name="type_subreddit_name">Type subreddit name</string>
 
 </resources>

@@ -27,6 +27,9 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
 import com.btmura.android.reddit.Provider;
@@ -61,23 +64,35 @@ public class AddSubredditFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.add_subreddit, null, false);
-
-        final EditText customText = (EditText) v.findViewById(R.id.custom_text);
-        customText.setFilters(INPUT_FILTERS);
-        customText.requestFocus();
+        final EditText subredditName = (EditText) v.findViewById(R.id.subreddit_name);        
+        final CheckBox addFrontPage = (CheckBox) v.findViewById(R.id.add_front_page);
         
+        addFrontPage.setOnCheckedChangeListener(new OnCheckedChangeListener() {           
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                subredditName.setEnabled(!isChecked);
+            }
+        });
+                
         String name = nameHolder.getSubredditName();
         int length = name != null ? name.length() : 0;
-        customText.setText(name);
-        customText.setSelection(length, length);
-        
+        subredditName.setText(name);
+        subredditName.setSelection(length, length);
+        subredditName.setFilters(INPUT_FILTERS);
+                
         return new AlertDialog.Builder(getActivity()).setView(v)
-                .setTitle(R.string.add_subreddit_title)
+                .setTitle(R.string.add_subreddit)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        ContentValues values = new ContentValues(1);
-                        values.put(Subreddits.COLUMN_NAME, customText.getText().toString());
+                        String name;
+                        if (addFrontPage.isChecked()) {
+                            name = "";
+                        } else {
+                            name = subredditName.getText().toString();
+                        }
+                        
+                        ContentValues values = new ContentValues(1);                        
+                        values.put(Subreddits.COLUMN_NAME, name);
                         Provider.addSubredditInBackground(getActivity(), values);
                     }
                 }).create();
