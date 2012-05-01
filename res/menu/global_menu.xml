@@ -20,7 +20,7 @@
         android:id="@+id/menu_search"
         android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/ic_action_search"
-        android:showAsAction="never|collapseActionView"
+        android:showAsAction="ifRoom|collapseActionView"
         android:title="@string/menu_search"/>
     <item
         android:id="@+id/menu_add_subreddit"

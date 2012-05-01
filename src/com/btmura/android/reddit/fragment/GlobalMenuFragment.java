@@ -30,17 +30,12 @@ import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SearchActivity;
-import com.btmura.android.reddit.data.Flag;
 
 public class GlobalMenuFragment extends Fragment implements
         SearchView.OnFocusChangeListener,
         SearchView.OnQueryTextListener {
 
     public static final String TAG = "GlobalMenuFragment";
-
-    public static final int FLAG_SHOW_SEARCH_ACTION = 0x1;
-
-    private static final String ARG_FLAGS = "af";
 
     private static final int REQUEST_SEARCH = 0;
 
@@ -49,11 +44,7 @@ public class GlobalMenuFragment extends Fragment implements
     private SearchView searchView;
 
     public static GlobalMenuFragment newInstance(int flags) {
-        GlobalMenuFragment f = new GlobalMenuFragment();
-        Bundle args = new Bundle(1);
-        args.putInt(ARG_FLAGS, flags);
-        f.setArguments(args);
-        return f;
+        return new GlobalMenuFragment();
     }
 
     @Override
@@ -75,10 +66,6 @@ public class GlobalMenuFragment extends Fragment implements
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.global_menu, menu);
         searchItem = menu.findItem(R.id.menu_search);
-        if (showSearchAction()) {
-            searchItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS
-                    | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-        }
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextFocusChangeListener(this);
         searchView.setOnQueryTextListener(this);
@@ -148,13 +135,5 @@ public class GlobalMenuFragment extends Fragment implements
         } else {
             return false;
         }
-    }
-
-    private int getFlags() {
-        return getArguments().getInt(ARG_FLAGS);
-    }
-
-    private boolean showSearchAction() {
-        return Flag.isEnabled(getFlags(), FLAG_SHOW_SEARCH_ACTION);
     }
 }

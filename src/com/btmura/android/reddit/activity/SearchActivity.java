@@ -87,8 +87,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(GlobalMenuFragment.FLAG_SHOW_SEARCH_ACTION),
-                    GlobalMenuFragment.TAG);
+            ft.add(GlobalMenuFragment.newInstance(0), GlobalMenuFragment.TAG);
             ft.commit();
         }
     }
