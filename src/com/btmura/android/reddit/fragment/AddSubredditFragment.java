@@ -20,16 +20,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.content.Loader;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,13 +39,9 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
 public class AddSubredditFragment extends DialogFragment implements
-        TextWatcher,
-        AdapterView.OnItemClickListener,
-        LoaderCallbacks<Cursor> {
+        AdapterView.OnItemClickListener {
 
     public static final String TAG = "AddSubredditFragment";
-
-    private static final String LOADER_ARG_QUERY = "q";
 
     private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
         new SubredditInputFilter(),
@@ -99,7 +90,6 @@ public class AddSubredditFragment extends DialogFragment implements
         nameField.setSelection(length, length);
         nameField.setFilters(INPUT_FILTERS);
         nameField.setAdapter(adapter);
-        nameField.addTextChangedListener(this);
         nameField.setOnItemClickListener(this);
 
         return new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.add_subreddit)
@@ -120,36 +110,9 @@ public class AddSubredditFragment extends DialogFragment implements
                 }).create();
     }
 
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-    }
-
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (s.length() >= nameField.getThreshold()) {
-            Bundle args = new Bundle(1);
-            args.putString(LOADER_ARG_QUERY, s.toString());
-            getLoaderManager().restartLoader(0, args, this);
-        }
-    }
-
-    public void afterTextChanged(Editable s) {
-    }
-
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         String name = adapter.getName(getActivity(), position);
         nameField.setText(name);
-    }
-
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String query = args.getString(LOADER_ARG_QUERY);
-        return SubredditAdapter.createLoader(getActivity(), query);
-    }
-
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        adapter.swapCursor(data);
-    }
-
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
     }
 
     static class SubredditInputFilter implements InputFilter {
