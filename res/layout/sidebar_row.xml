@@ -24,7 +24,7 @@
         style="@android:style/TextAppearance.Holo.Large"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/padding" />
+        android:paddingBottom="@dimen/element_padding" />
 
     <TextView
         android:id="@+id/description"

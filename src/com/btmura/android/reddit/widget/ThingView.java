@@ -1,6 +1,7 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -24,13 +25,9 @@ public class ThingView extends View {
 
     private static float DENSITY;
 
-    private static final int MAX_THUMB_WIDTH_DP = 70;
-    private static final int PADDING_DP = 16;
-    private static final int MIN_DETAILS_WIDTH_DP = 100;
-    private static final int MAX_DETAILS_WIDTH_DP = 300;
-
     private static int THUMB_WIDTH;
     private static int PADDING;
+    private static int ELEMENT_PADDING;
     private static int MIN_DETAILS_WIDTH;
     private static int MAX_DETAILS_WIDTH;
 
@@ -62,11 +59,13 @@ public class ThingView extends View {
 
     private void init(Context context) {
         if (PAINTS == null) {
-            DENSITY = context.getResources().getDisplayMetrics().density;
-            PADDING = (int) (PADDING_DP * DENSITY);
-            THUMB_WIDTH = (int) (MAX_THUMB_WIDTH_DP * DENSITY);
-            MIN_DETAILS_WIDTH = (int) (MIN_DETAILS_WIDTH_DP * DENSITY);
-            MAX_DETAILS_WIDTH = (int) (MAX_DETAILS_WIDTH_DP * DENSITY);
+            Resources r = context.getResources();
+            DENSITY = r.getDisplayMetrics().density;
+            PADDING = r.getDimensionPixelSize(R.dimen.padding);
+            ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
+            THUMB_WIDTH = r.getDimensionPixelSize(R.dimen.max_thumb_width);
+            MIN_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.min_details_width);
+            MAX_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.max_details_width);
 
             Theme t = context.getTheme();
             int[] styles = new int[] {
@@ -178,7 +177,7 @@ public class ThingView extends View {
         }
 
         int thumbHeight = THUMB_WIDTH;
-        int textHeight = titleLayout.getHeight() + PADDING + statusLayout.getHeight();
+        int textHeight = titleLayout.getHeight() + ELEMENT_PADDING + statusLayout.getHeight();
         int minHeight = PADDING + Math.max(thumbHeight, textHeight) + PADDING;
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);

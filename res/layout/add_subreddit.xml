@@ -3,12 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:columnCount="1"
-    android:padding="@dimen/padding"
-    android:useDefaultMargins="true" >
+    android:padding="@dimen/padding" >
 
     <AutoCompleteTextView
         android:id="@+id/subreddit_name"
         android:layout_gravity="fill_horizontal"
+        android:layout_marginBottom="@dimen/element_padding"
         android:completionThreshold="3"
         android:hint="@string/type_subreddit_name"
         android:imeOptions="flagNoFullscreen"
