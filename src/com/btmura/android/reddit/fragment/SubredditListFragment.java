@@ -113,7 +113,7 @@ public class SubredditListFragment extends ListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return SubredditAdapter.createLoader(getActivity(), getQuery());
+        return SubredditAdapter.createLoader(getActivity().getApplicationContext(), getQuery());
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {

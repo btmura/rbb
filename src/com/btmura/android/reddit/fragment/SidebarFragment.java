@@ -57,7 +57,7 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sub
     }
 
     public Loader<Subreddit> onCreateLoader(int id, Bundle args) {
-        return new SidebarLoader(getActivity(), getName());
+        return new SidebarLoader(getActivity().getApplicationContext(), getName());
     }
 
     public void onLoadFinished(Loader<Subreddit> loader, Subreddit data) {

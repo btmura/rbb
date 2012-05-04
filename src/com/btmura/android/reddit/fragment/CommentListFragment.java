@@ -59,7 +59,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     public Loader<List<Comment>> onCreateLoader(int id, Bundle args) {
         CharSequence url = Urls.commentsUrl(getArguments().getString(ARG_THING_ID));
-        return new CommentLoader(getActivity(), url);
+        return new CommentLoader(getActivity().getApplicationContext(), url);
     }
 
     public void onLoadFinished(Loader<List<Comment>> loader, List<Comment> comments) {
