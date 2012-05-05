@@ -27,7 +27,6 @@ import java.util.List;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
-import android.os.SystemClock;
 import android.util.JsonReader;
 import android.util.Log;
 
@@ -67,7 +66,6 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
     @Override
     public List<Thing> loadInBackground() {
         try {
-            long t1 = SystemClock.currentThreadTimeMillis();
             URL u = new URL(url.toString());
             HttpURLConnection conn = (HttpURLConnection) u.openConnection();
             conn.connect();
@@ -78,9 +76,6 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
             parser.parseListingObject(reader);
             stream.close();
             conn.disconnect();
-
-            long t2 = SystemClock.currentThreadTimeMillis();
-            Log.v(TAG, String.valueOf(t2 - t1));
 
             return parser.things;
 
