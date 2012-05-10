@@ -120,7 +120,7 @@ public class AddSubredditFragment extends DialogFragment implements
                 int dstart, int dend) {
             for (int i = start; i < end; i++) {
                 char c = source.charAt(i);
-                if (!Character.isLetterOrDigit(c) && c != '+') {
+                if (!Character.isLetterOrDigit(c) && c != '+' && c != '_') {
                     return "";
                 }
             }
