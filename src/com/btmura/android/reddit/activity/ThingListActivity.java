@@ -30,6 +30,7 @@ import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.AddSubredditFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class ThingListActivity extends GlobalMenuActivity implements
         ActionBar.OnNavigationListener,

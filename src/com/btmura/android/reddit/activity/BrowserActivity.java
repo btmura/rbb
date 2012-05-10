@@ -31,6 +31,7 @@ import com.btmura.android.reddit.fragment.ControlFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity implements
         ActionBar.OnNavigationListener {

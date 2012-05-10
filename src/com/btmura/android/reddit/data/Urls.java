@@ -19,9 +19,9 @@ package com.btmura.android.reddit.data;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import com.btmura.android.reddit.activity.FilterAdapter;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class Urls {
 
