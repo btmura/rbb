@@ -16,6 +16,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
@@ -23,6 +24,9 @@ import com.btmura.android.reddit.entity.Thing;
 
 public class ThingView extends View {
 
+    public static final String TAG = "ThingView";
+
+    private static float FONT_SCALE;
     private static float DENSITY;
 
     private static int THUMB_WIDTH;
@@ -58,8 +62,11 @@ public class ThingView extends View {
     }
 
     private void init(Context context) {
-        if (PAINTS == null) {
-            Resources r = context.getResources();
+        Resources r = context.getResources();
+        float fontScale = r.getConfiguration().fontScale;
+        if (FONT_SCALE != fontScale) {
+            Log.v(TAG, "Hello");
+            FONT_SCALE = fontScale;
             DENSITY = r.getDisplayMetrics().density;
             PADDING = r.getDimensionPixelSize(R.dimen.padding);
             ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
@@ -81,7 +88,7 @@ public class ThingView extends View {
             for (int i = 0; i < 2; i++) {
                 TypedArray a = t.obtainStyledAttributes(styles[i], attrs);
                 PAINTS[i] = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-                PAINTS[i].setTextSize(a.getDimensionPixelSize(0, 0));
+                PAINTS[i].setTextSize(a.getDimensionPixelSize(0, 0) * FONT_SCALE);
                 PAINTS[i].setColor(a.getColor(1, -1));
                 a.recycle();
             }
