@@ -16,7 +16,32 @@
 
 package com.btmura.android.reddit.data;
 
+import com.btmura.android.reddit.data.Formatter.RawLinks;
+
 public class Formatter_RawLinksTest extends AbstractFormatterTest {
+
+    public void testPattern() {
+        // Test basic structure.
+        assertMatch("scheme://authority");
+        assertMatch("scheme://authority?query");
+        assertMatch("scheme://authority?query#fragment");
+        assertMatch("scheme://authority#fragment");
+
+        // Test some examples.
+        assertMatch("http://a");
+        assertMatch("http://abcd");
+        assertMatch("http://a/b/c");
+        assertMatch("https://a/b/c");
+        assertMatch("https://a/b/c");
+        assertMatch("HTTP://a/b/c");
+        assertMatch("ftp://a.b.c.d");
+
+        // Parentheses are valid in a URL.
+        assertMatch("http://a)");
+
+        // Capture first parenthesis to cancel out the ending one.
+        assertMatch("(http://abcd)");
+    }
 
     public void testFormat() {
         CharSequence cs = assertRawLinksFormat("http://abcd", "http://abcd");
@@ -29,5 +54,17 @@ public class Formatter_RawLinksTest extends AbstractFormatterTest {
     public void testFormat_multipleLine() {
         CharSequence cs = assertRawLinksFormat("http://abcd\ndef", "http://abcd\ndef");
         assertUrlSpan(cs, 0, 11, "http://abcd");
+    }
+
+    public void testFormat_parentheses() {
+        CharSequence cs = assertRawLinksFormat("(http://abcd)", "(http://abcd)");
+        assertUrlSpan(cs, 0, 13, "http://abcd");
+
+        cs = assertRawLinksFormat("end paren: http://abcd)", "end paren: http://abcd)");
+        assertUrlSpan(cs, 11, 23, "http://abcd)");
+    }
+
+    private void assertMatch(String input) {
+        assertTrue(input, RawLinks.PATTERN.matcher(input).matches());
     }
 }

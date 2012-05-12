@@ -33,6 +33,10 @@ import com.btmura.android.reddit.R;
 
 public class Formatter {
 
+    static final String REDDIT_URL = "http://www.reddit.com";
+    static final StringBuilder TMP = new StringBuilder();
+    static final Matcher MATCHER = RawLinks.PATTERN.matcher("");
+
     public static CharSequence formatTitle(Context context, CharSequence title) {
         CharSequence c = Escaped.format(title);
         c = Disapproval.format(context, c);
@@ -68,7 +72,7 @@ public class Formatter {
 
         static CharSequence format(Pattern pattern, CharSequence text) {
             CharSequence s = text;
-            Matcher m = pattern.matcher(text);
+            Matcher m = MATCHER.usePattern(pattern).reset(text);
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
@@ -134,7 +138,7 @@ public class Formatter {
                     throw new IllegalArgumentException("Unsupported style: " + style);
             }
 
-            Matcher m = p.matcher(text);
+            Matcher m = MATCHER.usePattern(p).reset(text);
             CharSequence s = text;
 
             for (int deleted = 0; m.find();) {
@@ -175,7 +179,7 @@ public class Formatter {
 
         static CharSequence format(CharSequence text) {
             CharSequence s = text;
-            Matcher m = PATTERN.matcher(text);
+            Matcher m = MATCHER.usePattern(PATTERN).reset(text);
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
@@ -191,13 +195,20 @@ public class Formatter {
 
     static class RawLinks {
 
-        private static final Pattern PATTERN = Pattern.compile("https?://[^ \n]+");
+        static final Pattern PATTERN = Pattern.compile("([(]??)([A-Za-z][A-Za-z0-9+-.]*?:"
+                + "//[A-Za-z0-9-._~!@#$%&'()*+,;=:/?]++)");
 
         static CharSequence format(CharSequence text) {
             CharSequence s = text;
-            Matcher m = PATTERN.matcher(text);
+            Matcher m = MATCHER.usePattern(PATTERN).reset(text);
             while (m.find()) {
-                String url = m.group();
+                String url = m.group(2);
+                if (url.endsWith(")")) {
+                    String openParen = m.group(1);
+                    if (!openParen.isEmpty()) {
+                        url = url.substring(0, url.length() - 1);
+                    }
+                }
                 URLSpan span = new URLSpan(url);
                 s = Formatter.setSpan(s, m.start(), m.end(), span);
             }
@@ -291,7 +302,7 @@ public class Formatter {
 
         static CharSequence format(CharSequence text) {
             CharSequence s = text;
-            Matcher m = SUBREDDIT_PATTERN.matcher(s);
+            Matcher m = MATCHER.usePattern(SUBREDDIT_PATTERN).reset(s);
             while (m.find()) {
                 SubredditSpan span = new SubredditSpan(m.group(1));
                 s = Formatter.setSpan(s, m.start(), m.end(), span);
@@ -306,7 +317,7 @@ public class Formatter {
 
         static CharSequence format(Context context, CharSequence text) {
             CharSequence s = text;
-            Matcher m = DISAPPROVAL_PATTERN.matcher(s);
+            Matcher m = MATCHER.usePattern(DISAPPROVAL_PATTERN).reset(s);
             for (; m.find();) {
                 ImageSpan span = new ImageSpan(context, R.drawable.disapproval_face,
                         ImageSpan.ALIGN_BOTTOM);
@@ -322,7 +333,7 @@ public class Formatter {
 
         static CharSequence format(CharSequence text) {
             CharSequence s = text;
-            Matcher m = PATTERN.matcher(text);
+            Matcher m = MATCHER.usePattern(PATTERN).reset(text);
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
@@ -362,9 +373,6 @@ public class Formatter {
         b.setSpan(span, start, end, 0);
         return s;
     }
-
-    private static final String REDDIT_URL = "http://www.reddit.com";
-    private static final StringBuilder TMP = new StringBuilder();
 
     static Object getUrlSpan(String url) {
         int srIndex = url.indexOf("/r/");
