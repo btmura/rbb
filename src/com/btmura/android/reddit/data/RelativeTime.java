@@ -28,8 +28,8 @@ public class RelativeTime {
     private static final int MONTH_SECONDS = DAY_SECONDS * 30;
     private static final int YEAR_SECONDS = MONTH_SECONDS * 12;
 
-    public static String format(Context context, long now, long time) {
-        long diff = now - time;
+    public static String format(Context context, long nowMs, long timeSec) {
+        long diff = nowMs / 1000 - timeSec;
         int resId;
         double value;
         if ((value = diff / YEAR_SECONDS) > 0) {
