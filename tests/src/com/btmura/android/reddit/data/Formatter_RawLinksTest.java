@@ -35,12 +35,6 @@ public class Formatter_RawLinksTest extends AbstractFormatterTest {
         assertMatch("https://a/b/c");
         assertMatch("HTTP://a/b/c");
         assertMatch("ftp://a.b.c.d");
-
-        // Parentheses are valid in a URL.
-        assertMatch("http://a)");
-
-        // Capture first parenthesis to cancel out the ending one.
-        assertMatch("(http://abcd)");
     }
 
     public void testFormat() {
@@ -56,12 +50,18 @@ public class Formatter_RawLinksTest extends AbstractFormatterTest {
         assertUrlSpan(cs, 0, 11, "http://abcd");
     }
 
-    public void testFormat_parentheses() {
+    public void testFormat_endings() {
         CharSequence cs = assertRawLinksFormat("(http://abcd)", "(http://abcd)");
-        assertUrlSpan(cs, 0, 13, "http://abcd");
+        assertUrlSpan(cs, 1, 12, "http://abcd");
 
         cs = assertRawLinksFormat("end paren: http://abcd)", "end paren: http://abcd)");
-        assertUrlSpan(cs, 11, 23, "http://abcd)");
+        assertUrlSpan(cs, 11, 22, "http://abcd");
+
+        cs = assertRawLinksFormat("look at http://abcd?", "look at http://abcd?");
+        assertUrlSpan(cs, 8, 19, "http://abcd");
+
+        cs = assertRawLinksFormat("see diagram (http://abcd)", "see diagram (http://abcd)");
+        assertUrlSpan(cs, 13, 24, "http://abcd");
     }
 
     private void assertMatch(String input) {

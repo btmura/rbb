@@ -27,7 +27,7 @@ public class Formatter_SubredditsTest extends AbstractFormatterTest {
 
         s = assertSubredditFormat("/r/under_score/", "/r/under_score/");
         assertSubredditSpan(s, 0, 15, "under_score");
-        
+
         s = assertSubredditFormat("/r/plus+minus/", "/r/plus+minus/");
         assertSubredditSpan(s, 0, 15, "plus+minus");
     }

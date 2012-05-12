@@ -195,20 +195,18 @@ public class Formatter {
 
     static class RawLinks {
 
-        static final Pattern PATTERN = Pattern.compile("([(]??)([A-Za-z][A-Za-z0-9+-.]*?:"
-                + "//[A-Za-z0-9-._~!@#$%&'()*+,;=:/?]++)");
+        /**
+         * Pattern capture URLs that don't end with ?, !, ., or ), since people
+         * sometimes put URLs at the end of a sentence.
+         */
+        static final Pattern PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9+-.]*?:"
+                + "//[A-Za-z0-9-._~!@#$%&'()*+,;=:/?]*" + "[A-Za-z0-9-_~@#$%&'(*+,;=:/]");
 
         static CharSequence format(CharSequence text) {
             CharSequence s = text;
             Matcher m = MATCHER.usePattern(PATTERN).reset(text);
             while (m.find()) {
-                String url = m.group(2);
-                if (url.endsWith(")")) {
-                    String openParen = m.group(1);
-                    if (!openParen.isEmpty()) {
-                        url = url.substring(0, url.length() - 1);
-                    }
-                }
+                String url = m.group();
                 URLSpan span = new URLSpan(url);
                 s = Formatter.setSpan(s, m.start(), m.end(), span);
             }
