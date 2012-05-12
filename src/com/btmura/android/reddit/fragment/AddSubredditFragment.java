@@ -38,8 +38,7 @@ import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
-public class AddSubredditFragment extends DialogFragment implements
-        AdapterView.OnItemClickListener {
+public class AddSubredditFragment extends DialogFragment implements AdapterView.OnItemClickListener {
 
     public static final String TAG = "AddSubredditFragment";
 

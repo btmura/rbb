@@ -87,6 +87,8 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 
     class CommentParser extends JsonParser {
 
+        private final long now = System.currentTimeMillis();
+
         private final List<Comment> comments = new ArrayList<Comment>(360);
 
         @Override
@@ -162,6 +164,7 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
                     comments.remove(i);
                     size--;
                 } else {
+                    c.assureFormat(getContext(), now);
                     i++;
                 }
             }

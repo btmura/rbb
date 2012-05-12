@@ -138,8 +138,8 @@ public class ThingListFragment extends ListFragment implements
         } else {
             url = Urls.searchUrl(query, moreKey);
         }
-        return new ThingLoader(getActivity().getApplicationContext(), url,
-                args != null ? adapter.getItems() : null);
+        return new ThingLoader(getActivity().getApplicationContext(), Subreddit.getName(subreddit),
+                url, args != null ? adapter.getItems() : null);
     }
 
     public void onLoadFinished(Loader<List<Thing>> loader, List<Thing> things) {

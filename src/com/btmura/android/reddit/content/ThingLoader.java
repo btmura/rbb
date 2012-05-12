@@ -37,12 +37,15 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
 
     private static final String TAG = "ThingLoader";
 
+    private final String parentSubreddit;
     private final CharSequence url;
     private List<Thing> things;
     private List<Thing> initThings;
 
-    public ThingLoader(Context context, CharSequence url, List<Thing> initThings) {
+    public ThingLoader(Context context, String parentSubreddit, CharSequence url,
+            List<Thing> initThings) {
         super(context);
+        this.parentSubreddit = parentSubreddit;
         this.url = url;
         this.initThings = initThings;
     }
@@ -90,6 +93,7 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
 
     class ThingParser extends JsonParser {
 
+        private final long now = System.currentTimeMillis();
         private final ArrayList<Thing> things = new ArrayList<Thing>(30);
         private String moreKey;
 
@@ -173,6 +177,11 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
         @Override
         public void onNumComments(JsonReader reader, int index) throws IOException {
             things.get(index).numComments = reader.nextInt();
+        }
+
+        @Override
+        public void onEntityEnd(int index) {
+            things.get(index).assureFormat(getContext(), parentSubreddit, now);
         }
 
         @Override
