@@ -24,8 +24,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Thing;
@@ -33,7 +31,7 @@ import com.btmura.android.reddit.entity.Thing;
 public class ThingAdapter extends BaseAdapter {
 
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
-    private final ArrayList<Thing> items = new ArrayList<Thing>();
+    private final ArrayList<Thing> items = new ArrayList<Thing>(30);
     private final Context context;
     private final LayoutInflater inflater;
     private final String subredditName;
@@ -130,31 +128,11 @@ public class ThingAdapter extends BaseAdapter {
                 return new ThingView(context);
 
             case Thing.TYPE_MORE:
-                return makeView(R.layout.thing_more_row, parent);
+                return inflater.inflate(R.layout.thing_more_row, parent, false);
 
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-    private View makeView(int layout, ViewGroup parent) {
-        View v = inflater.inflate(layout, parent, false);
-        v.setTag(createViewHolder(v));
-        return v;
-    }
-
-    private static ViewHolder createViewHolder(View v) {
-        ViewHolder holder = new ViewHolder();
-        holder.title = (TextView) v.findViewById(R.id.title);
-        holder.status = (TextView) v.findViewById(R.id.status);
-        holder.progress = (ProgressBar) v.findViewById(R.id.progress);
-        return holder;
-    }
-
-    static class ViewHolder {
-        TextView title;
-        TextView status;
-        ProgressBar progress;
     }
 
     private void setView(int position, View v) {
@@ -165,8 +143,6 @@ public class ThingAdapter extends BaseAdapter {
                 break;
 
             case Thing.TYPE_MORE:
-                ViewHolder h = (ViewHolder) v.getTag();
-                setMore(h, t);
                 break;
 
             default:
@@ -190,9 +166,5 @@ public class ThingAdapter extends BaseAdapter {
         } else {
             thumbnailLoader.clearThumbnail(v);
         }
-    }
-
-    private void setMore(ViewHolder h, Thing e) {
-        h.title.setCompoundDrawables(null, null, null, null);
     }
 }
