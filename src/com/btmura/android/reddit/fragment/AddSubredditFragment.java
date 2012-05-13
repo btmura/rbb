@@ -47,7 +47,7 @@ public class AddSubredditFragment extends DialogFragment implements AdapterView.
     };
 
     public interface SubredditNameHolder {
-        String getSubredditName();
+        CharSequence getSubredditName();
     }
 
     private SubredditNameHolder nameHolder;
@@ -83,7 +83,7 @@ public class AddSubredditFragment extends DialogFragment implements AdapterView.
             }
         });
 
-        String name = nameHolder.getSubredditName();
+        CharSequence name = nameHolder.getSubredditName();
         int length = name != null ? name.length() : 0;
         nameField.setText(name);
         nameField.setSelection(length, length);

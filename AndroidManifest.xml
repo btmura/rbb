@@ -47,7 +47,7 @@
         </activity>
         <activity
             android:name=".activity.SidebarActivity"
-            android:theme="@android:style/Theme.Holo.Light.Dialog" />
+            android:theme="@android:style/Theme.Holo.Light.DialogWhenLarge" />
         <activity android:name=".activity.ThingActivity" />
         <activity android:name=".activity.ThingListActivity" />
 

@@ -16,32 +16,68 @@
 
 package com.btmura.android.reddit.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.fragment.GlobalMenuFragment;
+import com.btmura.android.reddit.fragment.AddSubredditFragment.SubredditNameHolder;
 import com.btmura.android.reddit.widget.SidebarPagerAdapter;
 
-public class SidebarActivity extends Activity {
+public class SidebarActivity extends Activity implements SubredditNameHolder {
 
     public static final String EXTRA_SUBREDDIT = "s";
+
+    private SidebarPagerAdapter adapter;
+    private ViewPager pager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sidebar);
 
+        ActionBar bar = getActionBar();
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+
+            if (savedInstanceState == null) {
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.add(GlobalMenuFragment.newInstance(0), GlobalMenuFragment.TAG);
+                ft.commit();
+            }
+        }
+
         Subreddit subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
         setTitle(subreddit.getTitle(this));
 
         String[] subreddits = subreddit.name.split("\\+");
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(new SidebarPagerAdapter(getFragmentManager(), subreddits));
+        adapter = new SidebarPagerAdapter(getFragmentManager(), subreddits);
+        pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(adapter);
 
         View pagerStrip = findViewById(R.id.pager_strip);
         pagerStrip.setVisibility(subreddits.length > 1 ? View.VISIBLE : View.GONE);
+    }
+
+    public CharSequence getSubredditName() {
+        return adapter.getPageTitle(pager.getCurrentItem());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
