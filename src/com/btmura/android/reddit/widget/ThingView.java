@@ -36,8 +36,8 @@ public class ThingView extends View {
     private static int MAX_DETAILS_WIDTH;
 
     private static TextPaint[] PAINTS;
-    private static final int SMALL = 0;
-    private static final int MEDIUM = 1;
+    private static final int TITLE = 0;
+    private static final int STATUS = 1;
 
     private int bodyWidth;
 
@@ -76,9 +76,7 @@ public class ThingView extends View {
 
             Theme t = context.getTheme();
             int[] styles = new int[] {
-                    android.R.style.TextAppearance_Holo_Small,
-                    android.R.style.TextAppearance_Holo_Medium,
-                    android.R.style.TextAppearance_Holo_Large,
+                    R.style.ThingTitleText, R.style.ThingStatusText,
             };
             int[] attrs = new int[] {
                     android.R.attr.textSize, android.R.attr.textColor,
@@ -204,13 +202,13 @@ public class ThingView extends View {
     }
 
     private Layout makeTitleLayout(int width) {
-        return new StaticLayout(thing.title, PAINTS[MEDIUM], width, Alignment.ALIGN_NORMAL, 1f, 0f,
+        return new StaticLayout(thing.title, PAINTS[TITLE], width, Alignment.ALIGN_NORMAL, 1f, 0f,
                 true);
     }
 
     private static Layout makeLayout(CharSequence text, int width, Alignment alignment) {
-        BoringLayout.Metrics m = BoringLayout.isBoring(text, PAINTS[SMALL]);
-        return BoringLayout.make(text, PAINTS[SMALL], width, alignment, 1f, 0f, m, true,
+        BoringLayout.Metrics m = BoringLayout.isBoring(text, PAINTS[STATUS]);
+        return BoringLayout.make(text, PAINTS[STATUS], width, alignment, 1f, 0f, m, true,
                 TruncateAt.END, width);
     }
 

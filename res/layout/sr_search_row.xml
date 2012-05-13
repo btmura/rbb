@@ -22,7 +22,7 @@
 
     <TextView
         android:id="@+id/title"
-        style="@android:style/TextAppearance.Holo.Medium"
+        style="@style/SubredditTitleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="end"
@@ -31,7 +31,7 @@
 
     <TextView
         android:id="@+id/status"
-        style="@android:style/TextAppearance.Holo.Small"
+        style="@style/SubredditStatusText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="end"

@@ -21,14 +21,14 @@
 
     <TextView
         android:id="@+id/title"
-        style="@android:style/TextAppearance.Holo.Large"
+        style="@style/SidebarTitleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/element_padding" />
 
     <TextView
         android:id="@+id/description"
-        style="@android:style/TextAppearance.Holo.Medium"
+        style="@style/SidebarDescriptionText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

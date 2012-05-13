@@ -26,4 +26,28 @@
         <item name="android:maxHeight">4dp</item>
     </style>
 
+    <style name="SubredditTitleText" parent="@android:style/TextAppearance.Holo.Medium">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="SubredditStatusText" parent="@android:style/TextAppearance.Holo.Small">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="ThingTitleText" parent="@style/SubredditTitleText" />
+
+    <style name="ThingStatusText" parent="@style/SubredditStatusText" />
+
+    <style name="CommentTitleText" parent="@android:style/TextAppearance.Holo.Medium">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="CommentBodyText" parent="@style/SubredditTitleText" />
+
+    <style name="CommentStatusText" parent="@style/SubredditStatusText" />
+
+    <style name="SidebarTitleText" parent="@style/CommentTitleText" />
+    
+    <style name="SidebarDescriptionText" parent="@style/CommentBodyText" />
+    
 </resources>
