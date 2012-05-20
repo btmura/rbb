@@ -25,6 +25,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/element_padding" />
+    
+    <TextView
+        android:id="@+id/status"
+        style="@style/SidebarStatusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/padding" />
 
     <TextView
         android:id="@+id/description"

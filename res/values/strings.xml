@@ -53,7 +53,7 @@
     <string name="menu_view">View</string>
     <string name="menu_view_sidebar">View sidebar</string>
     
-    <string name="sr_search_status">%1$d subscribers</string>
+    <string name="sr_status">%1$d subscribers</string>
     
     <string name="tab_posts">Posts</string>
     <string name="tab_subreddits">Subreddits</string>

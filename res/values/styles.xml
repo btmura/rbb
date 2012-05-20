@@ -47,7 +47,9 @@
     <style name="CommentStatusText" parent="@style/SubredditStatusText" />
 
     <style name="SidebarTitleText" parent="@style/CommentTitleText" />
-    
+
+    <style name="SidebarStatusText" parent="@style/CommentStatusText" />
+
     <style name="SidebarDescriptionText" parent="@style/CommentBodyText" />
-    
+
 </resources>

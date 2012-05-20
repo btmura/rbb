@@ -108,8 +108,18 @@ public class SidebarLoader extends AsyncTaskLoader<Subreddit> {
         }
 
         @Override
+        public void onSubscribers(JsonReader reader, int index) throws IOException {
+            results.subscribers = reader.nextInt();
+        }
+
+        @Override
         public void onDescription(JsonReader reader, int index) throws IOException {
-            results.description = readTrimmedString(reader, "");
+            results.description = Formatter.formatInfo(getContext(), readTrimmedString(reader, ""));
+        }
+
+        @Override
+        public void onEntityEnd(int index) {
+            results.assureFormat(getContext());
         }
     }
 }

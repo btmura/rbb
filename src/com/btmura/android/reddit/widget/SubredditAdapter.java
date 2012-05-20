@@ -80,7 +80,7 @@ public class SubredditAdapter extends SimpleCursorAdapter {
         }
 
         if (query != null) {
-            String status = context.getString(R.string.sr_search_status, cursor.getInt(2));
+            String status = context.getString(R.string.sr_status, cursor.getInt(2));
             h.status.setText(status);
         }
 

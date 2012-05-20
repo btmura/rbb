@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,17 +24,14 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.entity.Subreddit;
 
 public class SidebarAdapter extends BaseAdapter {
 
     private Subreddit item;
-    private final Context context;
     private final LayoutInflater inflater;
 
     public SidebarAdapter(Context context) {
-        this.context = context;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -69,14 +65,16 @@ public class SidebarAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = inflater.inflate(R.layout.sidebar_row, parent, false);
 
-        Subreddit info = getItem(position);
+        Subreddit sr = getItem(position);
 
         TextView title = (TextView) v.findViewById(R.id.title);
-        title.setText(info.title);
+        title.setText(sr.title);
+
+        TextView status = (TextView) v.findViewById(R.id.status);
+        status.setText(sr.status);
 
         TextView desc = (TextView) v.findViewById(R.id.description);
-        desc.setText(Formatter.formatInfo(context, info.description));
-        desc.setMovementMethod(LinkMovementMethod.getInstance());
+        desc.setText(sr.description);
 
         return v;
     }

@@ -39,6 +39,7 @@ public class Subreddit implements Parcelable, Comparable<Subreddit> {
     public CharSequence title;
     public CharSequence description;
     public int subscribers;
+    public CharSequence status;
 
     public static Subreddit frontPage() {
         return newInstance("");
@@ -67,6 +68,13 @@ public class Subreddit implements Parcelable, Comparable<Subreddit> {
 
     public String getTitle(Context c) {
         return isFrontPage() ? c.getString(R.string.front_page) : name;
+    }
+
+    public Subreddit assureFormat(Context c) {
+        if (status == null) {
+            status = c.getString(R.string.sr_status, subscribers);
+        }
+        return this;
     }
 
     @Override
