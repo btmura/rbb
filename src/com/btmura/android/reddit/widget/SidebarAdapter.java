@@ -28,8 +28,12 @@ import com.btmura.android.reddit.entity.Subreddit;
 
 public class SidebarAdapter extends BaseAdapter {
 
-    private Subreddit item;
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_DESCRIPTION = 1;
+
     private final LayoutInflater inflater;
+
+    private Subreddit item;
 
     public SidebarAdapter(Context context) {
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -41,17 +45,12 @@ public class SidebarAdapter extends BaseAdapter {
     }
 
     @Override
-    public boolean areAllItemsEnabled() {
-        return false;
-    }
-
-    @Override
     public boolean isEnabled(int position) {
         return false;
     }
 
     public int getCount() {
-        return item != null ? 1 : 0;
+        return item != null ? 2 : 0;
     }
 
     public Subreddit getItem(int position) {
@@ -62,20 +61,58 @@ public class SidebarAdapter extends BaseAdapter {
         return position;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+
     public View getView(int position, View convertView, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.sidebar_row, parent, false);
+        View v = convertView;
+        if (v == null) {
+            v = inflater.inflate(getLayout(position), parent, false);
+        }
 
         Subreddit sr = getItem(position);
-
-        TextView title = (TextView) v.findViewById(R.id.title);
-        title.setText(sr.title);
-
-        TextView status = (TextView) v.findViewById(R.id.status);
-        status.setText(sr.status);
-
-        TextView desc = (TextView) v.findViewById(R.id.description);
-        desc.setText(sr.description);
+        setSubreddit(sr, v, position);
 
         return v;
+    }
+
+    private int getLayout(int position) {
+        switch (getItemViewType(position)) {
+            case TYPE_HEADER:
+                return R.layout.sidebar_header_row;
+
+            case TYPE_DESCRIPTION:
+                return R.layout.sidebar_row;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private void setSubreddit(Subreddit sr, View v, int position) {
+        switch (getItemViewType(position)) {
+            case TYPE_HEADER:
+                TextView title = (TextView) v.findViewById(R.id.title);
+                title.setText(sr.title);
+
+                TextView status = (TextView) v.findViewById(R.id.status);
+                status.setText(sr.status);
+                break;
+
+            case TYPE_DESCRIPTION:
+                TextView desc = (TextView) v;
+                desc.setText(sr.description);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 }
