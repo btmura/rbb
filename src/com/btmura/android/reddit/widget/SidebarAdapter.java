@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,6 +110,7 @@ public class SidebarAdapter extends BaseAdapter {
             case TYPE_DESCRIPTION:
                 TextView desc = (TextView) v;
                 desc.setText(sr.description);
+                desc.setMovementMethod(LinkMovementMethod.getInstance());
                 break;
 
             default:
