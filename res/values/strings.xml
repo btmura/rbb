@@ -16,7 +16,7 @@
 <resources>
 
     <string name="app_name">reddit by brian</string>
-    
+        
     <string name="add_front_page">Add front page</string>
     <string name="add_subreddit">Add subreddit</string>    
     
@@ -48,10 +48,14 @@
     <string name="menu_open">Open in another app</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_search">Search</string>
+    <string name="menu_settings">Settings</string>
     <string name="menu_share">Share</string>
     <string name="menu_split">Split</string>
     <string name="menu_view">View</string>
     <string name="menu_view_sidebar">View sidebar</string>
+    
+    <string name="settings_title">Settings</string>
+    <string name="settings_accounts">Accounts</string>
     
     <string name="sr_status">%1$d subscribers</string>
     

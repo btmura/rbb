@@ -30,6 +30,7 @@ import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SearchActivity;
+import com.btmura.android.reddit.activity.SettingsActivity;
 
 public class GlobalMenuFragment extends Fragment implements
         SearchView.OnFocusChangeListener,
@@ -89,6 +90,10 @@ public class GlobalMenuFragment extends Fragment implements
             case R.id.menu_search:
                 handleSearch();
                 return true;
+                
+            case R.id.menu_settings:
+                handleSettings();
+                return true;
 
             case R.id.menu_add_subreddit:
                 handleAddSubreddits();
@@ -101,6 +106,11 @@ public class GlobalMenuFragment extends Fragment implements
 
     public void handleSearch() {
         searchItem.expandActionView();
+    }
+    
+    private void handleSettings() {
+        Intent intent = new Intent(getActivity(), SettingsActivity.class);
+        startActivity(intent);
     }
 
     private void handleAddSubreddits() {

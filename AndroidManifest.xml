@@ -46,6 +46,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/settings_title" />
+        <activity
             android:name=".activity.SidebarActivity"
             android:theme="@android:style/Theme.Holo.Light.DialogWhenLarge" />
         <activity android:name=".activity.ThingActivity" />
