@@ -52,7 +52,7 @@ public class ThingAdapter extends BaseAdapter {
     public void swapData(List<Thing> newItems) {
         items.clear();
         if (newItems != null) {
-            items.ensureCapacity(items.size() + newItems.size());
+            items.ensureCapacity(newItems.size());
             items.addAll(newItems);
             notifyDataSetChanged();
         } else {
