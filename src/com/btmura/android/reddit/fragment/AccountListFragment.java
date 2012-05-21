@@ -18,19 +18,48 @@ package com.btmura.android.reddit.fragment;
 
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.widget.AccountAdapter;
 
-public class AccountListFragment extends ListFragment {
+public class AccountListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
+
+    private AccountAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        adapter = new AccountAdapter(getActivity());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setListAdapter(adapter);
+        setListShown(false);
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return AccountAdapter.createLoader(getActivity().getApplicationContext());
+    }
+
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+        setEmptyText(getString(data != null ? R.string.empty : R.string.error));
+        setListShown(true);
+    }
+
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 
     @Override
@@ -45,12 +74,12 @@ public class AccountListFragment extends ListFragment {
             case R.id.menu_add_account:
                 handleAddAccount();
                 return true;
-                
+
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-    
+
     private void handleAddAccount() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(AddAccountFragment.newInstance(), AddAccountFragment.TAG);

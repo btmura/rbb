@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.fragment;
 
 import android.app.DialogFragment;
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.method.PasswordTransformationMethod;
@@ -31,7 +32,9 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
+import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddAccountFragment extends DialogFragment implements
@@ -39,7 +42,7 @@ public class AddAccountFragment extends DialogFragment implements
         OnClickListener {
 
     public static final String TAG = "AddAccountFragment";
-    
+
     private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
         InputFilters.LOGIN_FILTER,
     };
@@ -60,7 +63,7 @@ public class AddAccountFragment extends DialogFragment implements
 
         login = (EditText) v.findViewById(R.id.login);
         login.setFilters(INPUT_FILTERS);
-        
+
         password = (EditText) v.findViewById(R.id.password);
 
         CheckBox showPassword = (CheckBox) v.findViewById(R.id.show_password);
@@ -102,8 +105,14 @@ public class AddAccountFragment extends DialogFragment implements
         if (password.getText().length() <= 0) {
             password.setError(getString(R.string.error_blank_field));
         }
-        if (login.getError() == null && password.getError() == null) {        
+        if (login.getError() == null && password.getError() == null) {
             dismiss();
+
+            ContentValues values = new ContentValues(2);
+            values.put(Accounts.COLUMN_LOGIN, login.getText().toString());
+            values.put(Accounts.COLUMN_PASSWORD, password.getText().toString());
+            Provider.addInBackground(getActivity(), Accounts.CONTENT_URI, values);
         }
-    }    
+    }
+
 }

@@ -238,7 +238,7 @@ public class ThingListFragment extends ListFragment implements
     private void handleAdd() {
         ContentValues values = new ContentValues(1);
         values.put(Subreddits.COLUMN_NAME, getSubreddit().name);
-        Provider.addSubredditInBackground(getActivity(), values);
+        Provider.addInBackground(getActivity(), Subreddits.CONTENT_URI, values);
     }
 
     private void handleViewSidebar() {

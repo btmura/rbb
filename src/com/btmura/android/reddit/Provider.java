@@ -43,24 +43,37 @@ import android.widget.Toast;
 
 public class Provider extends ContentProvider {
 
+    public static final String TAG = "Provider";
+
     static final String AUTHORITY = "com.btmura.android.reddit.provider";
 
-    private static final String TAG = "Provider";
+    private static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_SUBREDDITS = 1;
     private static final int MATCH_ONE_SUBREDDIT = 2;
+    private static final int MATCH_ALL_ACCOUNTS = 3;
+    private static final int MATCH_ONE_ACCOUNT = 4;
     static {
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME, MATCH_ALL_SUBREDDITS);
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
+        MATCHER.addURI(AUTHORITY, Accounts.TABLE_NAME, MATCH_ALL_ACCOUNTS);
+        MATCHER.addURI(AUTHORITY, Accounts.TABLE_NAME + "/#", MATCH_ONE_ACCOUNT);
     }
 
     public static class Subreddits implements BaseColumns {
         private static final String TABLE_NAME = "subreddits";
-        public static final Uri CONTENT_URI = Uri
-                .parse("content://" + AUTHORITY + "/" + TABLE_NAME);
+        public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
         public static final String COLUMN_NAME = "name";
         public static final String SORT = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
+    }
+
+    public static class Accounts implements BaseColumns {
+        private static final String TABLE_NAME = "accounts";
+        public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
+        public static final String COLUMN_LOGIN = "login";
+        public static final String COLUMN_PASSWORD = "password";
+        public static final String SORT = Accounts.COLUMN_LOGIN + " COLLATE NOCASE ASC";
     }
 
     private DbHelper helper;
@@ -74,12 +87,35 @@ public class Provider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
+        String tableName;
+        Uri notifyUri;
+
         switch (MATCHER.match(uri)) {
             case MATCH_ALL_SUBREDDITS:
+                tableName = Subreddits.TABLE_NAME;
+                notifyUri = Subreddits.CONTENT_URI;
+                break;
+
+            case MATCH_ALL_ACCOUNTS:
+                tableName = Accounts.TABLE_NAME;
+                notifyUri = Accounts.CONTENT_URI;
                 break;
 
             case MATCH_ONE_SUBREDDIT:
+                tableName = Subreddits.TABLE_NAME;
+                notifyUri = Subreddits.CONTENT_URI;
+
                 selection = Subreddits._ID + "= ?";
+                selectionArgs = new String[] {
+                    Long.toString(ContentUris.parseId(uri))
+                };
+                break;
+
+            case MATCH_ONE_ACCOUNT:
+                tableName = Accounts.TABLE_NAME;
+                notifyUri = Accounts.CONTENT_URI;
+
+                selection = Accounts._ID + "= ?";
                 selectionArgs = new String[] {
                     Long.toString(ContentUris.parseId(uri))
                 };
@@ -90,16 +126,25 @@ public class Provider extends ContentProvider {
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor c = db.query(Subreddits.TABLE_NAME, projection, selection, selectionArgs, null,
-                null, sortOrder);
-        c.setNotificationUri(getContext().getContentResolver(), Subreddits.CONTENT_URI);
+        Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
+        c.setNotificationUri(getContext().getContentResolver(), notifyUri);
         return c;
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+        String tableName;
+        Uri notifyUri;
+
         switch (MATCHER.match(uri)) {
             case MATCH_ALL_SUBREDDITS:
+                tableName = Subreddits.TABLE_NAME;
+                notifyUri = Subreddits.CONTENT_URI;
+                break;
+
+            case MATCH_ALL_ACCOUNTS:
+                tableName = Accounts.TABLE_NAME;
+                notifyUri = Accounts.CONTENT_URI;
                 break;
 
             default:
@@ -107,8 +152,8 @@ public class Provider extends ContentProvider {
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        long id = db.insert(Subreddits.TABLE_NAME, null, values);
-        getContext().getContentResolver().notifyChange(Subreddits.CONTENT_URI, null);
+        long id = db.insert(tableName, null, values);
+        getContext().getContentResolver().notifyChange(notifyUri, null);
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -147,12 +192,13 @@ public class Provider extends ContentProvider {
         return null;
     }
 
-    public static void addSubredditInBackground(final Context context, final ContentValues values) {
+    public static void addInBackground(final Context context, final Uri uri,
+            final ContentValues values) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 ContentResolver cr = context.getContentResolver();
-                cr.insert(Subreddits.CONTENT_URI, values);
+                cr.insert(uri, values);
                 return null;
             }
 
@@ -325,7 +371,7 @@ public class Provider extends ContentProvider {
     static class DbHelper extends SQLiteOpenHelper {
 
         public DbHelper(Context context) {
-            super(context, "reddit", null, 1);
+            super(context, "reddit", null, 2);
         }
 
         @Override
@@ -333,6 +379,7 @@ public class Provider extends ContentProvider {
             db.beginTransaction();
             try {
                 createSubreddits(db);
+                createAccounts(db);
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
@@ -376,8 +423,19 @@ public class Provider extends ContentProvider {
             }
         }
 
+        private void createAccounts(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + Accounts.TABLE_NAME + " (" + Accounts._ID
+                    + " INTEGER PRIMARY KEY, " + Accounts.COLUMN_LOGIN + " TEXT UNIQUE NOT NULL, "
+                    + Accounts.COLUMN_PASSWORD + " TEXT UNIQUE NOT NULL)");
+            db.execSQL("CREATE UNIQUE INDEX " + Accounts.COLUMN_LOGIN + " ON "
+                    + Accounts.TABLE_NAME + " (" + Accounts.COLUMN_LOGIN + " ASC)");
+        }
+
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (newVersion == 2) {
+                createAccounts(db);
+            }
         }
     }
 }

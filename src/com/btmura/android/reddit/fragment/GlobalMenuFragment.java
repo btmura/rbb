@@ -90,7 +90,7 @@ public class GlobalMenuFragment extends Fragment implements
             case R.id.menu_search:
                 handleSearch();
                 return true;
-                
+
             case R.id.menu_settings:
                 handleSettings();
                 return true;
@@ -107,7 +107,7 @@ public class GlobalMenuFragment extends Fragment implements
     public void handleSearch() {
         searchItem.expandActionView();
     }
-    
+
     private void handleSettings() {
         Intent intent = new Intent(getActivity(), SettingsActivity.class);
         startActivity(intent);
