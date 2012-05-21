@@ -24,7 +24,6 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -36,6 +35,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
 public class AddSubredditFragment extends DialogFragment implements AdapterView.OnItemClickListener {
@@ -43,7 +43,7 @@ public class AddSubredditFragment extends DialogFragment implements AdapterView.
     public static final String TAG = "AddSubredditFragment";
 
     private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
-        new SubredditInputFilter(),
+        InputFilters.SUBREDDIT_NAME_FILTER,
     };
 
     public interface SubredditNameHolder {
@@ -93,7 +93,7 @@ public class AddSubredditFragment extends DialogFragment implements AdapterView.
 
         return new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.add_subreddit)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String name;
                         if (addFrontPage.isChecked()) {
@@ -112,18 +112,5 @@ public class AddSubredditFragment extends DialogFragment implements AdapterView.
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         String name = adapter.getName(getActivity(), position);
         nameField.setText(name);
-    }
-
-    static class SubredditInputFilter implements InputFilter {
-        public CharSequence filter(CharSequence source, int start, int end, Spanned dest,
-                int dstart, int dend) {
-            for (int i = start; i < end; i++) {
-                char c = source.charAt(i);
-                if (!Character.isLetterOrDigit(c) && c != '+' && c != '_') {
-                    return "";
-                }
-            }
-            return null;
-        }
     }
 }

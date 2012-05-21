@@ -16,17 +16,20 @@
 <resources>
 
     <string name="app_name">reddit by brian</string>
-        
+    
+    <string name="add">Add</string>   
+    <string name="add_account">Add account</string>
     <string name="add_front_page">Add front page</string>
     <string name="add_subreddit">Add subreddit</string>    
-    
-    <string name="button_add">Add</string>
 
     <string name="comment_header_status">%1$s&#160; %2$s ago&#160; %3$d points&#160; %4$d comments</string>
     <string name="comment_comment_status">%1$s&#160; %2$s ago&#160; %3$d points</string>
     
     <string name="empty">Nothing to see here…</string>    
     <string name="error">Something went wrong…</string>
+    
+    <string name="error_login">Login cannot be empty.</string>
+    <string name="error_password">Password cannot be empty.</string>
 
     <string name="filter_hot">what\'s hot</string>
     <string name="filter_new">new</string>
@@ -57,6 +60,8 @@
     <string name="settings_title">Settings</string>
     <string name="settings_accounts">Accounts</string>
     
+    <string name="show_password">Show password</string>
+    
     <string name="sr_status">%1$d subscribers</string>
     
     <string name="tab_posts">Posts</string>
@@ -86,6 +91,8 @@
     <string name="time_x_months">%1$d months</string>
     <string name="time_x_years">%1$d years</string>
     
+    <string name="type_login">Type login</string>
+    <string name="type_password">Type password</string>
     <string name="type_subreddit_name">Type subreddit name</string>
 
 </resources>

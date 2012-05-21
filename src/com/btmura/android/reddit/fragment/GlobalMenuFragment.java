@@ -96,7 +96,7 @@ public class GlobalMenuFragment extends Fragment implements
                 return true;
 
             case R.id.menu_add_subreddit:
-                handleAddSubreddits();
+                handleAddSubreddit();
                 return true;
 
             default:
@@ -113,7 +113,7 @@ public class GlobalMenuFragment extends Fragment implements
         startActivity(intent);
     }
 
-    private void handleAddSubreddits() {
+    private void handleAddSubreddit() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(AddSubredditFragment.newInstance(), AddSubredditFragment.TAG);
         ft.commit();

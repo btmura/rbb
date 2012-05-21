@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:columnCount="1" >
+
+    <EditText
+        android:id="@+id/login"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginBottom="@dimen/element_padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:hint="@string/type_login"
+        android:imeOptions="flagNoFullscreen"
+        android:inputType="textNoSuggestions"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginBottom="@dimen/element_padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:hint="@string/type_password"
+        android:imeOptions="flagNoFullscreen"
+        android:inputType="textPassword"
+        android:singleLine="true" />
+
+    <CheckBox
+        android:id="@+id/show_password"
+        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:text="@string/show_password" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="?android:attr/dividerHorizontal"
+        android:orientation="vertical"
+        android:showDividers="beginning" >
+
+        <LinearLayout
+            style="@android:style/Holo.Light.ButtonBar.AlertDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/cancel"
+                style="@android:style/Widget.Holo.Light.Button.Borderless.Small"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@android:string/cancel" />
+
+            <Button
+                android:id="@+id/add"
+                style="@android:style/Widget.Holo.Light.Button.Borderless.Small"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/add" />
+        </LinearLayout>
+    </LinearLayout>
+
+</GridLayout>
