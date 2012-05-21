@@ -27,9 +27,8 @@
     
     <string name="empty">Nothing to see here…</string>    
     <string name="error">Something went wrong…</string>
-    
-    <string name="error_login">Login cannot be empty.</string>
-    <string name="error_password">Password cannot be empty.</string>
+
+    <string name="error_blank_field">This field cannot be blank.</string>
 
     <string name="filter_hot">what\'s hot</string>
     <string name="filter_new">new</string>

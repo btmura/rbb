@@ -97,10 +97,10 @@ public class AddAccountFragment extends DialogFragment implements
 
     private void handleAdd() {
         if (login.getText().length() <= 0) {
-            login.setError(getString(R.string.error_login));
+            login.setError(getString(R.string.error_blank_field));
         }
         if (password.getText().length() <= 0) {
-            password.setError(getString(R.string.error_password));
+            password.setError(getString(R.string.error_blank_field));
         }
         if (login.getError() == null && password.getError() == null) {        
             dismiss();

@@ -2,14 +2,15 @@
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnCount="1"
-    android:padding="@dimen/padding" >
+    android:columnCount="1" >
 
-    <AutoCompleteTextView
+    <EditText
         android:id="@+id/subreddit_name"
         android:layout_gravity="fill_horizontal"
         android:layout_marginBottom="@dimen/element_padding"
-        android:completionThreshold="3"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
         android:hint="@string/type_subreddit_name"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
@@ -17,6 +18,14 @@
 
     <CheckBox
         android:id="@+id/add_front_page"
+        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
         android:text="@string/add_front_page" />
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/add_button_bar" />
 
 </GridLayout>

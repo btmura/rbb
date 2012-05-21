@@ -26,6 +26,14 @@
         <item name="android:maxHeight">4dp</item>
     </style>
 
+    <style name="ButtonBarContainer">
+        <item name="android:divider">?android:attr/dividerHorizontal</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:showDividers">beginning</item>
+    </style>
+    
+    <style name="ButtonBar" parent="@android:style/Holo.ButtonBar.AlertDialog" />
+
     <style name="SubredditTitleText" parent="@android:style/TextAppearance.Holo.Medium">
         <item name="android:textSize">16sp</item>
     </style>

@@ -17,28 +17,27 @@
 package com.btmura.android.reddit.fragment;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.text.InputFilters;
-import com.btmura.android.reddit.widget.SubredditAdapter;
 
-public class AddSubredditFragment extends DialogFragment implements AdapterView.OnItemClickListener {
+public class AddSubredditFragment extends DialogFragment implements
+        View.OnClickListener,
+        CheckBox.OnCheckedChangeListener {
 
     public static final String TAG = "AddSubredditFragment";
 
@@ -51,8 +50,11 @@ public class AddSubredditFragment extends DialogFragment implements AdapterView.
     }
 
     private SubredditNameHolder nameHolder;
-    private SubredditAdapter adapter;
-    private AutoCompleteTextView nameField;
+
+    private EditText nameField;
+    private CheckBox addFrontPage;
+    private Button cancel;
+    private Button add;
 
     public static AddSubredditFragment newInstance() {
         return new AddSubredditFragment();
@@ -65,52 +67,65 @@ public class AddSubredditFragment extends DialogFragment implements AdapterView.
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        adapter = new SubredditAdapter(getActivity(), null, false);
-    }
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View v = inflater.inflate(R.layout.add_subreddit, null, false);
-        nameField = (AutoCompleteTextView) v.findViewById(R.id.subreddit_name);
-        final CheckBox addFrontPage = (CheckBox) v.findViewById(R.id.add_front_page);
-
-        addFrontPage.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                nameField.setEnabled(!isChecked);
-            }
-        });
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        getDialog().setTitle(R.string.add_subreddit);
+        View v = inflater.inflate(R.layout.add_subreddit, container, false);
 
         CharSequence name = nameHolder.getSubredditName();
         int length = name != null ? name.length() : 0;
+        nameField = (EditText) v.findViewById(R.id.subreddit_name);
         nameField.setText(name);
         nameField.setSelection(length, length);
         nameField.setFilters(INPUT_FILTERS);
-        nameField.setAdapter(adapter);
-        nameField.setOnItemClickListener(this);
 
-        return new AlertDialog.Builder(getActivity()).setView(v).setTitle(R.string.add_subreddit)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        String name;
-                        if (addFrontPage.isChecked()) {
-                            name = "";
-                        } else {
-                            name = nameField.getText().toString();
-                        }
+        addFrontPage = (CheckBox) v.findViewById(R.id.add_front_page);
+        addFrontPage.setOnCheckedChangeListener(this);
 
-                        ContentValues values = new ContentValues(1);
-                        values.put(Subreddits.COLUMN_NAME, name);
-                        Provider.addSubredditInBackground(getActivity(), values);
-                    }
-                }).create();
+        cancel = (Button) v.findViewById(R.id.cancel);
+        cancel.setOnClickListener(this);
+
+        add = (Button) v.findViewById(R.id.add);
+        add.setOnClickListener(this);
+
+        return v;
     }
 
-    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        String name = adapter.getName(getActivity(), position);
-        nameField.setText(name);
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        nameField.setEnabled(!isChecked);
+        if (!nameField.isEnabled()) {
+            nameField.setError(null);
+        }
+    }
+
+    public void onClick(View v) {
+        if (v == cancel) {
+            handleCancel();
+        } else if (v == add) {
+            handleAdd();
+        }
+    }
+
+    private void handleCancel() {
+        dismiss();
+    }
+
+    private void handleAdd() {
+        String name;
+        if (addFrontPage.isChecked()) {
+            name = "";
+        } else {
+            name = nameField.getText().toString();
+        }
+
+        if (!addFrontPage.isChecked() && TextUtils.isEmpty(name)) {
+            nameField.setError(getString(R.string.error_blank_field));
+            return;
+        }
+
+        ContentValues values = new ContentValues(1);
+        values.put(Subreddits.COLUMN_NAME, name);
+        Provider.addSubredditInBackground(getActivity(), values);
+
+        dismiss();
     }
 }
