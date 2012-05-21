@@ -16,7 +16,6 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
@@ -65,7 +64,6 @@ public class ThingView extends View {
         Resources r = context.getResources();
         float fontScale = r.getConfiguration().fontScale;
         if (FONT_SCALE != fontScale) {
-            Log.v(TAG, "Hello");
             FONT_SCALE = fontScale;
             DENSITY = r.getDisplayMetrics().density;
             PADDING = r.getDimensionPixelSize(R.dimen.padding);
