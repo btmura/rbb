@@ -14,48 +14,42 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.fragment;
+package com.btmura.android.reddit.activity;
 
+import android.app.ActionBar;
+import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.fragment.AccountListFragment;
 
-public class AccountFragment extends PreferenceFragment {
+public class AccountBrowserActivity extends Activity {
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
+        setContentView(R.layout.account_browser);
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.account_menu, menu);
+        ActionBar bar = getActionBar();
+        bar.setDisplayHomeAsUpEnabled(true);
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.single_container, AccountListFragment.newInstance(),
+                AccountListFragment.TAG);
+        ft.commit();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_remove_account:
-                handleRemoveAccount();
+            case android.R.id.home:
+                finish();
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void handleRemoveAccount() {
-        long[] ids = new long[] {
-            0
-        };
-        Provider.deleteInBackground(getActivity(), Accounts.CONTENT_URI, ids);
     }
 }

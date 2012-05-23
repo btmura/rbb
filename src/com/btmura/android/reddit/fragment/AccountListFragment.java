@@ -17,60 +17,55 @@
 package com.btmura.android.reddit.fragment;
 
 import android.app.FragmentTransaction;
+import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.preference.AccountPreference;
+import com.btmura.android.reddit.widget.AccountAdapter;
 
-public class AccountListFragment extends PreferenceFragment implements LoaderCallbacks<Cursor> {
+public class AccountListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
 
     public static final String TAG = "AccountListFragment";
+    
+    public static AccountListFragment newInstance() {
+        return new AccountListFragment();
+    }
 
-    private static final String[] PROJECTION = {
-            Accounts._ID, Accounts.COLUMN_LOGIN,
-    };
-
+    private AccountAdapter adapter;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        adapter = new AccountAdapter(getActivity());
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setListAdapter(adapter);
+        setListShown(false);
         getLoaderManager().initLoader(0, null, this);
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(), Accounts.CONTENT_URI, PROJECTION, null, null,
-                Accounts.SORT);
+        return AccountAdapter.createLoader(getActivity().getApplicationContext());
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(getActivity());
-        for (data.moveToPosition(-1); data.moveToNext();) {
-            screen.addPreference(new AccountPreference(getActivity(), data.getLong(0), data
-                    .getString(1)));
-        }
-        setPreferenceScreen(screen);
+        adapter.swapCursor(data);
+        setEmptyText(getString(data != null ? R.string.empty : R.string.error));
+        setListShown(true);
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
-        PreferenceScreen screen = getPreferenceScreen();
-        if (screen != null) {
-            screen.removeAll();
-        }
+        adapter.swapCursor(null);
     }
 
     @Override

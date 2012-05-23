@@ -14,10 +14,11 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <header
-        android:fragment="com.btmura.android.reddit.fragment.AccountListFragment"
-        android:title="@string/settings_accounts" />
-
-</preference-headers>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/title"
+    style="@style/AccountLoginText"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ellipsize="end"
+    android:padding="@dimen/padding"
+    android:singleLine="true" />
