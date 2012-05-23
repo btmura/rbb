@@ -32,9 +32,9 @@ import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.preference.AccountPreference;
 
-public class AccountPreferenceFragment extends PreferenceFragment implements LoaderCallbacks<Cursor> {
+public class AccountListFragment extends PreferenceFragment implements LoaderCallbacks<Cursor> {
 
-    public static final String TAG = "AccountPreferenceFragment";
+    public static final String TAG = "AccountListFragment";
 
     private static final String[] PROJECTION = {
             Accounts._ID, Accounts.COLUMN_LOGIN,
@@ -45,7 +45,7 @@ public class AccountPreferenceFragment extends PreferenceFragment implements Loa
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -59,12 +59,13 @@ public class AccountPreferenceFragment extends PreferenceFragment implements Loa
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(getActivity());
-        for (data.moveToPosition(-1); data.moveToNext(); ) {
-            screen.addPreference(new AccountPreference(getActivity(), data.getString(1)));
+        for (data.moveToPosition(-1); data.moveToNext();) {
+            screen.addPreference(new AccountPreference(getActivity(), data.getLong(0), data
+                    .getString(1)));
         }
         setPreferenceScreen(screen);
     }
-    
+
     public void onLoaderReset(Loader<Cursor> loader) {
         PreferenceScreen screen = getPreferenceScreen();
         if (screen != null) {
@@ -75,7 +76,7 @@ public class AccountPreferenceFragment extends PreferenceFragment implements Loa
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.account_menu, menu);
+        inflater.inflate(R.menu.account_list_menu, menu);
     }
 
     @Override

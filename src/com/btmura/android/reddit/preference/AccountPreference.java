@@ -21,10 +21,12 @@ import android.preference.Preference;
 
 public class AccountPreference extends Preference {
 
-    private final String login;
-    
-    public AccountPreference(Context context, String login) {
+    public final long id;
+    public final String login;
+
+    public AccountPreference(Context context, long id, String login) {
         super(context);
+        this.id = id;
         this.login = login;
     }
 

@@ -247,21 +247,20 @@ public class SubredditListFragment extends ListFragment implements
 
         long[] ids = getListView().getCheckedItemIds();
 
-        Provider.combineSubredditsInBackground(getActivity().getApplicationContext(), names, ids);
+        Provider.combineSubredditsInBackground(getActivity(), names, ids);
         mode.finish();
     }
 
     private void handleSplit(ActionMode mode) {
         ArrayList<String> names = getCheckedNames();
         long[] ids = getListView().getCheckedItemIds();
-        Provider.splitSubredditInBackground(getActivity().getApplicationContext(), names.get(0),
-                ids[0]);
+        Provider.splitSubredditInBackground(getActivity(), names.get(0), ids[0]);
         mode.finish();
     }
 
     private void handleDelete(ActionMode mode) {
         long[] ids = getListView().getCheckedItemIds();
-        Provider.deleteSubredditInBackground(getActivity().getApplicationContext(), ids);
+        Provider.deleteInBackground(getActivity(), Subreddits.CONTENT_URI, ids);
         mode.finish();
     }
 

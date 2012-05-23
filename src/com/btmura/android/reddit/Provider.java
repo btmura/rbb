@@ -90,39 +90,32 @@ public class Provider extends ContentProvider {
         String tableName;
         Uri notifyUri;
 
-        switch (MATCHER.match(uri)) {
+        int match = MATCHER.match(uri);
+        switch (match) {
             case MATCH_ALL_SUBREDDITS:
+            case MATCH_ONE_SUBREDDIT:
                 tableName = Subreddits.TABLE_NAME;
                 notifyUri = Subreddits.CONTENT_URI;
                 break;
 
             case MATCH_ALL_ACCOUNTS:
-                tableName = Accounts.TABLE_NAME;
-                notifyUri = Accounts.CONTENT_URI;
-                break;
-
-            case MATCH_ONE_SUBREDDIT:
-                tableName = Subreddits.TABLE_NAME;
-                notifyUri = Subreddits.CONTENT_URI;
-
-                selection = Subreddits._ID + "= ?";
-                selectionArgs = new String[] {
-                    Long.toString(ContentUris.parseId(uri))
-                };
-                break;
-
             case MATCH_ONE_ACCOUNT:
                 tableName = Accounts.TABLE_NAME;
                 notifyUri = Accounts.CONTENT_URI;
+                break;
 
-                selection = Accounts._ID + "= ?";
+            default:
+                return null;
+        }
+
+        switch (match) {
+            case MATCH_ONE_ACCOUNT:
+            case MATCH_ONE_SUBREDDIT:
+                selection = BaseColumns._ID + "= ?";
                 selectionArgs = new String[] {
                     Long.toString(ContentUris.parseId(uri))
                 };
                 break;
-
-            default:
-                throw new IllegalArgumentException(uri.toString());
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -164,25 +157,41 @@ public class Provider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        switch (MATCHER.match(uri)) {
+        String tableName;
+        Uri notifyUri;
+
+        int match = MATCHER.match(uri);
+        switch (match) {
             case MATCH_ALL_SUBREDDITS:
+            case MATCH_ONE_SUBREDDIT:
+                tableName = Subreddits.TABLE_NAME;
+                notifyUri = Subreddits.CONTENT_URI;
                 break;
 
-            case MATCH_ONE_SUBREDDIT:
-                selection = Subreddits._ID + "= ?";
-                selectionArgs = new String[] {
-                    Long.toString(ContentUris.parseId(uri))
-                };
+            case MATCH_ALL_ACCOUNTS:
+            case MATCH_ONE_ACCOUNT:
+                tableName = Accounts.TABLE_NAME;
+                notifyUri = Accounts.CONTENT_URI;
                 break;
 
             default:
                 return 0;
         }
 
+        switch (match) {
+            case MATCH_ONE_SUBREDDIT:
+            case MATCH_ONE_ACCOUNT:
+                selection = BaseColumns._ID + "= ?";
+                selectionArgs = new String[] {
+                    Long.toString(ContentUris.parseId(uri))
+                };
+                break;
+        }
+
         SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.delete(Subreddits.TABLE_NAME, selection, selectionArgs);
+        int count = db.delete(tableName, selection, selectionArgs);
         if (count > 0) {
-            getContext().getContentResolver().notifyChange(Subreddits.CONTENT_URI, null);
+            getContext().getContentResolver().notifyChange(notifyUri, null);
         }
         return count;
     }
@@ -228,11 +237,11 @@ public class Provider extends ContentProvider {
         }.execute();
     }
 
-    public static void deleteSubredditInBackground(final Context context, final long[] ids) {
+    public static void deleteInBackground(final Context context, final Uri uri, final long[] ids) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                StringBuilder s = new StringBuilder(Subreddits._ID).append(" IN (");
+                StringBuilder s = new StringBuilder(BaseColumns._ID).append(" IN (");
                 int numIds = ids.length;
                 for (int i = 0; i < numIds; i++) {
                     s.append(ids[i]);
@@ -242,7 +251,7 @@ public class Provider extends ContentProvider {
                 }
                 s.append(")");
                 ContentResolver cr = context.getContentResolver();
-                cr.delete(Subreddits.CONTENT_URI, s.toString(), null);
+                cr.delete(uri, s.toString(), null);
                 return null;
             }
 
