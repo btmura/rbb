@@ -49,5 +49,6 @@ public class AccountAdapter extends SimpleCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         TextView tv = (TextView) view;
         tv.setText(cursor.getString(1));
+        tv.setBackgroundResource(R.drawable.selector_normal);
     }
 }

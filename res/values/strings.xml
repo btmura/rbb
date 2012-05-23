@@ -57,7 +57,7 @@
     <string name="menu_view">View</string>
     <string name="menu_view_sidebar">View sidebar</string>
     
-    <string name="remove_account">Remove account</string>
+    <string name="remove">Remove</string>
 
     <string name="show_password">Show password</string>
     
