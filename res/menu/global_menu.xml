@@ -24,7 +24,7 @@
         android:title="@string/menu_search"/>
     <item
         android:id="@+id/menu_accounts"
-        android:title="@string/accounts"/>
+        android:title="@string/manage_accounts"/>
     <item
         android:id="@+id/menu_add_subreddit"
         android:title="@string/menu_add_subreddit"/>

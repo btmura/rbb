@@ -40,6 +40,8 @@
     <string name="front_page">front page</string>
     <string name="loading">Loading…</string>
     <string name="logging_in">Logging in…</string>
+    
+    <string name="manage_accounts">Manage accounts</string>
 
     <string name="menu_add">Add</string>
     <string name="menu_add_combined">Add combined</string>
