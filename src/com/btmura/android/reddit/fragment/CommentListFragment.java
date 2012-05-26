@@ -16,18 +16,19 @@
 
 package com.btmura.android.reddit.fragment;
 
+import java.net.URL;
 import java.util.List;
+
+import android.app.ListFragment;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
+import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.widget.CommentAdapter;
-
-import android.app.ListFragment;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Loader;
-import android.os.Bundle;
 
 public class CommentListFragment extends ListFragment implements LoaderCallbacks<List<Comment>> {
 
@@ -58,7 +59,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public Loader<List<Comment>> onCreateLoader(int id, Bundle args) {
-        CharSequence url = Urls.commentsUrl(getArguments().getString(ARG_THING_ID));
+        URL url = Urls.commentsUrl(getArguments().getString(ARG_THING_ID));
         return new CommentLoader(getActivity().getApplicationContext(), url);
     }
 

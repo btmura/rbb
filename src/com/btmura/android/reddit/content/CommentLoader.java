@@ -37,10 +37,10 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 
     private static final String TAG = "CommentLoader";
 
-    private final CharSequence url;
+    private final URL url;
     private List<Comment> comments;
 
-    public CommentLoader(Context context, CharSequence url) {
+    public CommentLoader(Context context, URL url) {
         super(context);
         this.url = url;
     }
@@ -64,8 +64,7 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
     @Override
     public List<Comment> loadInBackground() {
         try {
-            URL u = new URL(url.toString());
-            HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.connect();
 
             InputStream stream = conn.getInputStream();

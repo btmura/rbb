@@ -159,7 +159,7 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private CharSequence getLink() {
-        return isShowingLink() ? thing.url : Urls.permaUrl(thing);
+        return isShowingLink() ? thing.url : Urls.permaUrl(thing).toExternalForm();
     }
 
     private ThingPagerHolder getHolder() {

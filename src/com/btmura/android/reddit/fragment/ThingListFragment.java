@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.fragment;
 
+import java.net.URL;
 import java.util.List;
 
 import android.app.ListFragment;
@@ -132,7 +133,7 @@ public class ThingListFragment extends ListFragment implements
 
     public Loader<List<Thing>> onCreateLoader(int id, Bundle args) {
         String moreKey = args != null ? args.getString(LOADER_ARG_MORE_KEY) : null;
-        CharSequence url;
+        URL url;
         if (subreddit != null) {
             url = Urls.subredditUrl(subreddit, getFilter(), moreKey);
         } else {

@@ -43,9 +43,9 @@ public class SubredditSearchLoader extends AsyncTaskLoader<Cursor> {
 
     private Cursor results;
 
-    private CharSequence url;
+    private URL url;
 
-    public SubredditSearchLoader(Context context, CharSequence url) {
+    public SubredditSearchLoader(Context context, URL url) {
         super(context);
         this.url = url;
     }
@@ -63,9 +63,7 @@ public class SubredditSearchLoader extends AsyncTaskLoader<Cursor> {
     @Override
     public Cursor loadInBackground() {
         try {
-            URL subredditUrl = new URL(url.toString());
-
-            HttpURLConnection connection = (HttpURLConnection) subredditUrl.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
 
             InputStream stream = connection.getInputStream();

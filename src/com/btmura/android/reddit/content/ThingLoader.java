@@ -38,11 +38,11 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
     private static final String TAG = "ThingLoader";
 
     private final String parentSubreddit;
-    private final CharSequence url;
+    private final URL url;
     private List<Thing> things;
     private List<Thing> initThings;
 
-    public ThingLoader(Context context, String parentSubreddit, CharSequence url,
+    public ThingLoader(Context context, String parentSubreddit, URL url,
             List<Thing> initThings) {
         super(context);
         this.parentSubreddit = parentSubreddit;
@@ -69,8 +69,7 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
     @Override
     public List<Thing> loadInBackground() {
         try {
-            URL u = new URL(url.toString());
-            HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.connect();
 
             InputStream stream = conn.getInputStream();

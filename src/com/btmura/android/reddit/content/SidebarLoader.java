@@ -59,7 +59,7 @@ public class SidebarLoader extends AsyncTaskLoader<Subreddit> {
     @Override
     public Subreddit loadInBackground() {
         try {
-            URL subredditUrl = new URL(Urls.sidebarUrl(subreddit).toString());
+            URL subredditUrl = Urls.sidebarUrl(subreddit);
 
             HttpURLConnection connection = (HttpURLConnection) subredditUrl.openConnection();
             connection.connect();

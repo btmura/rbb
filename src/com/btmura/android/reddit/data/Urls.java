@@ -17,6 +17,8 @@
 package com.btmura.android.reddit.data;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 
 import com.btmura.android.reddit.entity.Subreddit;
@@ -25,26 +27,38 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class Urls {
 
-    private static final String BASE_SEARCH_URL = "http://www.reddit.com/search.json?q=";
-    private static final String BASE_SUBREDDIT_SEARCH_URL = "http://www.reddit.com/reddits/search.json?q=";
+    private static final String BASE_URL = "http://www.reddit.com";
+    private static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
-    public static CharSequence commentsUrl(String id) {
-        return new StringBuilder("http://www.reddit.com/comments/").append(id).append(".json");
+    private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
+    private static final String BASE_LOGIN_URL = BASE_SSL_URL + "/api/login/";
+    private static final String BASE_SEARCH_URL = BASE_URL + "/search.json?q=";
+    private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
+    private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
+
+    private static final StringBuilder S = new StringBuilder(BASE_URL.length() * 3);
+
+    public static URL commentsUrl(String id) {
+        return newUrl(resetBuilder().append(BASE_COMMENTS_URL).append(id).append(".json"));
     }
 
-    public static CharSequence permaUrl(Thing thing) {
-        return new StringBuilder("http://www.reddit.com").append(thing.permaLink);
+    public static URL loginUrl(String userName) {
+        return newUrl(resetBuilder().append(BASE_LOGIN_URL).append(encode(userName)));
     }
 
-    public static CharSequence sidebarUrl(String name) {
-        return new StringBuilder("http://www.reddit.com/r/").append(name).append("/about.json");
+    public static URL permaUrl(Thing thing) {
+        return newUrl(resetBuilder().append(BASE_URL).append(thing.permaLink));
     }
 
-    public static CharSequence subredditUrl(Subreddit sr, int filter, String more) {
-        StringBuilder b = new StringBuilder("http://www.reddit.com/");
+    public static URL sidebarUrl(String name) {
+        return newUrl(resetBuilder().append(BASE_SUBREDDIT_URL).append(name).append("/about.json"));
+    }
+
+    public static URL subredditUrl(Subreddit sr, int filter, String more) {
+        StringBuilder b = resetBuilder().append(BASE_URL);
 
         if (!sr.isFrontPage()) {
-            b.append("r/").append(sr.name);
+            b.append("/r/").append(encode(sr.name));
         }
 
         switch (filter) {
@@ -74,26 +88,42 @@ public class Urls {
             b.append("?sort=new");
         }
         if (more != null) {
-            b.append(hasSort ? "&" : "?").append("count=25&after=").append(more);
+            b.append(hasSort ? "&" : "?").append("count=25&after=").append(encode(more));
         }
-        return b;
+        return newUrl(b);
     }
 
-    public static CharSequence searchUrl(String query, String more) {
-        return getSearchUrl(BASE_SEARCH_URL, query, more);
+    public static URL searchUrl(String query, String more) {
+        return newSearchUrl(BASE_SEARCH_URL, query, more);
     }
 
-    public static CharSequence subredditSearchUrl(String query, String more) {
-        return getSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, more);
+    public static URL subredditSearchUrl(String query, String more) {
+        return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, more);
     }
 
-    private static CharSequence getSearchUrl(String base, String query, String more) {
+    private static URL newSearchUrl(String base, String query, String more) {
+        StringBuilder b = resetBuilder().append(base).append(encode(query));
+        if (more != null) {
+            b.append("&count=25&after=").append(encode(more));
+        }
+        return newUrl(b);
+    }
+
+    private static URL newUrl(StringBuilder builder) {
         try {
-            StringBuilder b = new StringBuilder(base).append(URLEncoder.encode(query, "UTF-8"));
-            if (more != null) {
-                b.append("&count=25&after=").append(more);
-            }
-            return b;
+            return new URL(builder.toString());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static StringBuilder resetBuilder() {
+        return S.delete(0, S.length());
+    }
+
+    private static String encode(String param) {
+        try {
+            return URLEncoder.encode(param, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
