@@ -33,6 +33,10 @@
     </style>
 
     <style name="ButtonBar" parent="@android:style/Holo.ButtonBar.AlertDialog" />
+    
+    <style name="ButtonBarButton" parent="@android:style/Widget.Holo.Light.Button.Borderless.Small">
+        <item name="android:textAllCaps">true</item>
+    </style>
 
     <style name="SubredditTitleText" parent="@android:style/TextAppearance.Holo.Medium">
         <item name="android:textSize">16sp</item>

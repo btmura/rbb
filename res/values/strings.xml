@@ -16,9 +16,7 @@
 <resources>
 
     <string name="app_name">reddit by brian</string>
-    
-    <string name="accounts">Accounts</string>
-    
+
     <string name="add">Add</string>   
     <string name="add_account">Add account</string>
     <string name="add_front_page">Add front page</string>

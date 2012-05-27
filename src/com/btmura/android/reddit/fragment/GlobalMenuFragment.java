@@ -29,7 +29,7 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.activity.AccountBrowserActivity;
+import com.btmura.android.reddit.activity.AccountManagerActivity;
 import com.btmura.android.reddit.activity.SearchActivity;
 
 public class GlobalMenuFragment extends Fragment implements
@@ -109,7 +109,7 @@ public class GlobalMenuFragment extends Fragment implements
     }
 
     private void handleAccounts() {
-        Intent intent = new Intent(getActivity(), AccountBrowserActivity.class);
+        Intent intent = new Intent(getActivity(), AccountManagerActivity.class);
         startActivity(intent);
     }
 

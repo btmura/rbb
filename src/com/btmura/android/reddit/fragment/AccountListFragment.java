@@ -118,26 +118,4 @@ public class AccountListFragment extends ListFragment implements
 
     public void onDestroyActionMode(ActionMode mode) {
     }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.account_list_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_add_account:
-                handleAddAccount();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void handleAddAccount() {
-        AddAccountFragment.newInstance().show(getFragmentManager(), AddAccountFragment.TAG);
-    }
 }

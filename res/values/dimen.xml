@@ -4,6 +4,7 @@
     <dimen name="element_padding">8dp</dimen>
     <dimen name="padding">16dp</dimen>
     <dimen name="subreddit_list_width">150dp</dimen>
+    <dimen name="min_dialog_content_height">72dp</dimen>
     <dimen name="min_details_width">100dp</dimen>
     <dimen name="max_details_width">300dp</dimen>
     <dimen name="max_thumb_width">70dp</dimen>

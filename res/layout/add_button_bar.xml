@@ -27,15 +27,16 @@
 
         <Button
             android:id="@+id/cancel"
-            style="@android:style/Widget.Holo.Light.Button.Borderless.Small"
+            style="@style/ButtonBarButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@android:string/cancel" />
+            android:text="@android:string/cancel"
+            android:textAllCaps="true" />
 
         <Button
             android:id="@+id/add"
-            style="@android:style/Widget.Holo.Light.Button.Borderless.Small"
+            style="@style/ButtonBarButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

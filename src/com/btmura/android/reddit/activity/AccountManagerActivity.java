@@ -21,19 +21,25 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.fragment.AccountListFragment;
+import com.btmura.android.reddit.fragment.AddAccountFragment;
 
-public class AccountBrowserActivity extends Activity {
+public class AccountManagerActivity extends Activity implements OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.account_browser);
-
+        setContentView(R.layout.account_manager);
+        findViewById(R.id.add).setOnClickListener(this);
+        
         ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.single_container, AccountListFragment.newInstance(),
@@ -51,5 +57,9 @@ public class AccountBrowserActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+    
+    public void onClick(View v) {
+        AddAccountFragment.newInstance().show(getFragmentManager(), AddAccountFragment.TAG);
     }
 }
