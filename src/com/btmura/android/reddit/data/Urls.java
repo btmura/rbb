@@ -45,6 +45,14 @@ public class Urls {
     public static URL loginUrl(String userName) {
         return newUrl(resetBuilder().append(BASE_LOGIN_URL).append(encode(userName)));
     }
+    
+    public static String loginQuery(String userName, String password) {
+        StringBuilder b = resetBuilder();
+        b.append("user=").append(encode(userName));
+        b.append("&passwd=").append(encode(password));
+        b.append("&api_type=json");
+        return b.toString();
+    }
 
     public static URL permaUrl(Thing thing) {
         return newUrl(resetBuilder().append(BASE_URL).append(thing.permaLink));

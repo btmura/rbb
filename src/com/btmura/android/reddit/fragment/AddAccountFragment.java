@@ -17,10 +17,9 @@
 package com.btmura.android.reddit.fragment;
 
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.ContentValues;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.text.InputFilter;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TransformationMethod;
@@ -37,16 +36,18 @@ import android.widget.EditText;
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.LoginLoader.LoginResult;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddAccountFragment extends DialogFragment implements
         OnCheckedChangeListener,
-        OnClickListener {
+        OnClickListener,
+        LoginFragment.LoginResultListener {
 
     public static final String TAG = "AddAccountFragment";
 
     private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
-        InputFilters.LOGIN_FILTER,
+            InputFilters.LOGIN_FILTER,
     };
 
     private EditText login;
@@ -108,46 +109,26 @@ public class AddAccountFragment extends DialogFragment implements
             password.setError(getString(R.string.error_blank_field));
         }
         if (login.getError() == null && password.getError() == null) {
-            new LoginTask(login.getText().toString(), password.getText().toString()).execute();
+            LoginFragment frag = LoginFragment.newInstance(login.getText().toString(),
+                    password.getText().toString());
+            frag.setTargetFragment(this, 0);
+            frag.show(getFragmentManager(), LoginFragment.TAG);
         }
     }
-
-    class LoginTask extends AsyncTask<Void, Void, String> {
-
-        private final String login;
-        private final String password;
-
-        private LoginDialogFragment dialog;
-
-        LoginTask(String login, String password) {
-            this.login = login;
-            this.password = password;
+    
+    public void onLoginResult(LoginResult result) {
+        FragmentManager fm = getFragmentManager();        
+        if (result == null) {
+            SimpleDialogFragment.showMessage(fm, getString(R.string.error));
+        } else if (result.error != null) {
+            SimpleDialogFragment.showMessage(fm, getString(R.string.error_reddit, result.error));
+        } else {
+            dismiss();            
+            LoginFragment frag = (LoginFragment) fm.findFragmentByTag(LoginFragment.TAG);            
+            ContentValues values = new ContentValues(2);
+            values.put(Accounts.COLUMN_LOGIN, frag.getLogin());
+            values.put(Accounts.COLUMN_PASSWORD, frag.getPassword());
+            Provider.addInBackground(getActivity(), Accounts.CONTENT_URI, values);
         }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            dialog = LoginDialogFragment.newInstance();
-            dialog.show(getFragmentManager(), LoginDialogFragment.TAG);
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            SystemClock.sleep(10000);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String error) {
-            super.onPostExecute(error);
-            if (error == null) {            
-                dialog.dismiss();
-
-                ContentValues values = new ContentValues(2);
-                values.put(Accounts.COLUMN_LOGIN, login);
-                values.put(Accounts.COLUMN_PASSWORD, password);
-                Provider.addInBackground(getActivity(), Accounts.CONTENT_URI, values);
-            }
-        }        
     }
 }

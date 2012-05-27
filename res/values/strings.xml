@@ -27,10 +27,12 @@
     <string name="comment_header_status">%1$s&#160; %2$s ago&#160; %3$d points&#160; %4$d comments</string>
     <string name="comment_comment_status">%1$s&#160; %2$s ago&#160; %3$d points</string>
     
-    <string name="empty">Nothing to see here…</string>    
+    <string name="empty">Nothing to see here…</string>
+    <string name="empty_accounts">You haven\'t added any accounts.</string>
+    
     <string name="error">Something went wrong…</string>
-
     <string name="error_blank_field">This field cannot be blank.</string>
+    <string name="error_reddit">Reddit says: %1$s</string>
 
     <string name="filter_hot">what\'s hot</string>
     <string name="filter_new">new</string>

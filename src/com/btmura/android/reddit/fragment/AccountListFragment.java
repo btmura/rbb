@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.fragment;
 
-import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
@@ -29,8 +28,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.ListView;
 
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Accounts;
@@ -79,44 +78,44 @@ public class AccountListFragment extends ListFragment implements
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         adapter.swapCursor(data);
-        setEmptyText(getString(data != null ? R.string.empty : R.string.error));
+        setEmptyText(getString(data != null ? R.string.empty_accounts : R.string.error));
         setListShown(true);
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
     }
-    
+
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.account_action_menu, menu);
         return true;
     }
-    
+
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         return false;
     }
-    
+
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_remove:
                 handleRemoveAction(mode);
                 return true;
-                
+
             default:
                 return false;
         }
     }
-    
+
     private void handleRemoveAction(ActionMode mode) {
         long[] ids = getListView().getCheckedItemIds();
         Provider.deleteInBackground(getActivity(), Accounts.CONTENT_URI, ids);
         mode.finish();
     }
-    
+
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
     }
-    
+
     public void onDestroyActionMode(ActionMode mode) {
     }
 
@@ -139,8 +138,6 @@ public class AccountListFragment extends ListFragment implements
     }
 
     private void handleAddAccount() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(AddAccountFragment.newInstance(), AddAccountFragment.TAG);
-        ft.commit();
+        AddAccountFragment.newInstance().show(getFragmentManager(), AddAccountFragment.TAG);
     }
 }
