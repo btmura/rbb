@@ -127,7 +127,7 @@ public class AddAccountFragment extends DialogFragment implements
             LoginFragment frag = (LoginFragment) fm.findFragmentByTag(LoginFragment.TAG);            
             ContentValues values = new ContentValues(2);
             values.put(Accounts.COLUMN_LOGIN, frag.getLogin());
-            values.put(Accounts.COLUMN_PASSWORD, frag.getPassword());
+            values.put(Accounts.COLUMN_COOKIE, result.cookie);
             Provider.addInBackground(getActivity(), Accounts.CONTENT_URI, values);
         }
     }

@@ -72,7 +72,7 @@ public class Provider extends ContentProvider {
         private static final String TABLE_NAME = "accounts";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
         public static final String COLUMN_LOGIN = "login";
-        public static final String COLUMN_PASSWORD = "password";
+        public static final String COLUMN_COOKIE = "cookie";
         public static final String SORT = Accounts.COLUMN_LOGIN + " COLLATE NOCASE ASC";
     }
 
@@ -435,7 +435,7 @@ public class Provider extends ContentProvider {
         private void createAccounts(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + Accounts.TABLE_NAME + " (" + Accounts._ID
                     + " INTEGER PRIMARY KEY, " + Accounts.COLUMN_LOGIN + " TEXT UNIQUE NOT NULL, "
-                    + Accounts.COLUMN_PASSWORD + " TEXT UNIQUE NOT NULL)");
+                    + Accounts.COLUMN_COOKIE + " TEXT UNIQUE NOT NULL)");
             db.execSQL("CREATE UNIQUE INDEX " + Accounts.COLUMN_LOGIN + " ON "
                     + Accounts.TABLE_NAME + " (" + Accounts.COLUMN_LOGIN + " ASC)");
         }
