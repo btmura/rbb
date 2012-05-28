@@ -52,6 +52,7 @@ public class SubredditListFragment extends ListFragment implements
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
     private static final String ARG_SELECTED_SUBREDDIT = "s";
+    private static final String ARG_COOKIE = "c";
     private static final String ARG_QUERY = "q";
     private static final String ARG_FLAGS = "f";
 
@@ -65,21 +66,33 @@ public class SubredditListFragment extends ListFragment implements
     private OnSubredditSelectedListener listener;
 
     public static SubredditListFragment newInstance(Subreddit selectedSubreddit, int flags) {
-        SubredditListFragment f = new SubredditListFragment();
         Bundle args = new Bundle(2);
         args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
         args.putInt(ARG_FLAGS, flags);
-        f.setArguments(args);
-        return f;
+        
+        SubredditListFragment frag = new SubredditListFragment();        
+        frag.setArguments(args);
+        return frag;
+    }
+    
+    public static SubredditListFragment newAccountInstance(String cookie, int flags) {
+        Bundle args = new Bundle(2);
+        args.putString(ARG_COOKIE, cookie);
+        args.putInt(ARG_FLAGS, flags);
+        
+        SubredditListFragment frag = new SubredditListFragment();
+        frag.setArguments(args);
+        return frag;
     }
 
     public static SubredditListFragment newSearchInstance(String query, int flags) {
-        SubredditListFragment f = new SubredditListFragment();
         Bundle args = new Bundle(2);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
-        f.setArguments(args);
-        return f;
+        
+        SubredditListFragment frag = new SubredditListFragment();        
+        frag.setArguments(args);
+        return frag;
     }
 
     @Override
@@ -113,12 +126,13 @@ public class SubredditListFragment extends ListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return SubredditAdapter.createLoader(getActivity().getApplicationContext(), getQuery());
+        return SubredditAdapter.createLoader(getActivity().getApplicationContext(), 
+                getCookie(), getQuery());
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         adapter.swapCursor(data);
-        setEmptyText(getString(data != null ? R.string.empty : R.string.error));
+        setEmptyText(getString(data != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
         if (data.getCount() > 0) {
             getListView().post(new Runnable() {
@@ -287,6 +301,10 @@ public class SubredditListFragment extends ListFragment implements
 
     private Subreddit getSelectedSubreddit() {
         return getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
+    }
+    
+    private String getCookie() {
+        return getArguments().getString(ARG_COOKIE);
     }
 
     private String getQuery() {

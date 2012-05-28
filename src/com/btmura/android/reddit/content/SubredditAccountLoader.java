@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.content.AsyncTaskLoader;
@@ -29,17 +28,19 @@ import android.database.Cursor;
 import android.util.JsonReader;
 import android.util.Log;
 
-public class SubredditSearchLoader extends AsyncTaskLoader<Cursor> {
+import com.btmura.android.reddit.data.Urls;
 
-    private static final String TAG = "SubredditSearchLoader";
+public class SubredditAccountLoader extends AsyncTaskLoader<Cursor> {
+
+    public static final String TAG = "SubredditAccountLoader";
+
+    private final String cookie;
 
     private Cursor results;
 
-    private final URL url;
-
-    public SubredditSearchLoader(Context context, URL url) {
+    public SubredditAccountLoader(Context context, String cookie) {
         super(context);
-        this.url = url;
+        this.cookie = cookie;
     }
 
     @Override
@@ -55,21 +56,23 @@ public class SubredditSearchLoader extends AsyncTaskLoader<Cursor> {
     @Override
     public Cursor loadInBackground() {
         try {
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.connect();
-
-            InputStream stream = connection.getInputStream();
-            JsonReader reader = new JsonReader(new InputStreamReader(stream));
+            URL url = Urls.subredditListUrl();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
+            conn.setRequestProperty("Cookie", Urls.loginCookie(cookie));
+            conn.connect();
+            
+            InputStream in = conn.getInputStream();
+            JsonReader reader = new JsonReader(new InputStreamReader(in));
             SubredditParser parser = new SubredditParser();
             parser.parseListingObject(reader);
-            stream.close();
-
-            connection.disconnect();
-
+            
+            in.close();
+            
+            conn.disconnect();
+            
             return new SubredditCursor(parser.results);
-
-        } catch (MalformedURLException e) {
-            Log.e(TAG, "loadInBackground", e);
+            
         } catch (IOException e) {
             Log.e(TAG, "loadInBackground", e);
         }

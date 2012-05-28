@@ -27,6 +27,7 @@
     
     <string name="empty">Nothing to see here…</string>
     <string name="empty_accounts">You haven\'t added any accounts.</string>
+    <string name="empty_subreddits">You haven\'t added any subreddits.</string>
     
     <string name="error">Something went wrong…</string>
     <string name="error_blank_field">This field cannot be blank.</string>

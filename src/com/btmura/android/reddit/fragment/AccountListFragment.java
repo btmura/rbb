@@ -52,7 +52,7 @@ public class AccountListFragment extends ListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        adapter = new AccountAdapter(getActivity());
+        adapter = new AccountAdapter(getActivity(), false);
     }
 
     @Override

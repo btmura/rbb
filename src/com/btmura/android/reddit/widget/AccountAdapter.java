@@ -30,7 +30,7 @@ import com.btmura.android.reddit.R;
 public class AccountAdapter extends SimpleCursorAdapter {
 
     private static final String[] PROJECTION = {
-            Accounts._ID, Accounts.COLUMN_LOGIN,
+            Accounts._ID, Accounts.COLUMN_LOGIN, Accounts.COLUMN_COOKIE,
     };
 
     private static final String[] FROM = {};
@@ -41,8 +41,8 @@ public class AccountAdapter extends SimpleCursorAdapter {
                 Accounts.SORT);
     }
 
-    public AccountAdapter(Context context) {
-        super(context, R.layout.account_row, null, FROM, TO, 0);        
+    public AccountAdapter(Context context, boolean title) {
+        super(context, title ? R.layout.account_title_row : R.layout.account_row, null, FROM, TO, 0);
     }
 
     @Override
@@ -50,5 +50,13 @@ public class AccountAdapter extends SimpleCursorAdapter {
         TextView tv = (TextView) view;
         tv.setText(cursor.getString(1));
         tv.setBackgroundResource(R.drawable.selector_normal);
+    }
+    
+    public String getCookie(Context context, int position) {
+        Cursor c = getCursor();
+        if (!c.moveToPosition(position)) {
+            throw new IllegalStateException();
+        }
+        return c.getString(2);
     }
 }

@@ -27,14 +27,17 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class Urls {
 
+    public static final String CHARSET = "UTF-8";
+    
     private static final String BASE_URL = "http://www.reddit.com";
     private static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
     private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
     private static final String BASE_LOGIN_URL = BASE_SSL_URL + "/api/login/";
-    private static final String BASE_SEARCH_URL = BASE_URL + "/search.json?q=";
-    private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
+    private static final String BASE_SEARCH_URL = BASE_URL + "/search.json?q=";    
+    private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
+    private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
 
     private static final StringBuilder S = new StringBuilder(BASE_URL.length() * 3);
 
@@ -42,6 +45,12 @@ public class Urls {
         return newUrl(resetBuilder().append(BASE_COMMENTS_URL).append(id).append(".json"));
     }
 
+    public static String loginCookie(String cookie) {
+        StringBuilder b = resetBuilder();
+        b.append("reddit_session=").append(encode(cookie));
+        return b.toString();
+    }
+    
     public static URL loginUrl(String userName) {
         return newUrl(resetBuilder().append(BASE_LOGIN_URL).append(encode(userName)));
     }
@@ -100,6 +109,10 @@ public class Urls {
         }
         return newUrl(b);
     }
+    
+    public static URL subredditListUrl() {
+        return newUrl(BASE_SUBREDDIT_LIST_URL);
+    }
 
     public static URL searchUrl(String query, String more) {
         return newSearchUrl(BASE_SEARCH_URL, query, more);
@@ -117,7 +130,7 @@ public class Urls {
         return newUrl(b);
     }
 
-    private static URL newUrl(StringBuilder builder) {
+    private static URL newUrl(CharSequence builder) {
         try {
             return new URL(builder.toString());
         } catch (MalformedURLException e) {
