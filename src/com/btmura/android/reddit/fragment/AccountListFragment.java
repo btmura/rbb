@@ -52,7 +52,7 @@ public class AccountListFragment extends ListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        adapter = new AccountAdapter(getActivity(), false);
+        adapter = AccountAdapter.listItemInstance(getActivity());
     }
 
     @Override
@@ -78,8 +78,14 @@ public class AccountListFragment extends ListFragment implements
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         adapter.swapCursor(data);
-        setEmptyText(getString(data != null ? R.string.empty_accounts : R.string.error));
+        setEmptyViewText(R.string.empty_accounts, data == null);
         setListShown(true);
+    }
+    
+    private void setEmptyViewText(int emptyMessageId, boolean error) {
+        setEmptyText(getString(error ? R.string.error : emptyMessageId));
+        int minHeight = getResources().getDimensionPixelSize(R.dimen.min_dialog_content_height);        
+        getListView().getEmptyView().setMinimumHeight(minHeight);
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {

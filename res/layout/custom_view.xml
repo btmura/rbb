@@ -14,12 +14,22 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/title"
-    style="@style/AccountLoginText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:ellipsize="end"
-    android:background="@drawable/selector_normal"
-    android:padding="@dimen/padding"
-    android:singleLine="true" />
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/title"
+        style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:text="@string/app_name" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        style="?android:attr/actionDropDownStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+
+</ViewSwitcher>

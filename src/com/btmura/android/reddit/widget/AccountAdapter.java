@@ -21,6 +21,7 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -40,23 +41,27 @@ public class AccountAdapter extends SimpleCursorAdapter {
         return new CursorLoader(context, Accounts.CONTENT_URI, PROJECTION, null, null,
                 Accounts.SORT);
     }
+    
+    public static AccountAdapter titleBarInstance(Context context) {
+        return new AccountAdapter(context, R.layout.account_title_row);
+    }
+    
+    public static AccountAdapter listItemInstance(Context context) {
+        return new AccountAdapter(context, R.layout.account_row);
+    }
 
-    public AccountAdapter(Context context, boolean title) {
-        super(context, title ? R.layout.account_title_row : R.layout.account_row, null, FROM, TO, 0);
+    private AccountAdapter(Context context, int layout) {
+        super(context, layout, null, FROM, TO, 0);
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView tv = (TextView) view;
         tv.setText(cursor.getString(1));
-        tv.setBackgroundResource(R.drawable.selector_normal);
     }
     
-    public String getCookie(Context context, int position) {
-        Cursor c = getCursor();
-        if (!c.moveToPosition(position)) {
-            throw new IllegalStateException();
-        }
-        return c.getString(2);
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        return super.getDropDownView(position, convertView, parent);
     }
 }

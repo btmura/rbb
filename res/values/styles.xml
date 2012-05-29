@@ -16,6 +16,14 @@
 -->
 <resources>
 
+    <style name="LandscapeTitle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="LandscapeSubtitle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Subtitle">
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="PagerTitleStrip">
         <item name="android:background">#666666</item>
         <item name="android:textAppearance">@android:style/TextAppearance.Holo.Inverse</item>
@@ -33,7 +41,7 @@
     </style>
 
     <style name="ButtonBar" parent="@android:style/Holo.ButtonBar.AlertDialog" />
-    
+
     <style name="ButtonBarButton" parent="@android:style/Widget.Holo.Light.Button.Borderless.Small">
         <item name="android:textAllCaps">true</item>
     </style>
@@ -63,7 +71,7 @@
     <style name="SidebarStatusText" parent="@style/CommentStatusText" />
 
     <style name="SidebarDescriptionText" parent="@style/CommentBodyText" />
-    
+
     <style name="AccountLoginText" parent="@style/SubredditTitleText" />
 
 </resources>

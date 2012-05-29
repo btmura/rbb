@@ -17,11 +17,17 @@
 package com.btmura.android.reddit.activity;
 
 import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Spinner;
+import android.widget.ViewSwitcher;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Flag;
@@ -31,10 +37,12 @@ import com.btmura.android.reddit.fragment.ControlFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
+import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity implements
-        ActionBar.OnNavigationListener {
+        OnNavigationListener,
+        LoaderCallbacks<Cursor> {
 
     public static final String TAG = "BrowserActivity";
 
@@ -47,10 +55,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     private static final String STATE_NAVIGATION_INDEX = "i";
 
     private ActionBar bar;
+    private ViewSwitcher switcher;
     private FilterAdapter filterAdapter;
-
     private View singleContainer;
-
+    
+    private AccountAdapter adapter;
+    
     private boolean homeUpEnabled;
     private boolean navigationListenerDisabled;
 
@@ -78,7 +88,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void initSinglePaneLayout(Bundle savedInstanceState) {
-        getActionBar().setDisplayHomeAsUpEnabled(homeUpEnabled);
+        ActionBar bar = getActionBar();        
+        bar.setDisplayHomeAsUpEnabled(homeUpEnabled);
+        
+        
         if (getIntent().hasExtra(EXTRA_SUBREDDIT_NAME)) {
             finish();
             Subreddit s = Subreddit.newInstance(getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME));
@@ -86,13 +99,25 @@ public class BrowserActivity extends AbstractBrowserActivity implements
             intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, s);
             intent.putExtra(ThingListActivity.EXTRA_FLAGS, ThingListActivity.FLAG_INSERT_HOME);
             startActivity(intent);
-        } else if (savedInstanceState == null) {
+        } else if (savedInstanceState == null) {            
+            bar.setDisplayShowTitleEnabled(false);
+            bar.setDisplayShowCustomEnabled(true);
+            bar.setCustomView(R.layout.custom_view); 
+            
+            switcher = (ViewSwitcher) bar.getCustomView();
+            adapter = AccountAdapter.titleBarInstance(this);
+            
+            Spinner spinner = (Spinner) switcher.findViewById(R.id.spinner);        
+            spinner.setAdapter(adapter);
+            
             SubredditListFragment slf = SubredditListFragment.newInstance(null, 0);
             GlobalMenuFragment gmf = GlobalMenuFragment.newInstance(0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(gmf, GlobalMenuFragment.TAG);
             ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
             ft.commit();
+            
+            getLoaderManager().initLoader(0, null, this);
         }
     }
 
@@ -174,5 +199,20 @@ public class BrowserActivity extends AbstractBrowserActivity implements
         if (!isSinglePane()) {
             outState.putInt(STATE_NAVIGATION_INDEX, bar.getSelectedNavigationIndex());
         }
+    }
+    
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return AccountAdapter.createLoader(getApplicationContext());
+    }
+
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+        if (data.getCount() > 0) {
+            switcher.showNext();
+        }
+    }
+ 
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 }

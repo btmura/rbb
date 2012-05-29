@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <dimen name="spinner_triangle_padding">4dp</dimen>
     <dimen name="element_padding">8dp</dimen>
     <dimen name="padding">16dp</dimen>
     <dimen name="subreddit_list_width">150dp</dimen>

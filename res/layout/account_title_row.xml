@@ -19,5 +19,4 @@
     style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:ellipsize="end"
-    android:singleLine="true" />
+    android:paddingRight="@dimen/spinner_triangle_padding" />
