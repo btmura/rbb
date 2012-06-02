@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
 
@@ -61,7 +62,9 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
 
     @Override
     public BrowserResult loadInBackground() {
-        Log.v(TAG, "loadInBackground");
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "loadInBackground (loader id: " + getId() + ")");
+        }
         Cursor cursor = getContext().getContentResolver().query(Accounts.CONTENT_URI, PROJECTION,
                 null, null, Accounts.SORT);
         if (cursor != null) {

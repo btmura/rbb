@@ -24,6 +24,7 @@ import android.content.Loader;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.BrowserLoader;
 import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
@@ -44,7 +45,7 @@ public class LoginBrowserActivity extends Activity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);        
         setContentView(R.layout.browser);
         setActionBar();
         getLoaderManager().initLoader(0, null, this);
@@ -66,7 +67,9 @@ public class LoginBrowserActivity extends Activity implements
     }
     
     public void onLoadFinished(Loader<BrowserResult> loader, BrowserResult result) {
-        Log.v(TAG, "onLoadFinished: " + result);
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "onLoadFinished (id: " + loader.getId() + ")");
+        }
         adapter.swapCursor(result.accounts);        
         initFragments();
     }
@@ -87,6 +90,9 @@ public class LoginBrowserActivity extends Activity implements
     }
     
     public void onLoaderReset(Loader<BrowserResult> loader) {
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "onLoaderReset (id: " + loader.getId() + ")");
+        }
         adapter.swapCursor(null);
     }    
     

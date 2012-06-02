@@ -37,6 +37,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.Provider;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
@@ -123,7 +124,7 @@ public class SubredditListFragment extends ListFragment implements
         super.onActivityCreated(savedInstanceState);
         setListAdapter(adapter);
         setListShown(false);
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(1, null, this);
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -132,7 +133,9 @@ public class SubredditListFragment extends ListFragment implements
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.v(TAG, "onLoadFinished: " + data);
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "onLoadFinished (id: " + loader.getId() + ")");
+        }
         adapter.swapCursor(data);
         setEmptyText(getString(data != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
@@ -147,7 +150,9 @@ public class SubredditListFragment extends ListFragment implements
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.v(TAG, "onReset");
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "onLoaderReset (id: " + loader.getId() + ")");
+        }
         adapter.swapCursor(null);
     }
 

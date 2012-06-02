@@ -19,7 +19,6 @@ package com.btmura.android.reddit.widget;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -68,14 +67,12 @@ public class AccountSwitcher extends FrameLayout {
         @Override
         public void onChanged() {
             super.onChanged();
-            Log.v(TAG, "onChanged: " + spinner.getCount());
             updateViews(spinner.getCount());
         }
         
         @Override
         public void onInvalidated() {
-            Log.v(TAG, "onInvalidated: " + spinner.getCount());
-            updateViews(spinner.getCount());
+            updateViews(0);
         }
     };
 }
