@@ -25,6 +25,7 @@ import android.content.ContentValues;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -131,6 +132,7 @@ public class SubredditListFragment extends ListFragment implements
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.v(TAG, "onLoadFinished: " + data);
         adapter.swapCursor(data);
         setEmptyText(getString(data != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
@@ -145,6 +147,7 @@ public class SubredditListFragment extends ListFragment implements
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
+        Log.v(TAG, "onReset");
         adapter.swapCursor(null);
     }
 
