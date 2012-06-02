@@ -59,7 +59,9 @@ public class AccountSwitcher extends FrameLayout {
     }
     
     public void setAdapter(SpinnerAdapter adapter) {
-        adapter.registerDataSetObserver(observer);
+        if (adapter != null) {
+            adapter.registerDataSetObserver(observer);
+        }
         spinner.setAdapter(adapter);        
     }
     

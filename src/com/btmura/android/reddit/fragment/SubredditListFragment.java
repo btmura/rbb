@@ -134,7 +134,7 @@ public class SubredditListFragment extends ListFragment implements
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onLoadFinished (id: " + loader.getId() + ")");
+            Log.d(TAG, "onLoadFinished (id " + loader.getId() + ")");
         }
         adapter.swapCursor(data);
         setEmptyText(getString(data != null ? R.string.empty_subreddits : R.string.error));
@@ -151,7 +151,7 @@ public class SubredditListFragment extends ListFragment implements
 
     public void onLoaderReset(Loader<Cursor> loader) {
         if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onLoaderReset (id: " + loader.getId() + ")");
+            Log.d(TAG, "onLoaderReset (id " + loader.getId() + ")");
         }
         adapter.swapCursor(null);
     }

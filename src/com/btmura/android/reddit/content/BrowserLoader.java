@@ -29,7 +29,7 @@ import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
 public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
 
     public static final String TAG = "BrowserLoader";
-    
+
     public static class BrowserResult {
         public Cursor accounts;
         public SharedPreferences prefs;
@@ -37,11 +37,6 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
         private BrowserResult(Cursor accounts, SharedPreferences prefs) {
             this.accounts = accounts;
             this.prefs = prefs;
-        }
-        
-        @Override
-        public String toString() {
-            return "BrowserResult accounts: " + accounts;
         }
     }
 
@@ -63,7 +58,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
     @Override
     public BrowserResult loadInBackground() {
         if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "loadInBackground (loader id: " + getId() + ")");
+            Log.d(TAG, "loadInBackground (id " + getId() + ")");
         }
         Cursor cursor = getContext().getContentResolver().query(Accounts.CONTENT_URI, PROJECTION,
                 null, null, Accounts.SORT);
@@ -78,7 +73,9 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
 
     @Override
     public void deliverResult(BrowserResult newResult) {
-        super.deliverResult(newResult);
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "deliverResult (id " + getId() + ")");
+        }
         if (isReset()) {
             closeResult(newResult);
             return;
@@ -91,11 +88,16 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
             super.deliverResult(newResult);
         }
 
-        closeResult(oldResult);
+        if (oldResult != newResult) {
+            closeResult(oldResult);
+        }
     }
 
     @Override
     protected void onStartLoading() {
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "onStartLoading (id " + getId() + ")");
+        }
         if (result != null) {
             deliverResult(result);
         }
@@ -106,16 +108,25 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
 
     @Override
     protected void onStopLoading() {
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "onStopLoading (id " + getId() + ")");
+        }
         cancelLoad();
     }
 
     @Override
     public void onCanceled(BrowserResult result) {
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "onCanceled (id " + getId() + ")");
+        }
         closeResult(result);
     }
 
     @Override
     protected void onReset() {
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "onReset (id " + getId() + ")");
+        }
         super.onReset();
         onStopLoading();
         closeResult(result);
@@ -123,9 +134,11 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
     }
 
     private void closeResult(BrowserResult result) {
-        if (result != null && result.accounts != null) {
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "closeResult");
+        }
+        if (result != null && result.accounts != null && !result.accounts.isClosed()) {
             result.accounts.close();
-            result = null;
         }
     }
 }

@@ -68,7 +68,7 @@ public class LoginBrowserActivity extends Activity implements
     
     public void onLoadFinished(Loader<BrowserResult> loader, BrowserResult result) {
         if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onLoadFinished (id: " + loader.getId() + ")");
+            Log.d(TAG, "onLoadFinished (id " + loader.getId() + ")");
         }
         adapter.swapCursor(result.accounts);        
         initFragments();
@@ -91,7 +91,7 @@ public class LoginBrowserActivity extends Activity implements
     
     public void onLoaderReset(Loader<BrowserResult> loader) {
         if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onLoaderReset (id: " + loader.getId() + ")");
+            Log.d(TAG, "onLoaderReset (id " + loader.getId() + ")");
         }
         adapter.swapCursor(null);
     }    
