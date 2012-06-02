@@ -67,9 +67,10 @@ public class SubredditListFragment extends ListFragment implements
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
 
-    public static SubredditListFragment newInstance(Subreddit selectedSubreddit, int flags) {
-        Bundle args = new Bundle(2);
+    public static SubredditListFragment newInstance(Subreddit selectedSubreddit, String cookie, int flags) {
+        Bundle args = new Bundle(3);
         args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
+        args.putString(ARG_COOKIE, cookie);
         args.putInt(ARG_FLAGS, flags);
         
         SubredditListFragment frag = new SubredditListFragment();        
@@ -77,16 +78,6 @@ public class SubredditListFragment extends ListFragment implements
         return frag;
     }
     
-    public static SubredditListFragment newAccountInstance(String cookie, int flags) {
-        Bundle args = new Bundle(2);
-        args.putString(ARG_COOKIE, cookie);
-        args.putInt(ARG_FLAGS, flags);
-        
-        SubredditListFragment frag = new SubredditListFragment();
-        frag.setArguments(args);
-        return frag;
-    }
-
     public static SubredditListFragment newSearchInstance(String query, int flags) {
         Bundle args = new Bundle(2);
         args.putString(ARG_QUERY, query);

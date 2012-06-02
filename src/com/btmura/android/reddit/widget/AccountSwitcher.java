@@ -21,6 +21,7 @@ import android.database.DataSetObserver;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
@@ -29,35 +30,36 @@ import android.widget.TextView;
 import com.btmura.android.reddit.R;
 
 public class AccountSwitcher extends FrameLayout {
-    
+
     public static final String TAG = "AccountSwitcher";
 
     private TextView title;
     private Spinner spinner;
-    
+
     public AccountSwitcher(Context context) {
         super(context);
         init(context);
     }
-    
+
     public AccountSwitcher(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
-    
+
     private void init(Context context) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.account_switcher, this);        
-        title = (TextView) view.findViewById(R.id.title);        
-        spinner = (Spinner) view.findViewById(R.id.spinner);        
+        LayoutInflater inflater =
+                (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.account_switcher, this);
+        title = (TextView) view.findViewById(R.id.title);
+        spinner = (Spinner) view.findViewById(R.id.spinner);
         updateViews(0);
     }
-    
+
     void updateViews(int numAccounts) {
         title.setVisibility(numAccounts > 0 ? View.GONE : View.VISIBLE);
-        spinner.setVisibility(numAccounts > 0 ? View.VISIBLE : View.GONE);        
+        spinner.setVisibility(numAccounts > 0 ? View.VISIBLE : View.GONE);
     }
-    
+
     public void setAdapter(SpinnerAdapter adapter) {
         if (adapter != null) {
             adapter.registerDataSetObserver(observer);
@@ -71,10 +73,14 @@ public class AccountSwitcher extends FrameLayout {
             super.onChanged();
             updateViews(spinner.getCount());
         }
-        
+
         @Override
         public void onInvalidated() {
             updateViews(0);
         }
     };
+    
+    public void setOnItemSelectedListener(OnItemSelectedListener listener) {
+        spinner.setOnItemSelectedListener(listener);
+    }
 }

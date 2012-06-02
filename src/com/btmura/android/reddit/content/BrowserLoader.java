@@ -33,10 +33,12 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
     public static class BrowserResult {
         public Cursor accounts;
         public SharedPreferences prefs;
+        public String lastLogin;
 
-        private BrowserResult(Cursor accounts, SharedPreferences prefs) {
+        private BrowserResult(Cursor accounts, SharedPreferences prefs, String lastLogin) {
             this.accounts = accounts;
             this.prefs = prefs;
+            this.lastLogin = lastLogin;
         }
     }
 
@@ -47,6 +49,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
     };
 
     private static final String PREFS = "prefs";
+    private static final String PREF_LAST_LOGIN = "lastLogin";
 
     private ForceLoadContentObserver observer = new ForceLoadContentObserver();
     private BrowserResult result;
@@ -60,13 +63,14 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "loadInBackground (id " + getId() + ")");
         }
+        SharedPreferences prefs = getContext().getSharedPreferences(PREFS, 0);
         Cursor cursor = getContext().getContentResolver().query(Accounts.CONTENT_URI, PROJECTION,
                 null, null, Accounts.SORT);
         if (cursor != null) {
             cursor.getCount();
             cursor.registerContentObserver(observer);
-            SharedPreferences prefs = getContext().getSharedPreferences(PREFS, 0);
-            return new BrowserResult(cursor, prefs);
+            String lastAccount = prefs.getString(PREF_LAST_LOGIN, null);
+            return new BrowserResult(cursor, prefs, lastAccount);
         }
         return null;
     }

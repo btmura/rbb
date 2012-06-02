@@ -110,7 +110,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
             Spinner spinner = (Spinner) switcher.findViewById(R.id.spinner);        
             spinner.setAdapter(adapter);
             
-            SubredditListFragment slf = SubredditListFragment.newInstance(null, 0);
+            SubredditListFragment slf = SubredditListFragment.newInstance(null, null, 0);
             GlobalMenuFragment gmf = GlobalMenuFragment.newInstance(0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(gmf, GlobalMenuFragment.TAG);
@@ -150,7 +150,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
         ControlFragment cf = ControlFragment.newInstance(s, null, -1, filter);
         GlobalMenuFragment gmf = GlobalMenuFragment.newInstance(0);
-        SubredditListFragment slf = SubredditListFragment.newInstance(s,
+        SubredditListFragment slf = SubredditListFragment.newInstance(s, null,
                 SubredditListFragment.FLAG_SINGLE_CHOICE);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();

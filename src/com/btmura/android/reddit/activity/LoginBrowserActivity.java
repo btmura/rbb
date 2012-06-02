@@ -21,9 +21,14 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
@@ -38,11 +43,14 @@ import com.btmura.android.reddit.widget.AccountSwitcher;
 
 public class LoginBrowserActivity extends Activity implements Debug,
         LoaderCallbacks<BrowserResult>,
+        OnItemSelectedListener,
         OnSubredditSelectedListener {
 
     public static final String TAG = "LoginBrowserActivity";
 
     private AccountAdapter adapter;
+    
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +59,17 @@ public class LoginBrowserActivity extends Activity implements Debug,
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.browser);
+        setInitialFragments(savedInstanceState);
         setActionBar();
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    private void setInitialFragments(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(GlobalMenuFragment.newInstance(0), GlobalMenuFragment.TAG);
+            ft.commit();
+        }
     }
 
     private void setActionBar() {
@@ -62,7 +79,9 @@ public class LoginBrowserActivity extends Activity implements Debug,
         bar.setCustomView(R.layout.browser_actionbar);
 
         AccountSwitcher switcher = (AccountSwitcher) bar.getCustomView();
-        adapter = AccountAdapter.titleBarInstance(this);
+        switcher.setOnItemSelectedListener(this);
+        
+        adapter = AccountAdapter.titleBarInstance(this);        
         switcher.setAdapter(adapter);
     }
 
@@ -75,22 +94,7 @@ public class LoginBrowserActivity extends Activity implements Debug,
             Log.d(TAG, "onLoadFinished (id " + loader.getId() + ")");
         }
         adapter.swapCursor(result.accounts);
-        initFragments();
-    }
-
-    private void initFragments() {
-        if (!hasFragment(GlobalMenuFragment.TAG)) {
-            SubredditListFragment slf = SubredditListFragment.newInstance(null, 0);
-            GlobalMenuFragment gmf = GlobalMenuFragment.newInstance(0);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(gmf, GlobalMenuFragment.TAG);
-            ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
-            ft.commitAllowingStateLoss();
-        }
-    }
-
-    private boolean hasFragment(String tag) {
-        return getFragmentManager().findFragmentByTag(tag) != null;
+        prefs = result.prefs;
     }
 
     public void onLoaderReset(Loader<BrowserResult> loader) {
@@ -99,7 +103,34 @@ public class LoginBrowserActivity extends Activity implements Debug,
         }
         adapter.swapCursor(null);
     }
-
+    
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+        if (DEBUG_ACTIVITY) {
+            Log.d(TAG, "onItemSelected (position " + position + ")");
+        }        
+        
+        String cookie = adapter.getCookie(position);        
+        SubredditListFragment slf = SubredditListFragment.newInstance(null, cookie, 0);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
+        ft.commit();
+        
+        String lastLogin = adapter.getLogin(position);
+        saveLastLoginPreference(lastLogin);        
+    }
+    
+    private void saveLastLoginPreference(String lastLogin) {
+        Editor editor = prefs.edit();
+        editor.putString("lastLogin", lastLogin);
+        editor.apply();
+    }
+    
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        if (DEBUG_ACTIVITY) {
+            Log.d(TAG, "onNothingSelected");
+        }
+    }
+    
     public void onSubredditLoaded(Subreddit subreddit) {
     }
 

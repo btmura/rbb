@@ -64,4 +64,20 @@ public class AccountAdapter extends SimpleCursorAdapter {
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         return super.getDropDownView(position, convertView, parent);
     }
+    
+    public String getLogin(int position) {
+        Cursor c = getCursor();
+        if (c.moveToPosition(position)) {
+            return c.getString(1);
+        }
+        return null;
+    }
+    
+    public String getCookie(int position) {
+        Cursor c = getCursor();
+        if (c.moveToPosition(position)) {
+            return c.getString(2);
+        }
+        return null;
+    }
 }
