@@ -16,8 +16,9 @@
 
 package com.btmura.android.reddit;
 
-public class Debug {
+public interface Debug {
 
+    public static final boolean DEBUG_STRICT_MODE = true;
     public static final boolean DEBUG_LOADERS = true;
 
 }

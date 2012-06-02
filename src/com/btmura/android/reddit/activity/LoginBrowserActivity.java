@@ -22,6 +22,7 @@ import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
@@ -35,17 +36,20 @@ import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelec
 import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.AccountSwitcher;
 
-public class LoginBrowserActivity extends Activity implements
+public class LoginBrowserActivity extends Activity implements Debug,
         LoaderCallbacks<BrowserResult>,
         OnSubredditSelectedListener {
-    
+
     public static final String TAG = "LoginBrowserActivity";
-    
+
     private AccountAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);        
+        if (DEBUG_STRICT_MODE) {
+            StrictMode.enableDefaults();
+        }
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.browser);
         setActionBar();
         getLoaderManager().initLoader(0, null, this);
@@ -61,20 +65,20 @@ public class LoginBrowserActivity extends Activity implements
         adapter = AccountAdapter.titleBarInstance(this);
         switcher.setAdapter(adapter);
     }
-    
+
     public Loader<BrowserResult> onCreateLoader(int id, Bundle args) {
         return new BrowserLoader(this);
     }
-    
+
     public void onLoadFinished(Loader<BrowserResult> loader, BrowserResult result) {
-        if (Debug.DEBUG_LOADERS) {
+        if (DEBUG_LOADERS) {
             Log.d(TAG, "onLoadFinished (id " + loader.getId() + ")");
         }
-        adapter.swapCursor(result.accounts);        
+        adapter.swapCursor(result.accounts);
         initFragments();
     }
 
-    private void initFragments() { 
+    private void initFragments() {
         if (!hasFragment(GlobalMenuFragment.TAG)) {
             SubredditListFragment slf = SubredditListFragment.newInstance(null, 0);
             GlobalMenuFragment gmf = GlobalMenuFragment.newInstance(0);
@@ -84,21 +88,21 @@ public class LoginBrowserActivity extends Activity implements
             ft.commitAllowingStateLoss();
         }
     }
-        
+
     private boolean hasFragment(String tag) {
         return getFragmentManager().findFragmentByTag(tag) != null;
     }
-    
+
     public void onLoaderReset(Loader<BrowserResult> loader) {
-        if (Debug.DEBUG_LOADERS) {
+        if (DEBUG_LOADERS) {
             Log.d(TAG, "onLoaderReset (id " + loader.getId() + ")");
         }
         adapter.swapCursor(null);
-    }    
-    
+    }
+
     public void onSubredditLoaded(Subreddit subreddit) {
     }
-    
+
     public void onSubredditSelected(Subreddit subreddit) {
     }
 }

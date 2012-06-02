@@ -64,7 +64,7 @@ public class AccountSwitcher extends FrameLayout {
         }
         spinner.setAdapter(adapter);        
     }
-    
+
     final DataSetObserver observer = new DataSetObserver() {
         @Override
         public void onChanged() {
