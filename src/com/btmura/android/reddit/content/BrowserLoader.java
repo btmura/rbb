@@ -62,17 +62,18 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
     public BrowserResult loadInBackground() {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "loadInBackground (id " + getId() + ")");
-        }
-        SharedPreferences prefs = getContext().getSharedPreferences(PREFS, 0);
+        }        
+        SharedPreferences prefs = getContext().getSharedPreferences(PREFS, 0);        
         Cursor cursor = getContext().getContentResolver().query(Accounts.CONTENT_URI, PROJECTION,
                 null, null, Accounts.SORT);
         if (cursor != null) {
             cursor.getCount();
             cursor.registerContentObserver(observer);
-            String lastAccount = prefs.getString(PREF_LAST_LOGIN, null);
-            return new BrowserResult(cursor, prefs, lastAccount);
         }
-        return null;
+        
+        String lastLogin = prefs.getString(PREF_LAST_LOGIN, null);
+        
+        return new BrowserResult(cursor, prefs, lastLogin);
     }
 
     @Override
