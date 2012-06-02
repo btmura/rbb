@@ -20,12 +20,15 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
 
 public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
 
+    public static final String TAG = "BrowserLoader";
+    
     public static class BrowserResult {
         public Cursor accounts;
         public SharedPreferences prefs;
@@ -33,6 +36,11 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
         private BrowserResult(Cursor accounts, SharedPreferences prefs) {
             this.accounts = accounts;
             this.prefs = prefs;
+        }
+        
+        @Override
+        public String toString() {
+            return "BrowserResult accounts: " + accounts;
         }
     }
 
@@ -53,6 +61,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
 
     @Override
     public BrowserResult loadInBackground() {
+        Log.v(TAG, "loadInBackground");
         Cursor cursor = getContext().getContentResolver().query(Accounts.CONTENT_URI, PROJECTION,
                 null, null, Accounts.SORT);
         if (cursor != null) {
@@ -68,7 +77,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
     public void deliverResult(BrowserResult newResult) {
         super.deliverResult(newResult);
         if (isReset()) {
-            closeCursor(newResult);
+            closeResult(newResult);
             return;
         }
 
@@ -79,7 +88,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
             super.deliverResult(newResult);
         }
 
-        closeCursor(oldResult);
+        closeResult(oldResult);
     }
 
     @Override
@@ -99,21 +108,21 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
 
     @Override
     public void onCanceled(BrowserResult result) {
-        closeCursor(result);
+        closeResult(result);
     }
 
     @Override
     protected void onReset() {
         super.onReset();
         onStopLoading();
-        closeCursor(result);
+        closeResult(result);
         result = null;
     }
 
-    private void closeCursor(BrowserResult result) {
+    private void closeResult(BrowserResult result) {
         if (result != null && result.accounts != null) {
             result.accounts.close();
-            result.accounts = null;
+            result = null;
         }
     }
 }

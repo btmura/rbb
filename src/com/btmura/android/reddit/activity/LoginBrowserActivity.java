@@ -21,10 +21,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import com.btmura.android.reddit.R;
@@ -43,11 +40,7 @@ public class LoginBrowserActivity extends Activity implements
     
     public static final String TAG = "LoginBrowserActivity";
     
-    private static final int MESSAGE_INIT_FRAGMENTS = 0;
-    
     private AccountAdapter adapter;
-    
-    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,48 +66,33 @@ public class LoginBrowserActivity extends Activity implements
     }
     
     public void onLoadFinished(Loader<BrowserResult> loader, BrowserResult result) {
-        Log.v(TAG, "onLoadFinished: " + result.accounts.getCount());
-        adapter.swapCursor(result.accounts);
-        prefs = result.prefs;        
-        handler.obtainMessage(MESSAGE_INIT_FRAGMENTS).sendToTarget();
+        Log.v(TAG, "onLoadFinished: " + result);
+        adapter.swapCursor(result.accounts);        
+        initFragments();
     }
-    
-    public void onLoaderReset(Loader<BrowserResult> loader) {
-        adapter.swapCursor(null);
-    }
-    
-    final Handler handler = new Handler() {        
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MESSAGE_INIT_FRAGMENTS:
-                    initFragments();
-                    break;
-                    
-                default:
-                    throw new IllegalStateException();
-            }
-        }
-    };
-    
-    void initFragments() { 
+
+    private void initFragments() { 
         if (!hasFragment(GlobalMenuFragment.TAG)) {
             SubredditListFragment slf = SubredditListFragment.newInstance(null, 0);
             GlobalMenuFragment gmf = GlobalMenuFragment.newInstance(0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(gmf, GlobalMenuFragment.TAG);
             ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
     }
+        
+    private boolean hasFragment(String tag) {
+        return getFragmentManager().findFragmentByTag(tag) != null;
+    }
+    
+    public void onLoaderReset(Loader<BrowserResult> loader) {
+        adapter.swapCursor(null);
+    }    
     
     public void onSubredditLoaded(Subreddit subreddit) {
     }
     
     public void onSubredditSelected(Subreddit subreddit) {
-    }
-    
-    private boolean hasFragment(String tag) {
-        return getFragmentManager().findFragmentByTag(tag) != null;
     }
 }
