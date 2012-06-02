@@ -23,6 +23,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -48,8 +49,8 @@ public class LoginBrowserActivity extends Activity implements Debug,
 
     public static final String TAG = "LoginBrowserActivity";
 
-    private AccountAdapter adapter;
-    
+    private AccountSwitcher switcher;
+    private AccountAdapter adapter;    
     private SharedPreferences prefs;
 
     @Override
@@ -78,7 +79,7 @@ public class LoginBrowserActivity extends Activity implements Debug,
         bar.setDisplayShowCustomEnabled(true);
         bar.setCustomView(R.layout.browser_actionbar);
 
-        AccountSwitcher switcher = (AccountSwitcher) bar.getCustomView();
+        switcher = (AccountSwitcher) bar.getCustomView();
         switcher.setOnItemSelectedListener(this);
         
         adapter = AccountAdapter.titleBarInstance(this);        
@@ -95,6 +96,19 @@ public class LoginBrowserActivity extends Activity implements Debug,
         }
         adapter.swapCursor(result.accounts);
         prefs = result.prefs;
+        selectAccount(result);
+    }
+    
+    private void selectAccount(BrowserResult result) {
+        Cursor cursor = result.accounts;
+        String lastLogin = result.lastLogin;
+        for (cursor.moveToPosition(-1); cursor.moveToNext(); ) {
+            String login = cursor.getString(1);
+            if (login.equals(lastLogin)) {
+                switcher.setSelection(cursor.getPosition());
+                break;
+            }
+        }
     }
 
     public void onLoaderReset(Loader<BrowserResult> loader) {

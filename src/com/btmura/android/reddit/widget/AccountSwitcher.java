@@ -80,7 +80,11 @@ public class AccountSwitcher extends FrameLayout {
         }
     };
     
+    public void setSelection(int position) {
+        spinner.setSelection(position);
+    }
+    
     public void setOnItemSelectedListener(OnItemSelectedListener listener) {
         spinner.setOnItemSelectedListener(listener);
-    }
+    }    
 }
