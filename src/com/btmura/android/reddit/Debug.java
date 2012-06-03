@@ -21,5 +21,6 @@ public interface Debug {
     public static final boolean DEBUG_ACTIVITY = true;
     public static final boolean DEBUG_LOADERS = true;
     public static final boolean DEBUG_STRICT_MODE = true;
+    public static final boolean DEBUG_WIDGETS = true;
 
 }

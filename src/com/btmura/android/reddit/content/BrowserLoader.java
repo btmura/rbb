@@ -42,14 +42,15 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
         }
     }
 
-    private static final String[] PROJECTION = {
+    public static final String[] PROJECTION = {
             Accounts._ID,
             Accounts.COLUMN_LOGIN,
             Accounts.COLUMN_COOKIE,
     };
+    
+    public static final String PREF_LAST_LOGIN = "lastLogin";
 
     private static final String PREFS = "prefs";
-    private static final String PREF_LAST_LOGIN = "lastLogin";
 
     private ForceLoadContentObserver observer = new ForceLoadContentObserver();
     private BrowserResult result;
@@ -62,17 +63,17 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
     public BrowserResult loadInBackground() {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "loadInBackground (id " + getId() + ")");
-        }        
-        SharedPreferences prefs = getContext().getSharedPreferences(PREFS, 0);        
+        }
+        SharedPreferences prefs = getContext().getSharedPreferences(PREFS, 0);
         Cursor cursor = getContext().getContentResolver().query(Accounts.CONTENT_URI, PROJECTION,
                 null, null, Accounts.SORT);
         if (cursor != null) {
-            cursor.getCount();
+            cursor.getCount();            
             cursor.registerContentObserver(observer);
         }
-        
+
         String lastLogin = prefs.getString(PREF_LAST_LOGIN, null);
-        
+
         return new BrowserResult(cursor, prefs, lastLogin);
     }
 
@@ -93,7 +94,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
             super.deliverResult(newResult);
         }
 
-        if (oldResult != newResult) {
+        if (oldResult != null && oldResult != newResult) {
             closeResult(oldResult);
         }
     }
