@@ -128,6 +128,7 @@ public class AddAccountFragment extends DialogFragment implements
             ContentValues values = new ContentValues(2);
             values.put(Accounts.COLUMN_LOGIN, frag.getLogin());
             values.put(Accounts.COLUMN_COOKIE, result.cookie);
+            values.put(Accounts.COLUMN_MODHASH, result.modhash);
             Provider.addInBackground(getActivity(), Accounts.CONTENT_URI, values);
         }
     }
