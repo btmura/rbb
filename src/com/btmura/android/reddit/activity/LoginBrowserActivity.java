@@ -31,12 +31,11 @@ import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.BrowserLoader;
 import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
-import com.btmura.android.reddit.data.Objects;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.fragment.AccountHolder;
+import com.btmura.android.reddit.fragment.AddSubredditFragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
-import com.btmura.android.reddit.fragment.AddSubredditFragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.widget.AccountSwitcher;
 import com.btmura.android.reddit.widget.AccountSwitcher.OnAccountSwitchListener;
@@ -110,14 +109,14 @@ public class LoginBrowserActivity extends Activity implements Debug,
     }
     
     public void onAccountSwitch(AccountSwitcherAdapter adapter, int position) {
-        replaceSubredditListFragment(adapter.getCookie(position));
+        replaceSubredditListFragment(adapter.getItemId(position));
         saveLastLoginPreference(adapter.getLogin(position));
     }
     
-    private void replaceSubredditListFragment(String cookie) {
+    private void replaceSubredditListFragment(long accountId) {
         SubredditListFragment slf = getSubredditListFragment();
-        if (slf == null || !Objects.equals(cookie, slf.getCookie())) {        
-            slf = SubredditListFragment.newInstance(null, cookie, 0);
+        if (slf == null || accountId != slf.getAccountId()) {        
+            slf = SubredditListFragment.newInstance(null, accountId, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
             ft.commit();

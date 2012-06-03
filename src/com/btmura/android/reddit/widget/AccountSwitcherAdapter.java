@@ -55,7 +55,7 @@ public class AccountSwitcherAdapter extends SimpleCursorAdapter {
         }
         return -1;
     }
-
+    
     public String getLogin(int position) {
         return getString(position, 1);
     }

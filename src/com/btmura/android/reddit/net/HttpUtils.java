@@ -22,6 +22,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import android.util.Log;
+
 public class HttpUtils {
 
     public static final String TAG = "HttpUtils";
@@ -41,11 +43,14 @@ public class HttpUtils {
             conn.connect();
             writeData(conn, data);
             return conn.getInputStream();
+        } catch (IOException e) {
+            Log.e(TAG, "post", e);
         } finally {
             if (conn != null) {
                 conn.disconnect();
             }
         }
+        return null;
     }
 
     private static void writeData(HttpURLConnection conn, String data) throws IOException {

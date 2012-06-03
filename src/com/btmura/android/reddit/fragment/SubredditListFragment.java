@@ -45,8 +45,7 @@ import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
-public class SubredditListFragment extends ListFragment implements
-        LoaderCallbacks<Cursor>,
+public class SubredditListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
         MultiChoiceModeListener {
 
     public static final String TAG = "SubredditListFragment";
@@ -54,7 +53,7 @@ public class SubredditListFragment extends ListFragment implements
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
     private static final String ARG_SELECTED_SUBREDDIT = "s";
-    private static final String ARG_COOKIE = "c";
+    private static final String ARG_ACCOUNT_ID = "a";
     private static final String ARG_QUERY = "q";
     private static final String ARG_FLAGS = "f";
 
@@ -67,23 +66,24 @@ public class SubredditListFragment extends ListFragment implements
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
 
-    public static SubredditListFragment newInstance(Subreddit selectedSubreddit, String cookie, int flags) {
+    public static SubredditListFragment newInstance(Subreddit selectedSubreddit, long accountId,
+            int flags) {
         Bundle args = new Bundle(3);
         args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
-        args.putString(ARG_COOKIE, cookie);
+        args.putLong(ARG_ACCOUNT_ID, accountId);
         args.putInt(ARG_FLAGS, flags);
-        
-        SubredditListFragment frag = new SubredditListFragment();        
+
+        SubredditListFragment frag = new SubredditListFragment();
         frag.setArguments(args);
         return frag;
     }
-    
+
     public static SubredditListFragment newSearchInstance(String query, int flags) {
         Bundle args = new Bundle(2);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
-        
-        SubredditListFragment frag = new SubredditListFragment();        
+
+        SubredditListFragment frag = new SubredditListFragment();
         frag.setArguments(args);
         return frag;
     }
@@ -119,8 +119,8 @@ public class SubredditListFragment extends ListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return SubredditAdapter.createLoader(getActivity().getApplicationContext(), 
-                getCookie(), getQuery());
+        return SubredditAdapter.createLoader(getActivity().getApplicationContext(), getAccountId(),
+                getQuery());
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -301,9 +301,9 @@ public class SubredditListFragment extends ListFragment implements
     private Subreddit getSelectedSubreddit() {
         return getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
     }
-    
-    public String getCookie() {
-        return getArguments().getString(ARG_COOKIE);
+
+    public long getAccountId() {
+        return getArguments().getLong(ARG_ACCOUNT_ID);
     }
 
     private String getQuery() {

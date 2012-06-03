@@ -16,33 +16,34 @@
 
 package com.btmura.android.reddit.widget;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.btmura.android.reddit.Provider.AccountSubreddits;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.SubredditAccountLoader;
 import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 
 public class SubredditAdapter extends SimpleCursorAdapter {
 
-    private static final String[] PROJECTION = {
-            Subreddits._ID, Subreddits.COLUMN_NAME,
-    };
+    private static final String[] PROJECTION = {Subreddits._ID, Subreddits.COLUMN_NAME};
     private static final String[] FROM = {};
     private static final int[] TO = {};
 
-    public static Loader<Cursor> createLoader(Context context, String cookie, String query) {
-        if (cookie != null) {
-            return new SubredditAccountLoader(context, cookie);
+    public static Loader<Cursor> createLoader(Context context, long accountId, String query) {
+        if (accountId > 0) {
+            Uri uri = ContentUris.withAppendedId(AccountSubreddits.CONTENT_URI, accountId);
+            return new CursorLoader(context, uri, null, null, null, null);
         } else if (query != null) {
             return new SubredditSearchLoader(context, Urls.subredditSearchUrl(query, null));
         } else {

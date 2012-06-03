@@ -19,8 +19,6 @@ package com.btmura.android.reddit;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.btmura.android.reddit.R;
-
 import android.app.backup.BackupManager;
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
@@ -54,28 +52,39 @@ public class Provider extends ContentProvider {
     private static final int MATCH_ONE_SUBREDDIT = 2;
     private static final int MATCH_ALL_ACCOUNTS = 3;
     private static final int MATCH_ONE_ACCOUNT = 4;
+    private static final int MATCH_ONE_ACCOUNT_SUBREDDITS = 5;
     static {
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME, MATCH_ALL_SUBREDDITS);
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
         MATCHER.addURI(AUTHORITY, Accounts.TABLE_NAME, MATCH_ALL_ACCOUNTS);
         MATCHER.addURI(AUTHORITY, Accounts.TABLE_NAME + "/#", MATCH_ONE_ACCOUNT);
+        MATCHER.addURI(AUTHORITY, AccountSubreddits.TABLE_NAME + "/#", MATCH_ONE_ACCOUNT_SUBREDDITS);
     }
 
     public static class Subreddits implements BaseColumns {
-        private static final String TABLE_NAME = "subreddits";
+        static final String TABLE_NAME = "subreddits";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
         public static final String COLUMN_NAME = "name";
         public static final String SORT = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
     }
 
     public static class Accounts implements BaseColumns {
-        private static final String TABLE_NAME = "accounts";
+        static final String TABLE_NAME = "accounts";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
         public static final String COLUMN_LOGIN = "login";
         public static final String COLUMN_COOKIE = "cookie";
         public static final String COLUMN_MODHASH = "modhash";
         public static final String SORT = Accounts.COLUMN_LOGIN + " COLLATE NOCASE ASC";
     }
+
+    /** AccountSubreddits is a fake table that actually queries Reddit. */
+    public static class AccountSubreddits {
+        static final String TABLE_NAME = "accountSubreddits";
+        public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
+        public static final String COLUMN_NAME = "name";
+    }
+
+    static final String ID_SELECTION = BaseColumns._ID + "= ?";
 
     private DbHelper helper;
 
@@ -105,6 +114,11 @@ public class Provider extends ContentProvider {
                 notifyUri = Accounts.CONTENT_URI;
                 break;
 
+            case MATCH_ONE_ACCOUNT_SUBREDDITS:
+                tableName = AccountSubreddits.TABLE_NAME;
+                notifyUri = AccountSubreddits.CONTENT_URI;
+                break;
+
             default:
                 return null;
         }
@@ -112,17 +126,23 @@ public class Provider extends ContentProvider {
         switch (match) {
             case MATCH_ONE_ACCOUNT:
             case MATCH_ONE_SUBREDDIT:
-                selection = BaseColumns._ID + "= ?";
+                selection = ID_SELECTION;
                 selectionArgs = new String[] {
-                    Long.toString(ContentUris.parseId(uri))
+                        Long.toString(ContentUris.parseId(uri))
                 };
                 break;
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
-        c.setNotificationUri(getContext().getContentResolver(), notifyUri);
-        return c;
+
+        if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
+            return NetProvider.querySubreddits(db, ContentUris.parseId(uri));
+        } else {
+            Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null,
+                    sortOrder);
+            c.setNotificationUri(getContext().getContentResolver(), notifyUri);
+            return c;
+        }
     }
 
     @Override
@@ -184,7 +204,7 @@ public class Provider extends ContentProvider {
             case MATCH_ONE_ACCOUNT:
                 selection = BaseColumns._ID + "= ?";
                 selectionArgs = new String[] {
-                    Long.toString(ContentUris.parseId(uri))
+                        Long.toString(ContentUris.parseId(uri))
                 };
                 break;
         }
@@ -201,10 +221,10 @@ public class Provider extends ContentProvider {
     public String getType(Uri uri) {
         return null;
     }
-    
+
     public static Uri addSubreddit(Context context, String subreddit) {
         ContentValues values = new ContentValues(1);
-        values.put(Subreddits.COLUMN_NAME, subreddit);                    
+        values.put(Subreddits.COLUMN_NAME, subreddit);
         ContentResolver cr = context.getContentResolver();
         return cr.insert(Subreddits.CONTENT_URI, values);
     }
@@ -441,8 +461,8 @@ public class Provider extends ContentProvider {
         }
 
         private void createAccounts(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + Accounts.TABLE_NAME + " (" 
-                    + Accounts._ID + " INTEGER PRIMARY KEY, " 
+            db.execSQL("CREATE TABLE " + Accounts.TABLE_NAME + " ("
+                    + Accounts._ID + " INTEGER PRIMARY KEY, "
                     + Accounts.COLUMN_LOGIN + " TEXT UNIQUE NOT NULL, "
                     + Accounts.COLUMN_COOKIE + " TEXT UNIQUE NOT NULL, "
                     + Accounts.COLUMN_MODHASH + " TEXT UNIQUE NOT NULL)");
