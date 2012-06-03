@@ -20,6 +20,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ import com.btmura.android.reddit.data.Objects;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
+import com.btmura.android.reddit.fragment.AddSubredditFragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.widget.AccountSwitcher;
 import com.btmura.android.reddit.widget.AccountSwitcher.OnAccountSwitchListener;
@@ -42,7 +44,8 @@ import com.btmura.android.reddit.widget.AccountSwitcherAdapter;
 public class LoginBrowserActivity extends Activity implements Debug,
         LoaderCallbacks<BrowserResult>,
         OnAccountSwitchListener,
-        OnSubredditSelectedListener {
+        OnSubredditSelectedListener,
+        SubredditNameHolder {
 
     public static final String TAG = "LoginBrowserActivity";
 
@@ -127,6 +130,19 @@ public class LoginBrowserActivity extends Activity implements Debug,
     }
 
     public void onSubredditSelected(Subreddit subreddit) {
+        startThingListActivity(subreddit);
+    }
+    
+    protected void startThingListActivity(Subreddit subreddit) {
+        Intent intent = new Intent(this, ThingListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
+        intent.putExtra(ThingListActivity.EXTRA_FLAGS, 0);
+        startActivity(intent);
+    }
+    
+    public CharSequence getSubredditName() {
+        return null;
     }
     
     private SubredditListFragment getSubredditListFragment() {
