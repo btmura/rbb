@@ -41,13 +41,9 @@ public class AccountAdapter extends SimpleCursorAdapter {
         return new CursorLoader(context, Accounts.CONTENT_URI, PROJECTION, null, null,
                 Accounts.SORT);
     }
-    
-    public static AccountAdapter listItemInstance(Context context) {
-        return new AccountAdapter(context, R.layout.account_row);
-    }
 
-    private AccountAdapter(Context context, int layout) {
-        super(context, layout, null, FROM, TO, 0);
+    public AccountAdapter(Context context) {
+        super(context, R.layout.account_row, null, FROM, TO, 0);
     }
 
     @Override

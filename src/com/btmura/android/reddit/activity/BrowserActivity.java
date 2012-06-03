@@ -38,7 +38,6 @@ import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.widget.AccountAdapter;
-import com.btmura.android.reddit.widget.BrowserAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity implements
@@ -60,7 +59,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     private FilterAdapter filterAdapter;
     private View singleContainer;
     
-    private BrowserAdapter adapter;
+    private AccountAdapter adapter;
     
     private boolean homeUpEnabled;
     private boolean navigationListenerDisabled;
@@ -104,7 +103,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
             bar.setDisplayShowTitleEnabled(false); 
             
             switcher = (ViewSwitcher) bar.getCustomView();
-            adapter = new BrowserAdapter(this);
+            adapter = new AccountAdapter(this);
             
             Spinner spinner = (Spinner) switcher.findViewById(R.id.spinner);        
             spinner.setAdapter(adapter);

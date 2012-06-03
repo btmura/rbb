@@ -23,15 +23,10 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.database.Cursor;
-import android.database.CursorWrapper;
-import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
-import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
@@ -42,17 +37,18 @@ import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.widget.AccountSwitcher;
-import com.btmura.android.reddit.widget.BrowserAdapter;
+import com.btmura.android.reddit.widget.AccountSwitcher.OnAccountSwitchListener;
+import com.btmura.android.reddit.widget.AccountSwitcherAdapter;
 
 public class LoginBrowserActivity extends Activity implements Debug,
         LoaderCallbacks<BrowserResult>,
-        OnItemSelectedListener,
+        OnAccountSwitchListener,
         OnSubredditSelectedListener {
 
     public static final String TAG = "LoginBrowserActivity";
 
     private AccountSwitcher switcher;
-    private BrowserAdapter adapter;
+    private AccountSwitcherAdapter adapter;
     private SharedPreferences prefs;
 
     @Override
@@ -82,9 +78,9 @@ public class LoginBrowserActivity extends Activity implements Debug,
         bar.setCustomView(R.layout.browser_actionbar);
 
         switcher = (AccountSwitcher) bar.getCustomView();
-        switcher.setOnItemSelectedListener(this);
-
-        adapter = new BrowserAdapter(this);
+        switcher.setOnAccountSwitchedListener(this);
+        
+        adapter = new AccountSwitcherAdapter(this);
         switcher.setAdapter(adapter);
     }
 
@@ -98,26 +94,8 @@ public class LoginBrowserActivity extends Activity implements Debug,
                     + (result.accounts != null ? result.accounts.getCount() : "-1") + ")");
         }
         prefs = result.prefs;
-        
-        Cursor cursor = result.accounts;
-        if (cursor != null) {
-            // Wrap the cursor to make sure onItemSelected is always fired.
-            cursor = new NoAccountCursorWrapper(cursor);
-        }        
-        adapter.swapCursor(cursor);        
-        selectAccount(cursor, result.lastLogin);
-    }
-
-    private void selectAccount(Cursor cursor, String lastLogin) {
-        if (cursor != null) {
-            for (cursor.moveToPosition(-1); cursor.moveToNext();) {
-                String login = cursor.getString(1);
-                if (login.equals(lastLogin)) {
-                    switcher.setSelection(cursor.getPosition());
-                    break;
-                }
-            }
-        }
+        adapter.swapCursor(result.accounts);       
+        switcher.setSelection(adapter.findLogin(result.lastLogin));
     }
 
     private void showSubredditList(String cookie) {
@@ -133,17 +111,10 @@ public class LoginBrowserActivity extends Activity implements Debug,
         }
         adapter.swapCursor(null);
     }
-
-    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-        if (DEBUG_ACTIVITY) {
-            Log.d(TAG, "onItemSelected (position " + position + ")");
-        }
-
-        String cookie = adapter.getString(position, BrowserLoader.INDEX_COOKIE);
-        showSubredditList(cookie);
-
-        String lastLogin = adapter.getString(position, BrowserLoader.INDEX_LOGIN);
-        saveLastLoginPreference(lastLogin);
+    
+    public void onAccountSwitch(AccountSwitcherAdapter adapter, int position) {
+        showSubredditList(adapter.getCookie(position));
+        saveLastLoginPreference(adapter.getLogin(position));
     }
 
     private void saveLastLoginPreference(String lastLogin) {
@@ -152,121 +123,9 @@ public class LoginBrowserActivity extends Activity implements Debug,
         editor.apply();
     }
 
-    public void onNothingSelected(AdapterView<?> adapterView) {
-        if (DEBUG_ACTIVITY) {
-            Log.d(TAG, "onNothingSelected");
-        }
-    }
-
     public void onSubredditLoaded(Subreddit subreddit) {
     }
 
     public void onSubredditSelected(Subreddit subreddit) {
-    }
-
-    /**
-     * {@link CursorWrapper} for making sure there is always one item in the 
-     * cursor so that {@link OnItemSelectedListener#onItemSelected(
-     * AdapterView, View, int, long)} is always fired.
-     */
-    static class NoAccountCursorWrapper extends CursorWrapper {
-
-        private static final MatrixCursor NO_ACCOUNT_CURSOR = new MatrixCursor(
-                BrowserLoader.PROJECTION);
-        
-        static {
-            NO_ACCOUNT_CURSOR.addRow(new Object[] {
-                    AdapterView.INVALID_ROW_ID, "", null
-            });
-        }
-
-        public NoAccountCursorWrapper(Cursor cursor) {
-            super(cursor);
-        }
-
-        @Override
-        public boolean move(int offset) {
-            if (hasNoAccounts()) {
-                return NO_ACCOUNT_CURSOR.move(offset);
-            } else {
-                return super.move(offset);
-            }
-        }
-
-        @Override
-        public boolean moveToPosition(int position) {
-            if (hasNoAccounts()) {
-                return NO_ACCOUNT_CURSOR.moveToPosition(position);
-            } else {
-                return super.moveToPosition(position);
-            }
-        }
-
-        @Override
-        public boolean moveToFirst() {
-            if (hasNoAccounts()) {
-                return NO_ACCOUNT_CURSOR.moveToFirst();
-            } else {
-                return super.moveToFirst();
-            }
-        }
-
-        @Override
-        public boolean moveToPrevious() {
-            if (hasNoAccounts()) {
-                return NO_ACCOUNT_CURSOR.moveToPrevious();
-            } else {
-                return super.moveToPrevious();
-            }
-        }
-
-        @Override
-        public boolean moveToNext() {
-            if (hasNoAccounts()) {
-                return NO_ACCOUNT_CURSOR.moveToNext();
-            } else {
-                return super.moveToNext();
-            }
-        }
-
-        @Override
-        public boolean moveToLast() {
-            if (hasNoAccounts()) {
-                return NO_ACCOUNT_CURSOR.moveToLast();
-            } else {
-                return super.moveToLast();
-            }
-        }
-
-        @Override
-        public int getCount() {
-            if (hasNoAccounts()) {
-                return NO_ACCOUNT_CURSOR.getCount();
-            } else {
-                return super.getCount();
-            }
-        }
-
-        @Override
-        public long getLong(int columnIndex) {
-            if (hasNoAccounts()) {
-                return NO_ACCOUNT_CURSOR.getLong(columnIndex);
-            } else {
-                return super.getLong(columnIndex);
-            }
-        }
-
-        @Override
-        public String getString(int columnIndex) {
-            if (hasNoAccounts()) {
-                return NO_ACCOUNT_CURSOR.getString(columnIndex);
-            } else {
-                return super.getString(columnIndex);
-            }
-        }
-
-        private boolean hasNoAccounts() {
-            return super.getCount() == 0;
-        }
     }
 }
