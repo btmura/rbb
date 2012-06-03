@@ -81,7 +81,7 @@ public class Provider extends ContentProvider {
     public static class AccountSubreddits {
         static final String TABLE_NAME = "accountSubreddits";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
-        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_NAME = Subreddits.COLUMN_NAME;
     }
 
     static final String ID_SELECTION = BaseColumns._ID + "= ?";
@@ -127,22 +127,19 @@ public class Provider extends ContentProvider {
             case MATCH_ONE_ACCOUNT:
             case MATCH_ONE_SUBREDDIT:
                 selection = ID_SELECTION;
-                selectionArgs = new String[] {
-                        Long.toString(ContentUris.parseId(uri))
-                };
+                selectionArgs = new String[] {Long.toString(ContentUris.parseId(uri))};
                 break;
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-
+        Cursor c = null;
         if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
-            return NetProvider.querySubreddits(db, ContentUris.parseId(uri));
+            c = NetProvider.querySubreddits(db, ContentUris.parseId(uri));
         } else {
-            Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null,
-                    sortOrder);
-            c.setNotificationUri(getContext().getContentResolver(), notifyUri);
-            return c;
+            c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
         }
+        c.setNotificationUri(getContext().getContentResolver(), notifyUri);
+        return c;
     }
 
     @Override
@@ -150,7 +147,8 @@ public class Provider extends ContentProvider {
         String tableName;
         Uri notifyUri;
 
-        switch (MATCHER.match(uri)) {
+        int match = MATCHER.match(uri);
+        switch (match) {
             case MATCH_ALL_SUBREDDITS:
                 tableName = Subreddits.TABLE_NAME;
                 notifyUri = Subreddits.CONTENT_URI;
@@ -161,12 +159,22 @@ public class Provider extends ContentProvider {
                 notifyUri = Accounts.CONTENT_URI;
                 break;
 
+            case MATCH_ONE_ACCOUNT_SUBREDDITS:
+                tableName = AccountSubreddits.TABLE_NAME;
+                notifyUri = AccountSubreddits.CONTENT_URI;
+                break;
+
             default:
                 throw new IllegalArgumentException(uri.toString());
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        long id = db.insert(tableName, null, values);
+        long id = -1;
+        if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
+            id = NetProvider.insertSubreddit(db, ContentUris.parseId(uri), values);
+        } else {
+            id = db.insert(tableName, null, values);
+        }
         getContext().getContentResolver().notifyChange(notifyUri, null);
         return ContentUris.withAppendedId(uri, id);
     }
@@ -203,9 +211,7 @@ public class Provider extends ContentProvider {
             case MATCH_ONE_SUBREDDIT:
             case MATCH_ONE_ACCOUNT:
                 selection = BaseColumns._ID + "= ?";
-                selectionArgs = new String[] {
-                        Long.toString(ContentUris.parseId(uri))
-                };
+                selectionArgs = new String[] {Long.toString(ContentUris.parseId(uri))};
                 break;
         }
 
@@ -222,11 +228,12 @@ public class Provider extends ContentProvider {
         return null;
     }
 
-    public static Uri addSubreddit(Context context, String subreddit) {
-        ContentValues values = new ContentValues(1);
-        values.put(Subreddits.COLUMN_NAME, subreddit);
-        ContentResolver cr = context.getContentResolver();
-        return cr.insert(Subreddits.CONTENT_URI, values);
+    public static Uri getSubredditsUri(long accountId) {
+        if (accountId > 0) {
+            return ContentUris.withAppendedId(AccountSubreddits.CONTENT_URI, accountId);
+        } else {
+            return Subreddits.CONTENT_URI;
+        }
     }
 
     public static void addInBackground(final Context context, final Uri uri,
@@ -450,8 +457,7 @@ public class Provider extends ContentProvider {
                     "todayilearned",
                     "videos",
                     "worldnews",
-                    "WTF",
-            };
+                    "WTF",};
 
             for (int i = 0; i < defaultSubreddits.length; i++) {
                 ContentValues values = new ContentValues(1);
@@ -461,11 +467,10 @@ public class Provider extends ContentProvider {
         }
 
         private void createAccounts(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + Accounts.TABLE_NAME + " ("
-                    + Accounts._ID + " INTEGER PRIMARY KEY, "
-                    + Accounts.COLUMN_LOGIN + " TEXT UNIQUE NOT NULL, "
-                    + Accounts.COLUMN_COOKIE + " TEXT UNIQUE NOT NULL, "
-                    + Accounts.COLUMN_MODHASH + " TEXT UNIQUE NOT NULL)");
+            db.execSQL("CREATE TABLE " + Accounts.TABLE_NAME + " (" + Accounts._ID
+                    + " INTEGER PRIMARY KEY, " + Accounts.COLUMN_LOGIN + " TEXT UNIQUE NOT NULL, "
+                    + Accounts.COLUMN_COOKIE + " TEXT UNIQUE NOT NULL, " + Accounts.COLUMN_MODHASH
+                    + " TEXT UNIQUE NOT NULL)");
             db.execSQL("CREATE UNIQUE INDEX " + Accounts.COLUMN_LOGIN + " ON "
                     + Accounts.TABLE_NAME + " (" + Accounts.COLUMN_LOGIN + " ASC)");
         }

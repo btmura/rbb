@@ -16,7 +16,7 @@
 
 package com.btmura.android.reddit.fragment;
 
-public interface AccountHolder {
-    String getAccountCookie();    
-    String getAccountModHash();
+public interface AccountHolder {    
+    /** Return non-zero account id or 0 for no account. */
+    long getAccountId();
 }

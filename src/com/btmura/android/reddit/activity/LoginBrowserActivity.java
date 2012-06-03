@@ -42,11 +42,8 @@ import com.btmura.android.reddit.widget.AccountSwitcher.OnAccountSwitchListener;
 import com.btmura.android.reddit.widget.AccountSwitcherAdapter;
 
 public class LoginBrowserActivity extends Activity implements Debug,
-        LoaderCallbacks<BrowserResult>,
-        OnAccountSwitchListener,
-        OnSubredditSelectedListener,
-        AccountHolder,
-        SubredditNameHolder {
+        LoaderCallbacks<BrowserResult>, OnAccountSwitchListener, OnSubredditSelectedListener,
+        AccountHolder, SubredditNameHolder {
 
     public static final String TAG = "LoginBrowserActivity";
 
@@ -82,7 +79,7 @@ public class LoginBrowserActivity extends Activity implements Debug,
 
         switcher = (AccountSwitcher) bar.getCustomView();
         switcher.setOnAccountSwitchedListener(this);
-        
+
         adapter = new AccountSwitcherAdapter(this);
         switcher.setAdapter(adapter);
     }
@@ -97,32 +94,32 @@ public class LoginBrowserActivity extends Activity implements Debug,
                     + (result.accounts != null ? result.accounts.getCount() : "-1") + ")");
         }
         prefs = result.prefs;
-        adapter.swapCursor(result.accounts);       
+        adapter.swapCursor(result.accounts);
         switcher.setSelection(adapter.findLogin(result.lastLogin));
     }
-    
+
     public void onLoaderReset(Loader<BrowserResult> loader) {
         if (DEBUG_LOADERS) {
             Log.d(TAG, "onLoaderReset (id " + loader.getId() + ")");
         }
         adapter.swapCursor(null);
     }
-    
+
     public void onAccountSwitch(AccountSwitcherAdapter adapter, int position) {
         replaceSubredditListFragment(adapter.getItemId(position));
         saveLastLoginPreference(adapter.getLogin(position));
     }
-    
+
     private void replaceSubredditListFragment(long accountId) {
         SubredditListFragment slf = getSubredditListFragment();
-        if (slf == null || accountId != slf.getAccountId()) {        
+        if (slf == null || accountId != slf.getAccountId()) {
             slf = SubredditListFragment.newInstance(null, accountId, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
             ft.commit();
         }
     }
-    
+
     private void saveLastLoginPreference(String lastLogin) {
         prefs.edit().putString(BrowserLoader.PREF_LAST_LOGIN, lastLogin).apply();
     }
@@ -133,7 +130,7 @@ public class LoginBrowserActivity extends Activity implements Debug,
     public void onSubredditSelected(Subreddit subreddit) {
         startThingListActivity(subreddit);
     }
-    
+
     protected void startThingListActivity(Subreddit subreddit) {
         Intent intent = new Intent(this, ThingListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -141,19 +138,15 @@ public class LoginBrowserActivity extends Activity implements Debug,
         intent.putExtra(ThingListActivity.EXTRA_FLAGS, 0);
         startActivity(intent);
     }
-    
-    public String getAccountCookie() {
-        return adapter.getCookie(switcher.getSelectedItemPosition());
+
+    public long getAccountId() {
+        return adapter.getItemId(switcher.getSelectedItemPosition());
     }
-    
-    public String getAccountModHash() {
-        return adapter.getModhash(switcher.getSelectedItemPosition());
-    }
-    
+
     public CharSequence getSubredditName() {
         return null;
     }
-    
+
     private SubredditListFragment getSubredditListFragment() {
         return (SubredditListFragment) getFragmentManager().findFragmentByTag(SubredditListFragment.TAG);
     }

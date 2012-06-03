@@ -19,18 +19,21 @@ package com.btmura.android.reddit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.content.ContentValues;
 import android.database.AbstractCursor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.JsonReader;
 import android.util.Log;
 
+import com.btmura.android.reddit.Provider.AccountSubreddits;
 import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.data.JsonParser;
@@ -76,11 +79,43 @@ class NetProvider {
         return null;
     }
 
+    static long insertSubreddit(SQLiteDatabase db, long accountId, ContentValues values) {
+        String[] credentials = getCredentials(db, accountId);
+        try {
+            URL url = Urls.subscribeUrl();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
+            conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
+            conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
+            conn.setDoOutput(true);
+            conn.connect();
+
+            String subreddit = values.getAsString(AccountSubreddits.COLUMN_NAME);
+            String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit);
+            writeData(conn, data);
+            
+            InputStream in = conn.getInputStream();
+            in.close();
+            conn.disconnect();
+
+            return 1337;
+
+        } catch (IOException e) {
+            Log.e(TAG, "insertSubreddit", e);
+        }
+        return -1;
+    }
+
     private static String[] getCredentials(SQLiteDatabase db, long id) {
         String[] credentials = {null, null};
         String[] selectionArgs = new String[] {Long.toString(id)};
-        Cursor c = db.query(Accounts.TABLE_NAME, CREDENTIALS_PROJECTION, Provider.ID_SELECTION,
-                selectionArgs, null, null, null);
+        Cursor c = db.query(Accounts.TABLE_NAME,
+                CREDENTIALS_PROJECTION,
+                Provider.ID_SELECTION,
+                selectionArgs,
+                null,
+                null,
+                null);
         try {
             if (c.moveToNext()) {
                 credentials[INDEX_COOKIE] = c.getString(INDEX_COOKIE);
@@ -90,6 +125,19 @@ class NetProvider {
             c.close();
         }
         return credentials;
+    }
+
+    private static void writeData(HttpURLConnection conn, String data) throws IOException {
+        OutputStream output = null;
+        try {
+            output = conn.getOutputStream();
+            output.write(data.getBytes(Urls.CHARSET));
+            output.close();
+        } finally {
+            if (output != null) {
+                output.close();
+            }
+        }
     }
 
     static class SubredditParser extends JsonParser {
@@ -116,14 +164,15 @@ class NetProvider {
             Collections.sort(results);
         }
     }
-    
+
     static class SubredditCursor extends AbstractCursor {
 
         private static final String FAKE_COLUMN_SUBSCRIBERS = "subscribers";
 
         private static final String[] PROJECTION = {
-                Subreddits._ID, Subreddits.COLUMN_NAME, FAKE_COLUMN_SUBSCRIBERS,
-        };
+                Subreddits._ID,
+                Subreddits.COLUMN_NAME,
+                FAKE_COLUMN_SUBSCRIBERS,};
 
         private final List<Subreddit> results;
 

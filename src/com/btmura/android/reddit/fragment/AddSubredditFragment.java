@@ -18,24 +18,29 @@ package com.btmura.android.reddit.fragment;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.ContentValues;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
+import com.btmura.android.reddit.Provider;
+import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.Actions;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddSubredditFragment extends DialogFragment implements
-        View.OnClickListener,
-        CheckBox.OnCheckedChangeListener {
+        OnClickListener,
+        OnCheckedChangeListener {
 
     public static final String TAG = "AddSubredditFragment";
 
@@ -122,8 +127,10 @@ public class AddSubredditFragment extends DialogFragment implements
             return;
         }
         
-        Actions.addSubredditInBackground(getActivity(), accountHolder.getAccountCookie(), 
-                accountHolder.getAccountModHash(), name);
+        Uri uri = Provider.getSubredditsUri(accountHolder.getAccountId());        
+        ContentValues values = new ContentValues(1);
+        values.put(Subreddits.COLUMN_NAME, name);
+        Provider.addInBackground(getActivity(), uri, values);
         dismiss();
     }
 }

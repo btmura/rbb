@@ -28,13 +28,15 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 public class Urls {
 
     public static final String CHARSET = "UTF-8";
-    
+    public static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset="
+            + CHARSET;
+
     private static final String BASE_URL = "http://www.reddit.com";
     private static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
     private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
     private static final String BASE_LOGIN_URL = BASE_SSL_URL + "/api/login/";
-    private static final String BASE_SEARCH_URL = BASE_URL + "/search.json?q=";    
+    private static final String BASE_SEARCH_URL = BASE_URL + "/search.json?q=";
     private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
@@ -51,11 +53,11 @@ public class Urls {
         b.append("reddit_session=").append(encode(cookie));
         return b.toString();
     }
-    
+
     public static URL loginUrl(String userName) {
         return newUrl(resetBuilder().append(BASE_LOGIN_URL).append(encode(userName)));
     }
-    
+
     public static String subscribeQuery(String modhash, String subreddit) {
         StringBuilder b = resetBuilder();
         b.append("action=sub");
@@ -76,7 +78,7 @@ public class Urls {
     public static URL permaUrl(Thing thing) {
         return newUrl(resetBuilder().append(BASE_URL).append(thing.permaLink));
     }
-    
+
     public static URL searchUrl(String query, String more) {
         return newSearchUrl(BASE_SEARCH_URL, query, more);
     }
@@ -123,7 +125,7 @@ public class Urls {
         }
         return newUrl(b);
     }
-    
+
     public static URL subredditListUrl() {
         return newUrl(BASE_SUBREDDIT_LIST_URL);
     }
@@ -131,7 +133,7 @@ public class Urls {
     public static URL subredditSearchUrl(String query, String more) {
         return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, more);
     }
-    
+
     public static URL subscribeUrl() {
         return newUrl(BASE_SUBSCRIBE_URL);
     }
