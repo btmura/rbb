@@ -46,6 +46,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
             Accounts._ID,
             Accounts.COLUMN_LOGIN,
             Accounts.COLUMN_COOKIE,
+            Accounts.COLUMN_MODHASH,
     };
 
     public static final int INDEX_LOGIN = 1;

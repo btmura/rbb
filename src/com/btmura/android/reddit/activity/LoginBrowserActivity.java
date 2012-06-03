@@ -33,6 +33,7 @@ import com.btmura.android.reddit.content.BrowserLoader;
 import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
 import com.btmura.android.reddit.data.Objects;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.fragment.AccountHolder;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.AddSubredditFragment.SubredditNameHolder;
@@ -45,6 +46,7 @@ public class LoginBrowserActivity extends Activity implements Debug,
         LoaderCallbacks<BrowserResult>,
         OnAccountSwitchListener,
         OnSubredditSelectedListener,
+        AccountHolder,
         SubredditNameHolder {
 
     public static final String TAG = "LoginBrowserActivity";
@@ -139,6 +141,14 @@ public class LoginBrowserActivity extends Activity implements Debug,
         intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
         intent.putExtra(ThingListActivity.EXTRA_FLAGS, 0);
         startActivity(intent);
+    }
+    
+    public String getAccountCookie() {
+        return adapter.getCookie(switcher.getSelectedItemPosition());
+    }
+    
+    public String getAccountModHash() {
+        return adapter.getModhash(switcher.getSelectedItemPosition());
     }
     
     public CharSequence getSubredditName() {

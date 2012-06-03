@@ -18,7 +18,6 @@ package com.btmura.android.reddit.fragment;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.content.ContentValues;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
@@ -30,9 +29,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
-import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.Actions;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddSubredditFragment extends DialogFragment implements
@@ -50,6 +48,7 @@ public class AddSubredditFragment extends DialogFragment implements
     }
 
     private SubredditNameHolder nameHolder;
+    private AccountHolder accountHolder;
 
     private EditText nameField;
     private CheckBox addFrontPage;
@@ -64,6 +63,7 @@ public class AddSubredditFragment extends DialogFragment implements
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         nameHolder = (SubredditNameHolder) activity;
+        accountHolder = (AccountHolder) activity;
     }
 
     @Override
@@ -121,11 +121,9 @@ public class AddSubredditFragment extends DialogFragment implements
             nameField.setError(getString(R.string.error_blank_field));
             return;
         }
-
-        ContentValues values = new ContentValues(1);
-        values.put(Subreddits.COLUMN_NAME, name);
-        Provider.addInBackground(getActivity(), Subreddits.CONTENT_URI, values);
-
+        
+        Actions.addSubredditInBackground(getActivity(), accountHolder.getAccountCookie(), 
+                accountHolder.getAccountModHash(), name);
         dismiss();
     }
 }

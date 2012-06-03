@@ -63,6 +63,10 @@ public class AccountSwitcherAdapter extends SimpleCursorAdapter {
     public String getCookie(int position) {
         return getString(position, 2);
     }
+    
+    public String getModhash(int position) {
+        return getString(position, 3);
+    }
 
     private String getString(int position, int columnIndex) {
         Cursor c = getCursor();
@@ -115,7 +119,7 @@ public class AccountSwitcherAdapter extends SimpleCursorAdapter {
 
         static {
             NO_ACCOUNT_CURSOR.addRow(new Object[] {
-                    AdapterView.INVALID_ROW_ID, "", null
+                    AdapterView.INVALID_ROW_ID, "", null, null,
             });
         }
 

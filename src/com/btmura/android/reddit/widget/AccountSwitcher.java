@@ -96,6 +96,10 @@ public class AccountSwitcher extends FrameLayout implements OnItemSelectedListen
     public void setSelection(int position) {
         spinner.setSelection(position);
     }
+    
+    public int getSelectedItemPosition() {
+        return spinner.getSelectedItemPosition();
+    }
 
     public void setOnAccountSwitchedListener(OnAccountSwitchListener listener) {
         this.listener = listener;

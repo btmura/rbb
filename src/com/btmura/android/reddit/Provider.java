@@ -201,6 +201,13 @@ public class Provider extends ContentProvider {
     public String getType(Uri uri) {
         return null;
     }
+    
+    public static Uri addSubreddit(Context context, String subreddit) {
+        ContentValues values = new ContentValues(1);
+        values.put(Subreddits.COLUMN_NAME, subreddit);                    
+        ContentResolver cr = context.getContentResolver();
+        return cr.insert(Subreddits.CONTENT_URI, values);
+    }
 
     public static void addInBackground(final Context context, final Uri uri,
             final ContentValues values) {

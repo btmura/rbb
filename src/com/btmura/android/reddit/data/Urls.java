@@ -38,6 +38,7 @@ public class Urls {
     private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
+    private static final String BASE_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
 
     private static final StringBuilder S = new StringBuilder(BASE_URL.length() * 3);
 
@@ -55,6 +56,15 @@ public class Urls {
         return newUrl(resetBuilder().append(BASE_LOGIN_URL).append(encode(userName)));
     }
     
+    public static String subscribeQuery(String modhash, String subreddit) {
+        StringBuilder b = resetBuilder();
+        b.append("action=sub");
+        b.append("&uh=").append(encode(modhash));
+        b.append("&sr_name=").append(subreddit);
+        b.append("&api_type=json");
+        return b.toString();
+    }
+
     public static String loginQuery(String userName, String password) {
         StringBuilder b = resetBuilder();
         b.append("user=").append(encode(userName));
@@ -65,6 +75,10 @@ public class Urls {
 
     public static URL permaUrl(Thing thing) {
         return newUrl(resetBuilder().append(BASE_URL).append(thing.permaLink));
+    }
+    
+    public static URL searchUrl(String query, String more) {
+        return newSearchUrl(BASE_SEARCH_URL, query, more);
     }
 
     public static URL sidebarUrl(String name) {
@@ -114,12 +128,12 @@ public class Urls {
         return newUrl(BASE_SUBREDDIT_LIST_URL);
     }
 
-    public static URL searchUrl(String query, String more) {
-        return newSearchUrl(BASE_SEARCH_URL, query, more);
-    }
-
     public static URL subredditSearchUrl(String query, String more) {
         return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, more);
+    }
+    
+    public static URL subscribeUrl() {
+        return newUrl(BASE_SUBSCRIBE_URL);
     }
 
     private static URL newSearchUrl(String base, String query, String more) {
