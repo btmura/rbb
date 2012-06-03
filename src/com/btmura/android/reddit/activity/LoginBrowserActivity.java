@@ -89,7 +89,7 @@ public class LoginBrowserActivity extends Activity implements Debug,
     }
 
     public Loader<BrowserResult> onCreateLoader(int id, Bundle args) {
-        return new BrowserLoader(this);
+        return new BrowserLoader(getApplicationContext());
     }
 
     public void onLoadFinished(Loader<BrowserResult> loader, BrowserResult result) {

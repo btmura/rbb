@@ -117,6 +117,7 @@ public class LoginLoader extends AsyncTaskLoader<LoginResult> {
             }
         }
         reader.endObject();
+        reader.close();
         return result;
     }
 
