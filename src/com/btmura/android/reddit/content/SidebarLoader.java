@@ -42,7 +42,7 @@ public class SidebarLoader extends AsyncTaskLoader<Subreddit> {
     private String subreddit;
 
     public SidebarLoader(Context context, String subreddit) {
-        super(context);
+        super(context.getApplicationContext());
         this.subreddit = subreddit;
     }
 

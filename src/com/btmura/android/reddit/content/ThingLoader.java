@@ -44,7 +44,7 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
 
     public ThingLoader(Context context, String parentSubreddit, URL url,
             List<Thing> initThings) {
-        super(context);
+        super(context.getApplicationContext());
         this.parentSubreddit = parentSubreddit;
         this.url = url;
         this.initThings = initThings;

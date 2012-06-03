@@ -51,7 +51,7 @@ public class LoginLoader extends AsyncTaskLoader<LoginResult> {
     private LoginResult results;
     
     public LoginLoader(Context context, String login, String password) {
-        super(context);
+        super(context.getApplicationContext());
         this.login = login;
         this.password = password;
     }

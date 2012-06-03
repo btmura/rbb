@@ -41,7 +41,7 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
     private List<Comment> comments;
 
     public CommentLoader(Context context, URL url) {
-        super(context);
+        super(context.getApplicationContext());
         this.url = url;
     }
 
