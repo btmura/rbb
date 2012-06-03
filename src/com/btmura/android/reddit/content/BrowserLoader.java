@@ -47,7 +47,10 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
             Accounts.COLUMN_LOGIN,
             Accounts.COLUMN_COOKIE,
     };
-    
+
+    public static final int INDEX_LOGIN = 1;
+    public static final int INDEX_COOKIE = 2;
+
     public static final String PREF_LAST_LOGIN = "lastLogin";
 
     private static final String PREFS = "prefs";
@@ -56,7 +59,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
     private BrowserResult result;
 
     public BrowserLoader(Context context) {
-        super(context);
+        super(context.getApplicationContext());
     }
 
     @Override
@@ -68,7 +71,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
         Cursor cursor = getContext().getContentResolver().query(Accounts.CONTENT_URI, PROJECTION,
                 null, null, Accounts.SORT);
         if (cursor != null) {
-            cursor.getCount();            
+            cursor.getCount();
             cursor.registerContentObserver(observer);
         }
 

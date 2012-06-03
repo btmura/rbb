@@ -17,37 +17,25 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.R;
 
-public class AccountAdapter extends SimpleCursorAdapter {
-
-    private static final String[] PROJECTION = {
-            Accounts._ID, Accounts.COLUMN_LOGIN, Accounts.COLUMN_COOKIE,
-    };
+public class BrowserAdapter extends SimpleCursorAdapter {
 
     private static final String[] FROM = {};
     private static final int[] TO = {};
 
-    public static Loader<Cursor> createLoader(Context context) {
-        return new CursorLoader(context, Accounts.CONTENT_URI, PROJECTION, null, null,
-                Accounts.SORT);
-    }
-    
-    public static AccountAdapter listItemInstance(Context context) {
-        return new AccountAdapter(context, R.layout.account_row);
-    }
+    private final LayoutInflater inflater;
 
-    private AccountAdapter(Context context, int layout) {
-        super(context, layout, null, FROM, TO, 0);
+    public BrowserAdapter(Context context) {
+        super(context, R.layout.browser_row, null, FROM, TO, 0);
+        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -55,24 +43,21 @@ public class AccountAdapter extends SimpleCursorAdapter {
         TextView tv = (TextView) view;
         tv.setText(cursor.getString(1));
     }
-    
+
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        return super.getDropDownView(position, convertView, parent);
-    }
-    
-    public String getLogin(int position) {
-        Cursor c = getCursor();
-        if (c.moveToPosition(position)) {
-            return c.getString(1);
+        TextView tv = (TextView) convertView;
+        if (tv == null) {
+            tv = (TextView) inflater.inflate(R.layout.browser_dropdown_row, parent, false);
         }
-        return null;
+        tv.setText(getCursor().getString(1));
+        return tv;
     }
-    
-    public String getCookie(int position) {
+
+    public String getString(int position, int columnIndex) {
         Cursor c = getCursor();
         if (c.moveToPosition(position)) {
-            return c.getString(2);
+            return c.getString(columnIndex);
         }
         return null;
     }

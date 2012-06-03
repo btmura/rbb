@@ -41,8 +41,8 @@ import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
-import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.AccountSwitcher;
+import com.btmura.android.reddit.widget.BrowserAdapter;
 
 public class LoginBrowserActivity extends Activity implements Debug,
         LoaderCallbacks<BrowserResult>,
@@ -52,7 +52,7 @@ public class LoginBrowserActivity extends Activity implements Debug,
     public static final String TAG = "LoginBrowserActivity";
 
     private AccountSwitcher switcher;
-    private AccountAdapter adapter;
+    private BrowserAdapter adapter;
     private SharedPreferences prefs;
 
     @Override
@@ -84,12 +84,12 @@ public class LoginBrowserActivity extends Activity implements Debug,
         switcher = (AccountSwitcher) bar.getCustomView();
         switcher.setOnItemSelectedListener(this);
 
-        adapter = AccountAdapter.titleBarInstance(this);
+        adapter = new BrowserAdapter(this);
         switcher.setAdapter(adapter);
     }
 
     public Loader<BrowserResult> onCreateLoader(int id, Bundle args) {
-        return new BrowserLoader(getApplicationContext());
+        return new BrowserLoader(this);
     }
 
     public void onLoadFinished(Loader<BrowserResult> loader, BrowserResult result) {
@@ -139,10 +139,10 @@ public class LoginBrowserActivity extends Activity implements Debug,
             Log.d(TAG, "onItemSelected (position " + position + ")");
         }
 
-        String cookie = adapter.getCookie(position);
+        String cookie = adapter.getString(position, BrowserLoader.INDEX_COOKIE);
         showSubredditList(cookie);
 
-        String lastLogin = adapter.getLogin(position);
+        String lastLogin = adapter.getString(position, BrowserLoader.INDEX_LOGIN);
         saveLastLoginPreference(lastLogin);
     }
 
