@@ -39,7 +39,7 @@ public class SubredditAccountLoader extends AsyncTaskLoader<Cursor> {
     private Cursor results;
 
     public SubredditAccountLoader(Context context, String cookie) {
-        super(context);
+        super(context.getApplicationContext());
         this.cookie = cookie;
     }
 

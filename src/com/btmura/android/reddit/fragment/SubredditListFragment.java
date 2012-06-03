@@ -302,7 +302,7 @@ public class SubredditListFragment extends ListFragment implements
         return getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
     }
     
-    private String getCookie() {
+    public String getCookie() {
         return getArguments().getString(ARG_COOKIE);
     }
 

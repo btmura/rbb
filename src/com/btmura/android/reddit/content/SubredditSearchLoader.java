@@ -38,7 +38,7 @@ public class SubredditSearchLoader extends AsyncTaskLoader<Cursor> {
     private final URL url;
 
     public SubredditSearchLoader(Context context, URL url) {
-        super(context);
+        super(context.getApplicationContext());
         this.url = url;
     }
 

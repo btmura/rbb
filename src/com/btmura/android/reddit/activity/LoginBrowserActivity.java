@@ -22,16 +22,15 @@ import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
-import android.widget.AdapterView;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.BrowserLoader;
 import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
+import com.btmura.android.reddit.data.Objects;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
@@ -97,14 +96,7 @@ public class LoginBrowserActivity extends Activity implements Debug,
         adapter.swapCursor(result.accounts);       
         switcher.setSelection(adapter.findLogin(result.lastLogin));
     }
-
-    private void showSubredditList(String cookie) {
-        SubredditListFragment slf = SubredditListFragment.newInstance(null, cookie, 0);
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
-        ft.commit();
-    }
-
+    
     public void onLoaderReset(Loader<BrowserResult> loader) {
         if (DEBUG_LOADERS) {
             Log.d(TAG, "onLoaderReset (id " + loader.getId() + ")");
@@ -113,19 +105,31 @@ public class LoginBrowserActivity extends Activity implements Debug,
     }
     
     public void onAccountSwitch(AccountSwitcherAdapter adapter, int position) {
-        showSubredditList(adapter.getCookie(position));
+        replaceSubredditListFragment(adapter.getCookie(position));
         saveLastLoginPreference(adapter.getLogin(position));
     }
-
+    
+    private void replaceSubredditListFragment(String cookie) {
+        SubredditListFragment slf = getSubredditListFragment();
+        if (slf == null || !Objects.equals(cookie, slf.getCookie())) {        
+            slf = SubredditListFragment.newInstance(null, cookie, 0);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
+            ft.commit();
+        }
+    }
+    
     private void saveLastLoginPreference(String lastLogin) {
-        Editor editor = prefs.edit();
-        editor.putString(BrowserLoader.PREF_LAST_LOGIN, lastLogin);
-        editor.apply();
+        prefs.edit().putString(BrowserLoader.PREF_LAST_LOGIN, lastLogin).apply();
     }
 
     public void onSubredditLoaded(Subreddit subreddit) {
     }
 
     public void onSubredditSelected(Subreddit subreddit) {
+    }
+    
+    private SubredditListFragment getSubredditListFragment() {
+        return (SubredditListFragment) getFragmentManager().findFragmentByTag(SubredditListFragment.TAG);
     }
 }
