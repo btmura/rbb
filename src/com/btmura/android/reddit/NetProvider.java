@@ -63,6 +63,7 @@ class NetProvider {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
             conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
+            conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
             conn.connect();
 
             InputStream in = conn.getInputStream();
@@ -88,6 +89,7 @@ class NetProvider {
             conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
             conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
             conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
+            conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
             conn.setDoOutput(true);
             conn.connect();
 
@@ -119,6 +121,7 @@ class NetProvider {
             conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
             conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
             conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
+            conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
             conn.setDoOutput(true);
             conn.connect();
 
