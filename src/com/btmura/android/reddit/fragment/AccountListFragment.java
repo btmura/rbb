@@ -115,7 +115,8 @@ public class AccountListFragment extends ListFragment implements
 
     private void handleRemoveAction(ActionMode mode) {
         long[] ids = getListView().getCheckedItemIds();
-        Provider.deleteInBackground(getActivity(), Accounts.CONTENT_URI, ids);
+        String selection = Provider.getMultipleIdSelection(ids);
+        Provider.deleteInBackground(getActivity(), Accounts.CONTENT_URI, selection, null);
         mode.finish();
     }
 

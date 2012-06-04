@@ -24,6 +24,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentValues;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -65,6 +66,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
+    private AccountHolder accountHolder;
 
     public static SubredditListFragment newInstance(Subreddit selectedSubreddit, long accountId,
             int flags) {
@@ -92,6 +94,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         listener = (OnSubredditSelectedListener) activity;
+        accountHolder = (AccountHolder) activity;
     }
 
     @Override
@@ -272,8 +275,18 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     private void handleDelete(ActionMode mode) {
-        long[] ids = getListView().getCheckedItemIds();
-        Provider.deleteInBackground(getActivity(), Subreddits.CONTENT_URI, ids);
+        long accountId = accountHolder.getAccountId();
+        Uri uri = Provider.getSubredditsUri(accountId);
+        String selection = null;
+        String[] selectionArgs = null;
+        if (accountId > 0) {
+            ArrayList<String> names = getCheckedNames();
+            selectionArgs = new String[] {names.get(0)};
+        } else {
+            long[] ids = getListView().getCheckedItemIds();
+            selection = Provider.getMultipleIdSelection(ids);
+        }        
+        Provider.deleteInBackground(getActivity(), uri, selection, selectionArgs);
         mode.finish();
     }
 

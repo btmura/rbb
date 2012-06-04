@@ -58,9 +58,9 @@ public class Urls {
         return newUrl(resetBuilder().append(BASE_LOGIN_URL).append(encode(userName)));
     }
 
-    public static String subscribeQuery(String modhash, String subreddit) {
+    public static String subscribeQuery(String modhash, String subreddit, boolean subscribe) {
         StringBuilder b = resetBuilder();
-        b.append("action=sub");
+        b.append("action=").append(subscribe ? "sub" : "unsub");
         b.append("&uh=").append(encode(modhash));
         b.append("&sr_name=").append(subreddit);
         b.append("&api_type=json");

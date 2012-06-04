@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 import android.content.ContentValues;
 import android.database.AbstractCursor;
@@ -91,10 +92,14 @@ class NetProvider {
             conn.connect();
 
             String subreddit = values.getAsString(AccountSubreddits.COLUMN_NAME);
-            String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit);
+            String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, true);
             writeData(conn, data);
             
             InputStream in = conn.getInputStream();
+            Scanner sc = new Scanner(in);
+            while (sc.hasNextLine()) {
+                Log.v(TAG, sc.nextLine());
+            }
             in.close();
             conn.disconnect();
 
@@ -102,6 +107,37 @@ class NetProvider {
 
         } catch (IOException e) {
             Log.e(TAG, "insertSubreddit", e);
+        }
+        return -1;
+    }
+    
+    static int deleteSubreddit(SQLiteDatabase db, long accountId, String[] selectionArgs) {
+        String[] credentials = getCredentials(db, accountId);
+        try {
+            URL url = Urls.subscribeUrl();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
+            conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
+            conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
+            conn.setDoOutput(true);
+            conn.connect();
+
+            String subreddit = selectionArgs[0];
+            String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, false);
+            writeData(conn, data);
+            
+            InputStream in = conn.getInputStream();
+            Scanner sc = new Scanner(in);
+            while (sc.hasNextLine()) {
+                Log.v(TAG, sc.nextLine());
+            }
+            in.close();
+            conn.disconnect();
+
+            return 1;
+
+        } catch (IOException e) {
+            Log.e(TAG, "deleteSubreddit", e);
         }
         return -1;
     }

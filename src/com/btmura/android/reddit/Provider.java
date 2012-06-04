@@ -203,6 +203,11 @@ public class Provider extends ContentProvider {
                 notifyUri = Accounts.CONTENT_URI;
                 break;
 
+            case MATCH_ONE_ACCOUNT_SUBREDDITS:
+                tableName = AccountSubreddits.TABLE_NAME;
+                notifyUri = AccountSubreddits.CONTENT_URI;
+                break;
+
             default:
                 return 0;
         }
@@ -216,7 +221,12 @@ public class Provider extends ContentProvider {
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.delete(tableName, selection, selectionArgs);
+        int count = 0;
+        if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
+            count = NetProvider.deleteSubreddit(db, ContentUris.parseId(uri), selectionArgs);
+        } else {
+            count = db.delete(tableName, selection, selectionArgs);
+        }
         if (count > 0) {
             getContext().getContentResolver().notifyChange(notifyUri, null);
         }
@@ -235,6 +245,19 @@ public class Provider extends ContentProvider {
             return Subreddits.CONTENT_URI;
         }
     }
+    
+    public static String getMultipleIdSelection(long[] ids) {
+        StringBuilder s = new StringBuilder(BaseColumns._ID).append(" IN (");
+        int numIds = ids.length;
+        for (int i = 0; i < numIds; i++) {
+            s.append(ids[i]);
+            if (i + 1 < numIds) {
+                s.append(", ");
+            }
+        }
+        return s.append(")").toString();
+    }
+
 
     public static void addInBackground(final Context context, final Uri uri,
             final ContentValues values) {
@@ -272,27 +295,18 @@ public class Provider extends ContentProvider {
         }.execute();
     }
 
-    public static void deleteInBackground(final Context context, final Uri uri, final long[] ids) {
-        new AsyncTask<Void, Void, Void>() {
+    public static void deleteInBackground(final Context context, final Uri uri,
+            final String selection, final String[] selectionArgs) {
+        new AsyncTask<Void, Void, Integer>() {
             @Override
-            protected Void doInBackground(Void... params) {
-                StringBuilder s = new StringBuilder(BaseColumns._ID).append(" IN (");
-                int numIds = ids.length;
-                for (int i = 0; i < numIds; i++) {
-                    s.append(ids[i]);
-                    if (i + 1 < numIds) {
-                        s.append(", ");
-                    }
-                }
-                s.append(")");
+            protected Integer doInBackground(Void... params) {
                 ContentResolver cr = context.getContentResolver();
-                cr.delete(uri, s.toString(), null);
-                return null;
+                return cr.delete(uri, selection, selectionArgs);
             }
 
             @Override
-            protected void onPostExecute(Void result) {
-                showChangeToast(context, -ids.length);
+            protected void onPostExecute(Integer count) {
+                showChangeToast(context, -count);
                 scheduleBackup(context);
             }
         }.execute();
@@ -312,15 +326,16 @@ public class Provider extends ContentProvider {
                     }
                 }
 
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
-                        ids.length + 1);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(ids.length + 1);
                 ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
-                        .withValue(Subreddits.COLUMN_NAME, combined.toString()).build());
+                        .withValue(Subreddits.COLUMN_NAME, combined.toString())
+                        .build());
 
                 size = ids.length;
                 for (int i = 0; i < size; i++) {
-                    ops.add(ContentProviderOperation.newDelete(
-                            ContentUris.withAppendedId(Subreddits.CONTENT_URI, ids[i])).build());
+                    ops.add(ContentProviderOperation.newDelete(ContentUris.withAppendedId(Subreddits.CONTENT_URI,
+                            ids[i]))
+                            .build());
                 }
 
                 ContentResolver cr = context.getContentResolver();
@@ -350,15 +365,16 @@ public class Provider extends ContentProvider {
                 String[] parts = name.split("\\+");
                 int numParts = parts.length;
 
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
-                        numParts + 1);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(numParts + 1);
                 for (int i = 0; i < numParts; i++) {
                     ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
-                            .withValue(Subreddits.COLUMN_NAME, parts[i]).build());
+                            .withValue(Subreddits.COLUMN_NAME, parts[i])
+                            .build());
                 }
 
-                ops.add(ContentProviderOperation.newDelete(
-                        ContentUris.withAppendedId(Subreddits.CONTENT_URI, id)).build());
+                ops.add(ContentProviderOperation.newDelete(ContentUris.withAppendedId(Subreddits.CONTENT_URI,
+                        id))
+                        .build());
 
                 ContentResolver cr = context.getContentResolver();
                 try {
