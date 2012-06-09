@@ -40,12 +40,12 @@ import com.btmura.android.reddit.provider.Provider.Accounts;
 import com.btmura.android.reddit.provider.Provider.Subreddits;
 
 /**
- * {@link NetProvider} queries reddit.com for account info when {@link Provider}
+ * {@link AccountDataProvider} queries reddit.com for account info when {@link Provider}
  * asks for it.
  */
-class NetProvider {
+class AccountDataProvider {
 
-    public static String TAG = "NetProvider";
+    public static String TAG = "AccountDataProvider";
 
     private static final String[] CREDENTIALS_PROJECTION = new String[] {
             Accounts.COLUMN_COOKIE,
