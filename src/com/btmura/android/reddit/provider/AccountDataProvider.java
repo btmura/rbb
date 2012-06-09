@@ -22,22 +22,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Scanner;
 
-import android.database.AbstractCursor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.Provider.Accounts;
-import com.btmura.android.reddit.provider.Provider.Subreddits;
 
 /**
  * {@link AccountDataProvider} queries reddit.com for account info when {@link Provider}
@@ -160,92 +153,6 @@ class AccountDataProvider {
             if (output != null) {
                 output.close();
             }
-        }
-    }
-
-    static class SubredditParser extends JsonParser {
-
-        List<Subreddit> results = new ArrayList<Subreddit>();
-
-        @Override
-        public void onEntityStart(int index) {
-            results.add(Subreddit.emptyInstance());
-        }
-
-        @Override
-        public void onDisplayName(JsonReader reader, int index) throws IOException {
-            results.get(index).name = reader.nextString();
-        }
-
-        @Override
-        public void onSubscribers(JsonReader reader, int index) throws IOException {
-            results.get(index).subscribers = reader.nextInt();
-        }
-
-        @Override
-        public void onParseEnd() {
-            Collections.sort(results);
-        }
-    }
-
-    static class SubredditCursor extends AbstractCursor {
-
-        private static final String FAKE_COLUMN_SUBSCRIBERS = "subscribers";
-
-        private static final String[] PROJECTION = {
-                Subreddits._ID,
-                Subreddits.COLUMN_NAME,
-                FAKE_COLUMN_SUBSCRIBERS,};
-
-        private final List<Subreddit> results;
-
-        SubredditCursor(List<Subreddit> results) {
-            this.results = results;
-        }
-
-        @Override
-        public String[] getColumnNames() {
-            return PROJECTION;
-        }
-
-        @Override
-        public int getCount() {
-            return results.size();
-        }
-
-        @Override
-        public String getString(int column) {
-            return results.get(getPosition()).name;
-        }
-
-        @Override
-        public double getDouble(int column) {
-            return 0;
-        }
-
-        @Override
-        public float getFloat(int column) {
-            return 0;
-        }
-
-        @Override
-        public int getInt(int column) {
-            return results.get(getPosition()).subscribers;
-        }
-
-        @Override
-        public long getLong(int column) {
-            return getPosition();
-        }
-
-        @Override
-        public short getShort(int column) {
-            return 0;
-        }
-
-        @Override
-        public boolean isNull(int column) {
-            return false;
         }
     }
 }
