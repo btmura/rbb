@@ -53,13 +53,13 @@ class NetProvider {
 
     private static final int INDEX_COOKIE = 0;
     private static final int INDEX_MODHASH = 1;
-    
+
     static Cursor querySubreddits(SQLiteDatabase db, long accountId) {
         String[] credentials = getCredentials(db, accountId);
         try {
             URL url = Urls.subredditListUrl();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, credentials);            
+            setCommonHeaders(conn, credentials);
             conn.connect();
 
             InputStream in = conn.getInputStream();
@@ -77,60 +77,45 @@ class NetProvider {
         return null;
     }
 
-    static long insertSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
-        String[] credentials = getCredentials(db, accountId);
+    static int insertSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
         try {
-            URL url = Urls.subscribeUrl();
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, credentials);            
-            setFormDataHeaders(conn);
-            conn.connect();
-
-            String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, true);
-            writeFormData(conn, data);
-            
-            InputStream in = conn.getInputStream();
-            Scanner sc = new Scanner(in);
-            while (sc.hasNextLine()) {
-                Log.v(TAG, sc.nextLine());
-            }
-            in.close();
-            conn.disconnect();
-
-            return 1337;
-
+            subscribe(db, accountId, subreddit, true);
+            return 0;
         } catch (IOException e) {
             Log.e(TAG, "insertSubreddit", e);
         }
         return -1;
     }
-    
+
     static int deleteSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
-        String[] credentials = getCredentials(db, accountId);
         try {
-            URL url = Urls.subscribeUrl();
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, credentials);
-            setFormDataHeaders(conn);            
-            conn.connect();
-
-            String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, false);
-            writeFormData(conn, data);
-            
-            InputStream in = conn.getInputStream();
-            Scanner sc = new Scanner(in);
-            while (sc.hasNextLine()) {
-                Log.v(TAG, sc.nextLine());
-            }
-            in.close();
-            conn.disconnect();
-
+            subscribe(db, accountId, subreddit, false);
             return 1;
-
         } catch (IOException e) {
             Log.e(TAG, "deleteSubreddit", e);
         }
         return -1;
+    }
+
+    private static void subscribe(SQLiteDatabase db, long accountId, String subreddit,
+            boolean subscribe) throws IOException {
+        String[] credentials = getCredentials(db, accountId);
+        URL url = Urls.subscribeUrl();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        setCommonHeaders(conn, credentials);
+        setFormDataHeaders(conn);
+        conn.connect();
+
+        String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, subscribe);
+        writeFormData(conn, data);
+
+        InputStream in = conn.getInputStream();
+        Scanner sc = new Scanner(in);
+        while (sc.hasNextLine()) {
+            Log.v(TAG, sc.nextLine());
+        }
+        in.close();
+        conn.disconnect();
     }
 
     private static String[] getCredentials(SQLiteDatabase db, long id) {
@@ -153,18 +138,18 @@ class NetProvider {
         }
         return credentials;
     }
-    
+
     private static void setCommonHeaders(HttpURLConnection conn, String[] credentials) {
         conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
         conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
         conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
     }
-    
+
     private static void setFormDataHeaders(HttpURLConnection conn) {
         conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
         conn.setDoOutput(true);
     }
-    
+
     private static void writeFormData(HttpURLConnection conn, String data) throws IOException {
         OutputStream output = null;
         try {
