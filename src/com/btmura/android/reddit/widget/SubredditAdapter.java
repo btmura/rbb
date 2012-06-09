@@ -27,12 +27,12 @@ import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.btmura.android.reddit.Provider.AccountSubreddits;
-import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.provider.Provider.AccountSubreddits;
+import com.btmura.android.reddit.provider.Provider.Subreddits;
 
 public class SubredditAdapter extends SimpleCursorAdapter {
 

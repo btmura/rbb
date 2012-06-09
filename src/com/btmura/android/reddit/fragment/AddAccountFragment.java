@@ -33,10 +33,10 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
-import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.LoginLoader.LoginResult;
+import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.Provider.Accounts;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddAccountFragment extends DialogFragment implements

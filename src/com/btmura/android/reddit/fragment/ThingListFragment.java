@@ -35,8 +35,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
-import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.content.ThingLoader;
@@ -44,6 +42,8 @@ import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.Provider.Subreddits;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
 public class ThingListFragment extends ListFragment implements

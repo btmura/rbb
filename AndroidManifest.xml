@@ -83,7 +83,7 @@
         </activity-alias>
 
         <provider
-            android:name=".Provider"
+            android:name=".provider.Provider"
             android:authorities="com.btmura.android.reddit.provider"
             android:exported="false" />
 

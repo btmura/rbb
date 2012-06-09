@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,12 +34,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.Provider.AccountSubreddits;
-import com.btmura.android.reddit.Provider.Accounts;
-import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.provider.Provider.AccountSubreddits;
+import com.btmura.android.reddit.provider.Provider.Accounts;
+import com.btmura.android.reddit.provider.Provider.Subreddits;
 
 /**
  * {@link NetProvider} queries reddit.com for account info when {@link Provider}

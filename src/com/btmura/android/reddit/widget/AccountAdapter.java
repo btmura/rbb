@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.btmura.android.reddit.Provider.Accounts;
+import com.btmura.android.reddit.provider.Provider.Accounts;
 import com.btmura.android.reddit.R;
 
 public class AccountAdapter extends SimpleCursorAdapter {

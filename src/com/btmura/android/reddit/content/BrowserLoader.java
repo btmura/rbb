@@ -23,8 +23,8 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
-import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
+import com.btmura.android.reddit.provider.Provider.Accounts;
 
 public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
 

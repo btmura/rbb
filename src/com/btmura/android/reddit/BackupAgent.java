@@ -31,7 +31,8 @@ import android.database.Cursor;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 
-import com.btmura.android.reddit.Provider.Subreddits;
+import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.Provider.Subreddits;
 
 public class BackupAgent extends android.app.backup.BackupAgent {
 

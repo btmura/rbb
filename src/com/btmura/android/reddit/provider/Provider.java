@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.provider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +39,13 @@ import android.provider.BaseColumns;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.btmura.android.reddit.R;
+
 public class Provider extends ContentProvider {
 
     public static final String TAG = "Provider";
 
-    static final String AUTHORITY = "com.btmura.android.reddit.provider";
+    public static final String AUTHORITY = "com.btmura.android.reddit.provider";
 
     private static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
 

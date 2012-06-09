@@ -31,9 +31,9 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
-import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.Provider.Accounts;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.Provider.Accounts;
 import com.btmura.android.reddit.widget.AccountAdapter;
 
 public class AccountListFragment extends ListFragment implements

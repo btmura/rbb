@@ -39,11 +39,11 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.Debug;
-import com.btmura.android.reddit.Provider;
-import com.btmura.android.reddit.Provider.Subreddits;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.Provider.Subreddits;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
 public class SubredditListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
