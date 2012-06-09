@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-import android.content.ContentValues;
 import android.database.AbstractCursor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -37,7 +36,6 @@ import android.util.Log;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.provider.Provider.AccountSubreddits;
 import com.btmura.android.reddit.provider.Provider.Accounts;
 import com.btmura.android.reddit.provider.Provider.Subreddits;
 
@@ -79,7 +77,7 @@ class NetProvider {
         return null;
     }
 
-    static long insertSubreddit(SQLiteDatabase db, long accountId, ContentValues values) {
+    static long insertSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
         String[] credentials = getCredentials(db, accountId);
         try {
             URL url = Urls.subscribeUrl();
@@ -88,7 +86,6 @@ class NetProvider {
             setFormDataHeaders(conn);
             conn.connect();
 
-            String subreddit = values.getAsString(AccountSubreddits.COLUMN_NAME);
             String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, true);
             writeFormData(conn, data);
             
@@ -108,7 +105,7 @@ class NetProvider {
         return -1;
     }
     
-    static int deleteSubreddit(SQLiteDatabase db, long accountId, String[] selectionArgs) {
+    static int deleteSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
         String[] credentials = getCredentials(db, accountId);
         try {
             URL url = Urls.subscribeUrl();
@@ -117,7 +114,6 @@ class NetProvider {
             setFormDataHeaders(conn);            
             conn.connect();
 
-            String subreddit = selectionArgs[0];
             String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, false);
             writeFormData(conn, data);
             
