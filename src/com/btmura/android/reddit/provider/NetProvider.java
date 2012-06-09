@@ -55,15 +55,14 @@ class NetProvider {
 
     private static final int INDEX_COOKIE = 0;
     private static final int INDEX_MODHASH = 1;
-
+    
     static Cursor querySubreddits(SQLiteDatabase db, long accountId) {
         String[] credentials = getCredentials(db, accountId);
         try {
             URL url = Urls.subredditListUrl();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
-            conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
-            conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
+            setCommonHeaders(conn);
+            conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));            
             conn.connect();
 
             InputStream in = conn.getInputStream();
@@ -86,10 +85,9 @@ class NetProvider {
         try {
             URL url = Urls.subscribeUrl();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
+            setCommonHeaders(conn);            
             conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
             conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
-            conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
             conn.setDoOutput(true);
             conn.connect();
 
@@ -118,10 +116,9 @@ class NetProvider {
         try {
             URL url = Urls.subscribeUrl();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
+            setCommonHeaders(conn);
             conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
             conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
-            conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
             conn.setDoOutput(true);
             conn.connect();
 
@@ -145,6 +142,11 @@ class NetProvider {
         return -1;
     }
 
+    private static void setCommonHeaders(HttpURLConnection conn) {
+        conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
+        conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
+    }
+    
     private static String[] getCredentials(SQLiteDatabase db, long id) {
         String[] credentials = {null, null};
         String[] selectionArgs = new String[] {Long.toString(id)};
