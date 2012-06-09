@@ -17,62 +17,43 @@
 package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
+import java.util.ArrayList;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.data.Urls;
-import com.btmura.android.reddit.provider.Provider.Accounts;
+import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.entity.Subreddit;
 
 /**
- * {@link AccountDataProvider} queries reddit.com for account info when {@link Provider}
- * asks for it.
+ * {@link AccountDataProvider} queries reddit.com for account info when
+ * {@link Provider} asks for it.
  */
 class AccountDataProvider {
 
     public static String TAG = "AccountDataProvider";
 
-    private static final String[] CREDENTIALS_PROJECTION = new String[] {
-            Accounts.COLUMN_COOKIE,
-            Accounts.COLUMN_MODHASH};
-
-    private static final int INDEX_COOKIE = 0;
-    private static final int INDEX_MODHASH = 1;
+    private static final AccountDataCache CACHE = new AccountDataCache(2);
 
     static Cursor querySubreddits(SQLiteDatabase db, long accountId) {
-        String[] credentials = getCredentials(db, accountId);
-        try {
-            URL url = Urls.subredditListUrl();
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, credentials);
-            conn.connect();
-
-            InputStream in = conn.getInputStream();
-            JsonReader reader = new JsonReader(new InputStreamReader(in));
-            SubredditParser parser = new SubredditParser();
-            parser.parseListingObject(reader);
-            in.close();
-            conn.disconnect();
-
-            return new SubredditCursor(parser.results);
-
-        } catch (IOException e) {
-            Log.e(TAG, "querySubreddits", e);
+        ArrayList<Subreddit> subreddits = CACHE.get(accountId);
+        if (subreddits == null) {
+            if (Debug.DEBUG_CACHES) {
+                Log.d(TAG, "cache miss (accountId: " + accountId + ")");
+            }
+            subreddits = AccountDataUtils.querySubreddits(db, accountId);
+            if (subreddits != null) {
+                CACHE.put(accountId, subreddits);
+            }
         }
-        return null;
+        return new SubredditCursor(subreddits);
     }
 
     static int insertSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
         try {
-            subscribe(db, accountId, subreddit, true);
+            AccountDataUtils.subscribe(db, accountId, subreddit, true);
+            CACHE.addSubreddit(accountId, subreddit);            
             return 0;
         } catch (IOException e) {
             Log.e(TAG, "insertSubreddit", e);
@@ -82,77 +63,12 @@ class AccountDataProvider {
 
     static int deleteSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
         try {
-            subscribe(db, accountId, subreddit, false);
+            AccountDataUtils.subscribe(db, accountId, subreddit, false);
+            CACHE.deleteSubreddit(accountId, subreddit);            
             return 1;
         } catch (IOException e) {
             Log.e(TAG, "deleteSubreddit", e);
         }
         return -1;
-    }
-
-    private static void subscribe(SQLiteDatabase db, long accountId, String subreddit,
-            boolean subscribe) throws IOException {
-        String[] credentials = getCredentials(db, accountId);
-        URL url = Urls.subscribeUrl();
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        setCommonHeaders(conn, credentials);
-        setFormDataHeaders(conn);
-        conn.connect();
-
-        String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, subscribe);
-        writeFormData(conn, data);
-
-        InputStream in = conn.getInputStream();
-        Scanner sc = new Scanner(in);
-        while (sc.hasNextLine()) {
-            Log.v(TAG, sc.nextLine());
-        }
-        in.close();
-        conn.disconnect();
-    }
-
-    private static String[] getCredentials(SQLiteDatabase db, long id) {
-        String[] credentials = {null, null};
-        String[] selectionArgs = new String[] {Long.toString(id)};
-        Cursor c = db.query(Accounts.TABLE_NAME,
-                CREDENTIALS_PROJECTION,
-                Provider.ID_SELECTION,
-                selectionArgs,
-                null,
-                null,
-                null);
-        try {
-            if (c.moveToNext()) {
-                credentials[INDEX_COOKIE] = c.getString(INDEX_COOKIE);
-                credentials[INDEX_MODHASH] = c.getString(INDEX_MODHASH);
-            }
-        } finally {
-            c.close();
-        }
-        return credentials;
-    }
-
-    private static void setCommonHeaders(HttpURLConnection conn, String[] credentials) {
-        conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
-        conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
-        conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
-    }
-
-    private static void setFormDataHeaders(HttpURLConnection conn) {
-        conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
-        conn.setDoOutput(true);
-    }
-
-    private static void writeFormData(HttpURLConnection conn, String data) throws IOException {
-        OutputStream output = null;
-        try {
-            output = conn.getOutputStream();
-            output.write(data.getBytes(Urls.CHARSET));
-            output.close();
-        } finally {
-            if (output != null) {
-                output.close();
-            }
-        }
     }
 }

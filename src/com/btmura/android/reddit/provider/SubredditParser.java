@@ -19,7 +19,6 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import android.util.JsonReader;
 
@@ -28,7 +27,7 @@ import com.btmura.android.reddit.entity.Subreddit;
 
 class SubredditParser extends JsonParser {
 
-    List<Subreddit> results = new ArrayList<Subreddit>();
+    ArrayList<Subreddit> results = new ArrayList<Subreddit>();
 
     @Override
     public void onEntityStart(int index) {
