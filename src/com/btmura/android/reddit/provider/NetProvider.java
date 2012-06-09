@@ -61,8 +61,7 @@ class NetProvider {
         try {
             URL url = Urls.subredditListUrl();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn);
-            conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));            
+            setCommonHeaders(conn, credentials);            
             conn.connect();
 
             InputStream in = conn.getInputStream();
@@ -85,15 +84,13 @@ class NetProvider {
         try {
             URL url = Urls.subscribeUrl();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn);            
-            conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
-            conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
-            conn.setDoOutput(true);
+            setCommonHeaders(conn, credentials);            
+            setFormDataHeaders(conn);
             conn.connect();
 
             String subreddit = values.getAsString(AccountSubreddits.COLUMN_NAME);
             String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, true);
-            writeData(conn, data);
+            writeFormData(conn, data);
             
             InputStream in = conn.getInputStream();
             Scanner sc = new Scanner(in);
@@ -116,15 +113,13 @@ class NetProvider {
         try {
             URL url = Urls.subscribeUrl();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn);
-            conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
-            conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
-            conn.setDoOutput(true);
+            setCommonHeaders(conn, credentials);
+            setFormDataHeaders(conn);            
             conn.connect();
 
             String subreddit = selectionArgs[0];
             String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, false);
-            writeData(conn, data);
+            writeFormData(conn, data);
             
             InputStream in = conn.getInputStream();
             Scanner sc = new Scanner(in);
@@ -142,11 +137,6 @@ class NetProvider {
         return -1;
     }
 
-    private static void setCommonHeaders(HttpURLConnection conn) {
-        conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
-        conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
-    }
-    
     private static String[] getCredentials(SQLiteDatabase db, long id) {
         String[] credentials = {null, null};
         String[] selectionArgs = new String[] {Long.toString(id)};
@@ -167,8 +157,19 @@ class NetProvider {
         }
         return credentials;
     }
-
-    private static void writeData(HttpURLConnection conn, String data) throws IOException {
+    
+    private static void setCommonHeaders(HttpURLConnection conn, String[] credentials) {
+        conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
+        conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
+        conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
+    }
+    
+    private static void setFormDataHeaders(HttpURLConnection conn) {
+        conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
+        conn.setDoOutput(true);
+    }
+    
+    private static void writeFormData(HttpURLConnection conn, String data) throws IOException {
         OutputStream output = null;
         try {
             output = conn.getOutputStream();
