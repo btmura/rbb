@@ -26,14 +26,14 @@ import android.util.Log;
 import com.btmura.android.reddit.entity.Subreddit;
 
 /**
- * {@link AccountDataProvider} queries reddit.com for account info when
+ * {@link AccountSubredditProvider} queries reddit.com for account info when
  * {@link Provider} asks for it.
  */
-class AccountDataProvider {
+class AccountSubredditProvider {
 
-    public static String TAG = "AccountDataProvider";
+    public static String TAG = "AccountSubredditProvider";
 
-    private static final AccountDataCache CACHE = new AccountDataCache();
+    private static final AccountSubredditCache CACHE = new AccountSubredditCache();
 
     static Cursor querySubreddits(SQLiteDatabase db, long accountId) {
         ArrayList<Subreddit> subreddits = CACHE.querySubreddits(db, accountId);        
@@ -42,7 +42,7 @@ class AccountDataProvider {
 
     static int insertSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
         try {
-            AccountDataUtils.subscribe(db, accountId, subreddit, true);
+            AccountSubredditUtils.subscribe(db, accountId, subreddit, true);
             CACHE.addSubreddit(accountId, subreddit);            
             return 0;
         } catch (IOException e) {
@@ -53,7 +53,7 @@ class AccountDataProvider {
 
     static int deleteSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
         try {
-            AccountDataUtils.subscribe(db, accountId, subreddit, false);
+            AccountSubredditUtils.subscribe(db, accountId, subreddit, false);
             CACHE.deleteSubreddit(accountId, subreddit);            
             return 1;
         } catch (IOException e) {

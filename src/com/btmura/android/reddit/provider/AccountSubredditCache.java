@@ -24,9 +24,9 @@ import android.util.LruCache;
 
 import com.btmura.android.reddit.entity.Subreddit;
 
-class AccountDataCache {
+class AccountSubredditCache {
 
-    public static final String TAG = "AccountDataCache";
+    public static final String TAG = "AccountSubredditCache";
 
     private static final long EXPIRE_DURATION = 60 * 1000;
 
@@ -48,7 +48,7 @@ class AccountDataCache {
                 return entry.subreddits;
             }
 
-            entry.subreddits = AccountDataUtils.querySubreddits(db, accountId);
+            entry.subreddits = AccountSubredditUtils.querySubreddits(db, accountId);
             if (entry.subreddits != null) {
                 entry.modTime = System.currentTimeMillis();
                 return entry.subreddits;

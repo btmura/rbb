@@ -33,9 +33,9 @@ import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.Provider.Accounts;
 
-class AccountDataUtils {
+class AccountSubredditUtils {
     
-    public static final String TAG = "AccountDataUtils";
+    public static final String TAG = "AccountSubredditUtils";
 
     private static final String[] CREDENTIALS_PROJECTION = new String[] {
             Accounts.COLUMN_COOKIE,
@@ -45,11 +45,11 @@ class AccountDataUtils {
     private static final int INDEX_MODHASH = 1;
         
     static ArrayList<Subreddit> querySubreddits(SQLiteDatabase db, long accountId) {        
-        String[] credentials = AccountDataUtils.getCredentials(db, accountId);
+        String[] credentials = AccountSubredditUtils.getCredentials(db, accountId);
         try {
             URL url = Urls.subredditListUrl();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            AccountDataUtils.setCommonHeaders(conn, credentials);
+            AccountSubredditUtils.setCommonHeaders(conn, credentials);
             conn.connect();
 
             InputStream in = conn.getInputStream();
