@@ -23,7 +23,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.entity.Subreddit;
 
 /**
@@ -34,19 +33,10 @@ class AccountDataProvider {
 
     public static String TAG = "AccountDataProvider";
 
-    private static final AccountDataCache CACHE = new AccountDataCache(2);
+    private static final AccountDataCache CACHE = new AccountDataCache();
 
     static Cursor querySubreddits(SQLiteDatabase db, long accountId) {
-        ArrayList<Subreddit> subreddits = CACHE.get(accountId);
-        if (subreddits == null) {
-            if (Debug.DEBUG_CACHES) {
-                Log.d(TAG, "cache miss (accountId: " + accountId + ")");
-            }
-            subreddits = AccountDataUtils.querySubreddits(db, accountId);
-            if (subreddits != null) {
-                CACHE.put(accountId, subreddits);
-            }
-        }
+        ArrayList<Subreddit> subreddits = CACHE.querySubreddits(db, accountId);        
         return new SubredditCursor(subreddits);
     }
 
