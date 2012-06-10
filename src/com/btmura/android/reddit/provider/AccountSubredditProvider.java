@@ -19,6 +19,7 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -49,8 +50,6 @@ class AccountSubredditProvider {
 
     private static final int INDEX_NAME = 0;
     private static final int INDEX_TYPE = 1;
-
-    private static final AccountSubredditCache CACHE = new AccountSubredditCache();
 
     static Cursor query(SQLiteDatabase db, long accountId) {
         String[] credentials = getCredentials(db, accountId);
@@ -117,16 +116,28 @@ class AccountSubredditProvider {
     }
 
     static int insert(Context context, SQLiteDatabase db, long accountId, String subreddit) {
-        if (CACHE.insert(context, accountId, subreddit)) {
-            queueSubscription(context, db, accountId, subreddit, true);
-        }
+        ContentValues values = new ContentValues(4);
+        values.put(AccountSubreddits.COLUMN_ACCOUNT_ID, accountId);
+        values.put(AccountSubreddits.COLUMN_NAME, subreddit);
+        values.put(AccountSubreddits.COLUMN_TYPE, AccountSubreddits.TYPE_INSERT);
+        values.put(AccountSubreddits.COLUMN_CREATION_TIME, System.currentTimeMillis());
+        db.insert(AccountSubreddits.TABLE_NAME, null, values);
+
+        queueSubscription(context, db, accountId, subreddit, true);
+
         return 0;
     }
 
     static int delete(Context context, SQLiteDatabase db, long accountId, String subreddit) {
-        if (CACHE.delete(accountId, subreddit)) {
-            queueSubscription(context, db, accountId, subreddit, false);
-        }
+        ContentValues values = new ContentValues(4);
+        values.put(AccountSubreddits.COLUMN_ACCOUNT_ID, accountId);
+        values.put(AccountSubreddits.COLUMN_NAME, subreddit);
+        values.put(AccountSubreddits.COLUMN_TYPE, AccountSubreddits.TYPE_DELETE);
+        values.put(AccountSubreddits.COLUMN_CREATION_TIME, System.currentTimeMillis());
+        db.insert(AccountSubreddits.TABLE_NAME, null, values);
+
+        queueSubscription(context, db, accountId, subreddit, false);
+
         return 1;
     }
 
