@@ -19,7 +19,6 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.Provider.Accounts;
 
 class AccountSubredditUtils {
-    
+
     public static final String TAG = "AccountSubredditUtils";
 
     private static final String[] CREDENTIALS_PROJECTION = new String[] {
@@ -43,13 +42,13 @@ class AccountSubredditUtils {
 
     private static final int INDEX_COOKIE = 0;
     private static final int INDEX_MODHASH = 1;
-        
-    static ArrayList<Subreddit> querySubreddits(SQLiteDatabase db, long accountId) {        
+
+    static ArrayList<Subreddit> querySubreddits(SQLiteDatabase db, long accountId) {
         String[] credentials = AccountSubredditUtils.getCredentials(db, accountId);
         try {
             URL url = Urls.subredditListUrl();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            AccountSubredditUtils.setCommonHeaders(conn, credentials);
+            AccountSubredditUtils.setCommonHeaders(conn, credentials[0]);
             conn.connect();
 
             InputStream in = conn.getInputStream();
@@ -64,25 +63,8 @@ class AccountSubredditUtils {
         } catch (IOException e) {
             Log.e(TAG, "querySubreddits", e);
         }
-        
+
         return null;
-    }
-
-    static void subscribe(SQLiteDatabase db, long accountId, String subreddit, boolean subscribe)
-            throws IOException {
-        String[] credentials = getCredentials(db, accountId);
-        URL url = Urls.subscribeUrl();
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        setCommonHeaders(conn, credentials);
-        setFormDataHeaders(conn);
-        conn.connect();
-
-        String data = Urls.subscribeQuery(credentials[INDEX_MODHASH], subreddit, subscribe);
-        writeFormData(conn, data);
-
-        InputStream in = conn.getInputStream();
-        in.close();
-        conn.disconnect();
     }
 
     private static String[] getCredentials(SQLiteDatabase db, long id) {
@@ -106,27 +88,9 @@ class AccountSubredditUtils {
         return credentials;
     }
 
-    private static void setCommonHeaders(HttpURLConnection conn, String[] credentials) {
+    private static void setCommonHeaders(HttpURLConnection conn, String cookie) {
         conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
         conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
-        conn.setRequestProperty("Cookie", Urls.loginCookie(credentials[INDEX_COOKIE]));
-    }
-
-    private static void setFormDataHeaders(HttpURLConnection conn) {
-        conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
-        conn.setDoOutput(true);
-    }
-
-    private static void writeFormData(HttpURLConnection conn, String data) throws IOException {
-        OutputStream output = null;
-        try {
-            output = conn.getOutputStream();
-            output.write(data.getBytes(Urls.CHARSET));
-            output.close();
-        } finally {
-            if (output != null) {
-                output.close();
-            }
-        }
+        conn.setRequestProperty("Cookie", Urls.loginCookie(cookie));
     }
 }

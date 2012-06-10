@@ -174,7 +174,10 @@ public class Provider extends ContentProvider {
         long id = -1;
         if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
             String subreddit = values.getAsString(AccountSubreddits.COLUMN_NAME);
-            id = AccountSubredditProvider.insertSubreddit(db, ContentUris.parseId(uri), subreddit);
+            id = AccountSubredditProvider.insertSubreddit(getContext(),
+                    db,
+                    ContentUris.parseId(uri),
+                    subreddit);
         } else {
             id = db.insert(tableName, null, values);
         }
@@ -226,7 +229,10 @@ public class Provider extends ContentProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = 0;
         if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
-            count = AccountSubredditProvider.deleteSubreddit(db, ContentUris.parseId(uri), selectionArgs[0]);
+            count = AccountSubredditProvider.deleteSubreddit(getContext(),
+                    db,
+                    ContentUris.parseId(uri),
+                    selectionArgs[0]);
         } else {
             count = db.delete(tableName, selection, selectionArgs);
         }
@@ -248,7 +254,7 @@ public class Provider extends ContentProvider {
             return Subreddits.CONTENT_URI;
         }
     }
-    
+
     public static String getMultipleIdSelection(long[] ids) {
         StringBuilder s = new StringBuilder(BaseColumns._ID).append(" IN (");
         int numIds = ids.length;
@@ -260,7 +266,6 @@ public class Provider extends ContentProvider {
         }
         return s.append(")").toString();
     }
-
 
     public static void addInBackground(final Context context, final Uri uri,
             final ContentValues values) {

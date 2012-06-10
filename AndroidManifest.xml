@@ -87,6 +87,10 @@
             android:authorities="com.btmura.android.reddit.provider"
             android:exported="false" />
 
+        <service
+            android:name=".provider.AccountSubredditService"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAIf8pv0IsWSzrukJzjvXlDsBcXRwRCEFXVEjeQZw" />

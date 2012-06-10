@@ -19,6 +19,7 @@ package com.btmura.android.reddit.provider;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.LruCache;
 
@@ -59,7 +60,7 @@ class AccountSubredditCache {
         }
     }
 
-    public void addSubreddit(long accountId, String name) {
+    public void addSubreddit(Context context, long accountId, String name) {
         Entry entry = cache.get(accountId);
         if (entry == null) {
             return;

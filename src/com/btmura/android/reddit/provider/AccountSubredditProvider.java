@@ -16,14 +16,15 @@
 
 package com.btmura.android.reddit.provider;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.provider.Provider.Accounts;
 
 /**
  * {@link AccountSubredditProvider} queries reddit.com for account info when
@@ -33,32 +34,54 @@ class AccountSubredditProvider {
 
     public static String TAG = "AccountSubredditProvider";
 
+    private static final String[] CREDENTIALS_PROJECTION = new String[] {
+            Accounts.COLUMN_COOKIE,
+            Accounts.COLUMN_MODHASH};
+
     private static final AccountSubredditCache CACHE = new AccountSubredditCache();
 
     static Cursor querySubreddits(SQLiteDatabase db, long accountId) {
-        ArrayList<Subreddit> subreddits = CACHE.querySubreddits(db, accountId);        
+        ArrayList<Subreddit> subreddits = CACHE.querySubreddits(db, accountId);
         return new SubredditCursor(subreddits);
     }
 
-    static int insertSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
-        try {
-            AccountSubredditUtils.subscribe(db, accountId, subreddit, true);
-            CACHE.addSubreddit(accountId, subreddit);            
-            return 0;
-        } catch (IOException e) {
-            Log.e(TAG, "insertSubreddit", e);
-        }
-        return -1;
+    static int insertSubreddit(Context context, SQLiteDatabase db, long accountId, String subreddit) {
+        CACHE.addSubreddit(context, accountId, subreddit);
+
+        Intent intent = AccountSubredditService.getAddSubredditIntent(context, subreddit);
+        addCredentials(intent, db, accountId);
+        context.startService(intent);
+
+        return 0;
     }
 
-    static int deleteSubreddit(SQLiteDatabase db, long accountId, String subreddit) {
+    static int deleteSubreddit(Context context, SQLiteDatabase db, long accountId, String subreddit) {
+        CACHE.deleteSubreddit(accountId, subreddit);
+
+        Intent intent = AccountSubredditService.getRemoveSubredditIntent(context, subreddit);
+        addCredentials(intent, db, accountId);
+        context.startService(intent);
+
+        return 1;
+    }
+
+    private static Intent addCredentials(Intent intent, SQLiteDatabase db, long accountId) {
+        String[] selectionArgs = new String[] {Long.toString(accountId)};
+        Cursor c = db.query(Accounts.TABLE_NAME,
+                CREDENTIALS_PROJECTION,
+                Provider.ID_SELECTION,
+                selectionArgs,
+                null,
+                null,
+                null);
         try {
-            AccountSubredditUtils.subscribe(db, accountId, subreddit, false);
-            CACHE.deleteSubreddit(accountId, subreddit);            
-            return 1;
-        } catch (IOException e) {
-            Log.e(TAG, "deleteSubreddit", e);
+            if (c.moveToNext()) {
+                intent.putExtra(AccountSubredditService.EXTRA_COOKIE, c.getString(0));
+                intent.putExtra(AccountSubredditService.EXTRA_MODHASH, c.getString(1));
+            }
+        } finally {
+            c.close();
         }
-        return -1;
+        return intent;
     }
 }
