@@ -54,13 +54,13 @@ public class Provider extends ContentProvider {
     private static final int MATCH_ONE_SUBREDDIT = 2;
     private static final int MATCH_ALL_ACCOUNTS = 3;
     private static final int MATCH_ONE_ACCOUNT = 4;
-    private static final int MATCH_ONE_ACCOUNT_SUBREDDITS = 5;
+    private static final int MATCH_ACCOUNT_SUBREDDITS = 5;
     static {
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME, MATCH_ALL_SUBREDDITS);
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
         MATCHER.addURI(AUTHORITY, Accounts.TABLE_NAME, MATCH_ALL_ACCOUNTS);
         MATCHER.addURI(AUTHORITY, Accounts.TABLE_NAME + "/#", MATCH_ONE_ACCOUNT);
-        MATCHER.addURI(AUTHORITY, AccountSubreddits.TABLE_NAME + "/#", MATCH_ONE_ACCOUNT_SUBREDDITS);
+        MATCHER.addURI(AUTHORITY, AccountSubreddits.TABLE_NAME + "/#", MATCH_ACCOUNT_SUBREDDITS);
     }
 
     public static class Subreddits implements BaseColumns {
@@ -82,13 +82,20 @@ public class Provider extends ContentProvider {
     public static class AccountSubreddits implements BaseColumns {
         static final String TABLE_NAME = "accountSubreddits";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
+
         public static final String COLUMN_ACCOUNT_ID = "accountId";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_TYPE = "type";
         public static final String COLUMN_CREATION_TIME = "creationTime";
+
+        public static final int TYPE_INSERT = 0;
+        public static final int TYPE_DELETE = 1;
+
+        public static final String ACCOUNT_ID_SELECTION = COLUMN_ACCOUNT_ID + "= ?";
     }
 
     static final String ID_SELECTION = BaseColumns._ID + "= ?";
+
 
     private DbHelper helper;
 
@@ -118,7 +125,7 @@ public class Provider extends ContentProvider {
                 notifyUri = Accounts.CONTENT_URI;
                 break;
 
-            case MATCH_ONE_ACCOUNT_SUBREDDITS:
+            case MATCH_ACCOUNT_SUBREDDITS:
                 tableName = AccountSubreddits.TABLE_NAME;
                 notifyUri = AccountSubreddits.CONTENT_URI;
                 break;
@@ -137,7 +144,7 @@ public class Provider extends ContentProvider {
 
         SQLiteDatabase db = helper.getWritableDatabase();
         Cursor c = null;
-        if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
+        if (match == MATCH_ACCOUNT_SUBREDDITS) {
             c = AccountSubredditProvider.query(db, ContentUris.parseId(uri));
         } else {
             c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
@@ -163,7 +170,7 @@ public class Provider extends ContentProvider {
                 notifyUri = Accounts.CONTENT_URI;
                 break;
 
-            case MATCH_ONE_ACCOUNT_SUBREDDITS:
+            case MATCH_ACCOUNT_SUBREDDITS:
                 tableName = AccountSubreddits.TABLE_NAME;
                 notifyUri = AccountSubreddits.CONTENT_URI;
                 break;
@@ -174,7 +181,7 @@ public class Provider extends ContentProvider {
 
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = -1;
-        if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
+        if (match == MATCH_ACCOUNT_SUBREDDITS) {
             String subreddit = values.getAsString(AccountSubreddits.COLUMN_NAME);
             id = AccountSubredditProvider.insert(getContext(),
                     db,
@@ -211,7 +218,7 @@ public class Provider extends ContentProvider {
                 notifyUri = Accounts.CONTENT_URI;
                 break;
 
-            case MATCH_ONE_ACCOUNT_SUBREDDITS:
+            case MATCH_ACCOUNT_SUBREDDITS:
                 tableName = AccountSubreddits.TABLE_NAME;
                 notifyUri = AccountSubreddits.CONTENT_URI;
                 break;
@@ -230,7 +237,7 @@ public class Provider extends ContentProvider {
 
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = 0;
-        if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
+        if (match == MATCH_ACCOUNT_SUBREDDITS) {
             count = AccountSubredditProvider.delete(getContext(),
                     db,
                     ContentUris.parseId(uri),
@@ -512,7 +519,7 @@ public class Provider extends ContentProvider {
                     + AccountSubreddits.COLUMN_ACCOUNT_ID + " INTEGER NOT NULL, "
                     + AccountSubreddits.COLUMN_NAME + " TEXT UNIQUE NOT NULL, "
                     + AccountSubreddits.COLUMN_TYPE + " INTEGER NOT NULL, "
-                    + AccountSubreddits.COLUMN_CREATION_TIME + "INTEGER NOT NULL)");
+                    + AccountSubreddits.COLUMN_CREATION_TIME + " INTEGER NOT NULL)");
             db.execSQL("CREATE UNIQUE INDEX " + AccountSubreddits.COLUMN_ACCOUNT_ID
                     + " ON " + AccountSubreddits.TABLE_NAME + " ("
                     + AccountSubreddits.COLUMN_ACCOUNT_ID + " ASC)");

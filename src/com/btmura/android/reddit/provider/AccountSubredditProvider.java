@@ -16,14 +16,17 @@
 
 package com.btmura.android.reddit.provider;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.provider.Provider.AccountSubreddits;
 import com.btmura.android.reddit.provider.Provider.Accounts;
 
 class AccountSubredditProvider {
@@ -32,17 +35,85 @@ class AccountSubredditProvider {
 
     private static final String[] CREDENTIALS_PROJECTION = new String[] {
             Accounts.COLUMN_COOKIE,
-            Accounts.COLUMN_MODHASH};
+            Accounts.COLUMN_MODHASH
+    };
 
     private static final int INDEX_COOKIE = 0;
     private static final int INDEX_MODHASH = 1;
+
+    private static final String[] ACCOUNT_SUBREDDITS_PROJECTION = new String[] {
+            AccountSubreddits.COLUMN_NAME,
+            AccountSubreddits.COLUMN_TYPE,
+            AccountSubreddits.COLUMN_CREATION_TIME,
+    };
+
+    private static final int INDEX_NAME = 0;
+    private static final int INDEX_TYPE = 1;
 
     private static final AccountSubredditCache CACHE = new AccountSubredditCache();
 
     static Cursor query(SQLiteDatabase db, long accountId) {
         String[] credentials = getCredentials(db, accountId);
-        ArrayList<Subreddit> subreddits = CACHE.query(accountId, credentials[0]);
+
+        // 1. Ask reddit.com what subreddits the account is subscribed to.
+        ArrayList<Subreddit> subreddits = null;
+        try {
+            subreddits = NetApi.query(credentials[INDEX_COOKIE]);
+        } catch (IOException e) {
+            Log.e(TAG, "query", e);
+            return null;
+        }
+
+        // 2. Query the database for local inserts and deletes.
+        Cursor c = db.query(AccountSubreddits.TABLE_NAME,
+                ACCOUNT_SUBREDDITS_PROJECTION,
+                AccountSubreddits.ACCOUNT_ID_SELECTION,
+                new String[] {Long.toString(accountId)},
+                null,
+                null,
+                null);
+
+        // 3. Add local inserts and remove local deletes.
+        while (c.moveToNext()) {
+            String name = c.getString(INDEX_NAME);
+            switch (c.getInt(INDEX_TYPE)) {
+                case AccountSubreddits.TYPE_INSERT:
+                    insertSubreddit(subreddits, name);
+                    break;
+
+                case AccountSubreddits.TYPE_DELETE:
+                    deleteSubreddit(subreddits, name);
+                    break;
+
+                default:
+                    throw new IllegalStateException();
+            }
+        }
+        c.close();
+
         return new SubredditCursor(subreddits);
+    }
+
+    private static void insertSubreddit(ArrayList<Subreddit> subreddits, String name) {
+        int count = subreddits.size();
+        for (int i = 0; i < count; i++) {
+            String subreddit = subreddits.get(i).name;
+            if (name.equalsIgnoreCase(subreddit)) {
+                return;
+            }
+        }
+        subreddits.add(Subreddit.newInstance(name));
+    }
+
+    private static void deleteSubreddit(ArrayList<Subreddit> subreddits, String name) {
+        int count = subreddits.size();
+        for (int i = 0; i < count; i++) {
+            String subreddit = subreddits.get(i).name;
+            if (name.equalsIgnoreCase(subreddit)) {
+                subreddits.remove(i);
+                return;
+            }
+        }
     }
 
     static int insert(Context context, SQLiteDatabase db, long accountId, String subreddit) {
