@@ -136,7 +136,7 @@ public class Provider extends ContentProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         Cursor c = null;
         if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
-            c = AccountSubredditProvider.querySubreddits(db, ContentUris.parseId(uri));
+            c = AccountSubredditProvider.query(db, ContentUris.parseId(uri));
         } else {
             c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
         }
@@ -174,7 +174,7 @@ public class Provider extends ContentProvider {
         long id = -1;
         if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
             String subreddit = values.getAsString(AccountSubreddits.COLUMN_NAME);
-            id = AccountSubredditProvider.insertSubreddit(getContext(),
+            id = AccountSubredditProvider.insert(getContext(),
                     db,
                     ContentUris.parseId(uri),
                     subreddit);
@@ -229,7 +229,7 @@ public class Provider extends ContentProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = 0;
         if (match == MATCH_ONE_ACCOUNT_SUBREDDITS) {
-            count = AccountSubredditProvider.deleteSubreddit(getContext(),
+            count = AccountSubredditProvider.delete(getContext(),
                     db,
                     ContentUris.parseId(uri),
                     selectionArgs[0]);

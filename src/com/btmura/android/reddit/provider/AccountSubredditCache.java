@@ -16,11 +16,12 @@
 
 package com.btmura.android.reddit.provider;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.util.LruCache;
 
 import com.btmura.android.reddit.entity.Subreddit;
@@ -33,7 +34,7 @@ class AccountSubredditCache {
 
     private final InternalCache cache = new InternalCache(2);
 
-    public ArrayList<Subreddit> querySubreddits(SQLiteDatabase db, long accountId) {
+    public ArrayList<Subreddit> query(long accountId, String cookie) {
         Entry entry = null;
 
         synchronized (cache) {
@@ -49,7 +50,7 @@ class AccountSubredditCache {
                 return entry.subreddits;
             }
 
-            entry.subreddits = AccountSubredditUtils.querySubreddits(db, accountId);
+            entry.subreddits = querySubreddits(cookie);
             if (entry.subreddits != null) {
                 entry.modTime = System.currentTimeMillis();
                 return entry.subreddits;
@@ -60,10 +61,19 @@ class AccountSubredditCache {
         }
     }
 
-    public void addSubreddit(Context context, long accountId, String name) {
+    static ArrayList<Subreddit> querySubreddits(String cookie) {
+        try {
+            return NetApi.query(cookie);
+        } catch (IOException e) {
+            Log.e(TAG, "querySubreddits", e);
+        }
+        return null;
+    }
+
+    public boolean insert(Context context, long accountId, String name) {
         Entry entry = cache.get(accountId);
         if (entry == null) {
-            return;
+            return false;
         }
 
         synchronized (entry) {
@@ -72,19 +82,20 @@ class AccountSubredditCache {
             for (int i = 0; i < count; i++) {
                 String subreddit = subreddits.get(i).name;
                 if (name.equalsIgnoreCase(subreddit)) {
-                    return;
+                    return false;
                 }
             }
 
             subreddits.add(Subreddit.newInstance(name));
             Collections.sort(subreddits);
+            return true;
         }
     }
 
-    public void deleteSubreddit(long accountId, String name) {
+    public boolean delete(long accountId, String name) {
         Entry entry = cache.get(accountId);
         if (entry == null) {
-            return;
+            return false;
         }
 
         synchronized (entry) {
@@ -94,10 +105,12 @@ class AccountSubredditCache {
                 String subreddit = subreddits.get(i).name;
                 if (name.equalsIgnoreCase(subreddit)) {
                     subreddits.remove(i);
-                    return;
+                    return true;
                 }
             }
         }
+
+        return false;
     }
 
     static class InternalCache extends LruCache<Long, Entry> {

@@ -26,10 +26,6 @@ import android.database.sqlite.SQLiteDatabase;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.Provider.Accounts;
 
-/**
- * {@link AccountSubredditProvider} queries reddit.com for account info when
- * {@link Provider} asks for it.
- */
 class AccountSubredditProvider {
 
     public static String TAG = "AccountSubredditProvider";
@@ -38,35 +34,45 @@ class AccountSubredditProvider {
             Accounts.COLUMN_COOKIE,
             Accounts.COLUMN_MODHASH};
 
+    private static final int INDEX_COOKIE = 0;
+    private static final int INDEX_MODHASH = 1;
+
     private static final AccountSubredditCache CACHE = new AccountSubredditCache();
 
-    static Cursor querySubreddits(SQLiteDatabase db, long accountId) {
-        ArrayList<Subreddit> subreddits = CACHE.querySubreddits(db, accountId);
+    static Cursor query(SQLiteDatabase db, long accountId) {
+        String[] credentials = getCredentials(db, accountId);
+        ArrayList<Subreddit> subreddits = CACHE.query(accountId, credentials[0]);
         return new SubredditCursor(subreddits);
     }
 
-    static int insertSubreddit(Context context, SQLiteDatabase db, long accountId, String subreddit) {
-        CACHE.addSubreddit(context, accountId, subreddit);
-
-        Intent intent = AccountSubredditService.getAddSubredditIntent(context, subreddit);
-        addCredentials(intent, db, accountId);
-        context.startService(intent);
-
+    static int insert(Context context, SQLiteDatabase db, long accountId, String subreddit) {
+        if (CACHE.insert(context, accountId, subreddit)) {
+            queueSubscription(context, db, accountId, subreddit, true);
+        }
         return 0;
     }
 
-    static int deleteSubreddit(Context context, SQLiteDatabase db, long accountId, String subreddit) {
-        CACHE.deleteSubreddit(accountId, subreddit);
-
-        Intent intent = AccountSubredditService.getRemoveSubredditIntent(context, subreddit);
-        addCredentials(intent, db, accountId);
-        context.startService(intent);
-
+    static int delete(Context context, SQLiteDatabase db, long accountId, String subreddit) {
+        if (CACHE.delete(accountId, subreddit)) {
+            queueSubscription(context, db, accountId, subreddit, false);
+        }
         return 1;
     }
 
-    private static Intent addCredentials(Intent intent, SQLiteDatabase db, long accountId) {
-        String[] selectionArgs = new String[] {Long.toString(accountId)};
+    private static void queueSubscription(Context context, SQLiteDatabase db, long accountId,
+            String subreddit, boolean subscribe) {
+        String[] credentials = getCredentials(db, accountId);
+        Intent intent = new Intent(context, AccountSubredditService.class);
+        intent.putExtra(AccountSubredditService.EXTRA_COOKIE, credentials[INDEX_COOKIE]);
+        intent.putExtra(AccountSubredditService.EXTRA_MODHASH, credentials[INDEX_MODHASH]);
+        intent.putExtra(AccountSubredditService.EXTRA_SUBREDDIT, subreddit);
+        intent.putExtra(AccountSubredditService.EXTRA_SUBSCRIBE, subscribe);
+        context.startService(intent);
+    }
+
+    static String[] getCredentials(SQLiteDatabase db, long id) {
+        String[] credentials = {null, null};
+        String[] selectionArgs = new String[] {Long.toString(id)};
         Cursor c = db.query(Accounts.TABLE_NAME,
                 CREDENTIALS_PROJECTION,
                 Provider.ID_SELECTION,
@@ -76,12 +82,12 @@ class AccountSubredditProvider {
                 null);
         try {
             if (c.moveToNext()) {
-                intent.putExtra(AccountSubredditService.EXTRA_COOKIE, c.getString(0));
-                intent.putExtra(AccountSubredditService.EXTRA_MODHASH, c.getString(1));
+                credentials[INDEX_COOKIE] = c.getString(INDEX_COOKIE);
+                credentials[INDEX_MODHASH] = c.getString(INDEX_MODHASH);
             }
         } finally {
             c.close();
         }
-        return intent;
+        return credentials;
     }
 }

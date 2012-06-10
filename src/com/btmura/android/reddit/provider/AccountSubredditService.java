@@ -17,16 +17,10 @@
 package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-
-import com.btmura.android.reddit.data.Urls;
 
 public class AccountSubredditService extends IntentService {
 
@@ -35,25 +29,8 @@ public class AccountSubredditService extends IntentService {
     public static final String EXTRA_COOKIE = "c";
     public static final String EXTRA_MODHASH = "m";
 
-    public static final String EXTRA_ACTION = "a";
-    public static final String EXTRA_SUBREDDIT = "s";
-
-    public static final int ACTION_ADD = 0;
-    public static final int ACTION_REMOVE = 1;
-
-    static Intent getAddSubredditIntent(Context context, String subreddit) {
-        Intent intent = new Intent(context, AccountSubredditService.class);
-        intent.putExtra(EXTRA_ACTION, ACTION_ADD);
-        intent.putExtra(EXTRA_SUBREDDIT, subreddit);
-        return intent;
-    }
-
-    public static Intent getRemoveSubredditIntent(Context context, String subreddit) {
-        Intent intent = new Intent(context, AccountSubredditService.class);
-        intent.putExtra(EXTRA_ACTION, ACTION_REMOVE);
-        intent.putExtra(EXTRA_SUBREDDIT, subreddit);
-        return intent;
-    }
+    public static final String EXTRA_SUBSCRIBE = "ss";
+    public static final String EXTRA_SUBREDDIT = "sr";
 
     public AccountSubredditService() {
         super("AccountSubredditServiceWorker");
@@ -61,74 +38,18 @@ public class AccountSubredditService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        int action = intent.getIntExtra(EXTRA_ACTION, -1);
-        switch (action) {
-            case ACTION_ADD:
-                handleAddSubreddit(intent);
-                break;
-
-            case ACTION_REMOVE:
-                handleRemoveSubreddit(intent);
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-
+        handleSubscribe(intent);
     }
 
-    private void handleAddSubreddit(Intent intent) {
-        subscribe(intent, true);
-    }
-
-    private void handleRemoveSubreddit(Intent intent) {
-        subscribe(intent, false);
-    }
-
-    private void subscribe(Intent intent, boolean subscribe) {
+    private void handleSubscribe(Intent intent) {
         String cookie = intent.getStringExtra(EXTRA_COOKIE);
         String modhash = intent.getStringExtra(EXTRA_MODHASH);
         String subreddit = intent.getStringExtra(EXTRA_SUBREDDIT);
-
-        URL url = Urls.subscribeUrl();
-        HttpURLConnection conn = null;
+        boolean subscribe = intent.getBooleanExtra(EXTRA_SUBSCRIBE, false);
         try {
-            conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, cookie);
-            setFormDataHeaders(conn);
-
-            conn.connect();
-            writeFormData(conn, Urls.subscribeQuery(modhash, subreddit, subscribe));
-
-            conn.getInputStream().close();
-            conn.disconnect();
-
+            NetApi.subscribe(cookie, modhash, subreddit, subscribe);
         } catch (IOException e) {
             Log.e(TAG, "subscribe", e);
-        }
-    }
-
-    private static void setCommonHeaders(HttpURLConnection conn, String cookie) {
-        conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
-        conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
-        conn.setRequestProperty("Cookie", Urls.loginCookie(cookie));
-    }
-
-    private static void setFormDataHeaders(HttpURLConnection conn) {
-        conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
-        conn.setDoOutput(true);
-    }
-
-    private static void writeFormData(HttpURLConnection conn, String data) throws IOException {
-        OutputStream output = null;
-        try {
-            output = conn.getOutputStream();
-            output.write(data.getBytes(Urls.CHARSET));
-            output.close();
-        } finally {
-            if (output != null) {
-                output.close();
-            }
         }
     }
 }
