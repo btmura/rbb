@@ -79,11 +79,13 @@ public class Provider extends ContentProvider {
         public static final String SORT = Accounts.COLUMN_LOGIN + " COLLATE NOCASE ASC";
     }
 
-    /** AccountSubreddits is a fake table that actually queries Reddit. */
-    public static class AccountSubreddits {
+    public static class AccountSubreddits implements BaseColumns {
         static final String TABLE_NAME = "accountSubreddits";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
-        public static final String COLUMN_NAME = Subreddits.COLUMN_NAME;
+        public static final String COLUMN_ACCOUNT_ID = "accountId";
+        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_TYPE = "type";
+        public static final String COLUMN_CREATION_TIME = "creationTime";
     }
 
     static final String ID_SELECTION = BaseColumns._ID + "= ?";
@@ -448,6 +450,7 @@ public class Provider extends ContentProvider {
             try {
                 createSubreddits(db);
                 createAccounts(db);
+                createAccountSubreddits(db);
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
@@ -455,10 +458,12 @@ public class Provider extends ContentProvider {
         }
 
         private void createSubreddits(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + Subreddits.TABLE_NAME + " (" + Subreddits._ID
-                    + " INTEGER PRIMARY KEY, " + Subreddits.COLUMN_NAME + " TEXT UNIQUE NOT NULL)");
-            db.execSQL("CREATE UNIQUE INDEX " + Subreddits.COLUMN_NAME + " ON "
-                    + Subreddits.TABLE_NAME + " (" + Subreddits.COLUMN_NAME + " ASC)");
+            db.execSQL("CREATE TABLE " + Subreddits.TABLE_NAME + " ("
+                    + Subreddits._ID + " INTEGER PRIMARY KEY, "
+                    + Subreddits.COLUMN_NAME + " TEXT UNIQUE NOT NULL)");
+            db.execSQL("CREATE UNIQUE INDEX " + Subreddits.COLUMN_NAME
+                    + " ON " + Subreddits.TABLE_NAME + " ("
+                    + Subreddits.COLUMN_NAME + " ASC)");
 
             String[] defaultSubreddits = {
                     "",
@@ -491,18 +496,39 @@ public class Provider extends ContentProvider {
         }
 
         private void createAccounts(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + Accounts.TABLE_NAME + " (" + Accounts._ID
-                    + " INTEGER PRIMARY KEY, " + Accounts.COLUMN_LOGIN + " TEXT UNIQUE NOT NULL, "
-                    + Accounts.COLUMN_COOKIE + " TEXT UNIQUE NOT NULL, " + Accounts.COLUMN_MODHASH
-                    + " TEXT UNIQUE NOT NULL)");
-            db.execSQL("CREATE UNIQUE INDEX " + Accounts.COLUMN_LOGIN + " ON "
-                    + Accounts.TABLE_NAME + " (" + Accounts.COLUMN_LOGIN + " ASC)");
+            db.execSQL("CREATE TABLE " + Accounts.TABLE_NAME + " ("
+                    + Accounts._ID + " INTEGER PRIMARY KEY, "
+                    + Accounts.COLUMN_LOGIN + " TEXT UNIQUE NOT NULL, "
+                    + Accounts.COLUMN_COOKIE + " TEXT UNIQUE NOT NULL, "
+                    + Accounts.COLUMN_MODHASH + " TEXT UNIQUE NOT NULL)");
+            db.execSQL("CREATE UNIQUE INDEX " + Accounts.COLUMN_LOGIN
+                    + " ON " + Accounts.TABLE_NAME + " ("
+                    + Accounts.COLUMN_LOGIN + " ASC)");
+        }
+
+        private void createAccountSubreddits(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + AccountSubreddits.TABLE_NAME + " ("
+                    + AccountSubreddits._ID + " INTEGER PRIMARY KEY, "
+                    + AccountSubreddits.COLUMN_ACCOUNT_ID + " INTEGER NOT NULL, "
+                    + AccountSubreddits.COLUMN_NAME + " TEXT UNIQUE NOT NULL, "
+                    + AccountSubreddits.COLUMN_TYPE + " INTEGER NOT NULL, "
+                    + AccountSubreddits.COLUMN_CREATION_TIME + "INTEGER NOT NULL)");
+            db.execSQL("CREATE UNIQUE INDEX " + AccountSubreddits.COLUMN_ACCOUNT_ID
+                    + " ON " + AccountSubreddits.TABLE_NAME + " ("
+                    + AccountSubreddits.COLUMN_ACCOUNT_ID + " ASC)");
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (newVersion == 2) {
-                createAccounts(db);
+                db.beginTransaction();
+                try {
+                    createAccounts(db);
+                    createAccountSubreddits(db);
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
             }
         }
     }
