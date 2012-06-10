@@ -22,9 +22,9 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
-public class AccountSubredditService extends IntentService {
+public class SyncService extends IntentService {
 
-    public static final String TAG = "AccountSubredditService";
+    public static final String TAG = "SyncService";
 
     public static final String EXTRA_COOKIE = "c";
     public static final String EXTRA_MODHASH = "m";
@@ -32,8 +32,8 @@ public class AccountSubredditService extends IntentService {
     public static final String EXTRA_SUBSCRIBE = "ss";
     public static final String EXTRA_SUBREDDIT = "sr";
 
-    public AccountSubredditService() {
-        super("AccountSubredditServiceWorker");
+    public SyncService() {
+        super(TAG);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class AccountSubredditService extends IntentService {
         try {
             NetApi.subscribe(cookie, modhash, subreddit, subscribe);
         } catch (IOException e) {
-            Log.e(TAG, "subscribe", e);
+            Log.e(TAG, "handleSubscribe", e);
         }
     }
 }

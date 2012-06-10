@@ -144,11 +144,11 @@ class AccountSubredditProvider {
     private static void queueSubscription(Context context, SQLiteDatabase db, long accountId,
             String subreddit, boolean subscribe) {
         String[] credentials = getCredentials(db, accountId);
-        Intent intent = new Intent(context, AccountSubredditService.class);
-        intent.putExtra(AccountSubredditService.EXTRA_COOKIE, credentials[INDEX_COOKIE]);
-        intent.putExtra(AccountSubredditService.EXTRA_MODHASH, credentials[INDEX_MODHASH]);
-        intent.putExtra(AccountSubredditService.EXTRA_SUBREDDIT, subreddit);
-        intent.putExtra(AccountSubredditService.EXTRA_SUBSCRIBE, subscribe);
+        Intent intent = new Intent(context, SyncService.class);
+        intent.putExtra(SyncService.EXTRA_COOKIE, credentials[INDEX_COOKIE]);
+        intent.putExtra(SyncService.EXTRA_MODHASH, credentials[INDEX_MODHASH]);
+        intent.putExtra(SyncService.EXTRA_SUBREDDIT, subreddit);
+        intent.putExtra(SyncService.EXTRA_SUBSCRIBE, subscribe);
         context.startService(intent);
     }
 
