@@ -19,18 +19,39 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 
 import android.app.IntentService;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.util.Log;
+
+import com.btmura.android.reddit.provider.Provider.Accounts;
+import com.btmura.android.reddit.provider.Provider.SyncTasks;
 
 public class SyncService extends IntentService {
 
     public static final String TAG = "SyncService";
 
-    public static final String EXTRA_COOKIE = "c";
-    public static final String EXTRA_MODHASH = "m";
+    private static final boolean DEBUG_SERVICE = true;
 
-    public static final String EXTRA_SUBSCRIBE = "ss";
-    public static final String EXTRA_SUBREDDIT = "sr";
+    private static final String[] SYNC_TASK_PROJECTION = {
+            SyncTasks.COLUMN_ACCOUNT_ID,
+            SyncTasks.COLUMN_NAME,
+            SyncTasks.COLUMN_TYPE,
+    };
+
+    private static final int INDEX_ACCOUNT_ID = 0;
+    private static final int INDEX_NAME = 1;
+    private static final int INDEX_TYPE = 2;
+
+    private static final String[] CREDENTIALS_PROJECTION = new String[] {
+            Accounts.COLUMN_COOKIE,
+            Accounts.COLUMN_MODHASH
+    };
+
+    static final int INDEX_COOKIE = 0;
+    static final int INDEX_MODHASH = 1;
 
     public SyncService() {
         super(TAG);
@@ -38,18 +59,56 @@ public class SyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        handleSubscribe(intent);
-    }
+        if (DEBUG_SERVICE) {
+            Log.d(TAG, "Handling intent for " + intent.getDataString());
+        }
 
-    private void handleSubscribe(Intent intent) {
-        String cookie = intent.getStringExtra(EXTRA_COOKIE);
-        String modhash = intent.getStringExtra(EXTRA_MODHASH);
-        String subreddit = intent.getStringExtra(EXTRA_SUBREDDIT);
-        boolean subscribe = intent.getBooleanExtra(EXTRA_SUBSCRIBE, false);
+        long accountId = 0;
+        String subreddit = null;
+        boolean subscribe = false;
+        String cookie = null;
+        String modhash = null;
+
+        ContentResolver cr = getContentResolver();
+        Cursor c = cr.query(intent.getData(), SYNC_TASK_PROJECTION, null, null, null);
+        try {
+            if (c.moveToNext()) {
+                accountId = c.getLong(INDEX_ACCOUNT_ID);
+                subreddit = c.getString(INDEX_NAME);
+                subscribe = c.getInt(INDEX_TYPE) == SyncTasks.TYPE_INSERT;
+            } else {
+                throw new IllegalStateException();
+            }
+        } finally {
+            c.close();
+        }
+
+        c = cr.query(ContentUris.withAppendedId(Accounts.CONTENT_URI, accountId),
+                CREDENTIALS_PROJECTION, null, null, null);
+        try {
+            if (c.moveToNext()) {
+                cookie = c.getString(INDEX_COOKIE);
+                modhash = c.getString(INDEX_MODHASH);
+            } else {
+                Log.w(TAG, "No credentials found. Account deleted?");
+                return;
+            }
+        } finally {
+            c.close();
+        }
+
         try {
             NetApi.subscribe(cookie, modhash, subreddit, subscribe);
         } catch (IOException e) {
             Log.e(TAG, "handleSubscribe", e);
         }
+
+        ContentValues values = new ContentValues(1);
+        values.put(SyncTasks.COLUMN_EXPIRATION, System.currentTimeMillis());
+        int count = cr.update(intent.getData(), values, null, null);
+        if (DEBUG_SERVICE) {
+            Log.d(TAG, "Updated expiration time for " + count + " tasks.");
+        }
+
     }
 }

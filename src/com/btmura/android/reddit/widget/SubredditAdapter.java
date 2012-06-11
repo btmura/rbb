@@ -16,12 +16,10 @@
 
 package com.btmura.android.reddit.widget;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.SimpleCursorAdapter;
@@ -31,7 +29,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.provider.Provider.AccountSubreddits;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.Provider.Subreddits;
 
 public class SubredditAdapter extends SimpleCursorAdapter {
@@ -42,8 +40,7 @@ public class SubredditAdapter extends SimpleCursorAdapter {
 
     public static Loader<Cursor> createLoader(Context context, long accountId, String query) {
         if (accountId > 0) {
-            Uri uri = ContentUris.withAppendedId(AccountSubreddits.CONTENT_URI, accountId);
-            return new CursorLoader(context, uri, null, null, null, null);
+            return new CursorLoader(context, Provider.getSubredditsUri(accountId), null, null, null, null);
         } else if (query != null) {
             return new SubredditSearchLoader(context, Urls.subredditSearchUrl(query, null));
         } else {

@@ -18,69 +18,69 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.util.Log;
 
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.provider.Provider.AccountSubreddits;
-import com.btmura.android.reddit.provider.Provider.Accounts;
+import com.btmura.android.reddit.provider.Provider.SyncTasks;
 
 class AccountSubredditProvider {
 
     public static String TAG = "AccountSubredditProvider";
 
-    private static final String[] CREDENTIALS_PROJECTION = new String[] {
-            Accounts.COLUMN_COOKIE,
-            Accounts.COLUMN_MODHASH
+    private static final String[] SYNC_TASKS_PROJECTION = new String[] {
+            SyncTasks.COLUMN_NAME,
+            SyncTasks.COLUMN_TYPE,
+            SyncTasks.COLUMN_EXPIRATION,
     };
-
-    private static final int INDEX_COOKIE = 0;
-    private static final int INDEX_MODHASH = 1;
-
-    private static final String[] ACCOUNT_SUBREDDITS_PROJECTION = new String[] {
-            AccountSubreddits.COLUMN_NAME,
-            AccountSubreddits.COLUMN_TYPE,
-            AccountSubreddits.COLUMN_CREATION_TIME,
-    };
-
     private static final int INDEX_NAME = 0;
     private static final int INDEX_TYPE = 1;
 
-    static Cursor query(SQLiteDatabase db, long accountId) {
-        String[] credentials = getCredentials(db, accountId);
+    private static final String SELECTION = SyncTasks.COLUMN_ACCOUNT_ID + "= ?";
+    private static final String SORT = SyncTasks._ID + " ASC";
+
+    static Cursor query(Uri uri, SQLiteDatabase db) {
+        List<String> segments = uri.getPathSegments();
+        long accountId = Long.parseLong(segments.get(1));
+        String[] credentials = Credentials.getCredentials(db, accountId);
 
         // 1. Ask reddit.com what subreddits the account is subscribed to.
         ArrayList<Subreddit> subreddits = null;
         try {
-            subreddits = NetApi.query(credentials[INDEX_COOKIE]);
+            subreddits = NetApi.query(credentials[0]);
         } catch (IOException e) {
             Log.e(TAG, "query", e);
             return null;
         }
 
         // 2. Query the database for local inserts and deletes.
-        Cursor c = db.query(AccountSubreddits.TABLE_NAME,
-                ACCOUNT_SUBREDDITS_PROJECTION,
-                AccountSubreddits.ACCOUNT_ID_SELECTION,
+        Cursor c = db.query(SyncTasks.TABLE_NAME,
+                SYNC_TASKS_PROJECTION,
+                SELECTION,
                 new String[] {Long.toString(accountId)},
                 null,
                 null,
-                null);
+                SORT);
 
         // 3. Add local inserts and remove local deletes.
+        boolean modified = false;
         while (c.moveToNext()) {
             String name = c.getString(INDEX_NAME);
             switch (c.getInt(INDEX_TYPE)) {
-                case AccountSubreddits.TYPE_INSERT:
-                    insertSubreddit(subreddits, name);
+                case SyncTasks.TYPE_INSERT:
+                    modified |= insertSubreddit(subreddits, name);
                     break;
 
-                case AccountSubreddits.TYPE_DELETE:
+                case SyncTasks.TYPE_DELETE:
                     deleteSubreddit(subreddits, name);
                     break;
 
@@ -90,86 +90,58 @@ class AccountSubredditProvider {
         }
         c.close();
 
+        if (modified) {
+            Collections.sort(subreddits);
+        }
+
         return new SubredditCursor(subreddits);
     }
 
-    private static void insertSubreddit(ArrayList<Subreddit> subreddits, String name) {
+    private static boolean insertSubreddit(ArrayList<Subreddit> subreddits, String name) {
         int count = subreddits.size();
         for (int i = 0; i < count; i++) {
             String subreddit = subreddits.get(i).name;
             if (name.equalsIgnoreCase(subreddit)) {
-                return;
+                return false;
             }
         }
         subreddits.add(Subreddit.newInstance(name));
+        return true;
     }
 
-    private static void deleteSubreddit(ArrayList<Subreddit> subreddits, String name) {
+    private static boolean deleteSubreddit(ArrayList<Subreddit> subreddits, String name) {
         int count = subreddits.size();
         for (int i = 0; i < count; i++) {
             String subreddit = subreddits.get(i).name;
             if (name.equalsIgnoreCase(subreddit)) {
                 subreddits.remove(i);
-                return;
+                return true;
             }
         }
+        return false;
     }
 
-    static int insert(Context context, SQLiteDatabase db, long accountId, String subreddit) {
-        ContentValues values = new ContentValues(4);
-        values.put(AccountSubreddits.COLUMN_ACCOUNT_ID, accountId);
-        values.put(AccountSubreddits.COLUMN_NAME, subreddit);
-        values.put(AccountSubreddits.COLUMN_TYPE, AccountSubreddits.TYPE_INSERT);
-        values.put(AccountSubreddits.COLUMN_CREATION_TIME, System.currentTimeMillis());
-        db.insert(AccountSubreddits.TABLE_NAME, null, values);
-
-        queueSubscription(context, db, accountId, subreddit, true);
-
+    static int insert(Context context, long accountId, String subreddit) {
+        queueSubscription(context, accountId, subreddit, true);
         return 0;
     }
 
-    static int delete(Context context, SQLiteDatabase db, long accountId, String subreddit) {
-        ContentValues values = new ContentValues(4);
-        values.put(AccountSubreddits.COLUMN_ACCOUNT_ID, accountId);
-        values.put(AccountSubreddits.COLUMN_NAME, subreddit);
-        values.put(AccountSubreddits.COLUMN_TYPE, AccountSubreddits.TYPE_DELETE);
-        values.put(AccountSubreddits.COLUMN_CREATION_TIME, System.currentTimeMillis());
-        db.insert(AccountSubreddits.TABLE_NAME, null, values);
-
-        queueSubscription(context, db, accountId, subreddit, false);
-
+    static int delete(Context context, long accountId, String subreddit) {
+        queueSubscription(context, accountId, subreddit, false);
         return 1;
     }
 
-    private static void queueSubscription(Context context, SQLiteDatabase db, long accountId,
-            String subreddit, boolean subscribe) {
-        String[] credentials = getCredentials(db, accountId);
-        Intent intent = new Intent(context, SyncService.class);
-        intent.putExtra(SyncService.EXTRA_COOKIE, credentials[INDEX_COOKIE]);
-        intent.putExtra(SyncService.EXTRA_MODHASH, credentials[INDEX_MODHASH]);
-        intent.putExtra(SyncService.EXTRA_SUBREDDIT, subreddit);
-        intent.putExtra(SyncService.EXTRA_SUBSCRIBE, subscribe);
-        context.startService(intent);
-    }
+    private static void queueSubscription(Context context, long accountId, String subreddit, boolean subscribe) {
+        ContentValues values = new ContentValues(3);
+        values.put(SyncTasks.COLUMN_ACCOUNT_ID, accountId);
+        values.put(SyncTasks.COLUMN_NAME, subreddit);
+        values.put(SyncTasks.COLUMN_TYPE, subscribe ? SyncTasks.TYPE_INSERT : SyncTasks.TYPE_DELETE);
 
-    static String[] getCredentials(SQLiteDatabase db, long id) {
-        String[] credentials = {null, null};
-        String[] selectionArgs = new String[] {Long.toString(id)};
-        Cursor c = db.query(Accounts.TABLE_NAME,
-                CREDENTIALS_PROJECTION,
-                Provider.ID_SELECTION,
-                selectionArgs,
-                null,
-                null,
-                null);
-        try {
-            if (c.moveToNext()) {
-                credentials[INDEX_COOKIE] = c.getString(INDEX_COOKIE);
-                credentials[INDEX_MODHASH] = c.getString(INDEX_MODHASH);
-            }
-        } finally {
-            c.close();
-        }
-        return credentials;
+        ContentResolver cr = context.getContentResolver();
+        Uri taskUri = cr.insert(SyncTasks.CONTENT_URI, values);
+
+        Intent intent = new Intent(context, SyncService.class);
+        intent.setData(taskUri);
+        context.startService(intent);
     }
 }
