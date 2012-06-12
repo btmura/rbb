@@ -16,6 +16,9 @@
 
 package com.btmura.android.reddit.activity;
 
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
@@ -27,7 +30,7 @@ import android.view.View.OnClickListener;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.fragment.AccountListFragment;
 
-public class AccountManagerActivity extends Activity implements OnClickListener {
+public class AccountManagerActivity extends Activity implements OnClickListener, AccountManagerCallback<Bundle> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,5 +62,10 @@ public class AccountManagerActivity extends Activity implements OnClickListener 
     }
 
     public void onClick(View v) {
+        AccountManager manager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
+        manager.addAccount(getString(R.string.account_type), null, null, null, this, this, null);
+    }
+
+    public void run(AccountManagerFuture<Bundle> bundle) {
     }
 }
