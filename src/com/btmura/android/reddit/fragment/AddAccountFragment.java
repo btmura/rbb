@@ -16,9 +16,9 @@
 
 package com.btmura.android.reddit.fragment;
 
-import android.app.DialogFragment;
+import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.ContentValues;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.method.PasswordTransformationMethod;
@@ -35,11 +35,9 @@ import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.LoginLoader.LoginResult;
-import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.provider.Provider.Accounts;
 import com.btmura.android.reddit.text.InputFilters;
 
-public class AddAccountFragment extends DialogFragment implements
+public class AddAccountFragment extends Fragment implements
         OnCheckedChangeListener,
         OnClickListener,
         LoginFragment.LoginResultListener {
@@ -49,6 +47,12 @@ public class AddAccountFragment extends DialogFragment implements
     private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
             InputFilters.LOGIN_FILTER,
     };
+
+    public interface OnAccountAddedListener {
+        void onAccountAdded(String login, String cookie, String modhash);
+    }
+
+    private OnAccountAddedListener listener;
 
     private EditText login;
     private EditText password;
@@ -60,8 +64,13 @@ public class AddAccountFragment extends DialogFragment implements
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        listener = (OnAccountAddedListener) activity;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        getDialog().setTitle(R.string.add_account);
         View v = inflater.inflate(R.layout.add_account, container, false);
 
         login = (EditText) v.findViewById(R.id.login);
@@ -98,7 +107,7 @@ public class AddAccountFragment extends DialogFragment implements
     }
 
     private void handleCancel() {
-        dismiss();
+
     }
 
     private void handleAdd() {
@@ -115,21 +124,18 @@ public class AddAccountFragment extends DialogFragment implements
             frag.show(getFragmentManager(), LoginFragment.TAG);
         }
     }
-    
+
     public void onLoginResult(LoginResult result) {
-        FragmentManager fm = getFragmentManager();        
+        FragmentManager fm = getFragmentManager();
         if (result == null) {
             SimpleDialogFragment.showMessage(fm, getString(R.string.error));
         } else if (result.error != null) {
             SimpleDialogFragment.showMessage(fm, getString(R.string.error_reddit, result.error));
         } else {
-            dismiss();            
-            LoginFragment frag = (LoginFragment) fm.findFragmentByTag(LoginFragment.TAG);            
-            ContentValues values = new ContentValues(2);
-            values.put(Accounts.COLUMN_LOGIN, frag.getLogin());
-            values.put(Accounts.COLUMN_COOKIE, result.cookie);
-            values.put(Accounts.COLUMN_MODHASH, result.modhash);
-            Provider.addInBackground(getActivity(), Accounts.CONTENT_URI, values);
+            LoginFragment frag = (LoginFragment) fm.findFragmentByTag(LoginFragment.TAG);
+            if (listener != null) {
+                listener.onAccountAdded(frag.getLogin(), result.cookie, result.modhash);
+            }
         }
     }
 }

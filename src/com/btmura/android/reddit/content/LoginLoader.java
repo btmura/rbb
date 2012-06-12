@@ -34,7 +34,7 @@ import com.btmura.android.reddit.data.Urls;
 public class LoginLoader extends AsyncTaskLoader<LoginResult> {
 
     public static final String TAG = "LoginLoader";
-    
+
     public static class LoginResult {
         public String error;
         public String cookie;
@@ -47,15 +47,15 @@ public class LoginLoader extends AsyncTaskLoader<LoginResult> {
 
     public final String login;
     public final String password;
-    
+
     private LoginResult results;
-    
+
     public LoginLoader(Context context, String login, String password) {
         super(context.getApplicationContext());
         this.login = login;
         this.password = password;
     }
-    
+
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
@@ -65,7 +65,7 @@ public class LoginLoader extends AsyncTaskLoader<LoginResult> {
             forceLoad();
         }
     }
-    
+
     @Override
     public LoginResult loadInBackground() {
         HttpsURLConnection conn = null;

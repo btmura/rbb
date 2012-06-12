@@ -26,7 +26,6 @@ import android.view.View.OnClickListener;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.fragment.AccountListFragment;
-import com.btmura.android.reddit.fragment.AddAccountFragment;
 
 public class AccountManagerActivity extends Activity implements OnClickListener {
 
@@ -35,7 +34,7 @@ public class AccountManagerActivity extends Activity implements OnClickListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account_manager);
         findViewById(R.id.add).setOnClickListener(this);
-        
+
         ActionBar bar = getActionBar();
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
@@ -58,8 +57,7 @@ public class AccountManagerActivity extends Activity implements OnClickListener 
                 return super.onOptionsItemSelected(item);
         }
     }
-    
+
     public void onClick(View v) {
-        AddAccountFragment.newInstance().show(getFragmentManager(), AddAccountFragment.TAG);
     }
 }
