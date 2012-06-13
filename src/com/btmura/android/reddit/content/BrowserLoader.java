@@ -16,13 +16,15 @@
 
 package com.btmura.android.reddit.content;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
 import com.btmura.android.reddit.provider.Provider.Accounts;
 
@@ -31,14 +33,14 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
     public static final String TAG = "BrowserLoader";
 
     public static class BrowserResult {
-        public Cursor accounts;
         public SharedPreferences prefs;
-        public String lastLogin;
+        public Account[] accounts;
+        public int selectedAccount;
 
-        private BrowserResult(Cursor accounts, SharedPreferences prefs, String lastLogin) {
-            this.accounts = accounts;
+        private BrowserResult(SharedPreferences prefs, Account[] accounts, int selectedAccount) {
             this.prefs = prefs;
-            this.lastLogin = lastLogin;
+            this.accounts = accounts;
+            this.selectedAccount = selectedAccount;
         }
     }
 
@@ -56,7 +58,6 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
 
     private static final String PREFS = "prefs";
 
-    private ForceLoadContentObserver observer = new ForceLoadContentObserver();
     private BrowserResult result;
 
     public BrowserLoader(Context context) {
@@ -68,17 +69,30 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "loadInBackground (id " + getId() + ")");
         }
-        SharedPreferences prefs = getContext().getSharedPreferences(PREFS, 0);
-        Cursor cursor = getContext().getContentResolver().query(Accounts.CONTENT_URI, PROJECTION,
-                null, null, Accounts.SORT);
-        if (cursor != null) {
-            cursor.getCount();
-            cursor.registerContentObserver(observer);
+
+        Context context = getContext();
+
+        // Getting preferences launches a thread to load them so start early.
+        SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+
+        // Get the list of accounts to show in the spinner.
+        AccountManager manager = AccountManager.get(context);
+        Account[] accounts = manager.getAccountsByType(AccountAuthenticator.getAccountType(context));
+
+        // Find which account was selected last.
+        int selectedAccount = -1;
+        int numAccounts = accounts.length;
+        if (numAccounts != 0) {
+            String lastLogin = prefs.getString(PREF_LAST_LOGIN, null);
+            for (int i = 0; i < numAccounts; i++) {
+                if (accounts[i].name.equals(lastLogin)) {
+                    selectedAccount = i;
+                    break;
+                }
+            }
         }
 
-        String lastLogin = prefs.getString(PREF_LAST_LOGIN, null);
-
-        return new BrowserResult(cursor, prefs, lastLogin);
+        return new BrowserResult(prefs, accounts, selectedAccount);
     }
 
     @Override
@@ -146,9 +160,6 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
     private void closeResult(BrowserResult result) {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "closeResult");
-        }
-        if (result != null && result.accounts != null && !result.accounts.isClosed()) {
-            result.accounts.close();
         }
     }
 }

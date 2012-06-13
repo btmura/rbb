@@ -26,7 +26,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Spinner;
 import android.widget.ViewSwitcher;
 
 import com.btmura.android.reddit.R;
@@ -58,9 +57,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     private ViewSwitcher switcher;
     private FilterAdapter filterAdapter;
     private View singleContainer;
-    
+
     private AccountAdapter adapter;
-    
+
     private boolean homeUpEnabled;
     private boolean navigationListenerDisabled;
 
@@ -88,10 +87,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void initSinglePaneLayout(Bundle savedInstanceState) {
-        ActionBar bar = getActionBar();        
+        ActionBar bar = getActionBar();
         bar.setDisplayHomeAsUpEnabled(homeUpEnabled);
-        
-        
+
+
         if (getIntent().hasExtra(EXTRA_SUBREDDIT_NAME)) {
             finish();
             Subreddit s = Subreddit.newInstance(getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME));
@@ -99,22 +98,19 @@ public class BrowserActivity extends AbstractBrowserActivity implements
             intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, s);
             intent.putExtra(ThingListActivity.EXTRA_FLAGS, ThingListActivity.FLAG_INSERT_HOME);
             startActivity(intent);
-        } else if (savedInstanceState == null) {            
-            bar.setDisplayShowTitleEnabled(false); 
-            
+        } else if (savedInstanceState == null) {
+            bar.setDisplayShowTitleEnabled(false);
+
             switcher = (ViewSwitcher) bar.getCustomView();
             adapter = new AccountAdapter(this);
-            
-            Spinner spinner = (Spinner) switcher.findViewById(R.id.spinner);        
-            spinner.setAdapter(adapter);
-            
+
             SubredditListFragment slf = SubredditListFragment.newInstance(null, -1, 0);
             GlobalMenuFragment gmf = GlobalMenuFragment.newInstance(0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(gmf, GlobalMenuFragment.TAG);
             ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
             ft.commit();
-            
+
             getLoaderManager().initLoader(0, null, this);
         }
     }
@@ -198,7 +194,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
             outState.putInt(STATE_NAVIGATION_INDEX, bar.getSelectedNavigationIndex());
         }
     }
-    
+
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return AccountAdapter.createLoader(getApplicationContext());
     }
@@ -209,7 +205,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
             switcher.showNext();
         }
     }
- 
+
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
     }

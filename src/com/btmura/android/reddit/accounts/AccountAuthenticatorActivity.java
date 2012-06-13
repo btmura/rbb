@@ -31,9 +31,6 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
 
     public static final String TAG = "AccountAuthenticatorActivity";
 
-    private static final String AUTH_TOKEN_COOKIE = "cookie";
-    private static final String AUTH_TOKEN_MODHASH = "modhash";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,13 +44,12 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
     public void onAccountAdded(String login, String cookie, String modhash) {
         Log.d(TAG, "onAccountAdded");
 
-        String accountType = getString(R.string.account_type);
+        String accountType = AccountAuthenticator.getAccountType(this);
         Account account = new Account(login, accountType);
-
         AccountManager manager = AccountManager.get(this);
         manager.addAccountExplicitly(account, null, null);
-        manager.setAuthToken(account, AUTH_TOKEN_COOKIE, cookie);
-        manager.setAuthToken(account, AUTH_TOKEN_MODHASH, modhash);
+        manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, cookie);
+        manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, modhash);
 
         Bundle result = new Bundle();
         result.putString(AccountManager.KEY_ACCOUNT_NAME, login);

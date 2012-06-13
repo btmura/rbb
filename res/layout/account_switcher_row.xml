@@ -17,5 +17,4 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingRight="@dimen/spinner_triangle_padding" />
+    android:layout_height="wrap_content" />

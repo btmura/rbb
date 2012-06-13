@@ -26,11 +26,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.btmura.android.reddit.R;
+
 public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
     public static final String TAG = "AccountAuthenticator";
 
+    public static final String AUTH_TOKEN_COOKIE = "cookie";
+    public static final String AUTH_TOKEN_MODHASH = "modhash";
+
     private final Context context;
+
+    public static String getAccountType(Context context) {
+        return context.getString(R.string.account_type);
+    }
 
     public AccountAuthenticator(Context context) {
         super(context);
