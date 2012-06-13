@@ -16,6 +16,9 @@
 
 package com.btmura.android.reddit.content;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.OnAccountsUpdateListener;
@@ -27,7 +30,6 @@ import android.util.Log;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
-import com.btmura.android.reddit.provider.Provider.Accounts;
 
 public class BrowserLoader extends AsyncTaskLoader<BrowserResult> implements OnAccountsUpdateListener {
 
@@ -45,17 +47,13 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> implements OnA
         }
     }
 
-    public static final String[] PROJECTION = {
-            Accounts._ID,
-            Accounts.COLUMN_LOGIN,
-            Accounts.COLUMN_COOKIE,
-            Accounts.COLUMN_MODHASH,
-    };
-
-    public static final int INDEX_LOGIN = 1;
-    public static final int INDEX_COOKIE = 2;
-
     public static final String PREF_LAST_LOGIN = "lastLogin";
+
+    private static Comparator<Account> ACCOUNT_COMPARATOR = new Comparator<Account>() {
+        public int compare(Account lhs, Account rhs) {
+            return lhs.name.compareToIgnoreCase(rhs.name);
+        }
+    };
 
     private static final String PREFS = "prefs";
 
@@ -82,6 +80,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> implements OnA
 
         // Get the list of accounts to show in the spinner.
         Account[] accounts = manager.getAccountsByType(AccountAuthenticator.getAccountType(context));
+        Arrays.sort(accounts, ACCOUNT_COMPARATOR);
 
         // Find which account was selected last.
         int selectedAccount = 0;
