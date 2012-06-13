@@ -18,6 +18,7 @@ package com.btmura.android.reddit.content;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.OnAccountsUpdateListener;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -28,7 +29,7 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
 import com.btmura.android.reddit.provider.Provider.Accounts;
 
-public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
+public class BrowserLoader extends AsyncTaskLoader<BrowserResult> implements OnAccountsUpdateListener {
 
     public static final String TAG = "BrowserLoader";
 
@@ -60,8 +61,12 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
 
     private BrowserResult result;
 
+    private AccountManager manager;
+
     public BrowserLoader(Context context) {
         super(context.getApplicationContext());
+        manager = AccountManager.get(context.getApplicationContext());
+        manager.addOnAccountsUpdatedListener(this, null, false);
     }
 
     @Override
@@ -76,11 +81,10 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
         SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
 
         // Get the list of accounts to show in the spinner.
-        AccountManager manager = AccountManager.get(context);
         Account[] accounts = manager.getAccountsByType(AccountAuthenticator.getAccountType(context));
 
         // Find which account was selected last.
-        int selectedAccount = -1;
+        int selectedAccount = 0;
         int numAccounts = accounts.length;
         if (numAccounts != 0) {
             String lastLogin = prefs.getString(PREF_LAST_LOGIN, null);
@@ -161,5 +165,12 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "closeResult");
         }
+    }
+
+    public void onAccountsUpdated(Account[] accounts) {
+        if (Debug.DEBUG_LOADERS) {
+            Log.d(TAG, "onAccountsUpdated");
+        }
+        onContentChanged();
     }
 }

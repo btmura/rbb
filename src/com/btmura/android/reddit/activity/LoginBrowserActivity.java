@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.activity;
 
+import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
@@ -40,6 +41,7 @@ public class LoginBrowserActivity extends Activity implements
 
     public static final String TAG = "LoginBrowserActivity";
 
+    private ActionBar bar;
     private AccountSwitcherAdapter adapter;
     private SharedPreferences prefs;
 
@@ -64,7 +66,7 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     private void setActionBar() {
-        ActionBar bar = getActionBar();
+        bar = getActionBar();
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
@@ -83,6 +85,7 @@ public class LoginBrowserActivity extends Activity implements
         }
         prefs = result.prefs;
         adapter.setAccounts(result.accounts);
+        bar.setSelectedNavigationItem(result.selectedAccount);
     }
 
     public void onLoaderReset(Loader<BrowserResult> loader) {
@@ -96,6 +99,8 @@ public class LoginBrowserActivity extends Activity implements
         if (Debug.DEBUG_ACTIVITY) {
             Log.d(TAG, "onNavigationItemSelected (itemPosition " + itemPosition + ")");
         }
+        Account account = adapter.getItem(itemPosition);
+        prefs.edit().putString(BrowserLoader.PREF_LAST_LOGIN, account.name).apply();
         return false;
     }
 }
