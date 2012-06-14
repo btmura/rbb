@@ -29,7 +29,6 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.activity.AccountManagerActivity;
 import com.btmura.android.reddit.activity.SearchActivity;
 
 public class GlobalMenuFragment extends Fragment implements
@@ -91,10 +90,6 @@ public class GlobalMenuFragment extends Fragment implements
                 handleSearch();
                 return true;
 
-            case R.id.menu_accounts:
-                handleAccounts();
-                return true;
-
             case R.id.menu_add_subreddit:
                 handleAddSubreddit();
                 return true;
@@ -106,11 +101,6 @@ public class GlobalMenuFragment extends Fragment implements
 
     public void handleSearch() {
         searchItem.expandActionView();
-    }
-
-    private void handleAccounts() {
-        Intent intent = new Intent(getActivity(), AccountManagerActivity.class);
-        startActivity(intent);
     }
 
     private void handleAddSubreddit() {
