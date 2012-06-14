@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -43,7 +42,6 @@ public class LoginBrowserActivity extends Activity implements
 
     private ActionBar bar;
     private AccountSwitcherAdapter adapter;
-    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +81,6 @@ public class LoginBrowserActivity extends Activity implements
             Log.d(TAG, "onLoadFinished (id " + loader.getId() + ") "
                     + "(count " + result.accounts.length + ")");
         }
-        prefs = result.prefs;
         adapter.setAccounts(result.accounts);
         bar.setSelectedNavigationItem(result.selectedAccount);
     }
@@ -100,7 +97,7 @@ public class LoginBrowserActivity extends Activity implements
             Log.d(TAG, "onNavigationItemSelected (itemPosition " + itemPosition + ")");
         }
         Account account = adapter.getItem(itemPosition);
-        prefs.edit().putString(AccountLoader.PREF_LAST_LOGIN, account.name).apply();
-        return false;
+        AccountLoader.setLastAccount(getLoaderManager().getLoader(0), account.name);
+        return true;
     }
 }

@@ -24,7 +24,9 @@ import android.accounts.AccountManager;
 import android.accounts.OnAccountsUpdateListener;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.content.Loader;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
@@ -36,18 +38,14 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
     public static final String TAG = "AccountLoader";
 
     public static class AccountResult {
-        public SharedPreferences prefs;
         public Account[] accounts;
         public int selectedAccount;
 
-        private AccountResult(SharedPreferences prefs, Account[] accounts, int selectedAccount) {
-            this.prefs = prefs;
+        private AccountResult(Account[] accounts, int selectedAccount) {
             this.accounts = accounts;
             this.selectedAccount = selectedAccount;
         }
     }
-
-    public static final String PREF_LAST_LOGIN = "lastLogin";
 
     private static Comparator<Account> ACCOUNT_COMPARATOR = new Comparator<Account>() {
         public int compare(Account lhs, Account rhs) {
@@ -55,16 +53,19 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
         }
     };
 
-    private static final String PREFS = "prefs";
+    private static final String PREFS = "accountPreferences";
+    private static final String PREF_LAST_LOGIN = "lastAccount";
+
+    private SharedPreferences prefs;
+    private AccountManager manager;
 
     private AccountResult result;
 
-    private AccountManager manager;
-
     public AccountLoader(Context context) {
-        super(context.getApplicationContext());
-        manager = AccountManager.get(context.getApplicationContext());
-        //manager.addOnAccountsUpdatedListener(this, null, false);
+        super(context);
+        prefs = getContext().getSharedPreferences(PREFS, 0);
+        manager = AccountManager.get(getContext());
+        manager.addOnAccountsUpdatedListener(this, null, false);
     }
 
     @Override
@@ -74,9 +75,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
         }
 
         Context context = getContext();
-
-        // Getting preferences launches a thread to load them so start early.
-        SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
 
         // Get the list of accounts to show in the spinner.
         Account[] accounts = manager.getAccountsByType(AccountAuthenticator.getAccountType(context));
@@ -95,7 +93,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
             }
         }
 
-        return new AccountResult(prefs, accounts, selectedAccount);
+        return new AccountResult(accounts, selectedAccount);
     }
 
     @Override
@@ -104,19 +102,13 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
             Log.d(TAG, "deliverResult (id " + getId() + ")");
         }
         if (isReset()) {
-            closeResult(newResult);
             return;
         }
 
-        AccountResult oldResult = this.result;
         this.result = newResult;
 
         if (isStarted()) {
             super.deliverResult(newResult);
-        }
-
-        if (oldResult != null && oldResult != newResult) {
-            closeResult(oldResult);
         }
     }
 
@@ -134,36 +126,13 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
     }
 
     @Override
-    protected void onStopLoading() {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onStopLoading (id " + getId() + ")");
-        }
-        cancelLoad();
-    }
-
-    @Override
-    public void onCanceled(AccountResult result) {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onCanceled (id " + getId() + ")");
-        }
-        closeResult(result);
-    }
-
-    @Override
     protected void onReset() {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "onReset (id " + getId() + ")");
         }
         super.onReset();
         onStopLoading();
-        closeResult(result);
         result = null;
-    }
-
-    private void closeResult(AccountResult result) {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "closeResult");
-        }
     }
 
     public void onAccountsUpdated(Account[] accounts) {
@@ -171,5 +140,12 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
             Log.d(TAG, "onAccountsUpdated");
         }
         onContentChanged();
+    }
+
+    public static void setLastAccount(Loader<?> loader, String name) {
+        AccountLoader accountLoader = (AccountLoader) loader;
+        Editor editor = accountLoader.prefs.edit();
+        editor.putString(AccountLoader.PREF_LAST_LOGIN, name);
+        editor.apply();
     }
 }
