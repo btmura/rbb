@@ -24,7 +24,6 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentValues;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -54,7 +53,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
     private static final String ARG_SELECTED_SUBREDDIT = "s";
-    private static final String ARG_ACCOUNT_ID = "a";
+    private static final String ARG_ACCOUNT_NAME = "a";
     private static final String ARG_QUERY = "q";
     private static final String ARG_FLAGS = "f";
 
@@ -66,13 +65,13 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
-    private AccountHolder accountHolder;
 
-    public static SubredditListFragment newInstance(Subreddit selectedSubreddit, long accountId,
+    public static SubredditListFragment newInstance(Subreddit selectedSubreddit,
+            String accountName,
             int flags) {
         Bundle args = new Bundle(3);
         args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
-        args.putLong(ARG_ACCOUNT_ID, accountId);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putInt(ARG_FLAGS, flags);
 
         SubredditListFragment frag = new SubredditListFragment();
@@ -94,7 +93,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         listener = (OnSubredditSelectedListener) activity;
-        accountHolder = (AccountHolder) activity;
     }
 
     @Override
@@ -122,8 +120,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return SubredditAdapter.createLoader(getActivity().getApplicationContext(), getAccountId(),
-                getQuery());
+        return SubredditAdapter.createLoader(getActivity().getApplicationContext(), getQuery());
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -275,18 +272,19 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     private void handleDelete(ActionMode mode) {
-        long accountId = accountHolder.getAccountId();
-        Uri uri = Provider.getSubredditsUri(accountId);
-        String selection = null;
-        String[] selectionArgs = null;
-        if (accountId > 0) {
-            ArrayList<String> names = getCheckedNames();
-            selectionArgs = new String[] {names.get(0)};
-        } else {
-            long[] ids = getListView().getCheckedItemIds();
-            selection = Provider.getMultipleIdSelection(ids);
-        }        
-        Provider.deleteInBackground(getActivity(), uri, selection, selectionArgs);
+        // long accountId = accountHolder.getAccountId();
+        // Uri uri = Provider.getSubredditsUri(accountId);
+        // String selection = null;
+        // String[] selectionArgs = null;
+        // if (accountId > 0) {
+        // ArrayList<String> names = getCheckedNames();
+        // selectionArgs = new String[] {names.get(0)};
+        // } else {
+        // long[] ids = getListView().getCheckedItemIds();
+        // selection = Provider.getMultipleIdSelection(ids);
+        // }
+        // Provider.deleteInBackground(getActivity(), uri, selection,
+        // selectionArgs);
         mode.finish();
     }
 
@@ -315,8 +313,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         return getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
     }
 
-    public long getAccountId() {
-        return getArguments().getLong(ARG_ACCOUNT_ID);
+    public String getAccountName() {
+        return getArguments().getString(ARG_ACCOUNT_NAME);
     }
 
     private String getQuery() {

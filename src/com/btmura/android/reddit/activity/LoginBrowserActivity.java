@@ -31,12 +31,16 @@ import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
+import com.btmura.android.reddit.fragment.SubredditListFragment;
+import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.widget.AccountSwitcherAdapter;
 
 public class LoginBrowserActivity extends Activity implements
         LoaderCallbacks<AccountResult>,
-        OnNavigationListener {
+        OnNavigationListener,
+        OnSubredditSelectedListener {
 
     public static final String TAG = "LoginBrowserActivity";
 
@@ -98,6 +102,18 @@ public class LoginBrowserActivity extends Activity implements
         }
         Account account = adapter.getItem(itemPosition);
         AccountLoader.setLastAccount(getLoaderManager().getLoader(0), account.name);
+
+        SubredditListFragment slf = SubredditListFragment.newInstance(null, account.name, 0);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
+        ft.commit();
+
         return true;
+    }
+
+    public void onSubredditLoaded(Subreddit subreddit) {
+    }
+
+    public void onSubredditSelected(Subreddit subreddit) {
     }
 }
