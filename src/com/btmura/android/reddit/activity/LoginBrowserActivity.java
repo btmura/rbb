@@ -30,13 +30,13 @@ import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.BrowserLoader;
-import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.widget.AccountSwitcherAdapter;
 
 public class LoginBrowserActivity extends Activity implements
-        LoaderCallbacks<BrowserResult>,
+        LoaderCallbacks<AccountResult>,
         OnNavigationListener {
 
     public static final String TAG = "LoginBrowserActivity";
@@ -74,11 +74,11 @@ public class LoginBrowserActivity extends Activity implements
         bar.setListNavigationCallbacks(adapter, this);
     }
 
-    public Loader<BrowserResult> onCreateLoader(int id, Bundle args) {
-        return new BrowserLoader(this);
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(this);
     }
 
-    public void onLoadFinished(Loader<BrowserResult> loader, BrowserResult result) {
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "onLoadFinished (id " + loader.getId() + ") "
                     + "(count " + result.accounts.length + ")");
@@ -88,7 +88,7 @@ public class LoginBrowserActivity extends Activity implements
         bar.setSelectedNavigationItem(result.selectedAccount);
     }
 
-    public void onLoaderReset(Loader<BrowserResult> loader) {
+    public void onLoaderReset(Loader<AccountResult> loader) {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "onLoaderReset (id " + loader.getId() + ")");
         }
@@ -100,7 +100,7 @@ public class LoginBrowserActivity extends Activity implements
             Log.d(TAG, "onNavigationItemSelected (itemPosition " + itemPosition + ")");
         }
         Account account = adapter.getItem(itemPosition);
-        prefs.edit().putString(BrowserLoader.PREF_LAST_LOGIN, account.name).apply();
+        prefs.edit().putString(AccountLoader.PREF_LAST_LOGIN, account.name).apply();
         return false;
     }
 }

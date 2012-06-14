@@ -29,18 +29,18 @@ import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.content.BrowserLoader.BrowserResult;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 
-public class BrowserLoader extends AsyncTaskLoader<BrowserResult> implements OnAccountsUpdateListener {
+public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnAccountsUpdateListener {
 
-    public static final String TAG = "BrowserLoader";
+    public static final String TAG = "AccountLoader";
 
-    public static class BrowserResult {
+    public static class AccountResult {
         public SharedPreferences prefs;
         public Account[] accounts;
         public int selectedAccount;
 
-        private BrowserResult(SharedPreferences prefs, Account[] accounts, int selectedAccount) {
+        private AccountResult(SharedPreferences prefs, Account[] accounts, int selectedAccount) {
             this.prefs = prefs;
             this.accounts = accounts;
             this.selectedAccount = selectedAccount;
@@ -57,18 +57,18 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> implements OnA
 
     private static final String PREFS = "prefs";
 
-    private BrowserResult result;
+    private AccountResult result;
 
     private AccountManager manager;
 
-    public BrowserLoader(Context context) {
+    public AccountLoader(Context context) {
         super(context.getApplicationContext());
         manager = AccountManager.get(context.getApplicationContext());
-        manager.addOnAccountsUpdatedListener(this, null, false);
+        //manager.addOnAccountsUpdatedListener(this, null, false);
     }
 
     @Override
-    public BrowserResult loadInBackground() {
+    public AccountResult loadInBackground() {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "loadInBackground (id " + getId() + ")");
         }
@@ -95,11 +95,11 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> implements OnA
             }
         }
 
-        return new BrowserResult(prefs, accounts, selectedAccount);
+        return new AccountResult(prefs, accounts, selectedAccount);
     }
 
     @Override
-    public void deliverResult(BrowserResult newResult) {
+    public void deliverResult(AccountResult newResult) {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "deliverResult (id " + getId() + ")");
         }
@@ -108,7 +108,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> implements OnA
             return;
         }
 
-        BrowserResult oldResult = this.result;
+        AccountResult oldResult = this.result;
         this.result = newResult;
 
         if (isStarted()) {
@@ -142,7 +142,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> implements OnA
     }
 
     @Override
-    public void onCanceled(BrowserResult result) {
+    public void onCanceled(AccountResult result) {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "onCanceled (id " + getId() + ")");
         }
@@ -160,7 +160,7 @@ public class BrowserLoader extends AsyncTaskLoader<BrowserResult> implements OnA
         result = null;
     }
 
-    private void closeResult(BrowserResult result) {
+    private void closeResult(AccountResult result) {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "closeResult");
         }
