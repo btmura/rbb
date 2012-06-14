@@ -16,12 +16,9 @@
 
 package com.btmura.android.reddit;
 
-public interface Debug {
+public interface LoaderIds {
 
-    static final boolean DEBUG_ACTIVITY = true;
-    static final boolean DEBUG_CACHES = true;
-    static final boolean DEBUG_LOADERS = true;
-    static final boolean DEBUG_STRICT_MODE = true;
-    static final boolean DEBUG_WIDGETS = true;
+    static final int ACCOUNTS = 0;
+    static final int SUBREDDITS = 1;
 
 }

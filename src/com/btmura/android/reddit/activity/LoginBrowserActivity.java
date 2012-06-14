@@ -28,6 +28,7 @@ import android.os.StrictMode;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.LoaderIds;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -56,7 +57,7 @@ public class LoginBrowserActivity extends Activity implements
         setContentView(R.layout.browser);
         setInitialFragments(savedInstanceState);
         setActionBar();
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
     }
 
     private void setInitialFragments(Bundle savedInstanceState) {
@@ -101,7 +102,7 @@ public class LoginBrowserActivity extends Activity implements
             Log.d(TAG, "onNavigationItemSelected (itemPosition " + itemPosition + ")");
         }
         Account account = adapter.getItem(itemPosition);
-        AccountLoader.setLastAccount(getLoaderManager().getLoader(0), account.name);
+        AccountLoader.setLastAccount(getLoaderManager().getLoader(LoaderIds.ACCOUNTS), account.name);
 
         SubredditListFragment slf = SubredditListFragment.newInstance(null, account.name, 0);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
