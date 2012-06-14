@@ -52,19 +52,9 @@ public class Provider extends ContentProvider {
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_SUBREDDITS = 1;
     private static final int MATCH_ONE_SUBREDDIT = 2;
-    private static final int MATCH_ALL_ACCOUNTS = 3;
-    private static final int MATCH_ONE_ACCOUNT = 4;
-    private static final int MATCH_ACCOUNT_SUBREDDITS = 5;
-    private static final int MATCH_ALL_SYNC_TASKS = 6;
-    private static final int MATCH_ONE_SYNC_TASK = 7;
     static {
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME, MATCH_ALL_SUBREDDITS);
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
-        MATCHER.addURI(AUTHORITY, Accounts.TABLE_NAME, MATCH_ALL_ACCOUNTS);
-        MATCHER.addURI(AUTHORITY, Accounts.TABLE_NAME + "/#", MATCH_ONE_ACCOUNT);
-        MATCHER.addURI(AUTHORITY, AccountSubreddits.TABLE_NAME + "/#", MATCH_ACCOUNT_SUBREDDITS);
-        MATCHER.addURI(AUTHORITY, SyncTasks.TABLE_NAME, MATCH_ALL_SYNC_TASKS);
-        MATCHER.addURI(AUTHORITY, SyncTasks.TABLE_NAME + "/#", MATCH_ONE_SYNC_TASK);
     }
 
     public static class Subreddits implements BaseColumns {
@@ -72,32 +62,6 @@ public class Provider extends ContentProvider {
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
         public static final String COLUMN_NAME = "name";
         public static final String SORT = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
-    }
-
-    public static class Accounts implements BaseColumns {
-        static final String TABLE_NAME = "accounts";
-        public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
-        public static final String COLUMN_LOGIN = "login";
-        public static final String COLUMN_COOKIE = "cookie";
-        public static final String COLUMN_MODHASH = "modhash";
-        public static final String SORT = Accounts.COLUMN_LOGIN + " COLLATE NOCASE ASC";
-    }
-
-    public static class AccountSubreddits {
-        static final String TABLE_NAME = "accountSubreddits";
-        public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
-    }
-
-    /** {@link SyncTasks} is an internal table used by the {@link SyncService}. */
-    static class SyncTasks implements BaseColumns {
-        static final String TABLE_NAME = "syncTasks";
-        static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
-        static final String COLUMN_ACCOUNT_ID = "accountId";
-        static final String COLUMN_NAME = "name";
-        static final String COLUMN_TYPE = "type";
-        static final String COLUMN_EXPIRATION = "expiration";
-        static final int TYPE_INSERT = 0;
-        static final int TYPE_DELETE = 1;
     }
 
     static final String ID_SELECTION = BaseColumns._ID + "= ?";
@@ -124,43 +88,19 @@ public class Provider extends ContentProvider {
                 notifyUri = Subreddits.CONTENT_URI;
                 break;
 
-            case MATCH_ALL_ACCOUNTS:
-            case MATCH_ONE_ACCOUNT:
-                tableName = Accounts.TABLE_NAME;
-                notifyUri = Accounts.CONTENT_URI;
-                break;
-
-            case MATCH_ACCOUNT_SUBREDDITS:
-                tableName = AccountSubreddits.TABLE_NAME;
-                notifyUri = AccountSubreddits.CONTENT_URI;
-                break;
-
-            case MATCH_ALL_SYNC_TASKS:
-            case MATCH_ONE_SYNC_TASK:
-                tableName = SyncTasks.TABLE_NAME;
-                notifyUri = SyncTasks.CONTENT_URI;
-                break;
-
             default:
                 return null;
         }
 
         switch (match) {
-            case MATCH_ONE_ACCOUNT:
             case MATCH_ONE_SUBREDDIT:
-            case MATCH_ONE_SYNC_TASK:
                 selection = ID_SELECTION;
                 selectionArgs = new String[] {Long.toString(ContentUris.parseId(uri))};
                 break;
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor c = null;
-        if (match == MATCH_ACCOUNT_SUBREDDITS) {
-            c = AccountSubredditProvider.query(uri, db);
-        } else {
-            c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
-        }
+        Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), notifyUri);
         return c;
     }
@@ -177,68 +117,19 @@ public class Provider extends ContentProvider {
                 notifyUri = Subreddits.CONTENT_URI;
                 break;
 
-            case MATCH_ALL_ACCOUNTS:
-                tableName = Accounts.TABLE_NAME;
-                notifyUri = Accounts.CONTENT_URI;
-                break;
-
-            case MATCH_ACCOUNT_SUBREDDITS:
-                tableName = AccountSubreddits.TABLE_NAME;
-                notifyUri = AccountSubreddits.CONTENT_URI;
-                break;
-
-            case MATCH_ALL_SYNC_TASKS:
-                tableName = SyncTasks.TABLE_NAME;
-                notifyUri = SyncTasks.CONTENT_URI;
-                break;
-
             default:
                 throw new IllegalArgumentException(uri.toString());
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        long id = -1;
-        if (match == MATCH_ACCOUNT_SUBREDDITS) {
-            String subreddit = values.getAsString(SyncTasks.COLUMN_NAME);
-            id = AccountSubredditProvider.insert(getContext(),
-                    ContentUris.parseId(uri),
-                    subreddit);
-        } else {
-            id = db.insert(tableName, null, values);
-        }
+        long id = db.insert(tableName, null, values);
         getContext().getContentResolver().notifyChange(notifyUri, null);
         return ContentUris.withAppendedId(uri, id);
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        String tableName;
-        Uri notifyUri;
-
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ONE_SYNC_TASK:
-                tableName = SyncTasks.TABLE_NAME;
-                notifyUri = SyncTasks.CONTENT_URI;
-                break;
-
-            default:
-                return 0;
-        }
-
-        switch (match) {
-            case MATCH_ONE_SYNC_TASK:
-                selection = BaseColumns._ID + "= ?";
-                selectionArgs = new String[] {Long.toString(ContentUris.parseId(uri))};
-                break;
-        }
-
-        SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.update(tableName, values, selection, selectionArgs);
-        if (count > 0) {
-            getContext().getContentResolver().notifyChange(notifyUri, null);
-        }
-        return count;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -254,45 +145,19 @@ public class Provider extends ContentProvider {
                 notifyUri = Subreddits.CONTENT_URI;
                 break;
 
-            case MATCH_ALL_ACCOUNTS:
-            case MATCH_ONE_ACCOUNT:
-                tableName = Accounts.TABLE_NAME;
-                notifyUri = Accounts.CONTENT_URI;
-                break;
-
-            case MATCH_ACCOUNT_SUBREDDITS:
-                tableName = AccountSubreddits.TABLE_NAME;
-                notifyUri = AccountSubreddits.CONTENT_URI;
-                break;
-
-            case MATCH_ALL_SYNC_TASKS:
-            case MATCH_ONE_SYNC_TASK:
-                tableName = SyncTasks.TABLE_NAME;
-                notifyUri = SyncTasks.CONTENT_URI;
-                break;
-
             default:
                 return 0;
         }
 
         switch (match) {
             case MATCH_ONE_SUBREDDIT:
-            case MATCH_ONE_ACCOUNT:
-            case MATCH_ONE_SYNC_TASK:
                 selection = BaseColumns._ID + "= ?";
                 selectionArgs = new String[] {Long.toString(ContentUris.parseId(uri))};
                 break;
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        int count = 0;
-        if (match == MATCH_ACCOUNT_SUBREDDITS) {
-            count = AccountSubredditProvider.delete(getContext(),
-                    ContentUris.parseId(uri),
-                    selectionArgs[0]);
-        } else {
-            count = db.delete(tableName, selection, selectionArgs);
-        }
+        int count = db.delete(tableName, selection, selectionArgs);
         if (count > 0) {
             getContext().getContentResolver().notifyChange(notifyUri, null);
         }
@@ -302,14 +167,6 @@ public class Provider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         return null;
-    }
-
-    public static Uri getSubredditsUri(long accountId) {
-        if (accountId > 0) {
-            return ContentUris.withAppendedId(AccountSubreddits.CONTENT_URI, accountId);
-        } else {
-            return Subreddits.CONTENT_URI;
-        }
     }
 
     public static String getMultipleIdSelection(long[] ids) {
@@ -504,8 +361,6 @@ public class Provider extends ContentProvider {
             db.beginTransaction();
             try {
                 createSubreddits(db);
-                createAccounts(db);
-                createAccountSubreddits(db);
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
@@ -550,33 +405,11 @@ public class Provider extends ContentProvider {
             }
         }
 
-        private void createAccounts(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + Accounts.TABLE_NAME + " ("
-                    + Accounts._ID + " INTEGER PRIMARY KEY, "
-                    + Accounts.COLUMN_LOGIN + " TEXT UNIQUE NOT NULL, "
-                    + Accounts.COLUMN_COOKIE + " TEXT UNIQUE NOT NULL, "
-                    + Accounts.COLUMN_MODHASH + " TEXT UNIQUE NOT NULL)");
-            db.execSQL("CREATE UNIQUE INDEX " + Accounts.COLUMN_LOGIN
-                    + " ON " + Accounts.TABLE_NAME + " ("
-                    + Accounts.COLUMN_LOGIN + " ASC)");
-        }
-
-        private void createAccountSubreddits(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + SyncTasks.TABLE_NAME + " ("
-                    + SyncTasks._ID + " INTEGER PRIMARY KEY, "
-                    + SyncTasks.COLUMN_ACCOUNT_ID + " INTEGER DEFAULT 0, "
-                    + SyncTasks.COLUMN_NAME + " TEXT NOT NULL, "
-                    + SyncTasks.COLUMN_TYPE + " INTEGER DEFAULT 0, "
-                    + SyncTasks.COLUMN_EXPIRATION + " INTEGER DEFAULT 0)");
-        }
-
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (newVersion == 2) {
                 db.beginTransaction();
                 try {
-                    createAccounts(db);
-                    createAccountSubreddits(db);
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();

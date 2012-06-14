@@ -84,9 +84,6 @@
             android:authorities="com.btmura.android.reddit.provider"
             android:exported="false" />
 
-        <service
-            android:name=".provider.SyncService"
-            android:exported="false" />
         <service android:name=".accounts.AccountAuthenticatorService" >
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
