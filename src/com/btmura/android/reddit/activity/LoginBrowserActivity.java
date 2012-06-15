@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.activity;
 
-import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
@@ -101,10 +100,10 @@ public class LoginBrowserActivity extends Activity implements
         if (Debug.DEBUG_ACTIVITY) {
             Log.d(TAG, "onNavigationItemSelected (itemPosition " + itemPosition + ")");
         }
-        Account account = adapter.getItem(itemPosition);
-        AccountLoader.setLastAccount(getLoaderManager().getLoader(LoaderIds.ACCOUNTS), account.name);
+        String accountName = adapter.getAccountName(itemPosition);
+        AccountLoader.setLastAccount(this, accountName);
 
-        SubredditListFragment slf = SubredditListFragment.newInstance(null, account.name, 0);
+        SubredditListFragment slf = SubredditListFragment.newInstance(null, accountName, 0);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
         ft.commit();

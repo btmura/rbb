@@ -46,7 +46,6 @@
         </activity>
         <activity
             android:name=".activity.LoginBrowserActivity"
-            android:label="@string/empty"
             android:clearTaskOnLaunch="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -31,19 +31,28 @@ import com.btmura.android.reddit.R;
 
 public class AccountSpinnerAdapter extends BaseAdapter {
 
+    private static final Account NO_ACCOUNT = null;
+
     private final ArrayList<Account> accounts = new ArrayList<Account>();
     private final LayoutInflater inflater;
 
     public AccountSpinnerAdapter(Context context) {
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void setAccounts(Account[] accounts) {
-        this.accounts.clear();
-        if (accounts != null) {
-            Collections.addAll(this.accounts, accounts);
+    public void setAccounts(Account[] newAccounts) {
+        accounts.clear();
+        if (newAccounts != null && newAccounts.length > 0) {
+            Collections.addAll(accounts, newAccounts);
+        } else {
+            accounts.add(NO_ACCOUNT);
         }
         notifyDataSetChanged();
+    }
+
+    public String getAccountName(int position) {
+        Account account = getItem(position);
+        return account != null ? account.name : "";
     }
 
     public int getCount() {
@@ -59,20 +68,28 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        return setText(R.layout.account_spinner_row, position, convertView, parent);
+        return setView(R.layout.account_spinner_row, position, convertView, parent, false);
     }
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        return setText(R.layout.account_spinner_dropdown_row, position, convertView, parent);
+        return setView(R.layout.account_spinner_dropdown_row, position, convertView, parent, true);
     }
 
-    private View setText(int layout, int position, View convertView, ViewGroup parent) {
+    private View setView(int layout, int position, View convertView, ViewGroup parent,
+            boolean dropdown) {
         TextView tv = (TextView) convertView;
         if (tv == null) {
             tv = (TextView) inflater.inflate(layout, parent, false);
         }
-        tv.setText(getItem(position).name);
+        Account account = getItem(position);
+        if (account != null) {
+            tv.setText(account.name);
+        } else if (dropdown) {
+            tv.setText(R.string.no_account);
+        } else {
+            tv.setText(R.string.app_name);
+        }
         return tv;
     }
 }

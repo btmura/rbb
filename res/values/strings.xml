@@ -27,7 +27,6 @@
     <string name="comment_header_status">%1$s&#160; %2$s ago&#160; %3$d points&#160; %4$d comments</string>
     <string name="comment_comment_status">%1$s&#160; %2$s ago&#160; %3$d points</string>
     
-    <string name="empty" />
     <string name="empty_accounts">You haven\'t added any accounts.</string>
     <string name="empty_list">Nothing to see here…</string>
     <string name="empty_subreddits">You haven\'t added any subreddits.</string>
@@ -63,6 +62,8 @@
     <string name="menu_split">Split</string>
     <string name="menu_view">View</string>
     <string name="menu_view_sidebar">View sidebar</string>
+    
+    <string name="no_account">No account</string>
     
     <string name="remove">Remove</string>
 

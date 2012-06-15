@@ -24,7 +24,6 @@ import android.accounts.AccountManager;
 import android.accounts.OnAccountsUpdateListener;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
@@ -142,9 +141,9 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
         onContentChanged();
     }
 
-    public static void setLastAccount(Loader<?> loader, String name) {
-        AccountLoader accountLoader = (AccountLoader) loader;
-        Editor editor = accountLoader.prefs.edit();
+    public static void setLastAccount(Context context, String name) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+        Editor editor = prefs.edit();
         editor.putString(AccountLoader.PREF_LAST_LOGIN, name);
         editor.apply();
     }
