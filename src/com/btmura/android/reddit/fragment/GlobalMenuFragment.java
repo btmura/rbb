@@ -21,6 +21,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -90,6 +91,10 @@ public class GlobalMenuFragment extends Fragment implements
                 handleSearch();
                 return true;
 
+            case R.id.menu_accounts:
+                handleAccounts();
+                return true;
+
             case R.id.menu_add_subreddit:
                 handleAddSubreddit();
                 return true;
@@ -101,6 +106,10 @@ public class GlobalMenuFragment extends Fragment implements
 
     public void handleSearch() {
         searchItem.expandActionView();
+    }
+
+    private void handleAccounts() {
+        startActivity(new Intent(Settings.ACTION_SYNC_SETTINGS));
     }
 
     private void handleAddSubreddit() {
