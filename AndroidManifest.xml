@@ -37,8 +37,7 @@
             android:theme="@android:style/Theme.Holo.Light.Dialog" />
         <activity
             android:name=".activity.BrowserActivity"
-            android:clearTaskOnLaunch="true"
-            android:label="@string/app_name" >
+            android:clearTaskOnLaunch="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,8 +46,8 @@
         </activity>
         <activity
             android:name=".activity.LoginBrowserActivity"
-            android:clearTaskOnLaunch="true"
-            android:label="@string/app_name" >
+            android:label="@string/empty"
+            android:clearTaskOnLaunch="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -70,7 +69,6 @@
 
         <activity-alias
             android:name=".MainActivity"
-            android:label="@string/app_name"
             android:targetActivity=".activity.LoginBrowserActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

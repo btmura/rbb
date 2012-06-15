@@ -62,7 +62,7 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sub
 
     public void onLoadFinished(Loader<Subreddit> loader, Subreddit data) {
         adapter.swapData(data);
-        setEmptyText(getString(data != null ? R.string.empty : R.string.error));
+        setEmptyText(getString(data != null ? R.string.empty_list : R.string.error));
         setListShown(true);
     }
 

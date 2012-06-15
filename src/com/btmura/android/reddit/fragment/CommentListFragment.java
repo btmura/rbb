@@ -65,7 +65,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     public void onLoadFinished(Loader<List<Comment>> loader, List<Comment> comments) {
         adapter.swapData(comments);
-        setEmptyText(getString(comments != null ? R.string.empty : R.string.error));
+        setEmptyText(getString(comments != null ? R.string.empty_list : R.string.error));
         setListShown(true);
     }
 

@@ -146,7 +146,7 @@ public class ThingListFragment extends ListFragment implements
     public void onLoadFinished(Loader<List<Thing>> loader, List<Thing> things) {
         scrollLoading = false;
         adapter.swapData(things);
-        setEmptyText(getString(things != null ? R.string.empty : R.string.error));
+        setEmptyText(getString(things != null ? R.string.empty_list : R.string.error));
         setListShown(true);
     }
 
