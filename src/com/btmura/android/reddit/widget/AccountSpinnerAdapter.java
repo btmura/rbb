@@ -29,12 +29,12 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 
-public class AccountSwitcherAdapter extends BaseAdapter {
+public class AccountSpinnerAdapter extends BaseAdapter {
 
     private final ArrayList<Account> accounts = new ArrayList<Account>();
     private final LayoutInflater inflater;
 
-    public AccountSwitcherAdapter(Context context) {
+    public AccountSpinnerAdapter(Context context) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -59,22 +59,20 @@ public class AccountSwitcherAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        TextView tv = (TextView) convertView;
-        if (tv == null) {
-            tv = (TextView) inflater.inflate(R.layout.account_switcher_row, parent, false);
-        }
-        tv.setText(getItem(position).name);
-        return tv;
+        return setText(R.layout.account_spinner_row, position, convertView, parent);
     }
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        return setText(R.layout.account_spinner_dropdown_row, position, convertView, parent);
+    }
+
+    private View setText(int layout, int position, View convertView, ViewGroup parent) {
         TextView tv = (TextView) convertView;
         if (tv == null) {
-            tv = (TextView) inflater.inflate(R.layout.account_switcher_dropdown_row, parent, false);
+            tv = (TextView) inflater.inflate(layout, parent, false);
         }
         tv.setText(getItem(position).name);
         return tv;
     }
-
 }

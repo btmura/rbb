@@ -36,7 +36,7 @@ import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
-import com.btmura.android.reddit.widget.AccountSwitcherAdapter;
+import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
 public class LoginBrowserActivity extends Activity implements
         LoaderCallbacks<AccountResult>,
@@ -46,7 +46,7 @@ public class LoginBrowserActivity extends Activity implements
     public static final String TAG = "LoginBrowserActivity";
 
     private ActionBar bar;
-    private AccountSwitcherAdapter adapter;
+    private AccountSpinnerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,7 @@ public class LoginBrowserActivity extends Activity implements
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-        adapter = new AccountSwitcherAdapter(this);
+        adapter = new AccountSpinnerAdapter(this);
         bar.setListNavigationCallbacks(adapter, this);
     }
 
