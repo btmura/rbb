@@ -31,7 +31,6 @@ import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
@@ -347,74 +346,6 @@ public class Provider extends ContentProvider {
             return results;
         } finally {
             db.endTransaction();
-        }
-    }
-
-    static class DbHelper extends SQLiteOpenHelper {
-
-        public DbHelper(Context context) {
-            super(context, "reddit", null, 2);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.beginTransaction();
-            try {
-                createSubreddits(db);
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
-            }
-        }
-
-        private void createSubreddits(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + Subreddits.TABLE_NAME + " ("
-                    + Subreddits._ID + " INTEGER PRIMARY KEY, "
-                    + Subreddits.COLUMN_NAME + " TEXT UNIQUE NOT NULL)");
-            db.execSQL("CREATE UNIQUE INDEX " + Subreddits.COLUMN_NAME
-                    + " ON " + Subreddits.TABLE_NAME + " ("
-                    + Subreddits.COLUMN_NAME + " ASC)");
-
-            String[] defaultSubreddits = {
-                    "",
-                    "AdviceAnimals",
-                    "announcements",
-                    "AskReddit",
-                    "askscience",
-                    "atheism",
-                    "aww",
-                    "blog",
-                    "funny",
-                    "gaming",
-                    "IAmA",
-                    "movies",
-                    "Music",
-                    "pics",
-                    "politics",
-                    "science",
-                    "technology",
-                    "todayilearned",
-                    "videos",
-                    "worldnews",
-                    "WTF",};
-
-            for (int i = 0; i < defaultSubreddits.length; i++) {
-                ContentValues values = new ContentValues(1);
-                values.put(Subreddits.COLUMN_NAME, defaultSubreddits[i]);
-                db.insert(Subreddits.TABLE_NAME, null, values);
-            }
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (newVersion == 2) {
-                db.beginTransaction();
-                try {
-                    db.setTransactionSuccessful();
-                } finally {
-                    db.endTransaction();
-                }
-            }
         }
     }
 }
