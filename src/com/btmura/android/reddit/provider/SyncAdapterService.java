@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.content;
+package com.btmura.android.reddit.provider;
 
 import android.app.Service;
 import android.content.Intent;
