@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.content;
 
-public interface Debug {
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.util.Log;
 
-    static final boolean DEBUG_ACTIVITY = true;
-    static final boolean DEBUG_CACHES = true;
-    static final boolean DEBUG_LOADERS = true;
-    static final boolean DEBUG_STRICT_MODE = true;
-    static final boolean DEBUG_SERVICES = true;
-    static final boolean DEBUG_WIDGETS = true;
+import com.btmura.android.reddit.Debug;
 
+public class SyncAdapterService extends Service {
+
+    public static final String TAG = "SyncAdapterService";
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        if (Debug.DEBUG_SERVICES) {
+            Log.d(TAG, "onBind");
+        }
+        return new SyncAdapter(this).getSyncAdapterBinder();
+    }
 }

@@ -62,7 +62,7 @@ public class LoginFragment extends DialogFragment implements LoaderCallbacks<Log
     }
 
     public Loader<LoginResult> onCreateLoader(int id, Bundle args) {
-        return new LoginLoader(getActivity().getApplicationContext(), getLogin(), getPassword());
+        return new LoginLoader(getActivity(), getLogin(), getPassword());
     }
 
     public void onLoadFinished(Loader<LoginResult> loader, final LoginResult result) {
@@ -71,13 +71,13 @@ public class LoginFragment extends DialogFragment implements LoaderCallbacks<Log
             protected Void doInBackground(Void... params) {
                 return null;
             }
-            
+
             @Override
             protected void onPostExecute(Void voidRay) {
                 dismiss();
                 getLoginResultListener().onLoginResult(result);
             }
-        }.execute();        
+        }.execute();
     }
 
     public void onLoaderReset(Loader<LoginResult> loader) {

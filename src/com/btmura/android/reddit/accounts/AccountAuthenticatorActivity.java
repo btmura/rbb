@@ -19,12 +19,14 @@ package com.btmura.android.reddit.accounts;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.FragmentTransaction;
+import android.content.ContentResolver;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.fragment.AddAccountFragment;
 import com.btmura.android.reddit.fragment.AddAccountFragment.OnAccountAddedListener;
+import com.btmura.android.reddit.provider.Provider;
 
 public class AccountAuthenticatorActivity extends android.accounts.AccountAuthenticatorActivity
         implements OnAccountAddedListener {
@@ -41,22 +43,33 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
         ft.commit();
     }
 
-    public void onAccountAdded(String login, String cookie, String modhash) {
-        Log.d(TAG, "onAccountAdded");
+    public void onAccountAdded(final String login, final String cookie, final String modhash) {
+        new AsyncTask<Void, Void, Bundle>() {
+            @Override
+            protected Bundle doInBackground(Void... params) {
+                String accountType = AccountAuthenticator.getAccountType(AccountAuthenticatorActivity.this);
+                Account account = new Account(login, accountType);
 
-        String accountType = AccountAuthenticator.getAccountType(this);
-        Account account = new Account(login, accountType);
-        AccountManager manager = AccountManager.get(this);
-        manager.addAccountExplicitly(account, null, null);
-        manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, cookie);
-        manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, modhash);
+                AccountManager manager = AccountManager.get(AccountAuthenticatorActivity.this);
+                manager.addAccountExplicitly(account, null, null);
+                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, cookie);
+                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, modhash);
 
-        Bundle result = new Bundle();
-        result.putString(AccountManager.KEY_ACCOUNT_NAME, login);
-        result.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
-        setAccountAuthenticatorResult(result);
+                ContentResolver.setSyncAutomatically(account, Provider.AUTHORITY, true);
 
-        setResult(RESULT_OK);
-        finish();
+                Bundle result = new Bundle();
+                result.putString(AccountManager.KEY_ACCOUNT_NAME, login);
+                result.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+                return result;
+            }
+
+            @Override
+            protected void onPostExecute(Bundle result) {
+                super.onPostExecute(result);
+                setAccountAuthenticatorResult(result);
+                setResult(RESULT_OK);
+                finish();
+            }
+        }.execute();
     }
 }
