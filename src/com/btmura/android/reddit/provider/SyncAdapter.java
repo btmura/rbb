@@ -76,6 +76,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 Log.d(TAG, "Synced " + count + " subreddits.");
             }
 
+
         } catch (OperationCanceledException e) {
             Log.e(TAG, "onPerformSync", e);
         } catch (AuthenticatorException e) {

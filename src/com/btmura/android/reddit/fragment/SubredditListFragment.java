@@ -121,7 +121,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return SubredditAdapter.createLoader(getActivity().getApplicationContext(), getQuery());
+        return SubredditAdapter.createLoader(getActivity().getApplicationContext(),
+                getAccountName(), getQuery());
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {

@@ -35,6 +35,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -51,9 +52,11 @@ public class Provider extends ContentProvider {
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_SUBREDDITS = 1;
     private static final int MATCH_ONE_SUBREDDIT = 2;
+    private static final int MATCH_ACCOUNT_ALL_SUBREDDITS = 3;
     static {
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME, MATCH_ALL_SUBREDDITS);
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
+        MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/*", MATCH_ACCOUNT_ALL_SUBREDDITS);
     }
 
     public static class Subreddits implements BaseColumns {
@@ -66,10 +69,10 @@ public class Provider extends ContentProvider {
         public static final String SELECTION_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
         public static final String[] SELECTION_ARGS_NO_ACCOUNT = {""};
         public static final String SORT_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
-
     }
 
     static final String ID_SELECTION = BaseColumns._ID + "= ?";
+    static final String[] SINGLE_ARGUMENT = new String[1];
 
     private DbHelper helper;
 
@@ -89,6 +92,7 @@ public class Provider extends ContentProvider {
         switch (match) {
             case MATCH_ALL_SUBREDDITS:
             case MATCH_ONE_SUBREDDIT:
+            case MATCH_ACCOUNT_ALL_SUBREDDITS:
                 tableName = Subreddits.TABLE_NAME;
                 notifyUri = Subreddits.CONTENT_URI;
                 break;
@@ -100,7 +104,12 @@ public class Provider extends ContentProvider {
         switch (match) {
             case MATCH_ONE_SUBREDDIT:
                 selection = ID_SELECTION;
-                selectionArgs = new String[] {Long.toString(ContentUris.parseId(uri))};
+                selectionArgs = singleArgument(ContentUris.parseId(uri));
+                break;
+
+            case MATCH_ACCOUNT_ALL_SUBREDDITS:
+                selection = Subreddits.SELECTION_ACCOUNT;
+                selectionArgs = singleArgument(uri.getPathSegments().get(1));
                 break;
         }
 
@@ -157,7 +166,7 @@ public class Provider extends ContentProvider {
         switch (match) {
             case MATCH_ONE_SUBREDDIT:
                 selection = BaseColumns._ID + "= ?";
-                selectionArgs = new String[] {Long.toString(ContentUris.parseId(uri))};
+                selectionArgs = singleArgument(ContentUris.parseId(uri));
                 break;
         }
 
@@ -172,6 +181,14 @@ public class Provider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         return null;
+    }
+
+    public static Uri getSubredditsUri(String accountName) {
+        if (TextUtils.isEmpty(accountName)) {
+            return Subreddits.CONTENT_URI;
+        } else {
+            return Subreddits.CONTENT_URI.buildUpon().appendPath(accountName).build();
+        }
     }
 
     public static String getMultipleIdSelection(long[] ids) {
@@ -353,5 +370,15 @@ public class Provider extends ContentProvider {
         } finally {
             db.endTransaction();
         }
+    }
+
+    private static String[] singleArgument(long value) {
+        SINGLE_ARGUMENT[0] = Long.toString(value);
+        return SINGLE_ARGUMENT;
+    }
+
+    private static String[] singleArgument(String value) {
+        SINGLE_ARGUMENT[0] = value;
+        return SINGLE_ARGUMENT;
     }
 }
