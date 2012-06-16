@@ -42,7 +42,7 @@ public class SubredditAdapter extends SimpleCursorAdapter {
             return new SubredditSearchLoader(context, Urls.subredditSearchUrl(query, null));
         } else {
             return new CursorLoader(context, Subreddits.CONTENT_URI, PROJECTION, null, null,
-                    Subreddits.SORT);
+                    Subreddits.SORT_NAME);
         }
     }
 

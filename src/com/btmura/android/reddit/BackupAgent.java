@@ -39,7 +39,7 @@ public class BackupAgent extends android.app.backup.BackupAgent {
     private static final String KEY_SUBREDDITS = "subreddits";
 
     private static final String[] PROJECTION = {
-        Subreddits.COLUMN_NAME,
+            Subreddits.COLUMN_NAME,
     };
 
     @Override
@@ -65,8 +65,11 @@ public class BackupAgent extends android.app.backup.BackupAgent {
         ByteArrayOutputStream b = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(b);
 
-        Cursor c = getContentResolver().query(Subreddits.CONTENT_URI, PROJECTION, null, null,
-                Subreddits.SORT);
+        Cursor c = getContentResolver().query(Subreddits.CONTENT_URI,
+                PROJECTION,
+                Subreddits.SELECTION_ACCOUNT,
+                Subreddits.SELECTION_ARGS_NO_ACCOUNT,
+                Subreddits.SORT_NAME);
         try {
             out.writeInt(c.getCount());
             while (c.moveToNext()) {

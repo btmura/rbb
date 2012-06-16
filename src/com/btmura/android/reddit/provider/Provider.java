@@ -59,8 +59,14 @@ public class Provider extends ContentProvider {
     public static class Subreddits implements BaseColumns {
         static final String TABLE_NAME = "subreddits";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
+        public static final String COLUMN_ACCOUNT = "account";
         public static final String COLUMN_NAME = "name";
-        public static final String SORT = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
+        public static final String COLUMN_STATE = "state";
+        public static final String COLUMN_EXPIRATION = "expiration";
+        public static final String SELECTION_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
+        public static final String[] SELECTION_ARGS_NO_ACCOUNT = {""};
+        public static final String SORT_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
+
     }
 
     static final String ID_SELECTION = BaseColumns._ID + "= ?";
@@ -69,7 +75,7 @@ public class Provider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        helper = new DbHelper(getContext());
+        helper = new DbHelper(getContext(), DbHelper.DATABASE_REDDIT, 2);
         return false;
     }
 
