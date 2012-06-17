@@ -259,7 +259,16 @@ public class SubredditProvider extends ContentProvider {
                     }
                 }
 
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(3);
+                int count = ids.length;
+                Uri[] uris = new Uri[count];
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 2);
+                for (int i = 0; i < count; i++) {
+                    uris[i] = ContentUris.withAppendedId(Subreddits.CONTENT_URI, ids[i]);
+                    ops.add(ContentProviderOperation.newUpdate(uris[i])
+                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED)
+                            .build());
+                }
+
                 ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
                         .withSelection(SELECTION_ACCOUNT_AND_NAME, new String[] {
                                 accountName,
@@ -271,16 +280,18 @@ public class SubredditProvider extends ContentProvider {
                         .withValue(Subreddits.COLUMN_NAME, combinedName.toString())
                         .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED)
                         .build());
-                if (ids != null) {
-                    ops.add(ContentProviderOperation.newUpdate(Subreddits.CONTENT_URI)
-                            .withSelection(multipleIdSelection(ids), null)
-                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED)
-                            .build());
-                }
+
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                    ContentProviderResult[] results =
+                            cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                    startSyncOperation(context, results[results.length - 1].uri);
+                    for (int i = 0; i < count; i++) {
+                        if (results[i].count > 0) {
+                            startSyncOperation(context, uris[i]);
+                        }
+                    }
                 } catch (RemoteException e) {
                     Log.e(TAG, "combineInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -396,18 +407,6 @@ public class SubredditProvider extends ContentProvider {
         } finally {
             db.endTransaction();
         }
-    }
-
-    private static String multipleIdSelection(long[] ids) {
-        StringBuilder s = new StringBuilder(Subreddits._ID).append(" IN (");
-        int numIds = ids.length;
-        for (int i = 0; i < numIds; i++) {
-            s.append(ids[i]);
-            if (i + 1 < numIds) {
-                s.append(", ");
-            }
-        }
-        return s.append(")").toString();
     }
 
     private static String appendIdSelection(String selection) {

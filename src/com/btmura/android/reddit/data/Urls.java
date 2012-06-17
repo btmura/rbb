@@ -63,7 +63,7 @@ public class Urls {
         StringBuilder b = resetBuilder();
         b.append("action=").append(subscribe ? "sub" : "unsub");
         b.append("&uh=").append(encode(modhash));
-        b.append("&sr_name=").append(subreddit);
+        b.append("&sr_name=").append(encode(subreddit));
         b.append("&api_type=json");
         return b.toString();
     }
