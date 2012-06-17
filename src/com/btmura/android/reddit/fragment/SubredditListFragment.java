@@ -250,7 +250,10 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
                 }
             }
         }
-        SubredditProvider.combineSubredditsInBackground(getActivity(), names, new long[0]);
+        SubredditProvider.combineInBackground(getActivity(),
+                accountNameHolder.getAccountName(),
+                names,
+                null);
         mode.finish();
     }
 
@@ -264,7 +267,10 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
         long[] ids = getListView().getCheckedItemIds();
 
-        SubredditProvider.combineSubredditsInBackground(getActivity(), names, ids);
+        SubredditProvider.combineInBackground(getActivity(),
+                accountNameHolder.getAccountName(),
+                names,
+                ids);
         mode.finish();
     }
 

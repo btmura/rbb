@@ -188,25 +188,7 @@ public class SubredditProvider extends ContentProvider {
         }.execute();
     }
 
-    public static void addMultipleSubredditsInBackground(final Context context,
-            final ContentValues[] values) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                ContentResolver cr = context.getContentResolver();
-                cr.bulkInsert(Subreddits.CONTENT_URI, values);
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                showChangeToast(context, values.length);
-                scheduleBackup(context);
-            }
-        }.execute();
-    }
-
-    public static void combineSubredditsInBackground(final Context context,
+    public static void combineInBackground(final Context context, final String accountName,
             final List<String> names, final long[] ids) {
         new AsyncTask<Void, Void, Integer>() {
             @Override
@@ -220,15 +202,16 @@ public class SubredditProvider extends ContentProvider {
                     }
                 }
 
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(ids.length + 1);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(2);
                 ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+                        .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                         .withValue(Subreddits.COLUMN_NAME, combined.toString())
+                        .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED)
                         .build());
-
-                size = ids.length;
-                for (int i = 0; i < size; i++) {
-                    ops.add(ContentProviderOperation.newDelete(ContentUris.withAppendedId(Subreddits.CONTENT_URI,
-                            ids[i]))
+                if (ids != null) {
+                    ops.add(ContentProviderOperation.newUpdate(Subreddits.CONTENT_URI)
+                            .withSelection(multipleIdSelection(ids), null)
+                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED)
                             .build());
                 }
 
@@ -236,9 +219,9 @@ public class SubredditProvider extends ContentProvider {
                 try {
                     cr.applyBatch(SubredditProvider.AUTHORITY, ops);
                 } catch (RemoteException e) {
-                    Log.e(TAG, "combineSubredditsInBackground", e);
+                    Log.e(TAG, "combineInBackground", e);
                 } catch (OperationApplicationException e) {
-                    Log.e(TAG, "combineSubredditsInBackground", e);
+                    Log.e(TAG, "combineInBackground", e);
                 }
                 return size;
             }
@@ -284,6 +267,24 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected void onPostExecute(Integer added) {
                 showChangeToast(context, added);
+                scheduleBackup(context);
+            }
+        }.execute();
+    }
+
+    public static void addMultipleSubredditsInBackground(final Context context,
+            final ContentValues[] values) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                ContentResolver cr = context.getContentResolver();
+                cr.bulkInsert(Subreddits.CONTENT_URI, values);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                showChangeToast(context, values.length);
                 scheduleBackup(context);
             }
         }.execute();
