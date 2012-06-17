@@ -186,7 +186,8 @@ public class SubredditProvider extends ContentProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    ContentProviderResult[] results = cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                    ContentProviderResult[] results =
+                            cr.applyBatch(SubredditProvider.AUTHORITY, ops);
                     startSyncOperation(context, results[1].uri);
                 } catch (RemoteException e) {
                     Log.e(TAG, "addInBackground", e);
@@ -209,11 +210,31 @@ public class SubredditProvider extends ContentProvider {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
-                ContentValues values = new ContentValues(1);
-                values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED);
+                int count = ids.length;
+                Uri[] uris = new Uri[count];
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count);
+                for (int i = 0; i < count; i++) {
+                    uris[i] = ContentUris.withAppendedId(Subreddits.CONTENT_URI, ids[i]);
+                    ops.add(ContentProviderOperation.newUpdate(uris[i])
+                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED)
+                            .build());
+                }
 
                 ContentResolver cr = context.getContentResolver();
-                return cr.update(Subreddits.CONTENT_URI, values, multipleIdSelection(ids), null);
+                try {
+                    ContentProviderResult[] results =
+                            cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                    for (int i = 0; i < count; i++) {
+                        if (results[i].count > 0) {
+                            startSyncOperation(context, uris[i]);
+                        }
+                    }
+                } catch (RemoteException e) {
+                    Log.e(TAG, "deleteInBackground", e);
+                } catch (OperationApplicationException e) {
+                    Log.e(TAG, "deleteInBackground", e);
+                }
+                return count;
             }
 
             @Override
