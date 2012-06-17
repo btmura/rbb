@@ -36,6 +36,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -198,7 +199,7 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected void onPostExecute(Void result) {
                 showChangeToast(context, 1);
-                scheduleBackup(context);
+                scheduleBackup(context, accountName);
             }
         }.execute();
     }
@@ -218,7 +219,7 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected void onPostExecute(Integer count) {
                 showChangeToast(context, -count);
-                scheduleBackup(context);
+                scheduleBackup(context, accountName);
             }
         }.execute();
     }
@@ -270,7 +271,7 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected void onPostExecute(Integer deleted) {
                 showChangeToast(context, 1);
-                scheduleBackup(context);
+                scheduleBackup(context, accountName);
             }
         }.execute();
     }
@@ -318,7 +319,7 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected void onPostExecute(Integer added) {
                 showChangeToast(context, added);
-                scheduleBackup(context);
+                scheduleBackup(context, accountName);
             }
         }.execute();
     }
@@ -336,7 +337,7 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected void onPostExecute(Void result) {
                 showChangeToast(context, values.length);
-                scheduleBackup(context);
+                scheduleBackup(context, null);
             }
         }.execute();
     }
@@ -356,8 +357,10 @@ public class SubredditProvider extends ContentProvider {
                 .show();
     }
 
-    private static void scheduleBackup(Context context) {
-        new BackupManager(context).dataChanged();
+    private static void scheduleBackup(Context context, String accountName) {
+        if (TextUtils.isEmpty(accountName)) {
+            new BackupManager(context).dataChanged();
+        }
     }
 
     @Override
