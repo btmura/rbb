@@ -143,19 +143,26 @@ public class SubredditProvider extends ContentProvider {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                ContentValues values = new ContentValues(3);
-                values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED);
-                String[] selectionArgs = {accountName, subredditName};
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(2);
+                ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+                        .withSelection(SELECTION_ACCOUNT_AND_NAME, new String[] {
+                                accountName,
+                                subredditName,
+                        })
+                        .build());
+                ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+                        .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
+                        .withValue(Subreddits.COLUMN_NAME, subredditName)
+                        .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED)
+                        .build());
 
                 ContentResolver cr = context.getContentResolver();
-                int updated = cr.update(Subreddits.CONTENT_URI,
-                        values,
-                        SELECTION_ACCOUNT_AND_NAME,
-                        selectionArgs);
-                if (updated == 0) {
-                    values.put(Subreddits.COLUMN_ACCOUNT, accountName);
-                    values.put(Subreddits.COLUMN_NAME, subredditName);
-                    cr.insert(Subreddits.CONTENT_URI, values);
+                try {
+                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                } catch (RemoteException e) {
+                    Log.e(TAG, "addInBackground", e);
+                } catch (OperationApplicationException e) {
+                    Log.e(TAG, "addInBackground", e);
                 }
                 return null;
             }
@@ -189,23 +196,29 @@ public class SubredditProvider extends ContentProvider {
     }
 
     public static void combineInBackground(final Context context, final String accountName,
-            final List<String> names, final long[] ids) {
+            final List<String> subredditNames, final long[] ids) {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
-                int size = names.size();
-                StringBuilder combined = new StringBuilder();
+                int size = subredditNames.size();
+                StringBuilder combinedName = new StringBuilder();
                 for (int i = 0; i < size; i++) {
-                    combined.append(names.get(i));
+                    combinedName.append(subredditNames.get(i));
                     if (i + 1 < size) {
-                        combined.append("+");
+                        combinedName.append("+");
                     }
                 }
 
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(2);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(3);
+                ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+                        .withSelection(SELECTION_ACCOUNT_AND_NAME, new String[] {
+                                accountName,
+                                combinedName.toString(),
+                        })
+                        .build());
                 ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
                         .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
-                        .withValue(Subreddits.COLUMN_NAME, combined.toString())
+                        .withValue(Subreddits.COLUMN_NAME, combinedName.toString())
                         .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED)
                         .build());
                 if (ids != null) {
@@ -234,32 +247,42 @@ public class SubredditProvider extends ContentProvider {
         }.execute();
     }
 
-    public static void splitSubredditInBackground(final Context context, final String name,
+    public static void splitInBackground(final Context context, final String accountName,
+            final String subredditName,
             final long id) {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
-                String[] parts = name.split("\\+");
+                String[] parts = subredditName.split("\\+");
                 int numParts = parts.length;
 
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(numParts + 1);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(numParts * 2 + 1);
                 for (int i = 0; i < numParts; i++) {
+                    ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+                            .withSelection(SELECTION_ACCOUNT_AND_NAME, new String[] {
+                                    accountName,
+                                    parts[i],
+                            })
+                            .build());
                     ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+                            .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                             .withValue(Subreddits.COLUMN_NAME, parts[i])
+                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED)
                             .build());
                 }
 
-                ops.add(ContentProviderOperation.newDelete(ContentUris.withAppendedId(Subreddits.CONTENT_URI,
-                        id))
+                ops.add(ContentProviderOperation.newUpdate(Subreddits.CONTENT_URI)
+                        .withSelection(ID_SELECTION, new String[] {Long.toString(id)})
+                        .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED)
                         .build());
 
                 ContentResolver cr = context.getContentResolver();
                 try {
                     cr.applyBatch(SubredditProvider.AUTHORITY, ops);
                 } catch (RemoteException e) {
-                    Log.e(TAG, "splitSubredditInBackground", e);
+                    Log.e(TAG, "splitInBackground", e);
                 } catch (OperationApplicationException e) {
-                    Log.e(TAG, "splitSubredditInBackground", e);
+                    Log.e(TAG, "splitInBackground", e);
                 }
                 return numParts;
             }
@@ -324,7 +347,7 @@ public class SubredditProvider extends ContentProvider {
     }
 
     private static String multipleIdSelection(long[] ids) {
-        StringBuilder s = new StringBuilder(BaseColumns._ID).append(" IN (");
+        StringBuilder s = new StringBuilder(Subreddits._ID).append(" IN (");
         int numIds = ids.length;
         for (int i = 0; i < numIds; i++) {
             s.append(ids[i]);

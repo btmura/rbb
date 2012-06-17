@@ -277,7 +277,10 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private void handleSplit(ActionMode mode) {
         ArrayList<String> names = getCheckedNames();
         long[] ids = getListView().getCheckedItemIds();
-        SubredditProvider.splitSubredditInBackground(getActivity(), names.get(0), ids[0]);
+        SubredditProvider.splitInBackground(getActivity(),
+                accountNameHolder.getAccountName(),
+                names.get(0),
+                ids[0]);
         mode.finish();
     }
 
