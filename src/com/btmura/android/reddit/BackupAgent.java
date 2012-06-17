@@ -67,8 +67,8 @@ public class BackupAgent extends android.app.backup.BackupAgent {
 
         Cursor c = getContentResolver().query(Subreddits.CONTENT_URI,
                 PROJECTION,
-                Subreddits.SELECTION_ACCOUNT,
-                Subreddits.SELECTION_ARGS_NO_ACCOUNT,
+                SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
+                new String[] {Subreddits.ACCOUNT_NONE},
                 Subreddits.SORT_NAME);
         try {
             out.writeInt(c.getCount());

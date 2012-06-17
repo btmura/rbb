@@ -35,7 +35,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.provider.BaseColumns;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -51,12 +50,8 @@ public class SubredditProvider extends ContentProvider {
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_SUBREDDITS = 1;
-    private static final int MATCH_ONE_SUBREDDIT = 2;
-    private static final int MATCH_ACCOUNT_ALL_SUBREDDITS = 3;
     static {
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME, MATCH_ALL_SUBREDDITS);
-        MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
-        MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/*", MATCH_ACCOUNT_ALL_SUBREDDITS);
     }
 
     public static class Subreddits implements BaseColumns {
@@ -68,19 +63,20 @@ public class SubredditProvider extends ContentProvider {
         public static final String COLUMN_STATE = "state";
         public static final String COLUMN_EXPIRATION = "expiration";
 
+        public static final String SORT_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
+
+        public static final String ACCOUNT_NONE = "";
+
         public static final int STATE_NOTHING = 0;
         public static final int STATE_INSERTED = 1;
         public static final int STATE_DELETED = 2;
-
-        public static final String SELECTION_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
-        public static final String SELECTION_NOT_STATE = Subreddits.COLUMN_STATE + "!= ?";
-
-        public static final String[] SELECTION_ARGS_NO_ACCOUNT = {""};
-        public static final String[] SELECTION_ARGS_NOT_DELETED = {Integer.toString(STATE_DELETED)};
-
-        public static final String SORT_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
-
     }
+
+    public static final String SELECTION_ACCOUNT_NOT_DELETED = Subreddits.COLUMN_ACCOUNT
+            + "= ? AND " + Subreddits.COLUMN_STATE + "!= " + Subreddits.STATE_DELETED;
+
+    public static final String SELECTION_ACCOUNT_AND_NAME = Subreddits.COLUMN_ACCOUNT
+            + "= ? AND " + Subreddits.COLUMN_NAME + "= ?";
 
     static final String ID_SELECTION = BaseColumns._ID + "= ?";
 
@@ -95,19 +91,6 @@ public class SubredditProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ONE_SUBREDDIT:
-                selection = addIdSelection(selection);
-                selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
-                break;
-
-            case MATCH_ACCOUNT_ALL_SUBREDDITS:
-                selection = addAccountSelection(selection);
-                selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
-                break;
-        }
-
         SQLiteDatabase db = helper.getWritableDatabase();
         Cursor c = db.query(Subreddits.TABLE_NAME,
                 projection,
@@ -122,13 +105,6 @@ public class SubredditProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ACCOUNT_ALL_SUBREDDITS:
-                values.put(Subreddits.COLUMN_ACCOUNT, uri.getLastPathSegment());
-                break;
-        }
-
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(Subreddits.TABLE_NAME, null, values);
         if (id != -1) {
@@ -139,14 +115,6 @@ public class SubredditProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ACCOUNT_ALL_SUBREDDITS:
-                selection = addAccountSelection(selection);
-                selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
-                break;
-        }
-
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.update(Subreddits.TABLE_NAME, values, selection, selectionArgs);
         if (count > 0) {
@@ -157,19 +125,6 @@ public class SubredditProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ONE_SUBREDDIT:
-                selection = addIdSelection(selection);
-                selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
-                break;
-
-            case MATCH_ACCOUNT_ALL_SUBREDDITS:
-                selection = addAccountSelection(selection);
-                selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
-                return markDeleted(uri, selection, selectionArgs);
-        }
-
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.delete(Subreddits.TABLE_NAME, selection, selectionArgs);
         if (count > 0) {
@@ -178,23 +133,9 @@ public class SubredditProvider extends ContentProvider {
         return count;
     }
 
-    private int markDeleted(Uri uri, String selection, String[] selectionArgs) {
-        ContentValues values = new ContentValues(1);
-        values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED);
-        return update(uri, values, selection, selectionArgs);
-    }
-
     @Override
     public String getType(Uri uri) {
         return null;
-    }
-
-    public static Uri getAccountUri(String accountName) {
-        if (TextUtils.isEmpty(accountName)) {
-            return Subreddits.CONTENT_URI;
-        } else {
-            return Subreddits.CONTENT_URI.buildUpon().appendPath(accountName).build();
-        }
     }
 
     public static void addInBackground(final Context context, final String accountName,
@@ -203,15 +144,18 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected Void doInBackground(Void... params) {
                 ContentValues values = new ContentValues(3);
-                values.put(Subreddits.COLUMN_ACCOUNT, accountName);
-                values.put(Subreddits.COLUMN_NAME, subredditName);
                 values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED);
+                String[] selectionArgs = {accountName, subredditName};
 
                 ContentResolver cr = context.getContentResolver();
-                Uri uri = getAccountUri(accountName);
-                int updated = cr.update(uri, values, null, null);
+                int updated = cr.update(Subreddits.CONTENT_URI,
+                        values,
+                        SELECTION_ACCOUNT_AND_NAME,
+                        selectionArgs);
                 if (updated == 0) {
-                    cr.insert(uri, values);
+                    values.put(Subreddits.COLUMN_ACCOUNT, accountName);
+                    values.put(Subreddits.COLUMN_NAME, subredditName);
+                    cr.insert(Subreddits.CONTENT_URI, values);
                 }
                 return null;
             }
@@ -229,10 +173,11 @@ public class SubredditProvider extends ContentProvider {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
+                ContentValues values = new ContentValues(1);
+                values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED);
+
                 ContentResolver cr = context.getContentResolver();
-                Uri uri = getAccountUri(accountName);
-                String selection = makeMultipleIdSelection(ids);
-                return cr.delete(uri, selection, null);
+                return cr.update(Subreddits.CONTENT_URI, values, multipleIdSelection(ids), null);
             }
 
             @Override
@@ -377,34 +322,7 @@ public class SubredditProvider extends ContentProvider {
         }
     }
 
-    private static String addIdSelection(String selection) {
-        if (TextUtils.isEmpty(selection)) {
-            return ID_SELECTION;
-        } else {
-            return selection + " AND " + ID_SELECTION;
-        }
-    }
-
-    private static String addAccountSelection(String selection) {
-        if (TextUtils.isEmpty(selection)) {
-            return Subreddits.SELECTION_ACCOUNT;
-        } else {
-            return selection + " AND " + Subreddits.SELECTION_ACCOUNT;
-        }
-    }
-
-    private static String[] addSelectionArg(String[] selectionArgs, String arg) {
-        if (selectionArgs == null) {
-            return new String[] {arg};
-        } else {
-            String[] newSelectionArgs = new String[selectionArgs.length + 1];
-            System.arraycopy(selectionArgs, 0, newSelectionArgs, 0, selectionArgs.length);
-            newSelectionArgs[newSelectionArgs.length - 1] = arg;
-            return newSelectionArgs;
-        }
-    }
-
-    private static String makeMultipleIdSelection(long[] ids) {
+    private static String multipleIdSelection(long[] ids) {
         StringBuilder s = new StringBuilder(BaseColumns._ID).append(" IN (");
         int numIds = ids.length;
         for (int i = 0; i < numIds; i++) {

@@ -35,6 +35,7 @@ import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 public class SubredditAdapter extends SimpleCursorAdapter {
 
     private static final String[] PROJECTION = {Subreddits._ID, Subreddits.COLUMN_NAME};
+
     private static final String[] FROM = {};
     private static final int[] TO = {};
 
@@ -43,10 +44,10 @@ public class SubredditAdapter extends SimpleCursorAdapter {
             return new SubredditSearchLoader(context, Urls.subredditSearchUrl(query, null));
         } else {
             return new CursorLoader(context,
-                    SubredditProvider.getAccountUri(accountName),
+                    Subreddits.CONTENT_URI,
                     PROJECTION,
-                    Subreddits.SELECTION_NOT_STATE,
-                    Subreddits.SELECTION_ARGS_NOT_DELETED,
+                    SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
+                    new String[] {accountName},
                     Subreddits.SORT_NAME);
         }
     }
