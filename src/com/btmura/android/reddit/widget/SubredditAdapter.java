@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.SimpleCursorAdapter;
@@ -43,8 +42,12 @@ public class SubredditAdapter extends SimpleCursorAdapter {
         if (query != null) {
             return new SubredditSearchLoader(context, Urls.subredditSearchUrl(query, null));
         } else {
-            Uri uri = SubredditProvider.getAccountUri(accountName);
-            return new CursorLoader(context, uri, PROJECTION, null, null, Subreddits.SORT_NAME);
+            return new CursorLoader(context,
+                    SubredditProvider.getAccountUri(accountName),
+                    PROJECTION,
+                    Subreddits.SELECTION_NOT_STATE,
+                    Subreddits.SELECTION_ARGS_NOT_DELETED,
+                    Subreddits.SORT_NAME);
         }
     }
 

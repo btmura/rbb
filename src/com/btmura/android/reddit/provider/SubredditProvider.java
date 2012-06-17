@@ -68,18 +68,21 @@ public class SubredditProvider extends ContentProvider {
         public static final String COLUMN_STATE = "state";
         public static final String COLUMN_EXPIRATION = "expiration";
 
+        public static final int STATE_NOTHING = 0;
+        public static final int STATE_INSERTED = 1;
+        public static final int STATE_DELETED = 2;
+
         public static final String SELECTION_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
+        public static final String SELECTION_NOT_STATE = Subreddits.COLUMN_STATE + "!= ?";
 
         public static final String[] SELECTION_ARGS_NO_ACCOUNT = {""};
+        public static final String[] SELECTION_ARGS_NOT_DELETED = {Integer.toString(STATE_DELETED)};
 
         public static final String SORT_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
 
-        public static final int STATE_NOTHING = 0;
-        public static final int STATE_INSERT = 1;
     }
 
     static final String ID_SELECTION = BaseColumns._ID + "= ?";
-    static final String[] SINGLE_ARGUMENT = new String[1];
 
     private DbHelper helper;
 
@@ -164,7 +167,7 @@ public class SubredditProvider extends ContentProvider {
             case MATCH_ACCOUNT_ALL_SUBREDDITS:
                 selection = addAccountSelection(selection);
                 selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
-                break;
+                return markDeleted(uri, selection, selectionArgs);
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -173,6 +176,12 @@ public class SubredditProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return count;
+    }
+
+    private int markDeleted(Uri uri, String selection, String[] selectionArgs) {
+        ContentValues values = new ContentValues(1);
+        values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED);
+        return update(uri, values, selection, selectionArgs);
     }
 
     @Override
@@ -196,7 +205,7 @@ public class SubredditProvider extends ContentProvider {
                 ContentValues values = new ContentValues(3);
                 values.put(Subreddits.COLUMN_ACCOUNT, accountName);
                 values.put(Subreddits.COLUMN_NAME, subredditName);
-                values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERT);
+                values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED);
 
                 ContentResolver cr = context.getContentResolver();
                 Uri uri = getAccountUri(accountName);
