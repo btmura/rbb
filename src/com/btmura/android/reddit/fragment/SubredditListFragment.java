@@ -65,6 +65,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     private SubredditAdapter adapter;
+    private AccountNameHolder accountNameHolder;
     private OnSubredditSelectedListener listener;
 
     public static SubredditListFragment newInstance(Subreddit selectedSubreddit,
@@ -93,6 +94,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        accountNameHolder = (AccountNameHolder) activity;
         listener = (OnSubredditSelectedListener) activity;
     }
 
@@ -274,19 +276,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     private void handleDelete(ActionMode mode) {
-        // long accountId = accountHolder.getAccountId();
-        // Uri uri = SubredditProvider.getSubredditsUri(accountId);
-        // String selection = null;
-        // String[] selectionArgs = null;
-        // if (accountId > 0) {
-        // ArrayList<String> names = getCheckedNames();
-        // selectionArgs = new String[] {names.get(0)};
-        // } else {
-        // long[] ids = getListView().getCheckedItemIds();
-        // selection = SubredditProvider.getMultipleIdSelection(ids);
-        // }
-        // SubredditProvider.deleteInBackground(getActivity(), uri, selection,
-        // selectionArgs);
+        long[] ids = getListView().getCheckedItemIds();
+        SubredditProvider.deleteInBackground(getActivity(), accountNameHolder.getAccountName(), ids);
         mode.finish();
     }
 

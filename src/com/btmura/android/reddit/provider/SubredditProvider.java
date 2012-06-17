@@ -39,7 +39,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 
 public class SubredditProvider extends ContentProvider {
@@ -93,89 +92,60 @@ public class SubredditProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
-        String tableName;
-
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ALL_SUBREDDITS:
             case MATCH_ONE_SUBREDDIT:
-            case MATCH_ACCOUNT_ALL_SUBREDDITS:
-                tableName = Subreddits.TABLE_NAME;
-                break;
-
-            default:
-                return null;
-        }
-
-        switch (match) {
-            case MATCH_ONE_SUBREDDIT:
-                selection = ID_SELECTION;
-                selectionArgs = singleArgument(ContentUris.parseId(uri));
+                selection = addIdSelection(selection);
+                selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
 
             case MATCH_ACCOUNT_ALL_SUBREDDITS:
-                selection = Subreddits.SELECTION_ACCOUNT;
-                selectionArgs = singleArgument(uri.getPathSegments().get(1));
+                selection = addAccountSelection(selection);
+                selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
+        Cursor c = db.query(Subreddits.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        String tableName;
-
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ALL_SUBREDDITS:
             case MATCH_ACCOUNT_ALL_SUBREDDITS:
-                tableName = Subreddits.TABLE_NAME;
-                break;
-
-            default:
-                throw new IllegalArgumentException(uri.toString());
-        }
-
-        switch (match) {
-            case MATCH_ACCOUNT_ALL_SUBREDDITS:
-                values.put(Subreddits.COLUMN_ACCOUNT, uri.getPathSegments().get(1));
+                values.put(Subreddits.COLUMN_ACCOUNT, uri.getLastPathSegment());
                 break;
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        long id = db.insert(tableName, null, values);
-        getContext().getContentResolver().notifyChange(uri, null);
+        long id = db.insert(Subreddits.TABLE_NAME, null, values);
+        if (id != -1) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
         return ContentUris.withAppendedId(uri, id);
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        String tableName;
-
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ALL_SUBREDDITS:
             case MATCH_ACCOUNT_ALL_SUBREDDITS:
-                tableName = Subreddits.TABLE_NAME;
-                break;
-
-            default:
-                throw new IllegalArgumentException(uri.toString());
-        }
-
-        switch (match) {
-            case MATCH_ACCOUNT_ALL_SUBREDDITS:
-                selection = Subreddits.SELECTION_ACCOUNT;
-                selectionArgs = singleArgument(uri.getPathSegments().get(1));
+                selection = addAccountSelection(selection);
+                selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.update(tableName, values, selection, selectionArgs);
+        int count = db.update(Subreddits.TABLE_NAME, values, selection, selectionArgs);
         if (count > 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
@@ -184,32 +154,23 @@ public class SubredditProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        String tableName;
-        Uri notifyUri;
-
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ALL_SUBREDDITS:
             case MATCH_ONE_SUBREDDIT:
-                tableName = Subreddits.TABLE_NAME;
-                notifyUri = Subreddits.CONTENT_URI;
+                selection = addIdSelection(selection);
+                selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
 
-            default:
-                return 0;
-        }
-
-        switch (match) {
-            case MATCH_ONE_SUBREDDIT:
-                selection = BaseColumns._ID + "= ?";
-                selectionArgs = singleArgument(ContentUris.parseId(uri));
+            case MATCH_ACCOUNT_ALL_SUBREDDITS:
+                selection = addAccountSelection(selection);
+                selectionArgs = addSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.delete(tableName, selection, selectionArgs);
+        int count = db.delete(Subreddits.TABLE_NAME, selection, selectionArgs);
         if (count > 0) {
-            getContext().getContentResolver().notifyChange(notifyUri, null);
+            getContext().getContentResolver().notifyChange(uri, null);
         }
         return count;
     }
@@ -227,34 +188,18 @@ public class SubredditProvider extends ContentProvider {
         }
     }
 
-    public static String getMultipleIdSelection(long[] ids) {
-        StringBuilder s = new StringBuilder(BaseColumns._ID).append(" IN (");
-        int numIds = ids.length;
-        for (int i = 0; i < numIds; i++) {
-            s.append(ids[i]);
-            if (i + 1 < numIds) {
-                s.append(", ");
-            }
-        }
-        return s.append(")").toString();
-    }
-
     public static void addInBackground(final Context context, final String accountName,
             final String subredditName) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                Uri uri = getAccountUri(accountName);
-                if (Debug.DEBUG_PROVIDERS) {
-                    Log.d(TAG, "add uri: " + uri);
-                }
-
                 ContentValues values = new ContentValues(3);
                 values.put(Subreddits.COLUMN_ACCOUNT, accountName);
                 values.put(Subreddits.COLUMN_NAME, subredditName);
                 values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERT);
 
                 ContentResolver cr = context.getContentResolver();
+                Uri uri = getAccountUri(accountName);
                 int updated = cr.update(uri, values, null, null);
                 if (updated == 0) {
                     cr.insert(uri, values);
@@ -265,6 +210,25 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected void onPostExecute(Void result) {
                 showChangeToast(context, 1);
+                scheduleBackup(context);
+            }
+        }.execute();
+    }
+
+    public static void deleteInBackground(final Context context, final String accountName,
+            final long[] ids) {
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... params) {
+                ContentResolver cr = context.getContentResolver();
+                Uri uri = getAccountUri(accountName);
+                String selection = makeMultipleIdSelection(ids);
+                return cr.delete(uri, selection, null);
+            }
+
+            @Override
+            protected void onPostExecute(Integer count) {
+                showChangeToast(context, -count);
                 scheduleBackup(context);
             }
         }.execute();
@@ -283,23 +247,6 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected void onPostExecute(Void result) {
                 showChangeToast(context, values.length);
-                scheduleBackup(context);
-            }
-        }.execute();
-    }
-
-    public static void deleteInBackground(final Context context, final Uri uri,
-            final String selection, final String[] selectionArgs) {
-        new AsyncTask<Void, Void, Integer>() {
-            @Override
-            protected Integer doInBackground(Void... params) {
-                ContentResolver cr = context.getContentResolver();
-                return cr.delete(uri, selection, selectionArgs);
-            }
-
-            @Override
-            protected void onPostExecute(Integer count) {
-                showChangeToast(context, -count);
                 scheduleBackup(context);
             }
         }.execute();
@@ -421,13 +368,42 @@ public class SubredditProvider extends ContentProvider {
         }
     }
 
-    private static String[] singleArgument(long value) {
-        SINGLE_ARGUMENT[0] = Long.toString(value);
-        return SINGLE_ARGUMENT;
+    private static String addIdSelection(String selection) {
+        if (TextUtils.isEmpty(selection)) {
+            return ID_SELECTION;
+        } else {
+            return selection + " AND " + ID_SELECTION;
+        }
     }
 
-    private static String[] singleArgument(String value) {
-        SINGLE_ARGUMENT[0] = value;
-        return SINGLE_ARGUMENT;
+    private static String addAccountSelection(String selection) {
+        if (TextUtils.isEmpty(selection)) {
+            return Subreddits.SELECTION_ACCOUNT;
+        } else {
+            return selection + " AND " + Subreddits.SELECTION_ACCOUNT;
+        }
+    }
+
+    private static String[] addSelectionArg(String[] selectionArgs, String arg) {
+        if (selectionArgs == null) {
+            return new String[] {arg};
+        } else {
+            String[] newSelectionArgs = new String[selectionArgs.length + 1];
+            System.arraycopy(selectionArgs, 0, newSelectionArgs, 0, selectionArgs.length);
+            newSelectionArgs[newSelectionArgs.length - 1] = arg;
+            return newSelectionArgs;
+        }
+    }
+
+    private static String makeMultipleIdSelection(long[] ids) {
+        StringBuilder s = new StringBuilder(BaseColumns._ID).append(" IN (");
+        int numIds = ids.length;
+        for (int i = 0; i < numIds; i++) {
+            s.append(ids[i]);
+            if (i + 1 < numIds) {
+                s.append(", ");
+            }
+        }
+        return s.append(")").toString();
     }
 }
