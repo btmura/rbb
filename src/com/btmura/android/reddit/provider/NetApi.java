@@ -29,7 +29,7 @@ import android.util.JsonReader;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 
-public class NetApi {
+class NetApi {
 
     static ArrayList<Subreddit> query(String cookie) throws IOException {
         URL url = Urls.subredditListUrl();
