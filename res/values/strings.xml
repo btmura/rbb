@@ -22,8 +22,10 @@
     <string name="add">Add</string>   
     <string name="add_account">Add account</string>
     <string name="add_front_page">Add front page</string>
-    <string name="add_subreddit">Add subreddit</string>    
-
+    <string name="add_subreddit">Add subreddit</string>
+    
+    <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
+    
     <string name="comment_header_status">%1$s&#160; %2$s ago&#160; %3$d points&#160; %4$d comments</string>
     <string name="comment_comment_status">%1$s&#160; %2$s ago&#160; %3$d points</string>
     
@@ -70,6 +72,8 @@
     <string name="show_password">Show password</string>
     
     <string name="sr_status">%1$d subscribers</string>
+    
+    <string name="subreddits">Subreddits</string>
     
     <string name="tab_posts">Posts</string>
     <string name="tab_subreddits">Subreddits</string>

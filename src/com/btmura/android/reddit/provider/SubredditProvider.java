@@ -41,11 +41,11 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 
-public class Provider extends ContentProvider {
+public class SubredditProvider extends ContentProvider {
 
-    public static final String TAG = "Provider";
+    public static final String TAG = "SubredditProvider";
 
-    public static final String AUTHORITY = "com.btmura.android.reddit.provider";
+    public static final String AUTHORITY = "com.btmura.android.reddit.provider.subreddits";
 
     private static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
@@ -284,7 +284,7 @@ public class Provider extends ContentProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    cr.applyBatch(Provider.AUTHORITY, ops);
+                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
                 } catch (RemoteException e) {
                     Log.e(TAG, "combineSubredditsInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -322,7 +322,7 @@ public class Provider extends ContentProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    cr.applyBatch(Provider.AUTHORITY, ops);
+                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
                 } catch (RemoteException e) {
                     Log.e(TAG, "splitSubredditInBackground", e);
                 } catch (OperationApplicationException e) {

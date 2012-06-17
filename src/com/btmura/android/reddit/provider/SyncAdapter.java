@@ -36,7 +36,7 @@ import android.util.Log;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.provider.Provider.Subreddits;
+import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 

@@ -21,7 +21,7 @@ import java.util.List;
 import android.database.AbstractCursor;
 
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.provider.Provider.Subreddits;
+import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 
 class SubredditCursor extends AbstractCursor {
 

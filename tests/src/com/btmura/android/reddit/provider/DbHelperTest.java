@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 
-import com.btmura.android.reddit.provider.Provider.Subreddits;
+import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 
 public class DbHelperTest extends AndroidTestCase {
 
@@ -37,7 +37,7 @@ public class DbHelperTest extends AndroidTestCase {
         values.put(Subreddits.COLUMN_NAME, "Android");
         long id = db.insert(Subreddits.TABLE_NAME, null, values);
 
-        Cursor cursor = db.query(Subreddits.TABLE_NAME, PROJECTION, Provider.ID_SELECTION,
+        Cursor cursor = db.query(Subreddits.TABLE_NAME, PROJECTION, SubredditProvider.ID_SELECTION,
                 new String[] {Long.toString(id)}, null, null, null);
         try {
             assertTrue(cursor.moveToNext());

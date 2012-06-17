@@ -123,7 +123,7 @@ public class AddSubredditFragment extends DialogFragment implements
 
 //        ContentValues values = new ContentValues(1);
 //        values.put(Subreddits.COLUMN_NAME, name);
-//        Provider.addInBackground(getActivity(), uri, values);
+//        SubredditProvider.addInBackground(getActivity(), uri, values);
         dismiss();
     }
 }

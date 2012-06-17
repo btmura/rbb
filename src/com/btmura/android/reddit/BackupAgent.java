@@ -31,8 +31,8 @@ import android.database.Cursor;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 
-import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.provider.Provider.Subreddits;
+import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 
 public class BackupAgent extends android.app.backup.BackupAgent {
 
@@ -101,7 +101,7 @@ public class BackupAgent extends android.app.backup.BackupAgent {
                     .withValue(Subreddits.COLUMN_NAME, in.readUTF()).build());
         }
         try {
-            getContentResolver().applyBatch(Provider.AUTHORITY, ops);
+            getContentResolver().applyBatch(SubredditProvider.AUTHORITY, ops);
         } catch (RemoteException e) {
             throw new IOException(e);
         } catch (OperationApplicationException e) {

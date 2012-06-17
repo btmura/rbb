@@ -31,7 +31,7 @@ import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SearchActivity;
-import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class GlobalMenuFragment extends Fragment implements
         SearchView.OnFocusChangeListener,
@@ -111,7 +111,7 @@ public class GlobalMenuFragment extends Fragment implements
 
     private void handleAccounts() {
         Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
-        intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {Provider.AUTHORITY});
+        intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {SubredditProvider.AUTHORITY});
         startActivity(intent);
     }
 

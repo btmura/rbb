@@ -26,7 +26,7 @@ import android.os.Bundle;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.fragment.AddAccountFragment;
 import com.btmura.android.reddit.fragment.AddAccountFragment.OnAccountAddedListener;
-import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class AccountAuthenticatorActivity extends android.accounts.AccountAuthenticatorActivity
         implements OnAccountAddedListener {
@@ -55,7 +55,7 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
                 manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, cookie);
                 manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, modhash);
 
-                ContentResolver.setSyncAutomatically(account, Provider.AUTHORITY, true);
+                ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
 
                 Bundle result = new Bundle();
                 result.putString(AccountManager.KEY_ACCOUNT_NAME, login);

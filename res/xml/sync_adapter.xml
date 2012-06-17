@@ -16,5 +16,5 @@
 -->
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
     android:accountType="@string/account_type"
-    android:contentAuthority="com.btmura.android.reddit.provider"
+    android:contentAuthority="@string/authority_subreddits"
     android:isAlwaysSyncable="true" />

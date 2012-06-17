@@ -24,7 +24,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.btmura.android.reddit.provider.Provider.Subreddits;
+import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 
 class DbHelper extends SQLiteOpenHelper {
 

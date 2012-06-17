@@ -42,8 +42,8 @@ import com.btmura.android.reddit.LoaderIds;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.provider.Provider.Subreddits;
+import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
 public class SubredditListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
@@ -232,7 +232,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
                 values[j++].put(Subreddits.COLUMN_NAME, adapter.getName(getActivity(), i));
             }
         }
-        Provider.addMultipleSubredditsInBackground(getActivity(), values);
+        SubredditProvider.addMultipleSubredditsInBackground(getActivity(), values);
         mode.finish();
     }
 
@@ -248,7 +248,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
                 }
             }
         }
-        Provider.combineSubredditsInBackground(getActivity(), names, new long[0]);
+        SubredditProvider.combineSubredditsInBackground(getActivity(), names, new long[0]);
         mode.finish();
     }
 
@@ -262,20 +262,20 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
         long[] ids = getListView().getCheckedItemIds();
 
-        Provider.combineSubredditsInBackground(getActivity(), names, ids);
+        SubredditProvider.combineSubredditsInBackground(getActivity(), names, ids);
         mode.finish();
     }
 
     private void handleSplit(ActionMode mode) {
         ArrayList<String> names = getCheckedNames();
         long[] ids = getListView().getCheckedItemIds();
-        Provider.splitSubredditInBackground(getActivity(), names.get(0), ids[0]);
+        SubredditProvider.splitSubredditInBackground(getActivity(), names.get(0), ids[0]);
         mode.finish();
     }
 
     private void handleDelete(ActionMode mode) {
         // long accountId = accountHolder.getAccountId();
-        // Uri uri = Provider.getSubredditsUri(accountId);
+        // Uri uri = SubredditProvider.getSubredditsUri(accountId);
         // String selection = null;
         // String[] selectionArgs = null;
         // if (accountId > 0) {
@@ -283,9 +283,9 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         // selectionArgs = new String[] {names.get(0)};
         // } else {
         // long[] ids = getListView().getCheckedItemIds();
-        // selection = Provider.getMultipleIdSelection(ids);
+        // selection = SubredditProvider.getMultipleIdSelection(ids);
         // }
-        // Provider.deleteInBackground(getActivity(), uri, selection,
+        // SubredditProvider.deleteInBackground(getActivity(), uri, selection,
         // selectionArgs);
         mode.finish();
     }
