@@ -27,6 +27,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -50,8 +51,10 @@ public class SubredditProvider extends ContentProvider {
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_SUBREDDITS = 1;
+    private static final int MATCH_ONE_SUBREDDIT = 2;
     static {
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME, MATCH_ALL_SUBREDDITS);
+        MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
     }
 
     public static class Subreddits implements BaseColumns {
@@ -91,6 +94,14 @@ public class SubredditProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
+        int match = MATCHER.match(uri);
+        switch (match) {
+            case MATCH_ONE_SUBREDDIT:
+                selection = appendIdSelection(selection);
+                selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
+                break;
+        }
+
         SQLiteDatabase db = helper.getWritableDatabase();
         Cursor c = db.query(Subreddits.TABLE_NAME,
                 projection,
@@ -115,6 +126,14 @@ public class SubredditProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        int match = MATCHER.match(uri);
+        switch (match) {
+            case MATCH_ONE_SUBREDDIT:
+                selection = appendIdSelection(selection);
+                selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
+                break;
+        }
+
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.update(Subreddits.TABLE_NAME, values, selection, selectionArgs);
         if (count > 0) {
@@ -125,6 +144,14 @@ public class SubredditProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        int match = MATCHER.match(uri);
+        switch (match) {
+            case MATCH_ONE_SUBREDDIT:
+                selection = appendIdSelection(selection);
+                selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
+                break;
+        }
+
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.delete(Subreddits.TABLE_NAME, selection, selectionArgs);
         if (count > 0) {
@@ -158,7 +185,8 @@ public class SubredditProvider extends ContentProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                    ContentProviderResult[] results = cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                    startSyncOperation(context, results[1].uri);
                 } catch (RemoteException e) {
                     Log.e(TAG, "addInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -356,5 +384,30 @@ public class SubredditProvider extends ContentProvider {
             }
         }
         return s.append(")").toString();
+    }
+
+    private static String appendIdSelection(String selection) {
+        if (selection == null) {
+            return ID_SELECTION;
+        } else {
+            return selection + " AND " + ID_SELECTION;
+        }
+    }
+
+    private static String[] appendIdSelectionArg(String[] selectionArgs, String id) {
+        if (selectionArgs == null) {
+            return new String[] {id};
+        } else {
+            String[] newSelectionArgs = new String[selectionArgs.length + 1];
+            System.arraycopy(selectionArgs, 0, newSelectionArgs, 0, selectionArgs.length);
+            newSelectionArgs[newSelectionArgs.length - 1] = id;
+            return newSelectionArgs;
+        }
+    }
+
+    private static void startSyncOperation(Context context, Uri uri) {
+        Intent intent = new Intent(context, SyncOperationService.class);
+        intent.setData(uri);
+        context.startService(intent);
     }
 }

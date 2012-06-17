@@ -106,6 +106,10 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_adapter" />
         </service>
+        <service
+            android:name=".provider.SyncOperationService"
+            android:exported="false"
+            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS" />
 
         <meta-data
             android:name="com.google.android.backup.api_key"

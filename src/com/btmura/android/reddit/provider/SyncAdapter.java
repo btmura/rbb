@@ -79,14 +79,24 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         } catch (OperationCanceledException e) {
             Log.e(TAG, "onPerformSync", e);
+            syncResult.stats.numAuthExceptions++;
+
         } catch (AuthenticatorException e) {
             Log.e(TAG, "onPerformSync", e);
+            syncResult.stats.numAuthExceptions++;
+
         } catch (IOException e) {
             Log.e(TAG, "onPerformSync", e);
+            syncResult.stats.numIoExceptions++;
+
         } catch (RemoteException e) {
             Log.e(TAG, "onPerformSync", e);
+            syncResult.databaseError = true;
+
         } catch (OperationApplicationException e) {
             Log.e(TAG, "onPerformSync", e);
+            syncResult.databaseError = true;
+
         }
     }
 }
