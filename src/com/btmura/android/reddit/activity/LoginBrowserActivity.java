@@ -32,15 +32,19 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.fragment.AccountNameHolder;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
+import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
 public class LoginBrowserActivity extends Activity implements
         LoaderCallbacks<AccountResult>,
         OnNavigationListener,
-        OnSubredditSelectedListener {
+        OnSubredditSelectedListener,
+        AccountNameHolder,
+        SubredditNameHolder {
 
     public static final String TAG = "LoginBrowserActivity";
 
@@ -115,5 +119,13 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public void onSubredditSelected(Subreddit subreddit) {
+    }
+
+    public String getAccountName() {
+        return adapter.getAccountName(bar.getSelectedNavigationIndex());
+    }
+
+    public CharSequence getSubredditName() {
+        return null;
     }
 }

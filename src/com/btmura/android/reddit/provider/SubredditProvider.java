@@ -39,6 +39,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 
 public class SubredditProvider extends ContentProvider {
@@ -62,13 +63,20 @@ public class SubredditProvider extends ContentProvider {
     public static class Subreddits implements BaseColumns {
         static final String TABLE_NAME = "subreddits";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
+
         public static final String COLUMN_ACCOUNT = "account";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_STATE = "state";
         public static final String COLUMN_EXPIRATION = "expiration";
+
         public static final String SELECTION_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
+
         public static final String[] SELECTION_ARGS_NO_ACCOUNT = {""};
+
         public static final String SORT_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
+
+        public static final int STATE_NOTHING = 0;
+        public static final int STATE_INSERT = 1;
     }
 
     static final String ID_SELECTION = BaseColumns._ID + "= ?";
@@ -86,7 +94,6 @@ public class SubredditProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         String tableName;
-        Uri notifyUri;
 
         int match = MATCHER.match(uri);
         switch (match) {
@@ -94,7 +101,6 @@ public class SubredditProvider extends ContentProvider {
             case MATCH_ONE_SUBREDDIT:
             case MATCH_ACCOUNT_ALL_SUBREDDITS:
                 tableName = Subreddits.TABLE_NAME;
-                notifyUri = Subreddits.CONTENT_URI;
                 break;
 
             default:
@@ -115,35 +121,65 @@ public class SubredditProvider extends ContentProvider {
 
         SQLiteDatabase db = helper.getWritableDatabase();
         Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
-        c.setNotificationUri(getContext().getContentResolver(), notifyUri);
+        c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         String tableName;
-        Uri notifyUri;
 
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_ALL_SUBREDDITS:
+            case MATCH_ACCOUNT_ALL_SUBREDDITS:
                 tableName = Subreddits.TABLE_NAME;
-                notifyUri = Subreddits.CONTENT_URI;
                 break;
 
             default:
                 throw new IllegalArgumentException(uri.toString());
         }
 
+        switch (match) {
+            case MATCH_ACCOUNT_ALL_SUBREDDITS:
+                values.put(Subreddits.COLUMN_ACCOUNT, uri.getPathSegments().get(1));
+                break;
+        }
+
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(tableName, null, values);
-        getContext().getContentResolver().notifyChange(notifyUri, null);
+        getContext().getContentResolver().notifyChange(uri, null);
         return ContentUris.withAppendedId(uri, id);
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        throw new UnsupportedOperationException();
+        String tableName;
+
+        int match = MATCHER.match(uri);
+        switch (match) {
+            case MATCH_ALL_SUBREDDITS:
+            case MATCH_ACCOUNT_ALL_SUBREDDITS:
+                tableName = Subreddits.TABLE_NAME;
+                break;
+
+            default:
+                throw new IllegalArgumentException(uri.toString());
+        }
+
+        switch (match) {
+            case MATCH_ACCOUNT_ALL_SUBREDDITS:
+                selection = Subreddits.SELECTION_ACCOUNT;
+                selectionArgs = singleArgument(uri.getPathSegments().get(1));
+                break;
+        }
+
+        SQLiteDatabase db = helper.getWritableDatabase();
+        int count = db.update(tableName, values, selection, selectionArgs);
+        if (count > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return count;
     }
 
     @Override
@@ -183,7 +219,7 @@ public class SubredditProvider extends ContentProvider {
         return null;
     }
 
-    public static Uri getSubredditsUri(String accountName) {
+    public static Uri getAccountUri(String accountName) {
         if (TextUtils.isEmpty(accountName)) {
             return Subreddits.CONTENT_URI;
         } else {
@@ -203,13 +239,26 @@ public class SubredditProvider extends ContentProvider {
         return s.append(")").toString();
     }
 
-    public static void addInBackground(final Context context, final Uri uri,
-            final ContentValues values) {
+    public static void addInBackground(final Context context, final String accountName,
+            final String subredditName) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
+                Uri uri = getAccountUri(accountName);
+                if (Debug.DEBUG_PROVIDERS) {
+                    Log.d(TAG, "add uri: " + uri);
+                }
+
+                ContentValues values = new ContentValues(3);
+                values.put(Subreddits.COLUMN_ACCOUNT, accountName);
+                values.put(Subreddits.COLUMN_NAME, subredditName);
+                values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERT);
+
                 ContentResolver cr = context.getContentResolver();
-                cr.insert(uri, values);
+                int updated = cr.update(uri, values, null, null);
+                if (updated == 0) {
+                    cr.insert(uri, values);
+                }
                 return null;
             }
 

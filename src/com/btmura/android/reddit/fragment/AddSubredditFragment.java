@@ -32,6 +32,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddSubredditFragment extends DialogFragment implements
@@ -41,14 +42,11 @@ public class AddSubredditFragment extends DialogFragment implements
     public static final String TAG = "AddSubredditFragment";
 
     private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
-        InputFilters.SUBREDDIT_NAME_FILTER,
+            InputFilters.SUBREDDIT_NAME_FILTER,
     };
 
-    public interface SubredditNameHolder {
-        CharSequence getSubredditName();
-    }
-
-    private SubredditNameHolder nameHolder;
+    private AccountNameHolder accountNameHolder;
+    private SubredditNameHolder subredditNameHolder;
 
     private EditText nameField;
     private CheckBox addFrontPage;
@@ -62,7 +60,8 @@ public class AddSubredditFragment extends DialogFragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        nameHolder = (SubredditNameHolder) activity;
+        accountNameHolder = (AccountNameHolder) activity;
+        subredditNameHolder = (SubredditNameHolder) activity;
     }
 
     @Override
@@ -70,7 +69,7 @@ public class AddSubredditFragment extends DialogFragment implements
         getDialog().setTitle(R.string.add_subreddit);
         View v = inflater.inflate(R.layout.add_subreddit, container, false);
 
-        CharSequence name = nameHolder.getSubredditName();
+        CharSequence name = subredditNameHolder.getSubredditName();
         int length = name != null ? name.length() : 0;
         nameField = (EditText) v.findViewById(R.id.subreddit_name);
         nameField.setText(name);
@@ -121,9 +120,7 @@ public class AddSubredditFragment extends DialogFragment implements
             return;
         }
 
-//        ContentValues values = new ContentValues(1);
-//        values.put(Subreddits.COLUMN_NAME, name);
-//        SubredditProvider.addInBackground(getActivity(), uri, values);
+        SubredditProvider.addInBackground(getActivity(), accountNameHolder.getAccountName(), name);
         dismiss();
     }
 }

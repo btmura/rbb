@@ -37,9 +37,9 @@ import android.view.View.OnClickListener;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
-import com.btmura.android.reddit.fragment.AddSubredditFragment;
 import com.btmura.android.reddit.fragment.ControlFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
+import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.widget.FilterAdapter;
@@ -50,7 +50,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ThingListFragment.OnThingSelectedListener,
         ViewPager.OnPageChangeListener,
         FragmentManager.OnBackStackChangedListener,
-        AddSubredditFragment.SubredditNameHolder,
+        SubredditNameHolder,
         ThingMenuFragment.ThingPagerHolder {
 
     public static final String TAG = "AbstractBrowserActivity";

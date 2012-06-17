@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.fragment;
 
-public interface Debug {
-
-    static final boolean DEBUG_ACTIVITY = true;
-    static final boolean DEBUG_CACHES = true;
-    static final boolean DEBUG_LOADERS = true;
-    static final boolean DEBUG_PROVIDERS = true;
-    static final boolean DEBUG_STRICT_MODE = true;
-    static final boolean DEBUG_SERVICES = true;
-    static final boolean DEBUG_SYNC = true;
-    static final boolean DEBUG_WIDGETS = true;
-
+public interface SubredditNameHolder {
+    CharSequence getSubredditName();
 }

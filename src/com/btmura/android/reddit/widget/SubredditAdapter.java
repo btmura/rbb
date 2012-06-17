@@ -43,7 +43,7 @@ public class SubredditAdapter extends SimpleCursorAdapter {
         if (query != null) {
             return new SubredditSearchLoader(context, Urls.subredditSearchUrl(query, null));
         } else {
-            Uri uri = SubredditProvider.getSubredditsUri(accountName);
+            Uri uri = SubredditProvider.getAccountUri(accountName);
             return new CursorLoader(context, uri, PROJECTION, null, null, Subreddits.SORT_NAME);
         }
     }

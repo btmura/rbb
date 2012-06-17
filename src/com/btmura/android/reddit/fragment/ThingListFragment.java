@@ -21,7 +21,6 @@ import java.util.List;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
@@ -42,8 +41,6 @@ import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
-import com.btmura.android.reddit.provider.SubredditProvider;
-import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
 public class ThingListFragment extends ListFragment implements
@@ -237,9 +234,6 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private void handleAdd() {
-        ContentValues values = new ContentValues(1);
-        values.put(Subreddits.COLUMN_NAME, getSubreddit().name);
-        SubredditProvider.addInBackground(getActivity(), Subreddits.CONTENT_URI, values);
     }
 
     private void handleViewSidebar() {

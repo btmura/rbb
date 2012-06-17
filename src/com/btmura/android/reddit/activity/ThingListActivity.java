@@ -27,15 +27,15 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
-import com.btmura.android.reddit.fragment.AddSubredditFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
+import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class ThingListActivity extends GlobalMenuActivity implements
         ActionBar.OnNavigationListener,
         ThingListFragment.OnThingSelectedListener,
-        AddSubredditFragment.SubredditNameHolder {
+        SubredditNameHolder {
 
     public static final String TAG = "ThingListActivity";
 

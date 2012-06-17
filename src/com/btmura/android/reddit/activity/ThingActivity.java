@@ -24,14 +24,14 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Thing;
-import com.btmura.android.reddit.fragment.AddSubredditFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
+import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class ThingActivity extends GlobalMenuActivity implements
         ThingMenuFragment.ThingPagerHolder,
-        AddSubredditFragment.SubredditNameHolder,
+        SubredditNameHolder,
         ViewPager.OnPageChangeListener {
 
     public static final String EXTRA_THING = "t";
