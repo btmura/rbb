@@ -31,17 +31,18 @@ import android.util.Log;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 
 public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnAccountsUpdateListener {
 
     public static final String TAG = "AccountLoader";
 
     public static class AccountResult {
-        public Account[] accounts;
+        public String[] accountNames;
         public int selectedAccount;
 
-        private AccountResult(Account[] accounts, int selectedAccount) {
-            this.accounts = accounts;
+        private AccountResult(String[] accountNames, int selectedAccount) {
+            this.accountNames = accountNames;
             this.selectedAccount = selectedAccount;
         }
     }
@@ -70,14 +71,21 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
     @Override
     public AccountResult loadInBackground() {
         if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "loadInBackground (id " + getId() + ")");
+            Log.d(TAG, "loadInBackground id: " + getId());
         }
 
         Context context = getContext();
 
-        // Get the list of accounts to show in the spinner.
+        // Get the accounts and sort them.
         Account[] accounts = manager.getAccountsByType(AccountAuthenticator.getAccountType(context));
         Arrays.sort(accounts, ACCOUNT_COMPARATOR);
+
+        // Convert to strings and prepend the no account at the top.
+        String[] accountNames = new String[accounts.length + 1];
+        accountNames[0] = Subreddits.ACCOUNT_NONE;
+        for (int i = 0; i < accounts.length; i++) {
+            accountNames[i + 1] = accounts[i].name;
+        }
 
         // Find which account was selected last.
         int selectedAccount = 0;
@@ -92,7 +100,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
             }
         }
 
-        return new AccountResult(accounts, selectedAccount);
+        return new AccountResult(accountNames, selectedAccount);
     }
 
     @Override

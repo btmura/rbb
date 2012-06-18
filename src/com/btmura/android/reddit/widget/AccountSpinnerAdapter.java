@@ -16,11 +16,8 @@
 
 package com.btmura.android.reddit.widget;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
-import android.accounts.Account;
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,36 +28,25 @@ import com.btmura.android.reddit.R;
 
 public class AccountSpinnerAdapter extends BaseAdapter {
 
-    private static final Account NO_ACCOUNT = null;
-
-    private final ArrayList<Account> accounts = new ArrayList<Account>();
     private final LayoutInflater inflater;
+
+    private String[] accountNames;
 
     public AccountSpinnerAdapter(Context context) {
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void setAccounts(Account[] newAccounts) {
-        accounts.clear();
-        if (newAccounts != null && newAccounts.length > 0) {
-            Collections.addAll(accounts, newAccounts);
-        } else {
-            accounts.add(NO_ACCOUNT);
-        }
+    public void setAccountNames(String[] newAccountNames) {
+        accountNames = newAccountNames;
         notifyDataSetChanged();
     }
 
-    public String getAccountName(int position) {
-        Account account = getItem(position);
-        return account != null ? account.name : "";
-    }
-
     public int getCount() {
-        return accounts.size();
+        return accountNames != null ? accountNames.length : 0;
     }
 
-    public Account getItem(int position) {
-        return accounts.get(position);
+    public String getItem(int position) {
+        return accountNames[position];
     }
 
     public long getItemId(int position) {
@@ -68,27 +54,24 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        return setView(R.layout.account_spinner_row, position, convertView, parent, false);
+        return setView(R.layout.account_spinner_row, position, convertView, parent);
     }
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        return setView(R.layout.account_spinner_dropdown_row, position, convertView, parent, true);
+        return setView(R.layout.account_spinner_dropdown_row, position, convertView, parent);
     }
 
-    private View setView(int layout, int position, View convertView, ViewGroup parent,
-            boolean dropdown) {
+    private View setView(int layout, int position, View convertView, ViewGroup parent) {
         TextView tv = (TextView) convertView;
         if (tv == null) {
             tv = (TextView) inflater.inflate(layout, parent, false);
         }
-        Account account = getItem(position);
-        if (account != null) {
-            tv.setText(account.name);
-        } else if (dropdown) {
+        String accountName = getItem(position);
+        if (TextUtils.isEmpty(accountName)) {
             tv.setText(R.string.no_account);
         } else {
-            tv.setText(R.string.app_name);
+            tv.setText(accountName);
         }
         return tv;
     }

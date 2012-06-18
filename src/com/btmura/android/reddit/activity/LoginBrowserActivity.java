@@ -87,9 +87,9 @@ public class LoginBrowserActivity extends Activity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "onLoadFinished (id " + loader.getId() + ") "
-                    + "(count " + result.accounts.length + ")");
+                    + "(count " + result.accountNames.length + ")");
         }
-        adapter.setAccounts(result.accounts);
+        adapter.setAccountNames(result.accountNames);
         bar.setSelectedNavigationItem(result.selectedAccount);
     }
 
@@ -97,14 +97,14 @@ public class LoginBrowserActivity extends Activity implements
         if (Debug.DEBUG_LOADERS) {
             Log.d(TAG, "onLoaderReset (id " + loader.getId() + ")");
         }
-        adapter.setAccounts(null);
+        adapter.setAccountNames(null);
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         if (Debug.DEBUG_ACTIVITY) {
             Log.d(TAG, "onNavigationItemSelected (itemPosition " + itemPosition + ")");
         }
-        String accountName = adapter.getAccountName(itemPosition);
+        String accountName = adapter.getItem(itemPosition);
         AccountLoader.setLastAccount(this, accountName);
 
         SubredditListFragment slf = SubredditListFragment.newInstance(null, accountName, 0);
@@ -122,7 +122,7 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public String getAccountName() {
-        return adapter.getAccountName(bar.getSelectedNavigationIndex());
+        return adapter.getItem(bar.getSelectedNavigationIndex());
     }
 
     public CharSequence getSubredditName() {
