@@ -188,9 +188,8 @@ public class SubredditProvider extends ContentProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    ContentProviderResult[] results =
-                            cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-                    startSyncOperation(context, results[1].uri);
+                    ContentProviderResult[] r = cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                    startSyncOperation(context, accountName, r[1].uri);
                 } catch (RemoteException e) {
                     Log.e(TAG, "addInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -224,13 +223,8 @@ public class SubredditProvider extends ContentProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    ContentProviderResult[] results =
-                            cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-                    for (int i = 0; i < count; i++) {
-                        if (results[i].count > 0) {
-                            startSyncOperation(context, uris[i]);
-                        }
-                    }
+                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                    startSyncOperation(context, accountName, uris);
                 } catch (RemoteException e) {
                     Log.e(TAG, "deleteInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -362,12 +356,6 @@ public class SubredditProvider extends ContentProvider {
                 .show();
     }
 
-    private static void scheduleBackup(Context context, String accountName) {
-        if (TextUtils.isEmpty(accountName)) {
-            new BackupManager(context).dataChanged();
-        }
-    }
-
     @Override
     public ContentProviderResult[] applyBatch(ArrayList<ContentProviderOperation> operations)
             throws OperationApplicationException {
@@ -401,9 +389,19 @@ public class SubredditProvider extends ContentProvider {
         }
     }
 
-    private static void startSyncOperation(Context context, Uri uri) {
-        Intent intent = new Intent(context, SyncOperationService.class);
-        intent.setData(uri);
-        context.startService(intent);
+    private static void scheduleBackup(Context context, String accountName) {
+        if (TextUtils.isEmpty(accountName)) {
+            new BackupManager(context).dataChanged();
+        }
+    }
+
+    private static void startSyncOperation(Context context, String accountName, Uri... uris) {
+        if (!TextUtils.isEmpty(accountName)) {
+            for (int i = 0; i < uris.length; i++) {
+                Intent intent = new Intent(context, SyncOperationService.class);
+                intent.setData(uris[i]);
+                context.startService(intent);
+            }
+        }
     }
 }
