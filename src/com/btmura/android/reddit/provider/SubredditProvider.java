@@ -71,16 +71,18 @@ public class SubredditProvider extends ContentProvider {
 
         public static final String ACCOUNT_NONE = "";
 
-        public static final int STATE_NOTHING = 0;
-        public static final int STATE_INSERTED = 1;
-        public static final int STATE_DELETED = 2;
+        public static final int STATE_NORMAL = 0;
+        public static final int STATE_INSERTING = 1;
+        public static final int STATE_DELETING = 2;
     }
 
-    public static final String SELECTION_ACCOUNT_NOT_DELETED = Subreddits.COLUMN_ACCOUNT
-            + "= ? AND " + Subreddits.COLUMN_STATE + "!= " + Subreddits.STATE_DELETED;
+    public static final String SELECTION_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
 
-    public static final String SELECTION_ACCOUNT_AND_NAME = Subreddits.COLUMN_ACCOUNT
-            + "= ? AND " + Subreddits.COLUMN_NAME + "= ?";
+    public static final String SELECTION_ACCOUNT_NOT_DELETED = SELECTION_ACCOUNT + " AND "
+            + Subreddits.COLUMN_STATE + "!= " + Subreddits.STATE_DELETING;
+
+    public static final String SELECTION_ACCOUNT_AND_NAME = SELECTION_ACCOUNT + " AND "
+            + Subreddits.COLUMN_NAME + "= ?";
 
     static final String ID_SELECTION = BaseColumns._ID + "= ?";
 
@@ -181,7 +183,7 @@ public class SubredditProvider extends ContentProvider {
                 ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
                         .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                         .withValue(Subreddits.COLUMN_NAME, subredditName)
-                        .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED)
+                        .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
                         .build());
 
                 ContentResolver cr = context.getContentResolver();
@@ -216,7 +218,7 @@ public class SubredditProvider extends ContentProvider {
                 for (int i = 0; i < count; i++) {
                     uris[i] = ContentUris.withAppendedId(Subreddits.CONTENT_URI, ids[i]);
                     ops.add(ContentProviderOperation.newUpdate(uris[i])
-                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED)
+                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETING)
                             .build());
                 }
 

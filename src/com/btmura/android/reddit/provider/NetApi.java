@@ -26,12 +26,12 @@ import java.util.ArrayList;
 
 import android.util.JsonReader;
 
+import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
-import com.btmura.android.reddit.entity.Subreddit;
 
 class NetApi {
 
-    static ArrayList<Subreddit> query(String cookie) throws IOException {
+    static ArrayList<String> query(String cookie) throws IOException {
         URL url = Urls.subredditListUrl();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         setCommonHeaders(conn, cookie);
@@ -82,6 +82,21 @@ class NetApi {
             if (output != null) {
                 output.close();
             }
+        }
+    }
+
+    static class SubredditParser extends JsonParser {
+
+        ArrayList<String> results = new ArrayList<String>();
+
+        @Override
+        public void onEntityStart(int index) {
+            results.add(null);
+        }
+
+        @Override
+        public void onDisplayName(JsonReader reader, int index) throws IOException {
+            results.set(index, reader.nextString());
         }
     }
 }

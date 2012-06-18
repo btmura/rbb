@@ -44,6 +44,8 @@ public class SyncOperationService extends IntentService {
             Subreddits.COLUMN_STATE,
     };
 
+    private static final int EXPIRATION_PADDING = 5 * 60 * 1000; // 5 minutes
+
     public SyncOperationService() {
         super("SyncOperationServiceWorker");
     }
@@ -76,11 +78,12 @@ public class SyncOperationService extends IntentService {
                         AccountAuthenticator.AUTH_TOKEN_MODHASH,
                         true);
 
-                boolean subscribe = state == Subreddits.STATE_INSERTED;
+                boolean subscribe = state == Subreddits.STATE_INSERTING;
                 NetApi.subscribe(cookie, modhash, subreddit, subscribe);
 
                 ContentValues values = new ContentValues(1);
-                values.put(Subreddits.COLUMN_EXPIRATION, System.currentTimeMillis());
+                values.put(Subreddits.COLUMN_EXPIRATION, System.currentTimeMillis()
+                        + EXPIRATION_PADDING);
                 int count = cr.update(intent.getData(), values, null, null);
                 if (Debug.DEBUG_SYNC) {
                     Log.d(TAG, "updated: " + count);

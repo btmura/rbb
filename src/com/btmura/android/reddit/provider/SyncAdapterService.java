@@ -18,6 +18,7 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -27,10 +28,12 @@ import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -38,22 +41,30 @@ import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 
 public class SyncAdapterService extends Service {
 
-    public static final String TAG = "SyncAdapterService";
+    private static final String[] PROJECTION = {
+            Subreddits._ID,
+            Subreddits.COLUMN_NAME,
+            Subreddits.COLUMN_STATE,
+            Subreddits.COLUMN_EXPIRATION,
+    };
+
+    private static final int INDEX_ID = 0;
+    private static final int INDEX_NAME = 1;
+    private static final int INDEX_STATE = 2;
+    private static final int INDEX_EXPIRATION = 3;
 
     @Override
     public IBinder onBind(Intent intent) {
-        if (Debug.DEBUG_SERVICES) {
-            Log.d(TAG, "onBind");
-        }
         return new SyncAdapter(this).getSyncAdapterBinder();
     }
 
     static class SyncAdapter extends AbstractThreadedSyncAdapter {
+
+        public static final String TAG = "SyncAdapter";
 
         public SyncAdapter(Context context) {
             super(context, true);
@@ -62,55 +73,135 @@ public class SyncAdapterService extends Service {
         @Override
         public void onPerformSync(Account account, Bundle extras, String authority,
                 ContentProviderClient provider, SyncResult syncResult) {
-            if (Debug.DEBUG_SYNC) {
-                Log.d(TAG, "onPerformSync");
-            }
+
+            int numInserts = 0;
+            int numUpdates = 0;
+            int numDeletes = 0;
+            int numEntries = 0;
 
             AccountManager manager = AccountManager.get(getContext());
+            ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 
             try {
                 String cookie = manager.blockingGetAuthToken(account,
                         AccountAuthenticator.AUTH_TOKEN_COOKIE,
                         true);
 
-                ArrayList<Subreddit> subreddits = NetApi.query(cookie);
-                int count = subreddits.size();
+                ArrayList<String> subreddits = NetApi.query(cookie);
 
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count);
-                for (int i = 0; i < count; i++) {
-                    ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
-                            .withValue(Subreddits.COLUMN_ACCOUNT, account.name)
-                            .withValue(Subreddits.COLUMN_NAME, subreddits.get(i).name)
-                            .build());
+                Cursor c = provider.query(Subreddits.CONTENT_URI, PROJECTION,
+                        SubredditProvider.SELECTION_ACCOUNT,
+                        new String[] {account.name},
+                        null);
+                while (c.moveToNext()) {
+                    long expiration = c.getLong(INDEX_EXPIRATION);
+                    boolean expired = expiration != 0 && System.currentTimeMillis() > expiration;
+
+                    String name = c.getString(INDEX_NAME);
+                    int index = find(subreddits, name);
+                    boolean exists = index != -1;
+                    if (exists) {
+                        subreddits.remove(index);
+                    }
+
+                    long id = c.getLong(INDEX_ID);
+                    int state = c.getInt(INDEX_STATE);
+                    switch (state) {
+                        case Subreddits.STATE_INSERTING:
+                        case Subreddits.STATE_DELETING:
+                            if (expired) {
+                                if (exists) {
+                                    ops.add(newNormalUpdate(id));
+                                    numUpdates++;
+                                } else {
+                                    ops.add(newRealDelete(id));
+                                    numDeletes++;
+                                }
+                                numEntries++;
+                            }
+                            break;
+
+                        case Subreddits.STATE_NORMAL:
+                            if (!exists) {
+                                ops.add(newRealDelete(id));
+                                numDeletes++;
+                                numEntries++;
+                            }
+                            break;
+                    }
                 }
-                provider.applyBatch(ops);
+                c.close();
 
-                if (Debug.DEBUG_SYNC) {
-                    Log.d(TAG, "Synced " + count + " subreddits.");
+                if (!subreddits.isEmpty()) {
+                    int count = subreddits.size();
+                    for (int i = 0; i < count; i++) {
+                        ops.add(newInsert(account.name, subreddits.get(i)));
+                        numInserts++;
+
+                    }
                 }
 
+                ContentResolver cr = getContext().getContentResolver();
+                cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+
+                syncResult.stats.numInserts += numInserts;
+                syncResult.stats.numUpdates += numUpdates;
+                syncResult.stats.numDeletes += numDeletes;
+                syncResult.stats.numEntries += numEntries;
 
             } catch (OperationCanceledException e) {
                 Log.e(TAG, "onPerformSync", e);
                 syncResult.stats.numAuthExceptions++;
-
             } catch (AuthenticatorException e) {
                 Log.e(TAG, "onPerformSync", e);
                 syncResult.stats.numAuthExceptions++;
-
             } catch (IOException e) {
                 Log.e(TAG, "onPerformSync", e);
                 syncResult.stats.numIoExceptions++;
-
             } catch (RemoteException e) {
                 Log.e(TAG, "onPerformSync", e);
                 syncResult.databaseError = true;
-
             } catch (OperationApplicationException e) {
                 Log.e(TAG, "onPerformSync", e);
                 syncResult.databaseError = true;
-
             }
+
+            if (Debug.DEBUG_SYNC) {
+                Log.d(TAG, syncResult.toString());
+            }
+        }
+
+        private static int find(List<String> subreddits, String name) {
+            int count = subreddits.size();
+            for (int i = 0; i < count; i++) {
+                if (name.equalsIgnoreCase(subreddits.get(i))) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        private static ContentProviderOperation newNormalUpdate(long id) {
+            return ContentProviderOperation.newUpdate(Subreddits.CONTENT_URI)
+                    .withSelection(SubredditProvider.ID_SELECTION,
+                            new String[] {Long.toString(id)})
+                    .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
+                    .withValue(Subreddits.COLUMN_EXPIRATION, 0)
+                    .build();
+        }
+
+        private static ContentProviderOperation newRealDelete(long id) {
+            return ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+                    .withSelection(SubredditProvider.ID_SELECTION,
+                            new String[] {Long.toString(id)})
+                    .build();
+        }
+
+        private static ContentProviderOperation newInsert(String accountName, String name) {
+            return ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+                    .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
+                    .withValue(Subreddits.COLUMN_NAME, name)
+                    .build();
         }
     }
 }
