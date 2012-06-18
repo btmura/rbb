@@ -25,6 +25,7 @@ import android.content.ContentValues;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -172,9 +173,13 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         CheckedInfo info = (CheckedInfo) mode.getTag();
         menu.findItem(R.id.menu_add).setVisible(isQuery());
         menu.findItem(R.id.menu_add_combined).setVisible(isQuery() && info.checkedCount > 1);
-        menu.findItem(R.id.menu_combine).setVisible(!isQuery() && info.checkedCount > 1);
-        menu.findItem(R.id.menu_split).setVisible(
-                !isQuery() && info.checkedCount == 1 && info.numSplittable > 0);
+        menu.findItem(R.id.menu_combine).setVisible(!isQuery()
+                && TextUtils.isEmpty(accountNameHolder.getAccountName())
+                && info.checkedCount > 1);
+        menu.findItem(R.id.menu_split).setVisible(!isQuery()
+                && TextUtils.isEmpty(accountNameHolder.getAccountName())
+                && info.checkedCount == 1
+                && info.numSplittable > 0);
         menu.findItem(R.id.menu_delete).setVisible(!isQuery());
         return true;
     }
@@ -250,10 +255,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
                 }
             }
         }
-        SubredditProvider.combineInBackground(getActivity(),
-                accountNameHolder.getAccountName(),
-                names,
-                null);
+        SubredditProvider.combineInBackground(getActivity(), names, null);
         mode.finish();
     }
 
@@ -266,21 +268,14 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         }
 
         long[] ids = getListView().getCheckedItemIds();
-
-        SubredditProvider.combineInBackground(getActivity(),
-                accountNameHolder.getAccountName(),
-                names,
-                ids);
+        SubredditProvider.combineInBackground(getActivity(), names, ids);
         mode.finish();
     }
 
     private void handleSplit(ActionMode mode) {
         ArrayList<String> names = getCheckedNames();
         long[] ids = getListView().getCheckedItemIds();
-        SubredditProvider.splitInBackground(getActivity(),
-                accountNameHolder.getAccountName(),
-                names.get(0),
-                ids[0]);
+        SubredditProvider.splitInBackground(getActivity(), names.get(0), ids[0]);
         mode.finish();
     }
 

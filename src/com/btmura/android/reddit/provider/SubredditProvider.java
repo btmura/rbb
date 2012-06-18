@@ -245,7 +245,7 @@ public class SubredditProvider extends ContentProvider {
         }.execute();
     }
 
-    public static void combineInBackground(final Context context, final String accountName,
+    public static void combineInBackground(final Context context,
             final List<String> subredditNames, final long[] ids) {
         new AsyncTask<Void, Void, Integer>() {
             @Override
@@ -260,38 +260,19 @@ public class SubredditProvider extends ContentProvider {
                 }
 
                 int count = ids.length;
-                Uri[] uris = new Uri[count];
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 2);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 1);
                 for (int i = 0; i < count; i++) {
-                    uris[i] = ContentUris.withAppendedId(Subreddits.CONTENT_URI, ids[i]);
-                    ops.add(ContentProviderOperation.newUpdate(uris[i])
-                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED)
+                    ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+                            .withSelection(ID_SELECTION, new String[] {Long.toString(ids[i])})
                             .build());
                 }
-
-                ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
-                        .withSelection(SELECTION_ACCOUNT_AND_NAME, new String[] {
-                                accountName,
-                                combinedName.toString(),
-                        })
-                        .build());
                 ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
-                        .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                         .withValue(Subreddits.COLUMN_NAME, combinedName.toString())
-                        .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED)
                         .build());
-
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    ContentProviderResult[] results =
-                            cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-                    startSyncOperation(context, results[results.length - 1].uri);
-                    for (int i = 0; i < count; i++) {
-                        if (results[i].count > 0) {
-                            startSyncOperation(context, uris[i]);
-                        }
-                    }
+                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
                 } catch (RemoteException e) {
                     Log.e(TAG, "combineInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -303,13 +284,12 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected void onPostExecute(Integer deleted) {
                 showChangeToast(context, 1);
-                scheduleBackup(context, accountName);
+                scheduleBackup(context, null);
             }
         }.execute();
     }
 
-    public static void splitInBackground(final Context context, final String accountName,
-            final String subredditName,
+    public static void splitInBackground(final Context context, final String subredditName,
             final long id) {
         new AsyncTask<Void, Void, Integer>() {
             @Override
@@ -317,24 +297,15 @@ public class SubredditProvider extends ContentProvider {
                 String[] parts = subredditName.split("\\+");
                 int numParts = parts.length;
 
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(numParts * 2 + 1);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(numParts + 1);
                 for (int i = 0; i < numParts; i++) {
-                    ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
-                            .withSelection(SELECTION_ACCOUNT_AND_NAME, new String[] {
-                                    accountName,
-                                    parts[i],
-                            })
-                            .build());
                     ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
-                            .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                             .withValue(Subreddits.COLUMN_NAME, parts[i])
-                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTED)
                             .build());
                 }
 
-                ops.add(ContentProviderOperation.newUpdate(Subreddits.CONTENT_URI)
+                ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
                         .withSelection(ID_SELECTION, new String[] {Long.toString(id)})
-                        .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETED)
                         .build());
 
                 ContentResolver cr = context.getContentResolver();
@@ -351,7 +322,7 @@ public class SubredditProvider extends ContentProvider {
             @Override
             protected void onPostExecute(Integer added) {
                 showChangeToast(context, added);
-                scheduleBackup(context, accountName);
+                scheduleBackup(context, null);
             }
         }.execute();
     }
