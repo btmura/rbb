@@ -57,15 +57,18 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
 
                 ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
 
-                Bundle result = new Bundle();
-                result.putString(AccountManager.KEY_ACCOUNT_NAME, login);
-                result.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+                Bundle extras = new Bundle(1);
+                extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                ContentResolver.requestSync(account, SubredditProvider.AUTHORITY, extras);
+
+                Bundle result = new Bundle(2);
+                result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+                result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
                 return result;
             }
 
             @Override
             protected void onPostExecute(Bundle result) {
-                super.onPostExecute(result);
                 setAccountAuthenticatorResult(result);
                 setResult(RESULT_OK);
                 finish();

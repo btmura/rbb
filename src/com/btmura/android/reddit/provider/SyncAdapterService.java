@@ -167,7 +167,7 @@ public class SyncAdapterService extends Service {
             }
 
             if (Debug.DEBUG_SYNC) {
-                Log.d(TAG, syncResult.toString());
+                Log.d(TAG, account.name + " " + syncResult.toString());
             }
         }
 
