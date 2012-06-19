@@ -86,8 +86,7 @@ public class LoginBrowserActivity extends Activity implements
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onLoadFinished (id " + loader.getId() + ") "
-                    + "(count " + result.accountNames.length + ")");
+            Log.d(TAG, "onLoadFinished selectedAccount: " + result.selectedAccount);
         }
         adapter.setAccountNames(result.accountNames);
         bar.setSelectedNavigationItem(result.selectedAccount);

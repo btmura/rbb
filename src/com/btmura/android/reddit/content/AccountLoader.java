@@ -54,7 +54,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
     };
 
     private static final String PREFS = "accountPreferences";
-    private static final String PREF_LAST_LOGIN = "lastAccount";
+    private static final String PREF_LAST_ACCOUNT = "lastAccount";
 
     private SharedPreferences prefs;
     private AccountManager manager;
@@ -89,14 +89,12 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
 
         // Find which account was selected last.
         int selectedAccount = 0;
-        int numAccounts = accounts.length;
-        if (numAccounts != 0) {
-            String lastLogin = prefs.getString(PREF_LAST_LOGIN, null);
-            for (int i = 0; i < numAccounts; i++) {
-                if (accounts[i].name.equals(lastLogin)) {
-                    selectedAccount = i;
-                    break;
-                }
+        String lastAccount = prefs.getString(PREF_LAST_ACCOUNT, null);
+        Log.d(TAG, "lastAccount: " + lastAccount);
+        for (int i = 0; i < accountNames.length; i++) {
+            if (accountNames[i].equals(lastAccount)) {
+                selectedAccount = i;
+                break;
             }
         }
 
@@ -152,7 +150,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
     public static void setLastAccount(Context context, String name) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
         Editor editor = prefs.edit();
-        editor.putString(AccountLoader.PREF_LAST_LOGIN, name);
+        editor.putString(AccountLoader.PREF_LAST_ACCOUNT, name);
         editor.apply();
     }
 }
