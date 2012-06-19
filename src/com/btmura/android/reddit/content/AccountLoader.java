@@ -33,17 +33,18 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 
-public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnAccountsUpdateListener {
+public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
+        OnAccountsUpdateListener {
 
     public static final String TAG = "AccountLoader";
 
     public static class AccountResult {
         public String[] accountNames;
-        public int selectedAccount;
+        public SharedPreferences prefs;
 
-        private AccountResult(String[] accountNames, int selectedAccount) {
+        private AccountResult(String[] accountNames, SharedPreferences prefs) {
             this.accountNames = accountNames;
-            this.selectedAccount = selectedAccount;
+            this.prefs = prefs;
         }
     }
 
@@ -87,18 +88,10 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
             accountNames[i + 1] = accounts[i].name;
         }
 
-        // Find which account was selected last.
-        int selectedAccount = 0;
-        String lastAccount = prefs.getString(PREF_LAST_ACCOUNT, null);
-        Log.d(TAG, "lastAccount: " + lastAccount);
-        for (int i = 0; i < accountNames.length; i++) {
-            if (accountNames[i].equals(lastAccount)) {
-                selectedAccount = i;
-                break;
-            }
-        }
+        // Get a preference to make sure the loading thread is done.
+        prefs.getString(PREF_LAST_ACCOUNT, null);
 
-        return new AccountResult(accountNames, selectedAccount);
+        return new AccountResult(accountNames, prefs);
     }
 
     @Override
@@ -147,10 +140,20 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements OnA
         onContentChanged();
     }
 
-    public static void setLastAccount(Context context, String name) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+    public static int getLastAccountIndex(SharedPreferences prefs, String[] accountNames) {
+        String lastAccount = prefs.getString(AccountLoader.PREF_LAST_ACCOUNT,
+                Subreddits.ACCOUNT_NONE);
+        for (int i = 0; i < accountNames.length; i++) {
+            if (accountNames[i].equals(lastAccount)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    public static void setLastAccount(SharedPreferences prefs, String accountName) {
         Editor editor = prefs.edit();
-        editor.putString(AccountLoader.PREF_LAST_ACCOUNT, name);
+        editor.putString(AccountLoader.PREF_LAST_ACCOUNT, accountName);
         editor.apply();
     }
 }

@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -50,6 +51,7 @@ public class LoginBrowserActivity extends Activity implements
 
     private ActionBar bar;
     private AccountSpinnerAdapter adapter;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,26 +87,22 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onLoadFinished selectedAccount: " + result.selectedAccount);
-        }
         adapter.setAccountNames(result.accountNames);
-        bar.setSelectedNavigationItem(result.selectedAccount);
+        prefs = result.prefs;
+        int index = AccountLoader.getLastAccountIndex(prefs, result.accountNames);
+        bar.setSelectedNavigationItem(index);
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onLoaderReset (id " + loader.getId() + ")");
-        }
         adapter.setAccountNames(null);
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         if (Debug.DEBUG_ACTIVITY) {
-            Log.d(TAG, "onNavigationItemSelected (itemPosition " + itemPosition + ")");
+            Log.d(TAG, "onNavigationItemSelected itemPosition:" + itemPosition);
         }
         String accountName = adapter.getItem(itemPosition);
-        AccountLoader.setLastAccount(this, accountName);
+        AccountLoader.setLastAccount(prefs, accountName);
 
         SubredditListFragment slf = SubredditListFragment.newInstance(null, accountName, 0);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
