@@ -104,10 +104,13 @@ public class LoginBrowserActivity extends Activity implements
         String accountName = adapter.getItem(itemPosition);
         AccountLoader.setLastAccount(prefs, accountName);
 
-        SubredditListFragment slf = SubredditListFragment.newInstance(null, accountName, 0);
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.single_container, slf, SubredditListFragment.TAG);
-        ft.commit();
+        SubredditListFragment f = getSubredditListFragment();
+        if (f == null || !f.getAccountName().equals(accountName)) {
+            f = SubredditListFragment.newInstance(null, accountName, 0);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.single_container, f, SubredditListFragment.TAG);
+            ft.commit();
+        }
 
         return true;
     }
@@ -124,5 +127,9 @@ public class LoginBrowserActivity extends Activity implements
 
     public CharSequence getSubredditName() {
         return null;
+    }
+
+    private SubredditListFragment getSubredditListFragment() {
+        return (SubredditListFragment) getFragmentManager().findFragmentByTag(SubredditListFragment.TAG);
     }
 }
