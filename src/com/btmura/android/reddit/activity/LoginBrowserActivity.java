@@ -21,6 +21,7 @@ import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -119,6 +120,11 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public void onSubredditSelected(Subreddit subreddit) {
+        Intent intent = new Intent(this, ThingListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
+        intent.putExtra(ThingListActivity.EXTRA_FLAGS, 0);
+        startActivity(intent);
     }
 
     public String getAccountName() {
