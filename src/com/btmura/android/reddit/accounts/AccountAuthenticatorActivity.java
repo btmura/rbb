@@ -75,4 +75,9 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
             }
         }.execute();
     }
+
+    public void onAccountCancelled() {
+        finish();
+    }
 }
+

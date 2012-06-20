@@ -50,6 +50,7 @@ public class AddAccountFragment extends Fragment implements
 
     public interface OnAccountAddedListener {
         void onAccountAdded(String login, String cookie, String modhash);
+        void onAccountCancelled();
     }
 
     private OnAccountAddedListener listener;
@@ -107,7 +108,9 @@ public class AddAccountFragment extends Fragment implements
     }
 
     private void handleCancel() {
-
+        if (listener != null) {
+            listener.onAccountCancelled();
+        }
     }
 
     private void handleAdd() {
