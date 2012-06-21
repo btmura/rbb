@@ -69,7 +69,8 @@ public class LoginBrowserActivity extends Activity implements
     private void setInitialFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(0), GlobalMenuFragment.TAG);
+            ft.add(GlobalMenuFragment.newInstance(GlobalMenuFragment.FLAG_SHOW_MANAGE_ACCOUNTS),
+                    GlobalMenuFragment.TAG);
             ft.commit();
         }
     }

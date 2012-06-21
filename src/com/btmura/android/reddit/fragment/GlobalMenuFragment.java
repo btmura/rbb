@@ -31,6 +31,7 @@ import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SearchActivity;
+import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class GlobalMenuFragment extends Fragment implements
@@ -39,6 +40,10 @@ public class GlobalMenuFragment extends Fragment implements
 
     public static final String TAG = "GlobalMenuFragment";
 
+    public static final int FLAG_SHOW_MANAGE_ACCOUNTS = 0x1;
+
+    private static final String ARG_FLAGS = "f";
+
     private static final int REQUEST_SEARCH = 0;
 
     private OnQueryTextListener queryListener;
@@ -46,7 +51,11 @@ public class GlobalMenuFragment extends Fragment implements
     private SearchView searchView;
 
     public static GlobalMenuFragment newInstance(int flags) {
-        return new GlobalMenuFragment();
+        Bundle args = new Bundle(1);
+        args.putInt(ARG_FLAGS, flags);
+        GlobalMenuFragment f = new GlobalMenuFragment();
+        f.setArguments(args);
+        return f;
     }
 
     @Override
@@ -74,15 +83,10 @@ public class GlobalMenuFragment extends Fragment implements
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_SEARCH:
-                searchItem.collapseActionView();
-                break;
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.menu_manage_accounts).setVisible(showManageAccounts());
 
-            default:
-                super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     @Override
@@ -92,7 +96,7 @@ public class GlobalMenuFragment extends Fragment implements
                 handleSearch();
                 return true;
 
-            case R.id.menu_accounts:
+            case R.id.menu_manage_accounts:
                 handleAccounts();
                 return true;
 
@@ -127,6 +131,14 @@ public class GlobalMenuFragment extends Fragment implements
         }
     }
 
+    public boolean onQueryTextChange(String newText) {
+        if (queryListener != null) {
+            return queryListener.onQueryTextChange(newText);
+        } else {
+            return false;
+        }
+    }
+
     public boolean onQueryTextSubmit(String query) {
         if (queryListener != null) {
             searchItem.collapseActionView();
@@ -141,11 +153,23 @@ public class GlobalMenuFragment extends Fragment implements
         }
     }
 
-    public boolean onQueryTextChange(String newText) {
-        if (queryListener != null) {
-            return queryListener.onQueryTextChange(newText);
-        } else {
-            return false;
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_SEARCH:
+                searchItem.collapseActionView();
+                break;
+
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private boolean showManageAccounts() {
+        return Flag.isEnabled(getFlags(), FLAG_SHOW_MANAGE_ACCOUNTS);
+    }
+
+    private int getFlags() {
+        return getArguments().getInt(ARG_FLAGS);
     }
 }
