@@ -39,7 +39,7 @@ public class InputFilters {
                 int dstart, int dend) {
             for (int i = start; i < end; i++) {
                 char c = source.charAt(i);
-                if (!Character.isLetterOrDigit(c) && c != '+' && c != '_') {
+                if (!Character.isLetterOrDigit(c) && c != '_') {
                     return "";
                 }
             }

@@ -4,13 +4,20 @@
     android:layout_height="match_parent"
     android:columnCount="1" >
 
+    <Spinner
+        android:id="@+id/account_spinner"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginBottom="@dimen/element_padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/padding" />
+
     <EditText
         android:id="@+id/subreddit_name"
         android:layout_gravity="fill_horizontal"
         android:layout_marginBottom="@dimen/element_padding"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
-        android:layout_marginTop="@dimen/padding"
         android:hint="@string/type_subreddit_name"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"

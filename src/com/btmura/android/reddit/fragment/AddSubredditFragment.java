@@ -18,6 +18,8 @@ package com.btmura.android.reddit.fragment;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.TextUtils;
@@ -30,14 +32,20 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.Spinner;
 
+import com.btmura.android.reddit.LoaderIds;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.text.InputFilters;
+import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
 public class AddSubredditFragment extends DialogFragment implements
-        OnClickListener,
-        OnCheckedChangeListener {
+        LoaderCallbacks<AccountResult>,
+        OnCheckedChangeListener,
+        OnClickListener {
 
     public static final String TAG = "AddSubredditFragment";
 
@@ -45,9 +53,10 @@ public class AddSubredditFragment extends DialogFragment implements
             InputFilters.SUBREDDIT_NAME_FILTER,
     };
 
-    private AccountNameHolder accountNameHolder;
     private SubredditNameHolder subredditNameHolder;
+    private AccountSpinnerAdapter adapter;
 
+    private Spinner spinner;
     private EditText nameField;
     private CheckBox addFrontPage;
     private Button cancel;
@@ -60,14 +69,22 @@ public class AddSubredditFragment extends DialogFragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        accountNameHolder = (AccountNameHolder) activity;
         subredditNameHolder = (SubredditNameHolder) activity;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        adapter = new AccountSpinnerAdapter(getActivity());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setTitle(R.string.add_subreddit);
         View v = inflater.inflate(R.layout.add_subreddit, container, false);
+
+        spinner = (Spinner) v.findViewById(R.id.account_spinner);
+        spinner.setAdapter(adapter);
 
         CharSequence name = subredditNameHolder.getSubredditName();
         int length = name != null ? name.length() : 0;
@@ -86,6 +103,26 @@ public class AddSubredditFragment extends DialogFragment implements
         add.setOnClickListener(this);
 
         return v;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
+    }
+
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(getActivity());
+    }
+
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        adapter.setAccountNames(result.accountNames);
+        int index = AccountLoader.getLastAccountIndex(result.prefs, result.accountNames);
+        spinner.setSelection(index);
+    }
+
+    public void onLoaderReset(Loader<AccountResult> loader) {
+        adapter.setAccountNames(null);
     }
 
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -108,19 +145,21 @@ public class AddSubredditFragment extends DialogFragment implements
     }
 
     private void handleAdd() {
-        String name;
+        String subredditName;
         if (addFrontPage.isChecked()) {
-            name = "";
+            subredditName = "";
         } else {
-            name = nameField.getText().toString();
+            subredditName = nameField.getText().toString();
         }
 
-        if (!addFrontPage.isChecked() && TextUtils.isEmpty(name)) {
+        if (!addFrontPage.isChecked() && TextUtils.isEmpty(subredditName)) {
             nameField.setError(getString(R.string.error_blank_field));
             return;
         }
 
-        SubredditProvider.addInBackground(getActivity(), accountNameHolder.getAccountName(), name);
+        int position = spinner.getSelectedItemPosition();
+        String accountName = adapter.getItem(position);
+        SubredditProvider.addInBackground(getActivity(), accountName, subredditName);
         dismiss();
     }
 }
