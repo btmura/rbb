@@ -69,7 +69,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         }
         String accountName = getItem(position);
         if (TextUtils.isEmpty(accountName)) {
-            tv.setText(R.string.no_account);
+            tv.setText(R.string.app_name);
         } else {
             tv.setText(accountName);
         }
