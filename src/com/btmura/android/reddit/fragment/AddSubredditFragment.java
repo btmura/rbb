@@ -55,6 +55,7 @@ public class AddSubredditFragment extends DialogFragment implements
 
     private SubredditNameHolder subredditNameHolder;
     private AccountSpinnerAdapter adapter;
+    private boolean restoringState;
 
     private Spinner spinner;
     private EditText nameField;
@@ -108,6 +109,7 @@ public class AddSubredditFragment extends DialogFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        restoringState = savedInstanceState != null;
         getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
     }
 
@@ -117,8 +119,10 @@ public class AddSubredditFragment extends DialogFragment implements
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         adapter.setAccountNames(result.accountNames);
-        int index = AccountLoader.getLastAccountIndex(result.prefs, result.accountNames);
-        spinner.setSelection(index);
+        if (!restoringState) {
+            int index = AccountLoader.getLastAccountIndex(result.prefs, result.accountNames);
+            spinner.setSelection(index);
+        }
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
