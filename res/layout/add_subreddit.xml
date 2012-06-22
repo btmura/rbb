@@ -2,22 +2,33 @@
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnCount="1" >
+    android:columnCount="2" >
+
+    <TextView
+        android:layout_gravity="center_vertical|right"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/element_padding"
+        android:layout_marginTop="@dimen/padding"
+        android:text="@string/account" />
 
     <Spinner
         android:id="@+id/account_spinner"
         android:layout_gravity="fill_horizontal"
-        android:layout_marginBottom="@dimen/element_padding"
-        android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/padding" />
+
+    <TextView
+        android:layout_gravity="center_vertical|right"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/element_padding"
+        android:layout_marginTop="@dimen/element_padding"
+        android:text="@string/subreddit" />
 
     <EditText
         android:id="@+id/subreddit_name"
         android:layout_gravity="fill_horizontal"
-        android:layout_marginBottom="@dimen/element_padding"
-        android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
         android:hint="@string/type_subreddit_name"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
@@ -25,14 +36,16 @@
 
     <CheckBox
         android:id="@+id/add_front_page"
+        android:layout_column="1"
         android:layout_marginBottom="@dimen/padding"
-        android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
         android:text="@string/add_front_page" />
 
     <include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_columnSpan="2"
         layout="@layout/add_button_bar" />
 
 </GridLayout>
