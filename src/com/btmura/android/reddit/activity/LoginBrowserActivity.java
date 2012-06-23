@@ -123,6 +123,7 @@ public class LoginBrowserActivity extends Activity implements
     public void onSubredditSelected(Subreddit subreddit) {
         Intent intent = new Intent(this, ThingListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.putExtra(ThingListActivity.EXTRA_ACCOUNT_NAME, getAccountName());
         intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
         intent.putExtra(ThingListActivity.EXTRA_FLAGS, 0);
         startActivity(intent);

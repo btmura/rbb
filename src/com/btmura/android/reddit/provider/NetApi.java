@@ -23,15 +23,18 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
+import android.content.Context;
+import android.text.TextUtils;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
+import com.btmura.android.reddit.entity.Thing;
 
-class NetApi {
+public class NetApi {
 
-    static ArrayList<String> query(String cookie) throws IOException {
+    static ArrayList<String> querySubreddits(String cookie) throws IOException {
         URL url = Urls.subredditListUrl();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         setCommonHeaders(conn, cookie);
@@ -45,6 +48,22 @@ class NetApi {
         conn.disconnect();
 
         return parser.results;
+    }
+
+    public static ArrayList<Thing> queryThings(Context context, URL url, String cookie,
+            String parentSubreddit, List<Thing> initThings) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        setCommonHeaders(conn, cookie);
+        conn.connect();
+
+        InputStream in = conn.getInputStream();
+        JsonReader reader = new JsonReader(new InputStreamReader(in));
+        ThingParser parser = new ThingParser(context, parentSubreddit, initThings);
+        parser.parseListingObject(reader);
+        in.close();
+        conn.disconnect();
+
+        return parser.things;
     }
 
     static void subscribe(String cookie, String modhash, String subreddit, boolean subscribe)
@@ -64,7 +83,9 @@ class NetApi {
     private static void setCommonHeaders(HttpURLConnection conn, String cookie) {
         conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
         conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
-        conn.setRequestProperty("Cookie", Urls.loginCookie(cookie));
+        if (!TextUtils.isEmpty(cookie)) {
+            conn.setRequestProperty("Cookie", Urls.loginCookie(cookie));
+        }
     }
 
     private static void setFormDataHeaders(HttpURLConnection conn) {
@@ -82,21 +103,6 @@ class NetApi {
             if (output != null) {
                 output.close();
             }
-        }
-    }
-
-    static class SubredditParser extends JsonParser {
-
-        ArrayList<String> results = new ArrayList<String>();
-
-        @Override
-        public void onEntityStart(int index) {
-            results.add(null);
-        }
-
-        @Override
-        public void onDisplayName(JsonReader reader, int index) throws IOException {
-            results.set(index, reader.nextString());
         }
     }
 }

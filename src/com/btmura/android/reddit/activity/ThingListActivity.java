@@ -27,6 +27,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.fragment.AccountNameHolder;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingListFragment;
@@ -35,10 +36,12 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 public class ThingListActivity extends GlobalMenuActivity implements
         ActionBar.OnNavigationListener,
         ThingListFragment.OnThingSelectedListener,
+        AccountNameHolder,
         SubredditNameHolder {
 
     public static final String TAG = "ThingListActivity";
 
+    public static final String EXTRA_ACCOUNT_NAME = "a";
     public static final String EXTRA_SUBREDDIT = "s";
     public static final String EXTRA_FLAGS = "f";
 
@@ -47,6 +50,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private static final String STATE_FILTER = "f";
 
     private ActionBar bar;
+    private String accountName;
     private Subreddit subreddit;
     private boolean insertHome;
     private int tlfFlags;
@@ -61,6 +65,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
+        accountName = getIntent().getStringExtra(EXTRA_ACCOUNT_NAME);
         subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
 
         int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
@@ -106,6 +111,10 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public int getThingBodyWidth() {
         return 0;
+    }
+
+    public String getAccountName() {
+        return accountName;
     }
 
     public String getSubredditName() {

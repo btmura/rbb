@@ -19,6 +19,7 @@ package com.btmura.android.reddit.fragment;
 import java.net.URL;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
@@ -71,6 +72,8 @@ public class ThingListFragment extends ListFragment implements
     private String query;
 
     private ThingAdapter adapter;
+    private AccountNameHolder accountNameHolder;
+    private OnThingSelectedListener listener;
     private boolean scrollLoading;
 
     public static ThingListFragment newInstance(Subreddit sr, int filter, int flags) {
@@ -90,6 +93,13 @@ public class ThingListFragment extends ListFragment implements
         args.putInt(ARG_FLAGS, flags);
         f.setArguments(args);
         return f;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        accountNameHolder = (AccountNameHolder) activity;
+        listener = (OnThingSelectedListener) activity;
     }
 
     @Override
@@ -136,8 +146,11 @@ public class ThingListFragment extends ListFragment implements
         } else {
             url = Urls.searchUrl(query, moreKey);
         }
-        return new ThingLoader(getActivity().getApplicationContext(), Subreddit.getName(subreddit),
-                url, args != null ? adapter.getItems() : null);
+        return new ThingLoader(getActivity().getApplicationContext(),
+                accountNameHolder.getAccountName(),
+                Subreddit.getName(subreddit),
+                url,
+                args != null ? adapter.getItems() : null);
     }
 
     public void onLoadFinished(Loader<List<Thing>> loader, List<Thing> things) {
@@ -160,7 +173,7 @@ public class ThingListFragment extends ListFragment implements
 
         switch (t.type) {
             case Thing.TYPE_THING:
-                getListener().onThingSelected(adapter.getItem(position), position);
+                listener.onThingSelected(adapter.getItem(position), position);
                 break;
         }
     }
@@ -243,11 +256,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private int getThingBodyWidth() {
-        return getListener().getThingBodyWidth();
-    }
-
-    private OnThingSelectedListener getListener() {
-        return (OnThingSelectedListener) getActivity();
+        return listener.getThingBodyWidth();
     }
 
     private Subreddit getSubreddit() {

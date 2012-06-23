@@ -90,7 +90,7 @@ public class SyncAdapterService extends Service {
                         AccountAuthenticator.AUTH_TOKEN_COOKIE,
                         true);
 
-                ArrayList<String> subreddits = NetApi.query(cookie);
+                ArrayList<String> subreddits = NetApi.querySubreddits(cookie);
 
                 boolean firstSync = extras.getBoolean(EXTRA_INITIAL_SYNC);
                 if (firstSync) {
