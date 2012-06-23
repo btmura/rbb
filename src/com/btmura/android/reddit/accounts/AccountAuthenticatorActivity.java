@@ -27,6 +27,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.fragment.AddAccountFragment;
 import com.btmura.android.reddit.fragment.AddAccountFragment.OnAccountAddedListener;
 import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.SyncAdapterService;
 
 public class AccountAuthenticatorActivity extends android.accounts.AccountAuthenticatorActivity
         implements OnAccountAddedListener {
@@ -57,8 +58,9 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
 
                 ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
 
-                Bundle extras = new Bundle(1);
+                Bundle extras = new Bundle(2);
                 extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                extras.putBoolean(SyncAdapterService.EXTRA_INITIAL_SYNC, true);
                 ContentResolver.requestSync(account, SubredditProvider.AUTHORITY, extras);
 
                 Bundle result = new Bundle(2);

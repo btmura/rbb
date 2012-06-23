@@ -69,11 +69,13 @@ public class SubredditProvider extends ContentProvider {
 
         public static final String SORT_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
 
+        public static final String NAME_FRONT_PAGE = "";
         public static final String ACCOUNT_NONE = "";
 
         public static final int STATE_NORMAL = 0;
         public static final int STATE_INSERTING = 1;
         public static final int STATE_DELETING = 2;
+        public static final int STATE_FIXED = 3;
     }
 
     public static final String SELECTION_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
