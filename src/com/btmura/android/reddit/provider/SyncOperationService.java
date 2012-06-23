@@ -69,24 +69,26 @@ public class SyncOperationService extends IntentService {
                             + " state: " + state);
                 }
 
-                AccountManager manager = AccountManager.get(this);
-                Account account = new Account(accountName, getString(R.string.account_type));
-                String cookie = manager.blockingGetAuthToken(account,
-                        AccountAuthenticator.AUTH_TOKEN_COOKIE,
-                        true);
-                String modhash = manager.blockingGetAuthToken(account,
-                        AccountAuthenticator.AUTH_TOKEN_MODHASH,
-                        true);
+                if (!Subreddits.NAME_FRONT_PAGE.equals(subreddit)) {
+                    AccountManager manager = AccountManager.get(this);
+                    Account account = new Account(accountName, getString(R.string.account_type));
+                    String cookie = manager.blockingGetAuthToken(account,
+                            AccountAuthenticator.AUTH_TOKEN_COOKIE,
+                            true);
+                    String modhash = manager.blockingGetAuthToken(account,
+                            AccountAuthenticator.AUTH_TOKEN_MODHASH,
+                            true);
 
-                boolean subscribe = state == Subreddits.STATE_INSERTING;
-                NetApi.subscribe(cookie, modhash, subreddit, subscribe);
+                    boolean subscribe = state == Subreddits.STATE_INSERTING;
+                    NetApi.subscribe(cookie, modhash, subreddit, subscribe);
 
-                ContentValues values = new ContentValues(1);
-                values.put(Subreddits.COLUMN_EXPIRATION, System.currentTimeMillis()
-                        + EXPIRATION_PADDING);
-                int count = cr.update(intent.getData(), values, null, null);
-                if (Debug.DEBUG_SYNC) {
-                    Log.d(TAG, "updated: " + count);
+                    ContentValues values = new ContentValues(1);
+                    values.put(Subreddits.COLUMN_EXPIRATION, System.currentTimeMillis()
+                            + EXPIRATION_PADDING);
+                    int count = cr.update(intent.getData(), values, null, null);
+                    if (Debug.DEBUG_SYNC) {
+                        Log.d(TAG, "updated: " + count);
+                    }
                 }
             }
         } catch (OperationCanceledException e) {

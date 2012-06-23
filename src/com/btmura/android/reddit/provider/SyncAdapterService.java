@@ -97,7 +97,7 @@ public class SyncAdapterService extends Service {
                     ops.add(newDeleteByAccountName(account.name));
                     ops.add(newInsert(account.name,
                             Subreddits.NAME_FRONT_PAGE,
-                            Subreddits.STATE_FIXED));
+                            Subreddits.STATE_INSERTING));
                     numInserts++;
                     numEntries++;
                 } else {
