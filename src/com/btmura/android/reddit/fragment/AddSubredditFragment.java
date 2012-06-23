@@ -57,11 +57,15 @@ public class AddSubredditFragment extends DialogFragment implements
     private AccountSpinnerAdapter adapter;
     private boolean restoringState;
 
-    private Spinner spinner;
+    private Spinner accountSpinner;
     private EditText nameField;
     private CheckBox addFrontPage;
     private Button cancel;
     private Button add;
+
+    private View accountText;
+
+    private View subredditText;
 
     public static AddSubredditFragment newInstance() {
         return new AddSubredditFragment();
@@ -84,8 +88,11 @@ public class AddSubredditFragment extends DialogFragment implements
         getDialog().setTitle(R.string.add_subreddit);
         View v = inflater.inflate(R.layout.add_subreddit, container, false);
 
-        spinner = (Spinner) v.findViewById(R.id.account_spinner);
-        spinner.setAdapter(adapter);
+        accountText = v.findViewById(R.id.account_text);
+        subredditText = v.findViewById(R.id.subreddit_text);
+
+        accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
+        accountSpinner.setAdapter(adapter);
 
         CharSequence name = subredditNameHolder.getSubredditName();
         int length = name != null ? name.length() : 0;
@@ -118,10 +125,15 @@ public class AddSubredditFragment extends DialogFragment implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        int visiblility = result.accountNames.length > 1 ? View.VISIBLE : View.GONE;
+        accountText.setVisibility(visiblility);
+        subredditText.setVisibility(visiblility);
+        accountSpinner.setVisibility(visiblility);
+
         adapter.setAccountNames(result.accountNames);
         if (!restoringState) {
             int index = AccountLoader.getLastAccountIndex(result.prefs, result.accountNames);
-            spinner.setSelection(index);
+            accountSpinner.setSelection(index);
         }
     }
 
@@ -161,7 +173,7 @@ public class AddSubredditFragment extends DialogFragment implements
             return;
         }
 
-        int position = spinner.getSelectedItemPosition();
+        int position = accountSpinner.getSelectedItemPosition();
         String accountName = adapter.getItem(position);
         SubredditProvider.addInBackground(getActivity(), accountName, subredditName);
         dismiss();
