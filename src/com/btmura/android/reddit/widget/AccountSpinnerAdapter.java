@@ -41,6 +41,10 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public String getAccountName(int position) {
+        return accountNames[position];
+    }
+
     public int getCount() {
         return accountNames != null ? accountNames.length : 0;
     }
