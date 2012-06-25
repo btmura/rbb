@@ -23,8 +23,8 @@ import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.LoaderIds;
@@ -39,7 +39,7 @@ import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class ThingListActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
@@ -58,8 +58,8 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private static final String STATE_FILTER = "f";
 
     private ActionBar bar;
-    private AccountSpinnerAdapter adapter;
-    private SharedPreferences prefs;
+    private FilterAdapter adapter;
+    private String accountName;
 
     private Subreddit subreddit;
     private boolean insertHome;
@@ -74,13 +74,8 @@ public class ThingListActivity extends GlobalMenuActivity implements
         setActionBar();
         getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
 
-        subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
-
         int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
         insertHome = Flag.isEnabled(flags, FLAG_INSERT_HOME);
-
-//        FilterAdapter adapter = new FilterAdapter(this);
-//        adapter.setTitle(subreddit.getTitle(this));
     }
 
     private void setInitialFragments(Bundle savedInstanceState) {
@@ -97,7 +92,9 @@ public class ThingListActivity extends GlobalMenuActivity implements
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-        adapter = new AccountSpinnerAdapter(this);
+        adapter = new FilterAdapter(this);
+        subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
+        adapter.setTitle(subreddit.getTitle(this));
         bar.setListNavigationCallbacks(adapter, this);
     }
 
@@ -106,14 +103,13 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        adapter.setAccountNames(result.accountNames);
-        prefs = result.prefs;
-        int index = AccountLoader.getLastAccountIndex(prefs, result.accountNames);
-        bar.setSelectedNavigationItem(index);
+        accountName = AccountLoader.getLastAccount(result.prefs, result.accountNames);
+        adapter.setSubtitle(TextUtils.isEmpty(accountName) ? getString(R.string.app_name)
+                : accountName);
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-        adapter.setAccountNames(null);
+        accountName = null;
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
@@ -144,7 +140,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public String getAccountName() {
-        return adapter.getAccountName(bar.getSelectedNavigationIndex());
+        return accountName;
     }
 
     public String getSubredditName() {

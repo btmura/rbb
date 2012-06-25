@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 Brian Muramatsu
+<!--
+     Copyright (C) 2012 Brian Muramatsu
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -18,24 +19,31 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:id="@+id/line1"
+        android:id="@+id/text1"
         style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
+        android:layout_alignParentTop="true"
         android:layout_marginRight="@dimen/element_padding"
         android:singleLine="true" />
 
     <TextView
-        android:id="@+id/line2"
+        android:id="@+id/text2"
         style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/line1"
-        android:layout_toRightOf="@+id/line1"
+        android:layout_toRightOf="@+id/text1"
         android:ellipsize="end"
         android:singleLine="true"
         android:textColor="@android:color/darker_gray" />
+
+    <TextView
+        android:id="@+id/text3"
+        style="@android:style/TextAppearance.Holo.Widget.ActionBar.Subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:ellipsize="end"
+        android:singleLine="true" />
 
 </RelativeLayout>

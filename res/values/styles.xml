@@ -16,14 +16,6 @@
 -->
 <resources>
 
-    <style name="LandscapeTitle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="LandscapeSubtitle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Subtitle">
-        <item name="android:textSize">12sp</item>
-    </style>
-
     <style name="PagerTitleStrip">
         <item name="android:background">#666666</item>
         <item name="android:textAppearance">@android:style/TextAppearance.Holo.Inverse</item>

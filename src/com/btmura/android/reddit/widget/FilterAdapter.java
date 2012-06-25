@@ -37,6 +37,7 @@ public class FilterAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     private final ArrayList<String> names = new ArrayList<String>(4);
     private CharSequence title;
+    private CharSequence subtitle;
 
     public FilterAdapter(Context context) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -63,6 +64,11 @@ public class FilterAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void setSubtitle(CharSequence subtitle) {
+        this.subtitle = subtitle;
+        notifyDataSetChanged();
+    }
+
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
@@ -70,23 +76,26 @@ public class FilterAdapter extends BaseAdapter {
         }
 
         ViewHolder h = (ViewHolder) v.getTag();
-        h.line1.setText(title);
-        h.line2.setText(getItem(position));
+        h.text1.setText(title);
+        h.text2.setText(getItem(position));
+        h.text3.setText(subtitle);
         return v;
     }
 
     private View makeView(ViewGroup parent) {
         View v = inflater.inflate(R.layout.filter_row, parent, false);
         ViewHolder h = new ViewHolder();
-        h.line1 = (TextView) v.findViewById(R.id.line1);
-        h.line2 = (TextView) v.findViewById(R.id.line2);
+        h.text1 = (TextView) v.findViewById(R.id.text1);
+        h.text2 = (TextView) v.findViewById(R.id.text2);
+        h.text3 = (TextView) v.findViewById(R.id.text3);
         v.setTag(h);
         return v;
     }
 
     static class ViewHolder {
-        TextView line1;
-        TextView line2;
+        TextView text1;
+        TextView text2;
+        TextView text3;
     }
 
     @Override

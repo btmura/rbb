@@ -151,6 +151,17 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         return 0;
     }
 
+    public static String getLastAccount(SharedPreferences prefs, String[] accountNames) {
+        String lastAccount = prefs.getString(AccountLoader.PREF_LAST_ACCOUNT,
+                Subreddits.ACCOUNT_NONE);
+        for (int i = 0; i < accountNames.length; i++) {
+            if (accountNames[i].equals(lastAccount)) {
+                return lastAccount;
+            }
+        }
+        return accountNames[0];
+    }
+
     public static void setLastAccount(SharedPreferences prefs, String accountName) {
         Editor editor = prefs.edit();
         editor.putString(AccountLoader.PREF_LAST_ACCOUNT, accountName);
