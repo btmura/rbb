@@ -24,7 +24,6 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.LoaderIds;
@@ -104,8 +103,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = AccountLoader.getLastAccount(result.prefs, result.accountNames);
-        adapter.setSubtitle(TextUtils.isEmpty(accountName) ? getString(R.string.app_name)
-                : accountName);
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {

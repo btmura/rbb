@@ -37,7 +37,6 @@ public class FilterAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     private final ArrayList<String> names = new ArrayList<String>(4);
     private CharSequence title;
-    private CharSequence subtitle;
 
     public FilterAdapter(Context context) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -64,11 +63,6 @@ public class FilterAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void setSubtitle(CharSequence subtitle) {
-        this.subtitle = subtitle;
-        notifyDataSetChanged();
-    }
-
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
@@ -78,7 +72,6 @@ public class FilterAdapter extends BaseAdapter {
         ViewHolder h = (ViewHolder) v.getTag();
         h.text1.setText(title);
         h.text2.setText(getItem(position));
-        h.text3.setText(subtitle);
         return v;
     }
 
@@ -87,7 +80,6 @@ public class FilterAdapter extends BaseAdapter {
         ViewHolder h = new ViewHolder();
         h.text1 = (TextView) v.findViewById(R.id.text1);
         h.text2 = (TextView) v.findViewById(R.id.text2);
-        h.text3 = (TextView) v.findViewById(R.id.text3);
         v.setTag(h);
         return v;
     }
@@ -95,7 +87,6 @@ public class FilterAdapter extends BaseAdapter {
     static class ViewHolder {
         TextView text1;
         TextView text2;
-        TextView text3;
     }
 
     @Override
