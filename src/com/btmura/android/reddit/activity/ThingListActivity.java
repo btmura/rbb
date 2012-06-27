@@ -18,7 +18,6 @@ package com.btmura.android.reddit.activity;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
@@ -52,7 +51,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public static final int FLAG_INSERT_HOME = 0x1;
 
-    private static final String STATE_FILTER = "f";
+    private static final String STATE_NAVIGATION_INDEX = "ni";
 
     private ActionBar bar;
     private FilterAdapter adapter;
@@ -60,15 +59,13 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     private Subreddit subreddit;
     private boolean insertHome;
-    private int tlfFlags;
-    private boolean restoringState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.thing_list);
         setInitialFragments(savedInstanceState);
-        setActionBar();
+        setActionBar(savedInstanceState);
         getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
 
         int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
@@ -83,16 +80,19 @@ public class ThingListActivity extends GlobalMenuActivity implements
         }
     }
 
-    private void setActionBar() {
+    private void setActionBar(Bundle savedInstanceState) {
         bar = getActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-        adapter = new FilterAdapter(this);
         subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
+        adapter = new FilterAdapter(this);
         adapter.setTitle(subreddit.getTitle(this));
         bar.setListNavigationCallbacks(adapter, this);
+        if (savedInstanceState != null) {
+            bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_NAVIGATION_INDEX));
+        }
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
@@ -108,19 +108,16 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        if (restoringState) {
-            restoringState = false;
-            return true;
+        int filter = adapter.getFilter(itemPosition);
+        ThingListFragment f = getThingListFragment();
+        if (f == null || !f.getAccountName().equals(accountName)
+                || f.getFilter() != filter) {
+            f = ThingListFragment.newInstance(accountName, subreddit, filter, 0);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
+            ft.commit();
         }
-        replaceFragments((int) itemId);
         return true;
-    }
-
-    private void replaceFragments(int filter) {
-        Fragment tlf = ThingListFragment.newInstance(accountName, subreddit, filter, tlfFlags);
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.single_container, tlf, ThingListFragment.TAG);
-        ft.commit();
     }
 
     public void onThingSelected(Thing thing, int position) {
@@ -136,12 +133,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public String getSubredditName() {
         return subreddit.name;
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(STATE_FILTER, bar.getSelectedNavigationIndex());
     }
 
     @Override
@@ -163,5 +154,15 @@ public class ThingListActivity extends GlobalMenuActivity implements
             intent.putExtra(BrowserActivity.EXTRA_FLAGS, BrowserActivity.FLAG_HOME_UP_ENABLED);
             startActivity(intent);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_NAVIGATION_INDEX, bar.getSelectedNavigationIndex());
+    }
+
+    private ThingListFragment getThingListFragment() {
+        return (ThingListFragment) getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
     }
 }

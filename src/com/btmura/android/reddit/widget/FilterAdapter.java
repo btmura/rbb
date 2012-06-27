@@ -46,6 +46,10 @@ public class FilterAdapter extends BaseAdapter {
         names.add(context.getString(R.string.filter_top));
     }
 
+    public int getFilter(int position) {
+        return position;
+    }
+
     public int getCount() {
         return names.size();
     }

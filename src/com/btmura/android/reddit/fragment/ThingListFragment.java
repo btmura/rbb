@@ -260,7 +260,7 @@ public class ThingListFragment extends ListFragment implements
         return listener.getThingBodyWidth();
     }
 
-    private String getAccountName() {
+    public String getAccountName() {
         return getArguments().getString(ARG_ACCOUNT_NAME);
     }
 
@@ -268,7 +268,7 @@ public class ThingListFragment extends ListFragment implements
         return getArguments().getParcelable(ARG_SUBREDDIT);
     }
 
-    private int getFilter() {
+    public int getFilter() {
         return getArguments().getInt(ARG_FILTER);
     }
 
