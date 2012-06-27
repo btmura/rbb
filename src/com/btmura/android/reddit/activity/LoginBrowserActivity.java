@@ -40,10 +40,12 @@ import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
+import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment.OnThingSelectedListener;
+import com.btmura.android.reddit.fragment.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
@@ -52,7 +54,8 @@ public class LoginBrowserActivity extends Activity implements
         OnNavigationListener,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
-        SubredditNameHolder {
+        SubredditNameHolder,
+        ThingPagerHolder {
 
     public static final String TAG = "LoginBrowserActivity";
 
@@ -193,6 +196,12 @@ public class LoginBrowserActivity extends Activity implements
 
     protected void selectThingMultiPane(Thing thing) {
         FragmentManager fm = getFragmentManager();
+
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.add(ThingMenuFragment.newInstance(thing), ThingMenuFragment.TAG);
+        ft.addToBackStack(null);
+        ft.commit();
+
         ThingPagerAdapter adapter = new ThingPagerAdapter(fm, thing);
         thingPager.setAdapter(adapter);
         thingPager.setVisibility(View.VISIBLE);
@@ -204,6 +213,10 @@ public class LoginBrowserActivity extends Activity implements
 
     public CharSequence getSubredditName() {
         return null;
+    }
+
+    public ViewPager getPager() {
+        return thingPager;
     }
 
     private String getAccountName() {
