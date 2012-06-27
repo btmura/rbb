@@ -19,7 +19,7 @@ package com.btmura.android.reddit.activity;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
-import android.app.FragmentManager;
+import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
@@ -38,13 +38,14 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.fragment.ControlFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
-import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment.OnThingSelectedListener;
+import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
@@ -54,6 +55,7 @@ public class LoginBrowserActivity extends Activity implements
         OnNavigationListener,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
+        OnBackStackChangedListener,
         SubredditNameHolder,
         ThingPagerHolder {
 
@@ -100,7 +102,10 @@ public class LoginBrowserActivity extends Activity implements
 
     private void setViews() {
         isSinglePane = findViewById(R.id.thing_list_container) == null;
-        thingPager = (ViewPager) findViewById(R.id.thing_pager);
+        if (!isSinglePane) {
+            thingPager = (ViewPager) findViewById(R.id.thing_pager);
+            getFragmentManager().addOnBackStackChangedListener(this);
+        }
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
@@ -144,11 +149,14 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     protected void loadSubredditMultiPane(Subreddit subreddit) {
-        ThingListFragment f = getThingListFragment();
-        if (f == null) {
-            f = ThingListFragment.newInstance(getAccountName(), subreddit, 0, 0);
+        ThingListFragment tf = getThingListFragment();
+        if (tf == null) {
+            ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, 0);
+            tf = ThingListFragment.newInstance(getAccountName(), subreddit, 0, 0);
+
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
+            ft.add(cf, ControlFragment.TAG);
+            ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commit();
         }
@@ -171,9 +179,12 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     protected void selectSubredditMultiPane(Subreddit subreddit) {
-        ThingListFragment f = ThingListFragment.newInstance(getAccountName(), subreddit, 0, 0);
+        ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, 0);
+        ThingListFragment tf = ThingListFragment.newInstance(getAccountName(), subreddit, 0, 0);
+
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
+        ft.add(cf, ControlFragment.TAG);
+        ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
     }
@@ -182,7 +193,7 @@ public class LoginBrowserActivity extends Activity implements
         if (isSinglePane) {
             selectThingSinglePane(thing);
         } else {
-            selectThingMultiPane(thing);
+            selectThingMultiPane(thing, position);
         }
     }
 
@@ -194,21 +205,31 @@ public class LoginBrowserActivity extends Activity implements
         startActivity(intent);
     }
 
-    protected void selectThingMultiPane(Thing thing) {
-        FragmentManager fm = getFragmentManager();
+    protected void selectThingMultiPane(Thing thing, int thingPosition) {
+        ControlFragment cf = getControlFragment();
+        cf = ControlFragment.newInstance(cf.getSubreddit(), thing, thingPosition, 0);
+        ThingMenuFragment tf = ThingMenuFragment.newInstance(thing);
 
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.add(ThingMenuFragment.newInstance(thing), ThingMenuFragment.TAG);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.add(cf, ControlFragment.TAG);
+        ft.add(tf, ThingMenuFragment.TAG);
         ft.addToBackStack(null);
         ft.commit();
 
-        ThingPagerAdapter adapter = new ThingPagerAdapter(fm, thing);
+        ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(), thing);
         thingPager.setAdapter(adapter);
-        thingPager.setVisibility(View.VISIBLE);
     }
 
     public int getThingBodyWidth() {
         return 0;
+    }
+
+    public void onBackStackChanged() {
+        if (getThingMenuFragment() != null) {
+            thingPager.setVisibility(View.VISIBLE);
+        } else {
+            thingPager.setVisibility(View.GONE);
+        }
     }
 
     public CharSequence getSubredditName() {
@@ -223,11 +244,19 @@ public class LoginBrowserActivity extends Activity implements
         return adapter.getAccountName(bar.getSelectedNavigationIndex());
     }
 
+    private ControlFragment getControlFragment() {
+        return (ControlFragment) getFragmentManager().findFragmentByTag(ControlFragment.TAG);
+    }
+
     private SubredditListFragment getSubredditListFragment() {
         return (SubredditListFragment) getFragmentManager().findFragmentByTag(SubredditListFragment.TAG);
     }
 
     private ThingListFragment getThingListFragment() {
         return (ThingListFragment) getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
+    }
+
+    private ThingMenuFragment getThingMenuFragment() {
+        return (ThingMenuFragment) getFragmentManager().findFragmentByTag(ThingMenuFragment.TAG);
     }
 }
