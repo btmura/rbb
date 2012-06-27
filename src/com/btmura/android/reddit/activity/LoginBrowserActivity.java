@@ -119,6 +119,7 @@ public class LoginBrowserActivity extends Activity implements
             f = SubredditListFragment.newInstance(accountName, null, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.subreddit_list_container, f, SubredditListFragment.TAG);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commit();
         }
 
@@ -137,6 +138,7 @@ public class LoginBrowserActivity extends Activity implements
             f = ThingListFragment.newInstance(getAccountName(), subreddit, 0, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.commit();
         }
     }
@@ -161,6 +163,7 @@ public class LoginBrowserActivity extends Activity implements
         ThingListFragment f = ThingListFragment.newInstance(getAccountName(), subreddit, 0, 0);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
     }
 
