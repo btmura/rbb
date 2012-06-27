@@ -19,6 +19,7 @@ package com.btmura.android.reddit.activity;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
@@ -26,7 +27,9 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.View;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.LoaderIds;
@@ -42,6 +45,7 @@ import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
+import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class LoginBrowserActivity extends Activity implements
         LoaderCallbacks<AccountResult>,
@@ -54,8 +58,11 @@ public class LoginBrowserActivity extends Activity implements
 
     private ActionBar bar;
     private AccountSpinnerAdapter adapter;
-    private SharedPreferences prefs;
+
     private boolean isSinglePane;
+    private ViewPager thingPager;
+
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +73,7 @@ public class LoginBrowserActivity extends Activity implements
         setContentView(R.layout.browser);
         setInitialFragments(savedInstanceState);
         setActionBar();
-        setIsSinglePane();
+        setViews();
         getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
     }
 
@@ -88,8 +95,9 @@ public class LoginBrowserActivity extends Activity implements
         bar.setListNavigationCallbacks(adapter, this);
     }
 
-    private void setIsSinglePane() {
+    private void setViews() {
         isSinglePane = findViewById(R.id.thing_list_container) == null;
+        thingPager = (ViewPager) findViewById(R.id.thing_pager);
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
@@ -168,6 +176,26 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public void onThingSelected(Thing thing, int position) {
+        if (isSinglePane) {
+            selectThingSinglePane(thing);
+        } else {
+            selectThingMultiPane(thing);
+        }
+    }
+
+    protected void selectThingSinglePane(Thing thing) {
+        Intent intent = new Intent(this, ThingActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.putExtra(ThingActivity.EXTRA_THING, thing);
+        intent.putExtra(ThingActivity.EXTRA_FLAGS, 0);
+        startActivity(intent);
+    }
+
+    protected void selectThingMultiPane(Thing thing) {
+        FragmentManager fm = getFragmentManager();
+        ThingPagerAdapter adapter = new ThingPagerAdapter(fm, thing);
+        thingPager.setAdapter(adapter);
+        thingPager.setVisibility(View.VISIBLE);
     }
 
     public int getThingBodyWidth() {
