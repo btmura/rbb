@@ -17,9 +17,9 @@
 package com.btmura.android.reddit.activity;
 
 import android.app.ActionBar;
-import android.app.FragmentManager;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.btmura.android.reddit.Debug;
@@ -230,11 +231,9 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public void onBackStackChanged() {
-        if (getThingMenuFragment() != null) {
-            thingPager.setVisibility(View.VISIBLE);
-        } else {
-            thingPager.setVisibility(View.GONE);
-        }
+        boolean hasThing = getThingMenuFragment() != null;
+        bar.setDisplayHomeAsUpEnabled(hasThing);
+        thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
     }
 
     public CharSequence getSubredditName() {
@@ -243,6 +242,18 @@ public class LoginBrowserActivity extends Activity implements
 
     public ViewPager getPager() {
         return thingPager;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getFragmentManager().popBackStack();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private String getAccountName() {
