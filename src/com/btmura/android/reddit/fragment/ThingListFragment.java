@@ -52,6 +52,7 @@ public class ThingListFragment extends ListFragment implements
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
+    private static final String ARG_ACCOUNT_NAME = "a";
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
     private static final String ARG_SEARCH_QUERY = "q";
@@ -72,13 +73,14 @@ public class ThingListFragment extends ListFragment implements
     private String query;
 
     private ThingAdapter adapter;
-    private AccountNameHolder accountNameHolder;
     private OnThingSelectedListener listener;
     private boolean scrollLoading;
 
-    public static ThingListFragment newInstance(Subreddit sr, int filter, int flags) {
+    public static ThingListFragment newInstance(String accountName, Subreddit sr, int filter,
+            int flags) {
         ThingListFragment f = new ThingListFragment();
         Bundle args = new Bundle(4);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putParcelable(ARG_SUBREDDIT, sr);
         args.putInt(ARG_FILTER, filter);
         args.putInt(ARG_FLAGS, flags);
@@ -98,7 +100,6 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        accountNameHolder = (AccountNameHolder) activity;
         listener = (OnThingSelectedListener) activity;
     }
 
@@ -147,7 +148,7 @@ public class ThingListFragment extends ListFragment implements
             url = Urls.searchUrl(query, moreKey);
         }
         return new ThingLoader(getActivity().getApplicationContext(),
-                accountNameHolder.getAccountName(),
+                getAccountName(),
                 Subreddit.getName(subreddit),
                 url,
                 args != null ? adapter.getItems() : null);
@@ -257,6 +258,10 @@ public class ThingListFragment extends ListFragment implements
 
     private int getThingBodyWidth() {
         return listener.getThingBodyWidth();
+    }
+
+    private String getAccountName() {
+        return getArguments().getString(ARG_ACCOUNT_NAME);
     }
 
     private Subreddit getSubreddit() {

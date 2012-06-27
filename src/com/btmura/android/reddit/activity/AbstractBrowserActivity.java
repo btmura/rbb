@@ -228,7 +228,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshContainers(null);
 
         ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, filter);
-        Fragment tlf = ThingListFragment.newInstance(subreddit, filter, tlFragmentFlags
+        Fragment tlf = ThingListFragment.newInstance(null, subreddit, filter, tlFragmentFlags
                 | ThingListFragment.FLAG_SINGLE_CHOICE);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();

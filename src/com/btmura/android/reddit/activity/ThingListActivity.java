@@ -33,7 +33,6 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
-import com.btmura.android.reddit.fragment.AccountNameHolder;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingListFragment;
@@ -44,7 +43,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnNavigationListener,
         OnThingSelectedListener,
-        AccountNameHolder,
         SubredditNameHolder {
 
     public static final String TAG = "ThingListActivity";
@@ -119,7 +117,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     private void replaceFragments(int filter) {
-        Fragment tlf = ThingListFragment.newInstance(subreddit, filter, tlfFlags);
+        Fragment tlf = ThingListFragment.newInstance(accountName, subreddit, filter, tlfFlags);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.single_container, tlf, ThingListFragment.TAG);
         ft.commit();
@@ -134,10 +132,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public int getThingBodyWidth() {
         return 0;
-    }
-
-    public String getAccountName() {
-        return accountName;
     }
 
     public String getSubredditName() {

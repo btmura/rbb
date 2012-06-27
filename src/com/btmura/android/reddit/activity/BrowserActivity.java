@@ -130,7 +130,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
         ControlFragment cf = ControlFragment.newInstance(s, null, -1, filter);
         GlobalMenuFragment gmf = GlobalMenuFragment.newInstance(0);
-        SubredditListFragment slf = SubredditListFragment.newInstance(s, null,
+        SubredditListFragment slf = SubredditListFragment.newInstance(null, s,
                 SubredditListFragment.FLAG_SINGLE_CHOICE);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -140,7 +140,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
         if (s != null) {
             refreshActionBar(s, null, filter);
-            Fragment tlf = ThingListFragment.newInstance(s, filter, getThingListFragmentFlags());
+            Fragment tlf = ThingListFragment.newInstance(null, s, filter, getThingListFragmentFlags());
             ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
         }
 

@@ -35,7 +35,6 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
-import com.btmura.android.reddit.fragment.AccountNameHolder;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
@@ -49,7 +48,6 @@ public class LoginBrowserActivity extends Activity implements
         OnNavigationListener,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
-        AccountNameHolder,
         SubredditNameHolder {
 
     public static final String TAG = "LoginBrowserActivity";
@@ -118,7 +116,7 @@ public class LoginBrowserActivity extends Activity implements
 
         SubredditListFragment f = getSubredditListFragment();
         if (f == null || !f.getAccountName().equals(accountName)) {
-            f = SubredditListFragment.newInstance(null, accountName, 0);
+            f = SubredditListFragment.newInstance(accountName, null, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.subreddit_list_container, f, SubredditListFragment.TAG);
             ft.commit();
@@ -136,7 +134,7 @@ public class LoginBrowserActivity extends Activity implements
     protected void loadSubredditMultiPane(Subreddit subreddit) {
         ThingListFragment f = getThingListFragment();
         if (f == null) {
-            f = ThingListFragment.newInstance(subreddit, 0, 0);
+            f = ThingListFragment.newInstance(getAccountName(), subreddit, 0, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
             ft.commit();
@@ -160,7 +158,7 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     protected void selectSubredditMultiPane(Subreddit subreddit) {
-        ThingListFragment f = ThingListFragment.newInstance(subreddit, 0, 0);
+        ThingListFragment f = ThingListFragment.newInstance(getAccountName(), subreddit, 0, 0);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
         ft.commit();
@@ -173,12 +171,12 @@ public class LoginBrowserActivity extends Activity implements
         return 0;
     }
 
-    public String getAccountName() {
-        return adapter.getAccountName(bar.getSelectedNavigationIndex());
-    }
-
     public CharSequence getSubredditName() {
         return null;
+    }
+
+    private String getAccountName() {
+        return adapter.getAccountName(bar.getSelectedNavigationIndex());
     }
 
     private SubredditListFragment getSubredditListFragment() {

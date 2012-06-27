@@ -54,8 +54,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
-    private static final String ARG_SELECTED_SUBREDDIT = "s";
     private static final String ARG_ACCOUNT_NAME = "a";
+    private static final String ARG_SELECTED_SUBREDDIT = "s";
     private static final String ARG_QUERY = "q";
     private static final String ARG_FLAGS = "f";
 
@@ -66,15 +66,14 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     private SubredditAdapter adapter;
-    private AccountNameHolder accountNameHolder;
     private OnSubredditSelectedListener listener;
 
-    public static SubredditListFragment newInstance(Subreddit selectedSubreddit,
-            String accountName,
+    public static SubredditListFragment newInstance(String accountName,
+            Subreddit selectedSubreddit,
             int flags) {
         Bundle args = new Bundle(3);
-        args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
         args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
         args.putInt(ARG_FLAGS, flags);
 
         SubredditListFragment frag = new SubredditListFragment();
@@ -95,7 +94,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        accountNameHolder = (AccountNameHolder) activity;
         listener = (OnSubredditSelectedListener) activity;
     }
 
@@ -174,10 +172,10 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         menu.findItem(R.id.menu_add).setVisible(isQuery());
         menu.findItem(R.id.menu_add_combined).setVisible(isQuery() && info.checkedCount > 1);
         menu.findItem(R.id.menu_combine).setVisible(!isQuery()
-                && TextUtils.isEmpty(accountNameHolder.getAccountName())
+                && TextUtils.isEmpty(getAccountName())
                 && info.checkedCount > 1);
         menu.findItem(R.id.menu_split).setVisible(!isQuery()
-                && TextUtils.isEmpty(accountNameHolder.getAccountName())
+                && TextUtils.isEmpty(getAccountName())
                 && info.checkedCount == 1
                 && info.numSplittable > 0);
         menu.findItem(R.id.menu_delete).setVisible(!isQuery());
@@ -281,7 +279,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     private void handleDelete(ActionMode mode) {
         long[] ids = getListView().getCheckedItemIds();
-        SubredditProvider.deleteInBackground(getActivity(), accountNameHolder.getAccountName(), ids);
+        SubredditProvider.deleteInBackground(getActivity(), getAccountName(), ids);
         mode.finish();
     }
 
@@ -306,12 +304,12 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         adapter.notifyDataSetChanged();
     }
 
-    private Subreddit getSelectedSubreddit() {
-        return getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
-    }
-
     public String getAccountName() {
         return getArguments().getString(ARG_ACCOUNT_NAME);
+    }
+
+    private Subreddit getSelectedSubreddit() {
+        return getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
     }
 
     private String getQuery() {
