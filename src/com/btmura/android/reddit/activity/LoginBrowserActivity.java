@@ -19,7 +19,6 @@ package com.btmura.android.reddit.activity;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -181,7 +180,7 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     protected void selectSubredditMultiPane(Subreddit subreddit) {
-        safePopBackStackImmediate();
+        getFragmentManager().popBackStack();
 
         ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, 0);
         ThingListFragment tf = ThingListFragment.newInstance(getAccountName(), subreddit, 0, 0);
@@ -210,7 +209,7 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     protected void selectThingMultiPane(Thing thing, int thingPosition) {
-        safePopBackStackImmediate();
+        getFragmentManager().popBackStack();
 
         ControlFragment cf = getControlFragment();
         cf = ControlFragment.newInstance(cf.getSubreddit(), thing, thingPosition, 0);
@@ -258,15 +257,6 @@ public class LoginBrowserActivity extends Activity implements
 
     private String getAccountName() {
         return adapter.getAccountName(bar.getSelectedNavigationIndex());
-    }
-
-    private void safePopBackStackImmediate() {
-        FragmentManager fm = getFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-            fm.removeOnBackStackChangedListener(this);
-            fm.popBackStackImmediate();
-            fm.addOnBackStackChangedListener(this);
-        }
     }
 
     private ControlFragment getControlFragment() {
