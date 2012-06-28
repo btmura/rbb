@@ -54,11 +54,15 @@ public class JsonParser {
     }
 
     private void doParseListingArray(JsonReader reader) throws IOException {
-        reader.beginArray();
-        while (reader.hasNext()) {
-            doParseListingObject(reader);
+        if (JsonToken.BEGIN_ARRAY == reader.peek()) {
+            reader.beginArray();
+            while (reader.hasNext()) {
+                doParseListingObject(reader);
+            }
+            reader.endArray();
+        } else {
+            reader.skipValue();
         }
-        reader.endArray();
     }
 
     private void doParseListingObject(JsonReader reader) throws IOException {
