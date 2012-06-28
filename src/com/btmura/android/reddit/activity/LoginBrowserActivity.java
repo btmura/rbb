@@ -244,7 +244,7 @@ public class LoginBrowserActivity extends Activity implements
         thingPager.setAdapter(adapter);
     }
 
-    public int getThingBodyWidth() {
+    public int onMeasureThingBody() {
         return thingBodyWidth;
     }
 

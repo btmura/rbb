@@ -66,7 +66,7 @@ public class ThingListFragment extends ListFragment implements
     public interface OnThingSelectedListener {
         void onThingSelected(Thing thing, int position);
 
-        int getThingBodyWidth();
+        int onMeasureThingBody();
     }
 
     private Subreddit subreddit;
@@ -257,7 +257,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private int getThingBodyWidth() {
-        return listener.getThingBodyWidth();
+        return listener.onMeasureThingBody();
     }
 
     public String getAccountName() {

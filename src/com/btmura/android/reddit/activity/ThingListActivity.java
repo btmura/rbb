@@ -127,7 +127,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         startActivity(intent);
     }
 
-    public int getThingBodyWidth() {
+    public int onMeasureThingBody() {
         return 0;
     }
 

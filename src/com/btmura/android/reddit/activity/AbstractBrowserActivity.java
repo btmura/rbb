@@ -584,7 +584,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public int getThingBodyWidth() {
+    public int onMeasureThingBody() {
         return thingBodyWidth;
     }
 
