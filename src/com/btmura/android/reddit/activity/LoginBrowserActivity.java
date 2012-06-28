@@ -25,9 +25,11 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,6 +69,7 @@ public class LoginBrowserActivity extends Activity implements
 
     private boolean isSinglePane;
     private ViewPager thingPager;
+    private int thingBodyWidth;
 
     private SharedPreferences prefs;
 
@@ -105,6 +108,13 @@ public class LoginBrowserActivity extends Activity implements
         isSinglePane = findViewById(R.id.thing_list_container) == null;
         if (!isSinglePane) {
             thingPager = (ViewPager) findViewById(R.id.thing_pager);
+
+            Resources r = getResources();
+            DisplayMetrics dm = r.getDisplayMetrics();
+            int padding = r.getDimensionPixelSize(R.dimen.padding);
+            int subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
+            thingBodyWidth = dm.widthPixels / 2 - padding * 2 - subredditListWidth;
+
             getFragmentManager().addOnBackStackChangedListener(this);
         }
     }
@@ -226,7 +236,7 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public int getThingBodyWidth() {
-        return 0;
+        return thingBodyWidth;
     }
 
     public void onBackStackChanged() {
