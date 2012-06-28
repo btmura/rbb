@@ -60,7 +60,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private static final String ARG_FLAGS = "f";
 
     public interface OnSubredditSelectedListener {
-        void onSubredditLoaded(Subreddit subreddit);
+        void onInitialSubredditSelected(Subreddit subreddit);
 
         void onSubredditSelected(Subreddit subreddit);
     }
@@ -137,7 +137,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
             getListView().post(new Runnable() {
                 public void run() {
                     Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), 0));
-                    listener.onSubredditLoaded(sr);
+                    listener.onInitialSubredditSelected(sr);
                 }
             });
         }

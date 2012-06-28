@@ -185,7 +185,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public void onSubredditLoaded(Subreddit subreddit) {
+    public void onInitialSubredditSelected(Subreddit subreddit) {
         if (!isSinglePane() && !hasFragment(ThingListFragment.TAG)) {
             SubredditListFragment slf = getSubredditListFragment();
             if (slf != null) {
