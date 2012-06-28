@@ -29,6 +29,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
@@ -59,6 +60,7 @@ public class LoginBrowserActivity extends Activity implements
         OnSubredditSelectedListener,
         OnThingSelectedListener,
         OnBackStackChangedListener,
+        OnPageChangeListener,
         SubredditNameHolder,
         ThingPagerHolder {
 
@@ -113,6 +115,7 @@ public class LoginBrowserActivity extends Activity implements
             tlfFlags |= ThingListFragment.FLAG_SINGLE_CHOICE;
 
             thingPager = (ViewPager) findViewById(R.id.thing_pager);
+            thingPager.setOnPageChangeListener(this);
 
             Resources r = getResources();
             DisplayMetrics dm = r.getDisplayMetrics();
@@ -256,6 +259,16 @@ public class LoginBrowserActivity extends Activity implements
         ControlFragment cf = getControlFragment();
         ThingListFragment tlf = getThingListFragment();
         tlf.setSelectedThing(cf.getThing(), cf.getThingPosition());
+    }
+
+    public void onPageSelected(int position) {
+        invalidateOptionsMenu();
+    }
+
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    public void onPageScrollStateChanged(int state) {
     }
 
     public CharSequence getSubredditName() {
