@@ -74,6 +74,8 @@ public class LoginBrowserActivity extends Activity implements
 
     public static final String TAG = "LoginBrowserActivity";
 
+    public static final String EXTRA_QUERY = "q";
+
     private static final int ANIMATION_OPEN_NAV = 0;
     private static final int ANIMATION_CLOSE_NAV = 1;
     private static final int ANIMATION_OPEN_SIDE_NAV = 2;
