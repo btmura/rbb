@@ -221,6 +221,8 @@ public class LoginBrowserActivity extends Activity implements
         ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
+
+        refreshViews(null);
     }
 
     public void onThingSelected(Thing thing, int position) {
@@ -269,23 +271,24 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public void onBackStackChanged() {
-        refresh();
+        Thing thing = getControlFragment().getThing();
+        refreshViews(thing);
+        refreshCheckedItems();
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (!isSinglePane && savedInstanceState != null) {
-            refreshThingPager(getControlFragment().getThing());
-            refresh();
+            Thing thing = getControlFragment().getThing();
+            refreshThingPager(thing);
+            refreshViews(thing);
+            refreshCheckedItems();
         }
     }
 
-    private void refresh() {
-        ControlFragment cf = getControlFragment();
-        Thing thing = cf.getThing();
+    private void refreshViews(Thing thing) {
         boolean hasThing = thing != null;
-
         bar.setDisplayHomeAsUpEnabled(hasThing);
         thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
         if (!hasThing) {
@@ -298,7 +301,10 @@ public class LoginBrowserActivity extends Activity implements
                 }
             });
         }
+    }
 
+    private void refreshCheckedItems() {
+        ControlFragment cf = getControlFragment();
         SubredditListFragment slf = getSubredditListFragment();
         slf.setSelectedSubreddit(cf.getSubreddit());
         ThingListFragment tlf = getThingListFragment();
