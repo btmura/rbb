@@ -251,8 +251,7 @@ public class LoginBrowserActivity extends Activity implements
         ft.addToBackStack(null);
         ft.commit();
 
-        ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(), thing);
-        thingPager.setAdapter(adapter);
+        refreshThingPager(thing);
     }
 
     public int onMeasureThingBody() {
@@ -260,13 +259,43 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public void onBackStackChanged() {
-        boolean hasThing = getThingMenuFragment() != null;
+        refresh();
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (!isSinglePane && savedInstanceState != null) {
+            refresh();
+        }
+    }
+
+    private void refresh() {
+        ControlFragment cf = getControlFragment();
+        final Thing thing = cf.getThing();
+        boolean hasThing = thing != null;
+
         bar.setDisplayHomeAsUpEnabled(hasThing);
         thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
+        thingPager.post(new Runnable() {
+            public void run() {
+                refreshThingPager(thing);
+            }
+        });
 
-        ControlFragment cf = getControlFragment();
+        SubredditListFragment slf = getSubredditListFragment();
+        slf.setSelectedSubreddit(cf.getSubreddit());
         ThingListFragment tlf = getThingListFragment();
         tlf.setSelectedThing(cf.getThing(), cf.getThingPosition());
+    }
+
+    private void refreshThingPager(Thing thing) {
+        if (thing != null) {
+            ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(), thing);
+            thingPager.setAdapter(adapter);
+        } else {
+            thingPager.setAdapter(null);
+        }
     }
 
     public void onPageSelected(int position) {
@@ -336,9 +365,5 @@ public class LoginBrowserActivity extends Activity implements
 
     private ThingListFragment getThingListFragment() {
         return (ThingListFragment) getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
-    }
-
-    private ThingMenuFragment getThingMenuFragment() {
-        return (ThingMenuFragment) getFragmentManager().findFragmentByTag(ThingMenuFragment.TAG);
     }
 }
