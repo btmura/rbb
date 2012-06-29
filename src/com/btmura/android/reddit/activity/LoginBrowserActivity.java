@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.activity;
 
 import android.app.ActionBar;
+import android.app.FragmentManager;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.app.FragmentManager.OnBackStackChangedListener;
@@ -209,7 +210,7 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     protected void selectSubredditMultiPane(Subreddit subreddit) {
-        getFragmentManager().popBackStack();
+        safePopBackStackImmediate();
 
         ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, 0);
         ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), subreddit, 0,
@@ -239,7 +240,7 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     protected void selectThingMultiPane(Thing thing, int thingPosition) {
-        getFragmentManager().popBackStack();
+        safePopBackStackImmediate();
 
         ControlFragment cf = getControlFragment();
         cf = ControlFragment.newInstance(cf.getSubreddit(), thing, thingPosition, 0);
@@ -254,6 +255,15 @@ public class LoginBrowserActivity extends Activity implements
         refreshThingPager(thing);
     }
 
+    private void safePopBackStackImmediate() {
+        FragmentManager fm = getFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.removeOnBackStackChangedListener(this);
+            fm.popBackStackImmediate();
+            fm.addOnBackStackChangedListener(this);
+        }
+    }
+
     public int onMeasureThingBody() {
         return thingBodyWidth;
     }
@@ -266,22 +276,28 @@ public class LoginBrowserActivity extends Activity implements
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (!isSinglePane && savedInstanceState != null) {
+            refreshThingPager(getControlFragment().getThing());
             refresh();
         }
     }
 
     private void refresh() {
         ControlFragment cf = getControlFragment();
-        final Thing thing = cf.getThing();
+        Thing thing = cf.getThing();
         boolean hasThing = thing != null;
 
         bar.setDisplayHomeAsUpEnabled(hasThing);
         thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
-        thingPager.post(new Runnable() {
-            public void run() {
-                refreshThingPager(thing);
-            }
-        });
+        if (!hasThing) {
+            // Avoid nested executePendingTransactions that would occur by
+            // doing popBackStack. This is a hack to get around stale
+            // adapter issues with the ViewPager after orientation changes.
+            thingPager.post(new Runnable() {
+                public void run() {
+                    refreshThingPager(null);
+                }
+            });
+        }
 
         SubredditListFragment slf = getSubredditListFragment();
         slf.setSelectedSubreddit(cf.getSubreddit());
