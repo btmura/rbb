@@ -387,6 +387,7 @@ public class LoginBrowserActivity extends Activity implements
         if (thing != null) {
             ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(), thing);
             thingPager.setAdapter(adapter);
+            invalidateOptionsMenu();
         } else {
             thingPager.setAdapter(null);
         }
