@@ -74,6 +74,7 @@ public class LoginBrowserActivity extends Activity implements
     private int slfFlags;
     private int tlfFlags;
     private ViewPager thingPager;
+    private View navContainer;
     private int thingBodyWidth;
 
     private SharedPreferences prefs;
@@ -118,11 +119,17 @@ public class LoginBrowserActivity extends Activity implements
             thingPager = (ViewPager) findViewById(R.id.thing_pager);
             thingPager.setOnPageChangeListener(this);
 
+            navContainer = findViewById(R.id.nav_container);
+
             Resources r = getResources();
             DisplayMetrics dm = r.getDisplayMetrics();
-            int padding = r.getDimensionPixelSize(R.dimen.padding);
+            int padding = r.getDimensionPixelSize(R.dimen.element_padding);
             int subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
-            thingBodyWidth = dm.widthPixels / 2 - padding * 2 - subredditListWidth;
+            if (navContainer != null) {
+                thingBodyWidth = dm.widthPixels / 2 - padding * 4;
+            } else {
+                thingBodyWidth = dm.widthPixels / 2 - padding * 3 - subredditListWidth;
+            }
 
             getFragmentManager().addOnBackStackChangedListener(this);
         }

@@ -19,8 +19,8 @@
     android:layout_height="match_parent"
     android:baselineAligned="false"
     android:orientation="horizontal"
-    android:paddingLeft="@dimen/padding"
-    android:paddingRight="@dimen/padding" >
+    android:paddingLeft="@dimen/element_padding"
+    android:paddingRight="@dimen/element_padding" >
 
     <RelativeLayout
         android:layout_width="0dp"
@@ -31,14 +31,17 @@
             android:id="@+id/subreddit_list_container"
             android:layout_width="@dimen/subreddit_list_width"
             android:layout_height="match_parent"
-            android:paddingRight="@dimen/padding" />
+            android:paddingLeft="@dimen/element_padding"
+            android:paddingRight="@dimen/element_padding" />
 
         <FrameLayout
             android:id="@+id/thing_list_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:layout_toRightOf="@+id/subreddit_list_container" />
+            android:layout_toRightOf="@+id/subreddit_list_container"
+            android:paddingLeft="@dimen/element_padding"
+            android:paddingRight="@dimen/element_padding" />
     </RelativeLayout>
 
     <android.support.v4.view.ViewPager
@@ -46,7 +49,8 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:paddingLeft="@dimen/padding"
+        android:paddingLeft="@dimen/element_padding"
+        android:paddingRight="@dimen/element_padding"
         android:visibility="gone" />
 
 </LinearLayout>
