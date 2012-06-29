@@ -37,28 +37,32 @@ public class ThumbnailLoader {
 
     public void setThumbnail(ThingView v, String url) {
         Bitmap b = BITMAP_CACHE.get(url);
-        v.setThumbnail(b);
-        if (b == null) {
-            LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
-            if (task == null || !url.equals(task.url)) {
-                if (task != null) {
-                    task.cancel(true);
+        synchronized (v) {
+            v.setThumbnail(b);
+            if (b == null) {
+                LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
+                if (task == null || !url.equals(task.url)) {
+                    if (task != null) {
+                        task.cancel(true);
+                    }
+                    task = new LoadThumbnailTask(v, url);
+                    v.setTag(task);
+                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
-                task = new LoadThumbnailTask(v, url);
-                v.setTag(task);
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
+            v.setVisibility(View.VISIBLE);
         }
-        v.setVisibility(View.VISIBLE);
     }
 
     public void clearThumbnail(ThingView v) {
-        LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
-        if (task != null) {
-            task.cancel(true);
-            v.setTag(null);
+        synchronized (v) {
+            LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
+            if (task != null) {
+                task.cancel(true);
+                v.setTag(null);
+            }
+            v.removeThumbnail();
         }
-        v.removeThumbnail();
     }
 
     static class BitmapCache extends LruCache<String, Bitmap> {
@@ -107,11 +111,13 @@ public class ThumbnailLoader {
                 BITMAP_CACHE.put(url, b);
             }
             ThingView v = ref.get();
-            if (v != null && equals(v.getTag())) {
-                if (b != null) {
-                    v.setThumbnail(b);
+            synchronized (v) {
+                if (v != null && equals(v.getTag())) {
+                    if (b != null) {
+                        v.setThumbnail(b);
+                    }
+                    v.setTag(null);
                 }
-                v.setTag(null);
             }
         }
     }
