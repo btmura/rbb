@@ -273,7 +273,12 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public CharSequence getSubredditName() {
-        return null;
+        ControlFragment cf = getControlFragment();
+        if (cf != null) {
+            return Subreddit.getName(cf.getSubreddit());
+        } else {
+            return null;
+        }
     }
 
     public ViewPager getPager() {
