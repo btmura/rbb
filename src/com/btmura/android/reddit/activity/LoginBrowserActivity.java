@@ -25,7 +25,6 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
@@ -66,7 +65,7 @@ import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 import com.btmura.android.reddit.widget.SearchPagerAdapter;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
-public class LoginBrowserActivity extends Activity implements
+public class LoginBrowserActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         TabListener,
         OnNavigationListener,
