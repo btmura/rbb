@@ -55,7 +55,7 @@ public class ThingListFragment extends ListFragment implements
     private static final String ARG_ACCOUNT_NAME = "a";
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
-    private static final String ARG_SEARCH_QUERY = "q";
+    private static final String ARG_QUERY = "q";
     private static final String ARG_FLAGS = "l";
 
     private static final String STATE_THING_NAME = "n";
@@ -91,7 +91,7 @@ public class ThingListFragment extends ListFragment implements
     public static ThingListFragment newSearchInstance(String query, int flags) {
         ThingListFragment f = new ThingListFragment();
         Bundle args = new Bundle(2);
-        args.putString(ARG_SEARCH_QUERY, query);
+        args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
         f.setArguments(args);
         return f;
@@ -107,7 +107,7 @@ public class ThingListFragment extends ListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         subreddit = getSubreddit();
-        query = getSearchQuery();
+        query = getQuery();
         adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), isSingleChoice());
         setHasOptionsMenu(true);
     }
@@ -272,8 +272,8 @@ public class ThingListFragment extends ListFragment implements
         return getArguments().getInt(ARG_FILTER);
     }
 
-    private String getSearchQuery() {
-        return getArguments().getString(ARG_SEARCH_QUERY);
+    public String getQuery() {
+        return getArguments().getString(ARG_QUERY);
     }
 
     private int getFlags() {

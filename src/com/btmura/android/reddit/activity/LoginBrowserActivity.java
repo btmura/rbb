@@ -25,6 +25,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
@@ -65,7 +66,7 @@ import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 import com.btmura.android.reddit.widget.SearchPagerAdapter;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
-public class LoginBrowserActivity extends GlobalMenuActivity implements
+public class LoginBrowserActivity extends Activity implements
         LoaderCallbacks<AccountResult>,
         TabListener,
         OnNavigationListener,
@@ -91,8 +92,12 @@ public class LoginBrowserActivity extends GlobalMenuActivity implements
     private static final int NAV_LAYOUT_ORIGINAL = 0;
     private static final int NAV_LAYOUT_SIDENAV = 1;
 
+    private static final int TAB_POSTS = 0;
+    private static final int TAB_SUBREDDITS = 1;
+
     private ActionBar bar;
     private AccountSpinnerAdapter adapter;
+    private String accountName;
 
     private boolean isSearch;
     private boolean isSinglePane;
@@ -220,23 +225,48 @@ public class LoginBrowserActivity extends GlobalMenuActivity implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        if (!isSearch) {
+        prefs = result.prefs;
+        if (isSearch) {
+            accountName = AccountLoader.getLastAccount(prefs, result.accountNames);
+        } else {
             adapter.setAccountNames(result.accountNames);
-            prefs = result.prefs;
             int index = AccountLoader.getLastAccountIndex(prefs, result.accountNames);
             bar.setSelectedNavigationItem(index);
         }
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-        if (!isSearch) {
+        if (isSearch) {
+            accountName = null;
+        } else {
             adapter.setAccountNames(null);
         }
     }
 
-    public void onTabSelected(Tab tab, FragmentTransaction ft) {
+    public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
         if (searchPager != null) {
             searchPager.setCurrentItem(tab.getPosition());
+        } else {
+            String query = getIntent().getStringExtra(EXTRA_QUERY);
+            if (tab.getPosition() == TAB_SUBREDDITS) {
+                SubredditListFragment f = getSubredditListFragment();
+                if (f == null || !f.getQuery().equals(query)) {
+                    f = SubredditListFragment.newSearchInstance(query, slfFlags);
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.subreddit_list_container, f, SubredditListFragment.TAG);
+                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                    ft.commit();
+                }
+            } else {
+                ThingListFragment f = getThingListFragment();
+                if (f == null || !f.getQuery().equals(query)) {
+                    f = ThingListFragment.newSearchInstance(query, tlfFlags);
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
+                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                    ft.commit();
+                }
+            }
         }
     }
 
@@ -266,8 +296,12 @@ public class LoginBrowserActivity extends GlobalMenuActivity implements
     }
 
     public boolean onSearchQuerySubmitted(String query) {
-        if (isSinglePane && isSearch) {
-            submitSearchQuerySinglePane(query);
+        if (isSearch) {
+            if (isSinglePane) {
+                submitSearchQuerySinglePane(query);
+            } else {
+                submitSearchQueryMultiPane(query);
+            }
             return true;
         } else {
             return false;
@@ -283,6 +317,9 @@ public class LoginBrowserActivity extends GlobalMenuActivity implements
         searchPager.setOnPageChangeListener(this);
         searchPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
         searchPager.setCurrentItem(bar.getSelectedNavigationIndex());
+    }
+
+    private void submitSearchQueryMultiPane(String query) {
     }
 
     public void onInitialSubredditSelected(Subreddit subreddit) {
@@ -524,7 +561,11 @@ public class LoginBrowserActivity extends GlobalMenuActivity implements
     }
 
     private String getAccountName() {
-        return adapter.getAccountName(bar.getSelectedNavigationIndex());
+        if (isSearch) {
+            return accountName;
+        } else {
+            return adapter.getAccountName(bar.getSelectedNavigationIndex());
+        }
     }
 
     private ControlFragment getControlFragment() {

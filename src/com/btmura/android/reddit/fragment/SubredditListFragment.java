@@ -312,7 +312,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         return getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
     }
 
-    private String getQuery() {
+    public String getQuery() {
         return getArguments().getString(ARG_QUERY);
     }
 
