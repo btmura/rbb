@@ -23,6 +23,8 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
@@ -60,10 +62,12 @@ import com.btmura.android.reddit.fragment.ThingListFragment.OnThingSelectedListe
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
+import com.btmura.android.reddit.widget.SearchPagerAdapter;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class LoginBrowserActivity extends Activity implements
         LoaderCallbacks<AccountResult>,
+        TabListener,
         OnNavigationListener,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
@@ -89,10 +93,12 @@ public class LoginBrowserActivity extends Activity implements
     private ActionBar bar;
     private AccountSpinnerAdapter adapter;
 
+    private boolean isSearch;
     private boolean isSinglePane;
+    private ViewPager searchPager;
+    private ViewPager thingPager;
     private int slfFlags;
     private int tlfFlags;
-    private ViewPager thingPager;
 
     private View navContainer;
     private View subredditListContainer;
@@ -119,11 +125,16 @@ public class LoginBrowserActivity extends Activity implements
             StrictMode.enableDefaults();
         }
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.browser);
+        setContentView();
         setInitialFragments(savedInstanceState);
         setActionBar();
         setViews();
         getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
+    }
+
+    private void setContentView() {
+        isSearch = getIntent().hasExtra(EXTRA_QUERY);
+        setContentView(isSearch ? R.layout.search : R.layout.browser);
     }
 
     private void setInitialFragments(Bundle savedInstanceState) {
@@ -137,21 +148,36 @@ public class LoginBrowserActivity extends Activity implements
 
     private void setActionBar() {
         bar = getActionBar();
-        bar.setDisplayShowTitleEnabled(false);
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
-        adapter = new AccountSpinnerAdapter(this);
-        bar.setListNavigationCallbacks(adapter, this);
+        if (isSearch) {
+            String query = getIntent().getStringExtra(EXTRA_QUERY);
+            bar.setTitle(query);
+            bar.setDisplayHomeAsUpEnabled(true);
+            bar.addTab(bar.newTab().setText(R.string.tab_posts).setTabListener(this));
+            bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
+            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        } else {
+            adapter = new AccountSpinnerAdapter(this);
+            bar.setDisplayShowTitleEnabled(false);
+            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            bar.setListNavigationCallbacks(adapter, this);
+        }
     }
 
     private void setViews() {
         isSinglePane = findViewById(R.id.thing_list_container) == null;
-        if (!isSinglePane) {
-            slfFlags |= SubredditListFragment.FLAG_SINGLE_CHOICE;
-            tlfFlags |= ThingListFragment.FLAG_SINGLE_CHOICE;
-
+        if (isSinglePane) {
+            if (isSearch) {
+                String query = getIntent().getStringExtra(EXTRA_QUERY);
+                searchPager = (ViewPager) findViewById(R.id.search_pager);
+                searchPager.setOnPageChangeListener(this);
+                searchPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
+            }
+        } else {
             thingPager = (ViewPager) findViewById(R.id.thing_pager);
             thingPager.setOnPageChangeListener(this);
+
+            slfFlags |= SubredditListFragment.FLAG_SINGLE_CHOICE;
+            tlfFlags |= ThingListFragment.FLAG_SINGLE_CHOICE;
 
             navContainer = findViewById(R.id.nav_container);
             subredditListContainer = findViewById(R.id.subreddit_list_container);
@@ -197,14 +223,30 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        adapter.setAccountNames(result.accountNames);
-        prefs = result.prefs;
-        int index = AccountLoader.getLastAccountIndex(prefs, result.accountNames);
-        bar.setSelectedNavigationItem(index);
+        if (!isSearch) {
+            adapter.setAccountNames(result.accountNames);
+            prefs = result.prefs;
+            int index = AccountLoader.getLastAccountIndex(prefs, result.accountNames);
+            bar.setSelectedNavigationItem(index);
+        }
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-        adapter.setAccountNames(null);
+        if (!isSearch) {
+            adapter.setAccountNames(null);
+        }
+    }
+
+    public void onTabSelected(Tab tab, FragmentTransaction ft) {
+        if (searchPager != null) {
+            searchPager.setCurrentItem(tab.getPosition());
+        }
+    }
+
+    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+    }
+
+    public void onTabReselected(Tab tab, FragmentTransaction ft) {
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
@@ -396,7 +438,11 @@ public class LoginBrowserActivity extends Activity implements
     }
 
     public void onPageSelected(int position) {
-        invalidateOptionsMenu();
+        if (isSearch) {
+            bar.setSelectedNavigationItem(position);
+        } else {
+            invalidateOptionsMenu();
+        }
     }
 
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

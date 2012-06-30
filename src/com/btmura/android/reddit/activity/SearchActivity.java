@@ -56,7 +56,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     private boolean tabListenerDisabled;
 
     public SearchActivity() {
-        super(R.layout.search);
+        super(R.layout.browser);
     }
 
     @Override

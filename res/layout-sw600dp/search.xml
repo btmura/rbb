@@ -14,14 +14,18 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/element_padding"
+    android:paddingRight="@dimen/element_padding" >
 
     <android.support.v4.view.ViewPager
         android:id="@+id/thing_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingLeft="@dimen/element_padding"
+        android:paddingRight="@dimen/element_padding"
         android:visibility="gone" />
 
     <LinearLayout
@@ -33,15 +37,16 @@
             android:id="@+id/subreddit_list_container"
             android:layout_width="@dimen/subreddit_list_width"
             android:layout_height="match_parent"
-            android:paddingLeft="@dimen/padding" />
+            android:paddingLeft="@dimen/element_padding"
+            android:paddingRight="@dimen/element_padding" />
 
         <FrameLayout
             android:id="@+id/thing_list_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:paddingLeft="@dimen/padding"
-            android:paddingRight="@dimen/padding" />
+            android:paddingLeft="@dimen/element_padding"
+            android:paddingRight="@dimen/element_padding" />
 
         <View
             android:id="@+id/thing_click_absorber"
@@ -51,4 +56,4 @@
             android:visibility="gone" />
     </LinearLayout>
 
-</merge>
+</FrameLayout>
