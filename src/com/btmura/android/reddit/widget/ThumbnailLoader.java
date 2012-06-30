@@ -111,12 +111,14 @@ public class ThumbnailLoader {
                 BITMAP_CACHE.put(url, b);
             }
             ThingView v = ref.get();
-            synchronized (v) {
-                if (v != null && equals(v.getTag())) {
-                    if (b != null) {
-                        v.setThumbnail(b);
+            if (v != null) {
+                synchronized (v) {
+                    if (equals(v.getTag())) {
+                        if (b != null) {
+                            v.setThumbnail(b);
+                        }
+                        v.setTag(null);
                     }
-                    v.setTag(null);
                 }
             }
         }
