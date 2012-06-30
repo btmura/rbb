@@ -190,6 +190,7 @@ abstract class AbstractBrowserActivity extends Activity implements
     protected abstract boolean hasSubredditList();
 
     protected void setSubredditListNavigation(String query) {
+        safePopBackStackImmediate();
         refreshSubredditListVisibility();
 
         ControlFragment cf = ControlFragment.newInstance(null, null, -1, 0);
@@ -209,9 +210,12 @@ abstract class AbstractBrowserActivity extends Activity implements
         }
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
+
+        refreshViews(null);
     }
 
     protected void setThingListNavigation(String query) {
+        safePopBackStackImmediate();
         refreshSubredditListVisibility();
 
         ControlFragment cf = ControlFragment.newInstance(null, null, -1, 0);
@@ -231,6 +235,8 @@ abstract class AbstractBrowserActivity extends Activity implements
         }
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
+
+        refreshViews(null);
     }
 
     public void onInitialSubredditSelected(Subreddit subreddit) {
