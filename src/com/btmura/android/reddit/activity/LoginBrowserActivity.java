@@ -54,6 +54,7 @@ import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.ControlFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
+import com.btmura.android.reddit.fragment.GlobalMenuFragment.OnSearchQuerySubmittedListener;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
@@ -69,6 +70,7 @@ public class LoginBrowserActivity extends Activity implements
         LoaderCallbacks<AccountResult>,
         TabListener,
         OnNavigationListener,
+        OnSearchQuerySubmittedListener,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
         OnBackStackChangedListener,
@@ -149,8 +151,6 @@ public class LoginBrowserActivity extends Activity implements
     private void setActionBar() {
         bar = getActionBar();
         if (isSearch) {
-            String query = getIntent().getStringExtra(EXTRA_QUERY);
-            bar.setTitle(query);
             bar.setDisplayHomeAsUpEnabled(true);
             bar.addTab(bar.newTab().setText(R.string.tab_posts).setTabListener(this));
             bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
@@ -168,9 +168,7 @@ public class LoginBrowserActivity extends Activity implements
         if (isSinglePane) {
             if (isSearch) {
                 String query = getIntent().getStringExtra(EXTRA_QUERY);
-                searchPager = (ViewPager) findViewById(R.id.search_pager);
-                searchPager.setOnPageChangeListener(this);
-                searchPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
+                submitSearchQuerySinglePane(query);
             }
         } else {
             thingPager = (ViewPager) findViewById(R.id.thing_pager);
@@ -266,6 +264,26 @@ public class LoginBrowserActivity extends Activity implements
         }
 
         return true;
+    }
+
+    public boolean onSearchQuerySubmitted(String query) {
+        if (isSinglePane && isSearch) {
+            submitSearchQuerySinglePane(query);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void submitSearchQuerySinglePane(String query) {
+        // Update the intent to make it easier for us when restoring state.
+        getIntent().putExtra(EXTRA_QUERY, query);
+
+        bar.setTitle(query);
+        searchPager = (ViewPager) findViewById(R.id.search_pager);
+        searchPager.setOnPageChangeListener(this);
+        searchPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
+        searchPager.setCurrentItem(bar.getSelectedNavigationIndex());
     }
 
     public void onInitialSubredditSelected(Subreddit subreddit) {

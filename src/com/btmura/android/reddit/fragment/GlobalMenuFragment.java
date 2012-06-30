@@ -27,7 +27,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.LoginBrowserActivity;
@@ -46,7 +45,11 @@ public class GlobalMenuFragment extends Fragment implements
 
     private static final int REQUEST_SEARCH = 0;
 
-    private OnQueryTextListener queryListener;
+    public interface OnSearchQuerySubmittedListener {
+        boolean onSearchQuerySubmitted(String query);
+    }
+
+    private OnSearchQuerySubmittedListener listener;
     private MenuItem searchItem;
     private SearchView searchView;
 
@@ -61,8 +64,8 @@ public class GlobalMenuFragment extends Fragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof OnQueryTextListener) {
-            queryListener = (OnQueryTextListener) activity;
+        if (activity instanceof OnSearchQuerySubmittedListener) {
+            listener = (OnSearchQuerySubmittedListener) activity;
         }
     }
 
@@ -132,25 +135,20 @@ public class GlobalMenuFragment extends Fragment implements
     }
 
     public boolean onQueryTextChange(String newText) {
-        if (queryListener != null) {
-            return queryListener.onQueryTextChange(newText);
-        } else {
-            return false;
-        }
+        return false;
     }
 
     public boolean onQueryTextSubmit(String query) {
-        if (queryListener != null) {
+        if (listener != null && listener.onSearchQuerySubmitted(query)) {
             searchItem.collapseActionView();
-            return queryListener.onQueryTextSubmit(query);
         } else {
             Intent intent = new Intent(getActivity(), LoginBrowserActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
                     | Intent.FLAG_ACTIVITY_NO_ANIMATION);
             intent.putExtra(LoginBrowserActivity.EXTRA_QUERY, query);
             startActivityForResult(intent, REQUEST_SEARCH);
-            return true;
         }
+        return true;
     }
 
     @Override
