@@ -35,49 +35,77 @@ import com.btmura.android.reddit.entity.Thing;
 public class NetApi {
 
     static ArrayList<String> querySubreddits(String cookie) throws IOException {
-        URL url = Urls.subredditListUrl();
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        setCommonHeaders(conn, cookie);
-        conn.connect();
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.subredditListUrl();
+            conn = (HttpURLConnection) url.openConnection();
+            setCommonHeaders(conn, cookie);
+            conn.connect();
 
-        InputStream in = conn.getInputStream();
-        JsonReader reader = new JsonReader(new InputStreamReader(in));
-        SubredditParser parser = new SubredditParser();
-        parser.parseListingObject(reader);
-        in.close();
-        conn.disconnect();
+            in = conn.getInputStream();
+            JsonReader reader = new JsonReader(new InputStreamReader(in));
+            SubredditParser parser = new SubredditParser();
+            parser.parseListingObject(reader);
+            return parser.results;
 
-        return parser.results;
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
     }
 
     public static ArrayList<Thing> queryThings(Context context, URL url, String cookie,
             String parentSubreddit, List<Thing> initThings) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        setCommonHeaders(conn, cookie);
-        conn.connect();
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            setCommonHeaders(conn, cookie);
+            conn.connect();
 
-        InputStream in = conn.getInputStream();
-        JsonReader reader = new JsonReader(new InputStreamReader(in));
-        ThingParser parser = new ThingParser(context, parentSubreddit, initThings);
-        parser.parseListingObject(reader);
-        in.close();
-        conn.disconnect();
+            in = conn.getInputStream();
+            JsonReader reader = new JsonReader(new InputStreamReader(in));
+            ThingParser parser = new ThingParser(context, parentSubreddit, initThings);
+            parser.parseListingObject(reader);
+            return parser.things;
 
-        return parser.things;
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
     }
 
     static void subscribe(String cookie, String modhash, String subreddit, boolean subscribe)
             throws IOException {
-        URL url = Urls.subscribeUrl();
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        setCommonHeaders(conn, cookie);
-        setFormDataHeaders(conn);
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.subscribeUrl();
+            conn = (HttpURLConnection) url.openConnection();
+            setCommonHeaders(conn, cookie);
+            setFormDataHeaders(conn);
 
-        conn.connect();
-        writeFormData(conn, Urls.subscribeQuery(modhash, subreddit, subscribe));
+            conn.connect();
+            writeFormData(conn, Urls.subscribeQuery(modhash, subreddit, subscribe));
+            in = conn.getInputStream();
 
-        conn.getInputStream().close();
-        conn.disconnect();
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
     }
 
     private static void setCommonHeaders(HttpURLConnection conn, String cookie) {
