@@ -77,22 +77,15 @@ public class ThingListFragment extends ListFragment implements
     private boolean scrollLoading;
 
     public static ThingListFragment newInstance(String accountName, Subreddit sr, int filter,
-            int flags) {
-        ThingListFragment f = new ThingListFragment();
-        Bundle args = new Bundle(4);
+            String query, int flags) {
+        Bundle args = new Bundle(5);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putParcelable(ARG_SUBREDDIT, sr);
         args.putInt(ARG_FILTER, filter);
-        args.putInt(ARG_FLAGS, flags);
-        f.setArguments(args);
-        return f;
-    }
-
-    public static ThingListFragment newSearchInstance(String query, int flags) {
-        ThingListFragment f = new ThingListFragment();
-        Bundle args = new Bundle(2);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
+
+        ThingListFragment f = new ThingListFragment();
         f.setArguments(args);
         return f;
     }

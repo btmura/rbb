@@ -70,19 +70,11 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     public static SubredditListFragment newInstance(String accountName,
             Subreddit selectedSubreddit,
+            String query,
             int flags) {
-        Bundle args = new Bundle(3);
+        Bundle args = new Bundle(4);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
-        args.putInt(ARG_FLAGS, flags);
-
-        SubredditListFragment frag = new SubredditListFragment();
-        frag.setArguments(args);
-        return frag;
-    }
-
-    public static SubredditListFragment newSearchInstance(String query, int flags) {
-        Bundle args = new Bundle(2);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
 

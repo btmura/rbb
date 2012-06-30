@@ -25,10 +25,12 @@ import com.btmura.android.reddit.fragment.ThingListFragment;
 
 public class SearchPagerAdapter extends FragmentStatePagerAdapter {
 
+    private final String accountName;
     private final String query;
 
-    public SearchPagerAdapter(FragmentManager fm, String query) {
+    public SearchPagerAdapter(FragmentManager fm, String accountName, String query) {
         super(fm);
+        this.accountName = accountName;
         this.query = query;
     }
 
@@ -41,10 +43,10 @@ public class SearchPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return ThingListFragment.newSearchInstance(query, 0);
+                return ThingListFragment.newInstance(accountName, null, 0, query, 0);
 
             case 1:
-                return SubredditListFragment.newSearchInstance(query, 0);
+                return SubredditListFragment.newInstance(accountName, null, query, 0);
 
             default:
                 throw new IllegalArgumentException();

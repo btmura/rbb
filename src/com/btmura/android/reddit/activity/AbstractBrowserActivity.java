@@ -22,9 +22,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar;
-import android.app.ActionBar.OnNavigationListener;
-import android.app.ActionBar.Tab;
-import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
@@ -32,14 +29,12 @@ import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,7 +49,6 @@ import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.ControlFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
-import com.btmura.android.reddit.fragment.GlobalMenuFragment.OnSearchQuerySubmittedListener;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
@@ -62,15 +56,10 @@ import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment.ThingPagerHolder;
-import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
-import com.btmura.android.reddit.widget.SearchPagerAdapter;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
-public class AbstractBrowserActivity extends Activity implements
+abstract class AbstractBrowserActivity extends Activity implements
         LoaderCallbacks<AccountResult>,
-        TabListener,
-        OnNavigationListener,
-        OnSearchQuerySubmittedListener,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
         OnBackStackChangedListener,
@@ -79,8 +68,6 @@ public class AbstractBrowserActivity extends Activity implements
         ThingPagerHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
-
-    public static final String EXTRA_QUERY = "q";
 
     private static final int ANIMATION_OPEN_NAV = 0;
     private static final int ANIMATION_CLOSE_NAV = 1;
@@ -92,16 +79,9 @@ public class AbstractBrowserActivity extends Activity implements
     private static final int NAV_LAYOUT_ORIGINAL = 0;
     private static final int NAV_LAYOUT_SIDENAV = 1;
 
-    private static final int TAB_POSTS = 0;
-    private static final int TAB_SUBREDDITS = 1;
+    protected ActionBar bar;
 
-    private ActionBar bar;
-    private AccountSpinnerAdapter adapter;
-    private String accountName;
-
-    private boolean isSearch;
-    private boolean isSinglePane;
-    private ViewPager searchPager;
+    protected boolean isSinglePane;
     private ViewPager thingPager;
     private int slfFlags;
     private int tlfFlags;
@@ -123,28 +103,24 @@ public class AbstractBrowserActivity extends Activity implements
     private AnimatorSet expandSubredditNavAnimator;
     private AnimatorSet expandThingNavAnimator;
 
-    private SharedPreferences prefs;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (Debug.DEBUG_STRICT_MODE) {
             StrictMode.enableDefaults();
         }
         super.onCreate(savedInstanceState);
+        bar = getActionBar();
         setContentView();
-        setInitialFragments(savedInstanceState);
-        setViews();
-        setActionBar();
+        setupCommonFragments(savedInstanceState);
+        setupCommonViews();
+        setupViews();
+        setupActionBar();
         getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
     }
 
-    private void setContentView() {
-        bar = getActionBar();
-        isSearch = getIntent().hasExtra(EXTRA_QUERY);
-        setContentView(isSearch ? R.layout.search : R.layout.browser);
-    }
+    protected abstract void setContentView();
 
-    private void setInitialFragments(Bundle savedInstanceState) {
+    private void setupCommonFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(GlobalMenuFragment.FLAG_SHOW_MANAGE_ACCOUNTS),
@@ -153,28 +129,9 @@ public class AbstractBrowserActivity extends Activity implements
         }
     }
 
-    private void setActionBar() {
-        if (isSearch) {
-            bar.setDisplayHomeAsUpEnabled(true);
-            bar.addTab(bar.newTab().setText(R.string.tab_posts).setTabListener(this));
-            bar.addTab(bar.newTab().setText(R.string.tab_subreddits).setTabListener(this));
-            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        } else {
-            adapter = new AccountSpinnerAdapter(this);
-            bar.setDisplayShowTitleEnabled(false);
-            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-            bar.setListNavigationCallbacks(adapter, this);
-        }
-    }
-
-    private void setViews() {
+    private void setupCommonViews() {
         isSinglePane = findViewById(R.id.thing_list_container) == null;
-        if (isSinglePane) {
-            if (isSearch) {
-                String query = getIntent().getStringExtra(EXTRA_QUERY);
-                submitSearchQuerySinglePane(query);
-            }
-        } else {
+        if (!isSinglePane) {
             getFragmentManager().addOnBackStackChangedListener(this);
 
             thingPager = (ViewPager) findViewById(R.id.thing_pager);
@@ -216,123 +173,64 @@ public class AbstractBrowserActivity extends Activity implements
         }
     }
 
+    protected abstract void setupViews();
+
+    protected abstract void setupActionBar();
+
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
         return new AccountLoader(this);
     }
 
-    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        prefs = result.prefs;
-        if (isSearch) {
-            accountName = AccountLoader.getLastAccount(prefs, result.accountNames);
-        } else {
-            adapter.setAccountNames(result.accountNames);
-            int index = AccountLoader.getLastAccountIndex(prefs, result.accountNames);
-            bar.setSelectedNavigationItem(index);
+    public abstract void onLoadFinished(Loader<AccountResult> loader, AccountResult result);
+
+    public abstract void onLoaderReset(Loader<AccountResult> loader);
+
+    protected abstract String getAccountName();
+
+    protected abstract boolean hasSubredditList();
+
+    protected void setSubredditListNavigation(String query) {
+        refreshSubredditListVisibility();
+
+        ControlFragment cf = ControlFragment.newInstance(null, null, -1, 0);
+        SubredditListFragment slf = SubredditListFragment.newInstance(getAccountName(), null,
+                query, slfFlags);
+        ThingListFragment tlf = getThingListFragment();
+        ThingMenuFragment tmf = getThingMenuFragment();
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.add(cf, ControlFragment.TAG);
+        ft.replace(R.id.subreddit_list_container, slf, SubredditListFragment.TAG);
+        if (tlf != null) {
+            ft.remove(tlf);
         }
-    }
-
-    public void onLoaderReset(Loader<AccountResult> loader) {
-        if (isSearch) {
-            accountName = null;
-        } else {
-            adapter.setAccountNames(null);
+        if (tmf != null) {
+            ft.remove(tmf);
         }
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.commit();
     }
 
-    public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
-        if (searchPager != null) {
-            searchPager.setCurrentItem(tab.getPosition());
-        } else {
-            // refreshSubredditListVisibility();
-            String query = getIntent().getStringExtra(EXTRA_QUERY);
-            if (tab.getPosition() == TAB_SUBREDDITS) {
-                subredditListContainer.setVisibility(View.VISIBLE);
-                SubredditListFragment f = getSubredditListFragment();
-                if (f == null || !f.getQuery().equals(query)) {
-                    ControlFragment cf = ControlFragment.newInstance(null, null, -1, 0);
-                    f = SubredditListFragment.newSearchInstance(query, slfFlags);
-                    ThingListFragment tlf = getThingListFragment();
+    protected void setThingListNavigation(String query) {
+        refreshSubredditListVisibility();
 
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.add(cf, ControlFragment.TAG);
-                    ft.replace(R.id.subreddit_list_container, f, SubredditListFragment.TAG);
-                    if (tlf != null) {
-                        ft.remove(tlf);
-                    }
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    ft.commit();
-                }
-            } else {
-                subredditListContainer.setVisibility(View.GONE);
-                ThingListFragment f = getThingListFragment();
-                if (f == null || !f.getQuery().equals(query)) {
-                    ControlFragment cf = ControlFragment.newInstance(null, null, -1, 0);
-                    SubredditListFragment slf = getSubredditListFragment();
-                    f = ThingListFragment.newSearchInstance(query, tlfFlags);
+        ControlFragment cf = ControlFragment.newInstance(null, null, -1, 0);
+        SubredditListFragment slf = getSubredditListFragment();
+        ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), null, 0, query,
+                tlfFlags);
+        ThingMenuFragment tmf = getThingMenuFragment();
 
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.add(cf,  ControlFragment.TAG);
-                    if (slf != null) {
-                        ft.remove(slf);
-                    }
-                    ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    ft.commit();
-                }
-            }
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.add(cf, ControlFragment.TAG);
+        if (slf != null) {
+            ft.remove(slf);
         }
-    }
-
-    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-    }
-
-    public void onTabReselected(Tab tab, FragmentTransaction ft) {
-    }
-
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        if (Debug.DEBUG_ACTIVITY) {
-            Log.d(TAG, "onNavigationItemSelected itemPosition:" + itemPosition);
+        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+        if (tmf != null) {
+            ft.remove(tmf);
         }
-        String accountName = adapter.getItem(itemPosition);
-        AccountLoader.setLastAccount(prefs, accountName);
-
-        SubredditListFragment f = getSubredditListFragment();
-        if (f == null || !f.getAccountName().equals(accountName)) {
-            f = SubredditListFragment.newInstance(accountName, null, slfFlags);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.subreddit_list_container, f, SubredditListFragment.TAG);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            ft.commit();
-        }
-
-        return true;
-    }
-
-    public boolean onSearchQuerySubmitted(String query) {
-        if (isSearch) {
-            if (isSinglePane) {
-                submitSearchQuerySinglePane(query);
-            } else {
-                submitSearchQueryMultiPane(query);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private void submitSearchQuerySinglePane(String query) {
-        // Update the intent to make it easier for us when restoring state.
-        getIntent().putExtra(EXTRA_QUERY, query);
-
-        bar.setTitle(query);
-        searchPager = (ViewPager) findViewById(R.id.search_pager);
-        searchPager.setOnPageChangeListener(this);
-        searchPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), query));
-        searchPager.setCurrentItem(bar.getSelectedNavigationIndex());
-    }
-
-    private void submitSearchQueryMultiPane(String query) {
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.commit();
     }
 
     public void onInitialSubredditSelected(Subreddit subreddit) {
@@ -348,7 +246,7 @@ public class AbstractBrowserActivity extends Activity implements
             slf.setSelectedSubreddit(subreddit);
 
             ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, 0);
-            tlf = ThingListFragment.newInstance(getAccountName(), subreddit, 0, tlfFlags);
+            tlf = ThingListFragment.newInstance(getAccountName(), subreddit, 0, null, tlfFlags);
 
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(cf, ControlFragment.TAG);
@@ -379,7 +277,7 @@ public class AbstractBrowserActivity extends Activity implements
 
         ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, 0);
         ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), subreddit, 0,
-                tlfFlags);
+                null, tlfFlags);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
@@ -525,11 +423,7 @@ public class AbstractBrowserActivity extends Activity implements
     }
 
     public void onPageSelected(int position) {
-        if (isSearch) {
-            bar.setSelectedNavigationItem(position);
-        } else {
-            invalidateOptionsMenu();
-        }
+        invalidateOptionsMenu();
     }
 
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -588,30 +482,24 @@ public class AbstractBrowserActivity extends Activity implements
             } else {
                 fm.popBackStack();
             }
-        } else if (isSearch) {
-            finish();
         }
     }
 
-    private String getAccountName() {
-        if (isSearch) {
-            return accountName;
-        } else {
-            return adapter.getAccountName(bar.getSelectedNavigationIndex());
-        }
-    }
-
-    private ControlFragment getControlFragment() {
+    protected ControlFragment getControlFragment() {
         return (ControlFragment) getFragmentManager().findFragmentByTag(ControlFragment.TAG);
     }
 
-    private SubredditListFragment getSubredditListFragment() {
+    protected SubredditListFragment getSubredditListFragment() {
         return (SubredditListFragment) getFragmentManager().findFragmentByTag(
                 SubredditListFragment.TAG);
     }
 
-    private ThingListFragment getThingListFragment() {
+    protected ThingListFragment getThingListFragment() {
         return (ThingListFragment) getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
+    }
+
+    protected ThingMenuFragment getThingMenuFragment() {
+        return (ThingMenuFragment) getFragmentManager().findFragmentByTag(ThingMenuFragment.TAG);
     }
 
     private void runAnimation(int type, AnimatorListener listener) {
@@ -781,9 +669,5 @@ public class AbstractBrowserActivity extends Activity implements
 
         subredditListContainer.setVisibility(subredditListVisibility);
         thingClickAbsorber.setVisibility(clickAbsorberVisibility);
-    }
-
-    private boolean hasSubredditList() {
-        return true;
     }
 }

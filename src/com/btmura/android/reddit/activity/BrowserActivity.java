@@ -16,8 +16,78 @@
 
 package com.btmura.android.reddit.activity;
 
+import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
+import android.content.Loader;
+import android.content.SharedPreferences;
+import android.util.Log;
 
-public class BrowserActivity extends AbstractBrowserActivity  {
+import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.fragment.SubredditListFragment;
+import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
+
+public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
     public static final String EXTRA_SUBREDDIT_NAME = "sn";
+
+    private AccountSpinnerAdapter adapter;
+    private SharedPreferences prefs;
+
+    @Override
+    protected void setContentView() {
+        setContentView(R.layout.browser);
+    }
+
+    @Override
+    protected void setupViews() {
+    }
+
+    @Override
+    protected void setupActionBar() {
+        adapter = new AccountSpinnerAdapter(this);
+        bar.setDisplayShowTitleEnabled(false);
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        bar.setListNavigationCallbacks(adapter, this);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        prefs = result.prefs;
+        adapter.setAccountNames(result.accountNames);
+        int index = AccountLoader.getLastAccountIndex(result.prefs, result.accountNames);
+        bar.setSelectedNavigationItem(index);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<AccountResult> loader) {
+        adapter.setAccountNames(null);
+    }
+
+    @Override
+    protected String getAccountName() {
+        return adapter.getAccountName(bar.getSelectedNavigationIndex());
+    }
+
+    @Override
+    protected boolean hasSubredditList() {
+        return true;
+    }
+
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        if (Debug.DEBUG_ACTIVITY) {
+            Log.d(TAG, "onNavigationItemSelected itemPosition:" + itemPosition);
+        }
+        String accountName = adapter.getItem(itemPosition);
+        AccountLoader.setLastAccount(prefs, accountName);
+
+        SubredditListFragment f = getSubredditListFragment();
+        if (f == null || !f.getAccountName().equals(accountName)) {
+            setSubredditListNavigation(null);
+        }
+
+        return true;
+    }
 }
