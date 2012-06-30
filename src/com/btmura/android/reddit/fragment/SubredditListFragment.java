@@ -133,7 +133,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         adapter.swapCursor(data);
         setEmptyText(getString(data != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
-        if (data.getCount() > 0) {
+        if (data != null && data.getCount() > 0) {
             getListView().post(new Runnable() {
                 public void run() {
                     Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), 0));

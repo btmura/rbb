@@ -46,15 +46,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.LoginBrowserActivity"
-            android:clearTaskOnLaunch="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
         <activity android:name=".activity.SearchActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -70,7 +61,7 @@
 
         <activity-alias
             android:name=".MainActivity"
-            android:targetActivity=".activity.LoginBrowserActivity" >
+            android:targetActivity=".activity.BrowserActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -29,7 +29,6 @@ import com.btmura.android.reddit.LoaderIds;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
@@ -58,7 +57,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private String accountName;
 
     private Subreddit subreddit;
-    private boolean insertHome;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +65,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
         setInitialFragments(savedInstanceState);
         setActionBar(savedInstanceState);
         getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
-
-        int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
-        insertHome = Flag.isEnabled(flags, FLAG_INSERT_HOME);
     }
 
     private void setInitialFragments(Bundle savedInstanceState) {
@@ -149,11 +144,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     private void handleHome() {
         finish();
-        if (insertHome) {
-            Intent intent = new Intent(this, BrowserActivity.class);
-            intent.putExtra(BrowserActivity.EXTRA_FLAGS, BrowserActivity.FLAG_HOME_UP_ENABLED);
-            startActivity(intent);
-        }
     }
 
     @Override

@@ -29,7 +29,7 @@ import android.view.View;
 import android.widget.SearchView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.activity.LoginBrowserActivity;
+import com.btmura.android.reddit.activity.AbstractBrowserActivity;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
@@ -142,10 +142,10 @@ public class GlobalMenuFragment extends Fragment implements
         if (listener != null && listener.onSearchQuerySubmitted(query)) {
             searchItem.collapseActionView();
         } else {
-            Intent intent = new Intent(getActivity(), LoginBrowserActivity.class);
+            Intent intent = new Intent(getActivity(), AbstractBrowserActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
                     | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            intent.putExtra(LoginBrowserActivity.EXTRA_QUERY, query);
+            intent.putExtra(AbstractBrowserActivity.EXTRA_QUERY, query);
             startActivityForResult(intent, REQUEST_SEARCH);
         }
         return true;
