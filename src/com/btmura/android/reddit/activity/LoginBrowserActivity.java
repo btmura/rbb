@@ -519,6 +519,8 @@ public class LoginBrowserActivity extends Activity implements
             } else {
                 fm.popBackStack();
             }
+        } else if (isSearch) {
+            finish();
         }
     }
 
