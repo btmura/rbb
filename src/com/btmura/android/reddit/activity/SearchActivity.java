@@ -26,6 +26,7 @@ import android.support.v4.view.ViewPager;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment.OnSearchQuerySubmittedListener;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
@@ -112,6 +113,11 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
+    }
+
+    @Override
+    protected void refreshActionBar(Thing thing) {
+        bar.setTitle(getQuery());
     }
 
     public boolean onSearchQuerySubmitted(String query) {

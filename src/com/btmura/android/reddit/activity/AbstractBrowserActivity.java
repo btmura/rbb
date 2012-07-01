@@ -211,6 +211,7 @@ abstract class AbstractBrowserActivity extends Activity implements
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
 
+        refreshActionBar(null);
         refreshViews(null);
     }
 
@@ -236,6 +237,7 @@ abstract class AbstractBrowserActivity extends Activity implements
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
 
+        refreshActionBar(null);
         refreshViews(null);
     }
 
@@ -291,6 +293,7 @@ abstract class AbstractBrowserActivity extends Activity implements
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
 
+        refreshActionBar(null);
         refreshViews(null);
     }
 
@@ -341,6 +344,7 @@ abstract class AbstractBrowserActivity extends Activity implements
 
     public void onBackStackChanged() {
         Thing thing = getControlFragment().getThing();
+        refreshActionBar(thing);
         refreshViews(thing);
         refreshCheckedItems();
     }
@@ -351,6 +355,7 @@ abstract class AbstractBrowserActivity extends Activity implements
         if (!isSinglePane && savedInstanceState != null) {
             Thing thing = getControlFragment().getThing();
             refreshThingPager(thing);
+            refreshActionBar(thing);
             refreshViews(thing);
             refreshCheckedItems();
         }
@@ -358,7 +363,6 @@ abstract class AbstractBrowserActivity extends Activity implements
 
     private void refreshViews(Thing thing) {
         boolean hasThing = thing != null;
-        bar.setDisplayHomeAsUpEnabled(hasThing);
         if (navContainer != null) {
             int currVisibility = navContainer.getVisibility();
             int nextVisibility = !hasThing ? View.VISIBLE : View.GONE;
@@ -389,6 +393,8 @@ abstract class AbstractBrowserActivity extends Activity implements
             }
         }
     }
+
+    protected abstract void refreshActionBar(Thing thing);
 
     private void refreshCheckedItems() {
         ControlFragment cf = getControlFragment();

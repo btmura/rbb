@@ -26,6 +26,7 @@ import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
@@ -74,6 +75,11 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     protected boolean hasSubredditList() {
         return true;
+    }
+
+    @Override
+    protected void refreshActionBar(Thing thing) {
+        bar.setDisplayHomeAsUpEnabled(thing != null);
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
