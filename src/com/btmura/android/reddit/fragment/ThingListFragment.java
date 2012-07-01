@@ -257,7 +257,7 @@ public class ThingListFragment extends ListFragment implements
         return getArguments().getString(ARG_ACCOUNT_NAME);
     }
 
-    private Subreddit getSubreddit() {
+    public Subreddit getSubreddit() {
         return getArguments().getParcelable(ARG_SUBREDDIT);
     }
 

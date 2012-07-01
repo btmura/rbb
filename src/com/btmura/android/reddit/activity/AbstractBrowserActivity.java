@@ -247,7 +247,7 @@ abstract class AbstractBrowserActivity extends Activity implements
 
     protected void selectInitialSubredditMultiPane(Subreddit subreddit) {
         ThingListFragment tlf = getThingListFragment();
-        if (tlf == null) {
+        if (tlf == null || !subreddit.name.equals(Subreddit.getName(tlf.getSubreddit()))) {
             SubredditListFragment slf = getSubredditListFragment();
             slf.setSelectedSubreddit(subreddit);
 
