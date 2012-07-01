@@ -94,17 +94,21 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
         if (searchPager != null) {
             searchPager.setCurrentItem(tab.getPosition());
         } else {
-            String query = getQuery();
-            if (tab == tabSubreddits) {
-                SubredditListFragment f = getSubredditListFragment();
-                if (f == null || !query.equals(f.getQuery())) {
-                    setSubredditListNavigation(query);
-                }
-            } else {
-                ThingListFragment f = getThingListFragment();
-                if (f == null || !query.equals(f.getQuery())) {
-                    setThingListNavigation(query);
-                }
+            setNavigationFragments(tab);
+        }
+    }
+
+    private void setNavigationFragments(Tab tab) {
+        String query = getQuery();
+        if (tab == tabSubreddits) {
+            SubredditListFragment f = getSubredditListFragment();
+            if (f == null || !query.equals(f.getQuery())) {
+                setSubredditListNavigation(query);
+            }
+        } else {
+            ThingListFragment f = getThingListFragment();
+            if (f == null || !query.equals(f.getQuery())) {
+                setThingListNavigation(query);
             }
         }
     }
@@ -121,6 +125,8 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     public boolean onSearchQuerySubmitted(String query) {
+        setQuery(query);
+        refreshActionBar(null);
         if (isSinglePane) {
             submitSearchQuerySinglePane(query);
         } else {
@@ -130,10 +136,6 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     private void submitSearchQuerySinglePane(String query) {
-        // Update the intent to make it easier for us when restoring state.
-        getIntent().putExtra(EXTRA_QUERY, query);
-
-        bar.setTitle(query);
         searchPager = (ViewPager) findViewById(R.id.search_pager);
         searchPager.setOnPageChangeListener(this);
         searchPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), accountName, query));
@@ -141,6 +143,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     private void submitSearchQueryMultiPane(String query) {
+        setNavigationFragments(bar.getSelectedTab());
     }
 
     private boolean hasQuery() {
