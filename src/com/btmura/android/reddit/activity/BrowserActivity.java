@@ -20,6 +20,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
@@ -47,7 +48,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
-    protected void setupActionBar() {
+    protected void setupActionBar(Bundle savedInstanceState) {
         adapter = new AccountSpinnerAdapter(this);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);

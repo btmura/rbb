@@ -18,6 +18,8 @@ package com.btmura.android.reddit;
 
 public interface Debug {
 
+    static final boolean DEBUG = true;
+
     static final boolean DEBUG_ACTIVITY = true;
     static final boolean DEBUG_CACHES = true;
     static final boolean DEBUG_LOADERS = true;

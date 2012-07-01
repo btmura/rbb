@@ -39,7 +39,6 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.Debug;
-import com.btmura.android.reddit.LoaderIds;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
@@ -51,11 +50,12 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         MultiChoiceModeListener {
 
     public static final String TAG = "SubredditListFragment";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
-    private static final String ARG_ACCOUNT_NAME = "a";
-    private static final String ARG_SELECTED_SUBREDDIT = "s";
+    private static final String ARG_ACCOUNT_NAME = "an";
+    private static final String ARG_SELECTED_SUBREDDIT = "ss";
     private static final String ARG_QUERY = "q";
     private static final String ARG_FLAGS = "f";
 
@@ -64,6 +64,11 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
         void onSubredditSelected(Subreddit subreddit);
     }
+
+    private String accountName;
+    private Subreddit selectedSubreddit;
+    private String query;
+    private int flags;
 
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
@@ -92,8 +97,19 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new SubredditAdapter(getActivity(), getQuery(), isSingleChoice());
-        adapter.setSelectedSubreddit(getSelectedSubreddit());
+
+        Bundle bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+        accountName = bundle.getString(ARG_ACCOUNT_NAME);
+        selectedSubreddit = bundle.getParcelable(ARG_SELECTED_SUBREDDIT);
+        query = bundle.getString(ARG_QUERY);
+        flags = bundle.getInt(ARG_FLAGS);
+        if (DEBUG) {
+            Log.d(TAG, "onCreate an:" + accountName + " ss:" + selectedSubreddit
+                    + " q:" + query + " f:" + flags);
+        }
+
+        adapter = new SubredditAdapter(getActivity(), query, isSingleChoice());
+        adapter.setSelectedSubreddit(selectedSubreddit);
     }
 
     @Override
@@ -110,7 +126,17 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         super.onActivityCreated(savedInstanceState);
         setListAdapter(adapter);
         setListShown(false);
-        getLoaderManager().initLoader(LoaderIds.SUBREDDITS, null, this);
+        loadIfPossible();
+    }
+
+    public void loadIfPossible() {
+        if (DEBUG) {
+            Log.d(TAG, "loadIfPossible an:" + accountName + " ss:" + selectedSubreddit
+                    + " q:" + query + " f:" + flags);
+        }
+        if (accountName != null) {
+            getLoaderManager().initLoader(0, null, this);
+        }
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -119,19 +145,12 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onLoadFinished (id " + loader.getId() + ")");
-        }
         adapter.swapCursor(data);
         setEmptyText(getString(data != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
         if (data != null && data.getCount() > 0) {
-            getListView().post(new Runnable() {
-                public void run() {
-                    Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), 0));
-                    listener.onInitialSubredditSelected(sr);
-                }
-            });
+            Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), 0));
+            listener.onInitialSubredditSelected(sr);
         }
     }
 
@@ -146,6 +165,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), position));
+        selectedSubreddit = sr;
         adapter.setSelectedSubreddit(sr);
         listener.onSubredditSelected(sr);
     }
@@ -291,32 +311,49 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         return names;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (DEBUG) {
+            Log.d(TAG, "onSaveInstanceState an:" + accountName + " ss:" + selectedSubreddit
+                    + " q:" + query + " f:" + flags);
+        }
+        outState.putString(ARG_ACCOUNT_NAME, accountName);
+        outState.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
+        outState.putString(ARG_QUERY, query);
+        outState.putInt(ARG_FLAGS, flags);
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
     public void setSelectedSubreddit(Subreddit subreddit) {
+        if (DEBUG) {
+            Log.d(TAG, "setSelectedSubreddit subreddit:" + subreddit);
+        }
+        this.selectedSubreddit = subreddit;
         adapter.setSelectedSubreddit(subreddit);
         adapter.notifyDataSetChanged();
     }
 
-    public String getAccountName() {
-        return getArguments().getString(ARG_ACCOUNT_NAME);
-    }
-
-    private Subreddit getSelectedSubreddit() {
-        return getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
+    public Subreddit getSelectedSubreddit() {
+        return selectedSubreddit;
     }
 
     public String getQuery() {
-        return getArguments().getString(ARG_QUERY);
+        return query;
     }
 
     private boolean isQuery() {
-        return getQuery() != null;
-    }
-
-    private int getFlags() {
-        return getArguments().getInt(ARG_FLAGS);
+        return query != null;
     }
 
     private boolean isSingleChoice() {
-        return Flag.isEnabled(getFlags(), FLAG_SINGLE_CHOICE);
+        return Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
     }
 }

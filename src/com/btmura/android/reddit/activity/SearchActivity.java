@@ -21,8 +21,11 @@ import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
 import android.content.Loader;
+import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -36,13 +39,17 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
         OnSearchQuerySubmittedListener {
 
     public static final String TAG = "SearchActivity";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final String EXTRA_QUERY = "q";
+
+    private static final String STATE_SELECTED_TAB = "st";
 
     private String accountName;
     private Tab tabPosts;
     private Tab tabSubreddits;
     private ViewPager searchPager;
+    private boolean tabListenerEnabled;
 
     @Override
     protected void setContentView() {
@@ -60,18 +67,38 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     @Override
-    protected void setupActionBar() {
+    protected void setupActionBar(Bundle savedInstanceState) {
         tabPosts = bar.newTab().setText(R.string.tab_posts).setTabListener(this);
         tabSubreddits = bar.newTab().setText(R.string.tab_subreddits).setTabListener(this);
-        bar.addTab(tabPosts);
         bar.addTab(tabSubreddits);
+        bar.addTab(tabPosts);
+
+        // Prevent onTabSelected from being called twice after a configuration change. :C
+        tabListenerEnabled = savedInstanceState == null;
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        if (savedInstanceState != null) {
+            tabListenerEnabled = true;
+            bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_SELECTED_TAB));
+        }
+
         bar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = AccountLoader.getLastAccount(result.prefs, result.accountNames);
+
+        SubredditListFragment slf = getSubredditListFragment();
+        if (slf != null && slf.getAccountName() == null) {
+            slf.setAccountName(accountName);
+            slf.loadIfPossible();
+        }
+
+        ThingListFragment tlf = getThingListFragment();
+        if (tlf != null && tlf.getAccountName() == null) {
+            tlf.setAccountName(accountName);
+            tlf.loadIfPossible();
+        }
     }
 
     @Override
@@ -90,10 +117,15 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
-        if (searchPager != null) {
-            searchPager.setCurrentItem(tab.getPosition());
-        } else {
-            setNavigationFragments(tab);
+        if (tabListenerEnabled) {
+            if (DEBUG) {
+                Log.d(TAG, "onTabSelected tab:" + tab.getText());
+            }
+            if (searchPager != null) {
+                searchPager.setCurrentItem(tab.getPosition());
+            } else {
+                setNavigationFragments(tab);
+            }
         }
     }
 
@@ -110,6 +142,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
                 setThingListNavigation(query);
             }
         }
+        refreshSubredditListVisibility();
     }
 
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
@@ -143,6 +176,12 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
 
     private void submitSearchQueryMultiPane(String query) {
         setNavigationFragments(bar.getSelectedTab());
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_SELECTED_TAB, bar.getSelectedNavigationIndex());
     }
 
     private boolean hasQuery() {

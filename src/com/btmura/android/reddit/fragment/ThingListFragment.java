@@ -25,6 +25,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,6 +36,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.content.ThingLoader;
@@ -49,6 +51,7 @@ public class ThingListFragment extends ListFragment implements
         OnScrollListener {
 
     public static final String TAG = "ThingListFragment";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
@@ -69,6 +72,7 @@ public class ThingListFragment extends ListFragment implements
         int onMeasureThingBody();
     }
 
+    private String accountName;
     private Subreddit subreddit;
     private String query;
 
@@ -99,9 +103,14 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        subreddit = getSubreddit();
-        query = getQuery();
+
+        Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
+        accountName = b.getString(ARG_ACCOUNT_NAME);
+        subreddit = b.getParcelable(ARG_SUBREDDIT);
+        query = b.getString(ARG_QUERY);
+
         adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), isSingleChoice());
+        adapter.setSelectedThing(b.getString(STATE_THING_NAME), b.getInt(STATE_THING_POSITION, -1));
         setHasOptionsMenu(true);
     }
 
@@ -116,20 +125,20 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        String name;
-        int position;
-        if (savedInstanceState != null) {
-            name = savedInstanceState.getString(STATE_THING_NAME);
-            position = savedInstanceState.getInt(STATE_THING_POSITION);
-        } else {
-            name = null;
-            position = -1;
-        }
-        adapter.setSelectedThing(name, position);
         adapter.setThingBodyWidth(getThingBodyWidth());
         setListAdapter(adapter);
         setListShown(false);
-        getLoaderManager().initLoader(0, null, this);
+        loadIfPossible();
+    }
+
+    public void loadIfPossible() {
+        if (DEBUG) {
+            Log.d(TAG, "loadIfPossible an:" + accountName + " s:" + subreddit
+                    + " q:" + query);
+        }
+        if (accountName != null && (subreddit != null || query != null)) {
+            getLoaderManager().initLoader(0, null, this);
+        }
     }
 
     public Loader<List<Thing>> onCreateLoader(int id, Bundle args) {
@@ -199,6 +208,9 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putString(ARG_ACCOUNT_NAME, accountName);
+        outState.putParcelable(ARG_SUBREDDIT, subreddit);
+        outState.putString(ARG_QUERY, query);
         outState.putString(STATE_THING_NAME, adapter.getSelectedThingName());
         outState.putInt(STATE_THING_POSITION, adapter.getSelectedThingPosition());
     }
@@ -254,11 +266,19 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public String getAccountName() {
-        return getArguments().getString(ARG_ACCOUNT_NAME);
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 
     public Subreddit getSubreddit() {
-        return getArguments().getParcelable(ARG_SUBREDDIT);
+        return subreddit;
+    }
+
+    public void setSubreddit(Subreddit subreddit) {
+        this.subreddit = subreddit;
     }
 
     public int getFilter() {

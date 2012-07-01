@@ -35,6 +35,7 @@ import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,6 +69,8 @@ abstract class AbstractBrowserActivity extends Activity implements
         ThingPagerHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
+
+    private static final boolean DEBUG = Debug.DEBUG;
 
     private static final int ANIMATION_OPEN_NAV = 0;
     private static final int ANIMATION_CLOSE_NAV = 1;
@@ -114,7 +117,7 @@ abstract class AbstractBrowserActivity extends Activity implements
         setupCommonFragments(savedInstanceState);
         setupCommonViews();
         setupViews();
-        setupActionBar();
+        setupActionBar(savedInstanceState);
         getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
     }
 
@@ -175,7 +178,7 @@ abstract class AbstractBrowserActivity extends Activity implements
 
     protected abstract void setupViews();
 
-    protected abstract void setupActionBar();
+    protected abstract void setupActionBar(Bundle savedInstanceState);
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
         return new AccountLoader(this);
@@ -190,21 +193,22 @@ abstract class AbstractBrowserActivity extends Activity implements
     protected abstract boolean hasSubredditList();
 
     protected void setSubredditListNavigation(String query) {
+        if (DEBUG) {
+            Log.d(TAG, "setSubredditListNavigation query: " + query);
+        }
         safePopBackStackImmediate();
-        refreshSubredditListVisibility();
 
-        ControlFragment cf = ControlFragment.newInstance(null, null, -1, 0);
+        ControlFragment cf = ControlFragment.newInstance(getAccountName(), null, null, -1, 0);
         SubredditListFragment slf = SubredditListFragment.newInstance(getAccountName(), null,
                 query, slfFlags);
-        ThingListFragment tlf = getThingListFragment();
+        ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), null, 0,
+                null, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
         ft.replace(R.id.subreddit_list_container, slf, SubredditListFragment.TAG);
-        if (tlf != null) {
-            ft.remove(tlf);
-        }
+        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
         if (tmf != null) {
             ft.remove(tmf);
         }
@@ -216,13 +220,15 @@ abstract class AbstractBrowserActivity extends Activity implements
     }
 
     protected void setThingListNavigation(String query) {
+        if (DEBUG) {
+            Log.d(TAG, "setThingListNavigation query: " + query);
+        }
         safePopBackStackImmediate();
-        refreshSubredditListVisibility();
 
-        ControlFragment cf = ControlFragment.newInstance(null, null, -1, 0);
+        ControlFragment cf = ControlFragment.newInstance(getAccountName(), null, null, -1, 0);
         SubredditListFragment slf = getSubredditListFragment();
-        ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), null, 0, query,
-                tlfFlags);
+        ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), null, 0,
+                query, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -248,19 +254,20 @@ abstract class AbstractBrowserActivity extends Activity implements
     }
 
     protected void selectInitialSubredditMultiPane(Subreddit subreddit) {
-        ThingListFragment tlf = getThingListFragment();
-        if (tlf == null || !subreddit.name.equals(Subreddit.getName(tlf.getSubreddit()))) {
-            SubredditListFragment slf = getSubredditListFragment();
+        ControlFragment cf = getControlFragment();
+        if (cf != null && cf.getSubreddit() == null) {
+            cf.setSubreddit(subreddit);
+        }
+
+        SubredditListFragment slf = getSubredditListFragment();
+        if (slf != null && slf.getSelectedSubreddit() == null) {
             slf.setSelectedSubreddit(subreddit);
+        }
 
-            ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, 0);
-            tlf = ThingListFragment.newInstance(getAccountName(), subreddit, 0, null, tlfFlags);
-
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(cf, ControlFragment.TAG);
-            ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            ft.commit();
+        ThingListFragment tlf = getThingListFragment();
+        if (tlf != null && tlf.getSubreddit() == null) {
+            tlf.setSubreddit(subreddit);
+            tlf.loadIfPossible();
         }
     }
 
@@ -283,7 +290,7 @@ abstract class AbstractBrowserActivity extends Activity implements
     protected void selectSubredditMultiPane(Subreddit subreddit) {
         safePopBackStackImmediate();
 
-        ControlFragment cf = ControlFragment.newInstance(subreddit, null, -1, 0);
+        ControlFragment cf = ControlFragment.newInstance(getAccountName(), subreddit, null, -1, 0);
         ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), subreddit, 0,
                 null, tlfFlags);
 
@@ -317,7 +324,8 @@ abstract class AbstractBrowserActivity extends Activity implements
         safePopBackStackImmediate();
 
         ControlFragment cf = getControlFragment();
-        cf = ControlFragment.newInstance(cf.getSubreddit(), thing, thingPosition, 0);
+        cf = ControlFragment.newInstance(getAccountName(), cf.getSubreddit(), thing, thingPosition,
+                0);
         ThingMenuFragment tf = ThingMenuFragment.newInstance(thing);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -398,6 +406,11 @@ abstract class AbstractBrowserActivity extends Activity implements
 
     private void refreshCheckedItems() {
         ControlFragment cf = getControlFragment();
+
+        if (DEBUG) {
+            Log.d(TAG, "refreshCheckedItems subreddit:" + cf.getSubreddit());
+        }
+
         SubredditListFragment slf = getSubredditListFragment();
         if (slf != null) {
             slf.setSelectedSubreddit(cf.getSubreddit());
@@ -419,7 +432,7 @@ abstract class AbstractBrowserActivity extends Activity implements
         }
     }
 
-    private void refreshSubredditListVisibility() {
+    protected void refreshSubredditListVisibility() {
         boolean showSubreddits = hasSubredditList();
         subredditListContainer.setVisibility(showSubreddits ? View.VISIBLE : View.GONE);
         int newWidth = showSubreddits ? subredditListWidth : 0;

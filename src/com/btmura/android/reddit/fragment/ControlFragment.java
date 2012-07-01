@@ -26,30 +26,42 @@ public class ControlFragment extends Fragment {
 
     public static final String TAG = "ControlFragment";
 
+    private static final String ARG_ACCOUNT_NAME = "an";
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_THING = "t";
     private static final String ARG_THING_POSITION = "tp";
     private static final String ARG_FILTER = "f";
 
+    private String accountName;
     private Subreddit subreddit;
     private Thing thing;
     private int thingPosition;
     private int filter;
 
-    public static ControlFragment newInstance(Subreddit sr, Thing thing, int thingPosition,
-            int filter) {
-        ControlFragment frag = new ControlFragment();
-        Bundle b = new Bundle(4);
+    public static ControlFragment newInstance(String accountName, Subreddit sr, Thing thing,
+            int thingPosition, int filter) {
+        Bundle b = new Bundle(5);
+        b.putString(ARG_ACCOUNT_NAME, accountName);
         b.putParcelable(ARG_SUBREDDIT, sr);
         b.putParcelable(ARG_THING, thing);
         b.putInt(ARG_THING_POSITION, thingPosition);
         b.putInt(ARG_FILTER, filter);
+
+        ControlFragment frag = new ControlFragment();
         frag.setArguments(b);
         return frag;
     }
 
+    public String getAccountName() {
+        return accountName;
+    }
+
     public Subreddit getSubreddit() {
         return subreddit;
+    }
+
+    public void setSubreddit(Subreddit subreddit) {
+        this.subreddit = subreddit;
     }
 
     public Thing getThing() {
@@ -67,15 +79,22 @@ public class ControlFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+
+        Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
+        accountName = b.getString(ARG_ACCOUNT_NAME);
+        subreddit = b.getParcelable(ARG_SUBREDDIT);
+        thing = b.getParcelable(ARG_THING);
+        thingPosition = b.getInt(ARG_THING_POSITION);
+        filter = b.getInt(ARG_FILTER);
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        subreddit = getArguments().getParcelable(ARG_SUBREDDIT);
-        thing = getArguments().getParcelable(ARG_THING);
-        thingPosition = getArguments().getInt(ARG_THING_POSITION);
-        filter = getArguments().getInt(ARG_FILTER);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(ARG_ACCOUNT_NAME, accountName);
+        outState.putParcelable(ARG_SUBREDDIT, subreddit);
+        outState.putParcelable(ARG_THING, thing);
+        outState.putInt(ARG_THING_POSITION, thingPosition);
+        outState.putInt(ARG_FILTER, filter);
     }
 }
