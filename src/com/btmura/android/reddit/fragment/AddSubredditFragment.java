@@ -34,7 +34,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.btmura.android.reddit.LoaderIds;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -117,7 +116,7 @@ public class AddSubredditFragment extends DialogFragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         restoringState = savedInstanceState != null;
-        getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {

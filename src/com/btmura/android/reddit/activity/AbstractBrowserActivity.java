@@ -42,7 +42,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.btmura.android.reddit.Debug;
-import com.btmura.android.reddit.LoaderIds;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -117,7 +116,7 @@ abstract class AbstractBrowserActivity extends Activity implements
         setupCommonViews();
         setupViews();
         setupActionBar(savedInstanceState);
-        getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     protected abstract void setContentView();

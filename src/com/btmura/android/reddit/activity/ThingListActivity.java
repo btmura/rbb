@@ -25,7 +25,6 @@ import android.content.Loader;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.btmura.android.reddit.LoaderIds;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -64,7 +63,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         setContentView(R.layout.thing_list);
         setInitialFragments(savedInstanceState);
         setActionBar(savedInstanceState);
-        getLoaderManager().initLoader(LoaderIds.ACCOUNTS, null, this);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     private void setInitialFragments(Bundle savedInstanceState) {
