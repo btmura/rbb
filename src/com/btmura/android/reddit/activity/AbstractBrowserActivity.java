@@ -447,10 +447,16 @@ abstract class AbstractBrowserActivity extends Activity implements
     public CharSequence getSubredditName() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
-            return Subreddit.getName(cf.getSubreddit());
-        } else {
-            return null;
+            Subreddit subreddit = cf.getSubreddit();
+            if (subreddit != null) {
+                return Subreddit.getName(subreddit);
+            }
+            Thing thing = cf.getThing();
+            if (thing != null) {
+                return thing.subreddit;
+            }
         }
+        return null;
     }
 
     public ViewPager getPager() {

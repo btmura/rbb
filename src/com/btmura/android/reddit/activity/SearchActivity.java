@@ -63,7 +63,6 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     protected void setupActionBar() {
         tabPosts = bar.newTab().setText(R.string.tab_posts).setTabListener(this);
         tabSubreddits = bar.newTab().setText(R.string.tab_subreddits).setTabListener(this);
-
         bar.addTab(tabPosts);
         bar.addTab(tabSubreddits);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
