@@ -155,9 +155,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onLoaderReset (id " + loader.getId() + ")");
-        }
         adapter.swapCursor(null);
     }
 

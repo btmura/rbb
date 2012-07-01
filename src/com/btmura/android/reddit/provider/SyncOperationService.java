@@ -37,6 +37,7 @@ import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 public class SyncOperationService extends IntentService {
 
     public static final String TAG = "SyncOperationService";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final String[] PROJECTION = {
             Subreddits.COLUMN_ACCOUNT,
@@ -52,8 +53,8 @@ public class SyncOperationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (Debug.DEBUG_SYNC) {
-            Log.d(TAG, "onHandleIntent uri: " + intent.getDataString());
+        if (DEBUG) {
+            Log.d(TAG, "onHandleIntent data:" + intent.getDataString());
         }
 
         ContentResolver cr = getContentResolver();
@@ -64,9 +65,9 @@ public class SyncOperationService extends IntentService {
                 String subreddit = c.getString(1);
                 int state = c.getInt(2);
 
-                if (Debug.DEBUG_SYNC) {
-                    Log.d(TAG, "account name: " + accountName + " subreddit: " + subreddit
-                            + " state: " + state);
+                if (DEBUG) {
+                    Log.d(TAG, "onHandleIntent an: " + accountName + " s: " + subreddit
+                            + " st: " + state);
                 }
 
                 if (!Subreddits.NAME_FRONT_PAGE.equals(subreddit)) {
@@ -86,7 +87,7 @@ public class SyncOperationService extends IntentService {
                     values.put(Subreddits.COLUMN_EXPIRATION, System.currentTimeMillis()
                             + EXPIRATION_PADDING);
                     int count = cr.update(intent.getData(), values, null, null);
-                    if (Debug.DEBUG_SYNC) {
+                    if (DEBUG) {
                         Log.d(TAG, "updated: " + count);
                     }
                 }

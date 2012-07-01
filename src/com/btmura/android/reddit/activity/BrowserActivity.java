@@ -23,7 +23,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -84,7 +83,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        if (Debug.DEBUG_ACTIVITY) {
+        if (DEBUG) {
             Log.d(TAG, "onNavigationItemSelected itemPosition:" + itemPosition);
         }
         String accountName = adapter.getItem(itemPosition);

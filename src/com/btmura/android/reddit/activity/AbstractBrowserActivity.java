@@ -69,8 +69,7 @@ abstract class AbstractBrowserActivity extends Activity implements
         ThingPagerHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
-
-    private static final boolean DEBUG = Debug.DEBUG;
+    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final int ANIMATION_OPEN_NAV = 0;
     private static final int ANIMATION_CLOSE_NAV = 1;
@@ -108,7 +107,7 @@ abstract class AbstractBrowserActivity extends Activity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Debug.DEBUG_STRICT_MODE) {
+        if (DEBUG) {
             StrictMode.enableDefaults();
         }
         super.onCreate(savedInstanceState);

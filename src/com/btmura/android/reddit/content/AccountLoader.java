@@ -37,6 +37,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         OnAccountsUpdateListener {
 
     public static final String TAG = "AccountLoader";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     public static class AccountResult {
         public String[] accountNames;
@@ -71,8 +72,8 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     @Override
     public AccountResult loadInBackground() {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "loadInBackground id: " + getId());
+        if (DEBUG) {
+            Log.d(TAG, "loadInBackground");
         }
 
         Context context = getContext();
@@ -96,9 +97,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     @Override
     public void deliverResult(AccountResult newResult) {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "deliverResult (id " + getId() + ")");
-        }
         if (isReset()) {
             return;
         }
@@ -112,9 +110,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     @Override
     protected void onStartLoading() {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onStartLoading (id " + getId() + ")");
-        }
         if (result != null) {
             deliverResult(result);
         }
@@ -125,18 +120,12 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     @Override
     protected void onReset() {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onReset (id " + getId() + ")");
-        }
         super.onReset();
         onStopLoading();
         result = null;
     }
 
     public void onAccountsUpdated(Account[] accounts) {
-        if (Debug.DEBUG_LOADERS) {
-            Log.d(TAG, "onAccountsUpdated");
-        }
         onContentChanged();
     }
 

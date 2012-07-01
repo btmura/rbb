@@ -47,6 +47,7 @@ import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 public class SyncAdapterService extends Service {
 
     public static final String TAG = "SyncAdapterService";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final String EXTRA_INITIAL_SYNC = "firstSync";
 
@@ -184,8 +185,8 @@ public class SyncAdapterService extends Service {
                 syncResult.databaseError = true;
             }
 
-            if (Debug.DEBUG_SYNC) {
-                Log.d(TAG, "account: " + account.name + " " + syncResult.toString());
+            if (DEBUG) {
+                Log.d(TAG, "an:" + account.name + " sr:" + syncResult.toString());
             }
         }
 
