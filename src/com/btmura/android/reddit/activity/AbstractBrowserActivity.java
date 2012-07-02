@@ -201,6 +201,11 @@ abstract class AbstractBrowserActivity extends Activity implements
     protected void animateSetSubredditListNavigation(final String query) {
         runSubredditListAnimation(ANIMATION_OPEN_SUBREDDIT_NAV, new AnimatorListenerAdapter() {
             @Override
+            public void onAnimationStart(Animator animation) {
+                getFragmentManager().popBackStackImmediate();
+            }
+
+            @Override
             public void onAnimationEnd(Animator animation) {
                 animation.removeListener(this);
                 setSubredditListNavigation(query);
@@ -210,6 +215,11 @@ abstract class AbstractBrowserActivity extends Activity implements
 
     protected void animateSetThingListNavigation(final String query) {
         runSubredditListAnimation(ANIMATION_CLOSE_SUBREDDIT_NAV, new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                getFragmentManager().popBackStackImmediate();
+            }
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 animation.removeListener(this);
