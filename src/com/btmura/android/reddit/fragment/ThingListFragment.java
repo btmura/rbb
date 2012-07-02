@@ -286,7 +286,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public String getQuery() {
-        return getArguments().getString(ARG_QUERY);
+        return query;
     }
 
     private int getFlags() {

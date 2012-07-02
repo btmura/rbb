@@ -191,6 +191,24 @@ abstract class AbstractBrowserActivity extends Activity implements
     protected abstract boolean hasSubredditList();
 
     protected void setSubredditListNavigation(String query) {
+        if (isSinglePane) {
+            setSubredditListNavigationSinglePane(query);
+        } else {
+            setSubredditListNavigationMultiPane(query);
+        }
+    }
+
+    private void setSubredditListNavigationSinglePane(String query) {
+        SubredditListFragment slf = SubredditListFragment.newInstance(getAccountName(), null,
+                query, slfFlags);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.subreddit_list_container, slf, SubredditListFragment.TAG);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+        ft.commit();
+    }
+
+    private void setSubredditListNavigationMultiPane(String query) {
         if (DEBUG) {
             Log.d(TAG, "setSubredditListNavigation q:" + query);
         }
@@ -210,7 +228,8 @@ abstract class AbstractBrowserActivity extends Activity implements
         if (tmf != null) {
             ft.remove(tmf);
         }
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
 
         refreshSubredditListVisibility();
@@ -239,7 +258,8 @@ abstract class AbstractBrowserActivity extends Activity implements
         if (tmf != null) {
             ft.remove(tmf);
         }
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
 
         refreshSubredditListVisibility();
@@ -297,7 +317,8 @@ abstract class AbstractBrowserActivity extends Activity implements
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
         ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
 
         refreshActionBar(null);
