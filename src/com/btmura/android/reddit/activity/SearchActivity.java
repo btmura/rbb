@@ -73,8 +73,8 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
 
         tabPosts = bar.newTab().setText(R.string.tab_posts).setTabListener(this);
         tabSubreddits = bar.newTab().setText(R.string.tab_subreddits).setTabListener(this);
-        bar.addTab(tabSubreddits);
         bar.addTab(tabPosts);
+        bar.addTab(tabSubreddits);
 
         // Prevent onTabSelected from being called twice after a configuration change. :C
         tabListenerEnabled = savedInstanceState == null;
