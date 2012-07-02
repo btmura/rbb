@@ -94,9 +94,9 @@ public class ThumbnailLoader {
                 conn = (HttpURLConnection) u.openConnection();
                 return BitmapFactory.decodeStream(conn.getInputStream());
             } catch (MalformedURLException e) {
-                Log.e(TAG, url, e);
+                Log.e(TAG, "doInBackground", e);
             } catch (IOException e) {
-                Log.e(TAG, url, e);
+                Log.e(TAG, "doInBackground", e);
             } finally {
                 if (conn != null) {
                     conn.disconnect();
