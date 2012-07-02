@@ -511,6 +511,9 @@ abstract class AbstractBrowserActivity extends Activity implements
             } else {
                 fm.popBackStack();
             }
+        } else if ((bar.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP)
+                == ActionBar.DISPLAY_HOME_AS_UP) {
+            finish();
         }
     }
 
