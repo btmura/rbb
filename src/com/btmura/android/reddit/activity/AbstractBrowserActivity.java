@@ -22,7 +22,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
@@ -58,7 +57,7 @@ import com.btmura.android.reddit.fragment.ThingMenuFragment;
 import com.btmura.android.reddit.fragment.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
-abstract class AbstractBrowserActivity extends Activity implements
+abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
