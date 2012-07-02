@@ -76,10 +76,11 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
         bar.addTab(tabPosts);
         bar.addTab(tabSubreddits);
 
-        // Prevent onTabSelected from being called twice after a configuration change. :C
-        tabListenerEnabled = savedInstanceState == null;
+        // Prevent listener being called twice after a configuration change.
+        tabListenerEnabled = savedInstanceState == null
+                || savedInstanceState.getInt(STATE_SELECTED_TAB) == 0;
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        if (savedInstanceState != null) {
+        if (!tabListenerEnabled) {
             tabListenerEnabled = true;
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_SELECTED_TAB));
         }
@@ -118,15 +119,27 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
+        if (DEBUG) {
+            Log.d(TAG, "onTabSelected t:" + tab.getText() + " e:" + tabListenerEnabled);
+        }
         if (tabListenerEnabled) {
-            if (DEBUG) {
-                Log.d(TAG, "onTabSelected tab:" + tab.getText());
-            }
-            if (searchPager != null) {
-                searchPager.setCurrentItem(tab.getPosition());
-            } else {
-                setNavigationFragments(tab);
-            }
+            selectTab(tab);
+        }
+    }
+
+    public void onTabReselected(Tab tab, FragmentTransaction ft) {
+        if (DEBUG) {
+            Log.d(TAG, "onTabReselected t:" + tab.getText() + " e:" + tabListenerEnabled);
+        }
+        if (tabListenerEnabled) {
+        }
+    }
+
+    private void selectTab(Tab tab) {
+        if (searchPager != null) {
+            searchPager.setCurrentItem(tab.getPosition());
+        } else {
+            setNavigationFragments(tab);
         }
     }
 
@@ -150,9 +163,6 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-    }
-
-    public void onTabReselected(Tab tab, FragmentTransaction ft) {
     }
 
     @Override
