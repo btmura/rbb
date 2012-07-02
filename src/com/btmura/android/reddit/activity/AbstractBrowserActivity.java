@@ -76,8 +76,6 @@ abstract class AbstractBrowserActivity extends Activity implements
     private static final int ANIMATION_CLOSE_SIDE_NAV = 3;
     private static final int ANIMATION_EXPAND_SUBREDDIT_NAV = 4;
     private static final int ANIMATION_EXPAND_THING_NAV = 5;
-    private static final int ANIMATION_OPEN_SUBREDDIT_NAV = 6;
-    private static final int ANIMATION_CLOSE_SUBREDDIT_NAV = 7;
 
     private static final int NAV_LAYOUT_ORIGINAL = 0;
     private static final int NAV_LAYOUT_SIDENAV = 1;
@@ -91,7 +89,6 @@ abstract class AbstractBrowserActivity extends Activity implements
 
     private View navContainer;
     private View subredditListContainer;
-    private View thingListContainer;
     private int subredditListWidth;
     private int thingBodyWidth;
 
@@ -106,8 +103,6 @@ abstract class AbstractBrowserActivity extends Activity implements
     private AnimatorSet closeSideNavAnimator;
     private AnimatorSet expandSubredditNavAnimator;
     private AnimatorSet expandThingNavAnimator;
-    private AnimatorSet openSubredditNavAnimator;
-    private AnimatorSet closeSubredditNavAnimator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,7 +143,6 @@ abstract class AbstractBrowserActivity extends Activity implements
 
             navContainer = findViewById(R.id.nav_container);
             subredditListContainer = findViewById(R.id.subreddit_list_container);
-            thingListContainer = findViewById(R.id.thing_list_container);
 
             Resources r = getResources();
             DisplayMetrics dm = r.getDisplayMetrics();
@@ -176,10 +170,7 @@ abstract class AbstractBrowserActivity extends Activity implements
                 expandThingNavAnimator = createExpandNavAnimator(false);
             }
 
-            openSubredditNavAnimator = createSubredditNavAnimator(true);
-            closeSubredditNavAnimator = createSubredditNavAnimator(false);
             refreshSubredditListVisibility();
-            refreshThingBodyWidthMeasurement();
         }
     }
 
@@ -198,36 +189,6 @@ abstract class AbstractBrowserActivity extends Activity implements
     protected abstract String getAccountName();
 
     protected abstract boolean hasSubredditList();
-
-    protected void animateSetSubredditListNavigation(final String query) {
-        runSubredditListAnimation(ANIMATION_OPEN_SUBREDDIT_NAV, new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                getFragmentManager().popBackStackImmediate();
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                animation.removeListener(this);
-                setSubredditListNavigation(query);
-            }
-        });
-    }
-
-    protected void animateSetThingListNavigation(final String query) {
-        runSubredditListAnimation(ANIMATION_CLOSE_SUBREDDIT_NAV, new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                getFragmentManager().popBackStackImmediate();
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                animation.removeListener(this);
-                setThingListNavigation(query);
-            }
-        });
-    }
 
     protected void setSubredditListNavigation(String query) {
         if (DEBUG) {
@@ -249,10 +210,10 @@ abstract class AbstractBrowserActivity extends Activity implements
         if (tmf != null) {
             ft.remove(tmf);
         }
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
 
-        refreshThingBodyWidthMeasurement();
+        refreshSubredditListVisibility();
         refreshActionBar(null);
         refreshViews(null);
     }
@@ -278,10 +239,10 @@ abstract class AbstractBrowserActivity extends Activity implements
         if (tmf != null) {
             ft.remove(tmf);
         }
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
 
-        refreshThingBodyWidthMeasurement();
+        refreshSubredditListVisibility();
         refreshActionBar(null);
         refreshViews(null);
     }
@@ -474,6 +435,7 @@ abstract class AbstractBrowserActivity extends Activity implements
     protected void refreshSubredditListVisibility() {
         boolean showSubreddits = hasSubredditList();
         subredditListContainer.setVisibility(showSubreddits ? View.VISIBLE : View.GONE);
+        refreshThingBodyWidthMeasurement();
     }
 
     private void refreshThingBodyWidthMeasurement() {
@@ -589,18 +551,6 @@ abstract class AbstractBrowserActivity extends Activity implements
         as.start();
     }
 
-    private void runSubredditListAnimation(int type, AnimatorListener listener) {
-        subredditListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        subredditListContainer.setVisibility(View.VISIBLE);
-        thingListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        thingListContainer.setVisibility(View.VISIBLE);
-        AnimatorSet as = getAnimator(type);
-        if (listener != null) {
-            as.addListener(listener);
-        }
-        as.start();
-    }
-
     private AnimatorSet getAnimator(int type) {
         switch (type) {
             case ANIMATION_OPEN_NAV:
@@ -615,10 +565,6 @@ abstract class AbstractBrowserActivity extends Activity implements
                 return expandSubredditNavAnimator;
             case ANIMATION_EXPAND_THING_NAV:
                 return expandThingNavAnimator;
-            case ANIMATION_OPEN_SUBREDDIT_NAV:
-                return openSubredditNavAnimator;
-            case ANIMATION_CLOSE_SUBREDDIT_NAV:
-                return closeSubredditNavAnimator;
             default:
                 throw new IllegalArgumentException();
         }
@@ -756,45 +702,5 @@ abstract class AbstractBrowserActivity extends Activity implements
 
         subredditListContainer.setVisibility(subredditListVisibility);
         thingClickAbsorber.setVisibility(clickAbsorberVisibility);
-    }
-
-    private AnimatorSet createSubredditNavAnimator(final boolean open) {
-        subredditListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        subredditListContainer.setVisibility(View.VISIBLE);
-
-        thingListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        thingListContainer.setVisibility(View.VISIBLE);
-
-        ObjectAnimator slTransX;
-        ObjectAnimator tlTransX;
-        if (open) {
-            slTransX = ObjectAnimator.ofFloat(subredditListContainer, "translationX",
-                    -subredditListWidth, 0);
-            tlTransX = ObjectAnimator.ofFloat(thingListContainer, "translationX",
-                    -subredditListWidth, 0);
-        } else {
-            slTransX = ObjectAnimator.ofFloat(subredditListContainer, "translationX",
-                    0, -subredditListWidth);
-            tlTransX = ObjectAnimator.ofFloat(thingListContainer, "translationX",
-                    0, -subredditListWidth);
-        }
-
-        AnimatorSet animation = new AnimatorSet();
-        animation.setDuration(duration).play(slTransX).with(tlTransX);
-        animation.addListener(new AnimatorListenerAdapter() {
-           @Override
-           public void onAnimationEnd(Animator animation) {
-               subredditListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-               subredditListContainer.setTranslationX(0);
-
-               thingListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-               thingListContainer.setTranslationX(0);
-
-               if (!open) {
-                   subredditListContainer.setVisibility(View.GONE);
-               }
-           }
-        });
-        return animation;
     }
 }
