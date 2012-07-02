@@ -134,15 +134,18 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
         if (tab == tabSubreddits) {
             SubredditListFragment f = getSubredditListFragment();
             if (f == null || !query.equals(f.getQuery())) {
-                setSubredditListNavigation(query);
+                animateSetSubredditListNavigation(query);
+            } else {
+                refreshSubredditListVisibility();
             }
         } else {
             ThingListFragment f = getThingListFragment();
             if (f == null || !query.equals(f.getQuery())) {
-                setThingListNavigation(query);
+                animateSetThingListNavigation(query);
+            } else {
+                refreshSubredditListVisibility();
             }
         }
-        refreshSubredditListVisibility();
     }
 
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
