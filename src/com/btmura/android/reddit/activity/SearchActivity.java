@@ -63,6 +63,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
         }
         if (isSinglePane) {
             searchPager = (ViewPager) findViewById(R.id.search_pager);
+            searchPager.setOnPageChangeListener(this);
         }
     }
 
@@ -89,17 +90,18 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = AccountLoader.getLastAccount(result.prefs, result.accountNames);
+        if (!isSinglePane) {
+            SubredditListFragment slf = getSubredditListFragment();
+            if (slf != null && slf.getAccountName() == null) {
+                slf.setAccountName(accountName);
+                slf.loadIfPossible();
+            }
 
-        SubredditListFragment slf = getSubredditListFragment();
-        if (slf != null && slf.getAccountName() == null) {
-            slf.setAccountName(accountName);
-            slf.loadIfPossible();
-        }
-
-        ThingListFragment tlf = getThingListFragment();
-        if (tlf != null && tlf.getAccountName() == null) {
-            tlf.setAccountName(accountName);
-            tlf.loadIfPossible();
+            ThingListFragment tlf = getThingListFragment();
+            if (tlf != null && tlf.getAccountName() == null) {
+                tlf.setAccountName(accountName);
+                tlf.loadIfPossible();
+            }
         }
     }
 
@@ -183,14 +185,18 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     private void submitSearchQuerySinglePane(String query) {
-        searchPager = (ViewPager) findViewById(R.id.search_pager);
-        searchPager.setOnPageChangeListener(this);
         searchPager.setAdapter(new SearchPagerAdapter(getFragmentManager(), accountName, query));
         searchPager.setCurrentItem(bar.getSelectedNavigationIndex());
     }
 
     private void submitSearchQueryMultiPane(String query) {
         setNavigationFragments(bar.getSelectedTab());
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        super.onPageSelected(position);
+        bar.setSelectedNavigationItem(position);
     }
 
     @Override
