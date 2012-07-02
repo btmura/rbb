@@ -179,6 +179,7 @@ abstract class AbstractBrowserActivity extends Activity implements
             openSubredditNavAnimator = createSubredditNavAnimator(true);
             closeSubredditNavAnimator = createSubredditNavAnimator(false);
             refreshSubredditListVisibility();
+            refreshThingBodyWidthMeasurement();
         }
     }
 
@@ -230,7 +231,7 @@ abstract class AbstractBrowserActivity extends Activity implements
 
     protected void setSubredditListNavigation(String query) {
         if (DEBUG) {
-            Log.d(TAG, "setSubredditListNavigation query: " + query);
+            Log.d(TAG, "setSubredditListNavigation q:" + query);
         }
         safePopBackStackImmediate();
 
@@ -251,13 +252,14 @@ abstract class AbstractBrowserActivity extends Activity implements
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
 
+        refreshThingBodyWidthMeasurement();
         refreshActionBar(null);
         refreshViews(null);
     }
 
     protected void setThingListNavigation(String query) {
         if (DEBUG) {
-            Log.d(TAG, "setThingListNavigation query: " + query);
+            Log.d(TAG, "setThingListNavigation q:" + query);
         }
         safePopBackStackImmediate();
 
@@ -279,6 +281,7 @@ abstract class AbstractBrowserActivity extends Activity implements
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.commit();
 
+        refreshThingBodyWidthMeasurement();
         refreshActionBar(null);
         refreshViews(null);
     }
@@ -471,7 +474,9 @@ abstract class AbstractBrowserActivity extends Activity implements
     protected void refreshSubredditListVisibility() {
         boolean showSubreddits = hasSubredditList();
         subredditListContainer.setVisibility(showSubreddits ? View.VISIBLE : View.GONE);
+    }
 
+    private void refreshThingBodyWidthMeasurement() {
         int newWidth = hasSubredditList() ? subredditListWidth : 0;
         Resources r = getResources();
         DisplayMetrics dm = r.getDisplayMetrics();
