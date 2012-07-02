@@ -68,6 +68,9 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
+        bar.setTitle(getQuery());
+        bar.setDisplayHomeAsUpEnabled(true);
+
         tabPosts = bar.newTab().setText(R.string.tab_posts).setTabListener(this);
         tabSubreddits = bar.newTab().setText(R.string.tab_subreddits).setTabListener(this);
         bar.addTab(tabSubreddits);
@@ -80,8 +83,6 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
             tabListenerEnabled = true;
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_SELECTED_TAB));
         }
-
-        bar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
