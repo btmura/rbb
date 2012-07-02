@@ -132,6 +132,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
             Log.d(TAG, "onTabReselected t:" + tab.getText() + " e:" + tabListenerEnabled);
         }
         if (tabListenerEnabled) {
+            getFragmentManager().popBackStack();
         }
     }
 
