@@ -90,7 +90,9 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = AccountLoader.getLastAccount(result.prefs, result.accountNames);
-        if (!isSinglePane) {
+        if (isSinglePane) {
+            submitSearchQuerySinglePane(getQuery());
+        } else {
             SubredditListFragment slf = getSubredditListFragment();
             if (slf != null && slf.getAccountName() == null) {
                 slf.setAccountName(accountName);
@@ -133,7 +135,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
         if (DEBUG) {
             Log.d(TAG, "onTabReselected t:" + tab.getText() + " e:" + tabListenerEnabled);
         }
-        if (tabListenerEnabled) {
+        if (tabListenerEnabled && !isSinglePane) {
             getFragmentManager().popBackStack();
         }
     }
