@@ -22,6 +22,7 @@ import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -54,7 +55,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private ActionBar bar;
     private FilterAdapter adapter;
     private String accountName;
-
+    private SharedPreferences prefs;
     private Subreddit subreddit;
 
     @Override
@@ -94,7 +95,9 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        prefs = result.prefs;
         accountName = result.getLastAccount();
+        bar.setSelectedNavigationItem(result.getLastFilter());
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
@@ -103,6 +106,8 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         int filter = adapter.getFilter(itemPosition);
+        AccountLoader.setLastFilter(prefs, filter);
+
         ThingListFragment f = getThingListFragment();
         if (f == null || !f.getAccountName().equals(accountName)
                 || f.getFilter() != filter) {
