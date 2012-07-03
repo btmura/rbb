@@ -31,6 +31,7 @@ import android.util.JsonReader;
 
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Comment;
+import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 
 public class NetApi {
@@ -95,6 +96,26 @@ public class NetApi {
         }
     }
 
+    public static Subreddit querySidebar(Context context, String subreddit, String cookie)
+            throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.sidebarUrl(subreddit);
+            conn = (HttpURLConnection) url.openConnection();
+            setCommonHeaders(conn, cookie);
+            conn.connect();
+
+            in = conn.getInputStream();
+            JsonReader reader = new JsonReader(new InputStreamReader(in));
+            SidebarParser parser = new SidebarParser(context);
+            parser.parseEntity(reader);
+            return parser.results;
+        } finally {
+            close(in, conn);
+        }
+    }
+
     static void subscribe(String cookie, String modhash, String subreddit, boolean subscribe)
             throws IOException {
         HttpURLConnection conn = null;
@@ -104,8 +125,8 @@ public class NetApi {
             conn = (HttpURLConnection) url.openConnection();
             setCommonHeaders(conn, cookie);
             setFormDataHeaders(conn);
-
             conn.connect();
+
             writeFormData(conn, Urls.subscribeQuery(modhash, subreddit, subscribe));
             in = conn.getInputStream();
 

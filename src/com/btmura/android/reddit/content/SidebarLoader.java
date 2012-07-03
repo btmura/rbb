@@ -17,25 +17,17 @@
 package com.btmura.android.reddit.content;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
-import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.data.Formatter;
-import com.btmura.android.reddit.data.JsonParser;
-import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.provider.NetApi;
 
 public class SidebarLoader extends AsyncTaskLoader<Subreddit> {
 
-    private static final String TAG = "SidebarLoader";
+    public static final String TAG = "SidebarLoader";
 
     private Subreddit results;
 
@@ -59,67 +51,10 @@ public class SidebarLoader extends AsyncTaskLoader<Subreddit> {
     @Override
     public Subreddit loadInBackground() {
         try {
-            URL subredditUrl = Urls.sidebarUrl(subreddit);
-
-            HttpURLConnection connection = (HttpURLConnection) subredditUrl.openConnection();
-            connection.connect();
-
-            InputStream stream = connection.getInputStream();
-            JsonReader reader = new JsonReader(new InputStreamReader(stream));
-            DetailsParser parser = new DetailsParser();
-            parser.parseEntity(reader);
-            stream.close();
-
-            connection.disconnect();
-
-            return parser.results;
-
-        } catch (MalformedURLException e) {
-            Log.e(TAG, e.getMessage(), e);
+            return NetApi.querySidebar(getContext(), subreddit, null);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Log.e(TAG, "loadInBackground", e);
         }
-
         return null;
-    }
-
-    @Override
-    protected void onStopLoading() {
-        super.onStopLoading();
-    }
-
-    class DetailsParser extends JsonParser {
-
-        private Subreddit results;
-
-        @Override
-        public void onEntityStart(int index) {
-            results = Subreddit.emptyInstance();
-        }
-
-        @Override
-        public void onDisplayName(JsonReader reader, int index) throws IOException {
-            results.name = reader.nextString();
-        }
-
-        @Override
-        public void onTitle(JsonReader reader, int index) throws IOException {
-            results.title = Formatter.formatTitle(getContext(), readTrimmedString(reader, ""));
-        }
-
-        @Override
-        public void onSubscribers(JsonReader reader, int index) throws IOException {
-            results.subscribers = reader.nextInt();
-        }
-
-        @Override
-        public void onDescription(JsonReader reader, int index) throws IOException {
-            results.description = Formatter.formatInfo(getContext(), readTrimmedString(reader, ""));
-        }
-
-        @Override
-        public void onEntityEnd(int index) {
-            results.assureFormat(getContext());
-        }
     }
 }
