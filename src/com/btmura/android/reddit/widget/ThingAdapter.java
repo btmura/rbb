@@ -34,18 +34,15 @@ public class ThingAdapter extends BaseAdapter {
     private final ArrayList<Thing> items = new ArrayList<Thing>(30);
     private final Context context;
     private final LayoutInflater inflater;
-    private final String subredditName;
     private final boolean singleChoice;
-    private final long now = System.currentTimeMillis() / 1000;
 
     private String selectedName;
     private int selectedPosition;
     private int bodyWidth;
 
-    public ThingAdapter(Context context, String subredditName, boolean singleChoice) {
+    public ThingAdapter(Context context, boolean singleChoice) {
         this.context = context;
-        this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.subredditName = subredditName;
+        this.inflater = LayoutInflater.from(context);
         this.singleChoice = singleChoice;
     }
 
@@ -136,7 +133,7 @@ public class ThingAdapter extends BaseAdapter {
     }
 
     private void setView(int position, View v) {
-        Thing t = getItem(position).assureFormat(context, subredditName, now);
+        Thing t = getItem(position);
         switch (t.type) {
             case Thing.TYPE_THING:
                 setThing((ThingView) v, t, position);

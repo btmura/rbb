@@ -111,7 +111,7 @@ public class ThingListFragment extends ListFragment implements
         filter = b.getInt(ARG_FILTER);
         query = b.getString(ARG_QUERY);
 
-        adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), isSingleChoice());
+        adapter = new ThingAdapter(getActivity(), isSingleChoice());
         adapter.setSelectedThing(b.getString(STATE_THING_NAME), b.getInt(STATE_THING_POSITION, -1));
         setHasOptionsMenu(true);
     }
