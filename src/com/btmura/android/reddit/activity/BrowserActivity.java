@@ -26,6 +26,7 @@ import android.util.Log;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
@@ -89,8 +90,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
-    protected void refreshActionBar(Thing thing) {
+    protected void refreshActionBar(Subreddit subreddit, Thing thing) {
         bar.setDisplayHomeAsUpEnabled(thing != null);
+        adapter.setSubreddit(subreddit);
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {

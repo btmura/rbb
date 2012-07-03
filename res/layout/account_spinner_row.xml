@@ -24,7 +24,16 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:paddingRight="@dimen/element_padding" />
+        android:paddingRight="@dimen/padding" />
+
+    <TextView
+        android:id="@+id/subreddit_name"
+        style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:paddingRight="@dimen/element_padding"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/filter"

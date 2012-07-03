@@ -28,6 +28,7 @@ import android.util.Log;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment.OnSearchQuerySubmittedListener;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
@@ -176,13 +177,13 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     @Override
-    protected void refreshActionBar(Thing thing) {
+    protected void refreshActionBar(Subreddit subreddit, Thing thing) {
         bar.setTitle(getQuery());
     }
 
     public boolean onSearchQuerySubmitted(String query) {
         setQuery(query);
-        refreshActionBar(null);
+        refreshActionBar(null, null);
         if (isSinglePane) {
             submitSearchQuerySinglePane(query);
         } else {

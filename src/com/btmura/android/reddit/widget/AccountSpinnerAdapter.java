@@ -27,6 +27,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.Subreddit;
 
 public class AccountSpinnerAdapter extends BaseAdapter {
 
@@ -53,7 +54,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     private final boolean showFilters;
 
     private String accountName;
-    private String subredditName;
+    private Subreddit subreddit;
     private int filter;
 
     public AccountSpinnerAdapter(Context context, boolean showFilters) {
@@ -123,12 +124,12 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     }
 
 
-    public String getSubredditName() {
-        return subredditName;
+    public Subreddit getSubreddit() {
+        return subreddit;
     }
 
-    public void setSubredditName(String subredditName) {
-        this.subredditName = subredditName;
+    public void setSubreddit(Subreddit subreddit) {
+        this.subreddit = subreddit;
         notifyDataSetChanged();
     }
 
@@ -174,7 +175,15 @@ public class AccountSpinnerAdapter extends BaseAdapter {
             v = makeView(parent);
         }
         ViewHolder h = (ViewHolder) v.getTag();
-        h.accountName.setText(getDisplayLabel(accountName));
+        h.accountName.setText(getTitle(accountName));
+
+        if (subreddit != null) {
+            h.subreddit.setText(subreddit.getTitle(context));
+            h.subreddit.setVisibility(View.VISIBLE);
+        } else {
+            h.subreddit.setVisibility(View.GONE);
+        }
+
         if (showFilters) {
             h.filter.setText(filters.get(filter).text);
             h.filter.setVisibility(View.VISIBLE);
@@ -188,6 +197,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         View v = inflater.inflate(R.layout.account_spinner_row, parent, false);
         ViewHolder h = new ViewHolder();
         h.accountName = (TextView) v.findViewById(R.id.account_name);
+        h.subreddit = (TextView) v.findViewById(R.id.subreddit_name);
         h.filter = (TextView) v.findViewById(R.id.filter);
         v.setTag(h);
         return v;
@@ -195,6 +205,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
 
     static class ViewHolder {
         TextView accountName;
+        TextView subreddit;
         TextView filter;
     }
 
@@ -223,11 +234,11 @@ public class AccountSpinnerAdapter extends BaseAdapter {
             tv = (TextView) inflater.inflate(layout, parent, false);
         }
         Item item = getItem(position);
-        tv.setText(getDisplayLabel(item.text));
+        tv.setText(getTitle(item.text));
         return tv;
     }
 
-    private String getDisplayLabel(String accountName) {
+    private String getTitle(String accountName) {
         if (TextUtils.isEmpty(accountName)) {
             return context.getString(R.string.app_name);
         } else {

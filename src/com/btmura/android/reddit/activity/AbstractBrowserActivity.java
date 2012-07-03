@@ -237,7 +237,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commit();
 
         refreshSubredditListVisibility();
-        refreshActionBar(null);
+        refreshActionBar(null, null);
         refreshViews(null);
     }
 
@@ -270,7 +270,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commit();
 
         refreshSubredditListVisibility();
-        refreshActionBar(null);
+        refreshActionBar(null, null);
         refreshViews(null);
     }
 
@@ -296,6 +296,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             tlf.setSubreddit(subreddit);
             tlf.loadIfPossible();
         }
+
+        refreshActionBar(subreddit, null);
     }
 
     public void onSubredditSelected(Subreddit subreddit) {
@@ -335,7 +337,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
 
-        refreshActionBar(null);
+        refreshActionBar(subreddit, null);
         refreshViews(null);
     }
 
@@ -393,21 +395,29 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     public void onBackStackChanged() {
-        Thing thing = getControlFragment().getThing();
-        refreshActionBar(thing);
-        refreshViews(thing);
-        refreshCheckedItems();
+        ControlFragment cf = getControlFragment();
+        if (cf != null) {
+            Subreddit subreddit = cf.getSubreddit();
+            Thing thing = cf.getThing();
+            refreshActionBar(subreddit, thing);
+            refreshViews(thing);
+            refreshCheckedItems();
+        }
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (!isSinglePane && savedInstanceState != null) {
-            Thing thing = getControlFragment().getThing();
-            refreshThingPager(thing);
-            refreshActionBar(thing);
-            refreshViews(thing);
-            refreshCheckedItems();
+            ControlFragment cf = getControlFragment();
+            if (cf != null) {
+                Subreddit subreddit = cf.getSubreddit();
+                Thing thing = cf.getThing();
+                refreshThingPager(thing);
+                refreshActionBar(subreddit, thing);
+                refreshViews(thing);
+                refreshCheckedItems();
+            }
         }
     }
 
@@ -444,7 +454,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    protected abstract void refreshActionBar(Thing thing);
+    protected abstract void refreshActionBar(Subreddit subreddit, Thing thing);
 
     private void refreshCheckedItems() {
         ControlFragment cf = getControlFragment();
