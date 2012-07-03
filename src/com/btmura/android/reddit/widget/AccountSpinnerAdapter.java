@@ -32,15 +32,16 @@ import com.btmura.android.reddit.entity.Subreddit;
 public class AccountSpinnerAdapter extends BaseAdapter {
 
     static class Item {
-        public static final int TYPE_CATEGORY = 0;
-        public static final int TYPE_ACCOUNT_NAME = 1;
-        public static final int TYPE_FILTER = 2;
+        static final int NUM_TYPES = 3;
+        static final int TYPE_CATEGORY = 0;
+        static final int TYPE_ACCOUNT_NAME = 1;
+        static final int TYPE_FILTER = 2;
 
         private final int type;
         private final String text;
         private final int value;
 
-        public Item(int type, String text, int value) {
+        Item(int type, String text, int value) {
             this.type = type;
             this.text = text;
             this.value = value;
@@ -50,8 +51,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     private final Context context;
     private final LayoutInflater inflater;
     private final ArrayList<Item> items = new ArrayList<Item>();
-    private final ArrayList<Item> filters = new ArrayList<Item>();
-    private final boolean showFilters;
+    private final ArrayList<Item> filters;
 
     private String accountName;
     private Subreddit subreddit;
@@ -60,11 +60,15 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     public AccountSpinnerAdapter(Context context, boolean showFilters) {
         this.context = context.getApplicationContext();
         this.inflater = LayoutInflater.from(context);
-        this.showFilters = showFilters;
-        addFilter(R.string.filter_hot, FilterAdapter.FILTER_HOT);
-        addFilter(R.string.filter_top, FilterAdapter.FILTER_TOP);
-        addFilter(R.string.filter_controversial, FilterAdapter.FILTER_CONTROVERSIAL);
-        addFilter(R.string.filter_new, FilterAdapter.FILTER_NEW);
+        if (showFilters) {
+            filters = new ArrayList<Item>(4);
+            addFilter(R.string.filter_hot, FilterAdapter.FILTER_HOT);
+            addFilter(R.string.filter_top, FilterAdapter.FILTER_TOP);
+            addFilter(R.string.filter_controversial, FilterAdapter.FILTER_CONTROVERSIAL);
+            addFilter(R.string.filter_new, FilterAdapter.FILTER_NEW);
+        } else {
+            filters = null;
+        }
     }
 
     private void addFilter(int textId, int value) {
@@ -79,7 +83,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
                 items.add(new Item(Item.TYPE_ACCOUNT_NAME, accountNames[i], -1));
             }
         }
-        if (showFilters) {
+        if (filters != null) {
             addItem(Item.TYPE_CATEGORY, R.string.filter_category, -1);
             items.addAll(filters);
         }
@@ -123,7 +127,6 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         return -1;
     }
 
-
     public Subreddit getSubreddit() {
         return subreddit;
     }
@@ -157,7 +160,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-        return 3;
+        return Item.NUM_TYPES;
     }
 
     @Override
@@ -184,7 +187,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
             h.subreddit.setVisibility(View.GONE);
         }
 
-        if (showFilters) {
+        if (filters != null) {
             h.filter.setText(filters.get(filter).text);
             h.filter.setVisibility(View.VISIBLE);
             h.divider.setVisibility(View.VISIBLE);
