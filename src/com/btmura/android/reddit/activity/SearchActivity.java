@@ -27,12 +27,12 @@ import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment.OnSearchQuerySubmittedListener;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
+import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.SearchPagerAdapter;
 
 public class SearchActivity extends AbstractBrowserActivity implements TabListener,
@@ -89,7 +89,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        accountName = AccountLoader.getLastAccount(result.prefs, result.accountNames);
+        accountName = result.getLastAccount();
         if (isSinglePane) {
             submitSearchQuerySinglePane(getQuery());
         } else {
@@ -115,6 +115,11 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     @Override
     protected String getAccountName() {
         return accountName;
+    }
+
+    @Override
+    protected int getFilter() {
+        return FilterAdapter.FILTER_HOT;
     }
 
     @Override

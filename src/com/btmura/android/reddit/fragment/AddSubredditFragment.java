@@ -131,7 +131,10 @@ public class AddSubredditFragment extends DialogFragment implements
 
         adapter.setAccountNames(result.accountNames);
         if (!restoringState) {
-            int index = AccountLoader.getLastAccountIndex(result.prefs, result.accountNames);
+            String accountName = result.getLastAccount();
+            adapter.setAccountName(accountName);
+
+            int index = adapter.findAccountName(accountName);
             accountSpinner.setSelection(index);
         }
     }
@@ -172,8 +175,7 @@ public class AddSubredditFragment extends DialogFragment implements
             return;
         }
 
-        int position = accountSpinner.getSelectedItemPosition();
-        String accountName = adapter.getAccountName(position);
+        String accountName = adapter.getAccountName();
         SubredditProvider.addInBackground(getActivity(), accountName, subredditName);
         dismiss();
     }

@@ -134,7 +134,7 @@ public class ThingListFragment extends ListFragment implements
     public void loadIfPossible() {
         if (DEBUG) {
             Log.d(TAG, "loadIfPossible an:" + accountName + " s:" + subreddit
-                    + " q:" + query);
+                    + " q:" + query + " f:" + getFilter());
         }
         if (accountName != null && (subreddit != null || query != null)) {
             getLoaderManager().initLoader(0, null, this);

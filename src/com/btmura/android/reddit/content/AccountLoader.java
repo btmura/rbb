@@ -47,6 +47,21 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
             this.accountNames = accountNames;
             this.prefs = prefs;
         }
+
+        public String getLastAccount() {
+            String accountName = prefs.getString(AccountLoader.PREF_LAST_ACCOUNT,
+                    Subreddits.ACCOUNT_NONE);
+            for (int i = 0; i < accountNames.length; i++) {
+                if (accountNames[i].equals(accountName)) {
+                    return accountName;
+                }
+            }
+            return accountNames[0];
+        }
+
+        public int getLastFilter() {
+            return prefs.getInt(PREF_LAST_FILTER, 0);
+        }
     }
 
     private static Comparator<Account> ACCOUNT_COMPARATOR = new Comparator<Account>() {
@@ -57,6 +72,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     private static final String PREFS = "accountPreferences";
     private static final String PREF_LAST_ACCOUNT = "lastAccount";
+    private static final String PREF_LAST_FILTER = "lastFilter";
 
     private SharedPreferences prefs;
     private AccountManager manager;
@@ -129,31 +145,15 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         onContentChanged();
     }
 
-    public static int getLastAccountIndex(SharedPreferences prefs, String[] accountNames) {
-        String lastAccount = prefs.getString(AccountLoader.PREF_LAST_ACCOUNT,
-                Subreddits.ACCOUNT_NONE);
-        for (int i = 0; i < accountNames.length; i++) {
-            if (accountNames[i].equals(lastAccount)) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    public static String getLastAccount(SharedPreferences prefs, String[] accountNames) {
-        String lastAccount = prefs.getString(AccountLoader.PREF_LAST_ACCOUNT,
-                Subreddits.ACCOUNT_NONE);
-        for (int i = 0; i < accountNames.length; i++) {
-            if (accountNames[i].equals(lastAccount)) {
-                return lastAccount;
-            }
-        }
-        return accountNames[0];
-    }
-
     public static void setLastAccount(SharedPreferences prefs, String accountName) {
         Editor editor = prefs.edit();
         editor.putString(AccountLoader.PREF_LAST_ACCOUNT, accountName);
+        editor.apply();
+    }
+
+    public static void setLastFilter(SharedPreferences prefs, int filter) {
+        Editor editor = prefs.edit();
+        editor.putInt(AccountLoader.PREF_LAST_FILTER, filter);
         editor.apply();
     }
 }

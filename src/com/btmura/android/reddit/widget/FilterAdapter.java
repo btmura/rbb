@@ -30,9 +30,9 @@ import android.widget.TextView;
 public class FilterAdapter extends BaseAdapter {
 
     public static final int FILTER_HOT = 0;
-    public static final int FILTER_NEW = 1;
+    public static final int FILTER_TOP = 1;
     public static final int FILTER_CONTROVERSIAL = 2;
-    public static final int FILTER_TOP = 3;
+    public static final int FILTER_NEW = 3;
 
     private final LayoutInflater inflater;
     private final ArrayList<String> names = new ArrayList<String>(4);
@@ -41,9 +41,9 @@ public class FilterAdapter extends BaseAdapter {
     public FilterAdapter(Context context) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         names.add(context.getString(R.string.filter_hot));
-        names.add(context.getString(R.string.filter_new));
-        names.add(context.getString(R.string.filter_controversial));
         names.add(context.getString(R.string.filter_top));
+        names.add(context.getString(R.string.filter_controversial));
+        names.add(context.getString(R.string.filter_new));
     }
 
     public int getFilter(int position) {

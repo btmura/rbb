@@ -187,6 +187,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract String getAccountName();
 
+    protected abstract int getFilter();
+
     protected abstract boolean hasSubredditList();
 
     protected void setSubredditListNavigation(String query) {
@@ -213,10 +215,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
         safePopBackStackImmediate();
 
-        ControlFragment cf = ControlFragment.newInstance(getAccountName(), null, null, -1, 0);
-        SubredditListFragment slf = SubredditListFragment.newInstance(getAccountName(), null,
+        String accountName = getAccountName();
+        int filter = getFilter();
+
+        ControlFragment cf = ControlFragment.newInstance(accountName, null, null, -1, filter);
+        SubredditListFragment slf = SubredditListFragment.newInstance(accountName, null,
                 query, slfFlags);
-        ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), null, 0,
+        ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, filter,
                 null, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
@@ -242,9 +247,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
         safePopBackStackImmediate();
 
-        ControlFragment cf = ControlFragment.newInstance(getAccountName(), null, null, -1, 0);
+        String accountName = getAccountName();
+        int filter = getFilter();
+
+        ControlFragment cf = ControlFragment.newInstance(accountName, null, null, -1, filter);
         SubredditListFragment slf = getSubredditListFragment();
-        ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), null, 0,
+        ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, filter,
                 query, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
@@ -309,19 +317,30 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected void selectSubredditMultiPane(Subreddit subreddit) {
         safePopBackStackImmediate();
 
-        ControlFragment cf = ControlFragment.newInstance(getAccountName(), subreddit, null, -1, 0);
-        ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), subreddit, 0,
+        String accountName = getAccountName();
+        int filter = getFilter();
+
+        ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, -1, filter);
+        ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, filter,
                 null, tlfFlags);
+        ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
         ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+        if (tmf != null) {
+            ft.remove(tmf);
+        }
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
 
         refreshActionBar(null);
         refreshViews(null);
+    }
+
+    protected void replaceThingListFragmentMultiPane() {
+        selectSubredditMultiPane(getControlFragment().getSubreddit());
     }
 
     public void onThingSelected(Thing thing, int position) {
@@ -343,9 +362,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected void selectThingMultiPane(Thing thing, int thingPosition) {
         safePopBackStackImmediate();
 
+        String accountName = getAccountName();
+        int filter = getFilter();
+
         ControlFragment cf = getControlFragment();
-        cf = ControlFragment.newInstance(getAccountName(), cf.getSubreddit(), thing, thingPosition,
-                0);
+        cf = ControlFragment.newInstance(accountName, cf.getSubreddit(), thing, thingPosition,
+                filter);
         ThingMenuFragment tf = ThingMenuFragment.newInstance(thing);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();

@@ -35,24 +35,39 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         public static final int TYPE_ACCOUNT_NAME = 1;
         public static final int TYPE_FILTER = 2;
 
-        public final int type;
-        public final String text;
+        private final int type;
+        private final String text;
+        private final int value;
 
-        public Item(int type, String text) {
+        public Item(int type, String text, int value) {
             this.type = type;
             this.text = text;
+            this.value = value;
         }
     }
 
     private final Context context;
     private final LayoutInflater inflater;
     private final ArrayList<Item> items = new ArrayList<Item>();
+    private final ArrayList<Item> filters = new ArrayList<Item>();
     private final boolean showFilters;
+
+    private String accountName;
+    private String subredditName;
+    private int filter;
 
     public AccountSpinnerAdapter(Context context, boolean showFilters) {
         this.context = context.getApplicationContext();
         this.inflater = LayoutInflater.from(context);
         this.showFilters = showFilters;
+        addFilter(R.string.filter_hot, FilterAdapter.FILTER_HOT);
+        addFilter(R.string.filter_top, FilterAdapter.FILTER_TOP);
+        addFilter(R.string.filter_controversial, FilterAdapter.FILTER_CONTROVERSIAL);
+        addFilter(R.string.filter_new, FilterAdapter.FILTER_NEW);
+    }
+
+    private void addFilter(int textId, int value) {
+        filters.add(new Item(Item.TYPE_FILTER, context.getString(textId), value));
     }
 
     public void setAccountNames(String[] accountNames) {
@@ -60,21 +75,70 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         if (accountNames != null) {
             int count = accountNames.length;
             for (int i = 0; i < count; i++) {
-                items.add(new Item(Item.TYPE_ACCOUNT_NAME, accountNames[i]));
+                items.add(new Item(Item.TYPE_ACCOUNT_NAME, accountNames[i], -1));
             }
         }
         if (showFilters) {
-            items.add(new Item(Item.TYPE_CATEGORY, context.getString(R.string.filter_category)));
-            items.add(new Item(Item.TYPE_FILTER, context.getString(R.string.filter_hot)));
-            items.add(new Item(Item.TYPE_FILTER, context.getString(R.string.filter_top)));
-            items.add(new Item(Item.TYPE_FILTER, context.getString(R.string.filter_controversial)));
-            items.add(new Item(Item.TYPE_FILTER, context.getString(R.string.filter_new)));
+            addItem(Item.TYPE_CATEGORY, R.string.filter_category, -1);
+            items.addAll(filters);
         }
         notifyDataSetChanged();
     }
 
-    public String getAccountName(int position) {
-        return getItem(position).text;
+    private void addItem(int type, int textId, int value) {
+        items.add(new Item(type, context.getString(textId), value));
+    }
+
+    public void updateState(int position) {
+        Item item = getItem(position);
+        switch (item.type) {
+            case Item.TYPE_ACCOUNT_NAME:
+                accountName = item.text;
+                break;
+
+            case Item.TYPE_FILTER:
+                filter = item.value;
+                break;
+        }
+        notifyDataSetChanged();
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public int findAccountName(String accountName) {
+        int count = items.size();
+        for (int i = 0; i < count; i++) {
+            Item item = getItem(i);
+            if (item.type == Item.TYPE_ACCOUNT_NAME && accountName.equals(item.text)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
+    public String getSubredditName() {
+        return subredditName;
+    }
+
+    public void setSubredditName(String subredditName) {
+        this.subredditName = subredditName;
+        notifyDataSetChanged();
+    }
+
+    public int getFilter() {
+        return filter;
+    }
+
+    public void setFilter(int filter) {
+        this.filter = filter;
+        notifyDataSetChanged();
     }
 
     public Item getItem(int position) {
@@ -105,15 +169,41 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        return setView(R.layout.account_spinner_row, position, convertView, parent);
+        View v = convertView;
+        if (v == null) {
+            v = makeView(parent);
+        }
+        ViewHolder h = (ViewHolder) v.getTag();
+        h.accountName.setText(getDisplayLabel(accountName));
+        if (showFilters) {
+            h.filter.setText(filters.get(filter).text);
+            h.filter.setVisibility(View.VISIBLE);
+        } else {
+            h.filter.setVisibility(View.GONE);
+        }
+        return v;
+    }
+
+    private View makeView(ViewGroup parent) {
+        View v = inflater.inflate(R.layout.account_spinner_row, parent, false);
+        ViewHolder h = new ViewHolder();
+        h.accountName = (TextView) v.findViewById(R.id.account_name);
+        h.filter = (TextView) v.findViewById(R.id.filter);
+        v.setTag(h);
+        return v;
+    }
+
+    static class ViewHolder {
+        TextView accountName;
+        TextView filter;
     }
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        return setView(getLayout(position), position, convertView, parent);
+        return setView(getDropDownLayout(position), position, convertView, parent);
     }
 
-    private int getLayout(int position) {
+    private int getDropDownLayout(int position) {
         switch (getItemViewType(position)) {
             case Item.TYPE_ACCOUNT_NAME:
             case Item.TYPE_FILTER:
@@ -133,11 +223,15 @@ public class AccountSpinnerAdapter extends BaseAdapter {
             tv = (TextView) inflater.inflate(layout, parent, false);
         }
         Item item = getItem(position);
-        if (TextUtils.isEmpty(item.text)) {
-            tv.setText(R.string.app_name);
-        } else {
-            tv.setText(item.text);
-        }
+        tv.setText(getDisplayLabel(item.text));
         return tv;
+    }
+
+    private String getDisplayLabel(String accountName) {
+        if (TextUtils.isEmpty(accountName)) {
+            return context.getString(R.string.app_name);
+        } else {
+            return accountName;
+        }
     }
 }

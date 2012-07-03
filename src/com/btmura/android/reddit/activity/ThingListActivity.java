@@ -94,7 +94,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        accountName = AccountLoader.getLastAccount(result.prefs, result.accountNames);
+        accountName = result.getLastAccount();
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {

@@ -28,6 +28,7 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
+import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
@@ -58,7 +59,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         prefs = result.prefs;
         adapter.setAccountNames(result.accountNames);
-        int index = AccountLoader.getLastAccountIndex(result.prefs, result.accountNames);
+
+        String accountName = result.getLastAccount();
+        adapter.setAccountName(accountName);
+        adapter.setFilter(result.getLastFilter());
+
+        int index = adapter.findAccountName(accountName);
         bar.setSelectedNavigationItem(index);
     }
 
@@ -69,7 +75,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected String getAccountName() {
-        return adapter.getAccountName(bar.getSelectedNavigationIndex());
+        return adapter.getAccountName();
+    }
+
+    @Override
+    protected int getFilter() {
+        return adapter.getFilter();
     }
 
     @Override
@@ -83,15 +94,25 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        if (DEBUG) {
-            Log.d(TAG, "onNavigationItemSelected itemPosition:" + itemPosition);
-        }
-        String accountName = adapter.getAccountName(itemPosition);
+        adapter.updateState(itemPosition);
+
+        String accountName = adapter.getAccountName();
         AccountLoader.setLastAccount(prefs, accountName);
 
-        SubredditListFragment f = getSubredditListFragment();
-        if (f == null || !f.getAccountName().equals(accountName)) {
+        int filter = adapter.getFilter();
+        AccountLoader.setLastFilter(prefs, filter);
+
+        if (DEBUG) {
+            Log.d(TAG, "onNavigationItemSelected i:" + itemPosition
+                    + " an:" + accountName + " f:" + filter);
+        }
+
+        SubredditListFragment slf = getSubredditListFragment();
+        ThingListFragment tlf = getThingListFragment();
+        if (slf == null || !slf.getAccountName().equals(accountName)) {
             setSubredditListNavigation(null);
+        } else if (tlf != null && tlf.getFilter() != filter) {
+            replaceThingListFragmentMultiPane();
         }
 
         return true;
