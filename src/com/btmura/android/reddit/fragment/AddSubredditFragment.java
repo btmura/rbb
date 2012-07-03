@@ -79,7 +79,7 @@ public class AddSubredditFragment extends DialogFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new AccountSpinnerAdapter(getActivity());
+        adapter = new AccountSpinnerAdapter(getActivity(), false);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class AddSubredditFragment extends DialogFragment implements
         }
 
         int position = accountSpinner.getSelectedItemPosition();
-        String accountName = adapter.getItem(position);
+        String accountName = adapter.getAccountName(position);
         SubredditProvider.addInBackground(getActivity(), accountName, subredditName);
         dismiss();
     }

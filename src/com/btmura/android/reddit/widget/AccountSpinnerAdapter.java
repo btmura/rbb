@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.widget;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -28,33 +30,78 @@ import com.btmura.android.reddit.R;
 
 public class AccountSpinnerAdapter extends BaseAdapter {
 
-    private final LayoutInflater inflater;
+    static class Item {
+        public static final int TYPE_CATEGORY = 0;
+        public static final int TYPE_ACCOUNT_NAME = 1;
+        public static final int TYPE_FILTER = 2;
 
-    private String[] accountNames;
+        public final int type;
+        public final String text;
 
-    public AccountSpinnerAdapter(Context context) {
-        this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        public Item(int type, String text) {
+            this.type = type;
+            this.text = text;
+        }
     }
 
-    public void setAccountNames(String[] newAccountNames) {
-        accountNames = newAccountNames;
+    private final Context context;
+    private final LayoutInflater inflater;
+    private final ArrayList<Item> items = new ArrayList<Item>();
+    private final boolean showFilters;
+
+    public AccountSpinnerAdapter(Context context, boolean showFilters) {
+        this.context = context.getApplicationContext();
+        this.inflater = LayoutInflater.from(context);
+        this.showFilters = showFilters;
+    }
+
+    public void setAccountNames(String[] accountNames) {
+        items.clear();
+        if (accountNames != null) {
+            int count = accountNames.length;
+            for (int i = 0; i < count; i++) {
+                items.add(new Item(Item.TYPE_ACCOUNT_NAME, accountNames[i]));
+            }
+        }
+        if (showFilters) {
+            items.add(new Item(Item.TYPE_CATEGORY, context.getString(R.string.filter_category)));
+            items.add(new Item(Item.TYPE_FILTER, context.getString(R.string.filter_hot)));
+            items.add(new Item(Item.TYPE_FILTER, context.getString(R.string.filter_top)));
+            items.add(new Item(Item.TYPE_FILTER, context.getString(R.string.filter_controversial)));
+            items.add(new Item(Item.TYPE_FILTER, context.getString(R.string.filter_new)));
+        }
         notifyDataSetChanged();
     }
 
     public String getAccountName(int position) {
-        return accountNames[position];
+        return getItem(position).text;
     }
 
-    public int getCount() {
-        return accountNames != null ? accountNames.length : 0;
-    }
-
-    public String getItem(int position) {
-        return accountNames[position];
+    public Item getItem(int position) {
+        return items.get(position);
     }
 
     public long getItemId(int position) {
         return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return getItem(position).type;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 3;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return getItemViewType(position) != Item.TYPE_CATEGORY;
+    }
+
+    public int getCount() {
+        return items.size();
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -63,7 +110,21 @@ public class AccountSpinnerAdapter extends BaseAdapter {
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        return setView(R.layout.account_spinner_dropdown_row, position, convertView, parent);
+        return setView(getLayout(position), position, convertView, parent);
+    }
+
+    private int getLayout(int position) {
+        switch (getItemViewType(position)) {
+            case Item.TYPE_ACCOUNT_NAME:
+            case Item.TYPE_FILTER:
+                return R.layout.account_spinner_dropdown_row;
+
+            case Item.TYPE_CATEGORY:
+                return R.layout.account_spinner_category_row;
+
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     private View setView(int layout, int position, View convertView, ViewGroup parent) {
@@ -71,11 +132,11 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         if (tv == null) {
             tv = (TextView) inflater.inflate(layout, parent, false);
         }
-        String accountName = getItem(position);
-        if (TextUtils.isEmpty(accountName)) {
+        Item item = getItem(position);
+        if (TextUtils.isEmpty(item.text)) {
             tv.setText(R.string.app_name);
         } else {
-            tv.setText(accountName);
+            tv.setText(item.text);
         }
         return tv;
     }

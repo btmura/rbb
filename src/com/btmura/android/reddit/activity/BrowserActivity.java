@@ -48,7 +48,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
-        adapter = new AccountSpinnerAdapter(this);
+        adapter = new AccountSpinnerAdapter(this, !isSinglePane);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         bar.setListNavigationCallbacks(adapter, this);
@@ -86,7 +86,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         if (DEBUG) {
             Log.d(TAG, "onNavigationItemSelected itemPosition:" + itemPosition);
         }
-        String accountName = adapter.getItem(itemPosition);
+        String accountName = adapter.getAccountName(itemPosition);
         AccountLoader.setLastAccount(prefs, accountName);
 
         SubredditListFragment f = getSubredditListFragment();

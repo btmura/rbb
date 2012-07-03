@@ -38,6 +38,7 @@
     <string name="error_blank_field">This field cannot be blank.</string>
     <string name="error_reddit">Reddit says: %1$s</string>
 
+    <string name="filter_category">Filters</string>
     <string name="filter_hot">what\'s hot</string>
     <string name="filter_new">new</string>
     <string name="filter_controversial">controversial</string>
