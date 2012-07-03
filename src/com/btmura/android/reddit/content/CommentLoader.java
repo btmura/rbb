@@ -17,25 +17,19 @@
 package com.btmura.android.reddit.content;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
-import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.entity.Comment;
+import com.btmura.android.reddit.provider.NetApi;
 
 public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 
-    private static final String TAG = "CommentLoader";
+    public static final String TAG = "CommentLoader";
 
     private final URL url;
     private List<Comment> comments;
@@ -64,109 +58,10 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
     @Override
     public List<Comment> loadInBackground() {
         try {
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.connect();
-
-            InputStream stream = conn.getInputStream();
-            JsonReader reader = new JsonReader(new InputStreamReader(stream));
-            CommentParser parser = new CommentParser();
-            parser.parseListingArray(reader);
-            stream.close();
-            conn.disconnect();
-
-            return parser.comments;
-
-        } catch (MalformedURLException e) {
-            Log.e(TAG, e.getMessage(), e);
+            return NetApi.queryComments(getContext(), url, null);
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Log.e(TAG, "loadInBackground", e);
         }
         return null;
-    }
-
-    class CommentParser extends JsonParser {
-
-        private final long now = System.currentTimeMillis();
-
-        private final List<Comment> comments = new ArrayList<Comment>(360);
-
-        @Override
-        public boolean shouldParseReplies() {
-            return true;
-        }
-
-        @Override
-        public void onEntityStart(int index) {
-            comments.add(new Comment());
-        }
-
-        @Override
-        public void onKind(JsonReader reader, int index) throws IOException {
-            Comment c = comments.get(index);
-            String kind = reader.nextString();
-            if (index == 0) {
-                c.type = Comment.TYPE_HEADER;
-            } else if ("more".equalsIgnoreCase(kind)) {
-                c.type = Comment.TYPE_MORE;
-            } else {
-                c.type = Comment.TYPE_COMMENT;
-            }
-            c.nesting = replyNesting;
-        }
-
-        @Override
-        public void onTitle(JsonReader reader, int index) throws IOException {
-            comments.get(index).rawTitle = readTrimmedString(reader, "");
-        }
-
-        @Override
-        public void onSelfText(JsonReader reader, int index) throws IOException {
-            comments.get(index).rawBody = readTrimmedString(reader, "");
-        }
-
-        @Override
-        public void onBody(JsonReader reader, int index) throws IOException {
-            comments.get(index).rawBody = readTrimmedString(reader, "");
-        }
-
-        @Override
-        public void onAuthor(JsonReader reader, int index) throws IOException {
-            comments.get(index).author = readTrimmedString(reader, "");
-        }
-
-        @Override
-        public void onCreatedUtc(JsonReader reader, int index) throws IOException {
-            comments.get(index).createdUtc = reader.nextLong();
-        }
-
-        @Override
-        public void onNumComments(JsonReader reader, int index) throws IOException {
-            comments.get(index).numComments = reader.nextInt();
-        }
-
-        @Override
-        public void onUps(JsonReader reader, int index) throws IOException {
-            comments.get(index).ups = reader.nextInt();
-        }
-
-        @Override
-        public void onDowns(JsonReader reader, int index) throws IOException {
-            comments.get(index).downs = reader.nextInt();
-        }
-
-        @Override
-        public void onParseEnd() {
-            int size = comments.size();
-            for (int i = 0; i < size;) {
-                Comment c = comments.get(i);
-                if (c.type == Comment.TYPE_MORE) {
-                    comments.remove(i);
-                    size--;
-                } else {
-                    c.assureFormat(getContext(), now);
-                    i++;
-                }
-            }
-        }
     }
 }

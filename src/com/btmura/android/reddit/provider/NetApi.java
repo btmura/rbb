@@ -30,6 +30,7 @@ import android.text.TextUtils;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.data.Urls;
+import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.entity.Thing;
 
 public class NetApi {
@@ -50,12 +51,7 @@ public class NetApi {
             return parser.results;
 
         } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (conn != null) {
-                conn.disconnect();
-            }
+            close(in, conn);
         }
     }
 
@@ -75,12 +71,27 @@ public class NetApi {
             return parser.things;
 
         } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (conn != null) {
-                conn.disconnect();
-            }
+            close(in, conn);
+        }
+    }
+
+    public static ArrayList<Comment> queryComments(Context context, URL url, String cookie)
+            throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            setCommonHeaders(conn, cookie);
+            conn.connect();
+
+            in = conn.getInputStream();
+            JsonReader reader = new JsonReader(new InputStreamReader(in));
+            CommentParser parser = new CommentParser(context);
+            parser.parseListingArray(reader);
+            return parser.comments;
+
+        } finally {
+            close(in, conn);
         }
     }
 
@@ -99,12 +110,7 @@ public class NetApi {
             in = conn.getInputStream();
 
         } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (conn != null) {
-                conn.disconnect();
-            }
+            close(in, conn);
         }
     }
 
@@ -131,6 +137,15 @@ public class NetApi {
             if (output != null) {
                 output.close();
             }
+        }
+    }
+
+    private static void close(InputStream in, HttpURLConnection conn) throws IOException {
+        if (in != null) {
+            in.close();
+        }
+        if (conn != null) {
+            conn.disconnect();
         }
     }
 }
