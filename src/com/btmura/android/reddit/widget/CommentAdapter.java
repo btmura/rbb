@@ -19,9 +19,6 @@ package com.btmura.android.reddit.widget;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Comment;
-
 import android.content.Context;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -30,16 +27,16 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.entity.Comment;
+
 public class CommentAdapter extends BaseAdapter {
 
     private final ArrayList<Comment> items = new ArrayList<Comment>();
-    private final Context context;
     private final LayoutInflater inflater;
-    private final long now = System.currentTimeMillis() / 1000;
 
-    public CommentAdapter(Context context, LayoutInflater inflater) {
-        this.context = context;
-        this.inflater = inflater;
+    public CommentAdapter(Context context) {
+        this.inflater = LayoutInflater.from(context);
     }
 
     public void swapData(List<Comment> newItems) {
@@ -124,7 +121,7 @@ public class CommentAdapter extends BaseAdapter {
     }
 
     private void setView(int position, View v) {
-        Comment c = getItem(position).assureFormat(context, now);
+        Comment c = getItem(position);
         ViewHolder h = (ViewHolder) v.getTag();
         switch (c.type) {
             case Comment.TYPE_HEADER:
