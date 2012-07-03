@@ -24,8 +24,10 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -44,6 +46,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         SubredditNameHolder {
 
     public static final String TAG = "ThingListActivity";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final String EXTRA_SUBREDDIT = "s";
     public static final String EXTRA_FLAGS = "f";
@@ -97,6 +100,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         prefs = result.prefs;
         accountName = result.getLastAccount();
+        adapter.addFilters(this);
         bar.setSelectedNavigationItem(result.getLastFilter());
     }
 
@@ -105,6 +109,10 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        if (DEBUG) {
+            Log.d(TAG, "onNavigationItemSelected i:" + itemPosition);
+        }
+
         int filter = adapter.getFilter(itemPosition);
         AccountLoader.setLastFilter(prefs, filter);
 

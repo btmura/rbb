@@ -74,6 +74,7 @@ public class ThingListFragment extends ListFragment implements
 
     private String accountName;
     private Subreddit subreddit;
+    private int filter;
     private String query;
 
     private ThingAdapter adapter;
@@ -107,6 +108,7 @@ public class ThingListFragment extends ListFragment implements
         Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
         accountName = b.getString(ARG_ACCOUNT_NAME);
         subreddit = b.getParcelable(ARG_SUBREDDIT);
+        filter = b.getInt(ARG_FILTER);
         query = b.getString(ARG_QUERY);
 
         adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), isSingleChoice());
@@ -134,7 +136,7 @@ public class ThingListFragment extends ListFragment implements
     public void loadIfPossible() {
         if (DEBUG) {
             Log.d(TAG, "loadIfPossible an:" + accountName + " s:" + subreddit
-                    + " q:" + query + " f:" + getFilter());
+                    + " q:" + query + " f:" + filter);
         }
         if (accountName != null && (subreddit != null || query != null)) {
             getLoaderManager().initLoader(0, null, this);
@@ -145,7 +147,7 @@ public class ThingListFragment extends ListFragment implements
         String moreKey = args != null ? args.getString(LOADER_ARG_MORE_KEY) : null;
         URL url;
         if (subreddit != null) {
-            url = Urls.subredditUrl(subreddit, getFilter(), moreKey);
+            url = Urls.subredditUrl(subreddit, filter, moreKey);
         } else {
             url = Urls.searchUrl(query, moreKey);
         }
@@ -210,6 +212,7 @@ public class ThingListFragment extends ListFragment implements
         super.onSaveInstanceState(outState);
         outState.putString(ARG_ACCOUNT_NAME, accountName);
         outState.putParcelable(ARG_SUBREDDIT, subreddit);
+        outState.putInt(ARG_FILTER, filter);
         outState.putString(ARG_QUERY, query);
         outState.putString(STATE_THING_NAME, adapter.getSelectedThingName());
         outState.putInt(STATE_THING_POSITION, adapter.getSelectedThingPosition());
@@ -282,7 +285,11 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public int getFilter() {
-        return getArguments().getInt(ARG_FILTER);
+        return filter;
+    }
+
+    public void setFilter(int filter) {
+        this.filter = filter;
     }
 
     public String getQuery() {

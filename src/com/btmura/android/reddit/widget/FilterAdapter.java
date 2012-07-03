@@ -39,11 +39,15 @@ public class FilterAdapter extends BaseAdapter {
     private CharSequence title;
 
     public FilterAdapter(Context context) {
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater = LayoutInflater.from(context);
+    }
+
+    public void addFilters(Context context) {
         names.add(context.getString(R.string.filter_hot));
         names.add(context.getString(R.string.filter_top));
         names.add(context.getString(R.string.filter_controversial));
         names.add(context.getString(R.string.filter_new));
+        notifyDataSetChanged();
     }
 
     public int getFilter(int position) {
