@@ -23,16 +23,29 @@
         style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:ellipsize="end"
         android:gravity="center_vertical"
-        android:paddingRight="@dimen/padding" />
+        android:paddingRight="@dimen/padding"
+        android:singleLine="true" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/element_padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
+        android:background="@android:color/darker_gray" />
 
     <TextView
         android:id="@+id/subreddit_name"
         style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:ellipsize="end"
         android:gravity="center_vertical"
         android:paddingRight="@dimen/element_padding"
+        android:singleLine="true"
         android:visibility="gone" />
 
     <TextView
@@ -40,8 +53,10 @@
         style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:ellipsize="end"
         android:gravity="center_vertical"
         android:paddingRight="@dimen/element_padding"
+        android:singleLine="true"
         android:textColor="@android:color/darker_gray"
         android:visibility="gone" />
 

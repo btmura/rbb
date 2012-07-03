@@ -187,8 +187,10 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         if (showFilters) {
             h.filter.setText(filters.get(filter).text);
             h.filter.setVisibility(View.VISIBLE);
+            h.divider.setVisibility(View.VISIBLE);
         } else {
             h.filter.setVisibility(View.GONE);
+            h.divider.setVisibility(View.GONE);
         }
         return v;
     }
@@ -199,6 +201,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         h.accountName = (TextView) v.findViewById(R.id.account_name);
         h.subreddit = (TextView) v.findViewById(R.id.subreddit_name);
         h.filter = (TextView) v.findViewById(R.id.filter);
+        h.divider = v.findViewById(R.id.divider);
         v.setTag(h);
         return v;
     }
@@ -207,6 +210,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         TextView accountName;
         TextView subreddit;
         TextView filter;
+        View divider;
     }
 
     @Override
