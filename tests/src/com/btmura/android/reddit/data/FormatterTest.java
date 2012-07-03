@@ -18,6 +18,14 @@ package com.btmura.android.reddit.data;
 
 public class FormatterTest extends AbstractFormatterTest {
 
+    protected Formatter formatter;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        formatter = new Formatter();
+    }
+
     public void testFormatComment() {
         assertComment("this is <bold> text", "this is **&amp;lt;bold&gt;** text");
         assertComment("this is >italics< and this is strikethrough",
@@ -25,7 +33,7 @@ public class FormatterTest extends AbstractFormatterTest {
     }
 
     private void assertComment(String expected, String input) {
-        CharSequence formatted = Formatter.formatComment(mContext, input);
+        CharSequence formatted = formatter.formatComment(mContext, input);
         String actual = formatted.toString();
         assertEquals("expected: " + expected + " actual: " + actual, expected, actual);
     }

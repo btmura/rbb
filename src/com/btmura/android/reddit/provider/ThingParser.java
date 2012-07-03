@@ -23,17 +23,21 @@ import java.util.List;
 import android.content.Context;
 import android.util.JsonReader;
 
+import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.entity.Thing;
 
 class ThingParser extends JsonParser {
 
+    final ArrayList<Thing> things = new ArrayList<Thing>(30);
+
     private final Context context;
     private final String parentSubreddit;
     private final List<Thing> initThings;
 
+    private final Formatter formatter = new Formatter();
     private final long now = System.currentTimeMillis();
-    final ArrayList<Thing> things = new ArrayList<Thing>(30);
+
     private String moreKey;
 
     ThingParser(Context context, String parentSubreddit, List<Thing> initThings) {
@@ -126,7 +130,7 @@ class ThingParser extends JsonParser {
 
     @Override
     public void onEntityEnd(int index) {
-        things.get(index).assureFormat(context, parentSubreddit, now);
+        things.get(index).assureFormat(context, formatter, parentSubreddit, now);
     }
 
     @Override

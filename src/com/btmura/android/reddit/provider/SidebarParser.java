@@ -27,6 +27,7 @@ import com.btmura.android.reddit.entity.Subreddit;
 
 class SidebarParser extends JsonParser {
 
+    private final Formatter formatter = new Formatter();
     private final Context context;
 
     SidebarParser(Context context) {
@@ -47,7 +48,7 @@ class SidebarParser extends JsonParser {
 
     @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
-        results.title = Formatter.formatTitle(context, readTrimmedString(reader, ""));
+        results.title = formatter.formatTitle(context, readTrimmedString(reader, ""));
     }
 
     @Override
@@ -57,7 +58,7 @@ class SidebarParser extends JsonParser {
 
     @Override
     public void onDescription(JsonReader reader, int index) throws IOException {
-        results.description = Formatter.formatInfo(context, readTrimmedString(reader, ""));
+        results.description = formatter.formatInfo(context, readTrimmedString(reader, ""));
     }
 
     @Override

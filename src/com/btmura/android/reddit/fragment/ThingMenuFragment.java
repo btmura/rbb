@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
+import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
@@ -42,6 +43,8 @@ public class ThingMenuFragment extends Fragment {
     public static final String TAG = "ThingMenuFragment";
 
     private static final String ARGS_THING = "at";
+
+    private static final Formatter FORMATTER = new Formatter();
 
     public interface ThingPagerHolder {
         ViewPager getPager();
@@ -115,7 +118,7 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void updateShareProvider() {
-        CharSequence title = thing.assureTitle(getActivity()).title;
+        CharSequence title = thing.assureTitle(getActivity(), FORMATTER).title;
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_SUBJECT, title);
@@ -141,7 +144,7 @@ public class ThingMenuFragment extends Fragment {
     private void handleCopyUrl() {
         ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(
                 Context.CLIPBOARD_SERVICE);
-        CharSequence label = thing.assureTitle(getActivity()).title;
+        CharSequence label = thing.assureTitle(getActivity(), FORMATTER).title;
         CharSequence text = getLink();
         clipboard.setPrimaryClip(ClipData.newPlainText(label, text));
         Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();

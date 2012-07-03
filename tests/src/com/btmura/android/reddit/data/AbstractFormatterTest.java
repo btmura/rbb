@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.data;
 
+import java.util.regex.Matcher;
+
 import android.test.AndroidTestCase;
 import android.text.SpannableStringBuilder;
 import android.text.style.BulletSpan;
@@ -25,53 +27,62 @@ import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
 
 import com.btmura.android.reddit.data.Formatter.Escaped;
+import com.btmura.android.reddit.data.Formatter.RawLinks;
 import com.btmura.android.reddit.data.Formatter.Styles;
 import com.btmura.android.reddit.data.Formatter.Subreddits;
 
 abstract class AbstractFormatterTest extends AndroidTestCase {
 
-    static void assertEscapedFormat(String input, String expected) {
-        String actual = Escaped.format(input).toString();
+    protected Matcher matcher;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        matcher = RawLinks.PATTERN.matcher("");
+    }
+
+    void assertEscapedFormat(String input, String expected) {
+        String actual = Escaped.format(matcher, input).toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
     }
 
-    static CharSequence assertStyleFormat(int style, String input, String expected) {
-        CharSequence cs = Styles.format(input, style);
+    CharSequence assertStyleFormat(int style, String input, String expected) {
+        CharSequence cs = Styles.format(matcher, input, style);
+        String actual = cs.toString();
+        assertEquals("Expeprivate cted: " + expected + " Actual: " + actual, expected, actual);
+        return cs;
+    }
+
+    CharSequence assertBulletFormat(String input, String expected) {
+        CharSequence cs = Formatter.Bullets.format(matcher, input);
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
     }
 
-    static CharSequence assertBulletFormat(String input, String expected) {
-        CharSequence cs = Formatter.Bullets.format(input);
+    CharSequence assertRawLinksFormat(String input, String expected) {
+        CharSequence cs = Formatter.RawLinks.format(matcher, input);
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
     }
 
-    static CharSequence assertRawLinksFormat(String input, String expected) {
-        CharSequence cs = Formatter.RawLinks.format(input);
+    CharSequence assertNamedLinksFormat(String input, String expected) {
+        CharSequence cs = Formatter.NamedLinks.format(input, new StringBuilder());
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
     }
 
-    static CharSequence assertNamedLinksFormat(String input, String expected) {
-        CharSequence cs = Formatter.NamedLinks.format(input);
+    CharSequence assertSubredditFormat(String input, String expected) {
+        CharSequence cs = Subreddits.format(matcher, input);
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
     }
 
-    static CharSequence assertSubredditFormat(String input, String expected) {
-        CharSequence cs = Subreddits.format(input);
-        String actual = cs.toString();
-        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
-        return cs;
-    }
-
-    static CharSequence assertHeadingFormat(String input, String expected) {
-        CharSequence cs = Formatter.Heading.format(input);
+    CharSequence assertHeadingFormat(String input, String expected) {
+        CharSequence cs = Formatter.Heading.format(matcher, input);
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.util.JsonReader;
 
+import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.entity.Comment;
 
@@ -33,6 +34,7 @@ class CommentParser extends JsonParser {
         this.context = context;
     }
 
+    private final Formatter formatter = new Formatter();
     private final long now = System.currentTimeMillis();
 
     final ArrayList<Comment> comments = new ArrayList<Comment>(360);
@@ -110,7 +112,7 @@ class CommentParser extends JsonParser {
                 comments.remove(i);
                 size--;
             } else {
-                c.assureFormat(context, now);
+                c.assureFormat(context, formatter, now);
                 i++;
             }
         }

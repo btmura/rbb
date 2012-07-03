@@ -98,19 +98,19 @@ public class Thing implements Parcelable {
                 && !"self".equals(thumbnail) && !"nsfw".equals(thumbnail);
     }
 
-    public Thing assureTitle(Context c) {
+    public Thing assureTitle(Context c, Formatter f) {
         if (type == TYPE_MORE || title != null) {
             return this;
         }
-        title = Formatter.formatTitle(c, rawTitle);
+        title = f.formatTitle(c, rawTitle);
         return this;
     }
 
-    public Thing assureFormat(Context c, String parentSubreddit, long now) {
+    public Thing assureFormat(Context c, Formatter f, String parentSubreddit, long now) {
         if (type == TYPE_MORE || status != null) {
             return this;
         }
-        assureTitle(c);
+        assureTitle(c, f);
         boolean showSubreddit = parentSubreddit == null
                 || !parentSubreddit.equalsIgnoreCase(subreddit);
         int resId = showSubreddit ? R.string.thing_status_subreddit : R.string.thing_status;

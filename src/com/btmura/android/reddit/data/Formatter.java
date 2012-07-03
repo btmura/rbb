@@ -33,31 +33,30 @@ import com.btmura.android.reddit.R;
 
 public class Formatter {
 
-    static final String REDDIT_URL = "http://www.reddit.com";
-    static final StringBuilder TMP = new StringBuilder();
-    static final Matcher MATCHER = RawLinks.PATTERN.matcher("");
+    private final Matcher matcher = RawLinks.PATTERN.matcher("");
+    private final StringBuilder builder = new StringBuilder();
 
-    public static CharSequence formatTitle(Context context, CharSequence title) {
-        CharSequence c = Escaped.format(title);
-        c = Disapproval.format(context, c);
+    public CharSequence formatTitle(Context context, CharSequence title) {
+        CharSequence c = Escaped.format(matcher, title);
+        c = Disapproval.format(context, matcher, c);
         return c;
     }
 
-    public static CharSequence formatComment(Context context, CharSequence comment) {
-        CharSequence c = Escaped.format(comment);
-        c = Styles.format(c, Styles.STYLE_BOLD);
-        c = Styles.format(c, Styles.STYLE_ITALIC);
-        c = Styles.format(c, Styles.STYLE_STRIKETHROUGH);
-        c = Heading.format(c);
-        c = Bullets.format(c);
-        c = NamedLinks.format(c);
-        c = RawLinks.format(c);
-        c = Subreddits.format(c);
-        c = Disapproval.format(context, c);
+    public CharSequence formatComment(Context context, CharSequence comment) {
+        CharSequence c = Escaped.format(matcher, comment);
+        c = Styles.format(matcher, c, Styles.STYLE_BOLD);
+        c = Styles.format(matcher, c, Styles.STYLE_ITALIC);
+        c = Styles.format(matcher, c, Styles.STYLE_STRIKETHROUGH);
+        c = Heading.format(matcher, c);
+        c = Bullets.format(matcher, c);
+        c = NamedLinks.format(c, builder);
+        c = RawLinks.format(matcher, c);
+        c = Subreddits.format(matcher, c);
+        c = Disapproval.format(context, matcher, c);
         return c;
     }
 
-    public static CharSequence formatInfo(Context context, CharSequence info) {
+    public CharSequence formatInfo(Context context, CharSequence info) {
         return formatComment(context, info);
     }
 
@@ -66,13 +65,13 @@ public class Formatter {
         private static final Pattern AMP_PATTERN = Pattern.compile("&(amp);");
         private static final Pattern FULL_PATTERN = Pattern.compile("&(gt|lt|amp|quot|apos|nbsp);");
 
-        static CharSequence format(CharSequence text) {
-            return format(FULL_PATTERN, format(AMP_PATTERN, text));
+        static CharSequence format(Matcher matcher, CharSequence text) {
+            return format(FULL_PATTERN, matcher, format(AMP_PATTERN, matcher, text));
         }
 
-        static CharSequence format(Pattern pattern, CharSequence text) {
+        static CharSequence format(Pattern pattern, Matcher matcher, CharSequence text) {
             CharSequence s = text;
-            Matcher m = MATCHER.usePattern(pattern).reset(text);
+            Matcher m = matcher.usePattern(pattern).reset(text);
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
@@ -115,7 +114,7 @@ public class Formatter {
         private static final Pattern PATTERN_ITALIC = Pattern.compile("\\*(.+?)\\*");
         private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile("~~(.+?)~~");
 
-        static CharSequence format(CharSequence text, int style) {
+        static CharSequence format(Matcher matcher, CharSequence text, int style) {
             Pattern p = null;
             int charsDeleted = -1;
             switch (style) {
@@ -138,7 +137,7 @@ public class Formatter {
                     throw new IllegalArgumentException("Unsupported style: " + style);
             }
 
-            Matcher m = MATCHER.usePattern(p).reset(text);
+            Matcher m = matcher.usePattern(p).reset(text);
             CharSequence s = text;
 
             for (int deleted = 0; m.find();) {
@@ -177,9 +176,9 @@ public class Formatter {
 
         private static Pattern PATTERN = Pattern.compile("^( *\\* )(.+)$", Pattern.MULTILINE);
 
-        static CharSequence format(CharSequence text) {
+        static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
-            Matcher m = MATCHER.usePattern(PATTERN).reset(text);
+            Matcher m = matcher.usePattern(PATTERN).reset(text);
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
@@ -202,9 +201,9 @@ public class Formatter {
         static final Pattern PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9+-.]*?:"
                 + "//[A-Za-z0-9-._~!@#$%&'()*+,;=:/?]*" + "[A-Za-z0-9-_~@#$%&'(*+,;=:/]");
 
-        static CharSequence format(CharSequence text) {
+        static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
-            Matcher m = MATCHER.usePattern(PATTERN).reset(text);
+            Matcher m = matcher.usePattern(PATTERN).reset(text);
             while (m.find()) {
                 String url = m.group();
                 URLSpan span = new URLSpan(url);
@@ -216,7 +215,7 @@ public class Formatter {
 
     static class NamedLinks {
 
-        static CharSequence format(CharSequence text) {
+        static CharSequence format(CharSequence text, StringBuilder builder) {
             CharSequence s = text;
             for (int i = 0; i < s.length();) {
                 int startBrack = TextUtils.indexOf(s, '[', i);
@@ -248,7 +247,7 @@ public class Formatter {
                 }
 
                 String url = s.subSequence(startParen + 1, endUrl).toString();
-                Object span = Formatter.getUrlSpan(url);
+                Object span = Formatter.getUrlSpan(url, builder);
 
                 s = Formatter.setSpan(s, startBrack + 1, endParen, span);
                 s = Formatter.delete(s, startBrack, startBrack + 1);
@@ -298,9 +297,9 @@ public class Formatter {
 
         static Pattern SUBREDDIT_PATTERN = Pattern.compile("/r/([0-9A-Za-z_+]+)/?");
 
-        static CharSequence format(CharSequence text) {
+        static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
-            Matcher m = MATCHER.usePattern(SUBREDDIT_PATTERN).reset(s);
+            Matcher m = matcher.usePattern(SUBREDDIT_PATTERN).reset(s);
             while (m.find()) {
                 SubredditSpan span = new SubredditSpan(m.group(1));
                 s = Formatter.setSpan(s, m.start(), m.end(), span);
@@ -313,9 +312,9 @@ public class Formatter {
 
         static Pattern DISAPPROVAL_PATTERN = Pattern.compile("(ಠ_ಠ|&#3232;\\\\_&#3232;)");
 
-        static CharSequence format(Context context, CharSequence text) {
+        static CharSequence format(Context context, Matcher matcher, CharSequence text) {
             CharSequence s = text;
-            Matcher m = MATCHER.usePattern(DISAPPROVAL_PATTERN).reset(s);
+            Matcher m = matcher.usePattern(DISAPPROVAL_PATTERN).reset(s);
             for (; m.find();) {
                 ImageSpan span = new ImageSpan(context, R.drawable.disapproval_face,
                         ImageSpan.ALIGN_BOTTOM);
@@ -329,9 +328,9 @@ public class Formatter {
 
         private static Pattern PATTERN = Pattern.compile("^(#{1,} ?)(.+?)(#*)$", Pattern.MULTILINE);
 
-        static CharSequence format(CharSequence text) {
+        static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
-            Matcher m = MATCHER.usePattern(PATTERN).reset(text);
+            Matcher m = matcher.usePattern(PATTERN).reset(text);
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
@@ -372,7 +371,7 @@ public class Formatter {
         return s;
     }
 
-    static Object getUrlSpan(String url) {
+    static Object getUrlSpan(String url, StringBuilder builder) {
         int srIndex = url.indexOf("/r/");
         if (srIndex != -1 && srIndex + 3 < url.length()) {
             int slash = url.indexOf('/', srIndex + 3);
@@ -385,13 +384,13 @@ public class Formatter {
 
         Object span = null;
         if (url.startsWith("/")) {
-            url = TMP.delete(0, TMP.length()).append(REDDIT_URL).append(url).toString();
+            url = builder.delete(0, builder.length()).append(Urls.BASE_URL).append(url).toString();
             span = new URLSpan(url);
         } else if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = TMP.delete(0, TMP.length()).append("http://").append(url).toString();
+            url = builder.delete(0, builder.length()).append("http://").append(url).toString();
             span = new URLSpan(url);
         } else {
-            url = TMP.delete(0, TMP.length()).append(url).toString();
+            url = builder.delete(0, builder.length()).append(url).toString();
             span = new URLSpan(url);
         }
         return span;

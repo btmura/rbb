@@ -32,8 +32,8 @@ public class Urls {
             + CHARSET;
     public static final String USER_AGENT = "reddit by brian (rbb) for Android by /u/btmura";
 
-    private static final String BASE_URL = "http://www.reddit.com";
-    private static final String BASE_SSL_URL = "https://ssl.reddit.com";
+    public static final String BASE_URL = "http://www.reddit.com";
+    public static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
     private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
     private static final String BASE_LOGIN_URL = BASE_SSL_URL + "/api/login/";

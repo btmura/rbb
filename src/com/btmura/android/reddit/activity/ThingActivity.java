@@ -23,6 +23,7 @@ import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
@@ -53,7 +54,7 @@ public class ThingActivity extends GlobalMenuActivity implements
         ActionBar bar = getActionBar();
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP
                 | ActionBar.DISPLAY_SHOW_TITLE);
-        bar.setTitle(thing.assureTitle(this).title);
+        bar.setTitle(thing.assureTitle(this, new Formatter()).title);
 
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();

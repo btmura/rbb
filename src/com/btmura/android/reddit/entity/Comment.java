@@ -42,15 +42,15 @@ public class Comment {
     public CharSequence body;
     public CharSequence status;
 
-    public Comment assureFormat(Context c, long now) {
+    public Comment assureFormat(Context c, Formatter formatter, long now) {
         if (type == Comment.TYPE_MORE || status != null) {
             return this;
         }
         if (rawTitle != null) {
-            title = Formatter.formatTitle(c, rawTitle);
+            title = formatter.formatTitle(c, rawTitle);
         }
         if (rawBody != null) {
-            body = Formatter.formatComment(c, rawBody);
+            body = formatter.formatComment(c, rawBody);
         }
         status = getStatus(c, type == Comment.TYPE_HEADER, now);
         rawTitle = rawBody = author = null;
