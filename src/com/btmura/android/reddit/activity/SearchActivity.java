@@ -58,6 +58,11 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     @Override
+    protected boolean skipSetup() {
+        return false;
+    }
+
+    @Override
     protected void setupViews() {
         if (!hasQuery()) {
             setQuery("android");

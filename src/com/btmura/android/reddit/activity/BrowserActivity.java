@@ -46,6 +46,18 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
+    protected boolean skipSetup() {
+        if (isSinglePane && getIntent().hasExtra(EXTRA_SUBREDDIT_NAME)) {
+            String name = getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME);
+            selectSubredditSinglePane(Subreddit.newInstance(name),
+                    ThingListActivity.FLAG_INSERT_HOME);
+            finish();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     protected void setupViews() {
     }
 
@@ -53,6 +65,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     protected void setupActionBar(Bundle savedInstanceState) {
         adapter = new AccountSpinnerAdapter(this, !isSinglePane);
         bar.setDisplayShowTitleEnabled(false);
+        bar.setDisplayHomeAsUpEnabled(getIntent().hasExtra(EXTRA_SUBREDDIT_NAME));
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         bar.setListNavigationCallbacks(adapter, this);
     }

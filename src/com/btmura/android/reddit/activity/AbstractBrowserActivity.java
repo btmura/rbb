@@ -109,16 +109,25 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             StrictMode.enableDefaults();
         }
         super.onCreate(savedInstanceState);
-        bar = getActionBar();
         setContentView();
-        setupCommonFragments(savedInstanceState);
-        setupCommonViews();
-        setupViews();
-        setupActionBar(savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
+        setPrereqs();
+        if (!skipSetup()) {
+            setupCommonFragments(savedInstanceState);
+            setupCommonViews();
+            setupViews();
+            setupActionBar(savedInstanceState);
+            getLoaderManager().initLoader(0, null, this);
+        }
     }
 
     protected abstract void setContentView();
+
+    private void setPrereqs() {
+        bar = getActionBar();
+        isSinglePane = findViewById(R.id.thing_list_container) == null;
+    }
+
+    protected abstract boolean skipSetup();
 
     private void setupCommonFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
@@ -130,7 +139,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void setupCommonViews() {
-        isSinglePane = findViewById(R.id.thing_list_container) == null;
+
         if (!isSinglePane) {
             getFragmentManager().addOnBackStackChangedListener(this);
 
@@ -298,17 +307,17 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     public void onSubredditSelected(Subreddit subreddit) {
         if (isSinglePane) {
-            selectSubredditSinglePane(subreddit);
+            selectSubredditSinglePane(subreddit, 0);
         } else {
             selectSubredditMultiPane(subreddit);
         }
     }
 
-    protected void selectSubredditSinglePane(Subreddit subreddit) {
+    protected void selectSubredditSinglePane(Subreddit subreddit, int flags) {
         Intent intent = new Intent(this, ThingListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
-        intent.putExtra(ThingListActivity.EXTRA_FLAGS, 0);
+        intent.putExtra(ThingListActivity.EXTRA_FLAGS, flags);
         startActivity(intent);
     }
 
