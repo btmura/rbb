@@ -209,7 +209,9 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     @Override
     public void onPageSelected(int position) {
         super.onPageSelected(position);
-        bar.setSelectedNavigationItem(position);
+        if (isSinglePane) {
+            bar.setSelectedNavigationItem(position);
+        }
     }
 
     @Override
