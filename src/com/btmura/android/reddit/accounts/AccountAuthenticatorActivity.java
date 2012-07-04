@@ -16,23 +16,20 @@
 
 package com.btmura.android.reddit.accounts;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.FragmentTransaction;
-import android.content.ContentResolver;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.fragment.AddAccountFragment;
 import com.btmura.android.reddit.fragment.AddAccountFragment.OnAccountAddedListener;
-import com.btmura.android.reddit.provider.SubredditProvider;
-import com.btmura.android.reddit.provider.SyncAdapterService;
 
 public class AccountAuthenticatorActivity extends android.accounts.AccountAuthenticatorActivity
         implements OnAccountAddedListener {
 
     public static final String TAG = "AccountAuthenticatorActivity";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,38 +41,49 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
         ft.commit();
     }
 
-    public void onAccountAdded(final String login, final String cookie, final String modhash) {
-        new AsyncTask<Void, Void, Bundle>() {
+    public void onAccountAdded(final String login, final String password) {
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            protected Bundle doInBackground(Void... params) {
-                String accountType = AccountAuthenticator.getAccountType(AccountAuthenticatorActivity.this);
-                Account account = new Account(login, accountType);
+            protected Void doInBackground(Void... params) {
 
-                AccountManager manager = AccountManager.get(AccountAuthenticatorActivity.this);
-                manager.addAccountExplicitly(account, null, null);
-                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, cookie);
-                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, modhash);
 
-                ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
 
-                Bundle extras = new Bundle(2);
-                extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-                extras.putBoolean(SyncAdapterService.EXTRA_INITIAL_SYNC, true);
-                ContentResolver.requestSync(account, SubredditProvider.AUTHORITY, extras);
-
-                Bundle result = new Bundle(2);
-                result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-                result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-                return result;
-            }
-
-            @Override
-            protected void onPostExecute(Bundle result) {
-                setAccountAuthenticatorResult(result);
-                setResult(RESULT_OK);
-                finish();
+                return null;
             }
         }.execute();
+
+
+//        new AsyncTask<Void, Void, Bundle>() {
+//            @Override
+//            protected Bundle doInBackground(Void... params) {
+//                String accountType = AccountAuthenticator.getAccountType(AccountAuthenticatorActivity.this);
+//                Account account = new Account(login, accountType);
+//
+//                AccountManager manager = AccountManager.get(AccountAuthenticatorActivity.this);
+//                manager.addAccountExplicitly(account, null, null);
+//                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, cookie);
+//                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, modhash);
+//
+//                ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
+//
+//                Bundle extras = new Bundle(2);
+//                extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+//                extras.putBoolean(SyncAdapterService.EXTRA_INITIAL_SYNC, true);
+//                ContentResolver.requestSync(account, SubredditProvider.AUTHORITY, extras);
+//
+//                Bundle result = new Bundle(2);
+//                result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+//                result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+//                return result;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Bundle result) {
+//                setAccountAuthenticatorResult(result);
+//                setResult(RESULT_OK);
+//                finish();
+//            }
+//        }.execute();
     }
 
     public void onAccountCancelled() {

@@ -18,7 +18,6 @@ package com.btmura.android.reddit.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.method.PasswordTransformationMethod;
@@ -34,13 +33,11 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.LoginLoader.LoginResult;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddAccountFragment extends Fragment implements
         OnCheckedChangeListener,
-        OnClickListener,
-        LoginFragment.LoginResultListener {
+        OnClickListener {
 
     public static final String TAG = "AddAccountFragment";
 
@@ -49,7 +46,8 @@ public class AddAccountFragment extends Fragment implements
     };
 
     public interface OnAccountAddedListener {
-        void onAccountAdded(String login, String cookie, String modhash);
+        void onAccountAdded(String login, String password);
+
         void onAccountCancelled();
     }
 
@@ -67,7 +65,9 @@ public class AddAccountFragment extends Fragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        listener = (OnAccountAddedListener) activity;
+        if (activity instanceof OnAccountAddedListener) {
+            listener = (OnAccountAddedListener) activity;
+        }
     }
 
     @Override
@@ -116,29 +116,14 @@ public class AddAccountFragment extends Fragment implements
     private void handleAdd() {
         if (login.getText().length() <= 0) {
             login.setError(getString(R.string.error_blank_field));
+            return;
         }
         if (password.getText().length() <= 0) {
             password.setError(getString(R.string.error_blank_field));
+            return;
         }
-        if (login.getError() == null && password.getError() == null) {
-            LoginFragment frag = LoginFragment.newInstance(login.getText().toString(),
-                    password.getText().toString());
-            frag.setTargetFragment(this, 0);
-            frag.show(getFragmentManager(), LoginFragment.TAG);
-        }
-    }
-
-    public void onLoginResult(LoginResult result) {
-        FragmentManager fm = getFragmentManager();
-        if (result == null) {
-            SimpleDialogFragment.showMessage(fm, getString(R.string.error));
-        } else if (result.error != null) {
-            SimpleDialogFragment.showMessage(fm, getString(R.string.error_reddit, result.error));
-        } else {
-            LoginFragment frag = (LoginFragment) fm.findFragmentByTag(LoginFragment.TAG);
-            if (listener != null) {
-                listener.onAccountAdded(frag.getLogin(), result.cookie, result.modhash);
-            }
+        if (login.getError() == null && password.getError() == null && listener != null) {
+            listener.onAccountAdded(login.toString(), password.toString());
         }
     }
 }
