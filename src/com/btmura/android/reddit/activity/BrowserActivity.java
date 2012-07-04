@@ -21,6 +21,7 @@ import android.app.ActionBar.OnNavigationListener;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.R;
@@ -91,7 +92,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void refreshActionBar(Subreddit subreddit, Thing thing) {
-        bar.setDisplayHomeAsUpEnabled(thing != null);
+        bar.setDisplayHomeAsUpEnabled(getIntent().hasExtra(EXTRA_SUBREDDIT_NAME) || thing != null);
         adapter.setSubreddit(subreddit);
     }
 
@@ -112,7 +113,14 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         SubredditListFragment slf = getSubredditListFragment();
         ThingListFragment tlf = getThingListFragment();
         if (slf == null || !slf.getAccountName().equals(accountName)) {
-            setSubredditListNavigation(null);
+            String name = getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME);
+            Subreddit subreddit;
+            if (!isSinglePane && !TextUtils.isEmpty(name)) {
+                subreddit = Subreddit.newInstance(name);
+            } else {
+                subreddit = null;
+            }
+            setSubredditListNavigation(subreddit, null);
         } else if (tlf != null && tlf.getFilter() != filter) {
             replaceThingListFragmentMultiPane();
         }

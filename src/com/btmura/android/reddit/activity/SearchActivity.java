@@ -159,7 +159,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
         if (tab == tabSubreddits) {
             SubredditListFragment f = getSubredditListFragment();
             if (f == null || !query.equals(f.getQuery())) {
-                setSubredditListNavigation(query);
+                setSubredditListNavigation(null, query);
             } else {
                 refreshSubredditListVisibility();
             }

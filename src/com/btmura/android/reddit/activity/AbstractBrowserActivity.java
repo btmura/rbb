@@ -191,11 +191,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract boolean hasSubredditList();
 
-    protected void setSubredditListNavigation(String query) {
+    protected void setSubredditListNavigation(Subreddit subreddit, String query) {
         if (isSinglePane) {
             setSubredditListNavigationSinglePane(query);
         } else {
-            setSubredditListNavigationMultiPane(query);
+            setSubredditListNavigationMultiPane(subreddit, query);
         }
     }
 
@@ -209,7 +209,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commit();
     }
 
-    private void setSubredditListNavigationMultiPane(String query) {
+    private void setSubredditListNavigationMultiPane(Subreddit subreddit, String query) {
         if (DEBUG) {
             Log.d(TAG, "setSubredditListNavigation q:" + query);
         }
@@ -218,10 +218,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String accountName = getAccountName();
         int filter = getFilter();
 
-        ControlFragment cf = ControlFragment.newInstance(accountName, null, null, -1, filter);
-        SubredditListFragment slf = SubredditListFragment.newInstance(accountName, null,
+        ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, -1, filter);
+        SubredditListFragment slf = SubredditListFragment.newInstance(accountName, subreddit,
                 query, slfFlags);
-        ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, filter,
+        ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, filter,
                 null, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
@@ -237,7 +237,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commit();
 
         refreshSubredditListVisibility();
-        refreshActionBar(null, null);
+        refreshActionBar(subreddit, null);
         refreshViews(null);
     }
 
@@ -284,20 +284,16 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment cf = getControlFragment();
         if (cf != null && cf.getSubreddit() == null) {
             cf.setSubreddit(subreddit);
-        }
 
-        SubredditListFragment slf = getSubredditListFragment();
-        if (slf != null && slf.getSelectedSubreddit() == null) {
+            SubredditListFragment slf = getSubredditListFragment();
             slf.setSelectedSubreddit(subreddit);
-        }
 
-        ThingListFragment tlf = getThingListFragment();
-        if (tlf != null && tlf.getSubreddit() == null) {
+            ThingListFragment tlf = getThingListFragment();
             tlf.setSubreddit(subreddit);
             tlf.loadIfPossible();
-        }
 
-        refreshActionBar(subreddit, null);
+            refreshActionBar(subreddit, null);
+        }
     }
 
     public void onSubredditSelected(Subreddit subreddit) {
