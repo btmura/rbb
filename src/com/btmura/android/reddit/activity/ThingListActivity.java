@@ -155,7 +155,16 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     private void handleHome() {
+        if (insertBackStack()) {
+            Intent intent = new Intent(this, BrowserActivity.class);
+            startActivity(intent);
+        }
         finish();
+    }
+
+    private boolean insertBackStack() {
+        int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
+        return (flags & FLAG_INSERT_HOME) == FLAG_INSERT_HOME;
     }
 
     @Override
