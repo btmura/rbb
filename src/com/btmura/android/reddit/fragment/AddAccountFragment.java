@@ -16,12 +16,20 @@
 
 package com.btmura.android.reddit.fragment;
 
+import java.io.IOException;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,6 +41,11 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.entity.LoginResult;
+import com.btmura.android.reddit.provider.NetApi;
+import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.SyncAdapterService;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddAccountFragment extends Fragment implements
@@ -46,7 +59,7 @@ public class AddAccountFragment extends Fragment implements
     };
 
     public interface OnAccountAddedListener {
-        void onAccountAdded(String login, String password);
+        void onAccountAdded(Bundle result);
 
         void onAccountCancelled();
     }
@@ -63,11 +76,23 @@ public class AddAccountFragment extends Fragment implements
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         if (activity instanceof OnAccountAddedListener) {
             listener = (OnAccountAddedListener) activity;
         }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
     }
 
     @Override
@@ -123,7 +148,91 @@ public class AddAccountFragment extends Fragment implements
             return;
         }
         if (login.getError() == null && password.getError() == null && listener != null) {
-            listener.onAccountAdded(login.toString(), password.toString());
+            new LoginTask(login.toString(), password.toString()).execute();
+        }
+    }
+
+    class LoginTask extends AsyncTask<Void, Integer, Bundle> {
+
+        private final String login;
+        private final String password;
+        private final ProgressDialog progress;
+
+        LoginTask(String login, String password) {
+            this.login = login;
+            this.password = password;
+            this.progress = new ProgressDialog(getActivity());
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progress.setMessage(getString(R.string.authenticator_logging_in));
+            progress.show();
+        }
+
+        @Override
+        protected Bundle doInBackground(Void... params) {
+            try {
+                LoginResult result = NetApi.login(getActivity(), login, password);
+                if (result.error != null) {
+                    return errorBundle(R.string.authenticator_reddit_error, result.error);
+                }
+
+                publishProgress(R.string.authenticator_adding_account);
+
+                String accountType = AccountAuthenticator.getAccountType(getActivity());
+                Account account = new Account(login, accountType);
+
+                AccountManager manager = AccountManager.get(getActivity());
+                manager.addAccountExplicitly(account, null, null);
+                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, result.cookie);
+                manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH,
+                        result.modhash);
+
+                ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
+
+                Bundle extras = new Bundle(2);
+                extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                extras.putBoolean(SyncAdapterService.EXTRA_INITIAL_SYNC, true);
+                ContentResolver.requestSync(account, SubredditProvider.AUTHORITY, extras);
+
+                Bundle b = new Bundle(2);
+                b.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+                b.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+                return b;
+
+            } catch (IOException e) {
+                Log.e(TAG, "doInBackground", e);
+                return errorBundle(R.string.authenticator_error, e.getMessage());
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            progress.setMessage(getString(values[0]));
+        }
+
+        @Override
+        protected void onCancelled(Bundle result) {
+            progress.dismiss();
+        }
+
+        @Override
+        protected void onPostExecute(Bundle result) {
+            progress.dismiss();
+
+            String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
+            if (error != null) {
+                SimpleDialogFragment.showMessage(getFragmentManager(), error);
+            } else if (listener != null) {
+                listener.onAccountAdded(result);
+            }
+        }
+
+        private Bundle errorBundle(int resId, String... formatArgs) {
+            Bundle b = new Bundle(1);
+            b.putString(AccountManager.KEY_ERROR_MESSAGE, getString(resId, (Object[]) formatArgs));
+            return b;
         }
     }
 }
