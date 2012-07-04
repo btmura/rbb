@@ -14,99 +14,21 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.content;
+package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.URL;
 
-import javax.net.ssl.HttpsURLConnection;
-
-import android.content.AsyncTaskLoader;
-import android.content.Context;
 import android.util.JsonReader;
-import android.util.Log;
 
-import com.btmura.android.reddit.content.LoginLoader.LoginResult;
-import com.btmura.android.reddit.data.Urls;
+import com.btmura.android.reddit.entity.LoginResult;
 
-public class LoginLoader extends AsyncTaskLoader<LoginResult> {
+class LoginParser {
 
-    public static final String TAG = "LoginLoader";
-
-    public static class LoginResult {
-        public String error;
-        public String cookie;
-        public String modhash;
-    }
-
-    private static final String CHARSET_VALUE = "UTF-8";
-    private static final String CONTENT_TYPE_VALUE = "application/x-www-form-urlencoded;charset="
-            + CHARSET_VALUE;
-
-    public final String login;
-    public final String password;
-
-    private LoginResult results;
-
-    public LoginLoader(Context context, String login, String password) {
-        super(context.getApplicationContext());
-        this.login = login;
-        this.password = password;
-    }
-
-    @Override
-    protected void onStartLoading() {
-        super.onStartLoading();
-        if (results != null) {
-            deliverResult(results);
-        } else {
-            forceLoad();
-        }
-    }
-
-    @Override
-    public LoginResult loadInBackground() {
-        HttpsURLConnection conn = null;
-        try {
-            URL url = Urls.loginUrl(login);
-            conn = (HttpsURLConnection) url.openConnection();
-            conn.setRequestProperty("Accept-Charset", CHARSET_VALUE);
-            conn.setRequestProperty("Content-Type", CONTENT_TYPE_VALUE);
-            conn.setDoOutput(true);
-            conn.connect();
-
-            writeLoginQuery(conn, login, password);
-            return parseLoginResponse(conn);
-
-        } catch (IOException e) {
-            Log.e(TAG, "loadInBackground", e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-        return null;
-    }
-
-    private static void writeLoginQuery(HttpsURLConnection conn, String login, String password)
-            throws IOException {
-        OutputStream output = null;
-        try {
-            output = conn.getOutputStream();
-            output.write(Urls.loginQuery(login, password).getBytes(CHARSET_VALUE));
-            output.close();
-        } finally {
-            if (output != null) {
-                output.close();
-            }
-        }
-    }
-
-    private static LoginResult parseLoginResponse(HttpsURLConnection conn) throws IOException {
+    static LoginResult parseResponse(InputStream in) throws IOException {
         LoginResult result = new LoginResult();
-        JsonReader reader = new JsonReader(new InputStreamReader(conn.getInputStream()));
+        JsonReader reader = new JsonReader(new InputStreamReader(in));
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();

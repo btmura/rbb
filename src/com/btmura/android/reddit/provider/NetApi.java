@@ -25,12 +25,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Comment;
+import com.btmura.android.reddit.entity.LoginResult;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 
@@ -50,7 +53,6 @@ public class NetApi {
             SubredditParser parser = new SubredditParser();
             parser.parseListingObject(reader);
             return parser.results;
-
         } finally {
             close(in, conn);
         }
@@ -70,7 +72,6 @@ public class NetApi {
             ThingParser parser = new ThingParser(context, parentSubreddit, initThings);
             parser.parseListingObject(reader);
             return parser.things;
-
         } finally {
             close(in, conn);
         }
@@ -90,7 +91,6 @@ public class NetApi {
             CommentParser parser = new CommentParser(context);
             parser.parseListingArray(reader);
             return parser.comments;
-
         } finally {
             close(in, conn);
         }
@@ -111,6 +111,24 @@ public class NetApi {
             SidebarParser parser = new SidebarParser(context);
             parser.parseEntity(reader);
             return parser.results;
+        } finally {
+            close(in, conn);
+        }
+    }
+
+    public static LoginResult login(Context context, String login, String password) throws IOException {
+        HttpsURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.loginUrl(login);
+            conn = (HttpsURLConnection) url.openConnection();
+            setCommonHeaders(conn, null);
+            setFormDataHeaders(conn);
+            conn.connect();
+
+            writeFormData(conn, Urls.loginQuery(login, password));
+            in = conn.getInputStream();
+            return LoginParser.parseResponse(in);
         } finally {
             close(in, conn);
         }
