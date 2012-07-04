@@ -65,7 +65,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     protected void setupActionBar(Bundle savedInstanceState) {
         adapter = new AccountSpinnerAdapter(this, !isSinglePane);
         bar.setDisplayShowTitleEnabled(false);
-        bar.setDisplayHomeAsUpEnabled(getIntent().hasExtra(EXTRA_SUBREDDIT_NAME));
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         bar.setListNavigationCallbacks(adapter, this);
     }
@@ -105,7 +104,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void refreshActionBar(Subreddit subreddit, Thing thing) {
-        bar.setDisplayHomeAsUpEnabled(getIntent().hasExtra(EXTRA_SUBREDDIT_NAME) || thing != null);
+        bar.setDisplayHomeAsUpEnabled(thing != null);
         adapter.setSubreddit(subreddit);
     }
 
