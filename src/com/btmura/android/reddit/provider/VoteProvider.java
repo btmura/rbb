@@ -47,6 +47,11 @@ public class VoteProvider extends BaseProvider {
         static final String TABLE_NAME = "votes";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
 
+        static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
+                + AUTHORITY + "." + TABLE_NAME;
+        static final String MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
+                + AUTHORITY + "." + TABLE_NAME;
+
         public static final String COLUMN_ACCOUNT = "account";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_VOTE = "vote";
@@ -127,10 +132,21 @@ public class VoteProvider extends BaseProvider {
 
     @Override
     public String getType(Uri uri) {
-        return null;
+        int match = MATCHER.match(uri);
+        switch (match) {
+            case MATCH_ALL_VOTES:
+                return Votes.MIME_TYPE_DIR;
+
+            case MATCH_ONE_VOTE:
+                return Votes.MIME_TYPE_ITEM;
+
+            default:
+                return null;
+        }
     }
 
-    public static void insertMultipleVotesInBackground(final Context context, final ContentValues[] values) {
+    public static void insertMultipleVotesInBackground(final Context context,
+            final ContentValues[] values) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {

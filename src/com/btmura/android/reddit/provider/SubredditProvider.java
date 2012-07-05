@@ -61,6 +61,11 @@ public class SubredditProvider extends BaseProvider {
         static final String TABLE_NAME = "subreddits";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
 
+        static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
+                + AUTHORITY + "." + TABLE_NAME;
+        static final String MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
+                + AUTHORITY + "." + TABLE_NAME;
+
         public static final String COLUMN_ACCOUNT = "account";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_STATE = "state";
@@ -155,7 +160,17 @@ public class SubredditProvider extends BaseProvider {
 
     @Override
     public String getType(Uri uri) {
-        return null;
+        int match = MATCHER.match(uri);
+        switch (match) {
+            case MATCH_ALL_SUBREDDITS:
+                return Subreddits.MIME_TYPE_DIR;
+
+            case MATCH_ONE_SUBREDDIT:
+                return Subreddits.MIME_TYPE_ITEM;
+
+            default:
+                return null;
+        }
     }
 
     public static void addInBackground(final Context context, final String accountName,
@@ -203,7 +218,8 @@ public class SubredditProvider extends BaseProvider {
             protected Integer doInBackground(Void... params) {
                 int count = ids.length;
                 Uri[] uris = new Uri[count];
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
+                        count);
                 for (int i = 0; i < count; i++) {
                     uris[i] = ContentUris.withAppendedId(Subreddits.CONTENT_URI, ids[i]);
                     ops.add(ContentProviderOperation.newUpdate(uris[i])
@@ -246,7 +262,8 @@ public class SubredditProvider extends BaseProvider {
                 }
 
                 int count = ids.length;
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 1);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
+                        count + 1);
                 for (int i = 0; i < count; i++) {
                     ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
                             .withSelection(ID_SELECTION, new String[] {Long.toString(ids[i])})
@@ -283,7 +300,8 @@ public class SubredditProvider extends BaseProvider {
                 String[] parts = subredditName.split("\\+");
                 int numParts = parts.length;
 
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(numParts + 1);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
+                        numParts + 1);
                 for (int i = 0; i < numParts; i++) {
                     ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
                             .withValue(Subreddits.COLUMN_NAME, parts[i])
