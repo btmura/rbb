@@ -149,7 +149,7 @@ public class AddAccountFragment extends Fragment implements
             return;
         }
         if (login.getError() == null && password.getError() == null && listener != null) {
-            new LoginTask(login.toString(), password.toString()).execute();
+            new LoginTask(login.getText().toString(), password.getText().toString()).execute();
         }
     }
 
