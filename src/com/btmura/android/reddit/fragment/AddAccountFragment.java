@@ -157,7 +157,6 @@ public class AddAccountFragment extends Fragment implements
 
         private final String login;
         private final String password;
-        private ProgressDialogFragment progress;
 
         LoginTask(String login, String password) {
             this.login = login;
@@ -166,7 +165,7 @@ public class AddAccountFragment extends Fragment implements
 
         @Override
         protected void onPreExecute() {
-            progress = ProgressDialogFragment.showDialog(getFragmentManager(),
+            ProgressDialogFragment.showDialog(getFragmentManager(),
                     getString(R.string.login_logging_in));
         }
 
@@ -193,7 +192,6 @@ public class AddAccountFragment extends Fragment implements
                         result.modhash);
 
                 ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
-                ContentResolver.requestSync(account, SubredditProvider.AUTHORITY, null);
 
                 Bundle b = new Bundle(2);
                 b.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
@@ -214,17 +212,17 @@ public class AddAccountFragment extends Fragment implements
 
         @Override
         protected void onProgressUpdate(Integer... resIds) {
-            progress.setMessage(resIds[0]);
+            ProgressDialogFragment.showDialog(getFragmentManager(), getString(resIds[0]));
         }
 
         @Override
         protected void onCancelled(Bundle result) {
-            progress.dismiss();
+            ProgressDialogFragment.dismissDialog(getFragmentManager());
         }
 
         @Override
         protected void onPostExecute(Bundle result) {
-            progress.dismiss();
+            ProgressDialogFragment.dismissDialog(getFragmentManager());
 
             String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
             if (error != null) {

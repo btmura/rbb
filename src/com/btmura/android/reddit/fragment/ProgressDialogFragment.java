@@ -18,6 +18,7 @@ package com.btmura.android.reddit.fragment;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -40,41 +41,17 @@ public class ProgressDialogFragment extends DialogFragment {
         return f;
     }
 
-    private String message;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (message == null) {
-            Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
-            message = b.getString(ARG_MESSAGE);
+    public static void dismissDialog(FragmentManager fm) {
+        Fragment f = fm.findFragmentByTag(TAG);
+        if (f != null) {
+            fm.beginTransaction().remove(f).commit();
         }
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         ProgressDialog d = new ProgressDialog(getActivity());
-        if (message != null) {
-            d.setMessage(message);
-        }
+        d.setMessage(getArguments().getString(ARG_MESSAGE));
         return d;
-    }
-
-    public void setMessage(int resId) {
-        setMessage(getString(resId));
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-        ProgressDialog dialog = (ProgressDialog) getDialog();
-        if (dialog != null) {
-            dialog.setMessage(message);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(ARG_MESSAGE, message);
     }
 }

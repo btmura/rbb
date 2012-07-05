@@ -37,42 +37,11 @@ public class MessageDialogFragment extends DialogFragment {
         return frag;
     }
 
-    private String message;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (message == null) {
-            Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
-            message = b.getString(ARG_MESSAGE);
-        }
-    }
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder b = new AlertDialog.Builder(getActivity())
-                .setPositiveButton(android.R.string.ok, null);
-        if (message != null) {
-            b.setMessage(message);
-        }
-        return b.create();
-    }
-
-    public void setMessage(int resId) {
-        setMessage(getString(resId));
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-        AlertDialog dialog = (AlertDialog) getDialog();
-        if (dialog != null) {
-            dialog.setMessage(message);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(ARG_MESSAGE, message);
+        return new AlertDialog.Builder(getActivity())
+                .setPositiveButton(android.R.string.ok, null)
+                .setMessage(getArguments().getString(ARG_MESSAGE))
+                .create();
     }
 }
