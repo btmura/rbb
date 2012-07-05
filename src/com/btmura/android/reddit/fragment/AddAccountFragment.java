@@ -159,18 +159,17 @@ public class AddAccountFragment extends Fragment implements
 
         private final String login;
         private final String password;
-        private final ProgressDialogFragment progress;
+        private ProgressDialogFragment progress;
 
         LoginTask(String login, String password) {
             this.login = login;
             this.password = password;
-            this.progress = ProgressDialogFragment.newInstance(null);
         }
 
         @Override
         protected void onPreExecute() {
-            progress.setMessage(R.string.login_logging_in);
-            progress.show(getFragmentManager(), TAG);
+            progress = ProgressDialogFragment.showDialog(getFragmentManager(),
+                    getString(R.string.login_logging_in));
         }
 
         @Override
@@ -249,7 +248,7 @@ public class AddAccountFragment extends Fragment implements
 
             String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
             if (error != null) {
-                SimpleDialogFragment.showMessage(getFragmentManager(), error);
+                MessageDialogFragment.showMessage(getFragmentManager(), error);
             } else if (listener != null) {
                 listener.onAccountAdded(result);
             }

@@ -16,28 +16,25 @@
 
 package com.btmura.android.reddit.fragment;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.app.ProgressDialog;
 import android.os.Bundle;
 
-import com.btmura.android.reddit.Debug;
+public class MessageDialogFragment extends DialogFragment {
 
-public class ProgressDialogFragment extends DialogFragment {
+    public static final String TAG = "MessageDialogFragment";
 
-    public static final String TAG = "ProgressDialogFragment";
-    public static final boolean DEBUG = Debug.DEBUG;
+    private static final String ARG_MESSAGE = "m";
 
-    public static final String ARG_MESSAGE = "m";
-
-    public static ProgressDialogFragment showDialog(FragmentManager fm, String message) {
+    public static final MessageDialogFragment showMessage(FragmentManager fm, String message) {
         Bundle args = new Bundle(1);
         args.putString(ARG_MESSAGE, message);
-        ProgressDialogFragment f = new ProgressDialogFragment();
-        f.setArguments(args);
-        f.show(fm, TAG);
-        return f;
+        MessageDialogFragment frag = new MessageDialogFragment();
+        frag.setArguments(args);
+        frag.show(fm, TAG);
+        return frag;
     }
 
     private String message;
@@ -53,11 +50,12 @@ public class ProgressDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        ProgressDialog d = new ProgressDialog(getActivity());
+        AlertDialog.Builder b = new AlertDialog.Builder(getActivity())
+                .setPositiveButton(android.R.string.ok, null);
         if (message != null) {
-            d.setMessage(message);
+            b.setMessage(message);
         }
-        return d;
+        return b.create();
     }
 
     public void setMessage(int resId) {
@@ -66,7 +64,7 @@ public class ProgressDialogFragment extends DialogFragment {
 
     public void setMessage(String message) {
         this.message = message;
-        ProgressDialog dialog = (ProgressDialog) getDialog();
+        AlertDialog dialog = (AlertDialog) getDialog();
         if (dialog != null) {
             dialog.setMessage(message);
         }
