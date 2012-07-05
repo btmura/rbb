@@ -17,13 +17,11 @@
 package com.btmura.android.reddit.fragment;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.OperationApplicationException;
 import android.os.AsyncTask;
@@ -48,7 +46,7 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.entity.LoginResult;
 import com.btmura.android.reddit.provider.NetApi;
 import com.btmura.android.reddit.provider.SubredditProvider;
-import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
+import com.btmura.android.reddit.provider.SyncAdapterService;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddAccountFragment extends Fragment implements
@@ -181,36 +179,7 @@ public class AddAccountFragment extends Fragment implements
                 }
 
                 publishProgress(R.string.login_importing_subreddits);
-                ArrayList<String> subreddits = NetApi.querySubreddits(result.cookie);
-                int count = subreddits.size();
-
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
-                        count + 2);
-                ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
-                        .withSelection(SubredditProvider.SELECTION_ACCOUNT, new String[] {login})
-                        .build());
-                ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
-                        .withValue(Subreddits.COLUMN_ACCOUNT, login)
-                        .withValue(Subreddits.COLUMN_NAME, Subreddits.NAME_FRONT_PAGE)
-                        .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
-                        .build());
-                for (int i = 0; i < count; i++) {
-                    ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
-                            .withValue(Subreddits.COLUMN_ACCOUNT, login)
-                            .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
-                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
-                            .build());
-                }
-                ContentResolver cr = getActivity().getContentResolver();
-                try {
-                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-                } catch (RemoteException e) {
-                    Log.e(TAG, "doInBackground", e);
-                    return errorBundle(R.string.login_error, e.getMessage());
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, "doInBackground", e);
-                    return errorBundle(R.string.login_error, e.getMessage());
-                }
+                SyncAdapterService.initializeAccount(getActivity(), login, result.cookie);
 
                 publishProgress(R.string.login_adding_account);
 
@@ -232,6 +201,12 @@ public class AddAccountFragment extends Fragment implements
                 return b;
 
             } catch (IOException e) {
+                Log.e(TAG, "doInBackground", e);
+                return errorBundle(R.string.login_error, e.getMessage());
+            } catch (RemoteException e) {
+                Log.e(TAG, "doInBackground", e);
+                return errorBundle(R.string.login_error, e.getMessage());
+            } catch (OperationApplicationException e) {
                 Log.e(TAG, "doInBackground", e);
                 return errorBundle(R.string.login_error, e.getMessage());
             }
