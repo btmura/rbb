@@ -73,7 +73,12 @@
             android:name=".provider.SubredditProvider"
             android:authorities="@string/authority_subreddits"
             android:exported="true"
-            android:label="@string/subreddits" />
+            android:label="@string/provider_subreddits" />
+        <provider
+            android:name=".provider.VoteProvider"
+            android:authorities="@string/authority_votes"
+            android:exported="false"
+            android:label="@string/provider_votes" />
 
         <service
             android:name=".accounts.AccountAuthenticatorService"

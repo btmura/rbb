@@ -159,6 +159,24 @@ public class NetApi {
         }
     }
 
+    public static void vote(Context context, String id, int vote, String cookie,
+            String modhash) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.voteUrl();
+            conn = (HttpURLConnection) url.openConnection();
+            setCommonHeaders(conn, cookie);
+            conn.connect();
+
+            writeFormData(conn, Urls.voteQuery(modhash, id, vote));
+            in = conn.getInputStream();
+
+        } finally {
+            close(in, conn);
+        }
+    }
+
     private static void setCommonHeaders(HttpURLConnection conn, String cookie) {
         conn.setRequestProperty("Accept-Charset", CHARSET);
         conn.setRequestProperty("User-Agent", USER_AGENT);

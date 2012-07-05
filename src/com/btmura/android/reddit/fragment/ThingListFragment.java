@@ -22,10 +22,14 @@ import java.util.List;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
@@ -44,11 +49,14 @@ import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.provider.VoteProvider;
+import com.btmura.android.reddit.provider.VoteProvider.Votes;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
 public class ThingListFragment extends ListFragment implements
         LoaderCallbacks<List<Thing>>,
-        OnScrollListener {
+        OnScrollListener,
+        MultiChoiceModeListener {
 
     public static final String TAG = "ThingListFragment";
     public static final boolean DEBUG = Debug.DEBUG;
@@ -120,6 +128,8 @@ public class ThingListFragment extends ListFragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         ListView list = (ListView) view.findViewById(android.R.id.list);
+        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        list.setMultiChoiceModeListener(this);
         list.setOnScrollListener(this);
         return view;
     }
@@ -205,6 +215,58 @@ public class ThingListFragment extends ListFragment implements
                 }
             }
         }
+    }
+
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        if (!TextUtils.isEmpty(accountName)) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.thing_action_menu, menu);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+    }
+
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_upvote:
+                handleVote(mode, Votes.VOTE_UP);
+                return true;
+
+            case R.id.menu_downvote:
+                handleVote(mode, Votes.VOTE_DOWN);
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    public void onDestroyActionMode(ActionMode mode) {
+    }
+
+    private void handleVote(ActionMode mode, int vote) {
+        SparseBooleanArray positions = getListView().getCheckedItemPositions();
+        ContentValues[] values = new ContentValues[positions.size()];
+        int count = adapter.getCount();
+        int i, j;
+        for (i = 0, j = 0; i < count; i++) {
+            if (positions.get(i)) {
+                values[j] = new ContentValues(3);
+                values[j].put(Votes.COLUMN_ACCOUNT, accountName);
+                values[j].put(Votes.COLUMN_NAME, adapter.getItem(i).name);
+                values[j].put(Votes.COLUMN_VOTE, vote);
+            }
+        }
+        VoteProvider.insertMultipleVotesInBackground(getActivity(), values);
+        mode.finish();
     }
 
     @Override

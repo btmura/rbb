@@ -37,6 +37,7 @@ public class Urls {
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
     private static final String BASE_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
+    private static final String BASE_VOTE_URL = BASE_URL + "/api/vote/";
 
     private static final StringBuilder S = new StringBuilder(BASE_URL.length() * 3);
 
@@ -54,19 +55,19 @@ public class Urls {
         return newUrl(resetBuilder().append(BASE_LOGIN_URL).append(encode(userName)));
     }
 
+    public static String loginQuery(String userName, String password) {
+        StringBuilder b = resetBuilder();
+        b.append("user=").append(encode(userName));
+        b.append("&passwd=").append(encode(password));
+        b.append("&api_type=json");
+        return b.toString();
+    }
+
     public static String subscribeQuery(String modhash, String subreddit, boolean subscribe) {
         StringBuilder b = resetBuilder();
         b.append("action=").append(subscribe ? "sub" : "unsub");
         b.append("&uh=").append(encode(modhash));
         b.append("&sr_name=").append(encode(subreddit));
-        b.append("&api_type=json");
-        return b.toString();
-    }
-
-    public static String loginQuery(String userName, String password) {
-        StringBuilder b = resetBuilder();
-        b.append("user=").append(encode(userName));
-        b.append("&passwd=").append(encode(password));
         b.append("&api_type=json");
         return b.toString();
     }
@@ -134,6 +135,19 @@ public class Urls {
         return newUrl(BASE_SUBSCRIBE_URL);
     }
 
+    public static URL voteUrl() {
+        return newUrl(BASE_VOTE_URL);
+    }
+
+    public static String voteQuery(String modhash, String id, int vote) {
+        StringBuilder b = resetBuilder();
+        b.append("id=").append(id);
+        b.append("&dir=").append(encode(Integer.toString(vote)));
+        b.append("&uh=").append(encode(modhash));
+        b.append("&api_type=json");
+        return b.toString();
+    }
+
     private static URL newSearchUrl(String base, String query, String more) {
         StringBuilder b = resetBuilder().append(base).append(encode(query));
         if (more != null) {
@@ -142,9 +156,9 @@ public class Urls {
         return newUrl(b);
     }
 
-    private static URL newUrl(CharSequence builder) {
+    private static URL newUrl(CharSequence url) {
         try {
-            return new URL(builder.toString());
+            return new URL(url.toString());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

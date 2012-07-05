@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.backup.BackupManager;
-import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
@@ -42,7 +41,7 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 
-public class SubredditProvider extends ContentProvider {
+public class SubredditProvider extends BaseProvider {
 
     public static final String TAG = "SubredditProvider";
 
@@ -84,16 +83,6 @@ public class SubredditProvider extends ContentProvider {
 
     public static final String SELECTION_ACCOUNT_AND_NAME = SELECTION_ACCOUNT + " AND "
             + Subreddits.COLUMN_NAME + "= ?";
-
-    static final String ID_SELECTION = BaseColumns._ID + "= ?";
-
-    private DbHelper helper;
-
-    @Override
-    public boolean onCreate() {
-        helper = new DbHelper(getContext(), DbHelper.DATABASE_REDDIT, 2);
-        return false;
-    }
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
@@ -355,39 +344,6 @@ public class SubredditProvider extends ContentProvider {
         }
         Toast.makeText(context, context.getString(resId, Math.abs(count)), Toast.LENGTH_SHORT)
                 .show();
-    }
-
-    @Override
-    public ContentProviderResult[] applyBatch(ArrayList<ContentProviderOperation> operations)
-            throws OperationApplicationException {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        db.beginTransaction();
-        try {
-            ContentProviderResult[] results = super.applyBatch(operations);
-            db.setTransactionSuccessful();
-            return results;
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    private static String appendIdSelection(String selection) {
-        if (selection == null) {
-            return ID_SELECTION;
-        } else {
-            return selection + " AND " + ID_SELECTION;
-        }
-    }
-
-    private static String[] appendIdSelectionArg(String[] selectionArgs, String id) {
-        if (selectionArgs == null) {
-            return new String[] {id};
-        } else {
-            String[] newSelectionArgs = new String[selectionArgs.length + 1];
-            System.arraycopy(selectionArgs, 0, newSelectionArgs, 0, selectionArgs.length);
-            newSelectionArgs[newSelectionArgs.length - 1] = id;
-            return newSelectionArgs;
-        }
     }
 
     private static void scheduleBackup(Context context, String accountName) {

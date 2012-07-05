@@ -25,11 +25,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
+import com.btmura.android.reddit.provider.VoteProvider.Votes;
 
 class DbHelper extends SQLiteOpenHelper {
 
     static final String DATABASE_REDDIT = "reddit";
     static final String DATABASE_TEST = "test";
+    static final int LATEST_VERSION = 2;
 
     /** Version kept to control what tables are created mostly for testing. */
     private final int version;
@@ -45,6 +47,7 @@ class DbHelper extends SQLiteOpenHelper {
         try {
             if (version > 1) {
                 createSubredditsV2(db);
+                createVotes(db);
             } else {
                 createSubredditsV1(db);
             }
@@ -53,6 +56,19 @@ class DbHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+    }
+
+    private void createVotes(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + Votes.TABLE_NAME + " ("
+                + Votes._ID + " INTEGER PRIMARY KEY, "
+                + Votes.COLUMN_ACCOUNT + " TEXT DEFAULT '', "
+                + Votes.COLUMN_NAME + " TEXT NOT NULL, "
+                + Votes.COLUMN_VOTE + " INTEGER DEFAULT 0, "
+                + Votes.COLUMN_STATE + " INTEGER DEFAULT 0, "
+                + "UNIQUE (" + Votes.COLUMN_ACCOUNT + "," + Votes.COLUMN_NAME + "))");
+        db.execSQL("CREATE INDEX accountVotes " + "ON " + Votes.TABLE_NAME + " ("
+                + Votes.COLUMN_ACCOUNT + ", "
+                + Votes.COLUMN_NAME + " COLLATE NOCASE ASC)");
     }
 
     private void createSubredditsV2(SQLiteDatabase db) {
@@ -114,6 +130,7 @@ class DbHelper extends SQLiteOpenHelper {
             db.beginTransaction();
             try {
                 upgradeSubredditsV2(db);
+                createVotes(db);
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
