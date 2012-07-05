@@ -27,11 +27,6 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class Urls {
 
-    public static final String CHARSET = "UTF-8";
-    public static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset="
-            + CHARSET;
-    public static final String USER_AGENT = "reddit by brian (rbb) for Android by /u/btmura";
-
     public static final String BASE_URL = "http://www.reddit.com";
     public static final String BASE_SSL_URL = "https://ssl.reddit.com";
 

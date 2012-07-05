@@ -39,6 +39,11 @@ import com.btmura.android.reddit.entity.Thing;
 
 public class NetApi {
 
+    private static final String CHARSET = "UTF-8";
+    private static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset="
+            + CHARSET;
+    private static final String USER_AGENT = "reddit by brian (rbb) for Android by /u/btmura";
+
     public static ArrayList<String> querySubreddits(String cookie) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
@@ -116,7 +121,8 @@ public class NetApi {
         }
     }
 
-    public static LoginResult login(Context context, String login, String password) throws IOException {
+    public static LoginResult login(Context context, String login, String password)
+            throws IOException {
         HttpsURLConnection conn = null;
         InputStream in = null;
         try {
@@ -154,15 +160,15 @@ public class NetApi {
     }
 
     private static void setCommonHeaders(HttpURLConnection conn, String cookie) {
-        conn.setRequestProperty("Accept-Charset", Urls.CHARSET);
-        conn.setRequestProperty("User-Agent", Urls.USER_AGENT);
+        conn.setRequestProperty("Accept-Charset", CHARSET);
+        conn.setRequestProperty("User-Agent", USER_AGENT);
         if (!TextUtils.isEmpty(cookie)) {
             conn.setRequestProperty("Cookie", Urls.loginCookie(cookie));
         }
     }
 
     private static void setFormDataHeaders(HttpURLConnection conn) {
-        conn.setRequestProperty("Content-Type", Urls.CONTENT_TYPE);
+        conn.setRequestProperty("Content-Type", CONTENT_TYPE);
         conn.setDoOutput(true);
     }
 
@@ -170,7 +176,7 @@ public class NetApi {
         OutputStream output = null;
         try {
             output = conn.getOutputStream();
-            output.write(data.getBytes(Urls.CHARSET));
+            output.write(data.getBytes(CHARSET));
             output.close();
         } finally {
             if (output != null) {
