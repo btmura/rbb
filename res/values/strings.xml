@@ -24,12 +24,7 @@
     <string name="add_account">Add account</string>
     <string name="add_front_page">Add front page</string>
     <string name="add_subreddit">Add subreddit</string>
-    
-    <string name="authenticator_adding_account">Adding account…</string>
-    <string name="authenticator_error">There was a problem: %1$s</string>
-    <string name="authenticator_logging_in">Logging in…</string>
-    <string name="authenticator_reddit_error">Reddit says: %1$s</string>
-    
+     
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
     
     <string name="comment_header_status">%1$s&#160; %2$s ago&#160; %3$d points&#160; %4$d comments</string>
@@ -51,7 +46,12 @@
     <string name="front_page">front page</string>
     <string name="loading">Loading…</string>
     
-    
+    <string name="login_adding_account">Adding account…</string>
+    <string name="login_error">There was a problem: %1$s</string>
+    <string name="login_importing_subreddits">Importing subreddits…</string>
+    <string name="login_logging_in">Logging in…</string>
+    <string name="login_reddit_error">Reddit says: %1$s</string>
+
     <string name="manage_accounts">Manage accounts</string>
 
     <string name="menu_add">Add</string>

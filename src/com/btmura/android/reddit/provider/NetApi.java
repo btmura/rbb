@@ -39,7 +39,7 @@ import com.btmura.android.reddit.entity.Thing;
 
 public class NetApi {
 
-    static ArrayList<String> querySubreddits(String cookie) throws IOException {
+    public static ArrayList<String> querySubreddits(String cookie) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {

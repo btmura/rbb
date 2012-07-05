@@ -17,15 +17,18 @@
 package com.btmura.android.reddit.fragment;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.ProgressDialog;
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.OperationApplicationException;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.text.InputFilter;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TransformationMethod;
@@ -45,7 +48,7 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.entity.LoginResult;
 import com.btmura.android.reddit.provider.NetApi;
 import com.btmura.android.reddit.provider.SubredditProvider;
-import com.btmura.android.reddit.provider.SyncAdapterService;
+import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddAccountFragment extends Fragment implements
@@ -156,18 +159,18 @@ public class AddAccountFragment extends Fragment implements
 
         private final String login;
         private final String password;
-        private final ProgressDialog progress;
+        private final ProgressDialogFragment progress;
 
         LoginTask(String login, String password) {
             this.login = login;
             this.password = password;
-            this.progress = new ProgressDialog(getActivity());
+            this.progress = ProgressDialogFragment.newInstance(null);
         }
 
         @Override
         protected void onPreExecute() {
-            progress.setMessage(getString(R.string.authenticator_logging_in));
-            progress.show();
+            progress.setMessage(R.string.login_logging_in);
+            progress.show(getFragmentManager(), TAG);
         }
 
         @Override
@@ -175,10 +178,37 @@ public class AddAccountFragment extends Fragment implements
             try {
                 LoginResult result = NetApi.login(getActivity(), login, password);
                 if (result.error != null) {
-                    return errorBundle(R.string.authenticator_reddit_error, result.error);
+                    return errorBundle(R.string.login_reddit_error, result.error);
                 }
 
-                publishProgress(R.string.authenticator_adding_account);
+                publishProgress(R.string.login_importing_subreddits);
+                ArrayList<String> subreddits = NetApi.querySubreddits(result.cookie);
+                int count = subreddits.size();
+
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
+                        count + 1);
+                ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+                        .withSelection(SubredditProvider.SELECTION_ACCOUNT, new String[] {login})
+                        .build());
+                for (int i = 0; i < count; i++) {
+                    ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+                            .withValue(Subreddits.COLUMN_ACCOUNT, login)
+                            .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
+                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
+                            .build());
+                }
+                ContentResolver cr = getActivity().getContentResolver();
+                try {
+                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                } catch (RemoteException e) {
+                    Log.e(TAG, "doInBackground", e);
+                    return errorBundle(R.string.login_error, e.getMessage());
+                } catch (OperationApplicationException e) {
+                    Log.e(TAG, "doInBackground", e);
+                    return errorBundle(R.string.login_error, e.getMessage());
+                }
+
+                publishProgress(R.string.login_adding_account);
 
                 String accountType = AccountAuthenticator.getAccountType(getActivity());
                 Account account = new Account(login, accountType);
@@ -190,11 +220,7 @@ public class AddAccountFragment extends Fragment implements
                         result.modhash);
 
                 ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
-
-                Bundle extras = new Bundle(2);
-                extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-                extras.putBoolean(SyncAdapterService.EXTRA_INITIAL_SYNC, true);
-                ContentResolver.requestSync(account, SubredditProvider.AUTHORITY, extras);
+                ContentResolver.requestSync(account, SubredditProvider.AUTHORITY, null);
 
                 Bundle b = new Bundle(2);
                 b.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
@@ -203,13 +229,13 @@ public class AddAccountFragment extends Fragment implements
 
             } catch (IOException e) {
                 Log.e(TAG, "doInBackground", e);
-                return errorBundle(R.string.authenticator_error, e.getMessage());
+                return errorBundle(R.string.login_error, e.getMessage());
             }
         }
 
         @Override
-        protected void onProgressUpdate(Integer... values) {
-            progress.setMessage(getString(values[0]));
+        protected void onProgressUpdate(Integer... resIds) {
+            progress.setMessage(resIds[0]);
         }
 
         @Override
