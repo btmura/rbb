@@ -28,7 +28,6 @@ import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -48,8 +47,6 @@ public class SyncAdapterService extends Service {
 
     public static final String TAG = "SyncAdapterService";
     public static final boolean DEBUG = Debug.DEBUG;
-
-    public static final String EXTRA_INITIAL_SYNC = "firstSync";
 
     private static final String[] PROJECTION = {
             Subreddits._ID,
@@ -93,59 +90,49 @@ public class SyncAdapterService extends Service {
 
                 ArrayList<String> subreddits = NetApi.querySubreddits(cookie);
 
-                boolean firstSync = extras.getBoolean(EXTRA_INITIAL_SYNC);
-                if (firstSync) {
-                    ops.add(newDeleteByAccountName(account.name));
-                    ops.add(newInsert(account.name,
-                            Subreddits.NAME_FRONT_PAGE,
-                            Subreddits.STATE_INSERTING));
-                    numInserts++;
-                    numEntries++;
-                } else {
-                    Cursor c = provider.query(Subreddits.CONTENT_URI, PROJECTION,
-                            SubredditProvider.SELECTION_ACCOUNT,
-                            new String[] {account.name},
-                            null);
-                    while (c.moveToNext()) {
-                        long expiration = c.getLong(INDEX_EXPIRATION);
-                        boolean expired = expiration != 0
-                                && System.currentTimeMillis() > expiration;
+                Cursor c = provider.query(Subreddits.CONTENT_URI, PROJECTION,
+                        SubredditProvider.SELECTION_ACCOUNT,
+                        new String[] {account.name},
+                        null);
+                while (c.moveToNext()) {
+                    long expiration = c.getLong(INDEX_EXPIRATION);
+                    boolean expired = expiration != 0
+                            && System.currentTimeMillis() > expiration;
 
-                        String name = c.getString(INDEX_NAME);
-                        int index = find(subreddits, name);
-                        boolean exists = index != -1;
-                        if (exists) {
-                            subreddits.remove(index);
-                        }
+                    String name = c.getString(INDEX_NAME);
+                    int index = find(subreddits, name);
+                    boolean exists = index != -1;
+                    if (exists) {
+                        subreddits.remove(index);
+                    }
 
-                        long id = c.getLong(INDEX_ID);
-                        int state = c.getInt(INDEX_STATE);
-                        switch (state) {
-                            case Subreddits.STATE_INSERTING:
-                            case Subreddits.STATE_DELETING:
-                                if (expired) {
-                                    if (exists) {
-                                        ops.add(newUpdateToNormalState(id));
-                                        numUpdates++;
-                                    } else {
-                                        ops.add(newDeleteById(id));
-                                        numDeletes++;
-                                    }
-                                    numEntries++;
-                                }
-                                break;
-
-                            case Subreddits.STATE_NORMAL:
-                                if (!exists) {
+                    long id = c.getLong(INDEX_ID);
+                    int state = c.getInt(INDEX_STATE);
+                    switch (state) {
+                        case Subreddits.STATE_INSERTING:
+                        case Subreddits.STATE_DELETING:
+                            if (expired) {
+                                if (exists) {
+                                    ops.add(newUpdateToNormalState(id));
+                                    numUpdates++;
+                                } else {
                                     ops.add(newDeleteById(id));
                                     numDeletes++;
-                                    numEntries++;
                                 }
-                                break;
-                        }
+                                numEntries++;
+                            }
+                            break;
+
+                        case Subreddits.STATE_NORMAL:
+                            if (!exists) {
+                                ops.add(newDeleteById(id));
+                                numDeletes++;
+                                numEntries++;
+                            }
+                            break;
                     }
-                    c.close();
                 }
+                c.close();
 
                 if (!subreddits.isEmpty()) {
                     int count = subreddits.size();
@@ -157,12 +144,8 @@ public class SyncAdapterService extends Service {
                 }
 
                 ContentResolver cr = getContext().getContentResolver();
-                ContentProviderResult[] results = cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                cr.applyBatch(SubredditProvider.AUTHORITY, ops);
 
-                if (firstSync) {
-                    numDeletes += results[0].count;
-                    numEntries += results[0].count;
-                }
                 syncResult.stats.numInserts += numInserts;
                 syncResult.stats.numUpdates += numUpdates;
                 syncResult.stats.numDeletes += numDeletes;
@@ -198,12 +181,6 @@ public class SyncAdapterService extends Service {
                 }
             }
             return -1;
-        }
-
-        private static ContentProviderOperation newDeleteByAccountName(String accountName) {
-            return ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
-                    .withSelection(SubredditProvider.SELECTION_ACCOUNT, new String[] {accountName})
-                    .build();
         }
 
         private static ContentProviderOperation newUpdateToNormalState(long id) {
