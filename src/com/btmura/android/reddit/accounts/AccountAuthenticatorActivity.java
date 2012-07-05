@@ -33,9 +33,11 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account_authenticator);
 
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.single_container, AddAccountFragment.newInstance());
-        ft.commit();
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.single_container, AddAccountFragment.newInstance());
+            ft.commit();
+        }
     }
 
     public void onAccountAdded(Bundle result) {
