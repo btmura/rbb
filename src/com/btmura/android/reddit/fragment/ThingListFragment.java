@@ -22,7 +22,6 @@ import java.util.List;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
@@ -253,19 +252,20 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private void handleVote(ActionMode mode, int vote) {
+        int checked = getListView().getCheckedItemCount();
+        String[] names = new String[checked];
         SparseBooleanArray positions = getListView().getCheckedItemPositions();
-        ContentValues[] values = new ContentValues[positions.size()];
         int count = adapter.getCount();
         int i, j;
         for (i = 0, j = 0; i < count; i++) {
             if (positions.get(i)) {
-                values[j] = new ContentValues(3);
-                values[j].put(Votes.COLUMN_ACCOUNT, accountName);
-                values[j].put(Votes.COLUMN_NAME, adapter.getItem(i).name);
-                values[j].put(Votes.COLUMN_VOTE, vote);
+                if (DEBUG) {
+                    Log.d(TAG, "n:" + adapter.getItem(i).name);
+                }
+                names[j++] = adapter.getItem(i).name;
             }
         }
-        VoteProvider.insertMultipleVotesInBackground(getActivity(), values);
+        VoteProvider.insertMultipleVotesInBackground(getActivity(), accountName, names, vote);
         mode.finish();
     }
 

@@ -16,20 +16,33 @@
 
 package com.btmura.android.reddit.provider;
 
+import java.util.ArrayList;
+
+import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.R;
+
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.RemoteException;
 import android.provider.BaseColumns;
+import android.util.Log;
+import android.widget.Toast;
 
 public class VoteProvider extends BaseProvider {
 
     public static final String TAG = "VoteProvider";
+    public static boolean DEBUG = Debug.DEBUG;
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.votes";
 
@@ -43,7 +56,7 @@ public class VoteProvider extends BaseProvider {
         MATCHER.addURI(AUTHORITY, Votes.TABLE_NAME + "/#", MATCH_ONE_VOTE);
     }
 
-    public static class Votes implements BaseColumns {
+    public static class Votes implements BaseColumns, SyncColumns {
         static final String TABLE_NAME = "votes";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
 
@@ -90,8 +103,9 @@ public class VoteProvider extends BaseProvider {
         long id = db.insert(Votes.TABLE_NAME, null, values);
         if (id != -1) {
             getContext().getContentResolver().notifyChange(uri, null);
+            return ContentUris.withAppendedId(uri, id);
         }
-        return ContentUris.withAppendedId(uri, id);
+        return null;
     }
 
     @Override
@@ -146,13 +160,48 @@ public class VoteProvider extends BaseProvider {
     }
 
     public static void insertMultipleVotesInBackground(final Context context,
-            final ContentValues[] values) {
-        new AsyncTask<Void, Void, Void>() {
+            final String accountName, final String[] names, final int vote) {
+        new AsyncTask<Void, Void, Integer>() {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Integer doInBackground(Void... params) {
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(names.length);
+                for (int i = 0; i < names.length; i++) {
+                    if (DEBUG) {
+                        Log.d(TAG, "n:" + names[i]);
+                    }
+                    ops.add(ContentProviderOperation.newInsert(Votes.CONTENT_URI)
+                            .withValue(Votes.COLUMN_ACCOUNT, accountName)
+                            .withValue(Votes.COLUMN_NAME, names[i])
+                            .withValue(Votes.COLUMN_VOTE, vote)
+                            .withValue(Votes.COLUMN_STATE, Votes.STATE_INSERTING)
+                            .build());
+                }
+
                 ContentResolver cr = context.getContentResolver();
-                cr.bulkInsert(Votes.CONTENT_URI, values);
-                return null;
+                try {
+                    ContentProviderResult[] results = cr.applyBatch(VoteProvider.AUTHORITY, ops);
+                    for (int i = 0; i < results.length; i++) {
+                        Intent intent = new Intent(context, SyncOperationService.class);
+                        intent.setData(results[i].uri);
+                        context.startService(intent);
+                    }
+                    return results.length;
+                } catch (RemoteException e) {
+                    Log.e(TAG, "insertMultipleVotesInBackground", e);
+                } catch (OperationApplicationException e) {
+                    Log.e(TAG, "insertMultipleVotesInBackground", e);
+                }
+
+                return 0;
+            }
+
+            @Override
+            protected void onPostExecute(Integer count) {
+                super.onPostExecute(count);
+                int resId = vote == Votes.VOTE_UP ? R.plurals.upvotes : R.plurals.downvotes;
+                String text = context.getResources().getQuantityString(resId, count, count);
+                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
             }
         }.execute();
     }

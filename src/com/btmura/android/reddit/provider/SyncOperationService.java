@@ -33,6 +33,7 @@ import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
+import com.btmura.android.reddit.provider.VoteProvider.Votes;
 
 public class SyncOperationService extends IntentService {
 
@@ -57,6 +58,16 @@ public class SyncOperationService extends IntentService {
             Log.d(TAG, "onHandleIntent data:" + intent.getDataString());
         }
 
+        ContentResolver cr = getContentResolver();
+        String type = cr.getType(intent.getData());
+        if (Subreddits.MIME_TYPE_ITEM.equals(type)) {
+            syncSubredditOp(intent);
+        } else if (Votes.MIME_TYPE_ITEM.equals(type)) {
+            syncVoteOp(intent);
+        }
+    }
+
+    private void syncSubredditOp(Intent intent) {
         ContentResolver cr = getContentResolver();
         Cursor c = cr.query(intent.getData(), PROJECTION, null, null, null);
         try {
@@ -100,6 +111,12 @@ public class SyncOperationService extends IntentService {
             Log.e(TAG, "onHandleIntent", e);
         } finally {
             c.close();
+        }
+    }
+
+    private void syncVoteOp(Intent intent) {
+        if (DEBUG) {
+            Log.d(TAG, "syncVoteOp i:" + intent.getDataString());
         }
     }
 }

@@ -57,7 +57,7 @@ public class SubredditProvider extends BaseProvider {
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
     }
 
-    public static class Subreddits implements BaseColumns {
+    public static class Subreddits implements BaseColumns, SyncColumns {
         static final String TABLE_NAME = "subreddits";
         public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
 
@@ -75,10 +75,6 @@ public class SubredditProvider extends BaseProvider {
 
         public static final String NAME_FRONT_PAGE = "";
         public static final String ACCOUNT_NONE = "";
-
-        public static final int STATE_NORMAL = 0;
-        public static final int STATE_INSERTING = 1;
-        public static final int STATE_DELETING = 2;
     }
 
     public static final String SELECTION_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
@@ -118,8 +114,9 @@ public class SubredditProvider extends BaseProvider {
         long id = db.insert(Subreddits.TABLE_NAME, null, values);
         if (id != -1) {
             getContext().getContentResolver().notifyChange(uri, null);
+            return ContentUris.withAppendedId(uri, id);
         }
-        return ContentUris.withAppendedId(uri, id);
+        return null;
     }
 
     @Override
