@@ -16,7 +16,7 @@
 <resources>
 
     <string name="app_name">reddit by brian</string>
-
+    
     <string name="account">Account</string>    
     <string name="account_type">com.btmura.android.reddit.account</string>
     
@@ -66,6 +66,7 @@
     <string name="menu_open">Open in another app</string>
     <string name="menu_refresh">Refresh</string>    
     <string name="menu_search">Search</string>
+    <string name="menu_send">Send</string>
     <string name="menu_share">Share</string>
     <string name="menu_split">Split</string>
     <string name="menu_submit_link">Submit link</string>    
@@ -83,6 +84,11 @@
     <string name="show_password">Show password</string>
     
     <string name="sr_status">%1$d subscribers</string>
+    
+    <string name="submit_link_label">Submit link</string>
+    <string name="submit_link_subreddit">Subreddit</string>
+    <string name="submit_link_title">Title</string>
+    <string name="submit_link_text">Text</string>
     
     <string name="subreddit">Subreddit</string>
     <string name="subreddits">Subreddits</string>

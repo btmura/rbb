@@ -56,6 +56,16 @@
         <activity
             android:name=".activity.SidebarActivity"
             android:theme="@android:style/Theme.Holo.Light.DialogWhenLarge" />
+        <activity
+            android:name=".activity.SubmitLinkActivity"
+            android:label="@string/submit_link_label"
+            android:theme="@android:style/Theme.Holo.Light.DialogWhenLarge" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".activity.ThingActivity" />
         <activity android:name=".activity.ThingListActivity" />
 

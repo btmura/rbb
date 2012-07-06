@@ -30,6 +30,7 @@ import android.widget.SearchView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SearchActivity;
+import com.btmura.android.reddit.activity.SubmitLinkActivity;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
@@ -103,6 +104,10 @@ public class GlobalMenuFragment extends Fragment implements
                 handleAccounts();
                 return true;
 
+            case R.id.menu_submit_link:
+                handleSubmitLink();
+                return true;
+
             case R.id.menu_add_subreddit:
                 handleAddSubreddit();
                 return true;
@@ -119,6 +124,11 @@ public class GlobalMenuFragment extends Fragment implements
     private void handleAccounts() {
         Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
         intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {SubredditProvider.AUTHORITY});
+        startActivity(intent);
+    }
+
+    private void handleSubmitLink() {
+        Intent intent = new Intent(getActivity(), SubmitLinkActivity.class);
         startActivity(intent);
     }
 
