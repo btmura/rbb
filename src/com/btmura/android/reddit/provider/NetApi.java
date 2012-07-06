@@ -37,6 +37,7 @@ import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.entity.LoginResult;
+import com.btmura.android.reddit.entity.SubmitResult;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 
@@ -146,7 +147,7 @@ public class NetApi {
         }
     }
 
-    public static void submit(String subreddit, String title, String text, String cookie,
+    public static SubmitResult submit(String subreddit, String title, String text, String cookie,
             String modhash) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
@@ -159,9 +160,7 @@ public class NetApi {
 
             writeFormData(conn, Urls.submitTextQuery(modhash, subreddit, title, text));
             in = conn.getInputStream();
-            if (DEBUG) {
-                logResponse(in);
-            }
+            return SubmitParser.parse(in);
         } finally {
             close(in, conn);
         }

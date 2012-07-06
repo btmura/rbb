@@ -33,14 +33,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.AdapterView.OnItemSelectedListener;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.entity.SubmitResult;
+import com.btmura.android.reddit.fragment.MessageDialogFragment;
 import com.btmura.android.reddit.provider.NetApi;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
@@ -48,6 +51,7 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
         OnItemSelectedListener {
 
     public static final String TAG = "SubmitLinkActivity";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     private AccountSpinnerAdapter adapter;
 
@@ -169,8 +173,10 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
                 String modhash = manager.blockingGetAuthToken(account,
                         AccountAuthenticator.AUTH_TOKEN_MODHASH,
                         true);
-                NetApi.submit(subreddit, title, text, cookie, modhash);
-
+                SubmitResult result = NetApi.submit(subreddit, title, text, cookie, modhash);
+                if (result.captcha != null) {
+                    MessageDialogFragment.showMessage(getFragmentManager(), result.captcha);
+                }
             } catch (OperationCanceledException e) {
                 Log.e(TAG, "doInBackground", e);
             } catch (AuthenticatorException e) {
