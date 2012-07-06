@@ -154,7 +154,7 @@ public class AddSubredditFragment extends DialogFragment implements
         if (v == cancel) {
             handleCancel();
         } else if (v == ok) {
-            handleAdd();
+            handleOk();
         }
     }
 
@@ -162,7 +162,7 @@ public class AddSubredditFragment extends DialogFragment implements
         dismiss();
     }
 
-    private void handleAdd() {
+    private void handleOk() {
         String subredditName;
         if (addFrontPage.isChecked()) {
             subredditName = "";

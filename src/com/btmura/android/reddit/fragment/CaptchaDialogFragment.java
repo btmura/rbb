@@ -16,28 +16,47 @@
 
 package com.btmura.android.reddit.fragment;
 
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.CaptchaLoader;
+import com.btmura.android.reddit.text.InputFilters;
 
-public class CaptchaDialogFragment extends DialogFragment implements LoaderCallbacks<Bitmap> {
+public class CaptchaDialogFragment extends DialogFragment implements LoaderCallbacks<Bitmap>,
+        OnClickListener {
 
     public static final String TAG = "CaptchaDialogFragment";
 
+    private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
+            InputFilters.NO_SPACES_FILTER,
+    };
+
     private static final String ARG_CAPTCHA_ID = "ci";
 
+    public interface CaptchaListener {
+        void onCaptchaGuess(String id, String guess);
+
+        void onCaptchaCancelled();
+    }
+
+    private CaptchaListener listener;
     private ImageView captcha;
     private EditText guess;
+    private Button cancel;
+    private Button ok;
 
     public static CaptchaDialogFragment newInstance(String captchaId) {
         Bundle args = new Bundle(1);
@@ -54,10 +73,26 @@ public class CaptchaDialogFragment extends DialogFragment implements LoaderCallb
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof CaptchaListener) {
+            listener = (CaptchaListener) activity;
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.captcha, container, false);
         captcha = (ImageView) v.findViewById(R.id.captcha);
+
         guess = (EditText) v.findViewById(R.id.guess);
+        guess.setFilters(INPUT_FILTERS);
+
+        cancel = (Button) v.findViewById(R.id.cancel);
+        cancel.setOnClickListener(this);
+
+        ok = (Button) v.findViewById(R.id.ok);
+        ok.setOnClickListener(this);
         return v;
     }
 
@@ -77,5 +112,34 @@ public class CaptchaDialogFragment extends DialogFragment implements LoaderCallb
 
     public void onLoaderReset(Loader<Bitmap> loader) {
         captcha.setImageBitmap(null);
+    }
+
+    public void onClick(View v) {
+        if (v == cancel) {
+            handleCancel();
+        } else if (v == ok) {
+            handleOk();
+        }
+    }
+
+    private void handleCancel() {
+        dismiss();
+        if (listener != null) {
+            listener.onCaptchaCancelled();
+        }
+    }
+
+    private void handleOk() {
+        if (guess.getText().length() <= 0) {
+            guess.setError(getString(R.string.error_blank_field));
+            return;
+        }
+        if (listener != null) {
+            listener.onCaptchaGuess(getCaptchaId(), guess.getText().toString());
+        }
+    }
+
+    private String getCaptchaId() {
+        return getArguments().getString(ARG_CAPTCHA_ID);
     }
 }

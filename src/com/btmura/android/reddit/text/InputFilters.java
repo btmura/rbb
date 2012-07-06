@@ -34,6 +34,8 @@ public class InputFilters {
         }
     };
 
+    public static InputFilter NO_SPACES_FILTER = LOGIN_FILTER;
+
     public static InputFilter SUBREDDIT_NAME_FILTER = new InputFilter() {
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest,
                 int dstart, int dend) {
