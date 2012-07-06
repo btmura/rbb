@@ -18,6 +18,8 @@ package com.btmura.android.reddit.fragment;
 
 import java.io.IOException;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -26,6 +28,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.btmura.android.reddit.R;
@@ -35,27 +38,25 @@ public class CaptchaDialogFragment extends DialogFragment {
 
     public static final String TAG = "CaptchaDialogFragment";
 
-    private static final String ARG_CAPTCHA = "c";
+    private static final String ARG_CAPTCHA_ID = "ci";
 
-    private ImageView captchaImage;
+    private ImageView captcha;
+    private EditText guess;
 
-    public static CaptchaDialogFragment newInstance(String captcha) {
+    public static CaptchaDialogFragment newInstance(String captchaId) {
         Bundle args = new Bundle(1);
-        args.putString(ARG_CAPTCHA, captcha);
+        args.putString(ARG_CAPTCHA_ID, captchaId);
         CaptchaDialogFragment f = new CaptchaDialogFragment();
         f.setArguments(args);
         return f;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        captchaImage = (ImageView) inflater.inflate(R.layout.captcha, container, false);
-        return captchaImage;
+        View v = inflater.inflate(R.layout.captcha, container, false);
+        captcha = (ImageView) v.findViewById(R.id.captcha);
+        guess = (EditText) v.findViewById(R.id.guess);
+        return v;
     }
 
     @Override
@@ -69,7 +70,7 @@ public class CaptchaDialogFragment extends DialogFragment {
     class LoadCaptchaImageTask extends AsyncTask<Void, Void, Bitmap> {
         @Override
         protected Bitmap doInBackground(Void... params) {
-            String id = getArguments().getString(ARG_CAPTCHA);
+            String id = getArguments().getString(ARG_CAPTCHA_ID);
             try {
                 return NetApi.captcha(id);
             } catch (IOException e) {
@@ -82,7 +83,7 @@ public class CaptchaDialogFragment extends DialogFragment {
         protected void onPostExecute(Bitmap result) {
             super.onPostExecute(result);
             if (result != null) {
-                captchaImage.setImageBitmap(result);
+                captcha.setImageBitmap(result);
             }
         }
     }

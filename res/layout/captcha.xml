@@ -14,9 +14,33 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/captcha"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
-</ImageView>
+    <ImageView
+        android:id="@+id/captcha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:minHeight="100dp"
+        android:scaleType="fitXY" />
+
+    <EditText
+        android:id="@+id/guess"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding" />
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/add_button_bar" />
+
+</LinearLayout>
