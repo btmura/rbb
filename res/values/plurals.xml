@@ -17,14 +17,19 @@
 <resources>
 
     <plurals name="upvotes">
-        <item quantity="zero">No upvotes</item>
-        <item quantity="one">One upvote</item>
-        <item quantity="other">%1$d upvotes</item>
+        <item quantity="zero">Upvoted 0 things.</item>
+        <item quantity="one">Upvoted 1 thing.</item>
+        <item quantity="other">Upvoted %1$d things.</item>
+    </plurals>
+    <plurals name="rescindvotes">
+        <item quantity="zero">Rescinded 0 votes.</item>
+        <item quantity="one">Rescinded 1 vote.</item>
+        <item quantity="other">Rescinded %1$d votes.</item>
     </plurals>
     <plurals name="downvotes">
-        <item quantity="zero">No downvotes</item>
-        <item quantity="one">One downvote</item>
-        <item quantity="other">%1$d downvotes</item>
+        <item quantity="zero">Downvoted 0 things.</item>
+        <item quantity="one">Downvoted 1 thing.</item>
+        <item quantity="other">Downvoted %1$d things.</item>
     </plurals>
 
 </resources>
