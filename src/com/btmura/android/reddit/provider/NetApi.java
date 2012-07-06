@@ -146,6 +146,27 @@ public class NetApi {
         }
     }
 
+    public static void submit(String subreddit, String title, String text, String cookie,
+            String modhash) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.submitUrl();
+            conn = (HttpURLConnection) url.openConnection();
+            setCommonHeaders(conn, cookie);
+            setFormDataHeaders(conn);
+            conn.connect();
+
+            writeFormData(conn, Urls.submitTextQuery(modhash, subreddit, title, text));
+            in = conn.getInputStream();
+            if (DEBUG) {
+                logResponse(in);
+            }
+        } finally {
+            close(in, conn);
+        }
+    }
+
     static void subscribe(String cookie, String modhash, String subreddit, boolean subscribe)
             throws IOException {
         HttpURLConnection conn = null;
@@ -159,7 +180,9 @@ public class NetApi {
 
             writeFormData(conn, Urls.subscribeQuery(modhash, subreddit, subscribe));
             in = conn.getInputStream();
-
+            if (DEBUG) {
+                logResponse(in);
+            }
         } finally {
             close(in, conn);
         }
@@ -181,7 +204,6 @@ public class NetApi {
             if (DEBUG) {
                 logResponse(in);
             }
-
         } finally {
             close(in, conn);
         }

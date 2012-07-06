@@ -16,22 +16,38 @@
 
 package com.btmura.android.reddit.activity;
 
+import java.io.IOException;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.provider.NetApi;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
-public class SubmitLinkActivity extends Activity implements LoaderCallbacks<AccountResult> {
+public class SubmitLinkActivity extends Activity implements LoaderCallbacks<AccountResult>,
+        OnItemSelectedListener {
+
+    public static final String TAG = "SubmitLinkActivity";
 
     private AccountSpinnerAdapter adapter;
 
@@ -50,13 +66,16 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
 
     private void setupActionBar() {
         ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     private void setupAccountSpinner() {
         adapter = new AccountSpinnerAdapter(this, false);
         Spinner accountSpinner = (Spinner) findViewById(R.id.account_spinner);
         accountSpinner.setAdapter(adapter);
+        accountSpinner.setOnItemSelectedListener(this);
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -76,6 +95,14 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
 
     public void onLoaderReset(Loader<AccountResult> loader) {
         adapter.setAccountNames(null);
+    }
+
+    public void onItemSelected(AdapterView<?> av, View v, int position, long id) {
+        adapter.updateState(position);
+    }
+
+    public void onNothingSelected(android.widget.AdapterView<?> av) {
+
     }
 
     @Override
@@ -109,6 +136,50 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
         if (text.getText().length() <= 0) {
             text.setError(getString(R.string.error_blank_field));
             return;
+        }
+
+        new SubmitTask(adapter.getAccountName(),
+                subreddit.getText().toString(),
+                title.getText().toString(),
+                text.getText().toString()).execute();
+    }
+
+    class SubmitTask extends AsyncTask<Void, Void, Void> {
+
+        private final String accountName;
+        private final String subreddit;
+        private final String title;
+        private final String text;
+
+        SubmitTask(String accountName, String subreddit, String title, String text) {
+            this.accountName = accountName;
+            this.subreddit = subreddit;
+            this.title = title;
+            this.text = text;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                AccountManager manager = AccountManager.get(SubmitLinkActivity.this);
+                Account account = new Account(accountName, getString(R.string.account_type));
+                String cookie = manager.blockingGetAuthToken(account,
+                        AccountAuthenticator.AUTH_TOKEN_COOKIE,
+                        true);
+                String modhash = manager.blockingGetAuthToken(account,
+                        AccountAuthenticator.AUTH_TOKEN_MODHASH,
+                        true);
+                NetApi.submit(subreddit, title, text, cookie, modhash);
+
+            } catch (OperationCanceledException e) {
+                Log.e(TAG, "doInBackground", e);
+            } catch (AuthenticatorException e) {
+                Log.e(TAG, "doInBackground", e);
+            } catch (IOException e) {
+                Log.e(TAG, "doInBackground", e);
+            }
+
+            return null;
         }
     }
 }

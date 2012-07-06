@@ -33,6 +33,7 @@ public class Urls {
     private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
     private static final String BASE_LOGIN_URL = BASE_SSL_URL + "/api/login/";
     private static final String BASE_SEARCH_URL = BASE_URL + "/search.json?q=";
+    private static final String BASE_SUBMIT_URL = BASE_URL + "/api/submit/";
     private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
@@ -82,6 +83,21 @@ public class Urls {
 
     public static URL sidebarUrl(String name) {
         return newUrl(resetBuilder().append(BASE_SUBREDDIT_URL).append(name).append("/about.json"));
+    }
+
+    public static URL submitUrl() {
+        return newUrl(BASE_SUBMIT_URL);
+    }
+
+    public static String submitTextQuery(String modhash, String subreddit, String title, String text) {
+        StringBuilder b = resetBuilder();
+        b.append("kind=self");
+        b.append("&uh=").append(encode(modhash));
+        b.append("&sr=").append(encode(subreddit));
+        b.append("&title=").append(encode(title));
+        b.append("&text=").append(encode(text));
+        b.append("&api_type=json");
+        return b.toString();
     }
 
     public static URL subredditUrl(Subreddit sr, int filter, String more) {
