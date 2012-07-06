@@ -64,11 +64,7 @@ class DbHelper extends SQLiteOpenHelper {
                 + Votes.COLUMN_ACCOUNT + " TEXT DEFAULT '', "
                 + Votes.COLUMN_NAME + " TEXT NOT NULL, "
                 + Votes.COLUMN_VOTE + " INTEGER DEFAULT 0, "
-                + Votes.COLUMN_STATE + " INTEGER DEFAULT 0, "
-                + "UNIQUE (" + Votes.COLUMN_ACCOUNT + "," + Votes.COLUMN_NAME + "))");
-        db.execSQL("CREATE INDEX accountVotes " + "ON " + Votes.TABLE_NAME + " ("
-                + Votes.COLUMN_ACCOUNT + ", "
-                + Votes.COLUMN_NAME + " COLLATE NOCASE ASC)");
+                + Votes.COLUMN_STATE + " INTEGER DEFAULT 0)");
     }
 
     private void createSubredditsV2(SQLiteDatabase db) {
@@ -79,9 +75,6 @@ class DbHelper extends SQLiteOpenHelper {
                 + Subreddits.COLUMN_STATE + " INTEGER DEFAULT 0, "
                 + Subreddits.COLUMN_EXPIRATION + " INTEGER DEFAULT 0, "
                 + "UNIQUE (" + Subreddits.COLUMN_ACCOUNT + "," + Subreddits.COLUMN_NAME + "))");
-        db.execSQL("CREATE INDEX accountSubreddits " + "ON " + Subreddits.TABLE_NAME + " ("
-                + Subreddits.COLUMN_ACCOUNT + ", "
-                + Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC)");
     }
 
     private void createSubredditsV1(SQLiteDatabase db) {
