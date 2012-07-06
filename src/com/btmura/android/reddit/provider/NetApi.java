@@ -29,6 +29,8 @@ import java.util.Scanner;
 import javax.net.ssl.HttpsURLConnection;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.Log;
@@ -161,6 +163,20 @@ public class NetApi {
             writeFormData(conn, Urls.submitTextQuery(modhash, subreddit, title, text));
             in = conn.getInputStream();
             return SubmitParser.parse(in);
+        } finally {
+            close(in, conn);
+        }
+    }
+
+    public static Bitmap captcha(String id) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.captchaUrl(id);
+            conn = (HttpURLConnection) url.openConnection();
+
+            in = conn.getInputStream();
+            return BitmapFactory.decodeStream(in);
         } finally {
             close(in, conn);
         }

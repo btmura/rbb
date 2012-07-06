@@ -43,7 +43,7 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.SubmitResult;
-import com.btmura.android.reddit.fragment.MessageDialogFragment;
+import com.btmura.android.reddit.fragment.CaptchaDialogFragment;
 import com.btmura.android.reddit.provider.NetApi;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
@@ -175,7 +175,8 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
                         true);
                 SubmitResult result = NetApi.submit(subreddit, title, text, cookie, modhash);
                 if (result.captcha != null) {
-                    MessageDialogFragment.showMessage(getFragmentManager(), result.captcha);
+                    CaptchaDialogFragment cdf = CaptchaDialogFragment.newInstance(result.captcha);
+                    cdf.show(getFragmentManager(), CaptchaDialogFragment.TAG);
                 }
             } catch (OperationCanceledException e) {
                 Log.e(TAG, "doInBackground", e);
