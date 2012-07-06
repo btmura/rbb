@@ -33,18 +33,19 @@ public class RelativeTime {
         int resId;
         double value;
         if ((value = diff / YEAR_SECONDS) > 0) {
-            resId = value == 1 ? R.string.time_one_year : R.string.time_x_years;
+            resId = R.plurals.time_years;
         } else if ((value = diff / MONTH_SECONDS) > 0) {
-            resId = value == 1 ? R.string.time_one_month : R.string.time_x_months;
+            resId = R.plurals.time_months;
         } else if ((value = diff / DAY_SECONDS) > 0) {
-            resId = value == 1 ? R.string.time_one_day : R.string.time_x_days;
+            resId = R.plurals.time_days;
         } else if ((value = diff / HOUR_SECONDS) > 0) {
-            resId = value == 1 ? R.string.time_one_hour : R.string.time_x_hours;
+            resId = R.plurals.time_hours;
         } else if ((value = diff / MINUTE_SECONDS) > 0) {
-            resId = value == 1 ? R.string.time_one_minute : R.string.time_x_minutes;
+            resId = R.plurals.time_minutes;
         } else {
-            resId = (value = diff) == 1 ? R.string.time_one_second : R.string.time_x_seconds;
+            resId = R.plurals.time_seconds;
         }
-        return context.getString(resId, Math.round(value));
+        int quantity = (int) Math.round(value);
+        return context.getResources().getQuantityString(resId, quantity, quantity);
     }
 }

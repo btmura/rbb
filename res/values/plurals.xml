@@ -17,22 +17,42 @@
 <resources>
 
     <plurals name="subscribers">
-        <item quantity="zero">0 subscribers</item>
         <item quantity="one">1 subscriber</item>
         <item quantity="other">%1$d subscribers</item>
     </plurals>
+    <plurals name="time_seconds">
+        <item quantity="one">1 second</item>
+        <item quantity="other">%1$d seconds</item>
+    </plurals>
+    <plurals name="time_minutes">
+        <item quantity="one">1 minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <plurals name="time_hours">
+        <item quantity="one">1 hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+    <plurals name="time_days">
+        <item quantity="one">1 day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="time_months">
+        <item quantity="one">1 month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+    <plurals name="time_years">
+        <item quantity="one">1 year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
     <plurals name="votes_up">
-        <item quantity="zero">Upvoted 0 things.</item>
         <item quantity="one">Upvoted 1 thing.</item>
         <item quantity="other">Upvoted %1$d things.</item>
     </plurals>
     <plurals name="votes_rescind">
-        <item quantity="zero">Rescinded 0 votes.</item>
         <item quantity="one">Rescinded 1 vote.</item>
         <item quantity="other">Rescinded %1$d votes.</item>
     </plurals>
     <plurals name="votes_down">
-        <item quantity="zero">Downvoted 0 things.</item>
         <item quantity="one">Downvoted 1 thing.</item>
         <item quantity="other">Downvoted %1$d things.</item>
     </plurals>

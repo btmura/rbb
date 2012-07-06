@@ -104,20 +104,6 @@
     <string name="subreddit_x_added">%d subreddits added.</string>
     <string name="subreddit_x_deleted">%d subreddits deleted.</string>
 
-    <string name="time_one_second">1 second</string>
-    <string name="time_one_minute">1 minute</string>    
-    <string name="time_one_hour">1 hour</string>
-    <string name="time_one_day">1 day</string>
-    <string name="time_one_month">1 month</string>        
-    <string name="time_one_year">1 year</string>
-    
-    <string name="time_x_seconds">%1$d seconds</string>    
-    <string name="time_x_minutes">%1$d minutes</string>
-    <string name="time_x_hours">%1$d hours</string>    
-    <string name="time_x_days">%1$d days</string>
-    <string name="time_x_months">%1$d months</string>
-    <string name="time_x_years">%1$d years</string>
-    
     <string name="type_login">Type login</string>
     <string name="type_password">Type password</string>
     <string name="type_subreddit_name">Type subreddit name</string>
