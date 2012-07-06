@@ -48,6 +48,12 @@ public class CaptchaDialogFragment extends DialogFragment implements LoaderCallb
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NO_TITLE, android.R.style.Theme_Holo_Light_Dialog_MinWidth);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.captcha, container, false);
         captcha = (ImageView) v.findViewById(R.id.captcha);

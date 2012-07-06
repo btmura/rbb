@@ -63,6 +63,6 @@
     <include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        layout="@layout/add_button_bar" />
+        layout="@layout/ok_button_bar" />
 
 </LinearLayout>

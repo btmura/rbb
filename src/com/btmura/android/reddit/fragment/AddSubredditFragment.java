@@ -60,7 +60,7 @@ public class AddSubredditFragment extends DialogFragment implements
     private EditText nameField;
     private CheckBox addFrontPage;
     private Button cancel;
-    private Button add;
+    private Button ok;
 
     private View accountText;
 
@@ -106,8 +106,8 @@ public class AddSubredditFragment extends DialogFragment implements
         cancel = (Button) v.findViewById(R.id.cancel);
         cancel.setOnClickListener(this);
 
-        add = (Button) v.findViewById(R.id.add);
-        add.setOnClickListener(this);
+        ok = (Button) v.findViewById(R.id.ok);
+        ok.setOnClickListener(this);
 
         return v;
     }
@@ -153,7 +153,7 @@ public class AddSubredditFragment extends DialogFragment implements
     public void onClick(View v) {
         if (v == cancel) {
             handleCancel();
-        } else if (v == add) {
+        } else if (v == ok) {
             handleAdd();
         }
     }

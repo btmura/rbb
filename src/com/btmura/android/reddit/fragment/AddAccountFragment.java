@@ -69,7 +69,7 @@ public class AddAccountFragment extends Fragment implements
 
     private EditText login;
     private EditText password;
-    private Button add;
+    private Button ok;
     private Button cancel;
 
     public static AddAccountFragment newInstance() {
@@ -111,8 +111,8 @@ public class AddAccountFragment extends Fragment implements
         cancel = (Button) v.findViewById(R.id.cancel);
         cancel.setOnClickListener(this);
 
-        add = (Button) v.findViewById(R.id.add);
-        add.setOnClickListener(this);
+        ok = (Button) v.findViewById(R.id.ok);
+        ok.setOnClickListener(this);
 
         return v;
     }
@@ -128,7 +128,7 @@ public class AddAccountFragment extends Fragment implements
     public void onClick(View v) {
         if (v == cancel) {
             handleCancel();
-        } else if (v == add) {
+        } else if (v == ok) {
             handleAdd();
         }
     }
