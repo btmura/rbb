@@ -22,6 +22,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.util.JsonReader;
+import android.util.JsonToken;
 
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
@@ -116,6 +117,16 @@ class ThingParser extends JsonParser {
     @Override
     public void onDowns(JsonReader reader, int index) throws IOException {
         things.get(index).downs = reader.nextInt();
+    }
+
+    @Override
+    public void onLikes(JsonReader reader, int index) throws IOException {
+        if (reader.peek() == JsonToken.NULL) {
+            reader.skipValue();
+            things.get(index).likes = 0;
+        } else {
+            things.get(index).likes = reader.nextBoolean() ? 1 : -1;
+        }
     }
 
     @Override

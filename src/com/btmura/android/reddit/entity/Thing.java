@@ -48,6 +48,7 @@ public class Thing implements Parcelable {
     public int score;
     public int ups;
     public int downs;
+    public int likes;
     public CharSequence status;
     public String details;
     public String moreKey;

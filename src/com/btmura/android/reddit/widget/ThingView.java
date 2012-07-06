@@ -35,8 +35,11 @@ public class ThingView extends View {
     private static int MAX_DETAILS_WIDTH;
 
     private static TextPaint[] PAINTS;
+    private static final int NUM_PAINTS = 4;
     private static final int TITLE = 0;
     private static final int STATUS = 1;
+    private static final int STATUS_UPVOTE = 2;
+    private static final int STATUS_DOWNVOTE = 3;
 
     private int bodyWidth;
 
@@ -74,14 +77,18 @@ public class ThingView extends View {
 
             Theme t = context.getTheme();
             int[] styles = new int[] {
-                    R.style.ThingTitleText, R.style.ThingStatusText,
+                    R.style.ThingTitleText,
+                    R.style.ThingStatusText,
+                    R.style.ThingUpvoteStatusText,
+                    R.style.ThingDownvoteStatusText,
             };
             int[] attrs = new int[] {
-                    android.R.attr.textSize, android.R.attr.textColor,
+                    android.R.attr.textSize,
+                    android.R.attr.textColor,
             };
 
-            PAINTS = new TextPaint[2];
-            for (int i = 0; i < 2; i++) {
+            PAINTS = new TextPaint[NUM_PAINTS];
+            for (int i = 0; i < NUM_PAINTS; i++) {
                 TypedArray a = t.obtainStyledAttributes(styles[i], attrs);
                 PAINTS[i] = new TextPaint(Paint.ANTI_ALIAS_FLAG);
                 PAINTS[i].setTextSize(a.getDimensionPixelSize(0, 0) * FONT_SCALE);
@@ -172,9 +179,19 @@ public class ThingView extends View {
         detailsWidth = Math.max(0, detailsWidth);
 
         titleLayout = makeTitleLayout(titleWidth);
-        statusLayout = makeLayout(thing.status, statusWidth, Alignment.ALIGN_NORMAL);
+
+        int statusPaint;
+        if (thing.likes > 0) {
+            statusPaint = STATUS_UPVOTE;
+        } else if (thing.likes < 0) {
+            statusPaint = STATUS_DOWNVOTE;
+        } else {
+            statusPaint = STATUS;
+        }
+        statusLayout = makeLayout(statusPaint, thing.status, statusWidth, Alignment.ALIGN_NORMAL);
+
         if (detailsWidth > 0) {
-            detailsLayout = makeLayout(detailsText, detailsWidth, Alignment.ALIGN_OPPOSITE);
+            detailsLayout = makeLayout(STATUS, detailsText, detailsWidth, Alignment.ALIGN_OPPOSITE);
         } else {
             detailsLayout = null;
         }
@@ -204,9 +221,9 @@ public class ThingView extends View {
                 true);
     }
 
-    private static Layout makeLayout(CharSequence text, int width, Alignment alignment) {
-        BoringLayout.Metrics m = BoringLayout.isBoring(text, PAINTS[STATUS]);
-        return BoringLayout.make(text, PAINTS[STATUS], width, alignment, 1f, 0f, m, true,
+    private static Layout makeLayout(int paint, CharSequence text, int width, Alignment alignment) {
+        BoringLayout.Metrics m = BoringLayout.isBoring(text, PAINTS[paint]);
+        return BoringLayout.make(text, PAINTS[paint], width, alignment, 1f, 0f, m, true,
                 TruncateAt.END, width);
     }
 

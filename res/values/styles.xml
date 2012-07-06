@@ -49,6 +49,14 @@
     <style name="ThingTitleText" parent="@style/SubredditTitleText" />
 
     <style name="ThingStatusText" parent="@style/SubredditStatusText" />
+    
+    <style name="ThingUpvoteStatusText" parent="@style/ThingStatusText">
+        <item name="android:textColor">@android:color/holo_orange_dark</item>
+    </style>
+    
+    <style name="ThingDownvoteStatusText" parent="@style/ThingStatusText">
+        <item name="android:textColor">@android:color/holo_blue_dark</item>
+    </style>
 
     <style name="CommentTitleText" parent="@android:style/TextAppearance.Holo.Medium">
         <item name="android:textSize">18sp</item>
