@@ -17,13 +17,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_upvote"
+        android:id="@+id/menu_vote_up"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_upvote"/>
+        android:title="@string/menu_vote_up"/>
     <item
-        android:id="@+id/menu_downvote"
+        android:id="@+id/menu_vote_rescind"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_downvote"/>
-
+        android:title="@string/menu_vote_rescind"/>
+    <item
+        android:id="@+id/menu_vote_down"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_vote_down"/>
 
 </menu>

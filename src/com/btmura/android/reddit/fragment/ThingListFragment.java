@@ -235,11 +235,15 @@ public class ThingListFragment extends ListFragment implements
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_upvote:
+            case R.id.menu_vote_up:
                 handleVote(mode, Votes.VOTE_UP);
                 return true;
 
-            case R.id.menu_downvote:
+            case R.id.menu_vote_rescind:
+                handleVote(mode, Votes.VOTE_RESCIND);
+                return true;
+
+            case R.id.menu_vote_down:
                 handleVote(mode, Votes.VOTE_DOWN);
                 return true;
 
@@ -259,9 +263,6 @@ public class ThingListFragment extends ListFragment implements
         int i, j;
         for (i = 0, j = 0; i < count; i++) {
             if (positions.get(i)) {
-                if (DEBUG) {
-                    Log.d(TAG, "n:" + adapter.getItem(i).name);
-                }
                 names[j++] = adapter.getItem(i).name;
             }
         }

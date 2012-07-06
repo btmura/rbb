@@ -71,6 +71,7 @@ public class VoteProvider extends BaseProvider {
         public static final String COLUMN_STATE = "state";
 
         public static final int VOTE_UP = 1;
+        public static final int VOTE_RESCIND = 0;
         public static final int VOTE_DOWN = -1;
     }
 
@@ -199,7 +200,24 @@ public class VoteProvider extends BaseProvider {
             @Override
             protected void onPostExecute(Integer count) {
                 super.onPostExecute(count);
-                int resId = vote == Votes.VOTE_UP ? R.plurals.upvotes : R.plurals.downvotes;
+                int resId;
+                switch (vote) {
+                    case Votes.VOTE_UP:
+                        resId = R.plurals.votes_up;
+                        break;
+
+                    case Votes.VOTE_RESCIND:
+                        resId = R.plurals.votes_rescind;
+                        break;
+
+                    case Votes.VOTE_DOWN:
+                        resId = R.plurals.votes_down;
+                        break;
+
+                    default:
+                        throw new IllegalStateException();
+
+                }
                 String text = context.getResources().getQuantityString(resId, count, count);
                 Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
             }

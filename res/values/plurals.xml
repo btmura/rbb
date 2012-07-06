@@ -16,17 +16,17 @@
 -->
 <resources>
 
-    <plurals name="upvotes">
+    <plurals name="votes_up">
         <item quantity="zero">Upvoted 0 things.</item>
         <item quantity="one">Upvoted 1 thing.</item>
         <item quantity="other">Upvoted %1$d things.</item>
     </plurals>
-    <plurals name="rescindvotes">
+    <plurals name="votes_rescind">
         <item quantity="zero">Rescinded 0 votes.</item>
         <item quantity="one">Rescinded 1 vote.</item>
         <item quantity="other">Rescinded %1$d votes.</item>
     </plurals>
-    <plurals name="downvotes">
+    <plurals name="votes_down">
         <item quantity="zero">Downvoted 0 things.</item>
         <item quantity="one">Downvoted 1 thing.</item>
         <item quantity="other">Downvoted %1$d things.</item>
