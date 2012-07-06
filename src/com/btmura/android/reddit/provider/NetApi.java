@@ -24,13 +24,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.JsonReader;
+import android.util.Log;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.entity.LoginResult;
@@ -38,6 +41,9 @@ import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 
 public class NetApi {
+
+    public static final String TAG = "NetApi";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final String CHARSET = "UTF-8";
     private static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset="
@@ -159,7 +165,7 @@ public class NetApi {
         }
     }
 
-    public static void vote(Context context, String id, int vote, String cookie,
+    public static void vote(Context context, String name, int vote, String cookie,
             String modhash) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
@@ -167,10 +173,14 @@ public class NetApi {
             URL url = Urls.voteUrl();
             conn = (HttpURLConnection) url.openConnection();
             setCommonHeaders(conn, cookie);
+            setFormDataHeaders(conn);
             conn.connect();
 
-            writeFormData(conn, Urls.voteQuery(modhash, id, vote));
+            writeFormData(conn, Urls.voteQuery(modhash, name, vote));
             in = conn.getInputStream();
+            if (DEBUG) {
+                logResponse(in);
+            }
 
         } finally {
             close(in, conn);
@@ -201,6 +211,14 @@ public class NetApi {
                 output.close();
             }
         }
+    }
+
+    private static void logResponse(InputStream in) {
+        Scanner sc = new Scanner(in);
+        while (sc.hasNextLine()) {
+            Log.d(TAG, sc.nextLine());
+        }
+        sc.close();
     }
 
     private static void close(InputStream in, HttpURLConnection conn) throws IOException {

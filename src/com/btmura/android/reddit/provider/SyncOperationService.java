@@ -46,6 +46,13 @@ public class SyncOperationService extends IntentService {
             Subreddits.COLUMN_STATE,
     };
 
+    private static final String[] VOTES_PROJECTION = {
+            Votes.COLUMN_ACCOUNT,
+            Votes.COLUMN_NAME,
+            Votes.COLUMN_VOTE,
+            Votes.COLUMN_STATE,
+    };
+
     private static final int EXPIRATION_PADDING = 5 * 60 * 1000; // 5 minutes
 
     public SyncOperationService() {
@@ -104,11 +111,11 @@ public class SyncOperationService extends IntentService {
                 }
             }
         } catch (OperationCanceledException e) {
-            Log.e(TAG, "onHandleIntent", e);
+            Log.e(TAG, "syncSubredditOp", e);
         } catch (AuthenticatorException e) {
-            Log.e(TAG, "onHandleIntent", e);
+            Log.e(TAG, "syncSubredditOp", e);
         } catch (IOException e) {
-            Log.e(TAG, "onHandleIntent", e);
+            Log.e(TAG, "syncSubredditOp", e);
         } finally {
             c.close();
         }
@@ -117,6 +124,44 @@ public class SyncOperationService extends IntentService {
     private void syncVoteOp(Intent intent) {
         if (DEBUG) {
             Log.d(TAG, "syncVoteOp i:" + intent.getDataString());
+        }
+
+        ContentResolver cr = getContentResolver();
+        Cursor c = cr.query(intent.getData(), VOTES_PROJECTION, null, null, null);
+        try {
+            if (c.moveToNext()) {
+                String accountName = c.getString(0);
+                String thingName = c.getString(1);
+                int vote = c.getInt(2);
+
+                AccountManager manager = AccountManager.get(this);
+                Account account = new Account(accountName, getString(R.string.account_type));
+                String cookie = manager.blockingGetAuthToken(account,
+                        AccountAuthenticator.AUTH_TOKEN_COOKIE,
+                        true);
+                String modhash = manager.blockingGetAuthToken(account,
+                        AccountAuthenticator.AUTH_TOKEN_MODHASH,
+                        true);
+
+                NetApi.vote(getApplicationContext(), thingName, vote, cookie, modhash);
+
+                int count = cr.delete(intent.getData(), null, null);
+                if (DEBUG && count == 0) {
+                    Log.d(TAG, "Row not deleted: " + intent.getDataString());
+                }
+
+            } else if (DEBUG) {
+                Log.d(TAG, "Missing row: " + intent.getDataString());
+            }
+
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, "syncVoteOp", e);
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, "syncVoteOp", e);
+        } catch (IOException e) {
+            Log.e(TAG, "syncVoteOp", e);
+        } finally {
+            c.close();
         }
     }
 }
