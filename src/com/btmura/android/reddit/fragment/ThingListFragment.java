@@ -263,10 +263,13 @@ public class ThingListFragment extends ListFragment implements
         int i, j;
         for (i = 0, j = 0; i < count; i++) {
             if (positions.get(i)) {
-                names[j++] = adapter.getItem(i).name;
+                Thing t = adapter.getItem(i);
+                names[j++] = t.name;
+                t.likes = vote;
             }
         }
         VoteProvider.insertMultipleVotesInBackground(getActivity(), accountName, names, vote);
+        adapter.notifyDataSetChanged();
         mode.finish();
     }
 
