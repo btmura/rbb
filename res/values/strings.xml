@@ -82,9 +82,7 @@
     <string name="remove">Remove</string>
 
     <string name="show_password">Show password</string>
-    
-    <string name="sr_status">%1$d subscribers</string>
-    
+
     <string name="submit_link_label">Submit link</string>
     <string name="submit_link_subreddit">Subreddit</string>
     <string name="submit_link_title">Title</string>

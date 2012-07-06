@@ -72,7 +72,8 @@ public class Subreddit implements Parcelable, Comparable<Subreddit> {
 
     public Subreddit assureFormat(Context c) {
         if (status == null) {
-            status = c.getString(R.string.sr_status, subscribers);
+            status = c.getResources().getQuantityString(R.plurals.subscribers, subscribers,
+                    subscribers);
         }
         return this;
     }

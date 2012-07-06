@@ -16,6 +16,11 @@
 -->
 <resources>
 
+    <plurals name="subscribers">
+        <item quantity="zero">0 subscribers</item>
+        <item quantity="one">1 subscriber</item>
+        <item quantity="other">%1$d subscribers</item>
+    </plurals>
     <plurals name="votes_up">
         <item quantity="zero">Upvoted 0 things.</item>
         <item quantity="one">Upvoted 1 thing.</item>
