@@ -16,15 +16,11 @@
 
 package com.btmura.android.reddit.fragment;
 
-import java.io.IOException;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +28,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.provider.NetApi;
+import com.btmura.android.reddit.content.CaptchaLoader;
 
-public class CaptchaDialogFragment extends DialogFragment {
+public class CaptchaDialogFragment extends DialogFragment implements LoaderCallbacks<Bitmap> {
 
     public static final String TAG = "CaptchaDialogFragment";
 
@@ -62,29 +58,18 @@ public class CaptchaDialogFragment extends DialogFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState == null) {
-            new LoadCaptchaImageTask().execute();
-        }
+        getLoaderManager().initLoader(0, null, this);
     }
 
-    class LoadCaptchaImageTask extends AsyncTask<Void, Void, Bitmap> {
-        @Override
-        protected Bitmap doInBackground(Void... params) {
-            String id = getArguments().getString(ARG_CAPTCHA_ID);
-            try {
-                return NetApi.captcha(id);
-            } catch (IOException e) {
-                Log.e(TAG, "LoadCaptchaImageTask", e);
-                return null;
-            }
-        }
+    public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
+        return new CaptchaLoader(getActivity(), getArguments().getString(ARG_CAPTCHA_ID));
+    }
 
-        @Override
-        protected void onPostExecute(Bitmap result) {
-            super.onPostExecute(result);
-            if (result != null) {
-                captcha.setImageBitmap(result);
-            }
-        }
+    public void onLoadFinished(Loader<Bitmap> loader, Bitmap result) {
+        captcha.setImageBitmap(result);
+    }
+
+    public void onLoaderReset(Loader<Bitmap> loader) {
+        captcha.setImageBitmap(null);
     }
 }
