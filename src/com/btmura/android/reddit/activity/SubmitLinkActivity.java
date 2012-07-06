@@ -18,18 +18,34 @@ package com.btmura.android.reddit.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
-public class SubmitLinkActivity extends Activity {
+public class SubmitLinkActivity extends Activity implements LoaderCallbacks<AccountResult> {
+
+    private AccountSpinnerAdapter adapter;
+
+    private EditText subreddit;
+    private EditText title;
+    private EditText text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.submit_link);
         setupActionBar();
+        setupAccountSpinner();
+        setupViews();
     }
 
     private void setupActionBar() {
@@ -37,10 +53,62 @@ public class SubmitLinkActivity extends Activity {
         bar.setDisplayHomeAsUpEnabled(true);
     }
 
+    private void setupAccountSpinner() {
+        adapter = new AccountSpinnerAdapter(this, false);
+        Spinner accountSpinner = (Spinner) findViewById(R.id.account_spinner);
+        accountSpinner.setAdapter(adapter);
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    private void setupViews() {
+        subreddit = (EditText) findViewById(R.id.subreddit);
+        title = (EditText) findViewById(R.id.title);
+        text = (EditText) findViewById(R.id.text);
+    }
+
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(this);
+    }
+
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        adapter.setAccountNames(result.accountNames);
+    }
+
+    public void onLoaderReset(Loader<AccountResult> loader) {
+        adapter.setAccountNames(null);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.submit_link_menu, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_submit:
+                handleSubmit();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void handleSubmit() {
+        if (subreddit.getText().length() <= 0) {
+            subreddit.setError(getString(R.string.error_blank_field));
+            return;
+        }
+        if (title.getText().length() <= 0) {
+            title.setError(getString(R.string.error_blank_field));
+            return;
+        }
+        if (text.getText().length() <= 0) {
+            text.setError(getString(R.string.error_blank_field));
+            return;
+        }
     }
 }

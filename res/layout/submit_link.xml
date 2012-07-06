@@ -29,6 +29,7 @@
         android:layout_marginBottom="@dimen/element_padding" />
 
     <EditText
+        android:id="@+id/subreddit"
         android:layout_gravity="fill_horizontal"
         android:layout_marginBottom="@dimen/element_padding"
         android:hint="@string/submit_link_subreddit"
@@ -37,6 +38,7 @@
         android:singleLine="true" />
 
     <EditText
+        android:id="@+id/title"
         android:layout_gravity="fill_horizontal"
         android:layout_marginBottom="@dimen/element_padding"
         android:hint="@string/submit_link_title"
@@ -45,6 +47,7 @@
         android:singleLine="true" />
 
     <EditText
+        android:id="@+id/text"
         android:layout_gravity="fill_horizontal"
         android:layout_marginBottom="@dimen/element_padding"
         android:hint="@string/submit_link_text"
