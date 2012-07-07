@@ -149,8 +149,9 @@ public class NetApi {
         }
     }
 
-    public static SubmitResult submit(String subreddit, String title, String text, String cookie,
-            String modhash) throws IOException {
+    public static SubmitResult submit(String subreddit, String title, String text,
+            String captchaId, String captchaGuess, String cookie, String modhash)
+            throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
@@ -160,7 +161,8 @@ public class NetApi {
             setFormDataHeaders(conn);
             conn.connect();
 
-            writeFormData(conn, Urls.submitTextQuery(modhash, subreddit, title, text));
+            writeFormData(conn,
+                    Urls.submitTextQuery(modhash, subreddit, title, text, captchaId, captchaGuess));
             in = conn.getInputStream();
             return SubmitParser.parse(in);
         } finally {

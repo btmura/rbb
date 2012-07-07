@@ -46,13 +46,13 @@ public class CaptchaDialogFragment extends DialogFragment implements LoaderCallb
 
     private static final String ARG_CAPTCHA_ID = "ci";
 
-    public interface CaptchaListener {
+    public interface OnCaptchaGuessListener {
         void onCaptchaGuess(String id, String guess);
 
         void onCaptchaCancelled();
     }
 
-    private CaptchaListener listener;
+    private OnCaptchaGuessListener listener;
     private ImageView captcha;
     private EditText guess;
     private Button cancel;
@@ -75,8 +75,8 @@ public class CaptchaDialogFragment extends DialogFragment implements LoaderCallb
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof CaptchaListener) {
-            listener = (CaptchaListener) activity;
+        if (activity instanceof OnCaptchaGuessListener) {
+            listener = (OnCaptchaGuessListener) activity;
         }
     }
 
@@ -134,6 +134,7 @@ public class CaptchaDialogFragment extends DialogFragment implements LoaderCallb
             guess.setError(getString(R.string.error_blank_field));
             return;
         }
+        dismiss();
         if (listener != null) {
             listener.onCaptchaGuess(getCaptchaId(), guess.getText().toString());
         }

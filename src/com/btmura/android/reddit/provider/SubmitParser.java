@@ -22,25 +22,16 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import android.util.JsonReader;
+import android.util.Log;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.entity.SubmitResult;
 
 class SubmitParser {
 
-    /**
-     * Example:
-     *
-     * {
-     *   "json":
-     *   {
-     *      "captcha": "D5GggaXa0GWshObkjzzEPzzrK8zpQfeB",
-     *      "errors":
-     *      [
-     *        ["BAD_CAPTCHA", "care to try these again?", "captcha"]
-     *      ]
-     *   }
-     * }
-     */
+    public static final String TAG = "SubmitParser";
+    public static final boolean DEBUG = Debug.DEBUG;
+
     static SubmitResult parse(InputStream in) throws IOException {
         SubmitResult result = new SubmitResult();
         JsonReader reader = new JsonReader(new InputStreamReader(in));
@@ -50,6 +41,9 @@ class SubmitParser {
             if ("json".equals(name)) {
                 parseJson(reader, result);
             } else {
+                if (DEBUG) {
+                    Log.d(TAG, name);
+                }
                 reader.skipValue();
             }
         }
@@ -64,17 +58,42 @@ class SubmitParser {
             String name = reader.nextName();
             if ("captcha".equals(name)) {
                 parseCaptcha(reader, result);
+            } else if ("data".equals(name)) {
+                parseData(reader, result);
             } else if ("errors".equals(name)) {
                 parseErrors(reader, result);
             } else {
+                if (DEBUG) {
+                    Log.d(TAG, name);
+                }
                 reader.skipValue();
             }
         }
         reader.endObject();
     }
 
+    // {"json": {"captcha": "D5GggaXa0GWshObkjzzEPzzrK8zpQfeB", "errors":
+    // [["BAD_CAPTCHA", "care to try these again?", "captcha"]]}}
     private static void parseCaptcha(JsonReader reader, SubmitResult result) throws IOException {
         result.captcha = reader.nextString();
+    }
+
+    // {"json": {"errors": [], "data": {"url":
+    // "http://www.reddit.com/r/rbb/comments/w5mhh/test/", "id": "w5mhh",
+    // "name": "t3_w5mhh"}}}
+    private static void parseData(JsonReader reader, SubmitResult result) throws IOException {
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if ("url".equals(name)) {
+                result.url = reader.nextString();
+            } else if ("name".equals(name)) {
+                result.fullName = reader.nextString();
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
     }
 
     private static void parseErrors(JsonReader reader, SubmitResult result) throws IOException {

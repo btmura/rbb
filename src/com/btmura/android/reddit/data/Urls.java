@@ -94,13 +94,20 @@ public class Urls {
         return newUrl(BASE_SUBMIT_URL);
     }
 
-    public static String submitTextQuery(String modhash, String subreddit, String title, String text) {
+    public static String submitTextQuery(String modhash, String subreddit, String title,
+            String text, String captchaId, String captchaGuess) {
         StringBuilder b = resetBuilder();
         b.append("kind=self");
         b.append("&uh=").append(encode(modhash));
         b.append("&sr=").append(encode(subreddit));
         b.append("&title=").append(encode(title));
         b.append("&text=").append(encode(text));
+        if (captchaId != null) {
+            b.append("&iden=").append(encode(captchaId));
+        }
+        if (captchaGuess != null) {
+            b.append("&captcha=").append(encode(captchaGuess));
+        }
         b.append("&api_type=json");
         return b.toString();
     }

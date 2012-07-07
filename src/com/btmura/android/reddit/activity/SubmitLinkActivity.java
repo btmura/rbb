@@ -36,6 +36,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
@@ -44,11 +45,12 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.SubmitResult;
 import com.btmura.android.reddit.fragment.CaptchaDialogFragment;
+import com.btmura.android.reddit.fragment.CaptchaDialogFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.provider.NetApi;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
 public class SubmitLinkActivity extends Activity implements LoaderCallbacks<AccountResult>,
-        OnItemSelectedListener {
+        OnItemSelectedListener, OnCaptchaGuessListener {
 
     public static final String TAG = "SubmitLinkActivity";
     public static final boolean DEBUG = Debug.DEBUG;
@@ -120,7 +122,7 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_submit:
-                handleSubmit();
+                handleSubmit(null, null);
                 return true;
 
             default:
@@ -128,7 +130,7 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
         }
     }
 
-    private void handleSubmit() {
+    private void handleSubmit(String captchaId, String captchaGuess) {
         if (subreddit.getText().length() <= 0) {
             subreddit.setError(getString(R.string.error_blank_field));
             return;
@@ -145,25 +147,32 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
         new SubmitTask(adapter.getAccountName(),
                 subreddit.getText().toString(),
                 title.getText().toString(),
-                text.getText().toString()).execute();
+                text.getText().toString(),
+                captchaId,
+                captchaGuess).execute();
     }
 
-    class SubmitTask extends AsyncTask<Void, Void, Void> {
+    class SubmitTask extends AsyncTask<Void, Void, SubmitResult> {
 
         private final String accountName;
         private final String subreddit;
         private final String title;
         private final String text;
+        private final String captchaId;
+        private final String captchaGuess;
 
-        SubmitTask(String accountName, String subreddit, String title, String text) {
+        SubmitTask(String accountName, String subreddit, String title, String text,
+                String captchaId, String captchaGuess) {
             this.accountName = accountName;
             this.subreddit = subreddit;
             this.title = title;
             this.text = text;
+            this.captchaId = captchaId;
+            this.captchaGuess = captchaGuess;
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected SubmitResult doInBackground(Void... params) {
             try {
                 AccountManager manager = AccountManager.get(SubmitLinkActivity.this);
                 Account account = new Account(accountName, getString(R.string.account_type));
@@ -173,11 +182,8 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
                 String modhash = manager.blockingGetAuthToken(account,
                         AccountAuthenticator.AUTH_TOKEN_MODHASH,
                         true);
-                SubmitResult result = NetApi.submit(subreddit, title, text, cookie, modhash);
-                if (result.captcha != null) {
-                    CaptchaDialogFragment cdf = CaptchaDialogFragment.newInstance(result.captcha);
-                    cdf.show(getFragmentManager(), CaptchaDialogFragment.TAG);
-                }
+                return NetApi.submit(subreddit, title, text, captchaId, captchaGuess, cookie,
+                        modhash);
             } catch (OperationCanceledException e) {
                 Log.e(TAG, "doInBackground", e);
             } catch (AuthenticatorException e) {
@@ -188,5 +194,25 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
 
             return null;
         }
+
+        @Override
+        protected void onPostExecute(SubmitResult result) {
+            super.onPostExecute(result);
+            if (result != null) {
+                if (result.captcha != null) {
+                    CaptchaDialogFragment cdf = CaptchaDialogFragment.newInstance(result.captcha);
+                    cdf.show(getFragmentManager(), CaptchaDialogFragment.TAG);
+                } else if (result.url != null) {
+                    Toast.makeText(getApplicationContext(), result.url, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    public void onCaptchaGuess(String id, String guess) {
+        handleSubmit(id, guess);
+    }
+
+    public void onCaptchaCancelled() {
     }
 }

@@ -21,4 +21,6 @@ import java.util.List;
 public class SubmitResult {
     public String captcha;
     public List<String[]> errors;
+    public String url;
+    public String fullName;
 }
