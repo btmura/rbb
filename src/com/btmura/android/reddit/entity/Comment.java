@@ -62,6 +62,6 @@ public class Comment {
         String rt = RelativeTime.format(c, now, createdUtc);
         String comments = c.getResources().getQuantityString(R.plurals.comments, numComments,
                 numComments);
-        return c.getString(resId, author, rt, ups - downs, comments);
+        return c.getString(resId, author, rt, comments);
     }
 }
