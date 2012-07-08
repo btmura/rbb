@@ -16,28 +16,19 @@
 
 package com.btmura.android.reddit.provider;
 
-import java.util.ArrayList;
-
-import com.btmura.android.reddit.Debug;
-import com.btmura.android.reddit.R;
-
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.RemoteException;
 import android.provider.BaseColumns;
-import android.util.Log;
-import android.widget.Toast;
+
+import com.btmura.android.reddit.Debug;
 
 public class VoteProvider extends BaseProvider {
 
@@ -160,66 +151,25 @@ public class VoteProvider extends BaseProvider {
         }
     }
 
-    public static void insertMultipleVotesInBackground(final Context context,
-            final String accountName, final String[] names, final int vote) {
-        new AsyncTask<Void, Void, Integer>() {
+    public static void insertVoteInBackground(final Context context,
+            final String accountName, final String name, final int vote) {
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            protected Integer doInBackground(Void... params) {
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(names.length);
-                for (int i = 0; i < names.length; i++) {
-                    if (DEBUG) {
-                        Log.d(TAG, "n:" + names[i]);
-                    }
-                    ops.add(ContentProviderOperation.newInsert(Votes.CONTENT_URI)
-                            .withValue(Votes.COLUMN_ACCOUNT, accountName)
-                            .withValue(Votes.COLUMN_NAME, names[i])
-                            .withValue(Votes.COLUMN_VOTE, vote)
-                            .withValue(Votes.COLUMN_STATE, Votes.STATE_INSERTING)
-                            .build());
-                }
+            protected Void doInBackground(Void... params) {
+                ContentValues values = new ContentValues(4);
+                values.put(Votes.COLUMN_ACCOUNT, accountName);
+                values.put(Votes.COLUMN_NAME, name);
+                values.put(Votes.COLUMN_VOTE, vote);
+                values.put(Votes.COLUMN_STATE, Votes.STATE_INSERTING);
 
                 ContentResolver cr = context.getContentResolver();
-                try {
-                    ContentProviderResult[] results = cr.applyBatch(VoteProvider.AUTHORITY, ops);
-                    for (int i = 0; i < results.length; i++) {
-                        Intent intent = new Intent(context, SyncOperationService.class);
-                        intent.setData(results[i].uri);
-                        context.startService(intent);
-                    }
-                    return results.length;
-                } catch (RemoteException e) {
-                    Log.e(TAG, "insertMultipleVotesInBackground", e);
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, "insertMultipleVotesInBackground", e);
+                Uri uri = cr.insert(Votes.CONTENT_URI, values);
+                if (uri != null) {
+                    Intent intent = new Intent(context, SyncOperationService.class);
+                    intent.setData(uri);
+                    context.startService(intent);
                 }
-
-                return 0;
-            }
-
-            @Override
-            protected void onPostExecute(Integer count) {
-                super.onPostExecute(count);
-                int resId;
-                switch (vote) {
-                    case Votes.VOTE_UP:
-                        resId = R.plurals.votes_up;
-                        break;
-
-                    case Votes.VOTE_RESCIND:
-                        resId = R.plurals.votes_rescind;
-                        break;
-
-                    case Votes.VOTE_DOWN:
-                        resId = R.plurals.votes_down;
-                        break;
-
-                    default:
-                        throw new IllegalStateException();
-
-                }
-                String text = context.getResources().getQuantityString(resId, count, count);
-                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+                return null;
             }
         }.execute();
     }

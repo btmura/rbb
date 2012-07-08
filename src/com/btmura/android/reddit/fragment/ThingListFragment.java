@@ -25,18 +25,12 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
-import android.util.SparseBooleanArray;
-import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
@@ -49,13 +43,13 @@ import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.provider.VoteProvider;
-import com.btmura.android.reddit.provider.VoteProvider.Votes;
 import com.btmura.android.reddit.widget.ThingAdapter;
+import com.btmura.android.reddit.widget.ThingView.ThingViewListener;
 
 public class ThingListFragment extends ListFragment implements
         LoaderCallbacks<List<Thing>>,
         OnScrollListener,
-        MultiChoiceModeListener {
+        ThingViewListener {
 
     public static final String TAG = "ThingListFragment";
     public static final boolean DEBUG = Debug.DEBUG;
@@ -120,17 +114,8 @@ public class ThingListFragment extends ListFragment implements
 
         adapter = new ThingAdapter(getActivity(), isSingleChoice());
         adapter.setSelectedThing(b.getString(STATE_THING_NAME), b.getInt(STATE_THING_POSITION, -1));
+        adapter.setThingViewListener(this);
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        ListView list = (ListView) view.findViewById(android.R.id.list);
-        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        list.setMultiChoiceModeListener(this);
-        list.setOnScrollListener(this);
-        return view;
     }
 
     @Override
@@ -216,61 +201,10 @@ public class ThingListFragment extends ListFragment implements
         }
     }
 
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        if (!TextUtils.isEmpty(accountName)) {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.thing_action_menu, menu);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        return false;
-    }
-
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-    }
-
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_vote_up:
-                handleVote(mode, Votes.VOTE_UP);
-                return true;
-
-            case R.id.menu_vote_rescind:
-                handleVote(mode, Votes.VOTE_RESCIND);
-                return true;
-
-            case R.id.menu_vote_down:
-                handleVote(mode, Votes.VOTE_DOWN);
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    public void onDestroyActionMode(ActionMode mode) {
-    }
-
-    private void handleVote(ActionMode mode, int vote) {
-        int checked = getListView().getCheckedItemCount();
-        String[] names = new String[checked];
-        SparseBooleanArray positions = getListView().getCheckedItemPositions();
-        int count = adapter.getCount();
-        int i, j;
-        for (i = 0, j = 0; i < count; i++) {
-            if (positions.get(i)) {
-                Thing t = adapter.getItem(i);
-                names[j++] = t.name;
-                t.likes = vote;
-            }
-        }
-        VoteProvider.insertMultipleVotesInBackground(getActivity(), accountName, names, vote);
+    public void onVoteClick(Thing thing, int vote) {
+        thing.likes = vote;
+        VoteProvider.insertVoteInBackground(getActivity(), accountName, thing.name, vote);
         adapter.notifyDataSetChanged();
-        mode.finish();
     }
 
     @Override
@@ -298,11 +232,6 @@ public class ThingListFragment extends ListFragment implements
         inflater.inflate(R.menu.thing_list_menu, menu);
         menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(
                 subreddit != null && !subreddit.isFrontPage());
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
     }
 
     @Override

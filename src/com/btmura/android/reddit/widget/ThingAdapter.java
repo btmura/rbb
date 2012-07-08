@@ -27,6 +27,7 @@ import android.widget.BaseAdapter;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.widget.ThingView.ThingViewListener;
 
 public class ThingAdapter extends BaseAdapter {
 
@@ -39,11 +40,16 @@ public class ThingAdapter extends BaseAdapter {
     private String selectedName;
     private int selectedPosition;
     private int bodyWidth;
+    private ThingViewListener listener;
 
     public ThingAdapter(Context context, boolean singleChoice) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.singleChoice = singleChoice;
+    }
+
+    public void setThingViewListener(ThingViewListener listener) {
+        this.listener = listener;
     }
 
     public void swapData(List<Thing> newItems) {
@@ -158,10 +164,12 @@ public class ThingAdapter extends BaseAdapter {
         v.setBackgroundResource(resId);
         v.setBodyWidth(bodyWidth);
         v.setThing(t);
+        v.setThingViewListener(listener);
         if (t.thumbnail != null) {
             thumbnailLoader.setThumbnail(context, v, t.thumbnail);
         } else {
             thumbnailLoader.clearThumbnail(v);
         }
     }
+
 }

@@ -44,17 +44,5 @@
         <item quantity="one">1 year</item>
         <item quantity="other">%1$d years</item>
     </plurals>
-    <plurals name="votes_up">
-        <item quantity="one">Upvoted 1 thing.</item>
-        <item quantity="other">Upvoted %1$d things.</item>
-    </plurals>
-    <plurals name="votes_rescind">
-        <item quantity="one">Rescinded 1 vote.</item>
-        <item quantity="other">Rescinded %1$d votes.</item>
-    </plurals>
-    <plurals name="votes_down">
-        <item quantity="one">Downvoted 1 thing.</item>
-        <item quantity="other">Downvoted %1$d things.</item>
-    </plurals>
 
 </resources>

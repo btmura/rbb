@@ -73,8 +73,8 @@ public class ThingView extends View implements OnGestureListener {
     private static Path UPVOTE_PATH;
     private static Path DOWNVOTE_PATH;
 
-    public interface OnThingViewClickListener {
-        void onVoteArrowClick(int vote);
+    public interface ThingViewListener {
+        void onVoteClick(Thing thing, int vote);
     }
 
     private final GestureDetector detector;
@@ -91,7 +91,7 @@ public class ThingView extends View implements OnGestureListener {
     private Layout statusLayout;
     private Layout detailsLayout;
 
-    private OnThingViewClickListener listener;
+    private ThingViewListener listener;
 
     public ThingView(Context context) {
         this(context, null);
@@ -191,7 +191,7 @@ public class ThingView extends View implements OnGestureListener {
         }
     }
 
-    public void setOnThingViewClickListener(OnThingViewClickListener listener) {
+    public void setThingViewListener(ThingViewListener listener) {
         this.listener = listener;
     }
 
@@ -473,7 +473,7 @@ public class ThingView extends View implements OnGestureListener {
         }
         if (listener != null) {
             int vote = e.getY() < getVoteCenterY() ? Votes.VOTE_UP : Votes.VOTE_DOWN;
-            listener.onVoteArrowClick(vote);
+            listener.onVoteClick(thing, vote);
         }
         return true;
     }

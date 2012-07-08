@@ -75,9 +75,6 @@
     <string name="menu_submit_link">Submit link</string>    
     <string name="menu_view">View</string>
     <string name="menu_view_sidebar">View sidebar</string>    
-    <string name="menu_vote_down">Downvote</string>
-    <string name="menu_vote_rescind">Rescind vote</string>
-    <string name="menu_vote_up">Upvote</string>
 
     <string name="provider_subreddits">Subreddits</string>
     <string name="provider_votes">Votes</string>
