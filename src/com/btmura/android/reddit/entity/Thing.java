@@ -113,7 +113,7 @@ public class Thing implements Parcelable {
 
         String nsfw = over18 ? c.getString(R.string.thing_nsfw) : "";
         String rt = RelativeTime.format(c, now, createdUtc);
-        status = c.getString(resId, subreddit, author, rt, score, numComments, nsfw);
+        status = c.getString(resId, subreddit, author, rt, numComments, nsfw);
         if (!nsfw.isEmpty()) {
             SpannableStringBuilder b = new SpannableStringBuilder(status);
             b.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);

@@ -96,8 +96,8 @@
     
     <string name="thing_details">%1$d ups &#160; %2$d downs &#160; %3$s</string>
     <string name="thing_nsfw">NSFW&#160;&#160;</string>
-    <string name="thing_status">%6$s%2$s&#160; %3$s ago&#160; %4$d points&#160; %5$d comments</string>
-    <string name="thing_status_subreddit">%6$s%1$s&#160; %2$s&#160; %3$s ago&#160; %4$d points&#160; %5$d comments</string>
+    <string name="thing_status">%5$s%2$s&#160; %3$s ago&#160; %4$d comments</string>
+    <string name="thing_status_subreddit">%5$s%1$s&#160; %2$s&#160; %3$s ago&#160; %4$d comments</string>
 
     <string name="subreddit_one_added">%s subreddit added.</string>
     <string name="subreddit_one_deleted">%s subreddit deleted.</string>
