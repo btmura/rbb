@@ -20,6 +20,8 @@ import android.text.TextPaint;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,7 +31,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.provider.VoteProvider.Votes;
 
-public class ThingView extends View {
+public class ThingView extends View implements OnGestureListener {
 
     public static final String TAG = "ThingView";
     public static final boolean DEBUG = Debug.DEBUG;
@@ -71,6 +73,11 @@ public class ThingView extends View {
     private static Path UPVOTE_PATH;
     private static Path DOWNVOTE_PATH;
 
+    public interface OnThingViewClickListener {
+        void onVoteArrowClick(int vote);
+    }
+
+    private final GestureDetector detector;
     private final Rect thumbSrc = new Rect();
     private final RectF thumbDst = new RectF();
     private final RectF bubbleRect = new RectF();
@@ -84,6 +91,8 @@ public class ThingView extends View {
     private Layout statusLayout;
     private Layout detailsLayout;
 
+    private OnThingViewClickListener listener;
+
     public ThingView(Context context) {
         this(context, null);
     }
@@ -94,6 +103,7 @@ public class ThingView extends View {
 
     public ThingView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        detector = new GestureDetector(context, this);
         init(context);
     }
 
@@ -181,6 +191,10 @@ public class ThingView extends View {
         }
     }
 
+    public void setOnThingViewClickListener(OnThingViewClickListener listener) {
+        this.listener = listener;
+    }
+
     public void setBodyWidth(int bodyWidth) {
         if (this.bodyWidth != bodyWidth) {
             this.bodyWidth = bodyWidth;
@@ -202,7 +216,7 @@ public class ThingView extends View {
                 this.thumbSrc.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
                 this.thumbDst.set(0, 0, bitmap.getWidth() * DENSITY, bitmap.getHeight() * DENSITY);
             }
-            requestLayout();
+            invalidate();
         }
     }
 
@@ -256,8 +270,7 @@ public class ThingView extends View {
         }
 
         int statusWidth = measuredWidth - PADDING * 2;
-        boolean hasThumbnail = thing.hasThumbnail();
-        if (hasThumbnail) {
+        if (thing.thumbnail != null) {
             titleWidth -= THUMB_WIDTH + PADDING;
             statusWidth -= THUMB_WIDTH + PADDING;
             scoreWidth = THUMB_WIDTH;
@@ -293,7 +306,7 @@ public class ThingView extends View {
         }
 
         int leftHeight = (ARROW_TOTAL_HEIGHT + ARROW_SPACING) * 2;
-        if (hasThumbnail) {
+        if (thing.thumbnail != null) {
             leftHeight += THUMB_HEIGHT;
         } else {
             leftHeight += scoreLayout.getHeight();
@@ -335,7 +348,7 @@ public class ThingView extends View {
         canvas.translate(PADDING, PADDING);
 
         int arrowX = -ARROW_TOTAL_WIDTH / 2;
-        boolean hasThumbnail = thing.hasThumbnail();
+        boolean hasThumbnail = thing.thumbnail != null;
         if (hasThumbnail) {
             arrowX += THUMB_WIDTH / 2;
         } else {
@@ -416,7 +429,11 @@ public class ThingView extends View {
         if (DEBUG) {
             Log.d(TAG, "onTouchEvent");
         }
-        return super.onTouchEvent(event);
+        if (detector.onTouchEvent(event)) {
+            return true;
+        } else {
+            return super.onTouchEvent(event);
+        }
     }
 
     @Override
@@ -433,5 +450,75 @@ public class ThingView extends View {
             Log.d(TAG, "onKeyUp");
         }
         return super.onKeyUp(keyCode, event);
+    }
+
+    // OnGestureDetectorListener
+
+    public boolean onDown(MotionEvent e) {
+        if (DEBUG) {
+            Log.d(TAG, "onDown x:" + e.getX() + " y:" + e.getY());
+        }
+        int right = getVoteRight();
+        int bottom = getVoteBottom();
+        boolean consumed = e.getX() < right && e.getY() < bottom;
+        if (DEBUG && consumed) {
+            Log.d(TAG, "onDown consumed event");
+        }
+        return consumed;
+    }
+
+    public boolean onSingleTapUp(MotionEvent e) {
+        if (DEBUG) {
+            Log.d(TAG, "onSingleTapUp x:" + e.getX() + " y:" + e.getY());
+        }
+        if (listener != null) {
+            int vote = e.getY() < getVoteCenterY() ? Votes.VOTE_UP : Votes.VOTE_DOWN;
+            listener.onVoteArrowClick(vote);
+        }
+        return true;
+    }
+
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        return false;
+    }
+
+    public void onLongPress(MotionEvent e) {
+    }
+
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    public void onShowPress(MotionEvent e) {
+    }
+
+    private int getVoteRight() {
+        int voteRight = PADDING * 2;
+        if (thing.thumbnail != null) {
+            voteRight += THUMB_WIDTH;
+        } else {
+            voteRight += MAX_SCORE_WIDTH;
+        }
+        return voteRight;
+    }
+
+    private int getVoteBottom() {
+        int voteBottom = PADDING + (ARROW_TOTAL_HEIGHT + ARROW_SPACING) * 2;
+        if (thing.thumbnail != null) {
+            voteBottom += THUMB_HEIGHT;
+        } else {
+            voteBottom += scoreLayout.getHeight();
+        }
+        return voteBottom;
+    }
+
+    private int getVoteCenterY() {
+        int center = PADDING + ARROW_TOTAL_HEIGHT + ARROW_SPACING;
+        if (thing.thumbnail != null) {
+            center += THUMB_HEIGHT / 2;
+        } else {
+            center += scoreLayout.getHeight() / 2;
+        }
+        return center;
     }
 }

@@ -94,11 +94,6 @@ public class Thing implements Parcelable {
         return name.substring(sepIndex + 1);
     }
 
-    public boolean hasThumbnail() {
-        return thumbnail != null && !thumbnail.isEmpty() && !"default".equals(thumbnail)
-                && !"self".equals(thumbnail) && !"nsfw".equals(thumbnail);
-    }
-
     public Thing assureTitle(Context c, Formatter f) {
         if (type == TYPE_MORE || title != null) {
             return this;

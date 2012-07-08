@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
 
@@ -76,7 +77,10 @@ class ThingParser extends JsonParser {
 
     @Override
     public void onThumbnail(JsonReader reader, int index) throws IOException {
-        things.get(index).thumbnail = readTrimmedString(reader, "");
+        String thumbnail = readTrimmedString(reader, null);
+        if (!TextUtils.isEmpty(thumbnail) && thumbnail.startsWith("http")) {
+            things.get(index).thumbnail = thumbnail;
+        }
     }
 
     @Override
