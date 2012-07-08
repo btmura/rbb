@@ -49,12 +49,16 @@
     <style name="ThingTitleText" parent="@style/SubredditTitleText" />
 
     <style name="ThingStatusText" parent="@style/SubredditStatusText" />
-    
-    <style name="ThingUpvoteStatusText" parent="@style/ThingStatusText">
+
+    <style name="ThingNeutralScoreText" parent="@style/SubredditStatusText">
+        <item name="android:textColor">@color/score_fg</item>
+    </style>
+
+    <style name="ThingUpScoreText" parent="@style/SubredditStatusText">
         <item name="android:textColor">@android:color/holo_orange_dark</item>
     </style>
-    
-    <style name="ThingDownvoteStatusText" parent="@style/ThingStatusText">
+
+    <style name="ThingDownScoreText" parent="@style/SubredditStatusText">
         <item name="android:textColor">@android:color/holo_blue_dark</item>
     </style>
 
