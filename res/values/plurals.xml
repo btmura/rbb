@@ -16,6 +16,10 @@
 -->
 <resources>
 
+    <plurals name="comments">
+        <item quantity="one">1 comment</item>
+        <item quantity="other">%1$d comments</item>
+    </plurals>
     <plurals name="subscribers">
         <item quantity="one">1 subscriber</item>
         <item quantity="other">%1$d subscribers</item>
