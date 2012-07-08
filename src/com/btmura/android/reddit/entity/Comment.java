@@ -60,6 +60,8 @@ public class Comment {
     private CharSequence getStatus(Context c, boolean isHeader, long now) {
         int resId = isHeader ? R.string.comment_header_status : R.string.comment_comment_status;
         String rt = RelativeTime.format(c, now, createdUtc);
-        return c.getString(resId, author, rt, ups - downs, numComments);
+        String comments = c.getResources().getQuantityString(R.plurals.comments, numComments,
+                numComments);
+        return c.getString(resId, author, rt, ups - downs, comments);
     }
 }
