@@ -68,7 +68,7 @@ public class ThumbnailLoader {
             task.cancel(true);
             v.setTag(null);
         }
-        v.removeThumbnail();
+        v.setThumbnail(null);
     }
 
     static class BitmapCache extends LruCache<String, Bitmap> {

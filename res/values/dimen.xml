@@ -29,7 +29,8 @@
     <dimen name="min_details_width">100dp</dimen>
     <dimen name="padding">16dp</dimen>
     <dimen name="rounded_radius">6dp</dimen>
-    <dimen name="score_bubble_padding">5dp</dimen>
+    <dimen name="score_bubble_padding">3dp</dimen>
+    <dimen name="score_bubble_spacing">6dp</dimen>
     <dimen name="subreddit_list_width">150dp</dimen>
 
 </resources>
