@@ -25,6 +25,7 @@ import android.text.BoringLayout;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.view.View;
@@ -122,20 +123,22 @@ public class CommentView extends View {
         int minHeight = PADDING * 2;
         int contentWidth = measuredWidth - PADDING * 2;
 
-        switch (comment.type) {
-            case Comment.TYPE_HEADER:
-                titleLayout = createTitleLayout(contentWidth);
-                minHeight += titleLayout.getHeight();
-                break;
-
-            default:
-                bodyLayout = createBodyLayout(contentWidth);
-                minHeight += bodyLayout.getHeight();
-                break;
+        if (!TextUtils.isEmpty(comment.title)) {
+            titleLayout = createTitleLayout(contentWidth);
+            minHeight += titleLayout.getHeight();
+            minHeight += ELEMENT_PADDING;
         }
 
-        statusLayout = createStatusLayout(contentWidth);
-        minHeight += statusLayout.getHeight();
+        if (!TextUtils.isEmpty(comment.body)) {
+            bodyLayout = createBodyLayout(contentWidth);
+            minHeight += bodyLayout.getHeight();
+            minHeight += ELEMENT_PADDING;
+        }
+
+        if (!TextUtils.isEmpty(comment.status)) {
+            statusLayout = createStatusLayout(contentWidth);
+            minHeight += statusLayout.getHeight();
+        }
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getMode(heightMeasureSpec);
@@ -175,11 +178,11 @@ public class CommentView extends View {
         c.translate(PADDING, PADDING);
         if (titleLayout != null) {
             titleLayout.draw(c);
-            c.translate(0, titleLayout.getHeight());
+            c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
         }
         if (bodyLayout != null) {
             bodyLayout.draw(c);
-            c.translate(0, bodyLayout.getHeight());
+            c.translate(0, bodyLayout.getHeight() + ELEMENT_PADDING);
         }
         statusLayout.draw(c);
     }
