@@ -19,6 +19,8 @@ package com.btmura.android.reddit.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.text.Layout.Alignment;
+import android.text.TextUtils.TruncateAt;
+import android.text.BoringLayout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -29,14 +31,16 @@ import com.btmura.android.reddit.entity.Comment;
 public class CommentView extends View {
 
     private static TextPaint[] TEXT_PAINTS;
-    private static final int NUM_TEXT_PAINTS = 2;
+    private static final int NUM_TEXT_PAINTS = 3;
     private static final int TEXT_TITLE = 0;
     private static final int TEXT_BODY = 1;
+    private static final int TEXT_STATUS = 2;
 
     private Comment comment;
 
     private StaticLayout titleLayout;
     private StaticLayout bodyLayout;
+    private BoringLayout statusLayout;
 
     public CommentView(Context context) {
         this(context, null);
@@ -99,6 +103,9 @@ public class CommentView extends View {
                 break;
         }
 
+        statusLayout = createStatusLayout(measuredWidth);
+        minHeight += statusLayout.getHeight();
+
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getMode(heightMeasureSpec);
         switch (heightMode) {
@@ -125,15 +132,23 @@ public class CommentView extends View {
                 width, Alignment.ALIGN_NORMAL, 1, 0, true);
     }
 
+    private BoringLayout createStatusLayout(int width) {
+        BoringLayout.Metrics m = BoringLayout.isBoring(comment.status, TEXT_PAINTS[TEXT_STATUS]);
+        return BoringLayout.make(comment.status, TEXT_PAINTS[TEXT_STATUS], width,
+                Alignment.ALIGN_NORMAL, 1, 0, m, true, TruncateAt.END, width);
+    }
+
     @Override
     protected void onDraw(Canvas c) {
         super.onDraw(c);
         if (titleLayout != null) {
             titleLayout.draw(c);
+            c.translate(0, titleLayout.getHeight());
         }
         if (bodyLayout != null) {
             bodyLayout.draw(c);
+            c.translate(0, bodyLayout.getHeight());
         }
-
+        statusLayout.draw(c);
     }
 }
