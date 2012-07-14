@@ -121,7 +121,7 @@ public class CommentView extends View {
         titleLayout = null;
         bodyLayout = null;
         int minHeight = PADDING * 2;
-        int contentWidth = measuredWidth - PADDING * 2;
+        int contentWidth = measuredWidth - PADDING * (2 + comment.nesting);
 
         if (!TextUtils.isEmpty(comment.title)) {
             titleLayout = createTitleLayout(contentWidth);
@@ -175,7 +175,8 @@ public class CommentView extends View {
     @Override
     protected void onDraw(Canvas c) {
         super.onDraw(c);
-        c.translate(PADDING, PADDING);
+        c.translate(PADDING * (comment.nesting + 1), PADDING);
+
         if (titleLayout != null) {
             titleLayout.draw(c);
             c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
