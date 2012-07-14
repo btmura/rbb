@@ -36,6 +36,9 @@ public class CommentView extends View {
 
     private static float FONT_SCALE;
 
+    private static int PADDING;
+    private static int ELEMENT_PADDING;
+
     private static TextPaint[] TEXT_PAINTS;
     private static final int NUM_TEXT_PAINTS = 3;
     private static final int TEXT_TITLE = 0;
@@ -66,6 +69,8 @@ public class CommentView extends View {
         float fontScale = r.getConfiguration().fontScale;
         if (FONT_SCALE != fontScale) {
             FONT_SCALE = fontScale;
+            PADDING = r.getDimensionPixelSize(R.dimen.padding);
+            ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
 
             Theme t = context.getTheme();
             int[] styles = new int[] {
@@ -114,21 +119,22 @@ public class CommentView extends View {
 
         titleLayout = null;
         bodyLayout = null;
-        int minHeight = 0;
+        int minHeight = PADDING * 2;
+        int contentWidth = measuredWidth - PADDING * 2;
 
         switch (comment.type) {
             case Comment.TYPE_HEADER:
-                titleLayout = createTitleLayout(measuredWidth);
+                titleLayout = createTitleLayout(contentWidth);
                 minHeight += titleLayout.getHeight();
                 break;
 
             default:
-                bodyLayout = createBodyLayout(measuredWidth);
+                bodyLayout = createBodyLayout(contentWidth);
                 minHeight += bodyLayout.getHeight();
                 break;
         }
 
-        statusLayout = createStatusLayout(measuredWidth);
+        statusLayout = createStatusLayout(contentWidth);
         minHeight += statusLayout.getHeight();
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -166,6 +172,7 @@ public class CommentView extends View {
     @Override
     protected void onDraw(Canvas c) {
         super.onDraw(c);
+        c.translate(PADDING, PADDING);
         if (titleLayout != null) {
             titleLayout.draw(c);
             c.translate(0, titleLayout.getHeight());
