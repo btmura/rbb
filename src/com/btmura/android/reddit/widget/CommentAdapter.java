@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Comment;
 
 public class CommentAdapter extends BaseAdapter {
@@ -73,6 +74,7 @@ public class CommentAdapter extends BaseAdapter {
         if (v == null) {
             v = new CommentView(context);
         }
+        v.setBackgroundResource(R.drawable.selector_normal);
         v.setComment(getItem(position));
         return v;
     }
