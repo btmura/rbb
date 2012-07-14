@@ -23,6 +23,14 @@ import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.CommentLoader;
@@ -30,7 +38,8 @@ import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.widget.CommentAdapter;
 
-public class CommentListFragment extends ListFragment implements LoaderCallbacks<List<Comment>> {
+public class CommentListFragment extends ListFragment implements LoaderCallbacks<List<Comment>>,
+        MultiChoiceModeListener {
 
     private static final String ARG_THING_ID = "i";
 
@@ -48,6 +57,15 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adapter = new CommentAdapter(getActivity());
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        ListView l = (ListView) v.findViewById(android.R.id.list);
+        l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        l.setMultiChoiceModeListener(this);
+        return v;
     }
 
     @Override
@@ -71,5 +89,23 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     public void onLoaderReset(Loader<List<Comment>> loader) {
         adapter.swapData(null);
+    }
+
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        return false;
+    }
+
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+    }
+
+    public void onDestroyActionMode(ActionMode mode) {
     }
 }
