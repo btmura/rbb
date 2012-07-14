@@ -64,6 +64,11 @@ class CommentParser extends JsonParser {
     }
 
     @Override
+    public void onName(JsonReader reader, int index) throws IOException {
+        comments.get(index).name = readTrimmedString(reader, "");
+    }
+
+    @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
         comments.get(index).rawTitle = readTrimmedString(reader, "");
     }

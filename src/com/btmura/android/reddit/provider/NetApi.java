@@ -149,6 +149,25 @@ public class NetApi {
         }
     }
 
+    public static void comment(String thingId, String text, String cookie,
+            String modhash) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.commentsApiUrl();
+            conn = (HttpURLConnection) url.openConnection();
+            setCommonHeaders(conn, cookie);
+            setFormDataHeaders(conn);
+            conn.connect();
+
+            writeFormData(conn, Urls.commentsApiQuery(thingId, text, modhash));
+            in = conn.getInputStream();
+            logResponse(in);
+        } finally {
+            close(in, conn);
+        }
+    }
+
     public static SubmitResult submit(String subreddit, String title, String text,
             String captchaId, String captchaGuess, String cookie, String modhash)
             throws IOException {

@@ -30,6 +30,7 @@ public class Urls {
     public static final String BASE_URL = "http://www.reddit.com";
     public static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
+    private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
     private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
     private static final String BASE_LOGIN_URL = BASE_SSL_URL + "/api/login/";
@@ -42,6 +43,19 @@ public class Urls {
     private static final String BASE_VOTE_URL = BASE_URL + "/api/vote/";
 
     private static final StringBuilder S = new StringBuilder(BASE_URL.length() * 3);
+
+    public static URL commentsApiUrl() {
+        return newUrl(API_COMMENTS_URL);
+    }
+
+    public static String commentsApiQuery(String thingId, String text, String modhash) {
+        StringBuilder b = resetBuilder();
+        b.append("thing_id=").append(encode(thingId));
+        b.append("&text=").append(encode(text));
+        b.append("&uh=").append(encode(modhash));
+        b.append("&api_type=json");
+        return b.toString();
+    }
 
     public static URL captchaUrl(String id) {
         return newUrl(resetBuilder().append(BASE_CAPTCHA_URL).append(id).append(".png"));
