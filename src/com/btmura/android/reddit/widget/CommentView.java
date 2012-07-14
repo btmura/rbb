@@ -17,6 +17,10 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.text.Layout.Alignment;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -24,7 +28,13 @@ import com.btmura.android.reddit.entity.Comment;
 
 public class CommentView extends View {
 
+    private static TextPaint[] TEXT_PAINTS;
+    private static final int NUM_TEXT_PAINTS = 1;
+    private static final int TEXT_TITLE = 0;
+
     private Comment comment;
+
+    private StaticLayout titleLayout;
 
     public CommentView(Context context) {
         this(context, null);
@@ -36,10 +46,78 @@ public class CommentView extends View {
 
     public CommentView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        init(context);
     }
 
-    public void setComment(Comment c) {
+    private void init(Context context) {
+        if (TEXT_PAINTS == null) {
+            TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
+            TEXT_PAINTS[TEXT_TITLE] = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+        }
+    }
+
+    public void setComment(Comment comment) {
         this.comment = comment;
         requestLayout();
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int measuredWidth = 0;
+        int measuredHeight = 0;
+
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        switch (widthMode) {
+            case MeasureSpec.AT_MOST:
+            case MeasureSpec.EXACTLY:
+                measuredWidth = widthSize;
+                break;
+
+            case MeasureSpec.UNSPECIFIED:
+                measuredWidth = getSuggestedMinimumWidth();
+                break;
+        }
+
+        int minHeight = 0;
+
+        switch (comment.type) {
+            case Comment.TYPE_HEADER:
+                titleLayout = createTitleLayout(measuredWidth);
+                minHeight += titleLayout.getHeight();
+                break;
+
+            default:
+                titleLayout = null;
+                break;
+        }
+
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getMode(heightMeasureSpec);
+        switch (heightMode) {
+            case MeasureSpec.AT_MOST:
+            case MeasureSpec.EXACTLY:
+                measuredHeight = heightSize;
+                break;
+
+            case MeasureSpec.UNSPECIFIED:
+                measuredHeight = minHeight;
+                break;
+        }
+
+        setMeasuredDimension(measuredWidth, measuredHeight);
+    }
+
+    private StaticLayout createTitleLayout(int width) {
+        return new StaticLayout(comment.title, TEXT_PAINTS[TEXT_TITLE],
+                width, Alignment.ALIGN_NORMAL, 1, 0, true);
+    }
+
+    @Override
+    protected void onDraw(Canvas c) {
+        super.onDraw(c);
+        if (titleLayout != null) {
+            titleLayout.draw(c);
+        }
     }
 }
