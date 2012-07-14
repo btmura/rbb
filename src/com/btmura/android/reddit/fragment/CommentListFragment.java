@@ -23,9 +23,11 @@ import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +42,8 @@ import com.btmura.android.reddit.widget.CommentAdapter;
 
 public class CommentListFragment extends ListFragment implements LoaderCallbacks<List<Comment>>,
         MultiChoiceModeListener {
+
+    public static final String TAG = "CommentListFragment";
 
     private static final String ARG_THING_ID = "i";
 
@@ -92,11 +96,16 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        return false;
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.comment_action_menu, menu);
+        return true;
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        return false;
+        int checkedCount = getListView().getCheckedItemCount();
+        boolean showReply = checkedCount == 1;
+        menu.findItem(R.id.menu_reply).setVisible(showReply);
+        return true;
     }
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -104,6 +113,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        mode.invalidate();
     }
 
     public void onDestroyActionMode(ActionMode mode) {
