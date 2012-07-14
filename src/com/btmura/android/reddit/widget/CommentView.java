@@ -17,18 +17,24 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.content.res.Resources.Theme;
 import android.graphics.Canvas;
-import android.text.Layout.Alignment;
-import android.text.TextUtils.TruncateAt;
 import android.text.BoringLayout;
+import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Comment;
 
 public class CommentView extends View {
+
+    private static float FONT_SCALE;
 
     private static TextPaint[] TEXT_PAINTS;
     private static final int NUM_TEXT_PAINTS = 3;
@@ -56,10 +62,29 @@ public class CommentView extends View {
     }
 
     private void init(Context context) {
-        if (TEXT_PAINTS == null) {
+        Resources r = context.getResources();
+        float fontScale = r.getConfiguration().fontScale;
+        if (FONT_SCALE != fontScale) {
+            FONT_SCALE = fontScale;
+
+            Theme t = context.getTheme();
+            int[] styles = new int[] {
+                    R.style.CommentTitleText,
+                    R.style.CommentBodyText,
+                    R.style.CommentStatusText,
+            };
+            int[] attrs = new int[] {
+                    android.R.attr.textSize,
+                    android.R.attr.textColor,
+            };
+
             TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
             for (int i = 0; i < NUM_TEXT_PAINTS; i++) {
+                TypedArray a = t.obtainStyledAttributes(styles[i], attrs);
                 TEXT_PAINTS[i] = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+                TEXT_PAINTS[i].setTextSize(a.getDimensionPixelSize(0, 0) * FONT_SCALE);
+                TEXT_PAINTS[i].setColor(a.getColor(1, -1));
+                a.recycle();
             }
         }
     }
