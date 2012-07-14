@@ -82,6 +82,7 @@ public class CommentView extends View {
             int[] attrs = new int[] {
                     android.R.attr.textSize,
                     android.R.attr.textColor,
+                    android.R.attr.textColorLink,
             };
 
             TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
@@ -90,6 +91,7 @@ public class CommentView extends View {
                 TEXT_PAINTS[i] = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
                 TEXT_PAINTS[i].setTextSize(a.getDimensionPixelSize(0, 0) * FONT_SCALE);
                 TEXT_PAINTS[i].setColor(a.getColor(1, -1));
+                TEXT_PAINTS[i].linkColor = a.getColor(2, -1);
                 a.recycle();
             }
         }
