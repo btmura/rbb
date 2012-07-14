@@ -27,10 +27,12 @@ import android.content.Loader;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
@@ -117,6 +119,14 @@ public class ThingListFragment extends ListFragment implements
         adapter.setSelectedThing(b.getString(STATE_THING_NAME), b.getInt(STATE_THING_POSITION, -1));
         adapter.setThingViewListener(this);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        ListView l = (ListView) v.findViewById(android.R.id.list);
+        l.setOnScrollListener(this);
+        return v;
     }
 
     @Override
