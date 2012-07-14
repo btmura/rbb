@@ -29,12 +29,14 @@ import com.btmura.android.reddit.entity.Comment;
 public class CommentView extends View {
 
     private static TextPaint[] TEXT_PAINTS;
-    private static final int NUM_TEXT_PAINTS = 1;
+    private static final int NUM_TEXT_PAINTS = 2;
     private static final int TEXT_TITLE = 0;
+    private static final int TEXT_BODY = 1;
 
     private Comment comment;
 
     private StaticLayout titleLayout;
+    private StaticLayout bodyLayout;
 
     public CommentView(Context context) {
         this(context, null);
@@ -52,7 +54,9 @@ public class CommentView extends View {
     private void init(Context context) {
         if (TEXT_PAINTS == null) {
             TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
-            TEXT_PAINTS[TEXT_TITLE] = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+            for (int i = 0; i < NUM_TEXT_PAINTS; i++) {
+                TEXT_PAINTS[i] = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+            }
         }
     }
 
@@ -79,6 +83,8 @@ public class CommentView extends View {
                 break;
         }
 
+        titleLayout = null;
+        bodyLayout = null;
         int minHeight = 0;
 
         switch (comment.type) {
@@ -88,7 +94,8 @@ public class CommentView extends View {
                 break;
 
             default:
-                titleLayout = null;
+                bodyLayout = createBodyLayout(measuredWidth);
+                minHeight += bodyLayout.getHeight();
                 break;
         }
 
@@ -113,11 +120,20 @@ public class CommentView extends View {
                 width, Alignment.ALIGN_NORMAL, 1, 0, true);
     }
 
+    private StaticLayout createBodyLayout(int width) {
+        return new StaticLayout(comment.body, TEXT_PAINTS[TEXT_BODY],
+                width, Alignment.ALIGN_NORMAL, 1, 0, true);
+    }
+
     @Override
     protected void onDraw(Canvas c) {
         super.onDraw(c);
         if (titleLayout != null) {
             titleLayout.draw(c);
         }
+        if (bodyLayout != null) {
+            bodyLayout.draw(c);
+        }
+
     }
 }
