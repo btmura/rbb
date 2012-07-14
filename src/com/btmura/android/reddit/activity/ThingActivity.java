@@ -41,6 +41,8 @@ public class ThingActivity extends GlobalMenuActivity implements
         SubredditNameHolder,
         OnPageChangeListener {
 
+    public static final String TAG = "ThingActivity";
+
     public static final String EXTRA_THING = "t";
     public static final String EXTRA_FLAGS = "f";
 

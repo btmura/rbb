@@ -141,7 +141,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     private Comment findFirstCheckedComment() {
         SparseBooleanArray positions = getListView().getCheckedItemPositions();
-        int count = positions.size();
+        int count = adapter.getCount();
         for (int i = 0; i < count; i++) {
             if (positions.get(i)) {
                 return adapter.getItem(i);
