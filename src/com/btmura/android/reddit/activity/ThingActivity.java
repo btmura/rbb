@@ -18,22 +18,28 @@ package com.btmura.android.reddit.activity;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
+import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.fragment.CommentListFragment.CommentListener;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
+import com.btmura.android.reddit.fragment.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class ThingActivity extends GlobalMenuActivity implements
-        ThingMenuFragment.ThingPagerHolder,
+        CommentListener,
+        ThingPagerHolder,
         SubredditNameHolder,
-        ViewPager.OnPageChangeListener {
+        OnPageChangeListener {
 
     public static final String EXTRA_THING = "t";
     public static final String EXTRA_FLAGS = "f";
@@ -62,6 +68,12 @@ public class ThingActivity extends GlobalMenuActivity implements
             ft.add(ThingMenuFragment.newInstance(thing), ThingMenuFragment.TAG);
             ft.commit();
         }
+    }
+
+    public void onReplyToComment(Comment comment) {
+        Intent intent = new Intent(this, CommentReplyActivity.class);
+        intent.putExtra(CommentReplyActivity.EXTRA_COMMENT, comment);
+        startActivity(intent);
     }
 
     @Override

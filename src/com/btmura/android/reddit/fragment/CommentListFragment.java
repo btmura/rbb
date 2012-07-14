@@ -19,10 +19,12 @@ package com.btmura.android.reddit.fragment;
 import java.net.URL;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,6 +48,11 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     private static final String ARG_THING_ID = "i";
 
+    public interface CommentListener {
+        void onReplyToComment(Comment comment);
+    }
+
+    private CommentListener listener;
     private CommentAdapter adapter;
 
     public static CommentListFragment newInstance(String thingId) {
@@ -54,6 +61,14 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         b.putString(ARG_THING_ID, thingId);
         frag.setArguments(b);
         return frag;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof CommentListener) {
+            listener = (CommentListener) activity;
+        }
     }
 
     @Override
@@ -108,7 +123,31 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        return false;
+        switch (item.getItemId()) {
+            case R.id.menu_reply:
+                handleReply();
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    private void handleReply() {
+        if (listener != null) {
+            listener.onReplyToComment(findFirstCheckedComment());
+        }
+    }
+
+    private Comment findFirstCheckedComment() {
+        SparseBooleanArray positions = getListView().getCheckedItemPositions();
+        int count = positions.size();
+        for (int i = 0; i < count; i++) {
+            if (positions.get(i)) {
+                return adapter.getItem(i);
+            }
+        }
+        return null;
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
