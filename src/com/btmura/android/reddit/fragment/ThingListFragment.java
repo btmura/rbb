@@ -25,6 +25,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -202,9 +203,11 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public void onVoteClick(Thing thing, int vote) {
-        thing.likes = vote;
-        VoteProvider.insertVoteInBackground(getActivity(), accountName, thing.name, vote);
-        adapter.notifyDataSetChanged();
+        if (!TextUtils.isEmpty(accountName)) {
+            thing.likes = vote;
+            VoteProvider.insertVoteInBackground(getActivity(), accountName, thing.name, vote);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
