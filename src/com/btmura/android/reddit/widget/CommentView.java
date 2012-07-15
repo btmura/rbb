@@ -18,9 +18,10 @@ package com.btmura.android.reddit.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.content.res.Resources.Theme;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.text.BoringLayout;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
@@ -52,6 +53,12 @@ public class CommentView extends View {
     private StaticLayout bodyLayout;
     private BoringLayout statusLayout;
 
+    private String scoreText;
+    private Rect scoreBounds = new Rect();
+
+    private int rightHeight;
+    private int minHeight;
+
     public CommentView(Context context) {
         this(context, null);
     }
@@ -63,6 +70,7 @@ public class CommentView extends View {
     public CommentView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
+        VotingArrows.init(context);
     }
 
     private void init(Context context) {
@@ -120,27 +128,36 @@ public class CommentView extends View {
                 break;
         }
 
+        scoreText = VotingArrows.getScoreText(comment.ups - comment.downs);
+        VotingArrows.measureScoreText(scoreText, scoreBounds);
+
+        int rightContentWidth = measuredWidth
+                - PADDING - VotingArrows.ARROW_TOTAL_WIDTH - PADDING
+                - PADDING * comment.nesting - PADDING;
+
         titleLayout = null;
         bodyLayout = null;
-        int minHeight = PADDING * 2;
-        int contentWidth = measuredWidth - PADDING * (2 + comment.nesting);
+        rightHeight = PADDING * 2;
 
         if (!TextUtils.isEmpty(comment.title)) {
-            titleLayout = createTitleLayout(contentWidth);
-            minHeight += titleLayout.getHeight();
-            minHeight += ELEMENT_PADDING;
+            titleLayout = createTitleLayout(rightContentWidth);
+            rightHeight += titleLayout.getHeight();
+            rightHeight += ELEMENT_PADDING;
         }
 
         if (!TextUtils.isEmpty(comment.body)) {
-            bodyLayout = createBodyLayout(contentWidth);
-            minHeight += bodyLayout.getHeight();
-            minHeight += ELEMENT_PADDING;
+            bodyLayout = createBodyLayout(rightContentWidth);
+            rightHeight += bodyLayout.getHeight();
+            rightHeight += ELEMENT_PADDING;
         }
 
         if (!TextUtils.isEmpty(comment.status)) {
-            statusLayout = createStatusLayout(contentWidth);
-            minHeight += statusLayout.getHeight();
+            statusLayout = createStatusLayout(rightContentWidth);
+            rightHeight += statusLayout.getHeight();
         }
+
+        int leftHeight = PADDING + VotingArrows.getHeight() + PADDING;
+        minHeight = Math.max(leftHeight, rightHeight);
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getMode(heightMeasureSpec);
@@ -177,16 +194,23 @@ public class CommentView extends View {
     @Override
     protected void onDraw(Canvas c) {
         super.onDraw(c);
-        c.translate(PADDING * (comment.nesting + 1), PADDING);
+        c.translate(PADDING * (1 + comment.nesting), PADDING);
+
+        VotingArrows.draw(c, scoreText, scoreBounds);
+
+        int centerY = (minHeight - rightHeight) / 2;
+        c.translate(VotingArrows.ARROW_TOTAL_WIDTH + PADDING, centerY);
 
         if (titleLayout != null) {
             titleLayout.draw(c);
             c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
         }
+
         if (bodyLayout != null) {
             bodyLayout.draw(c);
             c.translate(0, bodyLayout.getHeight() + ELEMENT_PADDING);
         }
+
         statusLayout.draw(c);
     }
 }

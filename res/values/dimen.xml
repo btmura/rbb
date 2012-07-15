@@ -17,10 +17,14 @@
 <resources>
 
     <dimen name="arrow_head_height">10dp</dimen>
-    <dimen name="arrow_stem_width">8dp</dimen>
+    <dimen name="arrow_stem_width">6dp</dimen>
     <dimen name="arrow_spacing">4dp</dimen>
-    <dimen name="arrow_total_width">24dp</dimen>
+    <dimen name="arrow_total_width">14dp</dimen>
     <dimen name="arrow_total_height">18dp</dimen>
+    <dimen name="no_score_total_height">15dp</dimen>
+    <dimen name="score_total_height">30dp</dimen>
+    
+    
     <dimen name="element_padding">8dp</dimen>
     <dimen name="max_details_width">300dp</dimen>
     <dimen name="max_thumb_width">70dp</dimen>
@@ -31,6 +35,7 @@
     <dimen name="rounded_radius">6dp</dimen>
     <dimen name="score_bubble_padding">3dp</dimen>
     <dimen name="score_bubble_spacing">6dp</dimen>
+    
     <dimen name="subreddit_list_width">150dp</dimen>
 
 </resources>
