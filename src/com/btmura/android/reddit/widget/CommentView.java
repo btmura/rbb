@@ -194,7 +194,7 @@ public class CommentView extends View {
     @Override
     protected void onDraw(Canvas c) {
         c.translate(PADDING * (1 + comment.nesting), PADDING);
-        VotingArrows.draw(c, scoreText, scoreBounds);
+        VotingArrows.draw(c, scoreText, scoreBounds, 0);
         c.translate(0, -PADDING);
 
         int dx = VotingArrows.ARROW_TOTAL_WIDTH + PADDING;

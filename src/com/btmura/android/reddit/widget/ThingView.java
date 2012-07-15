@@ -261,7 +261,7 @@ public class ThingView extends View implements OnGestureListener {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.translate(PADDING, PADDING);
-        VotingArrows.draw(canvas, scoreText, scoreBounds);
+        VotingArrows.draw(canvas, scoreText, scoreBounds, thing.likes);
         canvas.translate(0, -PADDING);
 
         int tdx = VotingArrows.ARROW_TOTAL_WIDTH + PADDING;

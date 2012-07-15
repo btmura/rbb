@@ -29,6 +29,7 @@ import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.provider.VoteProvider.Votes;
 
 class VotingArrows {
 
@@ -122,18 +123,31 @@ class VotingArrows {
         }
     }
 
-    static void draw(Canvas c, String scoreText, Rect scoreBounds) {
-        c.drawPath(PATH_UPVOTE, PAINTS[NEUTRAL]);
+    static void draw(Canvas c, String scoreText, Rect scoreBounds, int likes) {
+        int upPaintIndex = NEUTRAL;
+        int scorePaintIndex = NEUTRAL;
+        int downPaintIndex = NEUTRAL;
+        switch (likes) {
+            case Votes.VOTE_UP:
+                upPaintIndex = scorePaintIndex = UP;
+                break;
+
+            case Votes.VOTE_DOWN:
+                scorePaintIndex = downPaintIndex = DOWN;
+                break;
+        }
+
+        c.drawPath(PATH_UPVOTE, PAINTS[upPaintIndex]);
         c.translate(0, ARROW_TOTAL_HEIGHT);
 
         int centerX = (ARROW_TOTAL_WIDTH - scoreBounds.width()) / 2;
         int centerY = (SCORE_TOTAL_HEIGHT + scoreBounds.height()) / 2;
         c.translate(centerX, centerY);
-        c.drawText(scoreText, 0, 0, TEXT_PAINTS[NEUTRAL]);
+        c.drawText(scoreText, 0, 0, TEXT_PAINTS[scorePaintIndex]);
         c.translate(-centerX, -centerY);
 
         c.translate(0, SCORE_TOTAL_HEIGHT);
-        c.drawPath(PATH_DOWNVOTE, PAINTS[NEUTRAL]);
+        c.drawPath(PATH_DOWNVOTE, PAINTS[downPaintIndex]);
         c.translate(0, -SCORE_TOTAL_HEIGHT - ARROW_TOTAL_HEIGHT);
     }
 
