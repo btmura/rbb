@@ -54,7 +54,7 @@ public class CommentView extends View {
     private BoringLayout statusLayout;
 
     private String scoreText;
-    private Rect scoreBounds = new Rect();
+    private final Rect scoreBounds = new Rect();
 
     private int rightHeight;
     private int minHeight;
@@ -137,7 +137,7 @@ public class CommentView extends View {
 
         titleLayout = null;
         bodyLayout = null;
-        rightHeight = PADDING * 2;
+        rightHeight = 0;
 
         if (!TextUtils.isEmpty(comment.title)) {
             titleLayout = createTitleLayout(rightContentWidth);
@@ -156,8 +156,8 @@ public class CommentView extends View {
             rightHeight += statusLayout.getHeight();
         }
 
-        int leftHeight = PADDING + VotingArrows.getHeight() + PADDING;
-        minHeight = Math.max(leftHeight, rightHeight);
+        int leftHeight = VotingArrows.getHeight();
+        minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getMode(heightMeasureSpec);
@@ -193,13 +193,13 @@ public class CommentView extends View {
 
     @Override
     protected void onDraw(Canvas c) {
-        super.onDraw(c);
         c.translate(PADDING * (1 + comment.nesting), PADDING);
-
         VotingArrows.draw(c, scoreText, scoreBounds);
+        c.translate(0, -PADDING);
 
-        int centerY = (minHeight - rightHeight) / 2;
-        c.translate(VotingArrows.ARROW_TOTAL_WIDTH + PADDING, centerY);
+        int dx = VotingArrows.ARROW_TOTAL_WIDTH + PADDING;
+        int dy = (minHeight - rightHeight) / 2;
+        c.translate(dx, dy);
 
         if (titleLayout != null) {
             titleLayout.draw(c);

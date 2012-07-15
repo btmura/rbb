@@ -52,8 +52,6 @@ class VotingArrows {
     private static Path PATH_UPVOTE;
     private static Path PATH_DOWNVOTE;
 
-    static final Rect ST_BOUNDS = new Rect();
-
     static void init(Context context) {
         Resources r = context.getResources();
         float fontScale = r.getConfiguration().fontScale;

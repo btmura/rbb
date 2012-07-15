@@ -6,11 +6,8 @@ import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
-import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.BoringLayout;
@@ -18,7 +15,6 @@ import android.text.Layout;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -45,46 +41,25 @@ public class ThingView extends View implements OnGestureListener {
     private static int THUMB_HEIGHT;
     private static int PADDING;
     private static int ELEMENT_PADDING;
-    private static int SCORE_BUBBLE_PADDING;
-    private static int SCORE_BUBBLE_SPACING;
     private static int MIN_DETAILS_WIDTH;
     private static int MAX_DETAILS_WIDTH;
     private static int MAX_SCORE_WIDTH;
-    private static int ROUNDED_RADIUS;
 
     private static TextPaint[] TEXT_PAINTS;
-    private static final int NUM_TEXT_PAINTS = 5;
+    private static final int NUM_TEXT_PAINTS = 2;
     private static final int TEXT_TITLE = 0;
     private static final int TEXT_STATUS = 1;
-    private static final int TEXT_NEUTRAL = 2;
-    private static final int TEXT_UP = 3;
-    private static final int TEXT_DOWN = 4;
-
-    private static Paint[] VOTE_PAINTS;
-    private static final int NUM_VOTE_PAINTS = 3;
-    private static final int VOTE_NEUTRAL = 0;
-    private static final int VOTE_UP = 1;
-    private static final int VOTE_DOWN = 2;
-
-    private static int ARROW_TOTAL_WIDTH;
-    private static int ARROW_TOTAL_HEIGHT;
-    private static int ARROW_SPACING;
 
     private static Paint THUMB_OUTLINE_PAINT;
     private static Paint SCORE_BUBBLE_PAINT;
-
-    private static Path UPVOTE_PATH;
-    private static Path DOWNVOTE_PATH;
 
     public interface ThingViewListener {
         void onVoteClick(Thing thing, int vote);
     }
 
     private final GestureDetector detector;
-    private final Rect scoreBounds = new Rect();
     private final Rect thumbSrc = new Rect();
     private final RectF thumbDst = new RectF();
-    private final RectF bubbleRect = new RectF();
 
     private int bodyWidth;
     private Thing thing;
@@ -95,7 +70,11 @@ public class ThingView extends View implements OnGestureListener {
     private Layout detailsLayout;
 
     private ThingViewListener listener;
+
     private String scoreText;
+    private Rect scoreBounds = new Rect();
+    private int rightHeight;
+    private int minHeight;
 
     public ThingView(Context context) {
         this(context, null);
@@ -109,6 +88,7 @@ public class ThingView extends View implements OnGestureListener {
         super(context, attrs, defStyle);
         detector = new GestureDetector(context, this);
         init(context);
+        VotingArrows.init(context);
     }
 
     private void init(Context context) {
@@ -119,22 +99,16 @@ public class ThingView extends View implements OnGestureListener {
             DENSITY = r.getDisplayMetrics().density;
             PADDING = r.getDimensionPixelSize(R.dimen.padding);
             ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
-            SCORE_BUBBLE_PADDING = r.getDimensionPixelSize(R.dimen.score_bubble_padding);
-            SCORE_BUBBLE_SPACING = r.getDimensionPixelSize(R.dimen.score_bubble_spacing);
             THUMB_WIDTH = r.getDimensionPixelSize(R.dimen.max_thumb_width);
             THUMB_HEIGHT = THUMB_WIDTH;
             MIN_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.min_details_width);
             MAX_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.max_details_width);
             MAX_SCORE_WIDTH = r.getDimensionPixelSize(R.dimen.max_score_width);
-            ROUNDED_RADIUS = r.getDimensionPixelSize(R.dimen.rounded_radius);
 
             Theme t = context.getTheme();
             int[] styles = new int[] {
                     R.style.ThingTitleText,
                     R.style.ThingStatusText,
-                    R.style.ThingNeutralScoreText,
-                    R.style.ThingUpScoreText,
-                    R.style.ThingDownScoreText,
             };
             int[] attrs = new int[] {
                     android.R.attr.textSize,
@@ -149,47 +123,6 @@ public class ThingView extends View implements OnGestureListener {
                 TEXT_PAINTS[i].setColor(a.getColor(1, -1));
                 a.recycle();
             }
-
-            TEXT_PAINTS[TEXT_NEUTRAL].setTextAlign(Align.CENTER);
-            TEXT_PAINTS[TEXT_UP].setTextAlign(Align.CENTER);
-            TEXT_PAINTS[TEXT_DOWN].setTextAlign(Align.CENTER);
-
-            int[] colorResIds = new int[] {
-                    R.color.score_bg,
-                    android.R.color.holo_orange_dark,
-                    android.R.color.holo_blue_dark,
-            };
-            VOTE_PAINTS = new Paint[NUM_VOTE_PAINTS];
-            for (int i = 0; i < NUM_VOTE_PAINTS; i++) {
-                VOTE_PAINTS[i] = new Paint(Paint.ANTI_ALIAS_FLAG);
-                VOTE_PAINTS[i].setColor(r.getColor(colorResIds[i]));
-            }
-
-            ARROW_TOTAL_WIDTH = r.getDimensionPixelSize(R.dimen.arrow_total_width);
-            ARROW_TOTAL_HEIGHT = r.getDimensionPixelSize(R.dimen.arrow_total_height);
-            ARROW_SPACING = r.getDimensionPixelSize(R.dimen.arrow_spacing);
-
-            int arrowHeadHeight = r.getDimensionPixelSize(R.dimen.arrow_head_height);
-            int arrowStemWidth = r.getDimensionPixelSize(R.dimen.arrow_stem_width);
-            int arrowStemIndent = (ARROW_TOTAL_WIDTH - arrowStemWidth) / 2;
-
-            UPVOTE_PATH = new Path();
-            UPVOTE_PATH.moveTo(ARROW_TOTAL_WIDTH / 2, 0);
-            UPVOTE_PATH.lineTo(ARROW_TOTAL_WIDTH, arrowHeadHeight);
-            UPVOTE_PATH.lineTo(ARROW_TOTAL_WIDTH - arrowStemIndent, arrowHeadHeight);
-            UPVOTE_PATH.lineTo(ARROW_TOTAL_WIDTH - arrowStemIndent, ARROW_TOTAL_HEIGHT);
-            UPVOTE_PATH.lineTo(arrowStemIndent, ARROW_TOTAL_HEIGHT);
-            UPVOTE_PATH.lineTo(arrowStemIndent, arrowHeadHeight);
-            UPVOTE_PATH.lineTo(0, arrowHeadHeight);
-            UPVOTE_PATH.close();
-
-            Matrix flip = new Matrix();
-            flip.setRotate(180, ARROW_TOTAL_WIDTH / 2, ARROW_TOTAL_HEIGHT / 2);
-
-            DOWNVOTE_PATH = new Path();
-            DOWNVOTE_PATH.set(UPVOTE_PATH);
-            DOWNVOTE_PATH.transform(flip);
-            DOWNVOTE_PATH.close();
 
             SCORE_BUBBLE_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
             SCORE_BUBBLE_PAINT.setColor(r.getColor(R.color.score_bg));
@@ -248,7 +181,9 @@ public class ThingView extends View implements OnGestureListener {
                 break;
         }
 
-        int scoreWidth;
+        scoreText = VotingArrows.getScoreText(thing.score);
+        VotingArrows.measureScoreText(scoreText, scoreBounds);
+
         int titleWidth;
         int detailsWidth;
         CharSequence detailsText;
@@ -273,20 +208,12 @@ public class ThingView extends View implements OnGestureListener {
         }
 
         int statusWidth = measuredWidth - PADDING * 2;
-        if (thing.thumbnail != null) {
-            titleWidth -= THUMB_WIDTH + PADDING;
-            statusWidth -= THUMB_WIDTH + PADDING;
-            scoreWidth = THUMB_WIDTH;
-        } else {
-            titleWidth -= MAX_SCORE_WIDTH + PADDING;
-            statusWidth -= MAX_SCORE_WIDTH + PADDING;
-            scoreWidth = MAX_SCORE_WIDTH;
-        }
+        statusWidth -= VotingArrows.ARROW_TOTAL_WIDTH + PADDING;
+        titleWidth -= VotingArrows.ARROW_TOTAL_WIDTH + PADDING;
         if (detailsWidth > 0) {
             statusWidth -= detailsWidth + PADDING;
         }
 
-        scoreWidth = Math.max(0, scoreWidth);
         titleWidth = Math.max(0, titleWidth);
         statusWidth = Math.max(0, statusWidth);
         detailsWidth = Math.max(0, detailsWidth);
@@ -300,18 +227,9 @@ public class ThingView extends View implements OnGestureListener {
             detailsLayout = null;
         }
 
-        scoreText = TextUtils.ellipsize(Integer.toString(thing.score), TEXT_PAINTS[VOTE_NEUTRAL],
-                scoreWidth, TruncateAt.END).toString();
-        TEXT_PAINTS[VOTE_NEUTRAL].getTextBounds(scoreText, 0, scoreText.length(), scoreBounds);
-
-        int leftHeight = (ARROW_TOTAL_HEIGHT + ARROW_SPACING) * 2;
-        if (thing.thumbnail != null) {
-            leftHeight += THUMB_HEIGHT;
-        } else {
-            leftHeight += scoreBounds.height();
-        }
-        int rightHeight = titleLayout.getHeight() + ELEMENT_PADDING + statusLayout.getHeight();
-        int minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
+        int leftHeight = VotingArrows.getHeight();
+        rightHeight = titleLayout.getHeight() + ELEMENT_PADDING + statusLayout.getHeight();
+        minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -342,63 +260,19 @@ public class ThingView extends View implements OnGestureListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.save();
         canvas.translate(PADDING, PADDING);
+        VotingArrows.draw(canvas, scoreText, scoreBounds);
+        canvas.translate(0, -PADDING);
 
-        int arrowX = -ARROW_TOTAL_WIDTH / 2;
-        boolean hasThumbnail = thing.thumbnail != null;
-        if (hasThumbnail) {
-            arrowX += THUMB_WIDTH / 2;
-        } else {
-            arrowX += MAX_SCORE_WIDTH / 2;
-        }
+        int tdx = VotingArrows.ARROW_TOTAL_WIDTH + PADDING;
+        int tdy = (minHeight - rightHeight) / 2;
+        canvas.translate(tdx, tdy);
+        titleLayout.draw(canvas);
 
-        Paint upPaint = VOTE_PAINTS[VOTE_NEUTRAL];
-        Paint downPaint = VOTE_PAINTS[VOTE_NEUTRAL];
-        Paint scorePaint = TEXT_PAINTS[TEXT_NEUTRAL];
-        if (thing.likes == Votes.VOTE_UP) {
-            upPaint = VOTE_PAINTS[VOTE_UP];
-            scorePaint = TEXT_PAINTS[TEXT_UP];
-        } else if (thing.likes == Votes.VOTE_DOWN) {
-            downPaint = VOTE_PAINTS[VOTE_DOWN];
-            scorePaint = TEXT_PAINTS[TEXT_DOWN];
-        }
-
-        canvas.translate(arrowX, 0);
-        canvas.drawPath(UPVOTE_PATH, upPaint);
-
-        canvas.translate(-arrowX, ARROW_TOTAL_HEIGHT + ARROW_SPACING);
-        if (hasThumbnail) {
-            if (bitmap != null) {
-                canvas.drawBitmap(bitmap, thumbSrc, thumbDst, THUMB_OUTLINE_PAINT);
-            } else {
-                canvas.drawRoundRect(thumbDst, ROUNDED_RADIUS, ROUNDED_RADIUS, THUMB_OUTLINE_PAINT);
-            }
-
-            bubbleRect.set(scoreBounds);
-            bubbleRect.offset((THUMB_WIDTH - scoreBounds.width()) / 2,
-                    THUMB_HEIGHT - SCORE_BUBBLE_SPACING);
-            bubbleRect.top -= SCORE_BUBBLE_PADDING;
-            bubbleRect.left -= SCORE_BUBBLE_PADDING;
-            bubbleRect.right += SCORE_BUBBLE_PADDING;
-            bubbleRect.bottom += SCORE_BUBBLE_PADDING;
-
-            canvas.drawRoundRect(bubbleRect, ROUNDED_RADIUS, ROUNDED_RADIUS, SCORE_BUBBLE_PAINT);
-            canvas.drawText(scoreText, THUMB_WIDTH / 2,
-                    THUMB_HEIGHT - SCORE_BUBBLE_SPACING,
-                    scorePaint);
-
-            canvas.translate(0, THUMB_HEIGHT);
-        } else {
-            canvas.drawText(scoreText, MAX_SCORE_WIDTH / 2, scoreBounds.height(), scorePaint);
-            canvas.translate(0, scoreBounds.height());
-        }
-
-        canvas.translate(arrowX, ARROW_SPACING);
-        canvas.drawPath(DOWNVOTE_PATH, downPaint);
-        canvas.restore();
-
-        canvas.save();
+        int sdy = titleLayout.getHeight() + ELEMENT_PADDING;
+        canvas.translate(0, sdy);
+        statusLayout.draw(canvas);
+        canvas.translate(-tdx, -sdy - tdy);
 
         if (detailsLayout != null) {
             int x = canvas.getWidth() - PADDING - detailsLayout.getWidth();
@@ -407,24 +281,6 @@ public class ThingView extends View implements OnGestureListener {
             detailsLayout.draw(canvas);
             canvas.translate(-x, -y);
         }
-
-        int titleX = PADDING * 2;
-        if (hasThumbnail) {
-            titleX += THUMB_WIDTH;
-        } else {
-            titleX += MAX_SCORE_WIDTH;
-        }
-
-        int rightHeight = titleLayout.getHeight() + ELEMENT_PADDING + statusLayout.getHeight();
-        int titleY = canvas.getHeight() / 2 - rightHeight / 2;
-
-        canvas.translate(titleX, titleY);
-        titleLayout.draw(canvas);
-
-        canvas.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
-        statusLayout.draw(canvas);
-
-        canvas.restore();
     }
 
     @Override
@@ -506,7 +362,8 @@ public class ThingView extends View implements OnGestureListener {
     }
 
     private int getVoteBottom() {
-        int voteBottom = PADDING + (ARROW_TOTAL_HEIGHT + ARROW_SPACING) * 2;
+        int voteBottom = 0;
+        // int voteBottom = PADDING + (ARROW_TOTAL_HEIGHT + ARROW_SPACING) * 2;
         if (thing.thumbnail != null) {
             voteBottom += THUMB_HEIGHT;
         } else {
@@ -516,7 +373,8 @@ public class ThingView extends View implements OnGestureListener {
     }
 
     private int getVoteCenterY() {
-        int center = PADDING + ARROW_TOTAL_HEIGHT + ARROW_SPACING;
+        int center = 0;
+        // int center = PADDING + ARROW_TOTAL_HEIGHT + ARROW_SPACING;
         if (thing.thumbnail != null) {
             center += THUMB_HEIGHT / 2;
         } else {
