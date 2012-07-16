@@ -72,11 +72,11 @@ public class ThingLoader extends AsyncTaskLoader<List<Thing>> {
             String cookie = AccountUtils.getCookie(context, accountName);
             return NetApi.queryThings(context, url, cookie, parentSubreddit, initThings);
         } catch (OperationCanceledException e) {
-            Log.e(TAG, "loadInBackground: " + url, e);
+            Log.e(TAG, "loadInBackground", e);
         } catch (AuthenticatorException e) {
-            Log.e(TAG, "loadInBackground: " + url, e);
+            Log.e(TAG, "loadInBackground", e);
         } catch (IOException e) {
-            Log.e(TAG, "loadInBackground: " + url, e);
+            Log.e(TAG, "loadInBackground", e);
         }
         return null;
     }

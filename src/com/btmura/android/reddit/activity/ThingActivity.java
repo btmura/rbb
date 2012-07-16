@@ -18,13 +18,18 @@ package com.btmura.android.reddit.activity;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
+import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.entity.Thing;
@@ -36,6 +41,7 @@ import com.btmura.android.reddit.fragment.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class ThingActivity extends GlobalMenuActivity implements
+        LoaderCallbacks<AccountResult>,
         CommentListener,
         ThingPagerHolder,
         SubredditNameHolder,
@@ -53,23 +59,42 @@ public class ThingActivity extends GlobalMenuActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.thing);
-
         thing = getIntent().getParcelableExtra(EXTRA_THING);
         pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(new ThingPagerAdapter(getFragmentManager(), thing));
         pager.setOnPageChangeListener(this);
+        setInitialFragments(savedInstanceState);
+        setActionBar(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
+    }
 
-        ActionBar bar = getActionBar();
-        bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP
-                | ActionBar.DISPLAY_SHOW_TITLE);
-        bar.setTitle(thing.assureTitle(this, new Formatter()).title);
-
+    private void setInitialFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(0), GlobalMenuFragment.TAG);
             ft.add(ThingMenuFragment.newInstance(thing), ThingMenuFragment.TAG);
             ft.commit();
         }
+    }
+
+    private void setActionBar(Bundle savedInstanceState) {
+        ActionBar bar = getActionBar();
+        bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+                | ActionBar.DISPLAY_HOME_AS_UP
+                | ActionBar.DISPLAY_SHOW_TITLE);
+        bar.setTitle(thing.assureTitle(this, new Formatter()).title);
+    }
+
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(this);
+    }
+
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        String accountName = result.getLastAccount();
+        Log.d(TAG, "an: " + accountName);
+        pager.setAdapter(new ThingPagerAdapter(getFragmentManager(), accountName, thing));
+    }
+
+    public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
     public void onReplyToComment(Comment comment) {

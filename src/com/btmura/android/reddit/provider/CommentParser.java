@@ -21,6 +21,8 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.util.JsonReader;
+import android.util.JsonToken;
+import android.util.Log;
 
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
@@ -106,6 +108,19 @@ class CommentParser extends JsonParser {
     @Override
     public void onDowns(JsonReader reader, int index) throws IOException {
         comments.get(index).downs = reader.nextInt();
+    }
+
+    @Override
+    public void onLikes(JsonReader reader, int index) throws IOException {
+        Log.d("CommentParser", "n: " + comments.get(index).name);
+        if (reader.peek() == JsonToken.NULL) {
+            reader.skipValue();
+            comments.get(index).likes = 0;
+        } else if (reader.nextBoolean()) {
+            comments.get(index).likes = 1;
+        } else {
+            comments.get(index).likes = -1;
+        }
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -101,7 +102,7 @@ public class ThumbnailLoader {
                 URL u = new URL(url);
                 conn = (HttpURLConnection) u.openConnection();
                 Bitmap original = BitmapFactory.decodeStream(conn.getInputStream());
-                Bitmap rounded = getRoundedBitmap(original);
+                Bitmap rounded = getThumbnailBitmap(original);
                 original.recycle();
                 return rounded;
 
@@ -117,20 +118,26 @@ public class ThumbnailLoader {
             return null;
         }
 
-        private Bitmap getRoundedBitmap(Bitmap original) {
-            Bitmap rounded = Bitmap.createBitmap(original.getWidth(), original.getHeight(),
-                    Config.ARGB_8888);
+        private Bitmap getThumbnailBitmap(Bitmap original) {
+            Resources r = context.getResources();
+            float density = r.getDisplayMetrics().density;
+            int radius = r.getDimensionPixelSize(R.dimen.rounded_radius);
+            int thumbWidth = r.getDimensionPixelSize(R.dimen.max_thumb_width);
+            int thumbHeight = Math.round(original.getHeight() * density);
+
+            Bitmap rounded = Bitmap.createBitmap(thumbWidth, thumbHeight, Config.ARGB_8888);
             Canvas canvas = new Canvas(rounded);
             canvas.drawARGB(0, 0, 0, 0);
 
             Rect src = new Rect(0, 0, original.getWidth(), original.getHeight());
-            RectF dst = new RectF(src);
-            int radius = context.getResources().getDimensionPixelSize(R.dimen.rounded_radius);
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            RectF dst = new RectF(0, 0, thumbWidth, thumbHeight);
+
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
             canvas.drawRoundRect(dst, radius, radius, paint);
 
             paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
             canvas.drawBitmap(original, src, dst, paint);
+
             return rounded;
         }
 

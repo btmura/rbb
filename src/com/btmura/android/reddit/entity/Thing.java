@@ -27,7 +27,7 @@ import android.os.Parcelable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 
-public class Thing implements Parcelable {
+public class Thing implements Parcelable, Votable {
 
     public static final int TYPE_THING = 0;
     public static final int TYPE_MORE = 1;
@@ -123,6 +123,18 @@ public class Thing implements Parcelable {
         }
         details = c.getString(R.string.thing_details, ups, downs, domain);
         return this;
+    }
+
+    public int getVote() {
+        return likes;
+    }
+
+    public void setVote(int vote) {
+        likes = vote;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int describeContents() {

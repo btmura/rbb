@@ -481,7 +481,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void refreshThingPager(Thing thing) {
         if (thing != null) {
-            ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(), thing);
+            ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(),
+                    getAccountName(), thing);
             thingPager.setAdapter(adapter);
             invalidateOptionsMenu();
         } else {

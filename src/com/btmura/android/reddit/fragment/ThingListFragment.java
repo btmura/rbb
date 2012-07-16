@@ -45,21 +45,22 @@ import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.entity.Votable;
 import com.btmura.android.reddit.provider.VoteProvider;
+import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
-import com.btmura.android.reddit.widget.ThingView.ThingViewListener;
 
 public class ThingListFragment extends ListFragment implements
         LoaderCallbacks<List<Thing>>,
         OnScrollListener,
-        ThingViewListener {
+        OnVoteListener {
 
     public static final String TAG = "ThingListFragment";
     public static final boolean DEBUG = Debug.DEBUG;
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
-    private static final String ARG_ACCOUNT_NAME = "a";
+    private static final String ARG_ACCOUNT_NAME = "an";
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_FILTER = "f";
     private static final String ARG_QUERY = "q";
@@ -117,7 +118,7 @@ public class ThingListFragment extends ListFragment implements
 
         adapter = new ThingAdapter(getActivity(), isSingleChoice());
         adapter.setSelectedThing(b.getString(STATE_THING_NAME), b.getInt(STATE_THING_POSITION, -1));
-        adapter.setThingViewListener(this);
+        adapter.setOnVoteListener(this);
         setHasOptionsMenu(true);
     }
 
@@ -212,10 +213,10 @@ public class ThingListFragment extends ListFragment implements
         }
     }
 
-    public void onVoteClick(Thing thing, int vote) {
+    public void onVote(Votable v, int vote) {
         if (!TextUtils.isEmpty(accountName)) {
-            thing.likes = vote;
-            VoteProvider.insertVoteInBackground(getActivity(), accountName, thing.name, vote);
+            v.setVote(vote);
+            VoteProvider.insertVoteInBackground(getActivity(), accountName, v.getName(), vote);
             adapter.notifyDataSetChanged();
         }
     }

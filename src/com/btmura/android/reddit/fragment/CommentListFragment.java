@@ -24,6 +24,8 @@ import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -39,25 +41,31 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Comment;
+import com.btmura.android.reddit.entity.Votable;
+import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
+import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ListFragment implements LoaderCallbacks<List<Comment>>,
-        MultiChoiceModeListener {
+        MultiChoiceModeListener, OnVoteListener {
 
     public static final String TAG = "CommentListFragment";
 
-    private static final String ARG_THING_ID = "i";
+    private static final String ARG_ACCOUNT_NAME = "an";
+    private static final String ARG_THING_ID = "ti";
 
     public interface CommentListener {
         void onReplyToComment(Comment comment);
     }
 
+    private String accountName;
     private CommentListener listener;
     private CommentAdapter adapter;
 
-    public static CommentListFragment newInstance(String thingId) {
+    public static CommentListFragment newInstance(String accountName, String thingId) {
         CommentListFragment frag = new CommentListFragment();
-        Bundle b = new Bundle(1);
+        Bundle b = new Bundle(2);
+        b.putString(ARG_ACCOUNT_NAME, accountName);
         b.putString(ARG_THING_ID, thingId);
         frag.setArguments(b);
         return frag;
@@ -74,7 +82,9 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        accountName = getArguments().getString(ARG_ACCOUNT_NAME);
         adapter = new CommentAdapter(getActivity());
+        adapter.setOnVoteListener(this);
     }
 
     @Override
@@ -96,7 +106,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     public Loader<List<Comment>> onCreateLoader(int id, Bundle args) {
         URL url = Urls.commentsUrl(getArguments().getString(ARG_THING_ID));
-        return new CommentLoader(getActivity().getApplicationContext(), url);
+        return new CommentLoader(getActivity().getApplicationContext(), accountName, url);
     }
 
     public void onLoadFinished(Loader<List<Comment>> loader, List<Comment> comments) {
@@ -107,6 +117,15 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     public void onLoaderReset(Loader<List<Comment>> loader) {
         adapter.swapData(null);
+    }
+
+    public void onVote(Votable v, int vote) {
+        Log.d(TAG, "an: " + accountName);
+        if (!TextUtils.isEmpty(accountName)) {
+            v.setVote(vote);
+            VoteProvider.insertVoteInBackground(getActivity(), accountName, v.getName(), vote);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {

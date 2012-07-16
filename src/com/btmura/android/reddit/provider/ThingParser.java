@@ -128,8 +128,10 @@ class ThingParser extends JsonParser {
         if (reader.peek() == JsonToken.NULL) {
             reader.skipValue();
             things.get(index).likes = 0;
+        } else if (reader.nextBoolean()) {
+            things.get(index).likes = 1;
         } else {
-            things.get(index).likes = reader.nextBoolean() ? 1 : -1;
+            things.get(index).likes = -1;
         }
     }
 

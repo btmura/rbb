@@ -20,10 +20,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
 
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.provider.NetApi;
 
@@ -31,11 +34,13 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
 
     public static final String TAG = "CommentLoader";
 
+    private final String accountName;
     private final URL url;
     private List<Comment> comments;
 
-    public CommentLoader(Context context, URL url) {
+    public CommentLoader(Context context, String accountName, URL url) {
         super(context.getApplicationContext());
+        this.accountName = accountName;
         this.url = url;
     }
 
@@ -58,8 +63,14 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
     @Override
     public List<Comment> loadInBackground() {
         try {
-            return NetApi.queryComments(getContext(), url, null);
+            Context context = getContext();
+            String cookie = AccountUtils.getCookie(context, accountName);
+            return NetApi.queryComments(getContext(), url, cookie);
         } catch (IOException e) {
+            Log.e(TAG, "loadInBackground", e);
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, "loadInBackground", e);
+        } catch (AuthenticatorException e) {
             Log.e(TAG, "loadInBackground", e);
         }
         return null;

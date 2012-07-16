@@ -14,7 +14,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="PagerTitleStrip">
         <item name="android:background">#666666</item>
@@ -51,15 +51,15 @@
     <style name="ThingStatusText" parent="@style/SubredditStatusText" />
 
     <style name="ThingNeutralScoreText" parent="@style/SubredditStatusText">
-        <item name="android:textColor">@color/score_fg</item>
+        <item name="android:textColor">@color/score_text_neutral</item>        
     </style>
 
     <style name="ThingUpScoreText" parent="@style/SubredditStatusText">
-        <item name="android:textColor">@android:color/holo_orange_dark</item>
+        <item name="android:textColor">@color/score_text_up</item>
     </style>
 
     <style name="ThingDownScoreText" parent="@style/SubredditStatusText">
-        <item name="android:textColor">@android:color/holo_blue_dark</item>
+        <item name="android:textColor">@color/score_text_down</item>
     </style>
 
     <style name="CommentTitleText" parent="@android:style/TextAppearance.Holo.Medium">

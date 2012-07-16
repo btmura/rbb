@@ -29,10 +29,12 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
     public static final int TYPE_LINK = 0;
     public static final int TYPE_COMMENTS = 1;
 
+    private final String accountName;
     private final Thing thing;
 
-    public ThingPagerAdapter(FragmentManager fm, Thing thing) {
+    public ThingPagerAdapter(FragmentManager fm, String accountName, Thing thing) {
         super(fm);
+        this.accountName = accountName;
         this.thing = thing;
     }
 
@@ -48,7 +50,7 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
                 return LinkFragment.newInstance(thing.url);
 
             case TYPE_COMMENTS:
-                return CommentListFragment.newInstance(thing.getId());
+                return CommentListFragment.newInstance(accountName, thing.getId());
 
             default:
                 throw new IllegalStateException();

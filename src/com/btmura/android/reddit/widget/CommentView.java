@@ -29,12 +29,17 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Comment;
 
-public class CommentView extends View {
+public class CommentView extends View implements OnGestureListener {
+
+    public static final String TAG = "CommentView";
 
     private static float FONT_SCALE;
 
@@ -47,6 +52,9 @@ public class CommentView extends View {
     private static final int TEXT_BODY = 1;
     private static final int TEXT_STATUS = 2;
 
+    private final GestureDetector detector;
+    private OnVoteListener listener;
+
     private Comment comment;
 
     private StaticLayout titleLayout;
@@ -55,7 +63,6 @@ public class CommentView extends View {
 
     private String scoreText;
     private final Rect scoreBounds = new Rect();
-
     private int rightHeight;
     private int minHeight;
 
@@ -69,11 +76,12 @@ public class CommentView extends View {
 
     public CommentView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        detector = new GestureDetector(context, this);
         init(context);
-        VotingArrows.init(context);
     }
 
     private void init(Context context) {
+        VotingArrows.init(context);
         Resources r = context.getResources();
         float fontScale = r.getConfiguration().fontScale;
         if (FONT_SCALE != fontScale) {
@@ -105,6 +113,10 @@ public class CommentView extends View {
         }
     }
 
+    public void setOnVoteListener(OnVoteListener listener) {
+        this.listener = listener;
+    }
+
     public void setComment(Comment comment) {
         this.comment = comment;
         requestLayout();
@@ -132,7 +144,7 @@ public class CommentView extends View {
         VotingArrows.measureScoreText(scoreText, scoreBounds);
 
         int rightContentWidth = measuredWidth
-                - PADDING - VotingArrows.ARROW_TOTAL_WIDTH - PADDING
+                - PADDING - VotingArrows.getWidth(false) - PADDING
                 - PADDING * comment.nesting - PADDING;
 
         titleLayout = null;
@@ -156,7 +168,7 @@ public class CommentView extends View {
             rightHeight += statusLayout.getHeight();
         }
 
-        int leftHeight = VotingArrows.getHeight();
+        int leftHeight = VotingArrows.getHeight(false);
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -194,10 +206,10 @@ public class CommentView extends View {
     @Override
     protected void onDraw(Canvas c) {
         c.translate(PADDING * (1 + comment.nesting), PADDING);
-        VotingArrows.draw(c, scoreText, scoreBounds, 0);
+        VotingArrows.draw(c, null, false, scoreText, scoreBounds, comment.likes);
         c.translate(0, -PADDING);
 
-        int dx = VotingArrows.ARROW_TOTAL_WIDTH + PADDING;
+        int dx = VotingArrows.getWidth(false) + PADDING;
         int dy = (minHeight - rightHeight) / 2;
         c.translate(dx, dy);
 
@@ -212,5 +224,40 @@ public class CommentView extends View {
         }
 
         statusLayout.draw(c);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (detector.onTouchEvent(event)) {
+            return true;
+        } else {
+            return super.onTouchEvent(event);
+        }
+    }
+
+    public boolean onDown(MotionEvent e) {
+        return VotingArrows.onDown(e, false, getCommentLeft());
+    }
+
+    public boolean onSingleTapUp(MotionEvent e) {
+        return VotingArrows.onSingleTapUp(e, false, getCommentLeft(), listener, comment);
+    }
+
+    private float getCommentLeft() {
+        return comment.nesting * PADDING;
+    }
+
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        return false;
+    }
+
+    public void onLongPress(MotionEvent e) {
+    }
+
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    public void onShowPress(MotionEvent e) {
     }
 }

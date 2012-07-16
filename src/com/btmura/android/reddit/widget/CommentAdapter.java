@@ -31,9 +31,14 @@ public class CommentAdapter extends BaseAdapter {
 
     private final ArrayList<Comment> items = new ArrayList<Comment>();
     private final Context context;
+    private OnVoteListener listener;
 
     public CommentAdapter(Context context) {
         this.context = context;
+    }
+
+    public void setOnVoteListener(OnVoteListener listener) {
+        this.listener = listener;
     }
 
     public void swapData(List<Comment> newItems) {
@@ -76,6 +81,7 @@ public class CommentAdapter extends BaseAdapter {
         }
         v.setBackgroundResource(R.drawable.selector_normal);
         v.setComment(getItem(position));
+        v.setOnVoteListener(listener);
         return v;
     }
 }
