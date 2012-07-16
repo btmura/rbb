@@ -70,6 +70,7 @@ class VotingArrows {
     private static RectF THUMB_OUTLINE_RECT;
     private static Paint THUMB_OUTLINE_PAINT;
 
+    private static Paint BUBBLE_PAINT;
     private static RectF BUBBLE_RECT;
     private static int BUBBLE_HPADDING;
     private static int BUBBLE_VPADDING;
@@ -97,6 +98,8 @@ class VotingArrows {
             BUBBLE_SPACING = r.getDimensionPixelSize(R.dimen.bubble_spacing);
             BUBBLE_HPADDING = r.getDimensionPixelSize(R.dimen.bubble_horizontal_padding);
             BUBBLE_VPADDING = r.getDimensionPixelSize(R.dimen.bubble_vertical_padding);
+            BUBBLE_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
+            BUBBLE_PAINT.setColor(r.getColor(R.color.bubble));
 
             Theme t = context.getTheme();
             int[] colorIds = new int[] {
@@ -191,8 +194,7 @@ class VotingArrows {
         int cdy;
         if (hasThumb) {
             if (thumb != null) {
-                int ty = (THUMB_TOTAL_HEIGHT - thumb.getHeight()) / 2;
-                c.drawBitmap(thumb, 0, ty, PAINTS[NEUTRAL]);
+                c.drawBitmap(thumb, 0, THUMB_OUTLINE_RECT.top, PAINTS[NEUTRAL]);
             } else {
                 c.drawRoundRect(THUMB_OUTLINE_RECT, RADIUS, RADIUS, THUMB_OUTLINE_PAINT);
             }
@@ -202,14 +204,9 @@ class VotingArrows {
             BUBBLE_RECT.set(0, 0, bw, bh);
 
             int bdx = (THUMB_WIDTH - bw) / 2;
-            int bdy;
-            if (thumb != null) {
-                bdy = (THUMB_TOTAL_HEIGHT + thumb.getHeight()) / 2 - BUBBLE_SPACING - bh;
-            } else {
-                bdy = (THUMB_TOTAL_HEIGHT + THUMB_HEIGHT) / 2 - BUBBLE_SPACING - bh;
-            }
+            int bdy = (THUMB_TOTAL_HEIGHT + THUMB_HEIGHT) / 2 - BUBBLE_SPACING - bh;
             BUBBLE_RECT.offset(bdx, bdy);
-            c.drawRoundRect(BUBBLE_RECT, RADIUS, RADIUS, PAINTS[NEUTRAL]);
+            c.drawRoundRect(BUBBLE_RECT, RADIUS, RADIUS, BUBBLE_PAINT);
 
             sdx = (THUMB_WIDTH - scoreBounds.width()) / 2;
             sdy = bdy + bh - BUBBLE_VPADDING;

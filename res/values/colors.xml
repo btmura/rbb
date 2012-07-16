@@ -20,6 +20,8 @@
     <color name="arrow_neutral">#ccc</color>
     <color name="arrow_up">@android:color/holo_orange_dark</color>
     
+    <color name="bubble">#ddd</color>
+    
     <color name="score_text_down">@android:color/holo_purple</color>
     <color name="score_text_neutral">#666</color>
     <color name="score_text_up">@android:color/holo_orange_dark</color>
