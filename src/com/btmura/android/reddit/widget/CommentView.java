@@ -32,6 +32,7 @@ import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
@@ -180,7 +181,7 @@ public class CommentView extends View implements OnGestureListener {
 
         bodyBounds.setEmpty();
 
-        int rx = PADDING + VotingArrows.getWidth(false) + PADDING;
+        int rx = PADDING * (1 + comment.nesting) + VotingArrows.getWidth(false) + PADDING;
         if (bodyLayout != null) {
             bodyBounds.left = rx;
             rx += bodyLayout.getWidth();
@@ -268,16 +269,25 @@ public class CommentView extends View implements OnGestureListener {
 
             int line = bodyLayout.getLineForVertical(Math.round(localY));
             int offset = bodyLayout.getOffsetForHorizontal(line, localX);
-            float right = bodyLayout.getLineRight(line);
+            float right = bodyBounds.left + bodyLayout.getLineRight(line);
+
+            if (DEBUG) {
+                Log.d(TAG, "b: " + bodyBounds + " x: " + e.getX() + " y: " + e.getY());
+            }
 
             if (localX > right) {
+                if (DEBUG) {
+                    Log.d(TAG, "lx: " + localX + " r: " + right);
+                }
                 return false;
             }
 
             Spannable bodySpan = (Spannable) comment.body;
             ClickableSpan[] spans = bodySpan.getSpans(offset, offset, ClickableSpan.class);
             if (spans != null && spans.length > 0) {
-                spans[0].onClick(this);
+                if (action == MotionEvent.ACTION_UP) {
+                    spans[0].onClick(this);
+                }
                 return true;
             }
         }
