@@ -22,24 +22,29 @@ import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.text.BoringLayout;
 import android.text.Layout.Alignment;
+import android.text.Spannable;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
+import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Comment;
 
 public class CommentView extends View implements OnGestureListener {
 
     public static final String TAG = "CommentView";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     private static float FONT_SCALE;
 
@@ -65,6 +70,8 @@ public class CommentView extends View implements OnGestureListener {
     private final Rect scoreBounds = new Rect();
     private int rightHeight;
     private int minHeight;
+
+    private final RectF bodyBounds = new RectF();
 
     public CommentView(Context context) {
         this(context, null);
@@ -171,6 +178,26 @@ public class CommentView extends View implements OnGestureListener {
         int leftHeight = VotingArrows.getHeight(false);
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
+        bodyBounds.setEmpty();
+
+        int rx = PADDING + VotingArrows.getWidth(false) + PADDING;
+        if (bodyLayout != null) {
+            bodyBounds.left = rx;
+            rx += bodyLayout.getWidth();
+            bodyBounds.right = rx;
+        }
+
+        int ry = (minHeight - rightHeight) / 2;
+        if (titleLayout != null) {
+            ry += titleLayout.getHeight() + ELEMENT_PADDING;
+        }
+        if (bodyLayout != null) {
+            bodyBounds.top = ry;
+            ry += bodyLayout.getHeight();
+            bodyBounds.bottom = ry;
+            ry += ELEMENT_PADDING;
+        }
+
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getMode(heightMeasureSpec);
         switch (heightMode) {
@@ -227,12 +254,34 @@ public class CommentView extends View implements OnGestureListener {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (detector.onTouchEvent(event)) {
-            return true;
-        } else {
-            return super.onTouchEvent(event);
+    public boolean onTouchEvent(MotionEvent e) {
+        return detector.onTouchEvent(e) || onBodyTouchEvent(e) || super.onTouchEvent(e);
+    }
+
+    private boolean onBodyTouchEvent(MotionEvent e) {
+        int action = e.getAction();
+        if ((action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
+                && comment.body instanceof Spannable
+                && bodyBounds.contains(e.getX(), e.getY())) {
+            float localX = e.getX() - bodyBounds.left;
+            float localY = e.getY() - bodyBounds.top;
+
+            int line = bodyLayout.getLineForVertical(Math.round(localY));
+            int offset = bodyLayout.getOffsetForHorizontal(line, localX);
+            float right = bodyLayout.getLineRight(line);
+
+            if (localX > right) {
+                return false;
+            }
+
+            Spannable bodySpan = (Spannable) comment.body;
+            ClickableSpan[] spans = bodySpan.getSpans(offset, offset, ClickableSpan.class);
+            if (spans != null && spans.length > 0) {
+                spans[0].onClick(this);
+                return true;
+            }
         }
+        return false;
     }
 
     public boolean onDown(MotionEvent e) {
