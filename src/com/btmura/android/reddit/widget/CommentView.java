@@ -152,7 +152,7 @@ public class CommentView extends View implements OnGestureListener {
         VotingArrows.measureScoreText(scoreText, scoreBounds);
 
         int rightContentWidth = measuredWidth
-                - PADDING - VotingArrows.getWidth(false) - PADDING
+                - PADDING - VotingArrows.getWidth() - PADDING
                 - PADDING * comment.nesting - PADDING;
 
         titleLayout = null;
@@ -176,12 +176,12 @@ public class CommentView extends View implements OnGestureListener {
             rightHeight += statusLayout.getHeight();
         }
 
-        int leftHeight = VotingArrows.getHeight(false);
+        int leftHeight = VotingArrows.getHeight();
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         bodyBounds.setEmpty();
 
-        int rx = PADDING * (1 + comment.nesting) + VotingArrows.getWidth(false) + PADDING;
+        int rx = PADDING * (1 + comment.nesting) + VotingArrows.getWidth() + PADDING;
         if (bodyLayout != null) {
             bodyBounds.left = rx;
             rx += bodyLayout.getWidth();
@@ -237,7 +237,7 @@ public class CommentView extends View implements OnGestureListener {
         VotingArrows.draw(c, null, false, scoreText, scoreBounds, comment.likes);
         c.translate(0, -PADDING);
 
-        int dx = VotingArrows.getWidth(false) + PADDING;
+        int dx = VotingArrows.getWidth() + PADDING;
         int dy = (minHeight - rightHeight) / 2;
         c.translate(dx, dy);
 

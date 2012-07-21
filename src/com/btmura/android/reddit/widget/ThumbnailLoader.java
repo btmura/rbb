@@ -121,8 +121,8 @@ public class ThumbnailLoader {
         private Bitmap getThumbnailBitmap(Bitmap original) {
             Resources r = context.getResources();
             float density = r.getDisplayMetrics().density;
-            int radius = r.getDimensionPixelSize(R.dimen.rounded_radius);
-            int thumbWidth = r.getDimensionPixelSize(R.dimen.max_thumb_width);
+            int radius = r.getDimensionPixelSize(R.dimen.radius);
+            int thumbWidth = r.getDimensionPixelSize(R.dimen.thumb_width);
             int thumbHeight = Math.round(original.getHeight() * density);
 
             Bitmap rounded = Bitmap.createBitmap(thumbWidth, thumbHeight, Config.ARGB_8888);

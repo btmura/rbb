@@ -73,6 +73,7 @@ public class ThingView extends View implements OnGestureListener {
 
     private void init(Context context) {
         VotingArrows.init(context);
+        Thumbnail.init(context);
         Resources r = context.getResources();
         float fontScale = r.getConfiguration().fontScale;
         if (FONT_SCALE != fontScale) {
@@ -170,14 +171,16 @@ public class ThingView extends View implements OnGestureListener {
             detailsText = "";
         }
 
-
-        boolean hasThumb = thing.thumbnail != null;
-        int width = VotingArrows.getWidth(hasThumb);
+        int width = VotingArrows.getWidth();
+        if (thing.thumbnail != null) {
+            width += PADDING + Thumbnail.getWidth();
+        }
+        width += PADDING;
+        titleWidth -= width;
         int statusWidth = measuredWidth - PADDING * 2;
-        statusWidth -= width + PADDING;
-        titleWidth -= width + PADDING;
+        statusWidth -= width;
         if (detailsWidth > 0) {
-            statusWidth -= detailsWidth + PADDING;
+            statusWidth -= detailsWidth + PADDING;titleWidth -= width;
         }
 
         titleWidth = Math.max(0, titleWidth);
@@ -193,7 +196,7 @@ public class ThingView extends View implements OnGestureListener {
             detailsLayout = null;
         }
 
-        int leftHeight = VotingArrows.getHeight(hasThumb);
+        int leftHeight = VotingArrows.getHeight();
         rightHeight = titleLayout.getHeight() + ELEMENT_PADDING + statusLayout.getHeight();
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
@@ -225,28 +228,32 @@ public class ThingView extends View implements OnGestureListener {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(Canvas c) {
         boolean hasThumb = thing.thumbnail != null;
-        canvas.translate(PADDING, PADDING);
-        VotingArrows.draw(canvas, thumb, hasThumb, scoreText, scoreBounds, thing.likes);
-        canvas.translate(0, -PADDING);
+        c.translate(PADDING, PADDING);
+        VotingArrows.draw(c, thumb, hasThumb, scoreText, scoreBounds, thing.likes);
+        c.translate(VotingArrows.getWidth() + PADDING, 0);
 
-        int tdx = VotingArrows.getWidth(hasThumb) + PADDING;
+        if (hasThumb) {
+            Thumbnail.draw(c, thumb, hasThumb);
+            c.translate(Thumbnail.getWidth() + PADDING, 0);
+        }
+
         int tdy = (minHeight - rightHeight) / 2;
-        canvas.translate(tdx, tdy);
-        titleLayout.draw(canvas);
+        c.translate(0, -PADDING + tdy);
+        titleLayout.draw(c);
 
         int sdy = titleLayout.getHeight() + ELEMENT_PADDING;
-        canvas.translate(0, sdy);
-        statusLayout.draw(canvas);
-        canvas.translate(-tdx, -sdy - tdy);
+        c.translate(0, sdy);
+        statusLayout.draw(c);
+        c.translate(0, -sdy - tdy);
 
         if (detailsLayout != null) {
-            int x = canvas.getWidth() - PADDING - detailsLayout.getWidth();
-            int y = (canvas.getHeight() - detailsLayout.getHeight()) / 2;
-            canvas.translate(x, y);
-            detailsLayout.draw(canvas);
-            canvas.translate(-x, -y);
+            int dx = c.getWidth() - PADDING - detailsLayout.getWidth();
+            int dy = (c.getHeight() - detailsLayout.getHeight()) / 2;
+            c.translate(dx, dy);
+            detailsLayout.draw(c);
+            c.translate(-dx, -dy);
         }
     }
 
