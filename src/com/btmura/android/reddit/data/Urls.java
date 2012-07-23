@@ -22,7 +22,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class Urls {
@@ -92,8 +91,8 @@ public class Urls {
         return b.toString();
     }
 
-    public static URL permaUrl(Thing thing) {
-        return newUrl(resetBuilder().append(BASE_URL).append(thing.permaLink));
+    public static URL permaUrl(String permaLink) {
+        return newUrl(resetBuilder().append(BASE_URL).append(permaLink));
     }
 
     public static URL searchUrl(String query, String more) {
@@ -126,11 +125,11 @@ public class Urls {
         return b.toString();
     }
 
-    public static URL subredditUrl(Subreddit sr, int filter, String more) {
+    public static URL subredditUrl(String subreddit, int filter, String more) {
         StringBuilder b = resetBuilder().append(BASE_URL);
 
-        if (!sr.isFrontPage()) {
-            b.append("/r/").append(encode(sr.name));
+        if (!Subreddit.isFrontPage(subreddit)) {
+            b.append("/r/").append(encode(subreddit));
         }
 
         switch (filter) {

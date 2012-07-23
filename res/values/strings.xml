@@ -26,6 +26,7 @@
     <string name="add_subreddit">Add subreddit</string>
      
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
+    <string name="authority_things">com.btmura.android.reddit.provider.things</string>
     <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
     
     <string name="captcha_guess">Type captcha</string>
@@ -78,6 +79,7 @@
     <string name="menu_view_sidebar">View sidebar</string>    
 
     <string name="provider_subreddits">Subreddits</string>
+    <string name="provider_things">Things</string>
     <string name="provider_votes">Votes</string>
     
     <string name="remove">Remove</string>

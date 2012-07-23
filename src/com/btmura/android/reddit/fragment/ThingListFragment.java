@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.fragment;
 
-import java.net.URL;
 import java.util.List;
 
 import android.app.Activity;
@@ -24,6 +23,7 @@ import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -40,9 +40,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
-import com.btmura.android.reddit.content.ThingLoader;
 import com.btmura.android.reddit.data.Flag;
-import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.entity.Votable;
@@ -51,7 +49,7 @@ import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
 public class ThingListFragment extends ListFragment implements
-        LoaderCallbacks<List<Thing>>,
+        LoaderCallbacks<Cursor>,
         OnScrollListener,
         OnVoteListener {
 
@@ -72,7 +70,7 @@ public class ThingListFragment extends ListFragment implements
     private static final String LOADER_ARG_MORE_KEY = "m";
 
     public interface OnThingSelectedListener {
-        void onThingSelected(Thing thing, int position);
+        void onThingSelected(Bundle thingBundle, int position);
 
         int onMeasureThingBody();
     }
@@ -116,9 +114,7 @@ public class ThingListFragment extends ListFragment implements
         filter = b.getInt(ARG_FILTER);
         query = b.getString(ARG_QUERY);
 
-        adapter = new ThingAdapter(getActivity(), isSingleChoice());
-        adapter.setSelectedThing(b.getString(STATE_THING_NAME), b.getInt(STATE_THING_POSITION, -1));
-        adapter.setOnVoteListener(this);
+        adapter = new ThingAdapter(getActivity());
         setHasOptionsMenu(true);
     }
 
@@ -149,43 +145,26 @@ public class ThingListFragment extends ListFragment implements
         }
     }
 
-    public Loader<List<Thing>> onCreateLoader(int id, Bundle args) {
-        String moreKey = args != null ? args.getString(LOADER_ARG_MORE_KEY) : null;
-        URL url;
-        if (subreddit != null) {
-            url = Urls.subredditUrl(subreddit, filter, moreKey);
-        } else {
-            url = Urls.searchUrl(query, moreKey);
-        }
-        return new ThingLoader(getActivity().getApplicationContext(),
-                getAccountName(),
-                Subreddit.getName(subreddit),
-                url,
-                args != null ? adapter.getItems() : null);
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return ThingAdapter.createLoader(getActivity(), getAccountName(),
+                Subreddit.getName(subreddit), filter);
     }
 
-    public void onLoadFinished(Loader<List<Thing>> loader, List<Thing> things) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor things) {
         scrollLoading = false;
-        adapter.swapData(things);
+        adapter.swapCursor(things);
         setEmptyText(getString(things != null ? R.string.empty_list : R.string.error));
         setListShown(true);
     }
 
-    public void onLoaderReset(Loader<List<Thing>> loader) {
-        adapter.swapData(null);
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        Thing t = adapter.getItem(position);
-        adapter.setSelectedThing(t.name, position);
-        adapter.notifyDataSetChanged();
-
-        switch (t.type) {
-            case Thing.TYPE_THING:
-                listener.onThingSelected(adapter.getItem(position), position);
-                break;
+        if (listener != null) {
+            listener.onThingSelected(adapter.getThingBundle(position), position);
         }
     }
 
@@ -201,13 +180,13 @@ public class ThingListFragment extends ListFragment implements
             Loader<List<Thing>> loader = getLoaderManager().getLoader(0);
             if (loader != null) {
                 if (!adapter.isEmpty()) {
-                    Thing t = adapter.getItem(adapter.getCount() - 1);
-                    if (t.type == Thing.TYPE_MORE) {
-                        scrollLoading = true;
-                        Bundle b = new Bundle(1);
-                        b.putString(LOADER_ARG_MORE_KEY, t.moreKey);
-                        getLoaderManager().restartLoader(0, b, this);
-                    }
+                    // Thing t = adapter.getItem(adapter.getCount() - 1);
+                    // if (t.type == Thing.TYPE_MORE) {
+                    // scrollLoading = true;
+                    // Bundle b = new Bundle(1);
+                    // b.putString(LOADER_ARG_MORE_KEY, t.moreKey);
+                    // getLoaderManager().restartLoader(0, b, this);
+                    // }
                 }
             }
         }
@@ -228,16 +207,17 @@ public class ThingListFragment extends ListFragment implements
         outState.putParcelable(ARG_SUBREDDIT, subreddit);
         outState.putInt(ARG_FILTER, filter);
         outState.putString(ARG_QUERY, query);
-        outState.putString(STATE_THING_NAME, adapter.getSelectedThingName());
-        outState.putInt(STATE_THING_POSITION, adapter.getSelectedThingPosition());
+        // outState.putString(STATE_THING_NAME, adapter.getSelectedThingName());
+        // outState.putInt(STATE_THING_POSITION,
+        // adapter.getSelectedThingPosition());
     }
 
-    public void setSelectedThing(Thing t, int position) {
-        String name = t != null ? t.name : null;
-        if (!adapter.isSelectedThing(name, position)) {
-            adapter.setSelectedThing(name, position);
-            adapter.notifyDataSetChanged();
-        }
+    public void setSelectedThing(Bundle thingBundle, int position) {
+        // String name = t != null ? t.name : null;
+        // if (!adapter.isSelectedThing(name, position)) {
+        // adapter.setSelectedThing(name, position);
+        // adapter.notifyDataSetChanged();
+        // }
     }
 
     @Override

@@ -36,10 +36,12 @@ public class Formatter {
     private final Matcher matcher = RawLinks.PATTERN.matcher("");
     private final StringBuilder builder = new StringBuilder();
 
+    public String preformatTitle(Context context, String title) {
+        return Escaped.format(matcher, title).toString();
+    }
+
     public CharSequence formatTitle(Context context, CharSequence title) {
-        CharSequence c = Escaped.format(matcher, title);
-        c = Disapproval.format(context, matcher, c);
-        return c;
+        return Disapproval.format(context, matcher, title);
     }
 
     public CharSequence formatComment(Context context, CharSequence comment) {

@@ -92,6 +92,11 @@
             android:exported="true"
             android:label="@string/provider_subreddits" />
         <provider
+            android:name=".provider.ThingProvider"
+            android:authorities="@string/authority_things"
+            android:exported="false"
+            android:label="@string/provider_things" />
+        <provider
             android:name=".provider.VoteProvider"
             android:authorities="@string/authority_votes"
             android:exported="false"

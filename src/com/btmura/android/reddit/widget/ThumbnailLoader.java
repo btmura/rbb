@@ -34,9 +34,9 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.LruCache;
-import android.view.View;
 
 import com.btmura.android.reddit.R;
 
@@ -47,29 +47,28 @@ public class ThumbnailLoader {
     private static final BitmapCache BITMAP_CACHE = new BitmapCache(2 * 1024 * 1024);
 
     public void setThumbnail(Context context, ThingView v, String url) {
-        Bitmap b = BITMAP_CACHE.get(url);
-        v.setThumbnail(b);
-        if (b == null) {
-            LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
-            if (task == null || !url.equals(task.url)) {
-                if (task != null) {
-                    task.cancel(true);
+        if (!TextUtils.isEmpty(url)) {
+            Bitmap b = BITMAP_CACHE.get(url);
+            v.setThumbnailBitmap(b);
+            if (b == null) {
+                LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
+                if (task == null || !url.equals(task.url)) {
+                    if (task != null) {
+                        task.cancel(true);
+                    }
+                    task = new LoadThumbnailTask(context, v, url);
+                    v.setTag(task);
+                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
-                task = new LoadThumbnailTask(context, v, url);
-                v.setTag(task);
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
+        } else {
+            LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
+            if (task != null) {
+                task.cancel(true);
+                v.setTag(null);
+            }
+            v.setThumbnailBitmap(null);
         }
-        v.setVisibility(View.VISIBLE);
-    }
-
-    public void clearThumbnail(ThingView v) {
-        LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
-        if (task != null) {
-            task.cancel(true);
-            v.setTag(null);
-        }
-        v.setThumbnail(null);
     }
 
     static class BitmapCache extends LruCache<String, Bitmap> {
@@ -149,7 +148,7 @@ public class ThumbnailLoader {
             ThingView v = ref.get();
             if (v != null && equals(v.getTag())) {
                 if (b != null) {
-                    v.setThumbnail(b);
+                    v.setThumbnailBitmap(b);
                 }
                 v.setTag(null);
             }

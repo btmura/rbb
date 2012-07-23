@@ -16,16 +16,19 @@
 
 package com.btmura.android.reddit.entity;
 
-import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.data.Formatter;
-import com.btmura.android.reddit.data.RelativeTime;
-
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.data.Formatter;
+import com.btmura.android.reddit.data.RelativeTime;
+import com.btmura.android.reddit.provider.ThingProvider.Things;
 
 public class Thing implements Parcelable, Votable {
 
@@ -34,7 +37,7 @@ public class Thing implements Parcelable, Votable {
 
     public int type;
     public String name;
-    public String rawTitle;
+    public String title;
     public boolean over18;
     public String subreddit;
     public String author;
@@ -54,8 +57,6 @@ public class Thing implements Parcelable, Votable {
     public String moreKey;
     public long createdUtc;
 
-    public CharSequence title;
-
     public Thing() {
     }
 
@@ -72,7 +73,7 @@ public class Thing implements Parcelable, Votable {
     Thing(Parcel parcel) {
         type = parcel.readInt();
         name = parcel.readString();
-        rawTitle = parcel.readString();
+        title = parcel.readString();
         subreddit = parcel.readString();
         url = parcel.readString();
         permaLink = parcel.readString();
@@ -82,11 +83,16 @@ public class Thing implements Parcelable, Votable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(type);
         dest.writeString(name);
-        dest.writeString(rawTitle);
+        dest.writeString(title);
         dest.writeString(subreddit);
         dest.writeString(url);
         dest.writeString(permaLink);
         dest.writeInt(isSelf ? 1 : 0);
+    }
+
+    public static String getId(String name) {
+        int sepIndex = name.indexOf('_');
+        return name.substring(sepIndex + 1);
     }
 
     public String getId() {
@@ -94,19 +100,10 @@ public class Thing implements Parcelable, Votable {
         return name.substring(sepIndex + 1);
     }
 
-    public Thing assureTitle(Context c, Formatter f) {
-        if (type == TYPE_MORE || title != null) {
-            return this;
-        }
-        title = f.formatTitle(c, rawTitle);
-        return this;
-    }
-
     public Thing assureFormat(Context c, Formatter f, String parentSubreddit, long now) {
         if (type == TYPE_MORE || status != null) {
             return this;
         }
-        assureTitle(c, f);
         boolean showSubreddit = parentSubreddit == null
                 || !parentSubreddit.equalsIgnoreCase(subreddit);
         int resId = showSubreddit ? R.string.thing_status_subreddit : R.string.thing_status;
@@ -139,5 +136,49 @@ public class Thing implements Parcelable, Votable {
 
     public int describeContents() {
         return 0;
+    }
+
+    public static String getSubreddit(Bundle thingBundle) {
+        if (thingBundle != null) {
+            return thingBundle.getString(Things.COLUMN_SUBREDDIT);
+        } else {
+            return null;
+        }
+    }
+
+    public static String getDomain(Bundle thingBundle) {
+        return thingBundle.getString(Things.COLUMN_DOMAIN);
+    }
+
+    public static int getLikes(Bundle thingBundle) {
+        return thingBundle.getInt(Things.COLUMN_LIKES);
+    }
+
+    public static String getPermaLink(Bundle thingBundle) {
+        return thingBundle.getString(Things.COLUMN_PERMA_LINK);
+    }
+
+    public static int getScore(Bundle thingBundle) {
+        return thingBundle.getInt(Things.COLUMN_SCORE);
+    }
+
+    public static boolean isSelf(Bundle thingBundle) {
+        return thingBundle.getBoolean(Things.COLUMN_SELF);
+    }
+
+    public static String getUrl(Bundle thingBundle) {
+        return thingBundle.getString(Things.COLUMN_URL);
+    }
+
+    public static CharSequence getTitle(Bundle thingBundle) {
+        return thingBundle.getCharSequence(Things.COLUMN_TITLE);
+    }
+
+    public static String getThumbnail(Bundle thingBundle) {
+        return thingBundle.getString(Things.COLUMN_THUMBNAIL);
+    }
+
+    public static boolean hasThumbnail(Bundle thingBundle) {
+        return !TextUtils.isEmpty(getThumbnail(thingBundle));
     }
 }

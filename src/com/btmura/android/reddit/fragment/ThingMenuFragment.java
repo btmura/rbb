@@ -32,7 +32,6 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
@@ -42,21 +41,19 @@ public class ThingMenuFragment extends Fragment {
 
     public static final String TAG = "ThingMenuFragment";
 
-    private static final String ARGS_THING = "at";
-
-    private static final Formatter FORMATTER = new Formatter();
+    private static final String ARG_THING_BUNDLE = "tb";
 
     public interface ThingPagerHolder {
         ViewPager getPager();
     }
 
-    private Thing thing;
+    private Bundle thingBundle;
     private ShareActionProvider shareProvider;
 
-    public static ThingMenuFragment newInstance(Thing thing) {
-        ThingMenuFragment f = new ThingMenuFragment();
+    public static ThingMenuFragment newInstance(Bundle thingBundle) {
         Bundle args = new Bundle(1);
-        args.putParcelable(ARGS_THING, thing);
+        args.putBundle(ARG_THING_BUNDLE, thingBundle);
+        ThingMenuFragment f = new ThingMenuFragment();
         f.setArguments(args);
         return f;
     }
@@ -64,7 +61,7 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        thing = getArguments().getParcelable(ARGS_THING);
+        thingBundle = getArguments().getBundle(ARG_THING_BUNDLE);
         setHasOptionsMenu(true);
     }
 
@@ -79,9 +76,10 @@ public class ThingMenuFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
+        boolean self = Thing.isSelf(thingBundle);
         boolean showingLink = isShowingLink();
-        boolean showLink = !thing.isSelf && !showingLink;
-        boolean showComments = !thing.isSelf && showingLink;
+        boolean showLink = !self && !showingLink;
+        boolean showComments = !self && showingLink;
 
         menu.findItem(R.id.menu_link).setVisible(showLink);
         menu.findItem(R.id.menu_comments).setVisible(showComments);
@@ -118,18 +116,17 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void updateShareProvider() {
-        CharSequence title = thing.assureTitle(getActivity(), FORMATTER).title;
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, title);
+        intent.putExtra(Intent.EXTRA_SUBJECT, Thing.getTitle(thingBundle));
         intent.putExtra(Intent.EXTRA_TEXT, getLink());
         shareProvider.setShareIntent(intent);
     }
 
     private void handleViewSidebar() {
-        Subreddit subreddit = Subreddit.newInstance(thing.subreddit);
+        Subreddit sr = Subreddit.newInstance(Thing.getSubreddit(thingBundle));
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, subreddit);
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, sr);
         startActivity(intent);
     }
 
@@ -142,11 +139,12 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void handleCopyUrl() {
-        ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(
-                Context.CLIPBOARD_SERVICE);
-        CharSequence label = thing.assureTitle(getActivity(), FORMATTER).title;
         CharSequence text = getLink();
-        clipboard.setPrimaryClip(ClipData.newPlainText(label, text));
+        ClipData data = ClipData.newPlainText(Thing.getTitle(thingBundle), text);
+
+        ClipboardManager clipboard =
+                (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+        clipboard.setPrimaryClip(data);
         Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
     }
 
@@ -158,11 +156,15 @@ public class ThingMenuFragment extends Fragment {
 
     private boolean isShowingLink() {
         int position = getHolder().getPager().getCurrentItem();
-        return ThingPagerAdapter.getType(thing, position) == ThingPagerAdapter.TYPE_LINK;
+        return ThingPagerAdapter.getType(thingBundle, position) == ThingPagerAdapter.TYPE_LINK;
     }
 
     private CharSequence getLink() {
-        return isShowingLink() ? thing.url : Urls.permaUrl(thing).toExternalForm();
+        if (isShowingLink()) {
+            return Thing.getUrl(thingBundle);
+        } else {
+            return Urls.permaUrl(Thing.getPermaLink(thingBundle)).toExternalForm();
+        }
     }
 
     private ThingPagerHolder getHolder() {

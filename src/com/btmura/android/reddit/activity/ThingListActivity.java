@@ -32,7 +32,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingListFragment;
@@ -127,11 +126,11 @@ public class ThingListActivity extends GlobalMenuActivity implements
         return true;
     }
 
-    public void onThingSelected(Thing thing, int position) {
-        Intent intent = new Intent(this, ThingActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        intent.putExtra(ThingActivity.EXTRA_THING, thing);
-        startActivity(intent);
+    public void onThingSelected(Bundle thingBundle, int position) {
+        Intent i = new Intent(this, ThingActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        i.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
+        startActivity(i);
     }
 
     public int onMeasureThingBody() {

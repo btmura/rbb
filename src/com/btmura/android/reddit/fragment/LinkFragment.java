@@ -120,8 +120,8 @@ public class LinkFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDetach() {
+        super.onDetach();
         webView.destroy();
         webView = null;
         progress = null;

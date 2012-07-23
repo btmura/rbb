@@ -23,11 +23,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,7 +41,6 @@ import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.entity.LoginResult;
 import com.btmura.android.reddit.entity.SubmitResult;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.entity.Thing;
 
 public class NetApi {
 
@@ -72,8 +71,8 @@ public class NetApi {
         }
     }
 
-    public static ArrayList<Thing> queryThings(Context context, URL url, String cookie,
-            String parentSubreddit, List<Thing> initThings) throws IOException {
+    static ArrayList<ContentValues> queryThings(Context context, URL url, String cookie)
+            throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
@@ -83,9 +82,9 @@ public class NetApi {
 
             in = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(in));
-            ThingParser parser = new ThingParser(context, parentSubreddit, initThings);
+            ThingParser parser = new ThingParser(context);
             parser.parseListingObject(reader);
-            return parser.things;
+            return parser.values;
         } finally {
             close(in, conn);
         }

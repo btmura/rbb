@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.Layout.Alignment;
@@ -45,8 +46,8 @@ public class ThingView extends View implements OnGestureListener {
     private OnVoteListener listener;
 
     private int bodyWidth;
-    private Thing thing;
-    private Bitmap thumb;
+    private Bundle thingBundle;
+    private Bitmap bitmap;
 
     private Layout titleLayout;
     private Layout statusLayout;
@@ -108,22 +109,20 @@ public class ThingView extends View implements OnGestureListener {
         this.listener = listener;
     }
 
-    public void setBodyWidth(int bodyWidth) {
+    public void setThingBodyWidth(int bodyWidth) {
         if (this.bodyWidth != bodyWidth) {
             this.bodyWidth = bodyWidth;
             requestLayout();
         }
     }
 
-    public void setThing(Thing thing) {
-        if (this.thing != thing) {
-            this.thing = thing;
-            requestLayout();
-        }
+    public void setThingBundle(Bundle thingBundle) {
+        this.thingBundle = thingBundle;
+        requestLayout();
     }
 
-    public void setThumbnail(Bitmap bitmap) {
-        this.thumb = bitmap;
+    public void setThumbnailBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
         invalidate();
     }
 
@@ -145,7 +144,7 @@ public class ThingView extends View implements OnGestureListener {
                 break;
         }
 
-        scoreText = VotingArrows.getScoreText(thing.score);
+        scoreText = VotingArrows.getScoreText(Thing.getScore(thingBundle));
         VotingArrows.measureScoreText(scoreText, scoreBounds);
 
         int titleWidth;
@@ -157,10 +156,10 @@ public class ThingView extends View implements OnGestureListener {
             int remainingWidth = measuredWidth - bodyWidth - PADDING * 2;
             if (remainingWidth > MAX_DETAILS_WIDTH) {
                 detailsWidth = MAX_DETAILS_WIDTH;
-                detailsText = thing.details;
+                detailsText = "Details!";
             } else if (remainingWidth > MIN_DETAILS_WIDTH) {
                 detailsWidth = MIN_DETAILS_WIDTH;
-                detailsText = thing.domain;
+                detailsText = Thing.getDomain(thingBundle);
             } else {
                 detailsWidth = 0;
                 detailsText = "";
@@ -172,7 +171,7 @@ public class ThingView extends View implements OnGestureListener {
         }
 
         int width = VotingArrows.getWidth();
-        if (thing.thumbnail != null) {
+        if (Thing.hasThumbnail(thingBundle)) {
             width += PADDING + Thumbnail.getWidth();
         }
         width += PADDING;
@@ -180,7 +179,8 @@ public class ThingView extends View implements OnGestureListener {
         int statusWidth = measuredWidth - PADDING * 2;
         statusWidth -= width;
         if (detailsWidth > 0) {
-            statusWidth -= detailsWidth + PADDING;titleWidth -= width;
+            statusWidth -= detailsWidth + PADDING;
+            titleWidth -= width;
         }
 
         titleWidth = Math.max(0, titleWidth);
@@ -188,7 +188,8 @@ public class ThingView extends View implements OnGestureListener {
         detailsWidth = Math.max(0, detailsWidth);
 
         titleLayout = makeTitleLayout(titleWidth);
-        statusLayout = makeLayout(TEXT_STATUS, thing.status, statusWidth, Alignment.ALIGN_NORMAL);
+        statusLayout = makeLayout(TEXT_STATUS, "missing status", statusWidth,
+                Alignment.ALIGN_NORMAL);
         if (detailsWidth > 0) {
             detailsLayout = makeLayout(TEXT_STATUS, detailsText, detailsWidth,
                     Alignment.ALIGN_OPPOSITE);
@@ -217,7 +218,7 @@ public class ThingView extends View implements OnGestureListener {
     }
 
     private Layout makeTitleLayout(int width) {
-        return new StaticLayout(thing.title, TEXT_PAINTS[TEXT_TITLE], width,
+        return new StaticLayout(Thing.getTitle(thingBundle), TEXT_PAINTS[TEXT_TITLE], width,
                 Alignment.ALIGN_NORMAL, 1f, 0f, true);
     }
 
@@ -229,13 +230,13 @@ public class ThingView extends View implements OnGestureListener {
 
     @Override
     protected void onDraw(Canvas c) {
-        boolean hasThumb = thing.thumbnail != null;
+        boolean hasThumb = Thing.hasThumbnail(thingBundle);
         c.translate(PADDING, PADDING);
-        VotingArrows.draw(c, thumb, hasThumb, scoreText, scoreBounds, thing.likes);
+        VotingArrows.draw(c, bitmap, hasThumb, scoreText, scoreBounds, Thing.getLikes(thingBundle));
         c.translate(VotingArrows.getWidth() + PADDING, 0);
 
         if (hasThumb) {
-            Thumbnail.draw(c, thumb, hasThumb);
+            Thumbnail.draw(c, bitmap, hasThumb);
             c.translate(Thumbnail.getWidth() + PADDING, 0);
         }
 
@@ -267,11 +268,12 @@ public class ThingView extends View implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, thing.thumbnail != null, 0);
+        return false; // VotingArrows.onDown(e, thumbnail != null, 0);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, thing.thumbnail != null, 0, listener, thing);
+        return false; // VotingArrows.onSingleTapUp(e, thumbnail != null, 0,
+                      // listener, thing);
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

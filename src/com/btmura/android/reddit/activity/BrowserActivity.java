@@ -28,7 +28,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
@@ -103,8 +102,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
-    protected void refreshActionBar(Subreddit subreddit, Thing thing) {
-        bar.setDisplayHomeAsUpEnabled(thing != null);
+    protected void refreshActionBar(Subreddit subreddit, Bundle thingBundle) {
+        bar.setDisplayHomeAsUpEnabled(thingBundle != null);
         adapter.setSubreddit(subreddit);
     }
 

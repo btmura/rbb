@@ -16,13 +16,15 @@
 
 package com.btmura.android.reddit.widget;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.os.Bundle;
+import android.support.v13.app.FragmentStatePagerAdapter;
+
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.CommentListFragment;
 import com.btmura.android.reddit.fragment.LinkFragment;
-
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.support.v13.app.FragmentStatePagerAdapter;
+import com.btmura.android.reddit.provider.ThingProvider.Things;
 
 public class ThingPagerAdapter extends FragmentStatePagerAdapter {
 
@@ -30,37 +32,38 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
     public static final int TYPE_COMMENTS = 1;
 
     private final String accountName;
-    private final Thing thing;
+    private final Bundle thingBundle;
 
-    public ThingPagerAdapter(FragmentManager fm, String accountName, Thing thing) {
+    public ThingPagerAdapter(FragmentManager fm, String accountName, Bundle thingBundle) {
         super(fm);
         this.accountName = accountName;
-        this.thing = thing;
+        this.thingBundle = thingBundle;
     }
 
     @Override
     public int getCount() {
-        return thing.isSelf ? 1 : 2;
+        return Thing.isSelf(thingBundle) ? 1 : 2;
     }
 
     @Override
     public Fragment getItem(int position) {
-        switch (getType(thing, position)) {
+        switch (getType(thingBundle, position)) {
             case TYPE_LINK:
-                return LinkFragment.newInstance(thing.url);
+                return LinkFragment.newInstance(Thing.getUrl(thingBundle));
 
             case TYPE_COMMENTS:
-                return CommentListFragment.newInstance(accountName, thing.getId());
+                return CommentListFragment.newInstance(accountName,
+                        Thing.getId(thingBundle.getString(Things.COLUMN_NAME)));
 
             default:
                 throw new IllegalStateException();
         }
     }
 
-    public static int getType(Thing t, int position) {
+    public static int getType(Bundle thingBundle, int position) {
         switch (position) {
             case 0:
-                return t.isSelf ? TYPE_COMMENTS : TYPE_LINK;
+                return Thing.isSelf(thingBundle) ? TYPE_COMMENTS : TYPE_LINK;
 
             case 1:
                 return TYPE_COMMENTS;

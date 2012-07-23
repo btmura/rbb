@@ -18,8 +18,8 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.JsonReader;
@@ -27,149 +27,114 @@ import android.util.JsonToken;
 
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
-import com.btmura.android.reddit.entity.Thing;
+import com.btmura.android.reddit.provider.ThingProvider.Things;
 
 class ThingParser extends JsonParser {
 
-    final ArrayList<Thing> things = new ArrayList<Thing>(30);
-
-    private final Context context;
-    private final String parentSubreddit;
-    private final List<Thing> initThings;
-
+    final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
     private final Formatter formatter = new Formatter();
-    private final long now = System.currentTimeMillis();
+    private final Context context;
 
-    private String moreKey;
-
-    ThingParser(Context context, String parentSubreddit, List<Thing> initThings) {
+    ThingParser(Context context) {
         this.context = context;
-        this.parentSubreddit = parentSubreddit;
-        this.initThings = initThings;
     }
 
     @Override
     public void onEntityStart(int index) {
-        Thing t = new Thing();
-        t.type = Thing.TYPE_THING;
-        things.add(t);
+        values.add(new ContentValues(Things.NUM_COLUMNS));
+    }
+
+    @Override
+    public void onAuthor(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_AUTHOR, readTrimmedString(reader, ""));
+    }
+
+    @Override
+    public void onCreatedUtc(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_CREATED_UTC, reader.nextLong());
+    }
+
+    @Override
+    public void onDomain(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_DOMAIN, readTrimmedString(reader, ""));
+    }
+
+    @Override
+    public void onDowns(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_DOWNS, reader.nextInt());
+    }
+
+    @Override
+    public void onLikes(JsonReader reader, int index) throws IOException {
+        int likes = 0;
+        if (reader.peek() == JsonToken.BOOLEAN) {
+            likes = reader.nextBoolean() ? 1 : -1;
+        } else {
+            reader.skipValue();
+        }
+        values.get(index).put(Things.COLUMN_LIKES, likes);
     }
 
     @Override
     public void onName(JsonReader reader, int index) throws IOException {
-        things.get(index).name = readTrimmedString(reader, "");
+        values.get(index).put(Things.COLUMN_NAME, readTrimmedString(reader, ""));
     }
 
     @Override
-    public void onIsSelf(JsonReader reader, int index) throws IOException {
-        things.get(index).isSelf = reader.nextBoolean();
+    public void onNumComments(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_NUM_COMMENTS, reader.nextInt());
     }
 
     @Override
-    public void onUrl(JsonReader reader, int index) throws IOException {
-        things.get(index).url = readTrimmedString(reader, "");
+    public void onOver18(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_OVER_18, reader.nextBoolean());
     }
 
     @Override
     public void onPermaLink(JsonReader reader, int index) throws IOException {
-        things.get(index).permaLink = readTrimmedString(reader, "");
+        values.get(index).put(Things.COLUMN_PERMA_LINK, readTrimmedString(reader, ""));
+    }
+
+    @Override
+    public void onScore(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_SCORE, reader.nextInt());
+    }
+
+    @Override
+    public void onIsSelf(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_SELF, reader.nextBoolean());
+    }
+
+    @Override
+    public void onSubreddit(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_SUBREDDIT, readTrimmedString(reader, ""));
+    }
+
+    @Override
+    public void onTitle(JsonReader reader, int index) throws IOException {
+        String title = formatter.preformatTitle(context, readTrimmedString(reader, ""));
+        values.get(index).put(Things.COLUMN_TITLE, title);
     }
 
     @Override
     public void onThumbnail(JsonReader reader, int index) throws IOException {
         String thumbnail = readTrimmedString(reader, null);
         if (!TextUtils.isEmpty(thumbnail) && thumbnail.startsWith("http")) {
-            things.get(index).thumbnail = thumbnail;
+            values.get(index).put(Things.COLUMN_THUMBNAIL, thumbnail);
         }
     }
 
     @Override
-    public void onTitle(JsonReader reader, int index) throws IOException {
-        things.get(index).rawTitle = readTrimmedString(reader, "");
-    }
-
-    @Override
-    public void onOver18(JsonReader reader, int index) throws IOException {
-        things.get(index).over18 = reader.nextBoolean();
-    }
-
-    @Override
-    public void onSubreddit(JsonReader reader, int index) throws IOException {
-        things.get(index).subreddit = readTrimmedString(reader, "");
-    }
-
-    @Override
-    public void onAuthor(JsonReader reader, int index) throws IOException {
-        things.get(index).author = readTrimmedString(reader, "");
-    }
-
-    @Override
-    public void onCreatedUtc(JsonReader reader, int index) throws IOException {
-        things.get(index).createdUtc = reader.nextLong();
-    }
-
-    @Override
-    public void onScore(JsonReader reader, int index) throws IOException {
-        things.get(index).score = reader.nextInt();
+    public void onUrl(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_URL, readTrimmedString(reader, ""));
     }
 
     @Override
     public void onUps(JsonReader reader, int index) throws IOException {
-        things.get(index).ups = reader.nextInt();
-    }
-
-    @Override
-    public void onDowns(JsonReader reader, int index) throws IOException {
-        things.get(index).downs = reader.nextInt();
-    }
-
-    @Override
-    public void onLikes(JsonReader reader, int index) throws IOException {
-        if (reader.peek() == JsonToken.NULL) {
-            reader.skipValue();
-            things.get(index).likes = 0;
-        } else if (reader.nextBoolean()) {
-            things.get(index).likes = 1;
-        } else {
-            things.get(index).likes = -1;
-        }
-    }
-
-    @Override
-    public void onDomain(JsonReader reader, int index) throws IOException {
-        things.get(index).domain = readTrimmedString(reader, "");
-    }
-
-    @Override
-    public void onNumComments(JsonReader reader, int index) throws IOException {
-        things.get(index).numComments = reader.nextInt();
+        values.get(index).put(Things.COLUMN_UPS, reader.nextInt());
     }
 
     @Override
     public void onEntityEnd(int index) {
-        things.get(index).assureFormat(context, formatter, parentSubreddit, now);
-    }
-
-    @Override
-    public void onAfter(JsonReader reader) throws IOException {
-        moreKey = readTrimmedString(reader, null);
-    }
-
-    @Override
-    public void onParseEnd() {
-        if (moreKey != null) {
-            Thing t = new Thing();
-            t.type = Thing.TYPE_MORE;
-            t.moreKey = moreKey;
-            things.add(t);
-        }
-
-        if (initThings != null) {
-            int size = initThings.size() - 1;
-            if (size > 0) {
-                things.ensureCapacity(things.size() + size);
-                things.addAll(0, initThings.subList(0, size));
-            }
-        }
     }
 }

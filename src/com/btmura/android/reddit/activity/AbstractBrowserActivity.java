@@ -350,32 +350,31 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         selectSubredditMultiPane(getControlFragment().getSubreddit());
     }
 
-    public void onThingSelected(Thing thing, int position) {
+    public void onThingSelected(Bundle thingBundle, int position) {
         if (isSinglePane) {
-            selectThingSinglePane(thing);
+            selectThingSinglePane(thingBundle);
         } else {
-            selectThingMultiPane(thing, position);
+            selectThingMultiPane(thingBundle, position);
         }
     }
 
-    protected void selectThingSinglePane(Thing thing) {
+    protected void selectThingSinglePane(Bundle thingBundle) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        intent.putExtra(ThingActivity.EXTRA_THING, thing);
-        intent.putExtra(ThingActivity.EXTRA_FLAGS, 0);
+        intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         startActivity(intent);
     }
 
-    protected void selectThingMultiPane(Thing thing, int thingPosition) {
+    protected void selectThingMultiPane(Bundle thingBundle, int thingPosition) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
         int filter = getFilter();
 
         ControlFragment cf = getControlFragment();
-        cf = ControlFragment.newInstance(accountName, cf.getSubreddit(), thing, thingPosition,
-                filter);
-        ThingMenuFragment tf = ThingMenuFragment.newInstance(thing);
+        cf = ControlFragment.newInstance(accountName, cf.getSubreddit(), thingBundle,
+                thingPosition, filter);
+        ThingMenuFragment tf = ThingMenuFragment.newInstance(thingBundle);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
@@ -383,7 +382,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.addToBackStack(null);
         ft.commit();
 
-        refreshThingPager(thing);
+        refreshThingPager(thingBundle);
     }
 
     private void safePopBackStackImmediate() {
@@ -403,9 +402,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment cf = getControlFragment();
         if (cf != null) {
             Subreddit subreddit = cf.getSubreddit();
-            Thing thing = cf.getThing();
-            refreshActionBar(subreddit, thing);
-            refreshViews(thing);
+            Bundle thingBundle = cf.getThingBundle();
+            refreshActionBar(subreddit, thingBundle);
+            refreshViews(thingBundle);
             refreshCheckedItems();
         }
     }
@@ -417,17 +416,17 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ControlFragment cf = getControlFragment();
             if (cf != null) {
                 Subreddit subreddit = cf.getSubreddit();
-                Thing thing = cf.getThing();
-                refreshThingPager(thing);
-                refreshActionBar(subreddit, thing);
-                refreshViews(thing);
+                Bundle thingBundle = cf.getThingBundle();
+                refreshThingPager(thingBundle);
+                refreshActionBar(subreddit, thingBundle);
+                refreshViews(thingBundle);
                 refreshCheckedItems();
             }
         }
     }
 
-    private void refreshViews(Thing thing) {
-        boolean hasThing = thing != null;
+    private void refreshViews(Bundle thingBundle) {
+        boolean hasThing = thingBundle != null;
         if (navContainer != null) {
             int currVisibility = navContainer.getVisibility();
             int nextVisibility = !hasThing ? View.VISIBLE : View.GONE;
@@ -459,7 +458,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    protected abstract void refreshActionBar(Subreddit subreddit, Thing thing);
+    protected abstract void refreshActionBar(Subreddit subreddit, Bundle thingBundle);
 
     private void refreshCheckedItems() {
         ControlFragment cf = getControlFragment();
@@ -475,14 +474,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         ThingListFragment tlf = getThingListFragment();
         if (tlf != null) {
-            tlf.setSelectedThing(cf.getThing(), cf.getThingPosition());
+            tlf.setSelectedThing(cf.getThingBundle(), cf.getThingPosition());
         }
     }
 
-    private void refreshThingPager(Thing thing) {
-        if (thing != null) {
+    private void refreshThingPager(Bundle thingBundle) {
+        if (thingBundle != null) {
             ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(),
-                    getAccountName(), thing);
+                    getAccountName(), thingBundle);
             thingPager.setAdapter(adapter);
             invalidateOptionsMenu();
         } else {
@@ -525,10 +524,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             if (subreddit != null) {
                 return Subreddit.getName(subreddit);
             }
-            Thing thing = cf.getThing();
-            if (thing != null) {
-                return thing.subreddit;
-            }
+            return Thing.getSubreddit(cf.getThingBundle());
         }
         return null;
     }

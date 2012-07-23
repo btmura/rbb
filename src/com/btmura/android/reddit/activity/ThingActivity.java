@@ -24,13 +24,11 @@ import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.CommentListFragment.CommentListener;
@@ -49,19 +47,19 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     public static final String TAG = "ThingActivity";
 
-    public static final String EXTRA_THING = "t";
-    public static final String EXTRA_FLAGS = "f";
+    public static final String EXTRA_THING_BUNDLE = "tb";
 
-    private Thing thing;
+    private Bundle thingBundle;
     private ViewPager pager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.thing);
-        thing = getIntent().getParcelableExtra(EXTRA_THING);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setOnPageChangeListener(this);
+
+        thingBundle = getIntent().getBundleExtra(EXTRA_THING_BUNDLE);
         setInitialFragments(savedInstanceState);
         setActionBar(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
@@ -71,7 +69,7 @@ public class ThingActivity extends GlobalMenuActivity implements
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(0), GlobalMenuFragment.TAG);
-            ft.add(ThingMenuFragment.newInstance(thing), ThingMenuFragment.TAG);
+            ft.add(ThingMenuFragment.newInstance(thingBundle), ThingMenuFragment.TAG);
             ft.commit();
         }
     }
@@ -81,7 +79,7 @@ public class ThingActivity extends GlobalMenuActivity implements
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_HOME_AS_UP
                 | ActionBar.DISPLAY_SHOW_TITLE);
-        bar.setTitle(thing.assureTitle(this, new Formatter()).title);
+        bar.setTitle(Thing.getTitle(thingBundle));
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
@@ -90,8 +88,7 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         String accountName = result.getLastAccount();
-        Log.d(TAG, "an: " + accountName);
-        pager.setAdapter(new ThingPagerAdapter(getFragmentManager(), accountName, thing));
+        pager.setAdapter(new ThingPagerAdapter(getFragmentManager(), accountName, thingBundle));
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
@@ -120,7 +117,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     public String getSubredditName() {
-        return thing.subreddit;
+        return Thing.getSubreddit(thingBundle);
     }
 
     public void onPageSelected(int position) {
