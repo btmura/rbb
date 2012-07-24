@@ -77,7 +77,7 @@ public class ThingProvider extends BaseProvider {
         public static final String COLUMN_SELF = "self";
         public static final String COLUMN_SUBREDDIT = "subreddit";
         public static final String COLUMN_TITLE = "title";
-        public static final String COLUMN_THUMBNAIL = "thumbnail";
+        public static final String COLUMN_THUMBNAIL_URL = "thumbnailUrl";
         public static final String COLUMN_UPS = "ups";
         public static final String COLUMN_URL = "url";
     }

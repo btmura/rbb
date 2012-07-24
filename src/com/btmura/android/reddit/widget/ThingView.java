@@ -8,9 +8,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Bundle;
 import android.text.BoringLayout;
 import android.text.Layout;
+import android.text.TextUtils;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -23,7 +23,6 @@ import android.view.View;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Thing;
 
 public class ThingView extends View implements OnGestureListener {
 
@@ -46,8 +45,13 @@ public class ThingView extends View implements OnGestureListener {
     private OnVoteListener listener;
 
     private int bodyWidth;
-    private Bundle thingBundle;
     private Bitmap bitmap;
+
+    private String domain;
+    private int likes;
+    private String thumbnailUrl;
+    private String title;
+    private int score;
 
     private Layout titleLayout;
     private Layout statusLayout;
@@ -110,20 +114,22 @@ public class ThingView extends View implements OnGestureListener {
     }
 
     public void setThingBodyWidth(int bodyWidth) {
-        if (this.bodyWidth != bodyWidth) {
-            this.bodyWidth = bodyWidth;
-            requestLayout();
-        }
-    }
-
-    public void setThingBundle(Bundle thingBundle) {
-        this.thingBundle = thingBundle;
+        this.bodyWidth = bodyWidth;
         requestLayout();
     }
 
     public void setThumbnailBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
         invalidate();
+    }
+
+    public void setData(String domain, int likes, int score, String thumbnailUrl, String title) {
+        this.domain = domain;
+        this.likes = likes;
+        this.score = score;
+        this.thumbnailUrl = thumbnailUrl;
+        this.title = title;
+        requestLayout();
     }
 
     @Override
@@ -144,7 +150,7 @@ public class ThingView extends View implements OnGestureListener {
                 break;
         }
 
-        scoreText = VotingArrows.getScoreText(Thing.getScore(thingBundle));
+        scoreText = VotingArrows.getScoreText(score);
         VotingArrows.measureScoreText(scoreText, scoreBounds);
 
         int titleWidth;
@@ -159,7 +165,7 @@ public class ThingView extends View implements OnGestureListener {
                 detailsText = "Details!";
             } else if (remainingWidth > MIN_DETAILS_WIDTH) {
                 detailsWidth = MIN_DETAILS_WIDTH;
-                detailsText = Thing.getDomain(thingBundle);
+                detailsText = domain;
             } else {
                 detailsWidth = 0;
                 detailsText = "";
@@ -171,7 +177,7 @@ public class ThingView extends View implements OnGestureListener {
         }
 
         int width = VotingArrows.getWidth();
-        if (Thing.hasThumbnail(thingBundle)) {
+        if (!TextUtils.isEmpty(thumbnailUrl)) {
             width += PADDING + Thumbnail.getWidth();
         }
         width += PADDING;
@@ -218,8 +224,8 @@ public class ThingView extends View implements OnGestureListener {
     }
 
     private Layout makeTitleLayout(int width) {
-        return new StaticLayout(Thing.getTitle(thingBundle), TEXT_PAINTS[TEXT_TITLE], width,
-                Alignment.ALIGN_NORMAL, 1f, 0f, true);
+        return new StaticLayout(title, TEXT_PAINTS[TEXT_TITLE], width, Alignment.ALIGN_NORMAL, 1f,
+                0f, true);
     }
 
     private static Layout makeLayout(int paint, CharSequence text, int width, Alignment alignment) {
@@ -230,13 +236,13 @@ public class ThingView extends View implements OnGestureListener {
 
     @Override
     protected void onDraw(Canvas c) {
-        boolean hasThumb = Thing.hasThumbnail(thingBundle);
+        boolean hasThumb = !TextUtils.isEmpty(thumbnailUrl);
         c.translate(PADDING, PADDING);
-        VotingArrows.draw(c, bitmap, hasThumb, scoreText, scoreBounds, Thing.getLikes(thingBundle));
+        VotingArrows.draw(c, bitmap, hasThumb, scoreText, scoreBounds, likes);
         c.translate(VotingArrows.getWidth() + PADDING, 0);
 
         if (hasThumb) {
-            Thumbnail.draw(c, bitmap, hasThumb);
+            Thumbnail.draw(c, bitmap);
             c.translate(Thumbnail.getWidth() + PADDING, 0);
         }
 

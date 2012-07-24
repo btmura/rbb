@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 
-import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.provider.ThingProvider.Things;
 
 public class ThingAdapter extends CursorAdapter {
@@ -45,7 +44,7 @@ public class ThingAdapter extends CursorAdapter {
             Things.COLUMN_SELF,
             Things.COLUMN_SUBREDDIT,
             Things.COLUMN_TITLE,
-            Things.COLUMN_THUMBNAIL,
+            Things.COLUMN_THUMBNAIL_URL,
             Things.COLUMN_UPS,
             Things.COLUMN_URL,
     };
@@ -63,7 +62,7 @@ public class ThingAdapter extends CursorAdapter {
     public static final int INDEX_SELF = 11;
     public static final int INDEX_SUBREDDIT = 12;
     public static final int INDEX_TITLE = 13;
-    public static final int INDEX_THUMBNAIL = 14;
+    public static final int INDEX_THUMBNAIL_URL = 14;
     public static final int INDEX_UPS = 15;
     public static final int INDEX_URL = 16;
 
@@ -96,11 +95,16 @@ public class ThingAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        Bundle thingBundle = makeBundle(cursor);
-        ThingView v = (ThingView) view;
-        v.setThingBodyWidth(thingBodyWidth);
-        v.setThingBundle(thingBundle);
-        thumbnailLoader.setThumbnail(context, v, Thing.getThumbnail(thingBundle));
+        String domain = cursor.getString(INDEX_DOMAIN);
+        int likes = cursor.getInt(INDEX_LIKES);
+        int score = cursor.getInt(INDEX_SCORE);
+        String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
+        String title = cursor.getString(INDEX_TITLE);
+
+        ThingView tv = (ThingView) view;
+        tv.setData(domain, likes, score, thumbnailUrl, title);
+        tv.setThingBodyWidth(thingBodyWidth);
+        thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
     }
 
     public Bundle getThingBundle(int position) {
@@ -126,7 +130,7 @@ public class ThingAdapter extends CursorAdapter {
         b.putBoolean(Things.COLUMN_SELF, c.getInt(INDEX_SELF) == 1);
         b.putString(Things.COLUMN_SUBREDDIT, c.getString(INDEX_SUBREDDIT));
         b.putString(Things.COLUMN_TITLE, c.getString(INDEX_TITLE));
-        b.putString(Things.COLUMN_THUMBNAIL, c.getString(INDEX_THUMBNAIL));
+        b.putString(Things.COLUMN_THUMBNAIL_URL, c.getString(INDEX_THUMBNAIL_URL));
         b.putInt(Things.COLUMN_UPS, c.getInt(INDEX_UPS));
         b.putString(Things.COLUMN_URL, c.getString(INDEX_URL));
         return b;

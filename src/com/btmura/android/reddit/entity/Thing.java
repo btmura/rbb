@@ -175,7 +175,7 @@ public class Thing implements Parcelable, Votable {
     }
 
     public static String getThumbnail(Bundle thingBundle) {
-        return thingBundle.getString(Things.COLUMN_THUMBNAIL);
+        return thingBundle.getString(Things.COLUMN_THUMBNAIL_URL);
     }
 
     public static boolean hasThumbnail(Bundle thingBundle) {

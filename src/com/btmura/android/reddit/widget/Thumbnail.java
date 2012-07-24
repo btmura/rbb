@@ -49,7 +49,7 @@ class Thumbnail {
         }
     }
 
-    static void draw(Canvas c, Bitmap thumb, boolean hasThumb) {
+    static void draw(Canvas c, Bitmap thumb) {
         if (thumb != null) {
             int tdy = (THUMB_HEIGHT - thumb.getHeight()) / 2;
             c.drawBitmap(thumb, 0, tdy, THUMB_PAINT);

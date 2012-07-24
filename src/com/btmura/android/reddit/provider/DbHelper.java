@@ -86,7 +86,7 @@ class DbHelper extends SQLiteOpenHelper {
                 + Things.COLUMN_SELF + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_SUBREDDIT + " TEXT DEFAULT '', "
                 + Things.COLUMN_TITLE + " TEXT DEFAULT '', "
-                + Things.COLUMN_THUMBNAIL + " TEXT DEFAULT '', "
+                + Things.COLUMN_THUMBNAIL_URL + " TEXT DEFAULT '', "
                 + Things.COLUMN_UPS + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_URL + " TEXT DEFAULT '')");
     }

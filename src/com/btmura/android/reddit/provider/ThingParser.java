@@ -120,7 +120,7 @@ class ThingParser extends JsonParser {
     public void onThumbnail(JsonReader reader, int index) throws IOException {
         String thumbnail = readTrimmedString(reader, null);
         if (!TextUtils.isEmpty(thumbnail) && thumbnail.startsWith("http")) {
-            values.get(index).put(Things.COLUMN_THUMBNAIL, thumbnail);
+            values.get(index).put(Things.COLUMN_THUMBNAIL_URL, thumbnail);
         }
     }
 
