@@ -17,17 +17,13 @@
 package com.btmura.android.reddit.entity;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
-import com.btmura.android.reddit.data.RelativeTime;
 import com.btmura.android.reddit.provider.ThingProvider.Things;
 
 public class Thing implements Parcelable, Votable {
@@ -103,20 +99,6 @@ public class Thing implements Parcelable, Votable {
     public Thing assureFormat(Context c, Formatter f, String parentSubreddit, long now) {
         if (type == TYPE_MORE || status != null) {
             return this;
-        }
-        boolean showSubreddit = parentSubreddit == null
-                || !parentSubreddit.equalsIgnoreCase(subreddit);
-        int resId = showSubreddit ? R.string.thing_status_subreddit : R.string.thing_status;
-
-        String nsfw = over18 ? c.getString(R.string.thing_nsfw) : "";
-        String rt = RelativeTime.format(c, now, createdUtc);
-        String comments = c.getResources().getQuantityString(R.plurals.comments, numComments,
-                numComments);
-        status = c.getString(resId, subreddit, author, rt, comments, nsfw);
-        if (!nsfw.isEmpty()) {
-            SpannableStringBuilder b = new SpannableStringBuilder(status);
-            b.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);
-            status = b;
         }
         details = c.getString(R.string.thing_details, ups, downs, domain);
         return this;

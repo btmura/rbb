@@ -67,6 +67,8 @@ public class ThingAdapter extends CursorAdapter {
     public static final int INDEX_URL = 16;
 
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
+    private final long nowTimeMs = System.currentTimeMillis();
+    private final String parentSubreddit;
     private int thingBodyWidth;
 
     public static CursorLoader createLoader(Context context, String account, String subreddit,
@@ -80,8 +82,9 @@ public class ThingAdapter extends CursorAdapter {
         return new CursorLoader(context, uri, PROJECTION, null, null, null);
     }
 
-    public ThingAdapter(Context context) {
+    public ThingAdapter(Context context, String parentSubreddit) {
         super(context, null, 0);
+        this.parentSubreddit = parentSubreddit;
     }
 
     public void setThingBodyWidth(int thingBodyWidth) {
@@ -95,15 +98,20 @@ public class ThingAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        String author = cursor.getString(INDEX_AUTHOR);
+        long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
         String domain = cursor.getString(INDEX_DOMAIN);
         int likes = cursor.getInt(INDEX_LIKES);
+        int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
+        boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
         int score = cursor.getInt(INDEX_SCORE);
+        String subreddit = cursor.getString(INDEX_SUBREDDIT);
         String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
         String title = cursor.getString(INDEX_TITLE);
 
         ThingView tv = (ThingView) view;
-        tv.setData(domain, likes, score, thumbnailUrl, title);
-        tv.setThingBodyWidth(thingBodyWidth);
+        tv.setData(author, createdUtc, domain, likes, nowTimeMs, numComments, over18,
+                parentSubreddit, score, subreddit, thingBodyWidth, thumbnailUrl, title);
         thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
     }
 

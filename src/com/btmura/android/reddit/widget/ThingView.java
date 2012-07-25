@@ -6,15 +6,18 @@ import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.BoringLayout;
 import android.text.Layout;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils.TruncateAt;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
@@ -23,6 +26,8 @@ import android.view.View;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.data.Formatter;
+import com.btmura.android.reddit.data.RelativeTime;
 
 public class ThingView extends View implements OnGestureListener {
 
@@ -30,11 +35,11 @@ public class ThingView extends View implements OnGestureListener {
     public static final boolean DEBUG = Debug.DEBUG;
 
     private static float FONT_SCALE;
-
     private static int PADDING;
     private static int ELEMENT_PADDING;
     private static int MIN_DETAILS_WIDTH;
     private static int MAX_DETAILS_WIDTH;
+    private static Formatter FORMATTER;
 
     private static TextPaint[] TEXT_PAINTS;
     private static final int NUM_TEXT_PAINTS = 2;
@@ -44,20 +49,29 @@ public class ThingView extends View implements OnGestureListener {
     private final GestureDetector detector;
     private OnVoteListener listener;
 
-    private int bodyWidth;
-    private Bitmap bitmap;
-
+    private String author;
+    private long createdUtc;
     private String domain;
     private int likes;
+    private long nowTimeMs;
+    private int numComments;
+    private boolean over18;
+    private String parentSubreddit;
+    private int score;
+    private String subreddit;
+    private int thingBodyWidth;
     private String thumbnailUrl;
     private String title;
-    private int score;
+
+    private Bitmap bitmap;
+
+    private String scoreText;
+    private CharSequence statusText;
 
     private Layout titleLayout;
     private Layout statusLayout;
     private Layout detailsLayout;
 
-    private String scoreText;
     private Rect scoreBounds = new Rect();
     private int rightHeight;
     private int minHeight;
@@ -87,6 +101,7 @@ public class ThingView extends View implements OnGestureListener {
             ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
             MIN_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.min_details_width);
             MAX_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.max_details_width);
+            FORMATTER = new Formatter();
 
             Theme t = context.getTheme();
             int[] styles = new int[] {
@@ -113,20 +128,35 @@ public class ThingView extends View implements OnGestureListener {
         this.listener = listener;
     }
 
-    public void setThingBodyWidth(int bodyWidth) {
-        this.bodyWidth = bodyWidth;
-        requestLayout();
-    }
-
     public void setThumbnailBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
         invalidate();
     }
 
-    public void setData(String domain, int likes, int score, String thumbnailUrl, String title) {
+    public void setData(String author,
+            long createdUtc,
+            String domain,
+            int likes,
+            long nowTimeMs,
+            int numComments,
+            boolean over18,
+            String parentSubreddit,
+            int score,
+            String subreddit,
+            int thingBodyWidth,
+            String thumbnailUrl,
+            String title) {
+        this.author = author;
+        this.createdUtc = createdUtc;
         this.domain = domain;
         this.likes = likes;
+        this.nowTimeMs = nowTimeMs;
+        this.numComments = numComments;
+        this.over18 = over18;
+        this.parentSubreddit = parentSubreddit;
         this.score = score;
+        this.subreddit = subreddit;
+        this.thingBodyWidth = thingBodyWidth;
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
         requestLayout();
@@ -153,13 +183,15 @@ public class ThingView extends View implements OnGestureListener {
         scoreText = VotingArrows.getScoreText(score);
         VotingArrows.measureScoreText(scoreText, scoreBounds);
 
+        statusText = makeStatusText();
+
         int titleWidth;
         int detailsWidth;
         CharSequence detailsText;
 
-        if (bodyWidth > 0) {
-            titleWidth = Math.min(measuredWidth, bodyWidth) - PADDING * 2;
-            int remainingWidth = measuredWidth - bodyWidth - PADDING * 2;
+        if (thingBodyWidth > 0) {
+            titleWidth = Math.min(measuredWidth, thingBodyWidth) - PADDING * 2;
+            int remainingWidth = measuredWidth - thingBodyWidth - PADDING * 2;
             if (remainingWidth > MAX_DETAILS_WIDTH) {
                 detailsWidth = MAX_DETAILS_WIDTH;
                 detailsText = "Details!";
@@ -194,8 +226,7 @@ public class ThingView extends View implements OnGestureListener {
         detailsWidth = Math.max(0, detailsWidth);
 
         titleLayout = makeTitleLayout(titleWidth);
-        statusLayout = makeLayout(TEXT_STATUS, "missing status", statusWidth,
-                Alignment.ALIGN_NORMAL);
+        statusLayout = makeLayout(TEXT_STATUS, statusText, statusWidth, Alignment.ALIGN_NORMAL);
         if (detailsWidth > 0) {
             detailsLayout = makeLayout(TEXT_STATUS, detailsText, detailsWidth,
                     Alignment.ALIGN_OPPOSITE);
@@ -221,6 +252,36 @@ public class ThingView extends View implements OnGestureListener {
         }
 
         setMeasuredDimension(measuredWidth, measuredHeight);
+    }
+
+    private CharSequence makeStatusText() {
+        Context c = getContext();
+        Resources r = getResources();
+
+        int resId;
+        if (!parentSubreddit.equalsIgnoreCase(subreddit)) {
+            resId = R.string.thing_status_subreddit;
+        } else {
+            resId = R.string.thing_status;
+        }
+
+        String nsfw;
+        if (over18) {
+            nsfw = c.getString(R.string.thing_nsfw);
+        } else {
+            nsfw = "";
+        }
+
+        String rt = RelativeTime.format(c, nowTimeMs, createdUtc);
+        String comments = r.getQuantityString(R.plurals.comments, numComments, numComments);
+
+        CharSequence status = c.getString(resId, subreddit, author, rt, comments, nsfw);
+        if (!nsfw.isEmpty()) {
+            SpannableStringBuilder b = new SpannableStringBuilder(status);
+            b.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);
+            status = b;
+        }
+        return status;
     }
 
     private Layout makeTitleLayout(int width) {
