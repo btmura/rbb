@@ -112,7 +112,7 @@ class ThingParser extends JsonParser {
 
     @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
-        String title = formatter.formatTitle(context, readTrimmedString(reader, ""));
+        String title = formatter.preformatTitle(context, readTrimmedString(reader, ""));
         values.get(index).put(Things.COLUMN_TITLE, title);
     }
 

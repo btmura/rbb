@@ -24,17 +24,24 @@ import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.BulletSpan;
+import android.text.style.ImageSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
+
+import com.btmura.android.reddit.R;
 
 public class Formatter {
 
     private final Matcher matcher = RawLinks.PATTERN.matcher("");
     private final StringBuilder builder = new StringBuilder();
 
-    public String formatTitle(Context context, String title) {
+    public String preformatTitle(Context context, String title) {
         return Escaped.format(matcher, title).toString();
+    }
+
+    public CharSequence formatTitle(Context context, CharSequence title) {
+        return Disapproval.format(context, matcher, title);
     }
 
     public CharSequence formatComment(Context context, CharSequence comment) {
@@ -47,6 +54,7 @@ public class Formatter {
         c = NamedLinks.format(c, builder);
         c = RawLinks.format(matcher, c);
         c = Subreddits.format(matcher, c);
+        c = Disapproval.format(context, matcher, c);
         return c;
     }
 
@@ -297,6 +305,22 @@ public class Formatter {
             while (m.find()) {
                 SubredditSpan span = new SubredditSpan(m.group(1));
                 s = Formatter.setSpan(s, m.start(), m.end(), span);
+            }
+            return s;
+        }
+    }
+
+    static class Disapproval {
+
+        static Pattern DISAPPROVAL_PATTERN = Pattern.compile("(ಠ_ಠ|&#3232;\\\\_&#3232;)");
+
+        static CharSequence format(Context context, Matcher matcher, CharSequence text) {
+            CharSequence s = text;
+            Matcher m = matcher.usePattern(DISAPPROVAL_PATTERN).reset(s);
+            for (; m.find();) {
+                ImageSpan span = new ImageSpan(context, R.drawable.disapproval_face,
+                        ImageSpan.ALIGN_BOTTOM);
+                s = setSpan(s, m.start(), m.end(), span);
             }
             return s;
         }
