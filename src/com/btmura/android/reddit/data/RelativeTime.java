@@ -44,6 +44,7 @@ public class RelativeTime {
             resId = R.plurals.time_minutes;
         } else {
             resId = R.plurals.time_seconds;
+            value = diff;
         }
         int quantity = (int) Math.round(value);
         return context.getResources().getQuantityString(resId, quantity, quantity);
