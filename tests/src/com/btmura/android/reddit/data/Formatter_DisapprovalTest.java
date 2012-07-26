@@ -20,8 +20,7 @@ import com.btmura.android.reddit.data.Formatter.Disapproval;
 
 public class Formatter_DisapprovalTest extends AbstractFormatterTest {
 
-    public void testFormat_unicode() {
-        CharSequence cs = Disapproval.format(mContext, matcher, "ಠ_ಠ");
-        assertImageSpan(cs, 0, 3);
+    public void testFormat() {
+        assertEquals("ಠ_ಠ", Disapproval.format(mContext, matcher, "&#3232;\\_&#3232;").toString());
     }
 }

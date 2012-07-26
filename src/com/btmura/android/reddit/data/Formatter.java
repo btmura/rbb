@@ -24,24 +24,20 @@ import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.BulletSpan;
-import android.text.style.ImageSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
-
-import com.btmura.android.reddit.R;
 
 public class Formatter {
 
     private final Matcher matcher = RawLinks.PATTERN.matcher("");
     private final StringBuilder builder = new StringBuilder();
 
-    public String preformatTitle(Context context, String title) {
-        return Escaped.format(matcher, title).toString();
-    }
-
-    public CharSequence formatTitle(Context context, CharSequence title) {
-        return Disapproval.format(context, matcher, title);
+    /** @return span-less formatted title that can be saved in a database */
+    public CharSequence formatTitle(Context context, String title) {
+        CharSequence c = Escaped.format(matcher, title).toString();
+        c = Disapproval.format(context, matcher, c);
+        return c;
     }
 
     public CharSequence formatComment(Context context, CharSequence comment) {
@@ -312,15 +308,17 @@ public class Formatter {
 
     static class Disapproval {
 
-        static Pattern DISAPPROVAL_PATTERN = Pattern.compile("(ಠ_ಠ|&#3232;\\\\_&#3232;)");
+        static final Pattern PATTERN = Pattern.compile("&#3232;\\\\_&#3232;");
+        static final String FACE = "ಠ_ಠ";
 
         static CharSequence format(Context context, Matcher matcher, CharSequence text) {
             CharSequence s = text;
-            Matcher m = matcher.usePattern(DISAPPROVAL_PATTERN).reset(s);
-            for (; m.find();) {
-                ImageSpan span = new ImageSpan(context, R.drawable.disapproval_face,
-                        ImageSpan.ALIGN_BOTTOM);
-                s = setSpan(s, m.start(), m.end(), span);
+            Matcher m = matcher.usePattern(PATTERN).reset(s);
+            for (int deleted = 0; m.find();) {
+                int start = m.start() - deleted;
+                int end = m.end() - deleted;
+                deleted += m.end() - m.start() - FACE.length();
+                s = Formatter.replace(s, start, end, FACE);
             }
             return s;
         }
