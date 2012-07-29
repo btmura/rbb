@@ -295,11 +295,11 @@ public class CommentView extends View implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, false, getCommentLeft());
+        return VotingArrows.onDown(e, getCommentLeft());
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, false, getCommentLeft(), listener, comment);
+        return VotingArrows.onSingleTapUp(e, getCommentLeft(), listener, -1);
     }
 
     private float getCommentLeft() {

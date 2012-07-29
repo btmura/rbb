@@ -31,7 +31,6 @@ import android.text.TextUtils.TruncateAt;
 import android.view.MotionEvent;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Votable;
 import com.btmura.android.reddit.provider.VoteProvider.Votes;
 
 class VotingArrows {
@@ -182,26 +181,27 @@ class VotingArrows {
         return ARROW_TOTAL_HEIGHT + SCORE_TOTAL_HEIGHT + ARROW_TOTAL_HEIGHT;
     }
 
-    static boolean onDown(MotionEvent e, boolean hasThumb, float left) {
-        return getEvent(e, hasThumb, left) != EVENT_NONE;
+    static boolean onDown(MotionEvent e, float left) {
+        return getEvent(e, left) != EVENT_NONE;
     }
 
-    static boolean onSingleTapUp(MotionEvent e, boolean hasThumb, float left,
-            OnVoteListener listener, Votable v) {
+    static boolean onSingleTapUp(MotionEvent e, float left, OnVoteListener listener, long thingId) {
         if (listener != null) {
-            int event = getEvent(e, hasThumb, left);
-            if (event == EVENT_UPVOTE && v.getVote() != OnVoteListener.VOTE_UP) {
-                listener.onVote(v, OnVoteListener.VOTE_UP);
-                return true;
-            } else if (event == EVENT_DOWNVOTE && v.getVote() != OnVoteListener.VOTE_DOWN) {
-                listener.onVote(v, OnVoteListener.VOTE_DOWN);
-                return true;
+            int event = getEvent(e, left);
+            switch (event) {
+                case EVENT_UPVOTE:
+                    listener.onVote(thingId, OnVoteListener.VOTE_UP);
+                    return true;
+
+                case EVENT_DOWNVOTE:
+                    listener.onVote(thingId, OnVoteListener.VOTE_DOWN);
+                    return true;
             }
         }
         return false;
     }
 
-    private static int getEvent(MotionEvent e, boolean hasThumb, float left) {
+    private static int getEvent(MotionEvent e, float left) {
         float right = left + PADDING + getWidth() + PADDING;
         if (e.getX() > left && e.getX() < right) {
             float upBottom = PADDING + ARROW_TOTAL_HEIGHT + PADDING;

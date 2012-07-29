@@ -16,11 +16,9 @@
 
 package com.btmura.android.reddit.widget;
 
-import com.btmura.android.reddit.entity.Votable;
-
 public interface OnVoteListener {
     static final int VOTE_UP = 1;
     static final int VOTE_DOWN = -1;
 
-    void onVote(Votable thing, int vote);
+    void onVote(long id, int vote);
 }

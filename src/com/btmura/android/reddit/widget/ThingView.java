@@ -11,11 +11,11 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.BoringLayout;
 import android.text.Layout;
-import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.Layout.Alignment;
+import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
@@ -26,7 +26,6 @@ import android.view.View;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.RelativeTime;
 
 public class ThingView extends View implements OnGestureListener {
@@ -39,7 +38,6 @@ public class ThingView extends View implements OnGestureListener {
     private static int ELEMENT_PADDING;
     private static int MIN_DETAILS_WIDTH;
     private static int MAX_DETAILS_WIDTH;
-    private static Formatter FORMATTER;
 
     private static TextPaint[] TEXT_PAINTS;
     private static final int NUM_TEXT_PAINTS = 2;
@@ -60,6 +58,7 @@ public class ThingView extends View implements OnGestureListener {
     private int score;
     private String subreddit;
     private int thingBodyWidth;
+    private long id;
     private String thumbnailUrl;
     private String title;
 
@@ -101,7 +100,6 @@ public class ThingView extends View implements OnGestureListener {
             ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
             MIN_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.min_details_width);
             MAX_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.max_details_width);
-            FORMATTER = new Formatter();
 
             Theme t = context.getTheme();
             int[] styles = new int[] {
@@ -133,7 +131,8 @@ public class ThingView extends View implements OnGestureListener {
         invalidate();
     }
 
-    public void setData(String author,
+    public void setData(long id,
+            String author,
             long createdUtc,
             String domain,
             int likes,
@@ -146,6 +145,7 @@ public class ThingView extends View implements OnGestureListener {
             int thingBodyWidth,
             String thumbnailUrl,
             String title) {
+        this.id = id;
         this.author = author;
         this.createdUtc = createdUtc;
         this.domain = domain;
@@ -335,12 +335,11 @@ public class ThingView extends View implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return false; // VotingArrows.onDown(e, thumbnail != null, 0);
+        return VotingArrows.onDown(e, 0);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return false; // VotingArrows.onSingleTapUp(e, thumbnail != null, 0,
-                      // listener, thing);
+        return VotingArrows.onSingleTapUp(e, 0, listener, id);
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

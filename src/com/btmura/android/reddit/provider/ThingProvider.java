@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.ContentProviderOperation;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -31,6 +32,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -151,7 +153,12 @@ public class ThingProvider extends BaseProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        SQLiteDatabase db = helper.getWritableDatabase();
+        int count = db.update(Things.TABLE_NAME, values, selection, selectionArgs);
+        if (count > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return count;
     }
 
     @Override
@@ -167,5 +174,19 @@ public class ThingProvider extends BaseProvider {
     @Override
     public String getType(Uri uri) {
         return null;
+    }
+
+    public static void updateLikesInBackground(final Context context, final long id, final int likes) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                ContentValues values = new ContentValues(1);
+                values.put(Things.COLUMN_LIKES, likes);
+
+                ContentResolver cr = context.getContentResolver();
+                cr.update(Things.CONTENT_URI, values, ID_SELECTION, idSelectionArg(id));
+                return null;
+            }
+        }.execute();
     }
 }

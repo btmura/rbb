@@ -24,7 +24,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.RelativeTime;
 
-public class Comment implements Parcelable, Votable {
+public class Comment implements Parcelable {
 
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_COMMENT = 1;
@@ -90,14 +90,6 @@ public class Comment implements Parcelable, Votable {
         String comments = c.getResources().getQuantityString(R.plurals.comments, numComments,
                 numComments);
         return c.getString(resId, author, rt, comments);
-    }
-
-    public int getVote() {
-        return likes;
-    }
-
-    public void setVote(int vote) {
-        likes = vote;
     }
 
     public String getName() {

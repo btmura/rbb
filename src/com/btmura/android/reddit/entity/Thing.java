@@ -26,7 +26,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.provider.ThingProvider.Things;
 
-public class Thing implements Parcelable, Votable {
+public class Thing implements Parcelable {
 
     public static final int TYPE_THING = 0;
     public static final int TYPE_MORE = 1;
@@ -102,14 +102,6 @@ public class Thing implements Parcelable, Votable {
         }
         details = c.getString(R.string.thing_details, ups, downs, domain);
         return this;
-    }
-
-    public int getVote() {
-        return likes;
-    }
-
-    public void setVote(int vote) {
-        likes = vote;
     }
 
     public String getName() {

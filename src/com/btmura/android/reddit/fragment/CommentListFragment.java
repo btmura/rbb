@@ -24,8 +24,6 @@ import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -41,8 +39,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Comment;
-import com.btmura.android.reddit.entity.Votable;
-import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
@@ -119,13 +115,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         adapter.swapData(null);
     }
 
-    public void onVote(Votable v, int vote) {
-        Log.d(TAG, "an: " + accountName);
-        if (!TextUtils.isEmpty(accountName)) {
-            v.setVote(vote);
-            VoteProvider.insertVoteInBackground(getActivity(), accountName, v.getName(), vote);
-            adapter.notifyDataSetChanged();
-        }
+    public void onVote(long id, int vote) {
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {

@@ -21,9 +21,11 @@ import java.util.List;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -43,8 +45,7 @@ import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
-import com.btmura.android.reddit.entity.Votable;
-import com.btmura.android.reddit.provider.VoteProvider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
@@ -114,7 +115,7 @@ public class ThingListFragment extends ListFragment implements
         filter = b.getInt(ARG_FILTER);
         query = b.getString(ARG_QUERY);
 
-        adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit));
+        adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), this);
         setHasOptionsMenu(true);
     }
 
@@ -146,11 +147,14 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return ThingAdapter.createLoader(getActivity(), getAccountName(),
-                Subreddit.getName(subreddit), filter);
+        Uri u = ThingAdapter.getInitialUri(getAccountName(), Subreddit.getName(subreddit), filter);
+        return ThingAdapter.createLoader(getActivity(), u);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor things) {
+        Uri u = ThingAdapter.getUri(getAccountName(), Subreddit.getName(subreddit), filter);
+        ((CursorLoader) loader).setUri(u);
+
         scrollLoading = false;
         adapter.swapCursor(things);
         setEmptyText(getString(things != null ? R.string.empty_list : R.string.error));
@@ -192,11 +196,12 @@ public class ThingListFragment extends ListFragment implements
         }
     }
 
-    public void onVote(Votable v, int vote) {
+    public void onVote(long id, int vote) {
+        if (DEBUG) {
+            Log.d(TAG, "onVote id: " + id + " vote: " + vote);
+        }
         if (!TextUtils.isEmpty(accountName)) {
-            v.setVote(vote);
-            VoteProvider.insertVoteInBackground(getActivity(), accountName, v.getName(), vote);
-            adapter.notifyDataSetChanged();
+            ThingProvider.updateLikesInBackground(getActivity(), id, vote);
         }
     }
 

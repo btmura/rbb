@@ -49,6 +49,7 @@ public class ThingAdapter extends CursorAdapter {
             Things.COLUMN_URL,
     };
 
+    public static final int INDEX_ID = 0;
     public static final int INDEX_AUTHOR = 1;
     public static final int INDEX_CREATED_UTC = 2;
     public static final int INDEX_DOMAIN = 3;
@@ -69,22 +70,34 @@ public class ThingAdapter extends CursorAdapter {
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final long nowTimeMs = System.currentTimeMillis();
     private final String parentSubreddit;
+    private final OnVoteListener listener;
     private int thingBodyWidth;
 
-    public static CursorLoader createLoader(Context context, String account, String subreddit,
-            int filter) {
-        Uri uri = Things.CONTENT_URI.buildUpon()
-                .appendQueryParameter(Things.QUERY_PARAM_SYNC, Boolean.toString(true))
-                .appendQueryParameter(Things.QUERY_PARAM_ACCOUNT, account)
-                .appendQueryParameter(Things.QUERY_PARAM_SUBREDDIT, subreddit)
-                .appendQueryParameter(Things.QUERY_PARAM_FILTER, Integer.toString(filter))
-                .build();
+    public static CursorLoader createLoader(Context context, Uri uri) {
         return new CursorLoader(context, uri, PROJECTION, null, null, null);
     }
 
-    public ThingAdapter(Context context, String parentSubreddit) {
+    public static Uri getInitialUri(String account, String subreddit, int filter) {
+        return getBaseUriBuilder(account, subreddit, filter)
+                .appendQueryParameter(Things.QUERY_PARAM_SYNC, Boolean.TRUE.toString())
+                .build();
+    }
+
+    public static Uri getUri(String account, String subreddit, int filter) {
+        return getBaseUriBuilder(account, subreddit, filter).build();
+    }
+
+    private static Uri.Builder getBaseUriBuilder(String account, String subreddit, int filter) {
+        return Things.CONTENT_URI.buildUpon()
+                .appendQueryParameter(Things.QUERY_PARAM_ACCOUNT, account)
+                .appendQueryParameter(Things.QUERY_PARAM_SUBREDDIT, subreddit)
+                .appendQueryParameter(Things.QUERY_PARAM_FILTER, Integer.toString(filter));
+    }
+
+    public ThingAdapter(Context context, String parentSubreddit, OnVoteListener listener) {
         super(context, null, 0);
         this.parentSubreddit = parentSubreddit;
+        this.listener = listener;
     }
 
     public void setThingBodyWidth(int thingBodyWidth) {
@@ -106,12 +119,14 @@ public class ThingAdapter extends CursorAdapter {
         boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
         int score = cursor.getInt(INDEX_SCORE);
         String subreddit = cursor.getString(INDEX_SUBREDDIT);
+        long thingId = cursor.getLong(INDEX_ID);
         String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
         String title = cursor.getString(INDEX_TITLE);
 
         ThingView tv = (ThingView) view;
-        tv.setData(author, createdUtc, domain, likes, nowTimeMs, numComments, over18,
-                parentSubreddit, score, subreddit, thingBodyWidth, thumbnailUrl, title);
+        tv.setData(thingId, author, createdUtc, domain, likes, nowTimeMs, numComments,
+                over18, parentSubreddit, score, subreddit, thingBodyWidth, thumbnailUrl, title);
+        tv.setOnVoteListener(listener);
         thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
     }
 
@@ -125,6 +140,7 @@ public class ThingAdapter extends CursorAdapter {
 
     private Bundle makeBundle(Cursor c) {
         Bundle b = new Bundle(PROJECTION.length - 1);
+        b.putLong(Things._ID, c.getLong(INDEX_ID));
         b.putString(Things.COLUMN_AUTHOR, c.getString(INDEX_AUTHOR));
         b.putLong(Things.COLUMN_CREATED_UTC, c.getLong(INDEX_CREATED_UTC));
         b.putString(Things.COLUMN_DOMAIN, c.getString(INDEX_DOMAIN));

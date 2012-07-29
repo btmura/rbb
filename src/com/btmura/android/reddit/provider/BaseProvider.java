@@ -59,6 +59,14 @@ abstract class BaseProvider extends ContentProvider {
         }
     }
 
+    static String[] idSelectionArg(long id) {
+        return appendIdSelectionArg(null, id);
+    }
+
+    static String[] appendIdSelectionArg(String[] selectionArgs, long id) {
+        return appendIdSelectionArg(selectionArgs, Long.toString(id));
+    }
+
     static String[] appendIdSelectionArg(String[] selectionArgs, String id) {
         if (selectionArgs == null) {
             return new String[] {id};
