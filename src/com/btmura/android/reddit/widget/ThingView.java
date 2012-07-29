@@ -180,7 +180,7 @@ public class ThingView extends View implements OnGestureListener {
                 break;
         }
 
-        scoreText = VotingArrows.getScoreText(score);
+        scoreText = VotingArrows.getScoreText(score + likes);
         VotingArrows.measureScoreText(scoreText, scoreBounds);
 
         statusText = makeStatusText();
