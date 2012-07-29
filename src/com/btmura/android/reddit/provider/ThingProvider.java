@@ -84,57 +84,80 @@ public class ThingProvider extends BaseProvider {
         public static final String COLUMN_URL = "url";
     }
 
+    private static final String[] SYNC_PROJECTION = {
+            Things._ID,
+            Things.COLUMN_NAME,
+            Things.COLUMN_LIKES,
+    };
+    private static final int SYNC_INDEX_NAME = 1;
+    private static final int SYNC_INDEX_LIKES = 2;
+
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         if (DEBUG) {
             Log.d(TAG, "query uri: " + uri);
         }
-        boolean sync = uri.getBooleanQueryParameter(Things.QUERY_PARAM_SYNC, false);
-        if (sync) {
-            try {
-                syncThings(uri);
-            } catch (OperationCanceledException e) {
-                Log.e(TAG, "query", e);
-            } catch (AuthenticatorException e) {
-                Log.e(TAG, "query", e);
-            } catch (IOException e) {
-                Log.e(TAG, "query", e);
-            } catch (OperationApplicationException e) {
-                Log.e(TAG, "query", e);
-            }
+        if (uri.getBooleanQueryParameter(Things.QUERY_PARAM_SYNC, false)) {
+            syncThings(uri, projection, selection, selectionArgs, sortOrder);
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor c = db.query(Things.TABLE_NAME, projection, selection, selectionArgs, null, null,
-                null);
+        Cursor c = db.query(Things.TABLE_NAME, projection, selection, selectionArgs,
+                null, null, null);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
     }
 
-    private void syncThings(Uri uri) throws OperationCanceledException, AuthenticatorException,
-            IOException, OperationApplicationException {
-        Context context = getContext();
-        String accountName = uri.getQueryParameter(Things.QUERY_PARAM_ACCOUNT);
-        String cookie = AccountUtils.getCookie(context, accountName);
+    private void syncThings(Uri uri, String[] projection, String selection, String[] selectionArgs,
+            String sortOrder) {
+        Cursor c = null;
+        try {
+            Context context = getContext();
+            String accountName = uri.getQueryParameter(Things.QUERY_PARAM_ACCOUNT);
+            String cookie = AccountUtils.getCookie(context, accountName);
 
-        String subreddit = uri.getQueryParameter(Things.QUERY_PARAM_SUBREDDIT);
-        int filter = Integer.parseInt(uri.getQueryParameter(Things.QUERY_PARAM_FILTER));
-        String more = uri.getQueryParameter(Things.QUERY_PARAM_MORE);
-        URL url = Urls.subredditUrl(subreddit, filter, more);
+            String subreddit = uri.getQueryParameter(Things.QUERY_PARAM_SUBREDDIT);
+            int filter = Integer.parseInt(uri.getQueryParameter(Things.QUERY_PARAM_FILTER));
+            String more = uri.getQueryParameter(Things.QUERY_PARAM_MORE);
+            URL url = Urls.subredditUrl(subreddit, filter, more);
 
-        ArrayList<ContentValues> values = NetApi.queryThings(context, url, cookie);
-        int count = values.size();
+            ThingListing listing = NetApi.queryThings(context, url, cookie);
+            int count = listing.values.size();
+            if (count > 0) {
+                SQLiteDatabase db = helper.getReadableDatabase();
+                c = db.query(Things.TABLE_NAME, SYNC_PROJECTION, selection, selectionArgs,
+                        null, null, null);
+                while (c.moveToNext()) {
+                    String name = c.getString(SYNC_INDEX_NAME);
+                    ContentValues v = listing.valueMap.get(name);
+                    if (v != null) {
+                        int likes = c.getInt(SYNC_INDEX_LIKES);
+                        v.put(Things.COLUMN_LIKES, likes);
+                    }
+                }
 
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 1);
-        ops.add(ContentProviderOperation.newDelete(Things.CONTENT_URI).build());
-        for (int i = 0; i < count; i++) {
-            ops.add(ContentProviderOperation.newInsert(Things.CONTENT_URI)
-                    .withValues(values.get(i))
-                    .build());
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(count + 1);
+                ops.add(ContentProviderOperation.newDelete(Things.CONTENT_URI).build());
+                for (int i = 0; i < count; i++) {
+                    ops.add(ContentProviderOperation.newInsert(Things.CONTENT_URI)
+                            .withValues(listing.values.get(i))
+                            .build());
+                }
+                applyBatch(ops);
+            }
+        } catch (OperationApplicationException e) {
+            Log.e(TAG, "syncThings", e);
+        } catch (IOException e) {
+            Log.e(TAG, "syncThings", e);
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, "syncThings", e);
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, "syncThings", e);
+        } finally {
+            c.close();
         }
-
-        applyBatch(ops);
     }
 
     @Override

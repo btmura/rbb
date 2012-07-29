@@ -17,7 +17,10 @@
 package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,13 +32,22 @@ import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.provider.ThingProvider.Things;
 
-class ThingParser extends JsonParser {
+class ThingListing extends JsonParser {
 
     final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
+    final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
+
     private final Formatter formatter = new Formatter();
     private final Context context;
 
-    ThingParser(Context context) {
+    static ThingListing parseListing(Context context, InputStream inputStream) throws IOException {
+        JsonReader reader = new JsonReader(new InputStreamReader(inputStream));
+        ThingListing listing = new ThingListing(context);
+        listing.parseListingObject(reader);
+        return listing;
+    }
+
+    private ThingListing(Context context) {
         this.context = context;
     }
 
@@ -77,7 +89,9 @@ class ThingParser extends JsonParser {
 
     @Override
     public void onName(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_NAME, readTrimmedString(reader, ""));
+        String name = readTrimmedString(reader, "");
+        values.get(index).put(Things.COLUMN_NAME, name);
+        valueMap.put(name, values.get(index));
     }
 
     @Override

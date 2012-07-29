@@ -27,7 +27,6 @@ import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -71,7 +70,7 @@ public class NetApi {
         }
     }
 
-    static ArrayList<ContentValues> queryThings(Context context, URL url, String cookie)
+    static ThingListing queryThings(Context context, URL url, String cookie)
             throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
@@ -81,10 +80,7 @@ public class NetApi {
             conn.connect();
 
             in = conn.getInputStream();
-            JsonReader reader = new JsonReader(new InputStreamReader(in));
-            ThingParser parser = new ThingParser(context);
-            parser.parseListingObject(reader);
-            return parser.values;
+            return ThingListing.parseListing(context, in);
         } finally {
             close(in, conn);
         }
