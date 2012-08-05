@@ -24,7 +24,7 @@ import android.support.v13.app.FragmentStatePagerAdapter;
 import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.CommentListFragment;
 import com.btmura.android.reddit.fragment.LinkFragment;
-import com.btmura.android.reddit.provider.ThingProvider.Things;
+import com.btmura.android.reddit.provider.Things;
 
 public class ThingPagerAdapter extends FragmentStatePagerAdapter {
 

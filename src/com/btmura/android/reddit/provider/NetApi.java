@@ -36,7 +36,6 @@ import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.data.Urls;
-import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.entity.LoginResult;
 import com.btmura.android.reddit.entity.SubmitResult;
 import com.btmura.android.reddit.entity.Subreddit;
@@ -70,39 +69,12 @@ public class NetApi {
         }
     }
 
-    static ThingListing queryThings(Context context, URL url, String cookie)
+    static HttpURLConnection connect(Context context, URL url, String cookie)
             throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, cookie);
-            conn.connect();
-
-            in = conn.getInputStream();
-            return ThingListing.parseListing(context, in);
-        } finally {
-            close(in, conn);
-        }
-    }
-
-    public static ArrayList<Comment> queryComments(Context context, URL url, String cookie)
-            throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, cookie);
-            conn.connect();
-
-            in = conn.getInputStream();
-            JsonReader reader = new JsonReader(new InputStreamReader(in));
-            CommentParser parser = new CommentParser(context);
-            parser.parseListingArray(reader);
-            return parser.comments;
-        } finally {
-            close(in, conn);
-        }
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        setCommonHeaders(conn, cookie);
+        conn.connect();
+        return conn;
     }
 
     public static Subreddit querySidebar(Context context, String subreddit, String cookie)

@@ -25,7 +25,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
-import com.btmura.android.reddit.provider.ThingProvider.Things;
 import com.btmura.android.reddit.provider.VoteProvider.Votes;
 
 class DbHelper extends SQLiteOpenHelper {
@@ -48,7 +47,8 @@ class DbHelper extends SQLiteOpenHelper {
         try {
             if (version > 1) {
                 createSubredditsV2(db);
-                createThings(db);
+                Things.createTable(db);
+                Comments.createTable(db);
                 createVotes(db);
             } else {
                 createSubredditsV1(db);
@@ -68,27 +68,6 @@ class DbHelper extends SQLiteOpenHelper {
                 + Subreddits.COLUMN_STATE + " INTEGER DEFAULT 0, "
                 + Subreddits.COLUMN_EXPIRATION + " INTEGER DEFAULT 0, "
                 + "UNIQUE (" + Subreddits.COLUMN_ACCOUNT + "," + Subreddits.COLUMN_NAME + "))");
-    }
-
-    private void createThings(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + Things.TABLE_NAME + " ("
-                + Things._ID + " INTEGER PRIMARY KEY, "
-                + Things.COLUMN_AUTHOR + " TEXT DEFAULT '', "
-                + Things.COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_DOMAIN + " TEXT DEFAULT '', "
-                + Things.COLUMN_DOWNS + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_LIKES + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_NAME + " TEXT DEFAULT '', "
-                + Things.COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_PERMA_LINK + " TEXT DEFAULT '', "
-                + Things.COLUMN_SCORE + " INTEGER DEFAULT '', "
-                + Things.COLUMN_SELF + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_SUBREDDIT + " TEXT DEFAULT '', "
-                + Things.COLUMN_TITLE + " TEXT DEFAULT '', "
-                + Things.COLUMN_THUMBNAIL_URL + " TEXT DEFAULT '', "
-                + Things.COLUMN_UPS + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_URL + " TEXT DEFAULT '')");
     }
 
     private void createVotes(SQLiteDatabase db) {

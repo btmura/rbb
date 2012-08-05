@@ -155,6 +155,8 @@ public class JsonParser {
                 onLikes(r, i);
             } else if ("num_comments".equals(name)) {
                 onNumComments(r, i);
+            } else if ("subreddit_id".equals(name)) {
+                onSubredditName(r, i);
             } else if ("thumbnail".equals(name)) {
                 onThumbnail(r, i);
             } else if ("is_self".equals(name)) {
@@ -251,6 +253,10 @@ public class JsonParser {
     }
 
     public void onUrl(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onSubredditName(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 

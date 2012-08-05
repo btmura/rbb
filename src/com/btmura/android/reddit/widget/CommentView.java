@@ -25,12 +25,10 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.BoringLayout;
 import android.text.Layout.Alignment;
-import android.text.Spannable;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
-import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -40,7 +38,6 @@ import android.view.View;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Comment;
 
 public class CommentView extends View implements OnGestureListener {
 
@@ -61,7 +58,12 @@ public class CommentView extends View implements OnGestureListener {
     private final GestureDetector detector;
     private OnVoteListener listener;
 
-    private Comment comment;
+    private String body;
+    private int downs;
+    private int likes;
+    private int nesting;
+    private String title;
+    private int ups;
 
     private StaticLayout titleLayout;
     private StaticLayout bodyLayout;
@@ -125,8 +127,13 @@ public class CommentView extends View implements OnGestureListener {
         this.listener = listener;
     }
 
-    public void setComment(Comment comment) {
-        this.comment = comment;
+    public void setData(String body, int downs, int likes, int nesting, String title, int ups) {
+        this.body = body;
+        this.downs = downs;
+        this.likes = likes;
+        this.nesting = nesting;
+        this.title = title;
+        this.ups = ups;
         requestLayout();
     }
 
@@ -148,30 +155,30 @@ public class CommentView extends View implements OnGestureListener {
                 break;
         }
 
-        scoreText = VotingArrows.getScoreText(comment.ups - comment.downs);
+        scoreText = VotingArrows.getScoreText(ups - downs);
         VotingArrows.measureScoreText(scoreText, scoreBounds);
 
         int rightContentWidth = measuredWidth
                 - PADDING - VotingArrows.getWidth() - PADDING
-                - PADDING * comment.nesting - PADDING;
+                - PADDING * nesting - PADDING;
 
         titleLayout = null;
         bodyLayout = null;
         rightHeight = 0;
 
-        if (!TextUtils.isEmpty(comment.title)) {
+        if (!TextUtils.isEmpty(title)) {
             titleLayout = createTitleLayout(rightContentWidth);
             rightHeight += titleLayout.getHeight();
             rightHeight += ELEMENT_PADDING;
         }
 
-        if (!TextUtils.isEmpty(comment.body)) {
+        if (!TextUtils.isEmpty(body)) {
             bodyLayout = createBodyLayout(rightContentWidth);
             rightHeight += bodyLayout.getHeight();
             rightHeight += ELEMENT_PADDING;
         }
 
-        if (!TextUtils.isEmpty(comment.status)) {
+        if (!TextUtils.isEmpty("status")) {
             statusLayout = createStatusLayout(rightContentWidth);
             rightHeight += statusLayout.getHeight();
         }
@@ -181,7 +188,7 @@ public class CommentView extends View implements OnGestureListener {
 
         bodyBounds.setEmpty();
 
-        int rx = PADDING * (1 + comment.nesting) + VotingArrows.getWidth() + PADDING;
+        int rx = PADDING * (1 + nesting) + VotingArrows.getWidth() + PADDING;
         if (bodyLayout != null) {
             bodyBounds.left = rx;
             rx += bodyLayout.getWidth();
@@ -216,25 +223,25 @@ public class CommentView extends View implements OnGestureListener {
     }
 
     private StaticLayout createTitleLayout(int width) {
-        return new StaticLayout(comment.title, TEXT_PAINTS[TEXT_TITLE],
+        return new StaticLayout(title, TEXT_PAINTS[TEXT_TITLE],
                 width, Alignment.ALIGN_NORMAL, 1, 0, true);
     }
 
     private StaticLayout createBodyLayout(int width) {
-        return new StaticLayout(comment.body, TEXT_PAINTS[TEXT_BODY],
+        return new StaticLayout(body, TEXT_PAINTS[TEXT_BODY],
                 width, Alignment.ALIGN_NORMAL, 1, 0, true);
     }
 
     private BoringLayout createStatusLayout(int width) {
-        BoringLayout.Metrics m = BoringLayout.isBoring(comment.status, TEXT_PAINTS[TEXT_STATUS]);
-        return BoringLayout.make(comment.status, TEXT_PAINTS[TEXT_STATUS], width,
+        BoringLayout.Metrics m = BoringLayout.isBoring("status", TEXT_PAINTS[TEXT_STATUS]);
+        return BoringLayout.make("status", TEXT_PAINTS[TEXT_STATUS], width,
                 Alignment.ALIGN_NORMAL, 1, 0, m, true, TruncateAt.END, width);
     }
 
     @Override
     protected void onDraw(Canvas c) {
-        c.translate(PADDING * (1 + comment.nesting), PADDING);
-        VotingArrows.draw(c, null, false, scoreText, scoreBounds, comment.likes);
+        c.translate(PADDING * (1 + nesting), PADDING);
+        VotingArrows.draw(c, null, false, scoreText, scoreBounds, likes);
         c.translate(0, -PADDING);
 
         int dx = VotingArrows.getWidth() + PADDING;
@@ -262,7 +269,7 @@ public class CommentView extends View implements OnGestureListener {
     private boolean onBodyTouchEvent(MotionEvent e) {
         int action = e.getAction();
         if ((action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
-                && comment.body instanceof Spannable
+                && false // body instanceof Spannable
                 && bodyBounds.contains(e.getX(), e.getY())) {
             float localX = e.getX() - bodyBounds.left;
             float localY = e.getY() - bodyBounds.top;
@@ -282,14 +289,15 @@ public class CommentView extends View implements OnGestureListener {
                 return false;
             }
 
-            Spannable bodySpan = (Spannable) comment.body;
-            ClickableSpan[] spans = bodySpan.getSpans(offset, offset, ClickableSpan.class);
-            if (spans != null && spans.length > 0) {
-                if (action == MotionEvent.ACTION_UP) {
-                    spans[0].onClick(this);
-                }
-                return true;
-            }
+            // Spannable bodySpan = (Spannable) comment.body;
+            // ClickableSpan[] spans = bodySpan.getSpans(offset, offset,
+            // ClickableSpan.class);
+            // if (spans != null && spans.length > 0) {
+            // if (action == MotionEvent.ACTION_UP) {
+            // spans[0].onClick(this);
+            // }
+            // return true;
+            // }
         }
         return false;
     }
@@ -303,7 +311,7 @@ public class CommentView extends View implements OnGestureListener {
     }
 
     private float getCommentLeft() {
-        return comment.nesting * PADDING;
+        return nesting * PADDING;
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

@@ -24,7 +24,7 @@ import android.text.TextUtils;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
-import com.btmura.android.reddit.provider.ThingProvider.Things;
+import com.btmura.android.reddit.provider.Things;
 
 public class Thing implements Parcelable {
 

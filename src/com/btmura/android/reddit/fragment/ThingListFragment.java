@@ -147,13 +147,16 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri u = ThingAdapter.getInitialUri(getAccountName(), Subreddit.getName(subreddit), filter);
-        return ThingAdapter.createLoader(getActivity(), u);
+        String subredditName = Subreddit.getName(subreddit);
+        Uri uri = ThingAdapter.createUri(getAccountName(), subredditName, filter, true);
+        return ThingAdapter.createLoader(getActivity(), uri, subredditName);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor things) {
-        Uri u = ThingAdapter.getUri(getAccountName(), Subreddit.getName(subreddit), filter);
-        ((CursorLoader) loader).setUri(u);
+        Uri uri = ThingAdapter.createUri(getAccountName(), Subreddit.getName(subreddit), filter,
+                false);
+        CursorLoader cursorLoader = (CursorLoader) loader;
+        cursorLoader.setUri(uri);
 
         scrollLoading = false;
         adapter.swapCursor(things);

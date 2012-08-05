@@ -19,6 +19,8 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,25 +32,48 @@ import android.util.JsonToken;
 
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
-import com.btmura.android.reddit.provider.ThingProvider.Things;
+import com.btmura.android.reddit.data.Urls;
 
-class ThingListing extends JsonParser {
+class ThingListing extends JsonParser implements Listing {
 
-    final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
-    final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
+    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
+    private final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
 
     private final Formatter formatter = new Formatter();
     private final Context context;
+    private final String cookie;
+    private final String subredditName;
+    private final URL url;
 
-    static ThingListing parseListing(Context context, InputStream inputStream) throws IOException {
-        JsonReader reader = new JsonReader(new InputStreamReader(inputStream));
-        ThingListing listing = new ThingListing(context);
-        listing.parseListingObject(reader);
-        return listing;
+    ThingListing(Context context, String cookie, String subredditName, int filter, String more) {
+        this.context = context;
+        this.cookie = cookie;
+        this.subredditName = subredditName;
+        this.url = Urls.subredditUrl(subredditName, filter, more);
     }
 
-    private ThingListing(Context context) {
-        this.context = context;
+    public void process() throws IOException {
+        HttpURLConnection conn = NetApi.connect(context, url, cookie);
+        InputStream input = conn.getInputStream();
+        try {
+            JsonReader reader = new JsonReader(new InputStreamReader(input));
+            parseListingObject(reader);
+        } finally {
+            input.close();
+            conn.disconnect();
+        }
+    }
+
+    public String getParent() {
+        return subredditName;
+    }
+
+    public ArrayList<ContentValues> getValues() {
+        return values;
+    }
+
+    public HashMap<String, ContentValues> getValueMap() {
+        return valueMap;
     }
 
     @Override
@@ -125,6 +150,11 @@ class ThingListing extends JsonParser {
     }
 
     @Override
+    public void onSubredditName(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_PARENT, readTrimmedString(reader, ""));
+    }
+
+    @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
         CharSequence title = formatter.formatTitle(context, readTrimmedString(reader, ""));
         values.get(index).put(Things.COLUMN_TITLE, title.toString());
@@ -150,5 +180,6 @@ class ThingListing extends JsonParser {
 
     @Override
     public void onEntityEnd(int index) {
+        values.get(index).put(Things.COLUMN_PARENT, subredditName);
     }
 }

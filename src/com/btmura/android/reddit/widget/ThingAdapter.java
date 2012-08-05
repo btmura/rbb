@@ -25,7 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 
-import com.btmura.android.reddit.provider.ThingProvider.Things;
+import com.btmura.android.reddit.provider.Things;
 
 public class ThingAdapter extends CursorAdapter {
 
@@ -73,25 +73,18 @@ public class ThingAdapter extends CursorAdapter {
     private final OnVoteListener listener;
     private int thingBodyWidth;
 
-    public static CursorLoader createLoader(Context context, Uri uri) {
-        return new CursorLoader(context, uri, PROJECTION, null, null, null);
-    }
-
-    public static Uri getInitialUri(String account, String subreddit, int filter) {
-        return getBaseUriBuilder(account, subreddit, filter)
-                .appendQueryParameter(Things.QUERY_PARAM_SYNC, Boolean.TRUE.toString())
+    public static Uri createUri(String accountName, String subredditName, int filter, boolean sync) {
+        return Things.CONTENT_URI.buildUpon()
+                .appendQueryParameter(Things.QUERY_SYNC, Boolean.toString(sync))
+                .appendQueryParameter(Things.QUERY_ACCOUNT_NAME, accountName)
+                .appendQueryParameter(Things.QUERY_SUBREDDIT_NAME, subredditName)
+                .appendQueryParameter(Things.QUERY_FILTER, Integer.toString(filter))
                 .build();
     }
 
-    public static Uri getUri(String account, String subreddit, int filter) {
-        return getBaseUriBuilder(account, subreddit, filter).build();
-    }
-
-    private static Uri.Builder getBaseUriBuilder(String account, String subreddit, int filter) {
-        return Things.CONTENT_URI.buildUpon()
-                .appendQueryParameter(Things.QUERY_PARAM_ACCOUNT, account)
-                .appendQueryParameter(Things.QUERY_PARAM_SUBREDDIT, subreddit)
-                .appendQueryParameter(Things.QUERY_PARAM_FILTER, Integer.toString(filter));
+    public static CursorLoader createLoader(Context context, Uri uri, String subredditName) {
+        return new CursorLoader(context, uri, PROJECTION, Things.PARENT_SELECTION,
+                new String[] {subredditName}, null);
     }
 
     public ThingAdapter(Context context, String parentSubreddit, OnVoteListener listener) {
@@ -124,9 +117,9 @@ public class ThingAdapter extends CursorAdapter {
         String title = cursor.getString(INDEX_TITLE);
 
         ThingView tv = (ThingView) view;
+        tv.setOnVoteListener(listener);
         tv.setData(thingId, author, createdUtc, domain, likes, nowTimeMs, numComments,
                 over18, parentSubreddit, score, subreddit, thingBodyWidth, thumbnailUrl, title);
-        tv.setOnVoteListener(listener);
         thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
     }
 

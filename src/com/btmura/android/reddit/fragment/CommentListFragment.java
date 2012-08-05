@@ -16,15 +16,12 @@
 
 package com.btmura.android.reddit.fragment;
 
-import java.net.URL;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,13 +33,11 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.CommentLoader;
-import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
-public class CommentListFragment extends ListFragment implements LoaderCallbacks<List<Comment>>,
+public class CommentListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
         MultiChoiceModeListener, OnVoteListener {
 
     public static final String TAG = "CommentListFragment";
@@ -79,8 +74,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-        adapter = new CommentAdapter(getActivity());
-        adapter.setOnVoteListener(this);
+        adapter = new CommentAdapter(getActivity(), this);
     }
 
     @Override
@@ -100,19 +94,19 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         getLoaderManager().initLoader(0, null, this);
     }
 
-    public Loader<List<Comment>> onCreateLoader(int id, Bundle args) {
-        URL url = Urls.commentsUrl(getArguments().getString(ARG_THING_ID));
-        return new CommentLoader(getActivity().getApplicationContext(), accountName, url);
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String thingId = getArguments().getString(ARG_THING_ID);
+        return CommentAdapter.createLoader(getActivity(), accountName, thingId);
     }
 
-    public void onLoadFinished(Loader<List<Comment>> loader, List<Comment> comments) {
-        adapter.swapData(comments);
-        setEmptyText(getString(comments != null ? R.string.empty_list : R.string.error));
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        adapter.swapCursor(cursor);
+        setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
     }
 
-    public void onLoaderReset(Loader<List<Comment>> loader) {
-        adapter.swapData(null);
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 
     public void onVote(long id, int vote) {
@@ -149,13 +143,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     private Comment findFirstCheckedComment() {
-        SparseBooleanArray positions = getListView().getCheckedItemPositions();
-        int count = adapter.getCount();
-        for (int i = 0; i < count; i++) {
-            if (positions.get(i)) {
-                return adapter.getItem(i);
-            }
-        }
         return null;
     }
 
