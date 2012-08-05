@@ -56,13 +56,14 @@ public class CommentView extends View implements OnGestureListener {
     private static final int TEXT_STATUS = 2;
 
     private final GestureDetector detector;
-    private OnVoteListener listener;
+    private OnLikeListener listener;
 
     private String body;
     private int downs;
     private int likes;
     private int nesting;
     private String title;
+    private String thingId;
     private int ups;
 
     private StaticLayout titleLayout;
@@ -123,16 +124,18 @@ public class CommentView extends View implements OnGestureListener {
         }
     }
 
-    public void setOnVoteListener(OnVoteListener listener) {
+    public void setOnVoteListener(OnLikeListener listener) {
         this.listener = listener;
     }
 
-    public void setData(String body, int downs, int likes, int nesting, String title, int ups) {
+    public void setData(String body, int downs, int likes, int nesting, String title,
+            String thingId, int ups) {
         this.body = body;
         this.downs = downs;
         this.likes = likes;
         this.nesting = nesting;
         this.title = title;
+        this.thingId = thingId;
         this.ups = ups;
         requestLayout();
     }
@@ -307,7 +310,7 @@ public class CommentView extends View implements OnGestureListener {
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, getCommentLeft(), listener, -1);
+        return VotingArrows.onSingleTapUp(e, getCommentLeft(), listener, thingId);
     }
 
     private float getCommentLeft() {

@@ -54,7 +54,7 @@ public class CommentProvider extends BaseProvider {
 
     private static final String[] SYNC_PROJECTION = {
             Comments._ID,
-            Comments.COLUMN_ID,
+            Comments.COLUMN_THING_ID,
             Comments.COLUMN_LIKES,
     };
     private static final int SYNC_INDEX_ID = 1;

@@ -185,16 +185,16 @@ class VotingArrows {
         return getEvent(e, left) != EVENT_NONE;
     }
 
-    static boolean onSingleTapUp(MotionEvent e, float left, OnVoteListener listener, long thingId) {
+    static boolean onSingleTapUp(MotionEvent e, float left, OnLikeListener listener, String thingId) {
         if (listener != null) {
             int event = getEvent(e, left);
             switch (event) {
                 case EVENT_UPVOTE:
-                    listener.onVote(thingId, OnVoteListener.VOTE_UP);
+                    listener.onLike(thingId, OnLikeListener.VOTE_UP);
                     return true;
 
                 case EVENT_DOWNVOTE:
-                    listener.onVote(thingId, OnVoteListener.VOTE_DOWN);
+                    listener.onLike(thingId, OnLikeListener.VOTE_DOWN);
                     return true;
             }
         }

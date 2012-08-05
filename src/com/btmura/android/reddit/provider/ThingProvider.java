@@ -23,7 +23,6 @@ import java.util.HashMap;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.ContentProviderOperation;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -32,7 +31,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
@@ -57,7 +55,7 @@ public class ThingProvider extends BaseProvider {
 
     private static final String[] SYNC_PROJECTION = {
             Things._ID,
-            Things.COLUMN_NAME,
+            Things.COLUMN_THING_ID,
             Things.COLUMN_LIKES,
     };
     private static final int SYNC_INDEX_NAME = 1;
@@ -182,19 +180,5 @@ public class ThingProvider extends BaseProvider {
     @Override
     public String getType(Uri uri) {
         return null;
-    }
-
-    public static void updateLikesInBackground(final Context context, final long id, final int likes) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                ContentValues values = new ContentValues(1);
-                values.put(Things.COLUMN_LIKES, likes);
-
-                ContentResolver cr = context.getContentResolver();
-                cr.update(Things.CONTENT_URI, values, ID_SELECTION, idSelectionArg(id));
-                return null;
-            }
-        }.execute();
     }
 }

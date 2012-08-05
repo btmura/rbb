@@ -36,6 +36,7 @@ public class CommentAdapter extends CursorAdapter {
             Comments.COLUMN_LIKES,
             Comments.COLUMN_NESTING,
             Comments.COLUMN_TITLE,
+            Comments.COLUMN_THING_ID,
             Comments.COLUMN_UPS,
     };
 
@@ -44,21 +45,25 @@ public class CommentAdapter extends CursorAdapter {
     private static final int INDEX_LIKES = 3;
     private static final int INDEX_NESTING = 4;
     private static final int INDEX_TITLE = 5;
-    private static final int INDEX_UP = 6;
+    private static final int INDEX_THING_ID = 6;
+    private static final int INDEX_UP = 7;
 
-    private final OnVoteListener listener;
+    private final OnLikeListener listener;
 
-    public static CursorLoader createLoader(Context context, String accountName, String thingId) {
-        Uri uri = Comments.CONTENT_URI.buildUpon()
-                .appendQueryParameter(Comments.PARAM_SYNC, Boolean.toString(true))
+    public static Uri createUri(String accountName, String thingId, boolean sync) {
+        return Comments.CONTENT_URI.buildUpon()
+                .appendQueryParameter(Comments.PARAM_SYNC, Boolean.toString(sync))
                 .appendQueryParameter(Comments.PARAM_ACCOUNT_NAME, accountName)
                 .appendQueryParameter(Comments.PARAM_THING_ID, thingId)
                 .build();
+    }
+
+    public static CursorLoader createLoader(Context context, Uri uri, String thingId) {
         return new CursorLoader(context, uri, PROJECTION, Comments.PARENT_ID_SELECTION,
                 ArrayUtils.toArray(thingId), null);
     }
 
-    public CommentAdapter(Context context, OnVoteListener listener) {
+    public CommentAdapter(Context context, OnLikeListener listener) {
         super(context, null, 0);
         this.listener = listener;
     }
@@ -75,10 +80,11 @@ public class CommentAdapter extends CursorAdapter {
         int likes = cursor.getInt(INDEX_LIKES);
         int nesting = cursor.getInt(INDEX_NESTING);
         String title = cursor.getString(INDEX_TITLE);
+        String thingId = cursor.getString(INDEX_THING_ID);
         int ups = cursor.getInt(INDEX_UP);
 
         CommentView cv = (CommentView) view;
         cv.setOnVoteListener(listener);
-        cv.setData(body, downs, likes, nesting, title, ups);
+        cv.setData(body, downs, likes, nesting, title, thingId, ups);
     }
 }

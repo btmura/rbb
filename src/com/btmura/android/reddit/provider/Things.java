@@ -37,7 +37,6 @@ public class Things implements BaseColumns, SyncColumns {
     public static final String COLUMN_DOMAIN = "domain";
     public static final String COLUMN_DOWNS = "downs";
     public static final String COLUMN_LIKES = "likes";
-    public static final String COLUMN_NAME = "name";
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_OVER_18 = "over18";
 
@@ -53,11 +52,13 @@ public class Things implements BaseColumns, SyncColumns {
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_TYPE = "type";
+    public static final String COLUMN_THING_ID = "thingId";
     public static final String COLUMN_THUMBNAIL_URL = "thumbnailUrl";
     public static final String COLUMN_UPS = "ups";
     public static final String COLUMN_URL = "url";
 
     public static final String PARENT_SELECTION = Things.COLUMN_PARENT + "= ?";
+    public static final String THING_ID_SELECTION = Things.COLUMN_THING_ID + "= ?";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + Things.TABLE_NAME + " ("
@@ -67,7 +68,6 @@ public class Things implements BaseColumns, SyncColumns {
                 + Things.COLUMN_DOMAIN + " TEXT DEFAULT '', "
                 + Things.COLUMN_DOWNS + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_LIKES + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_NAME + " TEXT DEFAULT '', "
                 + Things.COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_PARENT + " TEXT DEFAULT '', "
@@ -76,6 +76,7 @@ public class Things implements BaseColumns, SyncColumns {
                 + Things.COLUMN_SELF + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_SUBREDDIT + " TEXT DEFAULT '', "
                 + Things.COLUMN_TITLE + " TEXT DEFAULT '', "
+                + Things.COLUMN_THING_ID + " TEXT DEFAULT '', "
                 + Things.COLUMN_THUMBNAIL_URL + " TEXT DEFAULT '', "
                 + Things.COLUMN_TYPE + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_UPS + " INTEGER DEFAULT 0, "

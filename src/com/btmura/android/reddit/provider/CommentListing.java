@@ -132,7 +132,7 @@ class CommentListing extends JsonParser implements Listing {
     @Override
     public void onName(JsonReader reader, int index) throws IOException {
         String id = readTrimmedString(reader, "");
-        values.get(index).put(Comments.COLUMN_ID, id);
+        values.get(index).put(Comments.COLUMN_THING_ID, id);
         valueMap.put(id, values.get(index));
     }
 
@@ -168,7 +168,7 @@ class CommentListing extends JsonParser implements Listing {
             ContentValues v = values.get(i);
             Integer type = v.getAsInteger(Comments.COLUMN_KIND);
             if (type.intValue() == Comments.KIND_MORE) {
-                String id = v.getAsString(Comments.COLUMN_ID);
+                String id = v.getAsString(Comments.COLUMN_THING_ID);
                 values.remove(i);
                 valueMap.remove(id);
                 size--;

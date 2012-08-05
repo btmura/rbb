@@ -36,7 +36,7 @@ public class ThingAdapter extends CursorAdapter {
             Things.COLUMN_DOMAIN,
             Things.COLUMN_DOWNS,
             Things.COLUMN_LIKES,
-            Things.COLUMN_NAME,
+            Things.COLUMN_THING_ID,
             Things.COLUMN_NUM_COMMENTS,
             Things.COLUMN_OVER_18,
             Things.COLUMN_PERMA_LINK,
@@ -44,12 +44,12 @@ public class ThingAdapter extends CursorAdapter {
             Things.COLUMN_SELF,
             Things.COLUMN_SUBREDDIT,
             Things.COLUMN_TITLE,
+            Things.COLUMN_THING_ID,
             Things.COLUMN_THUMBNAIL_URL,
             Things.COLUMN_UPS,
             Things.COLUMN_URL,
     };
 
-    public static final int INDEX_ID = 0;
     public static final int INDEX_AUTHOR = 1;
     public static final int INDEX_CREATED_UTC = 2;
     public static final int INDEX_DOMAIN = 3;
@@ -63,14 +63,15 @@ public class ThingAdapter extends CursorAdapter {
     public static final int INDEX_SELF = 11;
     public static final int INDEX_SUBREDDIT = 12;
     public static final int INDEX_TITLE = 13;
-    public static final int INDEX_THUMBNAIL_URL = 14;
-    public static final int INDEX_UPS = 15;
-    public static final int INDEX_URL = 16;
+    public static final int INDEX_THING_ID = 14;
+    public static final int INDEX_THUMBNAIL_URL = 15;
+    public static final int INDEX_UPS = 16;
+    public static final int INDEX_URL = 17;
 
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final long nowTimeMs = System.currentTimeMillis();
     private final String parentSubreddit;
-    private final OnVoteListener listener;
+    private final OnLikeListener listener;
     private int thingBodyWidth;
 
     public static Uri createUri(String accountName, String subredditName, int filter, boolean sync) {
@@ -87,7 +88,7 @@ public class ThingAdapter extends CursorAdapter {
                 new String[] {subredditName}, null);
     }
 
-    public ThingAdapter(Context context, String parentSubreddit, OnVoteListener listener) {
+    public ThingAdapter(Context context, String parentSubreddit, OnLikeListener listener) {
         super(context, null, 0);
         this.parentSubreddit = parentSubreddit;
         this.listener = listener;
@@ -112,14 +113,14 @@ public class ThingAdapter extends CursorAdapter {
         boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
         int score = cursor.getInt(INDEX_SCORE);
         String subreddit = cursor.getString(INDEX_SUBREDDIT);
-        long thingId = cursor.getLong(INDEX_ID);
+        String thingId = cursor.getString(INDEX_THING_ID);
         String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
         String title = cursor.getString(INDEX_TITLE);
 
         ThingView tv = (ThingView) view;
         tv.setOnVoteListener(listener);
-        tv.setData(thingId, author, createdUtc, domain, likes, nowTimeMs, numComments,
-                over18, parentSubreddit, score, subreddit, thingBodyWidth, thumbnailUrl, title);
+        tv.setData(author, createdUtc, domain, likes, nowTimeMs, numComments, over18,
+                parentSubreddit, score, subreddit, thingBodyWidth, thingId, thumbnailUrl, title);
         thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
     }
 
@@ -133,13 +134,13 @@ public class ThingAdapter extends CursorAdapter {
 
     private Bundle makeBundle(Cursor c) {
         Bundle b = new Bundle(PROJECTION.length - 1);
-        b.putLong(Things._ID, c.getLong(INDEX_ID));
+        b.putLong(Things._ID, c.getLong(INDEX_THING_ID));
         b.putString(Things.COLUMN_AUTHOR, c.getString(INDEX_AUTHOR));
         b.putLong(Things.COLUMN_CREATED_UTC, c.getLong(INDEX_CREATED_UTC));
         b.putString(Things.COLUMN_DOMAIN, c.getString(INDEX_DOMAIN));
         b.putInt(Things.COLUMN_DOWNS, c.getInt(INDEX_DOWNS));
         b.putInt(Things.COLUMN_LIKES, c.getInt(INDEX_LIKES));
-        b.putString(Things.COLUMN_NAME, c.getString(INDEX_NAME));
+        b.putString(Things.COLUMN_THING_ID, c.getString(INDEX_NAME));
         b.putInt(Things.COLUMN_NUM_COMMENTS, c.getInt(INDEX_NUM_COMMENTS));
         b.putBoolean(Things.COLUMN_OVER_18, c.getInt(INDEX_OVER_18) == 1);
         b.putString(Things.COLUMN_PERMA_LINK, c.getString(INDEX_PERMA_LINK));

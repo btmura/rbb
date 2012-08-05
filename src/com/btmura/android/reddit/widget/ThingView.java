@@ -45,7 +45,7 @@ public class ThingView extends View implements OnGestureListener {
     private static final int TEXT_STATUS = 1;
 
     private final GestureDetector detector;
-    private OnVoteListener listener;
+    private OnLikeListener listener;
 
     private String author;
     private long createdUtc;
@@ -58,8 +58,8 @@ public class ThingView extends View implements OnGestureListener {
     private int score;
     private String subreddit;
     private int thingBodyWidth;
-    private long id;
     private String thumbnailUrl;
+    private String thingId;
     private String title;
 
     private Bitmap bitmap;
@@ -122,7 +122,7 @@ public class ThingView extends View implements OnGestureListener {
         }
     }
 
-    public void setOnVoteListener(OnVoteListener listener) {
+    public void setOnVoteListener(OnLikeListener listener) {
         this.listener = listener;
     }
 
@@ -131,8 +131,7 @@ public class ThingView extends View implements OnGestureListener {
         invalidate();
     }
 
-    public void setData(long id,
-            String author,
+    public void setData(String author,
             long createdUtc,
             String domain,
             int likes,
@@ -143,9 +142,9 @@ public class ThingView extends View implements OnGestureListener {
             int score,
             String subreddit,
             int thingBodyWidth,
+            String thingId,
             String thumbnailUrl,
             String title) {
-        this.id = id;
         this.author = author;
         this.createdUtc = createdUtc;
         this.domain = domain;
@@ -157,6 +156,7 @@ public class ThingView extends View implements OnGestureListener {
         this.score = score;
         this.subreddit = subreddit;
         this.thingBodyWidth = thingBodyWidth;
+        this.thingId = thingId;
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
         requestLayout();
@@ -339,7 +339,7 @@ public class ThingView extends View implements OnGestureListener {
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, 0, listener, id);
+        return VotingArrows.onSingleTapUp(e, 0, listener, thingId);
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

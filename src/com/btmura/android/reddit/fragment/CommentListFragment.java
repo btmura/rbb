@@ -19,9 +19,13 @@ package com.btmura.android.reddit.fragment;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,15 +36,18 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Comment;
+import com.btmura.android.reddit.provider.Likes;
 import com.btmura.android.reddit.widget.CommentAdapter;
-import com.btmura.android.reddit.widget.OnVoteListener;
+import com.btmura.android.reddit.widget.OnLikeListener;
 
 public class CommentListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
-        MultiChoiceModeListener, OnVoteListener {
+        MultiChoiceModeListener, OnLikeListener {
 
     public static final String TAG = "CommentListFragment";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final String ARG_ACCOUNT_NAME = "an";
     private static final String ARG_THING_ID = "ti";
@@ -50,6 +57,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     private String accountName;
+    private String thingId;
     private CommentListener listener;
     private CommentAdapter adapter;
 
@@ -74,6 +82,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
+        thingId = getArguments().getString(ARG_THING_ID);
         adapter = new CommentAdapter(getActivity(), this);
     }
 
@@ -96,10 +105,15 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String thingId = getArguments().getString(ARG_THING_ID);
-        return CommentAdapter.createLoader(getActivity(), accountName, thingId);
+        Uri uri = CommentAdapter.createUri(accountName, thingId, true);
+        return CommentAdapter.createLoader(getActivity(), uri, thingId);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Uri uri = CommentAdapter.createUri(accountName, thingId, false);
+        CursorLoader cursorLoader = (CursorLoader) loader;
+        cursorLoader.setUri(uri);
+
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
@@ -109,7 +123,13 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         adapter.swapCursor(null);
     }
 
-    public void onVote(long id, int vote) {
+    public void onLike(String thingId, int likes) {
+        if (DEBUG) {
+            Log.d(TAG, "onLike thingId: " + thingId + " likes: " + likes);
+        }
+        if (!TextUtils.isEmpty(accountName)) {
+            Likes.likeInBackground(getActivity(), thingId, likes);
+        }
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {

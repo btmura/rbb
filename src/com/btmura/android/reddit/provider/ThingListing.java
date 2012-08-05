@@ -115,7 +115,7 @@ class ThingListing extends JsonParser implements Listing {
     @Override
     public void onName(JsonReader reader, int index) throws IOException {
         String name = readTrimmedString(reader, "");
-        values.get(index).put(Things.COLUMN_NAME, name);
+        values.get(index).put(Things.COLUMN_THING_ID, name);
         valueMap.put(name, values.get(index));
     }
 

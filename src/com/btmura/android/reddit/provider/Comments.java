@@ -35,7 +35,6 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_BODY = "body";
     public static final String COLUMN_CREATED_UTC = "createdUtc";
     public static final String COLUMN_DOWNS = "downs";
-    public static final String COLUMN_ID = "id";
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_NESTING = "nesting";
@@ -43,6 +42,7 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_PARENT_ID = "parentId";
     public static final String COLUMN_SELF_TEXT = "selfText";
     public static final String COLUMN_TITLE = "title";
+    public static final String COLUMN_THING_ID = "thingId";
     public static final String COLUMN_UPS = "ups";
 
     public static final int KIND_HEADER = 0;
@@ -50,6 +50,7 @@ public class Comments implements BaseColumns {
     public static final int KIND_MORE = 2;
 
     public static String PARENT_ID_SELECTION = COLUMN_PARENT_ID + " = ?";
+    public static final String THING_ID_SELECTION = Comments.COLUMN_THING_ID + "= ?";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
@@ -58,13 +59,13 @@ public class Comments implements BaseColumns {
                 + COLUMN_BODY + " TEXT DEFAULT '', "
                 + COLUMN_CREATED_UTC + " INTEGER NOT NULL, "
                 + COLUMN_DOWNS + " INTEGER NOT NULL, "
-                + COLUMN_ID + " TEXT NOT NULL, "
                 + COLUMN_KIND + " INTEGER NOT NULL, "
                 + COLUMN_LIKES + " INTEGER NOT NULL, "
                 + COLUMN_NESTING + " INTEGER NOT NULL, "
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + COLUMN_PARENT_ID + " TEXT NOT NULL, "
                 + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "
+                + COLUMN_THING_ID + " TEXT NOT NULL, "
                 + COLUMN_TITLE + " TEXT DEFAULT '', "
                 + COLUMN_UPS + " INTEGER NOT NULL)");
     }

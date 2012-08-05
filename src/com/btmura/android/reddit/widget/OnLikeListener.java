@@ -16,9 +16,9 @@
 
 package com.btmura.android.reddit.widget;
 
-public interface OnVoteListener {
+public interface OnLikeListener {
     static final int VOTE_UP = 1;
     static final int VOTE_DOWN = -1;
 
-    void onVote(long id, int vote);
+    void onLike(String thingId, int likes);
 }
