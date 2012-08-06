@@ -19,14 +19,10 @@ package com.btmura.android.reddit.provider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.provider.BaseColumns;
 
 import com.btmura.android.reddit.Debug;
 
@@ -36,8 +32,9 @@ public class VoteProvider extends BaseProvider {
     public static boolean DEBUG = Debug.DEBUG;
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.votes";
+    static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
-    private static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
+    public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_VOTES = 1;
@@ -45,25 +42,6 @@ public class VoteProvider extends BaseProvider {
     static {
         MATCHER.addURI(AUTHORITY, Votes.TABLE_NAME, MATCH_ALL_VOTES);
         MATCHER.addURI(AUTHORITY, Votes.TABLE_NAME + "/#", MATCH_ONE_VOTE);
-    }
-
-    public static class Votes implements BaseColumns, SyncColumns {
-        static final String TABLE_NAME = "votes";
-        public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
-
-        static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
-                + AUTHORITY + "." + TABLE_NAME;
-        static final String MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
-                + AUTHORITY + "." + TABLE_NAME;
-
-        public static final String COLUMN_ACCOUNT = "account";
-        public static final String COLUMN_NAME = "name";
-        public static final String COLUMN_VOTE = "vote";
-        public static final String COLUMN_STATE = "state";
-
-        public static final int VOTE_UP = 1;
-        public static final int VOTE_RESCIND = 0;
-        public static final int VOTE_DOWN = -1;
     }
 
     @Override
@@ -78,13 +56,8 @@ public class VoteProvider extends BaseProvider {
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor c = db.query(Votes.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder);
+        Cursor c = db.query(Votes.TABLE_NAME, projection, selection, selectionArgs,
+                null, null, sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
     }
@@ -94,7 +67,12 @@ public class VoteProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(Votes.TABLE_NAME, null, values);
         if (id != -1) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            ContentResolver cr = getContext().getContentResolver();
+            cr.notifyChange(uri, null);
+            if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
+                cr.notifyChange(Things.CONTENT_URI, null);
+                cr.notifyChange(Comments.CONTENT_URI, null);
+            }
             return ContentUris.withAppendedId(uri, id);
         }
         return null;
@@ -113,7 +91,12 @@ public class VoteProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.update(Votes.TABLE_NAME, values, selection, selectionArgs);
         if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            ContentResolver cr = getContext().getContentResolver();
+            cr.notifyChange(uri, null);
+            if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
+                cr.notifyChange(Things.CONTENT_URI, null);
+                cr.notifyChange(Comments.CONTENT_URI, null);
+            }
         }
         return count;
     }
@@ -131,7 +114,12 @@ public class VoteProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.delete(Votes.TABLE_NAME, selection, selectionArgs);
         if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            ContentResolver cr = getContext().getContentResolver();
+            cr.notifyChange(uri, null);
+            if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
+                cr.notifyChange(Things.CONTENT_URI, null);
+                cr.notifyChange(Comments.CONTENT_URI, null);
+            }
         }
         return count;
     }
@@ -149,28 +137,5 @@ public class VoteProvider extends BaseProvider {
             default:
                 return null;
         }
-    }
-
-    public static void insertVoteInBackground(final Context context,
-            final String accountName, final String name, final int vote) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                ContentValues values = new ContentValues(4);
-                values.put(Votes.COLUMN_ACCOUNT, accountName);
-                values.put(Votes.COLUMN_NAME, name);
-                values.put(Votes.COLUMN_VOTE, vote);
-                values.put(Votes.COLUMN_STATE, Votes.STATE_INSERTING);
-
-                ContentResolver cr = context.getContentResolver();
-                Uri uri = cr.insert(Votes.CONTENT_URI, values);
-                if (uri != null) {
-                    Intent intent = new Intent(context, SyncOperationService.class);
-                    intent.setData(uri);
-                    context.startService(intent);
-                }
-                return null;
-            }
-        }.execute();
     }
 }

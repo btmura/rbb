@@ -18,7 +18,12 @@ package com.btmura.android.reddit.util;
 
 public class ArrayUtils {
 
-    public static String[] toArray(String element) {
-        return new String[] {element};
+    public static String[] toArray(String... elements) {
+        int length = elements.length;
+        String[] array = new String[length];
+        for (int i = 0; i < length; i++) {
+            array[i] = elements[i];
+        }
+        return array;
     }
 }

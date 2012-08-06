@@ -25,7 +25,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
-import com.btmura.android.reddit.provider.VoteProvider.Votes;
 
 class DbHelper extends SQLiteOpenHelper {
 
@@ -47,9 +46,9 @@ class DbHelper extends SQLiteOpenHelper {
         try {
             if (version > 1) {
                 createSubredditsV2(db);
-                Things.createTable(db);
                 Comments.createTable(db);
-                createVotes(db);
+                Votes.createTable(db);
+                Things.createTable(db);
             } else {
                 createSubredditsV1(db);
             }
@@ -68,15 +67,6 @@ class DbHelper extends SQLiteOpenHelper {
                 + Subreddits.COLUMN_STATE + " INTEGER DEFAULT 0, "
                 + Subreddits.COLUMN_EXPIRATION + " INTEGER DEFAULT 0, "
                 + "UNIQUE (" + Subreddits.COLUMN_ACCOUNT + "," + Subreddits.COLUMN_NAME + "))");
-    }
-
-    private void createVotes(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + Votes.TABLE_NAME + " ("
-                + Votes._ID + " INTEGER PRIMARY KEY, "
-                + Votes.COLUMN_ACCOUNT + " TEXT DEFAULT '', "
-                + Votes.COLUMN_NAME + " TEXT NOT NULL, "
-                + Votes.COLUMN_VOTE + " INTEGER DEFAULT 0, "
-                + Votes.COLUMN_STATE + " INTEGER DEFAULT 0)");
     }
 
     private void createSubredditsV1(SQLiteDatabase db) {
@@ -125,7 +115,9 @@ class DbHelper extends SQLiteOpenHelper {
             db.beginTransaction();
             try {
                 upgradeSubredditsV2(db);
-                createVotes(db);
+                Comments.createTable(db);
+                Votes.createTable(db);
+                Things.createTable(db);
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();

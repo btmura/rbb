@@ -56,7 +56,7 @@ public class CommentView extends View implements OnGestureListener {
     private static final int TEXT_STATUS = 2;
 
     private final GestureDetector detector;
-    private OnLikeListener listener;
+    private OnVoteListener listener;
 
     private String body;
     private int downs;
@@ -124,7 +124,7 @@ public class CommentView extends View implements OnGestureListener {
         }
     }
 
-    public void setOnVoteListener(OnLikeListener listener) {
+    public void setOnVoteListener(OnVoteListener listener) {
         this.listener = listener;
     }
 
@@ -158,7 +158,7 @@ public class CommentView extends View implements OnGestureListener {
                 break;
         }
 
-        scoreText = VotingArrows.getScoreText(ups - downs);
+        scoreText = VotingArrows.getScoreText(ups - downs + likes);
         VotingArrows.measureScoreText(scoreText, scoreBounds);
 
         int rightContentWidth = measuredWidth

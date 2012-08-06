@@ -24,13 +24,6 @@ public class Things implements BaseColumns, SyncColumns {
     static final String TABLE_NAME = "things";
     public static final Uri CONTENT_URI = Uri.parse(ThingProvider.BASE_AUTHORITY_URI);
 
-    public static final String QUERY_SYNC = "sync";
-    public static final String QUERY_ACCOUNT_NAME = "accountName";
-    public static final String QUERY_SUBREDDIT_NAME = "subredditName";
-    public static final String QUERY_FILTER = "filter";
-    public static final String QUERY_MORE = "more";
-    public static final String QUERY_THING_ID = "thing";
-
     public static final int NUM_COLUMNS = 20;
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_CREATED_UTC = "createdUtc";
@@ -56,6 +49,7 @@ public class Things implements BaseColumns, SyncColumns {
     public static final String COLUMN_THUMBNAIL_URL = "thumbnailUrl";
     public static final String COLUMN_UPS = "ups";
     public static final String COLUMN_URL = "url";
+    public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
     public static final String PARENT_SELECTION = Things.COLUMN_PARENT + "= ?";
     public static final String THING_ID_SELECTION = Things.COLUMN_THING_ID + "= ?";

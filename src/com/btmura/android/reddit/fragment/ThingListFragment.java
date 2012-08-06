@@ -45,14 +45,14 @@ import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
-import com.btmura.android.reddit.provider.Likes;
-import com.btmura.android.reddit.widget.OnLikeListener;
+import com.btmura.android.reddit.provider.Votes;
+import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
 public class ThingListFragment extends ListFragment implements
         LoaderCallbacks<Cursor>,
         OnScrollListener,
-        OnLikeListener {
+        OnVoteListener {
 
     public static final String TAG = "ThingListFragment";
     public static final boolean DEBUG = Debug.DEBUG;
@@ -199,12 +199,12 @@ public class ThingListFragment extends ListFragment implements
         }
     }
 
-    public void onLike(String thingId, int likes) {
+    public void onVote(String thingId, int likes) {
         if (DEBUG) {
             Log.d(TAG, "onLike id: " + thingId + " likes: " + likes);
         }
         if (!TextUtils.isEmpty(accountName)) {
-            Likes.likeInBackground(getActivity(), thingId, likes);
+            Votes.voteInBackground(getActivity(), accountName, thingId, likes);
         }
     }
 

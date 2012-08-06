@@ -39,12 +39,12 @@ import android.widget.ListView;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Comment;
-import com.btmura.android.reddit.provider.Likes;
+import com.btmura.android.reddit.provider.Votes;
 import com.btmura.android.reddit.widget.CommentAdapter;
-import com.btmura.android.reddit.widget.OnLikeListener;
+import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
-        MultiChoiceModeListener, OnLikeListener {
+        MultiChoiceModeListener, OnVoteListener {
 
     public static final String TAG = "CommentListFragment";
     public static final boolean DEBUG = Debug.DEBUG;
@@ -123,12 +123,12 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         adapter.swapCursor(null);
     }
 
-    public void onLike(String thingId, int likes) {
+    public void onVote(String thingId, int likes) {
         if (DEBUG) {
             Log.d(TAG, "onLike thingId: " + thingId + " likes: " + likes);
         }
         if (!TextUtils.isEmpty(accountName)) {
-            Likes.likeInBackground(getActivity(), thingId, likes);
+            Votes.voteInBackground(getActivity(), accountName, thingId, likes);
         }
     }
 

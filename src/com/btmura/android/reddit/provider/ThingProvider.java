@@ -18,7 +18,6 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -35,6 +34,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.util.ArrayUtils;
 
 public class ThingProvider extends BaseProvider {
 
@@ -42,8 +42,13 @@ public class ThingProvider extends BaseProvider {
     public static boolean DEBUG = Debug.DEBUG;
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
-
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
+
+    public static final String PARAM_SYNC = "sync";
+    public static final String PARAM_ACCOUNT = "account";
+    public static final String PARAM_SUBREDDIT = "subreddit";
+    public static final String PARAM_FILTER = "filter";
+    public static final String PARAM_MORE = "more";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_THINGS = 1;
@@ -53,13 +58,10 @@ public class ThingProvider extends BaseProvider {
         MATCHER.addURI(AUTHORITY, Things.TABLE_NAME + "/#", MATCH_ONE_THING);
     }
 
-    private static final String[] SYNC_PROJECTION = {
-            Things._ID,
-            Things.COLUMN_THING_ID,
-            Things.COLUMN_LIKES,
-    };
-    private static final int SYNC_INDEX_NAME = 1;
-    private static final int SYNC_INDEX_LIKES = 2;
+    private static final String TABLE_NAME_WITH_VOTES = Things.TABLE_NAME + " LEFT OUTER JOIN"
+            + " (SELECT " + Votes.COLUMN_THING_ID + ", " + Votes.COLUMN_VOTE
+            + " FROM " + Votes.TABLE_NAME + ")"
+            + " USING (" + Things.COLUMN_THING_ID + ")";
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
@@ -67,12 +69,17 @@ public class ThingProvider extends BaseProvider {
         if (DEBUG) {
             Log.d(TAG, "query uri: " + uri);
         }
-        if (uri.getBooleanQueryParameter(Things.QUERY_SYNC, false)) {
+        if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
             sync(uri, projection, selection, selectionArgs, sortOrder);
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor c = db.query(Things.TABLE_NAME, projection, selection, selectionArgs,
+
+
+
+
+
+        Cursor c = db.query(TABLE_NAME_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, null);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
@@ -83,51 +90,31 @@ public class ThingProvider extends BaseProvider {
         Cursor c = null;
         try {
             Context context = getContext();
-            String accountName = uri.getQueryParameter(Things.QUERY_ACCOUNT_NAME);
+            String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String cookie = AccountUtils.getCookie(context, accountName);
 
-            Listing listing;
-            String subredditName = uri.getQueryParameter(Things.QUERY_SUBREDDIT_NAME);
-            if (subredditName != null) {
-                int filter = Integer.parseInt(uri.getQueryParameter(Things.QUERY_FILTER));
-                String more = uri.getQueryParameter(Things.QUERY_MORE);
-                listing = new ThingListing(context, cookie, subredditName, filter, more);
-            } else {
-                String thingId = uri.getQueryParameter(Things.QUERY_THING_ID);
-                listing = new CommentListing(context, cookie, thingId);
-            }
+            String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
+            int filter = Integer.parseInt(uri.getQueryParameter(PARAM_FILTER));
+            String more = uri.getQueryParameter(PARAM_MORE);
+            Listing listing = new ThingListing(context, cookie, subredditName, filter, more);
 
             listing.process();
             ArrayList<ContentValues> values = listing.getValues();
-            HashMap<String, ContentValues> valueMap = listing.getValueMap();
 
             int count = values.size();
-            if (count > 0) {
-                SQLiteDatabase db = helper.getReadableDatabase();
-                c = db.query(Things.TABLE_NAME, SYNC_PROJECTION, selection, selectionArgs,
-                        null, null, null);
-                while (c.moveToNext()) {
-                    String name = c.getString(SYNC_INDEX_NAME);
-                    ContentValues v = valueMap.get(name);
-                    if (v != null) {
-                        int likes = c.getInt(SYNC_INDEX_LIKES);
-                        v.put(Things.COLUMN_LIKES, likes);
-                    }
-                }
-
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(count + 1);
-                ops.add(ContentProviderOperation
-                        .newDelete(Things.CONTENT_URI)
-                        .withSelection(Things.PARENT_SELECTION, new String[] {listing.getParent()})
+            ArrayList<ContentProviderOperation> ops =
+                    new ArrayList<ContentProviderOperation>(count + 1);
+            ops.add(ContentProviderOperation
+                    .newDelete(Things.CONTENT_URI)
+                    .withSelection(Things.PARENT_SELECTION, ArrayUtils.toArray(listing.getParent()))
+                    .build());
+            for (int i = 0; i < count; i++) {
+                ops.add(ContentProviderOperation.newInsert(Things.CONTENT_URI)
+                        .withValues(values.get(i))
                         .build());
-                for (int i = 0; i < count; i++) {
-                    ops.add(ContentProviderOperation.newInsert(Things.CONTENT_URI)
-                            .withValues(values.get(i))
-                            .build());
-                }
-                applyBatch(ops);
             }
+            applyBatch(ops);
+
         } catch (OperationApplicationException e) {
             Log.e(TAG, "sync", e);
         } catch (IOException e) {

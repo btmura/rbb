@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.provider.Things;
 
 public class ThingAdapter extends CursorAdapter {
@@ -48,6 +49,7 @@ public class ThingAdapter extends CursorAdapter {
             Things.COLUMN_THUMBNAIL_URL,
             Things.COLUMN_UPS,
             Things.COLUMN_URL,
+            Things.COLUMN_VOTE,
     };
 
     public static final int INDEX_AUTHOR = 1;
@@ -67,19 +69,20 @@ public class ThingAdapter extends CursorAdapter {
     public static final int INDEX_THUMBNAIL_URL = 15;
     public static final int INDEX_UPS = 16;
     public static final int INDEX_URL = 17;
+    public static final int INDEX_VOTE = 18;
 
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final long nowTimeMs = System.currentTimeMillis();
     private final String parentSubreddit;
-    private final OnLikeListener listener;
+    private final OnVoteListener listener;
     private int thingBodyWidth;
 
     public static Uri createUri(String accountName, String subredditName, int filter, boolean sync) {
         return Things.CONTENT_URI.buildUpon()
-                .appendQueryParameter(Things.QUERY_SYNC, Boolean.toString(sync))
-                .appendQueryParameter(Things.QUERY_ACCOUNT_NAME, accountName)
-                .appendQueryParameter(Things.QUERY_SUBREDDIT_NAME, subredditName)
-                .appendQueryParameter(Things.QUERY_FILTER, Integer.toString(filter))
+                .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(sync))
+                .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
+                .appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subredditName)
+                .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter))
                 .build();
     }
 
@@ -88,7 +91,7 @@ public class ThingAdapter extends CursorAdapter {
                 new String[] {subredditName}, null);
     }
 
-    public ThingAdapter(Context context, String parentSubreddit, OnLikeListener listener) {
+    public ThingAdapter(Context context, String parentSubreddit, OnVoteListener listener) {
         super(context, null, 0);
         this.parentSubreddit = parentSubreddit;
         this.listener = listener;
@@ -108,7 +111,6 @@ public class ThingAdapter extends CursorAdapter {
         String author = cursor.getString(INDEX_AUTHOR);
         long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
         String domain = cursor.getString(INDEX_DOMAIN);
-        int likes = cursor.getInt(INDEX_LIKES);
         int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
         boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
         int score = cursor.getInt(INDEX_SCORE);
@@ -116,6 +118,12 @@ public class ThingAdapter extends CursorAdapter {
         String thingId = cursor.getString(INDEX_THING_ID);
         String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
         String title = cursor.getString(INDEX_TITLE);
+
+        int likes = cursor.getInt(INDEX_LIKES);
+        int vote = cursor.getInt(INDEX_VOTE);
+        if (likes != vote) {
+            likes = vote;
+        }
 
         ThingView tv = (ThingView) view;
         tv.setOnVoteListener(listener);

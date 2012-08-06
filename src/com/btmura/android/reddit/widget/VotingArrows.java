@@ -31,7 +31,7 @@ import android.text.TextUtils.TruncateAt;
 import android.view.MotionEvent;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.provider.VoteProvider.Votes;
+import com.btmura.android.reddit.provider.Votes;
 
 class VotingArrows {
 
@@ -185,16 +185,16 @@ class VotingArrows {
         return getEvent(e, left) != EVENT_NONE;
     }
 
-    static boolean onSingleTapUp(MotionEvent e, float left, OnLikeListener listener, String thingId) {
+    static boolean onSingleTapUp(MotionEvent e, float left, OnVoteListener listener, String thingId) {
         if (listener != null) {
             int event = getEvent(e, left);
             switch (event) {
                 case EVENT_UPVOTE:
-                    listener.onLike(thingId, OnLikeListener.VOTE_UP);
+                    listener.onVote(thingId, Votes.VOTE_UP);
                     return true;
 
                 case EVENT_DOWNVOTE:
-                    listener.onLike(thingId, OnLikeListener.VOTE_DOWN);
+                    listener.onVote(thingId, Votes.VOTE_DOWN);
                     return true;
             }
         }

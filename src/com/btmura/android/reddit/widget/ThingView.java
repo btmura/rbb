@@ -45,7 +45,7 @@ public class ThingView extends View implements OnGestureListener {
     private static final int TEXT_STATUS = 1;
 
     private final GestureDetector detector;
-    private OnLikeListener listener;
+    private OnVoteListener listener;
 
     private String author;
     private long createdUtc;
@@ -122,7 +122,7 @@ public class ThingView extends View implements OnGestureListener {
         }
     }
 
-    public void setOnVoteListener(OnLikeListener listener) {
+    public void setOnVoteListener(OnVoteListener listener) {
         this.listener = listener;
     }
 

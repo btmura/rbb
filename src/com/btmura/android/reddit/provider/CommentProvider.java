@@ -18,7 +18,6 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -43,8 +42,11 @@ public class CommentProvider extends BaseProvider {
     public static final boolean DEBUG = Debug.DEBUG;
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.comments";
-
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
+
+    public static final String PARAM_SYNC = "sync";
+    public static final String PARAM_ACCOUNT_NAME = "accountName";
+    public static final String PARAM_THING_ID = "thingId";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_COMMENTS = 1;
@@ -52,13 +54,10 @@ public class CommentProvider extends BaseProvider {
         MATCHER.addURI(AUTHORITY, Comments.TABLE_NAME, MATCH_ALL_COMMENTS);
     }
 
-    private static final String[] SYNC_PROJECTION = {
-            Comments._ID,
-            Comments.COLUMN_THING_ID,
-            Comments.COLUMN_LIKES,
-    };
-    private static final int SYNC_INDEX_ID = 1;
-    private static final int SYNC_INDEX_LIKES = 2;
+    private static final String TABLE_NAME_WITH_VOTES = Comments.TABLE_NAME + " LEFT OUTER JOIN"
+            + " (SELECT " + Votes.COLUMN_THING_ID + ", " + Votes.COLUMN_VOTE
+            + " FROM " + Votes.TABLE_NAME + ")"
+            + " USING (" + Things.COLUMN_THING_ID + ")";
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
@@ -67,12 +66,12 @@ public class CommentProvider extends BaseProvider {
             Log.d(TAG, "query uri: " + uri);
         }
 
-        if (uri.getBooleanQueryParameter(Comments.PARAM_SYNC, false)) {
+        if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
             sync(uri);
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor c = db.query(Comments.TABLE_NAME, projection, selection, selectionArgs,
+        Cursor c = db.query(TABLE_NAME_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, null);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
@@ -82,43 +81,29 @@ public class CommentProvider extends BaseProvider {
         Cursor c = null;
         try {
             Context context = getContext();
-            String accountName = uri.getQueryParameter(Comments.PARAM_ACCOUNT_NAME);
-            String thingId = uri.getQueryParameter(Comments.PARAM_THING_ID);
+            String accountName = uri.getQueryParameter(PARAM_ACCOUNT_NAME);
+            String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
             String cookie = AccountUtils.getCookie(context, accountName);
             CommentListing listing = new CommentListing(context, cookie, thingId);
             listing.process();
 
             ArrayList<ContentValues> values = listing.getValues();
-            HashMap<String, ContentValues> valueMap = listing.getValueMap();
             int count = values.size();
-            if (count > 0) {
-                SQLiteDatabase db = helper.getReadableDatabase();
-                String[] selectionArgs = ArrayUtils.toArray(thingId);
-                c = db.query(Comments.TABLE_NAME, SYNC_PROJECTION,
-                        Comments.PARENT_ID_SELECTION, selectionArgs,
-                        null, null, null);
-                while (c.moveToNext()) {
-                    String id = c.getString(SYNC_INDEX_ID);
-                    ContentValues v = valueMap.get(id);
-                    if (values != null) {
-                        int likes = c.getInt(SYNC_INDEX_LIKES);
-                        v.put(Comments.COLUMN_LIKES, likes);
-                    }
-                }
+            String[] selectionArgs = ArrayUtils.toArray(thingId);
 
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(count + 1);
-                ops.add(ContentProviderOperation.newDelete(Comments.CONTENT_URI)
-                        .withSelection(Comments.PARENT_ID_SELECTION, selectionArgs)
+            ArrayList<ContentProviderOperation> ops =
+                    new ArrayList<ContentProviderOperation>(count + 1);
+            ops.add(ContentProviderOperation.newDelete(Comments.CONTENT_URI)
+                    .withSelection(Comments.PARENT_ID_SELECTION, selectionArgs)
+                    .build());
+            for (int i = 0; i < count; i++) {
+                ops.add(ContentProviderOperation.newInsert(Comments.CONTENT_URI)
+                        .withValues(values.get(i))
                         .build());
-                for (int i = 0; i < count; i++) {
-                    ops.add(ContentProviderOperation.newInsert(Comments.CONTENT_URI)
-                            .withValues(values.get(i))
-                            .build());
-                }
-                applyBatch(ops);
             }
+            applyBatch(ops);
+
         } catch (OperationCanceledException e) {
             Log.e(TAG, "sync", e);
         } catch (AuthenticatorException e) {

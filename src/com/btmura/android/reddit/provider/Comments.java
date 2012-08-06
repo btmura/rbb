@@ -26,10 +26,6 @@ public class Comments implements BaseColumns {
 
     public static final Uri CONTENT_URI = Uri.parse(CommentProvider.BASE_AUTHORITY_URI);
 
-    public static final String PARAM_SYNC = "sync";
-    public static final String PARAM_ACCOUNT_NAME = "accountName";
-    public static final String PARAM_THING_ID = "thingId";
-
     static final int NUM_COLUMNS = 13;
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_BODY = "body";
@@ -44,6 +40,7 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_THING_ID = "thingId";
     public static final String COLUMN_UPS = "ups";
+    public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
     public static final int KIND_HEADER = 0;
     public static final int KIND_COMMENT = 1;
