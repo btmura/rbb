@@ -57,24 +57,24 @@ public class Things implements BaseColumns, SyncColumns {
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + Things.TABLE_NAME + " ("
                 + Things._ID + " INTEGER PRIMARY KEY, "
-                + Things.COLUMN_AUTHOR + " TEXT DEFAULT '', "
+                + Things.COLUMN_AUTHOR + " TEXT NOT NULL, "
                 + Things.COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_DOMAIN + " TEXT DEFAULT '', "
+                + Things.COLUMN_DOMAIN + " TEXT NOT NULL, "
                 + Things.COLUMN_DOWNS + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_LIKES + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_PARENT + " TEXT DEFAULT '', "
-                + Things.COLUMN_PERMA_LINK + " TEXT DEFAULT '', "
+                + Things.COLUMN_PARENT + " TEXT NOT NULL, "
+                + Things.COLUMN_PERMA_LINK + " TEXT NOT NULL, "
                 + Things.COLUMN_SCORE + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_SELF + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_SUBREDDIT + " TEXT DEFAULT '', "
-                + Things.COLUMN_TITLE + " TEXT DEFAULT '', "
-                + Things.COLUMN_THING_ID + " TEXT DEFAULT '', "
-                + Things.COLUMN_THUMBNAIL_URL + " TEXT DEFAULT '', "
+                + Things.COLUMN_SELF + " INTEGER NOT NULL, "
+                + Things.COLUMN_SUBREDDIT + " TEXT NOT NULL, "
+                + Things.COLUMN_TITLE + " TEXT NOT NULL, "
+                + Things.COLUMN_THING_ID + " TEXT NOT NULL, "
+                + Things.COLUMN_THUMBNAIL_URL + " TEXT, "
                 + Things.COLUMN_TYPE + " INTEGER DEFAULT 0, "
                 + Things.COLUMN_UPS + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_URL + " TEXT DEFAULT '')");
+                + Things.COLUMN_URL + " TEXT)");
     }
 
 }
