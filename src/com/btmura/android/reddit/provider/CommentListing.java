@@ -22,20 +22,24 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.JsonReader;
 import android.util.JsonToken;
+import android.util.Log;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
 
-class CommentListing extends JsonParser implements Listing {
+class CommentListing extends JsonParser {
 
-    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
-    private final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
+    public static final String TAG = "CommentListing";
+    public static final boolean DEBUG = Debug.DEBUG;
+
+    public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
 
     private final Context context;
     private final String cookie;
@@ -51,26 +55,20 @@ class CommentListing extends JsonParser implements Listing {
 
     public void process() throws IOException {
         HttpURLConnection conn = NetApi.connect(context, url, cookie);
+        long t1 = SystemClock.currentThreadTimeMillis();
         InputStream input = conn.getInputStream();
+        long t2 = SystemClock.currentThreadTimeMillis();
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingArray(reader);
+            if (DEBUG) {
+                long t3 = SystemClock.currentThreadTimeMillis();
+                Log.d(TAG, "i: " + (t2 - t1) + " p: " + (t3 - t2));
+            }
         } finally {
             input.close();
             conn.disconnect();
         }
-    }
-
-    public String getParent() {
-        return thingId;
-    }
-
-    public ArrayList<ContentValues> getValues() {
-        return values;
-    }
-
-    public HashMap<String, ContentValues> getValueMap() {
-        return valueMap;
     }
 
     @Override
@@ -133,7 +131,6 @@ class CommentListing extends JsonParser implements Listing {
     public void onName(JsonReader reader, int index) throws IOException {
         String id = readTrimmedString(reader, "");
         values.get(index).put(Comments.COLUMN_THING_ID, id);
-        valueMap.put(id, values.get(index));
     }
 
     @Override
@@ -168,9 +165,7 @@ class CommentListing extends JsonParser implements Listing {
             ContentValues v = values.get(i);
             Integer type = v.getAsInteger(Comments.COLUMN_KIND);
             if (type.intValue() == Comments.KIND_MORE) {
-                String id = v.getAsString(Comments.COLUMN_THING_ID);
                 values.remove(i);
-                valueMap.remove(id);
                 size--;
             } else {
                 i++;

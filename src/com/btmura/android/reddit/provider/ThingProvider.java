@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -93,7 +92,7 @@ public class ThingProvider extends BaseProvider {
             String more = uri.getQueryParameter(PARAM_MORE);
 
             long t1 = SystemClock.currentThreadTimeMillis();
-            Listing listing = new ThingListing(context, cookie, subredditName, filter, more);
+            ThingListing listing = new ThingListing(context, cookie, subredditName, filter, more);
             listing.process();
 
             long t2 = SystemClock.currentThreadTimeMillis();
@@ -104,10 +103,9 @@ public class ThingProvider extends BaseProvider {
                         ArrayUtils.toArray(subredditName));
 
                 InsertHelper insertHelper = new InsertHelper(db, Things.TABLE_NAME);
-                ArrayList<ContentValues> values = listing.getValues();
-                int count = values.size();
+                int count = listing.values.size();
                 for (int i = 0; i < count; i++) {
-                    insertHelper.insert(values.get(i));
+                    insertHelper.insert(listing.values.get(i));
                 }
                 db.setTransactionSuccessful();
 

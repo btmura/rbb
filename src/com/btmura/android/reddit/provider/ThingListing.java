@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -34,10 +33,9 @@ import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
 
-class ThingListing extends JsonParser implements Listing {
+class ThingListing extends JsonParser {
 
-    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
-    private final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
+    final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
 
     private final Formatter formatter = new Formatter();
     private final Context context;
@@ -62,18 +60,6 @@ class ThingListing extends JsonParser implements Listing {
             input.close();
             conn.disconnect();
         }
-    }
-
-    public String getParent() {
-        return subredditName;
-    }
-
-    public ArrayList<ContentValues> getValues() {
-        return values;
-    }
-
-    public HashMap<String, ContentValues> getValueMap() {
-        return valueMap;
     }
 
     @Override
@@ -116,7 +102,6 @@ class ThingListing extends JsonParser implements Listing {
     public void onName(JsonReader reader, int index) throws IOException {
         String name = readTrimmedString(reader, "");
         values.get(index).put(Things.COLUMN_THING_ID, name);
-        valueMap.put(name, values.get(index));
     }
 
     @Override
