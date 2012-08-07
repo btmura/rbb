@@ -21,15 +21,15 @@ import java.util.ArrayList;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.content.ContentProviderOperation;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
@@ -74,11 +74,6 @@ public class ThingProvider extends BaseProvider {
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
-
-
-
-
-
         Cursor c = db.query(TABLE_NAME_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, null);
         c.setNotificationUri(getContext().getContentResolver(), uri);
@@ -96,27 +91,34 @@ public class ThingProvider extends BaseProvider {
             String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
             int filter = Integer.parseInt(uri.getQueryParameter(PARAM_FILTER));
             String more = uri.getQueryParameter(PARAM_MORE);
+
+            long t1 = SystemClock.currentThreadTimeMillis();
             Listing listing = new ThingListing(context, cookie, subredditName, filter, more);
-
             listing.process();
-            ArrayList<ContentValues> values = listing.getValues();
 
-            int count = values.size();
-            ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(count + 1);
-            ops.add(ContentProviderOperation
-                    .newDelete(Things.CONTENT_URI)
-                    .withSelection(Things.PARENT_SELECTION, ArrayUtils.toArray(listing.getParent()))
-                    .build());
-            for (int i = 0; i < count; i++) {
-                ops.add(ContentProviderOperation.newInsert(Things.CONTENT_URI)
-                        .withValues(values.get(i))
-                        .build());
+            long t2 = SystemClock.currentThreadTimeMillis();
+            SQLiteDatabase db = helper.getWritableDatabase();
+            try {
+                db.beginTransaction();
+                db.delete(Things.TABLE_NAME, Things.PARENT_SELECTION,
+                        ArrayUtils.toArray(subredditName));
+
+                InsertHelper insertHelper = new InsertHelper(db, Things.TABLE_NAME);
+                ArrayList<ContentValues> values = listing.getValues();
+                int count = values.size();
+                for (int i = 0; i < count; i++) {
+                    insertHelper.insert(values.get(i));
+                }
+                db.setTransactionSuccessful();
+
+                if (DEBUG) {
+                    long t3 = SystemClock.currentThreadTimeMillis();
+                    Log.d(TAG, "c: " + count + " p: " + (t2 - t1) + " db: " + (t3 - t1));
+                }
+            } finally {
+                db.endTransaction();
+                db.close();
             }
-            applyBatch(ops);
-
-        } catch (OperationApplicationException e) {
-            Log.e(TAG, "sync", e);
         } catch (IOException e) {
             Log.e(TAG, "sync", e);
         } catch (OperationCanceledException e) {

@@ -21,15 +21,15 @@ import java.util.ArrayList;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.content.ContentProviderOperation;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
@@ -82,35 +82,40 @@ public class CommentProvider extends BaseProvider {
         try {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT_NAME);
+            String cookie = AccountUtils.getCookie(context, accountName);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
-            String cookie = AccountUtils.getCookie(context, accountName);
+            long t1 = SystemClock.currentThreadTimeMillis();
             CommentListing listing = new CommentListing(context, cookie, thingId);
             listing.process();
 
-            ArrayList<ContentValues> values = listing.getValues();
-            int count = values.size();
-            String[] selectionArgs = ArrayUtils.toArray(thingId);
+            long t2 = SystemClock.currentThreadTimeMillis();
+            SQLiteDatabase db = helper.getWritableDatabase();
+            try {
+                db.beginTransaction();
+                db.delete(Comments.TABLE_NAME, Comments.PARENT_ID_SELECTION, ArrayUtils.toArray(thingId));
 
-            ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(count + 1);
-            ops.add(ContentProviderOperation.newDelete(Comments.CONTENT_URI)
-                    .withSelection(Comments.PARENT_ID_SELECTION, selectionArgs)
-                    .build());
-            for (int i = 0; i < count; i++) {
-                ops.add(ContentProviderOperation.newInsert(Comments.CONTENT_URI)
-                        .withValues(values.get(i))
-                        .build());
+                InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
+                ArrayList<ContentValues> values = listing.getValues();
+                int count = values.size();
+                for (int i = 0; i < count; i++) {
+                    insertHelper.insert(values.get(i));
+                }
+                db.setTransactionSuccessful();
+
+                if (DEBUG) {
+                    long t3 = SystemClock.currentThreadTimeMillis();
+                    Log.d(TAG, "c: " + count + " lp: " + (t2 - t1) + " db: " + (t3 - t2));
+                }
+            } finally {
+                db.endTransaction();
+                db.close();
             }
-            applyBatch(ops);
-
         } catch (OperationCanceledException e) {
             Log.e(TAG, "sync", e);
         } catch (AuthenticatorException e) {
             Log.e(TAG, "sync", e);
         } catch (IOException e) {
-            Log.e(TAG, "sync", e);
-        } catch (OperationApplicationException e) {
             Log.e(TAG, "sync", e);
         } finally {
             if (c != null) {
