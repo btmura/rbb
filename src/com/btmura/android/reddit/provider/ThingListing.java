@@ -39,12 +39,15 @@ class ThingListing extends JsonParser {
 
     private final Formatter formatter = new Formatter();
     private final Context context;
+    private final String accountName;
     private final String cookie;
     private final String subredditName;
     private final URL url;
 
-    ThingListing(Context context, String cookie, String subredditName, int filter, String more) {
+    ThingListing(Context context, String accountName, String cookie, String subredditName,
+            int filter, String more) {
         this.context = context;
+        this.accountName = accountName;
         this.cookie = cookie;
         this.subredditName = subredditName;
         this.url = Urls.subredditUrl(subredditName, filter, more);
@@ -64,7 +67,7 @@ class ThingListing extends JsonParser {
 
     @Override
     public void onEntityStart(int index) {
-        values.add(new ContentValues(Things.NUM_COLUMNS));
+        values.add(new ContentValues(19));
     }
 
     @Override
@@ -165,6 +168,7 @@ class ThingListing extends JsonParser {
 
     @Override
     public void onEntityEnd(int index) {
+        values.get(index).put(Things.COLUMN_ACCOUNT, accountName);
         values.get(index).put(Things.COLUMN_PARENT, subredditName);
     }
 }

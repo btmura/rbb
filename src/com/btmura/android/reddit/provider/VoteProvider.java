@@ -23,6 +23,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
 
@@ -47,6 +48,9 @@ public class VoteProvider extends BaseProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
+        if (DEBUG) {
+            Log.d(TAG, "query uri: " + uri);
+        }
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_ONE_VOTE:
@@ -64,12 +68,16 @@ public class VoteProvider extends BaseProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+        if (DEBUG) {
+            Log.d(TAG, "insert uri: " + uri);
+        }
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(Votes.TABLE_NAME, null, values);
         if (id != -1) {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(uri, null);
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
+                Log.d(TAG, "notifying others!");
                 cr.notifyChange(Things.CONTENT_URI, null);
                 cr.notifyChange(Comments.CONTENT_URI, null);
             }
@@ -80,6 +88,9 @@ public class VoteProvider extends BaseProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        if (DEBUG) {
+            Log.d(TAG, "update uri: " + uri);
+        }
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_ONE_VOTE:
@@ -103,6 +114,9 @@ public class VoteProvider extends BaseProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        if (DEBUG) {
+            Log.d(TAG, "delete uri: " + uri);
+        }
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_ONE_VOTE:

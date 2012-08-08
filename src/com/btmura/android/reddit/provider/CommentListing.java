@@ -42,12 +42,14 @@ class CommentListing extends JsonParser {
     public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
 
     private final Context context;
+    private final String accountName;
     private final String cookie;
     private final String thingId;
     private final URL url;
 
-    CommentListing(Context context, String cookie, String thingId) {
+    CommentListing(Context context, String accountName, String cookie, String thingId) {
         this.context = context;
+        this.accountName = accountName;
         this.cookie = cookie;
         this.thingId = thingId;
         this.url = Urls.commentsUrl(thingId);
@@ -155,6 +157,7 @@ class CommentListing extends JsonParser {
 
     @Override
     public void onEntityEnd(int index) {
+        values.get(index).put(Comments.COLUMN_ACCOUNT, accountName);
         values.get(index).put(Comments.COLUMN_PARENT_ID, thingId);
     }
 

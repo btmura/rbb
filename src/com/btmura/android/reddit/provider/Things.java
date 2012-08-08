@@ -24,7 +24,9 @@ public class Things implements BaseColumns, SyncColumns {
     static final String TABLE_NAME = "things";
     public static final Uri CONTENT_URI = Uri.parse(ThingProvider.BASE_AUTHORITY_URI);
 
-    public static final int NUM_COLUMNS = 20;
+    /** Account for joining with the votes table. */
+    public static final String COLUMN_ACCOUNT = Votes.COLUMN_ACCOUNT;
+
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_CREATED_UTC = "createdUtc";
     public static final String COLUMN_DOMAIN = "domain";
@@ -32,49 +34,44 @@ public class Things implements BaseColumns, SyncColumns {
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_OVER_18 = "over18";
-
-    /**
-     * Id of the parent of the thing. It can either be a subreddit name like
-     * "pics" or a thing id like "t3_a1b2c3".
-     */
     public static final String COLUMN_PARENT = "parent";
-
     public static final String COLUMN_PERMA_LINK = "permaLink";
     public static final String COLUMN_SCORE = "score";
     public static final String COLUMN_SELF = "self";
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_TYPE = "type";
-    public static final String COLUMN_THING_ID = "thingId";
+    public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
     public static final String COLUMN_THUMBNAIL_URL = "thumbnailUrl";
     public static final String COLUMN_UPS = "ups";
     public static final String COLUMN_URL = "url";
     public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
-    public static final String PARENT_SELECTION = Things.COLUMN_PARENT + "= ?";
-    public static final String THING_ID_SELECTION = Things.COLUMN_THING_ID + "= ?";
+    public static final String SELECTION_BY_PARENT = COLUMN_PARENT + " = ?";
+    public static final String SELECTION_BY_THING_ID = COLUMN_THING_ID + " = ?";
 
     static void createTable(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + Things.TABLE_NAME + " ("
-                + Things._ID + " INTEGER PRIMARY KEY, "
-                + Things.COLUMN_AUTHOR + " TEXT NOT NULL, "
-                + Things.COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_DOMAIN + " TEXT NOT NULL, "
-                + Things.COLUMN_DOWNS + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_LIKES + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_PARENT + " TEXT NOT NULL, "
-                + Things.COLUMN_PERMA_LINK + " TEXT NOT NULL, "
-                + Things.COLUMN_SCORE + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_SELF + " INTEGER NOT NULL, "
-                + Things.COLUMN_SUBREDDIT + " TEXT NOT NULL, "
-                + Things.COLUMN_TITLE + " TEXT NOT NULL, "
-                + Things.COLUMN_THING_ID + " TEXT NOT NULL, "
-                + Things.COLUMN_THUMBNAIL_URL + " TEXT, "
-                + Things.COLUMN_TYPE + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_UPS + " INTEGER DEFAULT 0, "
-                + Things.COLUMN_URL + " TEXT)");
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+                + _ID + " INTEGER PRIMARY KEY, "
+                + COLUMN_ACCOUNT + " TEXT NOT NULL, "
+                + COLUMN_AUTHOR + " TEXT NOT NULL, "
+                + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
+                + COLUMN_DOMAIN + " TEXT NOT NULL, "
+                + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
+                + COLUMN_LIKES + " INTEGER DEFAULT 0, "
+                + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
+                + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
+                + COLUMN_PARENT + " TEXT NOT NULL, "
+                + COLUMN_PERMA_LINK + " TEXT NOT NULL, "
+                + COLUMN_SCORE + " INTEGER DEFAULT 0, "
+                + COLUMN_SELF + " INTEGER NOT NULL, "
+                + COLUMN_SUBREDDIT + " TEXT NOT NULL, "
+                + COLUMN_TITLE + " TEXT NOT NULL, "
+                + COLUMN_THING_ID + " TEXT NOT NULL, "
+                + COLUMN_THUMBNAIL_URL + " TEXT, "
+                + COLUMN_TYPE + " INTEGER DEFAULT 0, "
+                + COLUMN_UPS + " INTEGER DEFAULT 0, "
+                + COLUMN_URL + " TEXT)");
     }
 
 }

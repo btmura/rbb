@@ -53,10 +53,14 @@ public class CommentProvider extends BaseProvider {
         MATCHER.addURI(AUTHORITY, Comments.TABLE_NAME, MATCH_ALL_COMMENTS);
     }
 
-    private static final String TABLE_NAME_WITH_VOTES = Comments.TABLE_NAME + " LEFT OUTER JOIN"
-            + " (SELECT " + Votes.COLUMN_THING_ID + ", " + Votes.COLUMN_VOTE
-            + " FROM " + Votes.TABLE_NAME + ")"
-            + " USING (" + Things.COLUMN_THING_ID + ")";
+    private static final String TABLE_NAME_WITH_VOTES = Comments.TABLE_NAME
+            + " LEFT OUTER JOIN (SELECT "
+            + Votes.COLUMN_ACCOUNT + ", "
+            + Votes.COLUMN_THING_ID + ", "
+            + Votes.COLUMN_VOTE
+            + " FROM " + Votes.TABLE_NAME + ") USING ("
+            + Votes.COLUMN_ACCOUNT + ", "
+            + Comments.COLUMN_THING_ID + ")";
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
@@ -85,14 +89,15 @@ public class CommentProvider extends BaseProvider {
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
             long t1 = SystemClock.currentThreadTimeMillis();
-            CommentListing listing = new CommentListing(context, cookie, thingId);
+            CommentListing listing = new CommentListing(context, accountName, cookie, thingId);
             listing.process();
 
             long t2 = SystemClock.currentThreadTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();
             try {
                 db.beginTransaction();
-                db.delete(Comments.TABLE_NAME, Comments.PARENT_ID_SELECTION, ArrayUtils.toArray(thingId));
+                db.delete(Comments.TABLE_NAME, Comments.SELECTION_BY_PARENT_ID,
+                        ArrayUtils.toArray(thingId));
 
                 InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
                 int count = listing.values.size();
@@ -103,7 +108,7 @@ public class CommentProvider extends BaseProvider {
 
                 if (DEBUG) {
                     long t3 = SystemClock.currentThreadTimeMillis();
-                    Log.d(TAG, "c: " + count + " lp: " + (t2 - t1) + " db: " + (t3 - t2));
+                    Log.d(TAG, "c: " + count + " p: " + (t2 - t1) + " db: " + (t3 - t2));
                 }
             } finally {
                 db.endTransaction();

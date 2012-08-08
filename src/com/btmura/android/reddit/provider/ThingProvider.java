@@ -57,10 +57,14 @@ public class ThingProvider extends BaseProvider {
         MATCHER.addURI(AUTHORITY, Things.TABLE_NAME + "/#", MATCH_ONE_THING);
     }
 
-    private static final String TABLE_NAME_WITH_VOTES = Things.TABLE_NAME + " LEFT OUTER JOIN"
-            + " (SELECT " + Votes.COLUMN_THING_ID + ", " + Votes.COLUMN_VOTE
-            + " FROM " + Votes.TABLE_NAME + ")"
-            + " USING (" + Things.COLUMN_THING_ID + ")";
+    private static final String TABLE_NAME_WITH_VOTES = Things.TABLE_NAME
+            + " LEFT OUTER JOIN (SELECT "
+            + Votes.COLUMN_ACCOUNT + ", "
+            + Votes.COLUMN_THING_ID + ", "
+            + Votes.COLUMN_VOTE
+            + " FROM " + Votes.TABLE_NAME + ") USING ("
+            + Votes.COLUMN_ACCOUNT + ", "
+            + Things.COLUMN_THING_ID + ")";
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
@@ -92,14 +96,15 @@ public class ThingProvider extends BaseProvider {
             String more = uri.getQueryParameter(PARAM_MORE);
 
             long t1 = SystemClock.currentThreadTimeMillis();
-            ThingListing listing = new ThingListing(context, cookie, subredditName, filter, more);
+            ThingListing listing = new ThingListing(context, accountName, cookie, subredditName,
+                    filter, more);
             listing.process();
 
             long t2 = SystemClock.currentThreadTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();
             try {
                 db.beginTransaction();
-                db.delete(Things.TABLE_NAME, Things.PARENT_SELECTION,
+                db.delete(Things.TABLE_NAME, Things.SELECTION_BY_PARENT,
                         ArrayUtils.toArray(subredditName));
 
                 InsertHelper insertHelper = new InsertHelper(db, Things.TABLE_NAME);

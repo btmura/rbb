@@ -26,7 +26,11 @@ public class Comments implements BaseColumns {
 
     public static final Uri CONTENT_URI = Uri.parse(CommentProvider.BASE_AUTHORITY_URI);
 
-    static final int NUM_COLUMNS = 13;
+    static final int NUM_COLUMNS = 14;
+
+    /** Account for joining with the votes table. */
+    public static final String COLUMN_ACCOUNT = Votes.COLUMN_ACCOUNT;
+
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_BODY = "body";
     public static final String COLUMN_CREATED_UTC = "createdUtc";
@@ -38,7 +42,7 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_PARENT_ID = "parentId";
     public static final String COLUMN_SELF_TEXT = "selfText";
     public static final String COLUMN_TITLE = "title";
-    public static final String COLUMN_THING_ID = "thingId";
+    public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
     public static final String COLUMN_UPS = "ups";
     public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
@@ -46,12 +50,13 @@ public class Comments implements BaseColumns {
     public static final int KIND_COMMENT = 1;
     public static final int KIND_MORE = 2;
 
-    public static String PARENT_ID_SELECTION = COLUMN_PARENT_ID + " = ?";
-    public static final String THING_ID_SELECTION = Comments.COLUMN_THING_ID + "= ?";
+    public static final String SELECTION_BY_PARENT_ID = COLUMN_PARENT_ID + " = ?";
+    public static final String SELECTION_BY_THING_ID = COLUMN_THING_ID + " = ?";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
+                + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_AUTHOR + " TEXT NOT NULL, "
                 + COLUMN_BODY + " TEXT DEFAULT '', "
                 + COLUMN_CREATED_UTC + " INTEGER NOT NULL, "

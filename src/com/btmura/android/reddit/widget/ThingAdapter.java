@@ -87,7 +87,7 @@ public class ThingAdapter extends CursorAdapter {
     }
 
     public static CursorLoader createLoader(Context context, Uri uri, String subredditName) {
-        return new CursorLoader(context, uri, PROJECTION, Things.PARENT_SELECTION,
+        return new CursorLoader(context, uri, PROJECTION, Things.SELECTION_BY_PARENT,
                 new String[] {subredditName}, null);
     }
 
