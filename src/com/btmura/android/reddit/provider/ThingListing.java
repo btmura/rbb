@@ -28,12 +28,17 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
+import android.util.Log;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
 
 class ThingListing extends JsonParser {
+
+    public static final String TAG = "ThingListing";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
 
@@ -43,6 +48,7 @@ class ThingListing extends JsonParser {
     private final String cookie;
     private final String subredditName;
     private final URL url;
+    private String moreThingId;
 
     ThingListing(Context context, String accountName, String cookie, String subredditName,
             int filter, String more) {
@@ -67,7 +73,11 @@ class ThingListing extends JsonParser {
 
     @Override
     public void onEntityStart(int index) {
-        values.add(new ContentValues(19));
+        ContentValues v = new ContentValues(20);
+        v.put(Things.COLUMN_KIND, Things.KIND_THING);
+        v.put(Things.COLUMN_ACCOUNT, accountName);
+        v.put(Things.COLUMN_PARENT, subredditName);
+        values.add(v);
     }
 
     @Override
@@ -138,11 +148,6 @@ class ThingListing extends JsonParser {
     }
 
     @Override
-    public void onSubredditName(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_PARENT, readTrimmedString(reader, ""));
-    }
-
-    @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
         CharSequence title = formatter.formatTitle(context, readTrimmedString(reader, ""));
         values.get(index).put(Things.COLUMN_TITLE, title.toString());
@@ -167,8 +172,22 @@ class ThingListing extends JsonParser {
     }
 
     @Override
-    public void onEntityEnd(int index) {
-        values.get(index).put(Things.COLUMN_ACCOUNT, accountName);
-        values.get(index).put(Things.COLUMN_PARENT, subredditName);
+    public void onAfter(JsonReader reader) throws IOException {
+        moreThingId = readTrimmedString(reader, null);
+    }
+
+    @Override
+    public void onParseEnd() {
+        if (!TextUtils.isEmpty(moreThingId)) {
+            ContentValues v = new ContentValues(4);
+            v.put(Things.COLUMN_KIND, Things.KIND_MORE);
+            v.put(Things.COLUMN_ACCOUNT, accountName);
+            v.put(Things.COLUMN_PARENT, subredditName);
+            v.put(Things.COLUMN_THING_ID, moreThingId);
+            values.add(v);
+        }
+        if (DEBUG) {
+            Log.d(TAG, "values: " + values.size());
+        }
     }
 }

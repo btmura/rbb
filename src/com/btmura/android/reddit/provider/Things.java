@@ -31,6 +31,7 @@ public class Things implements BaseColumns, SyncColumns {
     public static final String COLUMN_CREATED_UTC = "createdUtc";
     public static final String COLUMN_DOMAIN = "domain";
     public static final String COLUMN_DOWNS = "downs";
+    public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_OVER_18 = "over18";
@@ -40,36 +41,40 @@ public class Things implements BaseColumns, SyncColumns {
     public static final String COLUMN_SELF = "self";
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_TITLE = "title";
-    public static final String COLUMN_TYPE = "type";
     public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
     public static final String COLUMN_THUMBNAIL_URL = "thumbnailUrl";
     public static final String COLUMN_UPS = "ups";
     public static final String COLUMN_URL = "url";
     public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
-    public static final String SELECTION_BY_PARENT = COLUMN_PARENT + " = ?";
-    public static final String SELECTION_BY_THING_ID = COLUMN_THING_ID + " = ?";
+    public static final int KIND_THING = 0;
+    public static final int KIND_MORE = 1;
+
+    public static final String SELECTION_BY_ACCOUNT_AND_PARENT =
+            COLUMN_ACCOUNT + " = ? AND " + COLUMN_PARENT + " = ?";
+    public static final String SELECTION_BY_ACCOUNT_AND_PARENT_AND_MORE =
+            SELECTION_BY_ACCOUNT_AND_PARENT + " AND " + COLUMN_KIND + " = " + KIND_MORE;
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
-                + COLUMN_AUTHOR + " TEXT NOT NULL, "
+                + COLUMN_AUTHOR + " TEXT, "
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
-                + COLUMN_DOMAIN + " TEXT NOT NULL, "
+                + COLUMN_DOMAIN + " TEXT, "
                 + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
+                + COLUMN_KIND + " INTEGER NOT NULL, "
                 + COLUMN_LIKES + " INTEGER DEFAULT 0, "
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
                 + COLUMN_PARENT + " TEXT NOT NULL, "
-                + COLUMN_PERMA_LINK + " TEXT NOT NULL, "
+                + COLUMN_PERMA_LINK + " TEXT, "
                 + COLUMN_SCORE + " INTEGER DEFAULT 0, "
-                + COLUMN_SELF + " INTEGER NOT NULL, "
-                + COLUMN_SUBREDDIT + " TEXT NOT NULL, "
-                + COLUMN_TITLE + " TEXT NOT NULL, "
+                + COLUMN_SELF + " INTEGER DEFAULT 0, "
+                + COLUMN_SUBREDDIT + " TEXT, "
+                + COLUMN_TITLE + " TEXT, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
                 + COLUMN_THUMBNAIL_URL + " TEXT, "
-                + COLUMN_TYPE + " INTEGER DEFAULT 0, "
                 + COLUMN_UPS + " INTEGER DEFAULT 0, "
                 + COLUMN_URL + " TEXT)");
     }

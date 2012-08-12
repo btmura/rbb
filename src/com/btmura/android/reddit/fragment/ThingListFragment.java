@@ -147,14 +147,23 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if (DEBUG) {
+            Log.d(TAG, "onCreateLoder " + args);
+        }
+        String accountName = getAccountName();
         String subredditName = Subreddit.getName(subreddit);
-        Uri uri = ThingAdapter.createUri(getAccountName(), subredditName, filter, true);
-        return ThingAdapter.createLoader(getActivity(), uri, subredditName);
+        String more = args != null ? args.getString(LOADER_ARG_MORE_KEY) : null;
+        Uri uri = ThingAdapter.createUri(accountName, subredditName, filter, more, true);
+        return ThingAdapter.createLoader(getActivity(), uri, accountName, subredditName);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor things) {
+        if (DEBUG) {
+            Log.d(TAG, "onLoadFinished " + (things != null ? things.getCount() : -1));
+        }
+
         Uri uri = ThingAdapter.createUri(getAccountName(), Subreddit.getName(subreddit), filter,
-                false);
+                null, false);
         CursorLoader cursorLoader = (CursorLoader) loader;
         cursorLoader.setUri(uri);
 
@@ -187,13 +196,13 @@ public class ThingListFragment extends ListFragment implements
             Loader<List<Thing>> loader = getLoaderManager().getLoader(0);
             if (loader != null) {
                 if (!adapter.isEmpty()) {
-                    // Thing t = adapter.getItem(adapter.getCount() - 1);
-                    // if (t.type == Thing.TYPE_MORE) {
-                    // scrollLoading = true;
-                    // Bundle b = new Bundle(1);
-                    // b.putString(LOADER_ARG_MORE_KEY, t.moreKey);
-                    // getLoaderManager().restartLoader(0, b, this);
-                    // }
+                    String more = adapter.getMoreThingId();
+                    if (!TextUtils.isEmpty(more)) {
+                        scrollLoading = true;
+                        Bundle b = new Bundle(1);
+                        b.putString(LOADER_ARG_MORE_KEY, more);
+                        getLoaderManager().restartLoader(0, b, this);
+                    }
                 }
             }
         }

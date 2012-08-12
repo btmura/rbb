@@ -29,6 +29,7 @@ import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
@@ -73,7 +74,7 @@ public class ThingProvider extends BaseProvider {
             Log.d(TAG, "query uri: " + uri);
         }
         if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
-            sync(uri, projection, selection, selectionArgs, sortOrder);
+            sync(uri);
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -83,8 +84,7 @@ public class ThingProvider extends BaseProvider {
         return c;
     }
 
-    private void sync(Uri uri, String[] projection, String selection, String[] selectionArgs,
-            String sortOrder) {
+    private void sync(Uri uri) {
         Cursor c = null;
         try {
             Context context = getContext();
@@ -104,8 +104,14 @@ public class ThingProvider extends BaseProvider {
             SQLiteDatabase db = helper.getWritableDatabase();
             try {
                 db.beginTransaction();
-                db.delete(Things.TABLE_NAME, Things.SELECTION_BY_PARENT,
-                        ArrayUtils.toArray(subredditName));
+                String selection;
+                if (TextUtils.isEmpty(more)) {
+                    selection = Things.SELECTION_BY_ACCOUNT_AND_PARENT;
+                } else {
+                    selection = Things.SELECTION_BY_ACCOUNT_AND_PARENT_AND_MORE;
+                }
+                db.delete(Things.TABLE_NAME, selection,
+                        ArrayUtils.toArray(accountName, subredditName));
 
                 InsertHelper insertHelper = new InsertHelper(db, Things.TABLE_NAME);
                 int count = listing.values.size();
