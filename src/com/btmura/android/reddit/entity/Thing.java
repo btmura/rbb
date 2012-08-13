@@ -16,100 +16,16 @@
 
 package com.btmura.android.reddit.entity;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.text.TextUtils;
 
-import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.provider.Things;
 
-public class Thing implements Parcelable {
-
-    public static final int TYPE_THING = 0;
-    public static final int TYPE_MORE = 1;
-
-    public int type;
-    public String name;
-    public String title;
-    public boolean over18;
-    public String subreddit;
-    public String author;
-    public String url;
-    public String domain;
-    public String thumbnail;
-    public String permaLink;
-    public boolean isSelf;
-    public String selfText;
-    public int numComments;
-    public int score;
-    public int ups;
-    public int downs;
-    public int likes;
-    public CharSequence status;
-    public String details;
-    public String moreKey;
-    public long createdUtc;
-
-    public Thing() {
-    }
-
-    public static final Parcelable.Creator<Thing> CREATOR = new Parcelable.Creator<Thing>() {
-        public Thing createFromParcel(Parcel source) {
-            return new Thing(source);
-        }
-
-        public Thing[] newArray(int size) {
-            return new Thing[size];
-        }
-    };
-
-    Thing(Parcel parcel) {
-        type = parcel.readInt();
-        name = parcel.readString();
-        title = parcel.readString();
-        subreddit = parcel.readString();
-        url = parcel.readString();
-        permaLink = parcel.readString();
-        isSelf = parcel.readInt() == 1;
-    }
-
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(type);
-        dest.writeString(name);
-        dest.writeString(title);
-        dest.writeString(subreddit);
-        dest.writeString(url);
-        dest.writeString(permaLink);
-        dest.writeInt(isSelf ? 1 : 0);
-    }
+public class Thing {
 
     public static String getId(String name) {
         int sepIndex = name.indexOf('_');
         return name.substring(sepIndex + 1);
-    }
-
-    public String getId() {
-        int sepIndex = name.indexOf('_');
-        return name.substring(sepIndex + 1);
-    }
-
-    public Thing assureFormat(Context c, Formatter f, String parentSubreddit, long now) {
-        if (type == TYPE_MORE || status != null) {
-            return this;
-        }
-        details = c.getString(R.string.thing_details, ups, downs, domain);
-        return this;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int describeContents() {
-        return 0;
     }
 
     public static String getSubreddit(Bundle thingBundle) {
