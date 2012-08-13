@@ -41,6 +41,8 @@ import android.view.View;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
+import com.btmura.android.reddit.data.RelativeTime;
+import com.btmura.android.reddit.provider.Comments;
 
 public class CommentView extends View implements OnGestureListener {
 
@@ -63,10 +65,15 @@ public class CommentView extends View implements OnGestureListener {
     private final GestureDetector detector;
     private OnVoteListener listener;
 
+    private String author;
     private String body;
+    private long createdUtc;
     private int downs;
+    private int kind;
     private int likes;
     private int nesting;
+    private long nowTimeMs;
+    private int numComments;
     private String title;
     private String thingId;
     private int ups;
@@ -135,12 +142,27 @@ public class CommentView extends View implements OnGestureListener {
         this.listener = listener;
     }
 
-    public void setData(String body, int downs, int likes, int nesting, String title,
-            String thingId, int ups) {
+    public void setData(String author,
+            String body,
+            long createdUtc,
+            int downs,
+            int kind,
+            int likes,
+            int nesting,
+            long nowTimeMs,
+            int numComments,
+            String title,
+            String thingId,
+            int ups) {
+        this.author = author;
         this.body = body;
+        this.createdUtc = createdUtc;
         this.downs = downs;
+        this.kind = kind;
         this.likes = likes;
         this.nesting = nesting;
+        this.nowTimeMs = nowTimeMs;
+        this.numComments = numComments;
         this.title = title;
         this.thingId = thingId;
         this.ups = ups;
@@ -245,9 +267,19 @@ public class CommentView extends View implements OnGestureListener {
     }
 
     private BoringLayout createStatusLayout(int width) {
-        BoringLayout.Metrics m = BoringLayout.isBoring("status", TEXT_PAINTS[TEXT_STATUS]);
-        return BoringLayout.make("status", TEXT_PAINTS[TEXT_STATUS], width,
+        CharSequence statusText = getStatus(getContext());
+        BoringLayout.Metrics m = BoringLayout.isBoring(statusText, TEXT_PAINTS[TEXT_STATUS]);
+        return BoringLayout.make(statusText, TEXT_PAINTS[TEXT_STATUS], width,
                 Alignment.ALIGN_NORMAL, 1, 0, m, true, TruncateAt.END, width);
+    }
+
+    private CharSequence getStatus(Context c) {
+        int resId = kind == Comments.KIND_HEADER ? R.string.comment_header_status
+                : R.string.comment_comment_status;
+        String rt = RelativeTime.format(c, nowTimeMs, createdUtc);
+        String comments = c.getResources().getQuantityString(R.plurals.comments, numComments,
+                numComments);
+        return c.getString(resId, author, rt, comments);
     }
 
     @Override

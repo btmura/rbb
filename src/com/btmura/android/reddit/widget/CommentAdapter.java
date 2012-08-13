@@ -32,25 +32,51 @@ public class CommentAdapter extends CursorAdapter {
 
     private static final String[] PROJECTION = {
             Comments._ID,
+            Comments.COLUMN_AUTHOR,
             Comments.COLUMN_BODY,
+            Comments.COLUMN_CREATED_UTC,
             Comments.COLUMN_DOWNS,
+            Comments.COLUMN_KIND,
             Comments.COLUMN_LIKES,
             Comments.COLUMN_NESTING,
+            Comments.COLUMN_NUM_COMMENTS,
             Comments.COLUMN_TITLE,
             Comments.COLUMN_THING_ID,
             Comments.COLUMN_UPS,
             Comments.COLUMN_VOTE,
     };
 
-    private static final int INDEX_BODY = 1;
-    private static final int INDEX_DOWNS = 2;
-    private static final int INDEX_LIKES = 3;
-    private static final int INDEX_NESTING = 4;
-    private static final int INDEX_TITLE = 5;
-    private static final int INDEX_THING_ID = 6;
-    private static final int INDEX_UP = 7;
-    private static final int INDEX_VOTE = 8;
+    private static int INDEX_AUTHOR = -1;
+    private static int INDEX_BODY;
+    private static int INDEX_CREATED_UTC;
+    private static int INDEX_DOWNS;
+    private static int INDEX_KIND;
+    private static int INDEX_LIKES;
+    private static int INDEX_NESTING;
+    private static int INDEX_NUM_COMMENTS;
+    private static int INDEX_TITLE;
+    private static int INDEX_THING_ID;
+    private static int INDEX_UPS;
+    private static int INDEX_VOTE;
 
+    static void initColumnIndices(Cursor c) {
+        if (INDEX_AUTHOR == -1) {
+            INDEX_AUTHOR = c.getColumnIndexOrThrow(Comments.COLUMN_AUTHOR);
+            INDEX_BODY = c.getColumnIndexOrThrow(Comments.COLUMN_BODY);
+            INDEX_CREATED_UTC = c.getColumnIndexOrThrow(Comments.COLUMN_CREATED_UTC);
+            INDEX_DOWNS = c.getColumnIndexOrThrow(Comments.COLUMN_DOWNS);
+            INDEX_KIND = c.getColumnIndexOrThrow(Comments.COLUMN_KIND);
+            INDEX_LIKES = c.getColumnIndexOrThrow(Comments.COLUMN_LIKES);
+            INDEX_NESTING = c.getColumnIndexOrThrow(Comments.COLUMN_NESTING);
+            INDEX_NUM_COMMENTS = c.getColumnIndexOrThrow(Comments.COLUMN_NUM_COMMENTS);
+            INDEX_TITLE = c.getColumnIndexOrThrow(Comments.COLUMN_TITLE);
+            INDEX_THING_ID = c.getColumnIndexOrThrow(Comments.COLUMN_THING_ID);
+            INDEX_UPS = c.getColumnIndexOrThrow(Comments.COLUMN_UPS);
+            INDEX_VOTE = c.getColumnIndexOrThrow(Comments.COLUMN_VOTE);
+        }
+    }
+
+    private final long nowTimeMs = System.currentTimeMillis();
     private final OnVoteListener listener;
 
     public static Uri createUri(String accountName, String thingId, boolean sync) {
@@ -78,12 +104,18 @@ public class CommentAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        initColumnIndices(cursor);
+
+        String author = cursor.getString(INDEX_AUTHOR);
         String body = cursor.getString(INDEX_BODY);
+        long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
         int downs = cursor.getInt(INDEX_DOWNS);
+        int kind = cursor.getInt(INDEX_KIND);
         int nesting = cursor.getInt(INDEX_NESTING);
+        int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
         String title = cursor.getString(INDEX_TITLE);
         String thingId = cursor.getString(INDEX_THING_ID);
-        int ups = cursor.getInt(INDEX_UP);
+        int ups = cursor.getInt(INDEX_UPS);
 
         int likes = cursor.getInt(INDEX_LIKES);
         int vote = cursor.getInt(INDEX_VOTE);
@@ -93,6 +125,6 @@ public class CommentAdapter extends CursorAdapter {
 
         CommentView cv = (CommentView) view;
         cv.setOnVoteListener(listener);
-        cv.setData(body, downs, likes, nesting, title, thingId, ups);
+        cv.setData(author, body, createdUtc, downs, kind, likes, nesting, nowTimeMs, numComments, title, thingId, ups);
     }
 }
