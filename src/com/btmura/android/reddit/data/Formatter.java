@@ -33,15 +33,12 @@ public class Formatter {
     private final Matcher matcher = RawLinks.PATTERN.matcher("");
     private final StringBuilder builder = new StringBuilder();
 
-    /** @return span-less formatted title that can be saved in a database */
-    public CharSequence formatTitle(Context context, String title) {
-        CharSequence c = Escaped.format(matcher, title).toString();
-        c = Disapproval.format(context, matcher, c);
-        return c;
+    public CharSequence formatNoSpans(Context context, CharSequence c) {
+        c = Escaped.format(matcher, c);
+        return Disapproval.format(context, matcher, c);
     }
 
-    public CharSequence formatComment(Context context, CharSequence comment) {
-        CharSequence c = Escaped.format(matcher, comment);
+    public CharSequence formatSpans(Context context, CharSequence c) {
         c = Styles.format(matcher, c, Styles.STYLE_BOLD);
         c = Styles.format(matcher, c, Styles.STYLE_ITALIC);
         c = Styles.format(matcher, c, Styles.STYLE_STRIKETHROUGH);
@@ -49,13 +46,12 @@ public class Formatter {
         c = Bullets.format(matcher, c);
         c = NamedLinks.format(c, builder);
         c = RawLinks.format(matcher, c);
-        c = Subreddits.format(matcher, c);
-        c = Disapproval.format(context, matcher, c);
-        return c;
+        return Subreddits.format(matcher, c);
     }
 
-    public CharSequence formatInfo(Context context, CharSequence info) {
-        return formatComment(context, info);
+    public CharSequence formatAll(Context context, CharSequence c) {
+        c = formatNoSpans(context, c);
+        return formatSpans(context, c);
     }
 
     static class Escaped {

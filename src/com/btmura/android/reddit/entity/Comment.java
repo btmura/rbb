@@ -74,10 +74,10 @@ public class Comment implements Parcelable {
             return this;
         }
         if (rawTitle != null) {
-            title = formatter.formatTitle(c, rawTitle);
+            title = formatter.formatNoSpans(c, rawTitle);
         }
         if (rawBody != null) {
-            body = formatter.formatComment(c, rawBody);
+            body = formatter.formatSpans(c, rawBody);
         }
         status = getStatus(c, type == Comment.TYPE_HEADER, now);
         rawTitle = rawBody = author = null;

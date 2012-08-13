@@ -65,7 +65,6 @@ public class ThingView extends View implements OnGestureListener {
     private Bitmap bitmap;
 
     private String scoreText;
-    private CharSequence statusText;
 
     private Layout titleLayout;
     private Layout statusLayout;
@@ -183,8 +182,6 @@ public class ThingView extends View implements OnGestureListener {
         scoreText = VotingArrows.getScoreText(score + likes);
         VotingArrows.measureScoreText(scoreText, scoreBounds);
 
-        statusText = makeStatusText();
-
         int titleWidth;
         int detailsWidth;
         CharSequence detailsText;
@@ -226,7 +223,7 @@ public class ThingView extends View implements OnGestureListener {
         detailsWidth = Math.max(0, detailsWidth);
 
         titleLayout = makeTitleLayout(titleWidth);
-        statusLayout = makeLayout(TEXT_STATUS, statusText, statusWidth, Alignment.ALIGN_NORMAL);
+        statusLayout = makeLayout(TEXT_STATUS, makeStatusText(), statusWidth, Alignment.ALIGN_NORMAL);
         if (detailsWidth > 0) {
             detailsLayout = makeLayout(TEXT_STATUS, detailsText, detailsWidth,
                     Alignment.ALIGN_OPPOSITE);

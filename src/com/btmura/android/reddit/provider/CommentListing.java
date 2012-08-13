@@ -31,6 +31,7 @@ import android.util.JsonToken;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
 
@@ -39,8 +40,9 @@ class CommentListing extends JsonParser {
     public static final String TAG = "CommentListing";
     public static final boolean DEBUG = Debug.DEBUG;
 
-    public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
+    final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
 
+    private final Formatter formatter = new Formatter();
     private final Context context;
     private final String accountName;
     private final String cookie;
@@ -90,7 +92,8 @@ class CommentListing extends JsonParser {
 
     @Override
     public void onBody(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Comments.COLUMN_BODY, readTrimmedString(reader, ""));
+        CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        values.get(index).put(Comments.COLUMN_BODY, body.toString());
     }
 
     @Override
@@ -142,12 +145,14 @@ class CommentListing extends JsonParser {
 
     @Override
     public void onSelfText(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Comments.COLUMN_BODY, readTrimmedString(reader, ""));
+        CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        values.get(index).put(Comments.COLUMN_BODY, body.toString());
     }
 
     @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Comments.COLUMN_TITLE, readTrimmedString(reader, ""));
+        CharSequence title = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        values.get(index).put(Comments.COLUMN_TITLE, title.toString());
     }
 
     @Override

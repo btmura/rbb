@@ -26,14 +26,14 @@ public class FormatterTest extends AbstractFormatterTest {
         formatter = new Formatter();
     }
 
-    public void testFormatComment() {
-        assertComment("this is <bold> text", "this is **&amp;lt;bold&gt;** text");
-        assertComment("this is >italics< and this is strikethrough",
+    public void testFormatAll() {
+        assertFormatAll("this is <bold> text", "this is **&amp;lt;bold&gt;** text");
+        assertFormatAll("this is >italics< and this is strikethrough",
                 "this is &gt;*italics&amp;lt;* and this is ~~strikethrough~~");
     }
 
-    private void assertComment(String expected, String input) {
-        CharSequence formatted = formatter.formatComment(mContext, input);
+    private void assertFormatAll(String expected, String input) {
+        CharSequence formatted = formatter.formatAll(mContext, input);
         String actual = formatted.toString();
         assertEquals("expected: " + expected + " actual: " + actual, expected, actual);
     }

@@ -48,7 +48,7 @@ class SidebarParser extends JsonParser {
 
     @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
-        results.title = formatter.formatTitle(context, readTrimmedString(reader, ""));
+        results.title = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
     }
 
     @Override
@@ -58,7 +58,7 @@ class SidebarParser extends JsonParser {
 
     @Override
     public void onDescription(JsonReader reader, int index) throws IOException {
-        results.description = formatter.formatInfo(context, readTrimmedString(reader, ""));
+        results.description = formatter.formatAll(context, readTrimmedString(reader, ""));
     }
 
     @Override
