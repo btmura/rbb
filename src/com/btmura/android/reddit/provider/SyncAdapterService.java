@@ -41,7 +41,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
+import com.btmura.android.reddit.database.Subreddits;
 
 public class SyncAdapterService extends Service {
 
@@ -72,16 +72,16 @@ public class SyncAdapterService extends Service {
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
                 count + 2);
-        ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+        ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
                 .withSelection(SubredditProvider.SELECTION_ACCOUNT, new String[] {login})
                 .build());
-        ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+        ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
                 .withValue(Subreddits.COLUMN_ACCOUNT, login)
                 .withValue(Subreddits.COLUMN_NAME, Subreddits.NAME_FRONT_PAGE)
                 .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
                 .build());
         for (int i = 0; i < count; i++) {
-            ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+            ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
                     .withValue(Subreddits.COLUMN_ACCOUNT, login)
                     .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
                     .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
@@ -116,7 +116,7 @@ public class SyncAdapterService extends Service {
 
                 ArrayList<String> subreddits = NetApi.querySubreddits(cookie);
 
-                Cursor c = provider.query(Subreddits.CONTENT_URI, PROJECTION,
+                Cursor c = provider.query(SubredditProvider.CONTENT_URI, PROJECTION,
                         SubredditProvider.SELECTION_ACCOUNT,
                         new String[] {account.name},
                         null);
@@ -210,7 +210,7 @@ public class SyncAdapterService extends Service {
         }
 
         private static ContentProviderOperation newUpdateToNormalState(long id) {
-            return ContentProviderOperation.newUpdate(Subreddits.CONTENT_URI)
+            return ContentProviderOperation.newUpdate(SubredditProvider.CONTENT_URI)
                     .withSelection(SubredditProvider.ID_SELECTION,
                             new String[] {Long.toString(id)})
                     .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
@@ -219,7 +219,7 @@ public class SyncAdapterService extends Service {
         }
 
         private static ContentProviderOperation newDeleteById(long id) {
-            return ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+            return ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
                     .withSelection(SubredditProvider.ID_SELECTION,
                             new String[] {Long.toString(id)})
                     .build();
@@ -227,7 +227,7 @@ public class SyncAdapterService extends Service {
 
         private static ContentProviderOperation newInsert(String accountName, String subredditName,
                 int state) {
-            return ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+            return ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
                     .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                     .withValue(Subreddits.COLUMN_NAME, subredditName)
                     .withValue(Subreddits.COLUMN_STATE, state)

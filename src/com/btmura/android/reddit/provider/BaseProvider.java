@@ -18,6 +18,8 @@ package com.btmura.android.reddit.provider;
 
 import java.util.ArrayList;
 
+import com.btmura.android.reddit.database.DbHelper;
+
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
@@ -27,7 +29,7 @@ import android.provider.BaseColumns;
 
 abstract class BaseProvider extends ContentProvider {
 
-    static final String ID_SELECTION = BaseColumns._ID + "= ?";
+    public static final String ID_SELECTION = BaseColumns._ID + "= ?";
 
     protected DbHelper helper;
 

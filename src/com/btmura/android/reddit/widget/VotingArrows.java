@@ -31,7 +31,7 @@ import android.text.TextUtils.TruncateAt;
 import android.view.MotionEvent;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.provider.Votes;
+import com.btmura.android.reddit.database.Votes;
 
 class VotingArrows {
 

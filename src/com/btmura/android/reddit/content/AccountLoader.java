@@ -31,7 +31,7 @@ import android.util.Log;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
+import com.btmura.android.reddit.database.Subreddits;
 
 public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         OnAccountsUpdateListener {

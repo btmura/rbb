@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.provider;
+package com.btmura.android.reddit.database;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.provider.BaseColumns;
 
 public class Comments implements BaseColumns {
 
-    static final String TABLE_NAME = "comments";
-
-    public static final Uri CONTENT_URI = Uri.parse(CommentProvider.BASE_AUTHORITY_URI);
-
-    static final int NUM_COLUMNS = 14;
+    public static final String TABLE_NAME = "comments";
 
     /** Account for joining with the votes table. */
     public static final String COLUMN_ACCOUNT = Votes.COLUMN_ACCOUNT;

@@ -42,7 +42,7 @@ import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.RelativeTime;
-import com.btmura.android.reddit.provider.Comments;
+import com.btmura.android.reddit.database.Comments;
 
 public class CommentView extends View implements OnGestureListener {
 

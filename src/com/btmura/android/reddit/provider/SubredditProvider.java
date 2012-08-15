@@ -34,20 +34,26 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
-import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.database.Subreddits;
 
 public class SubredditProvider extends BaseProvider {
 
     public static final String TAG = "SubredditProvider";
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.subreddits";
+    static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
+    public static final Uri CONTENT_URI = Uri.parse(SubredditProvider.BASE_AUTHORITY_URI
+            + Subreddits.TABLE_NAME);
 
-    private static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
+    static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
+            + SubredditProvider.AUTHORITY + "." + Subreddits.TABLE_NAME;
+    static final String MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
+            + SubredditProvider.AUTHORITY + "." + Subreddits.TABLE_NAME;
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_SUBREDDITS = 1;
@@ -55,26 +61,6 @@ public class SubredditProvider extends BaseProvider {
     static {
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME, MATCH_ALL_SUBREDDITS);
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
-    }
-
-    public static class Subreddits implements BaseColumns, SyncColumns {
-        static final String TABLE_NAME = "subreddits";
-        public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI + TABLE_NAME);
-
-        static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
-                + AUTHORITY + "." + TABLE_NAME;
-        static final String MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
-                + AUTHORITY + "." + TABLE_NAME;
-
-        public static final String COLUMN_ACCOUNT = "account";
-        public static final String COLUMN_NAME = "name";
-        public static final String COLUMN_STATE = "state";
-        public static final String COLUMN_EXPIRATION = "expiration";
-
-        public static final String SORT_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
-
-        public static final String NAME_FRONT_PAGE = "";
-        public static final String ACCOUNT_NONE = "";
     }
 
     public static final String SELECTION_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
@@ -160,10 +146,10 @@ public class SubredditProvider extends BaseProvider {
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_ALL_SUBREDDITS:
-                return Subreddits.MIME_TYPE_DIR;
+                return MIME_TYPE_DIR;
 
             case MATCH_ONE_SUBREDDIT:
-                return Subreddits.MIME_TYPE_ITEM;
+                return MIME_TYPE_ITEM;
 
             default:
                 return null;
@@ -176,13 +162,13 @@ public class SubredditProvider extends BaseProvider {
             @Override
             protected Void doInBackground(Void... params) {
                 ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(2);
-                ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+                ops.add(ContentProviderOperation.newDelete(CONTENT_URI)
                         .withSelection(SELECTION_ACCOUNT_AND_NAME, new String[] {
                                 accountName,
                                 subredditName,
                         })
                         .build());
-                ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+                ops.add(ContentProviderOperation.newInsert(CONTENT_URI)
                         .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                         .withValue(Subreddits.COLUMN_NAME, subredditName)
                         .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
@@ -218,7 +204,7 @@ public class SubredditProvider extends BaseProvider {
                 ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
                         count);
                 for (int i = 0; i < count; i++) {
-                    uris[i] = ContentUris.withAppendedId(Subreddits.CONTENT_URI, ids[i]);
+                    uris[i] = ContentUris.withAppendedId(CONTENT_URI, ids[i]);
                     ops.add(ContentProviderOperation.newUpdate(uris[i])
                             .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETING)
                             .build());
@@ -262,11 +248,11 @@ public class SubredditProvider extends BaseProvider {
                 ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
                         count + 1);
                 for (int i = 0; i < count; i++) {
-                    ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+                    ops.add(ContentProviderOperation.newDelete(CONTENT_URI)
                             .withSelection(ID_SELECTION, new String[] {Long.toString(ids[i])})
                             .build());
                 }
-                ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+                ops.add(ContentProviderOperation.newInsert(CONTENT_URI)
                         .withValue(Subreddits.COLUMN_NAME, combinedName.toString())
                         .build());
 
@@ -300,12 +286,12 @@ public class SubredditProvider extends BaseProvider {
                 ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
                         numParts + 1);
                 for (int i = 0; i < numParts; i++) {
-                    ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+                    ops.add(ContentProviderOperation.newInsert(CONTENT_URI)
                             .withValue(Subreddits.COLUMN_NAME, parts[i])
                             .build());
                 }
 
-                ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI)
+                ops.add(ContentProviderOperation.newDelete(CONTENT_URI)
                         .withSelection(ID_SELECTION, new String[] {Long.toString(id)})
                         .build());
 
@@ -334,7 +320,7 @@ public class SubredditProvider extends BaseProvider {
             @Override
             protected Void doInBackground(Void... params) {
                 ContentResolver cr = context.getContentResolver();
-                cr.bulkInsert(Subreddits.CONTENT_URI, values);
+                cr.bulkInsert(CONTENT_URI, values);
                 return null;
             }
 

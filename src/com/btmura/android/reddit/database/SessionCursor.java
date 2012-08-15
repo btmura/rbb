@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.provider;
+package com.btmura.android.reddit.database;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -26,7 +26,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
 
-class SessionCursor extends CursorWrapper {
+public class SessionCursor extends CursorWrapper {
 
     public static final String TAG = "SessionCursor";
     public static final boolean DEBUG = Debug.DEBUG;

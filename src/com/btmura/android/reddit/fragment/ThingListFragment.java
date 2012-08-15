@@ -45,7 +45,7 @@ import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.entity.Thing;
-import com.btmura.android.reddit.provider.Votes;
+import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
@@ -213,7 +213,7 @@ public class ThingListFragment extends ListFragment implements
             Log.d(TAG, "onLike id: " + thingId + " likes: " + likes);
         }
         if (!TextUtils.isEmpty(accountName)) {
-            Votes.voteInBackground(getActivity(), accountName, thingId, likes);
+            VoteProvider.voteInBackground(getActivity(), accountName, thingId, likes);
         }
     }
 

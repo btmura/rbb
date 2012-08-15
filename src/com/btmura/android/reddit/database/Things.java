@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.provider;
+package com.btmura.android.reddit.database;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.provider.BaseColumns;
 
+
 public class Things implements BaseColumns, SyncColumns {
-    static final String TABLE_NAME = "things";
-    public static final Uri CONTENT_URI = Uri.parse(ThingProvider.BASE_AUTHORITY_URI);
+    public static final String TABLE_NAME = "things";
 
     /** Account for joining with the votes table. */
     public static final String COLUMN_ACCOUNT = Votes.COLUMN_ACCOUNT;

@@ -28,8 +28,8 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.provider.Things;
 import com.btmura.android.reddit.util.ArrayUtils;
 
 public class ThingAdapter extends CursorAdapter {
@@ -107,7 +107,7 @@ public class ThingAdapter extends CursorAdapter {
 
     public static Uri createUri(String accountName, String subredditName, int filter, String more,
             boolean sync) {
-        Uri.Builder b = Things.CONTENT_URI.buildUpon()
+        Uri.Builder b = ThingProvider.CONTENT_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(sync))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
                 .appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subredditName)

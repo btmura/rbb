@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.provider;
+package com.btmura.android.reddit.database;
 
 import java.util.ArrayList;
 
@@ -24,18 +24,17 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 
-class DbHelper extends SQLiteOpenHelper {
+public class DbHelper extends SQLiteOpenHelper {
 
-    static final String DATABASE_REDDIT = "reddit";
-    static final String DATABASE_TEST = "test";
-    static final int LATEST_VERSION = 2;
+    public static final String DATABASE_REDDIT = "reddit";
+    public static final String DATABASE_TEST = "test";
+    public static final int LATEST_VERSION = 2;
 
     /** Version kept to control what tables are created mostly for testing. */
     private final int version;
 
-    DbHelper(Context context, String name, int version) {
+    public DbHelper(Context context, String name, int version) {
         super(context, name, null, version);
         this.version = version;
     }

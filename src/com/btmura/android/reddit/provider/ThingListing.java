@@ -34,6 +34,7 @@ import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
+import com.btmura.android.reddit.database.Things;
 
 class ThingListing extends JsonParser {
 

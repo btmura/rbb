@@ -33,6 +33,9 @@ import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.SessionCursor;
+import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.ArrayUtils;
 
 public class CommentProvider extends BaseProvider {
@@ -42,6 +45,7 @@ public class CommentProvider extends BaseProvider {
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.comments";
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
+    public static final Uri CONTENT_URI = Uri.parse(CommentProvider.BASE_AUTHORITY_URI);
 
     public static final String PARAM_SYNC = "sync";
     public static final String PARAM_ACCOUNT_NAME = "accountName";

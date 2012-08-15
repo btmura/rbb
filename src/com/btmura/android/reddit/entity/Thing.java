@@ -19,7 +19,7 @@ package com.btmura.android.reddit.entity;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.btmura.android.reddit.provider.Things;
+import com.btmura.android.reddit.database.Things;
 
 public class Thing {
 

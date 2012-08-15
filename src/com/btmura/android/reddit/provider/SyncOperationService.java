@@ -32,7 +32,7 @@ import android.util.Log;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
+import com.btmura.android.reddit.database.Subreddits;
 
 public class SyncOperationService extends IntentService {
 
@@ -59,7 +59,7 @@ public class SyncOperationService extends IntentService {
 
         ContentResolver cr = getContentResolver();
         String type = cr.getType(intent.getData());
-        if (Subreddits.MIME_TYPE_ITEM.equals(type)) {
+        if (SubredditProvider.MIME_TYPE_ITEM.equals(type)) {
             syncSubredditOp(intent);
         }
     }

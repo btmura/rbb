@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.provider;
+package com.btmura.android.reddit.database;
 
 public interface SyncColumns {
     static final int STATE_NORMAL = 0;

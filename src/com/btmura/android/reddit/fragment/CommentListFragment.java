@@ -39,7 +39,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Comment;
-import com.btmura.android.reddit.provider.Votes;
+import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
@@ -128,7 +128,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             Log.d(TAG, "onLike thingId: " + thingId + " likes: " + likes);
         }
         if (!TextUtils.isEmpty(accountName)) {
-            Votes.voteInBackground(getActivity(), accountName, thingId, likes);
+            VoteProvider.voteInBackground(getActivity(), accountName, thingId, likes);
         }
     }
 

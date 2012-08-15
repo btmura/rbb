@@ -19,13 +19,17 @@ package com.btmura.android.reddit.provider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.database.Votes;
+import com.btmura.android.reddit.util.ArrayUtils;
 
 public class VoteProvider extends BaseProvider {
 
@@ -34,6 +38,13 @@ public class VoteProvider extends BaseProvider {
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.votes";
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
+    public static final Uri CONTENT_URI = Uri.parse(VoteProvider.BASE_AUTHORITY_URI
+            + Votes.TABLE_NAME);
+
+    static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
+            + VoteProvider.AUTHORITY + "." + Votes.TABLE_NAME;
+    static final String MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
+            + VoteProvider.AUTHORITY + "." + Votes.TABLE_NAME;
 
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
@@ -78,8 +89,8 @@ public class VoteProvider extends BaseProvider {
             cr.notifyChange(uri, null);
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
                 Log.d(TAG, "notifying others!");
-                cr.notifyChange(Things.CONTENT_URI, null);
-                cr.notifyChange(Comments.CONTENT_URI, null);
+                cr.notifyChange(ThingProvider.CONTENT_URI, null);
+                cr.notifyChange(CommentProvider.CONTENT_URI, null);
             }
             return ContentUris.withAppendedId(uri, id);
         }
@@ -105,8 +116,8 @@ public class VoteProvider extends BaseProvider {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(uri, null);
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
-                cr.notifyChange(Things.CONTENT_URI, null);
-                cr.notifyChange(Comments.CONTENT_URI, null);
+                cr.notifyChange(ThingProvider.CONTENT_URI, null);
+                cr.notifyChange(CommentProvider.CONTENT_URI, null);
             }
         }
         return count;
@@ -131,8 +142,8 @@ public class VoteProvider extends BaseProvider {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(uri, null);
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
-                cr.notifyChange(Things.CONTENT_URI, null);
-                cr.notifyChange(Comments.CONTENT_URI, null);
+                cr.notifyChange(ThingProvider.CONTENT_URI, null);
+                cr.notifyChange(CommentProvider.CONTENT_URI, null);
             }
         }
         return count;
@@ -143,13 +154,43 @@ public class VoteProvider extends BaseProvider {
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_ALL_VOTES:
-                return Votes.MIME_TYPE_DIR;
+                return MIME_TYPE_DIR;
 
             case MATCH_ONE_VOTE:
-                return Votes.MIME_TYPE_ITEM;
+                return MIME_TYPE_ITEM;
 
             default:
                 return null;
         }
+    }
+
+    public static void voteInBackground(final Context context, final String accountName,
+            final String thingId, final int likes) {
+        AsyncTask.execute(new Runnable() {
+            public void run() {
+                ContentResolver cr = context.getContentResolver();
+                String[] selectionArgs = ArrayUtils.toArray(accountName, thingId);
+
+                ContentValues values = new ContentValues(3);
+                values.put(Votes.COLUMN_ACCOUNT, accountName);
+                values.put(Votes.COLUMN_THING_ID, thingId);
+                values.put(Votes.COLUMN_VOTE, likes);
+
+                Uri uri = CONTENT_URI.buildUpon()
+                        .appendQueryParameter(VoteProvider.PARAM_NOTIFY_OTHERS,
+                                Boolean.toString(true))
+                        .build();
+                int count = cr.update(uri, values, Votes.SELECTION_BY_ACCOUNT_AND_THING_ID,
+                        selectionArgs);
+                if (count == 0) {
+                    Uri insertUri = cr.insert(uri, values);
+                    if (DEBUG) {
+                        Log.d(TAG, "inserted: " + insertUri);
+                    }
+                } else if (DEBUG) {
+                    Log.d(TAG, "updated: " + count);
+                }
+            }
+        });
     }
 }

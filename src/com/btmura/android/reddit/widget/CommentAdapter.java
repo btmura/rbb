@@ -24,8 +24,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.provider.CommentProvider;
-import com.btmura.android.reddit.provider.Comments;
 import com.btmura.android.reddit.util.ArrayUtils;
 
 public class CommentAdapter extends CursorAdapter {
@@ -80,7 +80,7 @@ public class CommentAdapter extends CursorAdapter {
     private final OnVoteListener listener;
 
     public static Uri createUri(String accountName, String thingId, boolean sync) {
-        return Comments.CONTENT_URI.buildUpon()
+        return CommentProvider.CONTENT_URI.buildUpon()
                 .appendQueryParameter(CommentProvider.PARAM_SYNC, Boolean.toString(sync))
                 .appendQueryParameter(CommentProvider.PARAM_ACCOUNT_NAME, accountName)
                 .appendQueryParameter(CommentProvider.PARAM_THING_ID, thingId)

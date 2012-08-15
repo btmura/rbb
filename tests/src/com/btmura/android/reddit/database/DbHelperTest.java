@@ -1,11 +1,13 @@
-package com.btmura.android.reddit.provider;
+package com.btmura.android.reddit.database;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 
-import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
+import com.btmura.android.reddit.database.DbHelper;
+import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class DbHelperTest extends AndroidTestCase {
 

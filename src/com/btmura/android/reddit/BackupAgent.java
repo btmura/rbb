@@ -31,8 +31,8 @@ import android.database.Cursor;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.SubredditProvider;
-import com.btmura.android.reddit.provider.SubredditProvider.Subreddits;
 
 public class BackupAgent extends android.app.backup.BackupAgent {
 
@@ -65,7 +65,7 @@ public class BackupAgent extends android.app.backup.BackupAgent {
         ByteArrayOutputStream b = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(b);
 
-        Cursor c = getContentResolver().query(Subreddits.CONTENT_URI,
+        Cursor c = getContentResolver().query(SubredditProvider.CONTENT_URI,
                 PROJECTION,
                 SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
                 new String[] {Subreddits.ACCOUNT_NONE},
@@ -95,9 +95,9 @@ public class BackupAgent extends android.app.backup.BackupAgent {
         int count = in.readInt();
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 1);
-        ops.add(ContentProviderOperation.newDelete(Subreddits.CONTENT_URI).build());
+        ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI).build());
         for (int i = 0; i < count; i++) {
-            ops.add(ContentProviderOperation.newInsert(Subreddits.CONTENT_URI)
+            ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
                     .withValue(Subreddits.COLUMN_NAME, in.readUTF()).build());
         }
         try {

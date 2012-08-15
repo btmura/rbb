@@ -34,6 +34,7 @@ import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
+import com.btmura.android.reddit.database.Comments;
 
 class CommentListing extends JsonParser {
 
@@ -82,7 +83,7 @@ class CommentListing extends JsonParser {
 
     @Override
     public void onEntityStart(int index) {
-        values.add(new ContentValues(Comments.NUM_COLUMNS));
+        values.add(new ContentValues(14));
     }
 
     @Override
