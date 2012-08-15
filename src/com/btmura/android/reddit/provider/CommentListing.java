@@ -163,7 +163,7 @@ class CommentListing extends JsonParser {
     @Override
     public void onEntityEnd(int index) {
         values.get(index).put(Comments.COLUMN_ACCOUNT, accountName);
-        values.get(index).put(Comments.COLUMN_PARENT_ID, thingId);
+        values.get(index).put(Comments.COLUMN_SESSION_ID, thingId);
     }
 
     @Override

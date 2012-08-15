@@ -53,7 +53,7 @@ public class CommentProvider extends BaseProvider {
         MATCHER.addURI(AUTHORITY, Comments.TABLE_NAME, MATCH_ALL_COMMENTS);
     }
 
-    private static final String TABLE_NAME_WITH_VOTES = Comments.TABLE_NAME
+    private static final String COMMENTS_WITH_VOTES = Comments.TABLE_NAME
             + " LEFT OUTER JOIN (SELECT "
             + Votes.COLUMN_ACCOUNT + ", "
             + Votes.COLUMN_THING_ID + ", "
@@ -74,10 +74,11 @@ public class CommentProvider extends BaseProvider {
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor c = db.query(TABLE_NAME_WITH_VOTES, projection, selection, selectionArgs,
+        Cursor c = db.query(COMMENTS_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, null);
-        c.setNotificationUri(getContext().getContentResolver(), uri);
-        return c;
+        SessionCursor sc = new SessionCursor(getContext(), uri, selection, selectionArgs, c);
+        sc.setNotificationUri(getContext().getContentResolver(), uri);
+        return sc;
     }
 
     private void sync(Uri uri) {
@@ -96,7 +97,7 @@ public class CommentProvider extends BaseProvider {
             SQLiteDatabase db = helper.getWritableDatabase();
             try {
                 db.beginTransaction();
-                db.delete(Comments.TABLE_NAME, Comments.SELECTION_BY_PARENT_ID,
+                db.delete(Comments.TABLE_NAME, Comments.SELECTION_BY_SESSION_ID,
                         ArrayUtils.toArray(thingId));
 
                 InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
