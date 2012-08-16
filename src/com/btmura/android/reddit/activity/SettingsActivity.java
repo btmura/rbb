@@ -16,8 +16,16 @@
 
 package com.btmura.android.reddit.activity;
 
-import android.app.Activity;
+import java.util.List;
 
-public class SettingsActivity extends Activity {
+import com.btmura.android.reddit.R;
 
+import android.preference.PreferenceActivity;
+
+public class SettingsActivity extends PreferenceActivity {
+
+    @Override
+    public void onBuildHeaders(List<Header> target) {
+        loadHeadersFromResource(R.xml.settings_headers, target);
+    }
 }

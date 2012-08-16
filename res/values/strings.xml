@@ -16,7 +16,7 @@
 <resources>
 
     <string name="app_name">reddit by brian</string>
-    
+        
     <string name="account">Account</string>    
     <string name="account_type">com.btmura.android.reddit.account</string>
     
@@ -85,6 +85,9 @@
     <string name="provider_votes">Votes</string>
     
     <string name="remove">Remove</string>
+
+    <string name="settings_label">Settings</string>
+    <string name="settings_header_accounts">Accounts</string>
 
     <string name="show_password">Show password</string>
 
