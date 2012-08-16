@@ -27,6 +27,8 @@ public class Votes implements BaseColumns {
 
     public static final String COLUMN_THING_ID = "thingId";
     public static final String COLUMN_VOTE = "vote";
+    public static final String COLUMN_SYNC_STATE = "syncState";
+    public static final String COLUMN_SYNC_EXPIRATION = "syncExpiration";
 
     public static final int VOTE_UP = 1;
     public static final int VOTE_DOWN = -1;
@@ -41,6 +43,8 @@ public class Votes implements BaseColumns {
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
-                + COLUMN_VOTE + " INTEGER NOT NULL)");
+                + COLUMN_VOTE + " INTEGER NOT NULL, "
+                + COLUMN_SYNC_STATE + " INTEGER DEFAULT 0, "
+                + COLUMN_SYNC_EXPIRATION + " INTEGER DEFAULT 0)");
     }
 }
