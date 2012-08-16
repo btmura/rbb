@@ -23,8 +23,8 @@
         android:showAsAction="ifRoom|collapseActionView"
         android:title="@string/menu_search"/>
     <item
-        android:id="@+id/menu_manage_accounts"
-        android:title="@string/menu_manage_accounts"/>
+        android:id="@+id/menu_settings"
+        android:title="@string/menu_settings"/>
     <item
         android:id="@+id/menu_submit_link"
         android:title="@string/menu_submit_link" />

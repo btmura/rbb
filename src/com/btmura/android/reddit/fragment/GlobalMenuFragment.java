@@ -21,7 +21,6 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,9 +29,9 @@ import android.widget.SearchView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SearchActivity;
+import com.btmura.android.reddit.activity.SettingsActivity;
 import com.btmura.android.reddit.activity.SubmitLinkActivity;
 import com.btmura.android.reddit.data.Flag;
-import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class GlobalMenuFragment extends Fragment implements
         SearchView.OnFocusChangeListener,
@@ -89,7 +88,7 @@ public class GlobalMenuFragment extends Fragment implements
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_manage_accounts).setVisible(showManageAccounts());
+        menu.findItem(R.id.menu_settings).setVisible(showManageAccounts());
 
     }
 
@@ -100,8 +99,8 @@ public class GlobalMenuFragment extends Fragment implements
                 handleSearch();
                 return true;
 
-            case R.id.menu_manage_accounts:
-                handleAccounts();
+            case R.id.menu_settings:
+                handleSettings();
                 return true;
 
             case R.id.menu_submit_link:
@@ -121,10 +120,8 @@ public class GlobalMenuFragment extends Fragment implements
         searchItem.expandActionView();
     }
 
-    private void handleAccounts() {
-        Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
-        intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {SubredditProvider.AUTHORITY});
-        startActivity(intent);
+    private void handleSettings() {
+        startActivity(new Intent(getActivity(), SettingsActivity.class));
     }
 
     private void handleSubmitLink() {
