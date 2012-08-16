@@ -44,8 +44,8 @@ import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.ControlFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
@@ -524,7 +524,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             if (subreddit != null) {
                 return Subreddit.getName(subreddit);
             }
-            return Thing.getSubreddit(cf.getThingBundle());
+            return Things.getSubreddit(cf.getThingBundle());
         }
         return null;
     }

@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.fragment;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -44,7 +42,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
@@ -193,8 +190,7 @@ public class ThingListFragment extends ListFragment implements
             return;
         }
         if (firstVisibleItem + visibleItemCount * 2 >= totalItemCount) {
-            Loader<List<Thing>> loader = getLoaderManager().getLoader(0);
-            if (loader != null) {
+            if (getLoaderManager().getLoader(0) != null) {
                 if (!adapter.isEmpty()) {
                     String more = adapter.getMoreThingId();
                     if (!TextUtils.isEmpty(more)) {

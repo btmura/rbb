@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.CommentListFragment;
 import com.btmura.android.reddit.fragment.LinkFragment;
 
@@ -42,18 +41,18 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return Thing.isSelf(thingBundle) ? 1 : 2;
+        return Things.isSelf(thingBundle) ? 1 : 2;
     }
 
     @Override
     public Fragment getItem(int position) {
         switch (getType(thingBundle, position)) {
             case TYPE_LINK:
-                return LinkFragment.newInstance(Thing.getUrl(thingBundle));
+                return LinkFragment.newInstance(Things.getUrl(thingBundle));
 
             case TYPE_COMMENTS:
                 return CommentListFragment.newInstance(accountName,
-                        Thing.getId(thingBundle.getString(Things.COLUMN_THING_ID)));
+                        Things.getId(thingBundle.getString(Things.COLUMN_THING_ID)));
 
             default:
                 throw new IllegalStateException();
@@ -63,7 +62,7 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
     public static int getType(Bundle thingBundle, int position) {
         switch (position) {
             case 0:
-                return Thing.isSelf(thingBundle) ? TYPE_COMMENTS : TYPE_LINK;
+                return Things.isSelf(thingBundle) ? TYPE_COMMENTS : TYPE_LINK;
 
             case 1:
                 return TYPE_COMMENTS;

@@ -33,8 +33,8 @@ import android.widget.Toast;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.data.Urls;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class ThingMenuFragment extends Fragment {
@@ -76,7 +76,7 @@ public class ThingMenuFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        boolean self = Thing.isSelf(thingBundle);
+        boolean self = Things.isSelf(thingBundle);
         boolean showingLink = isShowingLink();
         boolean showLink = !self && !showingLink;
         boolean showComments = !self && showingLink;
@@ -118,13 +118,13 @@ public class ThingMenuFragment extends Fragment {
     private void updateShareProvider() {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, Thing.getTitle(thingBundle));
+        intent.putExtra(Intent.EXTRA_SUBJECT, Things.getTitle(thingBundle));
         intent.putExtra(Intent.EXTRA_TEXT, getLink());
         shareProvider.setShareIntent(intent);
     }
 
     private void handleViewSidebar() {
-        Subreddit sr = Subreddit.newInstance(Thing.getSubreddit(thingBundle));
+        Subreddit sr = Subreddit.newInstance(Things.getSubreddit(thingBundle));
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
         intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, sr);
         startActivity(intent);
@@ -140,7 +140,7 @@ public class ThingMenuFragment extends Fragment {
 
     private void handleCopyUrl() {
         CharSequence text = getLink();
-        ClipData data = ClipData.newPlainText(Thing.getTitle(thingBundle), text);
+        ClipData data = ClipData.newPlainText(Things.getTitle(thingBundle), text);
 
         ClipboardManager clipboard =
                 (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -161,9 +161,9 @@ public class ThingMenuFragment extends Fragment {
 
     private CharSequence getLink() {
         if (isShowingLink()) {
-            return Thing.getUrl(thingBundle);
+            return Things.getUrl(thingBundle);
         } else {
-            return Urls.permaUrl(Thing.getPermaLink(thingBundle)).toExternalForm();
+            return Urls.permaUrl(Things.getPermaLink(thingBundle)).toExternalForm();
         }
     }
 

@@ -29,8 +29,8 @@ import android.view.MenuItem;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.entity.Comment;
-import com.btmura.android.reddit.entity.Thing;
 import com.btmura.android.reddit.fragment.CommentListFragment.CommentListener;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
@@ -79,7 +79,7 @@ public class ThingActivity extends GlobalMenuActivity implements
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_HOME_AS_UP
                 | ActionBar.DISPLAY_SHOW_TITLE);
-        bar.setTitle(Thing.getTitle(thingBundle));
+        bar.setTitle(Things.getTitle(thingBundle));
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
@@ -117,7 +117,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     public String getSubredditName() {
-        return Thing.getSubreddit(thingBundle);
+        return Things.getSubreddit(thingBundle);
     }
 
     public void onPageSelected(int position) {
