@@ -14,10 +14,11 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <header
-        android:fragment="com.btmura.android.reddit.fragment.AccountManagerFragment"
-        android:title="@string/settings_header_accounts" />
+    <item
+        android:id="@+id/menu_add_account"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_add_account"/>
 
-</preference-headers>
+</menu>

@@ -59,6 +59,7 @@
     <string name="login_reddit_error">Reddit says: %1$s</string>
 
     <string name="menu_add">Add</string>
+    <string name="menu_add_account">Add account</string>
     <string name="menu_add_combined">Add combined</string>
     <string name="menu_add_front_page">Add front page</string>
     <string name="menu_add_subreddit">Add subreddit</string>
