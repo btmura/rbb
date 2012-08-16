@@ -120,6 +120,7 @@ public class ThingListFragment extends ListFragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         ListView l = (ListView) v.findViewById(android.R.id.list);
+        l.setVerticalScrollBarEnabled(false);
         l.setOnScrollListener(this);
         return v;
     }
