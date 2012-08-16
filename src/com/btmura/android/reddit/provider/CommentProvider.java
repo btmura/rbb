@@ -34,7 +34,6 @@ import android.util.Log;
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.database.SessionCursor;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.ArrayUtils;
 
@@ -80,9 +79,8 @@ public class CommentProvider extends BaseProvider {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.query(COMMENTS_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, null);
-        SessionCursor sc = new SessionCursor(getContext(), uri, selection, selectionArgs, c);
-        sc.setNotificationUri(getContext().getContentResolver(), uri);
-        return sc;
+        c.setNotificationUri(getContext().getContentResolver(), uri);
+        return c;
     }
 
     private void sync(Uri uri) {
