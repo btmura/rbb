@@ -28,7 +28,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.SystemClock;
 import android.util.Log;
 
 import com.btmura.android.reddit.Debug;
@@ -91,11 +90,10 @@ public class CommentProvider extends BaseProvider {
             String cookie = AccountUtils.getCookie(context, accountName);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
-            long t1 = SystemClock.currentThreadTimeMillis();
             CommentListing listing = new CommentListing(context, accountName, cookie, thingId);
             listing.process();
 
-            long t2 = SystemClock.currentThreadTimeMillis();
+            long t1 = System.currentTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();
             try {
                 db.beginTransaction();
@@ -108,14 +106,13 @@ public class CommentProvider extends BaseProvider {
                     insertHelper.insert(listing.values.get(i));
                 }
                 db.setTransactionSuccessful();
-
-                if (DEBUG) {
-                    long t3 = SystemClock.currentThreadTimeMillis();
-                    Log.d(TAG, "c: " + count + " p: " + (t2 - t1) + " db: " + (t3 - t2));
-                }
             } finally {
                 db.endTransaction();
                 db.close();
+            }
+            if (DEBUG) {
+                long t2 = System.currentTimeMillis();
+                Log.d(TAG, "db: " + (t2 - t1));
             }
         } catch (OperationCanceledException e) {
             Log.e(TAG, "sync", e);

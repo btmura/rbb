@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.provider;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -61,11 +62,17 @@ class ThingListing extends JsonParser {
     }
 
     public void process() throws IOException {
+        long t1 = System.currentTimeMillis();
         HttpURLConnection conn = NetApi.connect(context, url, cookie);
-        InputStream input = conn.getInputStream();
+        InputStream input = new BufferedInputStream(conn.getInputStream());
+        long t2 = System.currentTimeMillis();
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingObject(reader);
+            if (DEBUG) {
+                long t3 = System.currentTimeMillis();
+                Log.d(TAG, "net: " + (t2 - t1) + " parse: " + (t3 - t2));
+            }
         } finally {
             input.close();
             conn.disconnect();
@@ -186,9 +193,6 @@ class ThingListing extends JsonParser {
             v.put(Things.COLUMN_PARENT, subredditName);
             v.put(Things.COLUMN_THING_ID, moreThingId);
             values.add(v);
-        }
-        if (DEBUG) {
-            Log.d(TAG, "values: " + values.size());
         }
     }
 }

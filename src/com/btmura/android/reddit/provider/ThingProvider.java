@@ -28,7 +28,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -98,12 +97,11 @@ public class ThingProvider extends BaseProvider {
             int filter = Integer.parseInt(uri.getQueryParameter(PARAM_FILTER));
             String more = uri.getQueryParameter(PARAM_MORE);
 
-            long t1 = SystemClock.currentThreadTimeMillis();
             ThingListing listing = new ThingListing(context, accountName, cookie, subredditName,
                     filter, more);
             listing.process();
 
-            long t2 = SystemClock.currentThreadTimeMillis();
+            long t1 = System.currentTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();
             try {
                 db.beginTransaction();
@@ -124,8 +122,8 @@ public class ThingProvider extends BaseProvider {
                 db.setTransactionSuccessful();
 
                 if (DEBUG) {
-                    long t3 = SystemClock.currentThreadTimeMillis();
-                    Log.d(TAG, "c: " + count + " p: " + (t2 - t1) + " db: " + (t3 - t1));
+                    long t2 = System.currentTimeMillis();
+                    Log.d(TAG, "db: " + (t2 - t1));
                 }
             } finally {
                 db.endTransaction();

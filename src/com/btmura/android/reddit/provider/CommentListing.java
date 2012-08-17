@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.provider;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.os.SystemClock;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.Log;
@@ -59,16 +59,16 @@ class CommentListing extends JsonParser {
     }
 
     public void process() throws IOException {
+        long t1 = System.currentTimeMillis();
         HttpURLConnection conn = NetApi.connect(context, url, cookie);
-        long t1 = SystemClock.currentThreadTimeMillis();
-        InputStream input = conn.getInputStream();
-        long t2 = SystemClock.currentThreadTimeMillis();
+        InputStream input = new BufferedInputStream(conn.getInputStream());
+        long t2 = System.currentTimeMillis();
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingArray(reader);
             if (DEBUG) {
-                long t3 = SystemClock.currentThreadTimeMillis();
-                Log.d(TAG, "i: " + (t2 - t1) + " p: " + (t3 - t2));
+                long t3 = System.currentTimeMillis();
+                Log.d(TAG, "net: " + (t2 - t1) + " parse: " + (t3 - t2));
             }
         } finally {
             input.close();
