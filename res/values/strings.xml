@@ -88,7 +88,7 @@
     <string name="remove">Remove</string>
 
     <string name="settings_label">Settings</string>
-    <string name="settings_header_accounts">Accounts</string>
+    <string name="settings_header_general_settings">General settings</string>
 
     <string name="show_password">Show password</string>
 

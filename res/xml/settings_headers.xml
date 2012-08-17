@@ -16,8 +16,6 @@
 -->
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <header
-        android:fragment="com.btmura.android.reddit.fragment.AccountManagerFragment"
-        android:title="@string/settings_header_accounts" />
+    <header android:title="@string/settings_header_general_settings" />
 
 </preference-headers>
