@@ -24,15 +24,21 @@ import android.content.Loader;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.fragment.AccountPreferenceFragment;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class SettingsActivity extends PreferenceActivity implements LoaderCallbacks<AccountResult> {
+
+    public static final String TAG = "SettingsActivity";
+    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final String[] AUTHORITIES = {
             SubredditProvider.AUTHORITY,
@@ -62,6 +68,9 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
 
     @Override
     public void onBuildHeaders(List<Header> target) {
+        if (DEBUG) {
+            Log.d(TAG, "onBuildHeaders");
+        }
         loadHeadersFromResource(R.xml.settings_headers, target);
         if (result != null) {
             String[] accountNames = result.accountNames;
@@ -69,6 +78,11 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
             for (int i = 0; i < length; i++) {
                 Header header = new Header();
                 header.title = accountNames[i];
+                header.fragment = AccountPreferenceFragment.class.getName();
+
+                Bundle args = new Bundle(1);
+                args.putString(AccountPreferenceFragment.ARG_ACCOUNT_NAME, accountNames[i]);
+                header.fragmentArguments = args;
                 target.add(header);
             }
         }
@@ -77,7 +91,7 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.account_manager_menu, menu);
+        getMenuInflater().inflate(R.menu.settings_menu, menu);
         return true;
     }
 
