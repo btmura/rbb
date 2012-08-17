@@ -205,17 +205,16 @@ public class ThingView extends View implements OnGestureListener {
             detailsText = "";
         }
 
-        int width = VotingArrows.getWidth();
+        int width = VotingArrows.getWidth() + PADDING;
         if (!TextUtils.isEmpty(thumbnailUrl)) {
             width += PADDING + Thumbnail.getWidth();
         }
-        width += PADDING;
         titleWidth -= width;
+
         int statusWidth = measuredWidth - PADDING * 2;
         statusWidth -= width;
         if (detailsWidth > 0) {
             statusWidth -= detailsWidth + PADDING;
-            titleWidth -= width;
         }
 
         titleWidth = Math.max(0, titleWidth);
@@ -223,7 +222,8 @@ public class ThingView extends View implements OnGestureListener {
         detailsWidth = Math.max(0, detailsWidth);
 
         titleLayout = makeTitleLayout(titleWidth);
-        statusLayout = makeLayout(TEXT_STATUS, makeStatusText(), statusWidth, Alignment.ALIGN_NORMAL);
+        statusLayout = makeLayout(TEXT_STATUS, makeStatusText(), statusWidth,
+                Alignment.ALIGN_NORMAL);
         if (detailsWidth > 0) {
             detailsLayout = makeLayout(TEXT_STATUS, detailsText, detailsWidth,
                     Alignment.ALIGN_OPPOSITE);
@@ -290,6 +290,14 @@ public class ThingView extends View implements OnGestureListener {
 
     @Override
     protected void onDraw(Canvas c) {
+        if (detailsLayout != null) {
+            int dx = c.getWidth() - PADDING - detailsLayout.getWidth();
+            int dy = (c.getHeight() - detailsLayout.getHeight()) / 2;
+            c.translate(dx, dy);
+            detailsLayout.draw(c);
+            c.translate(-dx, -dy);
+        }
+
         boolean hasThumb = !TextUtils.isEmpty(thumbnailUrl);
         c.translate(PADDING, PADDING);
         VotingArrows.draw(c, bitmap, hasThumb, scoreText, scoreBounds, likes);
@@ -308,14 +316,6 @@ public class ThingView extends View implements OnGestureListener {
         c.translate(0, sdy);
         statusLayout.draw(c);
         c.translate(0, -sdy - tdy);
-
-        if (detailsLayout != null) {
-            int dx = c.getWidth() - PADDING - detailsLayout.getWidth();
-            int dy = (c.getHeight() - detailsLayout.getHeight()) / 2;
-            c.translate(dx, dy);
-            detailsLayout.draw(c);
-            c.translate(-dx, -dy);
-        }
     }
 
     @Override
