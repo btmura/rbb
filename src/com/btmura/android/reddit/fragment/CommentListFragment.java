@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.fragment;
 
-import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
@@ -38,7 +37,6 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Comment;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -52,13 +50,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private static final String ARG_ACCOUNT_NAME = "an";
     private static final String ARG_THING_ID = "ti";
 
-    public interface CommentListener {
-        void onReplyToComment(Comment comment);
-    }
-
     private String accountName;
     private String thingId;
-    private CommentListener listener;
     private CommentAdapter adapter;
 
     public static CommentListFragment newInstance(String accountName, String thingId) {
@@ -68,14 +61,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         b.putString(ARG_THING_ID, thingId);
         frag.setArguments(b);
         return frag;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof CommentListener) {
-            listener = (CommentListener) activity;
-        }
     }
 
     @Override
@@ -157,13 +142,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     private void handleReply() {
-        if (listener != null) {
-            listener.onReplyToComment(findFirstCheckedComment());
-        }
-    }
-
-    private Comment findFirstCheckedComment() {
-        return null;
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {

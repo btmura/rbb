@@ -19,7 +19,6 @@ package com.btmura.android.reddit.activity;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -30,8 +29,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.entity.Comment;
-import com.btmura.android.reddit.fragment.CommentListFragment.CommentListener;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingMenuFragment;
@@ -40,7 +37,6 @@ import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class ThingActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
-        CommentListener,
         ThingPagerHolder,
         SubredditNameHolder,
         OnPageChangeListener {
@@ -92,12 +88,6 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-    }
-
-    public void onReplyToComment(Comment comment) {
-        Intent intent = new Intent(this, CommentReplyActivity.class);
-        intent.putExtra(CommentReplyActivity.EXTRA_COMMENT, comment);
-        startActivity(intent);
     }
 
     @Override

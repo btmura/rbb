@@ -38,7 +38,10 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_SEQUENCE = "sequence";
     public static final String COLUMN_SESSION_ID = "sessionId";
     public static final String COLUMN_TITLE = "title";
+
+    /** Thing id that can be null if the row represents a pending reply. */
     public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
+
     public static final String COLUMN_UPS = "ups";
     public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
@@ -66,7 +69,7 @@ public class Comments implements BaseColumns {
                 + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "
                 + COLUMN_SEQUENCE + " INTEGER NOT NULL, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
-                + COLUMN_THING_ID + " TEXT NOT NULL, "
+                + COLUMN_THING_ID + " TEXT, "
                 + COLUMN_TITLE + " TEXT DEFAULT '', "
                 + COLUMN_UPS + " INTEGER NOT NULL)");
     }
