@@ -22,6 +22,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
+import android.view.Menu;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.provider.SubredditProvider;
@@ -31,6 +32,9 @@ public class GeneralSettingsFragment extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
+        // TODO: Figure out to specify extras in the XML.
         Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
         intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {SubredditProvider.AUTHORITY});
 
@@ -43,4 +47,10 @@ public class GeneralSettingsFragment extends PreferenceFragment {
         setPreferenceScreen(prefScreen);
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        // TODO: Figure out how to move this somehow to SettingsActivity.
+        menu.findItem(R.id.menu_add_account).setVisible(false);
+    }
 }

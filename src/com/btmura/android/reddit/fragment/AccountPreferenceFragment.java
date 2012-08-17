@@ -23,13 +23,17 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
@@ -58,6 +62,7 @@ public class AccountPreferenceFragment extends PreferenceFragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        // TODO: Figure out how to move this somehow to SettingsActivity.
         menu.findItem(R.id.menu_add_account).setVisible(false);
     }
 
@@ -95,7 +100,13 @@ public class AccountPreferenceFragment extends PreferenceFragment {
 
             @Override
             protected void onPostExecute(Boolean result) {
-
+                if (result) {
+                    PreferenceActivity prefActivity = (PreferenceActivity) getActivity();
+                    prefActivity.finishPreferencePanel(AccountPreferenceFragment.this,
+                            Activity.RESULT_OK, new Intent());
+                } else {
+                    Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
+                }
             }
         }.execute();
     }
