@@ -18,6 +18,7 @@ package com.btmura.android.reddit.activity;
 
 import java.util.List;
 
+import android.app.ActionBar;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
@@ -49,7 +50,13 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setupActionBar();
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    private void setupActionBar() {
+        ActionBar bar = getActionBar();
+        bar.setDisplayHomeAsUpEnabled(true);
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
@@ -98,6 +105,10 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+
             case R.id.menu_add_account:
                 handleAddAccount();
                 return true;
