@@ -82,11 +82,11 @@ public class ThingListFragment extends ListFragment implements
     private OnThingSelectedListener listener;
     private boolean scrollLoading;
 
-    public static ThingListFragment newInstance(String accountName, Subreddit sr, int filter,
+    public static ThingListFragment newInstance(String accountName, Subreddit subreddit, int filter,
             String query, int flags) {
         Bundle args = new Bundle(5);
         args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putParcelable(ARG_SUBREDDIT, sr);
+        args.putParcelable(ARG_SUBREDDIT, subreddit);
         args.putInt(ARG_FILTER, filter);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);

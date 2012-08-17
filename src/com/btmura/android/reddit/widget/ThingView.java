@@ -255,18 +255,14 @@ public class ThingView extends View implements OnGestureListener {
         Context c = getContext();
         Resources r = getResources();
 
-        int resId;
-        if (!parentSubreddit.equalsIgnoreCase(subreddit)) {
+        int resId = R.string.thing_status;
+        if (!subreddit.equalsIgnoreCase(parentSubreddit)) {
             resId = R.string.thing_status_subreddit;
-        } else {
-            resId = R.string.thing_status;
         }
 
-        String nsfw;
+        String nsfw = "";
         if (over18) {
             nsfw = c.getString(R.string.thing_nsfw);
-        } else {
-            nsfw = "";
         }
 
         String rt = RelativeTime.format(c, nowTimeMs, createdUtc);
