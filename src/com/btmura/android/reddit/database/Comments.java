@@ -35,6 +35,7 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_NESTING = "nesting";
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_SELF_TEXT = "selfText";
+    public static final String COLUMN_SEQUENCE = "sequence";
     public static final String COLUMN_SESSION_ID = "sessionId";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
@@ -47,6 +48,8 @@ public class Comments implements BaseColumns {
 
     public static final String SELECTION_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
     public static final String SELECTION_BY_THING_ID = COLUMN_THING_ID + " = ?";
+
+    public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
@@ -61,6 +64,7 @@ public class Comments implements BaseColumns {
                 + COLUMN_NESTING + " INTEGER NOT NULL, "
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "
+                + COLUMN_SEQUENCE + " INTEGER NOT NULL, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
                 + COLUMN_TITLE + " TEXT DEFAULT '', "

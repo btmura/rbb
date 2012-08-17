@@ -89,7 +89,7 @@ public class CommentAdapter extends CursorAdapter {
 
     public static CursorLoader createLoader(Context context, Uri uri, String thingId) {
         return new CursorLoader(context, uri, PROJECTION, Comments.SELECTION_BY_SESSION_ID,
-                ArrayUtils.toArray(thingId), null);
+                ArrayUtils.toArray(thingId), Comments.SORT_BY_SEQUENCE_AND_ID);
     }
 
     public CommentAdapter(Context context, OnVoteListener listener) {

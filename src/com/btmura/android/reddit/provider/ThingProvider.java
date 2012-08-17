@@ -81,7 +81,7 @@ public class ThingProvider extends BaseProvider {
 
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.query(TABLE_NAME_WITH_VOTES, projection, selection, selectionArgs,
-                null, null, null);
+                null, null, sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
     }

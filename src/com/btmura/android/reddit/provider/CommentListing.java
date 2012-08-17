@@ -83,7 +83,9 @@ class CommentListing extends JsonParser {
 
     @Override
     public void onEntityStart(int index) {
-        values.add(new ContentValues(14));
+        ContentValues v = new ContentValues(15);
+        v.put(Comments.COLUMN_SEQUENCE, index);
+        values.add(v);
     }
 
     @Override

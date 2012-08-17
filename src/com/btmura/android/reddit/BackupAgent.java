@@ -69,7 +69,7 @@ public class BackupAgent extends android.app.backup.BackupAgent {
                 PROJECTION,
                 SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
                 new String[] {Subreddits.ACCOUNT_NONE},
-                Subreddits.SORT_NAME);
+                Subreddits.SORT_BY_NAME);
         try {
             out.writeInt(c.getCount());
             while (c.moveToNext()) {

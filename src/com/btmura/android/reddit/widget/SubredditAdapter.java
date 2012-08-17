@@ -48,7 +48,7 @@ public class SubredditAdapter extends SimpleCursorAdapter {
                     PROJECTION,
                     SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
                     new String[] {accountName},
-                    Subreddits.SORT_NAME);
+                    Subreddits.SORT_BY_NAME);
         }
     }
 

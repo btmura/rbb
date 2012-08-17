@@ -42,8 +42,7 @@ public class CommentProvider extends BaseProvider {
     public static final boolean DEBUG = Debug.DEBUG;
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.comments";
-    static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
-    public static final Uri CONTENT_URI = Uri.parse(CommentProvider.BASE_AUTHORITY_URI);
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/");
 
     public static final String PARAM_SYNC = "sync";
     public static final String PARAM_ACCOUNT_NAME = "accountName";
@@ -77,7 +76,7 @@ public class CommentProvider extends BaseProvider {
 
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.query(COMMENTS_WITH_VOTES, projection, selection, selectionArgs,
-                null, null, null);
+                null, null, sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
     }
