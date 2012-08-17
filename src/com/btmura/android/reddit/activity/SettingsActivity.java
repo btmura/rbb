@@ -84,6 +84,8 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
             int length = accountNames.length;
             for (int i = 0; i < length; i++) {
                 Header header = new Header();
+                header.breadCrumbTitle = accountNames[i];
+                header.breadCrumbShortTitle = accountNames[i];
                 header.title = accountNames[i];
                 header.fragment = AccountPreferenceFragment.class.getName();
 
