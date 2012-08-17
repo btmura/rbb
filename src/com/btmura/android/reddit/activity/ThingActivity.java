@@ -83,7 +83,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this);
+        return new AccountLoader(this, true);
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {

@@ -76,14 +76,16 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     private SharedPreferences prefs;
     private AccountManager manager;
+    private boolean includeNoAccount;
 
     private AccountResult result;
 
-    public AccountLoader(Context context) {
+    public AccountLoader(Context context, boolean includeNoAccount) {
         super(context);
-        prefs = getContext().getSharedPreferences(PREFS, 0);
-        manager = AccountManager.get(getContext());
-        manager.addOnAccountsUpdatedListener(this, null, false);
+        this.prefs = getContext().getSharedPreferences(PREFS, 0);
+        this.manager = AccountManager.get(getContext());
+        this.manager.addOnAccountsUpdatedListener(this, null, false);
+        this.includeNoAccount = includeNoAccount;
     }
 
     @Override
@@ -95,14 +97,23 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         Context context = getContext();
 
         // Get the accounts and sort them.
-        Account[] accounts = manager.getAccountsByType(AccountAuthenticator.getAccountType(context));
+        Account[] accounts = manager
+                .getAccountsByType(AccountAuthenticator.getAccountType(context));
         Arrays.sort(accounts, ACCOUNT_COMPARATOR);
 
         // Convert to strings and prepend the no account at the top.
-        String[] accountNames = new String[accounts.length + 1];
-        accountNames[0] = Subreddits.ACCOUNT_NONE;
+        int start = 0;
+        int length = accounts.length;
+        if (includeNoAccount) {
+            start++;
+            length++;
+        }
+        String[] accountNames = new String[length];
+        if (includeNoAccount) {
+            accountNames[0] = Subreddits.ACCOUNT_NONE;
+        }
         for (int i = 0; i < accounts.length; i++) {
-            accountNames[i + 1] = accounts[i].name;
+            accountNames[start++] = accounts[i].name;
         }
 
         // Get a preference to make sure the loading thread is done.

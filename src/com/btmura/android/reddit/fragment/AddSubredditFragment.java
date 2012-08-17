@@ -120,7 +120,7 @@ public class AddSubredditFragment extends DialogFragment implements
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(getActivity());
+        return new AccountLoader(getActivity(), true);
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {

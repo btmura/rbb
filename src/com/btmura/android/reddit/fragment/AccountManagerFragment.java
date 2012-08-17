@@ -16,18 +16,26 @@
 
 package com.btmura.android.reddit.fragment;
 
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
+import android.content.Loader;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
-public class AccountManagerFragment extends PreferenceFragment {
+public class AccountManagerFragment extends PreferenceFragment implements
+        LoaderCallbacks<AccountResult> {
 
     private static final String[] AUTHORITIES = {
             SubredditProvider.AUTHORITY,
@@ -37,6 +45,39 @@ public class AccountManagerFragment extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        PreferenceManager prefManager = getPreferenceManager();
+        PreferenceScreen prefScreen = prefManager.createPreferenceScreen(getActivity());
+        setPreferenceScreen(prefScreen);
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(getActivity(), false);
+    }
+
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        PreferenceScreen prefScreen = getPreferenceScreen();
+        prefScreen.removeAll();
+        String[] accountNames = result.accountNames;
+        for (int i = 0; i < accountNames.length; i++) {
+            prefScreen.addPreference(new AccountPreference(getActivity(), accountNames[i]));
+        }
+    }
+
+    public void onLoaderReset(Loader<AccountResult> loader) {
+    }
+
+    @Override
+    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
+        intent.putExtra(Settings.EXTRA_AUTHORITIES, AUTHORITIES);
+        startActivity(intent);
+        return true;
     }
 
     @Override

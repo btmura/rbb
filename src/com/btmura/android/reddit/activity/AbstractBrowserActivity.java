@@ -187,7 +187,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected abstract void setupActionBar(Bundle savedInstanceState);
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this);
+        return new AccountLoader(this, true);
     }
 
     public abstract void onLoadFinished(Loader<AccountResult> loader, AccountResult result);
