@@ -145,7 +145,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private void handleReply(ActionMode mode) {
         SparseBooleanArray checked = getListView().getCheckedItemPositions();
         int position = -1;
-        int size = checked.size();
+        int size = adapter.getCount();
         for (int i = 0; i < size; i++) {
             if (checked.get(i)) {
                 position = i;
@@ -154,10 +154,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         }
 
         if (position != -1) {
-            String author = adapter.getAuthor(position);
-            int sequence = adapter.getSequence(position);
-            String thingId = adapter.getThingId(position);
-            CommentReplyFragment frag = CommentReplyFragment.newInstance(author, sequence, thingId);
+            CommentReplyFragment frag = CommentReplyFragment.newInstance(accountName,
+                    adapter.getCommentBundle(position));
             frag.show(getFragmentManager(), CommentReplyFragment.TAG);
         }
 

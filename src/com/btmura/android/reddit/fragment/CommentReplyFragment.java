@@ -17,32 +17,37 @@
 package com.btmura.android.reddit.fragment;
 
 import android.app.DialogFragment;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.provider.CommentProvider;
 
 public class CommentReplyFragment extends DialogFragment implements OnClickListener {
 
     public static final String TAG = "CommentReplyFragment";
 
-    public static final String ARG_AUTHOR = "author";
-    public static final String ARG_SEQUENCE = "sequence";
-    public static final String ARG_THING_ID = "thingId";
+    public static final String ARG_ACCOUNT_NAME = "accountName";
+    public static final String ARG_COMMENT_BUNDLE = "commentBundle";
 
-    private String author;
+    private String accountName;
+    private Bundle commentBundle;
+    private EditText bodyText;
     private View cancel;
     private View ok;
 
-    public static CommentReplyFragment newInstance(String author, int sequence, String thingId) {
-        Bundle args = new Bundle(3);
-        args.putString(ARG_AUTHOR, author);
-        args.putInt(ARG_SEQUENCE, sequence);
-        args.putString(ARG_THING_ID, thingId);
-
+    public static CommentReplyFragment newInstance(String accountName, Bundle commentBundle) {
+        Bundle args = new Bundle(2);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putBundle(ARG_COMMENT_BUNDLE, commentBundle);
         CommentReplyFragment frag = new CommentReplyFragment();
         frag.setArguments(args);
         return frag;
@@ -51,14 +56,17 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        author = getArguments().getString(ARG_AUTHOR);
+        accountName = getArguments().getString(ARG_ACCOUNT_NAME);
+        commentBundle = getArguments().getBundle(ARG_COMMENT_BUNDLE);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        String author = Comments.getAuthor(commentBundle);
         getDialog().setTitle(getString(R.string.comment_reply_title, author));
 
         View v = inflater.inflate(R.layout.comment_reply, container, false);
+        bodyText = (EditText) v.findViewById(R.id.body_text);
         cancel = v.findViewById(R.id.cancel);
         cancel.setOnClickListener(this);
         ok = v.findViewById(R.id.ok);
@@ -66,10 +74,32 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
         return v;
     }
 
-    public void onClick(View v) {
-        if (v == cancel) {
+    public void onClick(View view) {
+        if (view == ok) {
             dismiss();
-        } else if (v == ok) {
+            AsyncTask.execute(new Runnable() {
+                public void run() {
+                    int sequence = Comments.getSequence(commentBundle);
+                    int nesting = Comments.getNesting(commentBundle);
+                    if (sequence != 0) {
+                        nesting++;
+                    }
+
+                    ContentValues v = new ContentValues(8);
+                    v.put(Comments.COLUMN_ACCOUNT, accountName);
+                    v.put(Comments.COLUMN_AUTHOR, accountName);
+                    v.put(Comments.COLUMN_BODY, bodyText.getText().toString());
+                    v.put(Comments.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000);
+                    v.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
+                    v.put(Comments.COLUMN_NESTING, nesting);
+                    v.put(Comments.COLUMN_SEQUENCE, sequence);
+                    v.put(Comments.COLUMN_SESSION_ID, Comments.getSessionId(commentBundle));
+
+                    ContentResolver cr = getActivity().getContentResolver();
+                    cr.insert(CommentProvider.CONTENT_URI, v);
+                }
+            });
+        } else if (view == cancel) {
             dismiss();
         }
     }

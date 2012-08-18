@@ -56,7 +56,8 @@ public class ThingAdapter extends CursorAdapter {
             Things.COLUMN_VOTE,
     };
 
-    public static int INDEX_AUTHOR = -1;
+    public static int INDEX_ID = -1;
+    public static int INDEX_AUTHOR;
     public static int INDEX_CREATED_UTC;
     public static int INDEX_DOMAIN;
     public static int INDEX_DOWNS;
@@ -74,29 +75,6 @@ public class ThingAdapter extends CursorAdapter {
     public static int INDEX_UPS;
     public static int INDEX_URL;
     public static int INDEX_VOTE;
-
-    static void initColumnIndices(Cursor c) {
-        if (INDEX_AUTHOR == -1) {
-            INDEX_AUTHOR = c.getColumnIndexOrThrow(Things.COLUMN_AUTHOR);
-            INDEX_CREATED_UTC = c.getColumnIndexOrThrow(Things.COLUMN_CREATED_UTC);
-            INDEX_DOMAIN = c.getColumnIndexOrThrow(Things.COLUMN_DOMAIN);
-            INDEX_DOWNS = c.getColumnIndexOrThrow(Things.COLUMN_DOWNS);
-            INDEX_KIND = c.getColumnIndexOrThrow(Things.COLUMN_KIND);
-            INDEX_LIKES = c.getColumnIndexOrThrow(Things.COLUMN_LIKES);
-            INDEX_NUM_COMMENTS = c.getColumnIndexOrThrow(Things.COLUMN_NUM_COMMENTS);
-            INDEX_OVER_18 = c.getColumnIndexOrThrow(Things.COLUMN_OVER_18);
-            INDEX_PERMA_LINK = c.getColumnIndexOrThrow(Things.COLUMN_PERMA_LINK);
-            INDEX_SCORE = c.getColumnIndexOrThrow(Things.COLUMN_SCORE);
-            INDEX_SELF = c.getColumnIndexOrThrow(Things.COLUMN_SELF);
-            INDEX_SUBREDDIT = c.getColumnIndexOrThrow(Things.COLUMN_SUBREDDIT);
-            INDEX_TITLE = c.getColumnIndexOrThrow(Things.COLUMN_TITLE);
-            INDEX_THING_ID = c.getColumnIndexOrThrow(Things.COLUMN_THING_ID);
-            INDEX_THUMBNAIL_URL = c.getColumnIndexOrThrow(Things.COLUMN_THUMBNAIL_URL);
-            INDEX_UPS = c.getColumnIndexOrThrow(Things.COLUMN_UPS);
-            INDEX_URL = c.getColumnIndexOrThrow(Things.COLUMN_URL);
-            INDEX_VOTE = c.getColumnIndexOrThrow(Things.COLUMN_VOTE);
-        }
-    }
 
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final long nowTimeMs = System.currentTimeMillis();
@@ -213,8 +191,32 @@ public class ThingAdapter extends CursorAdapter {
         return null;
     }
 
+    private static void initColumnIndices(Cursor c) {
+        if (INDEX_ID == -1) {
+            INDEX_ID = c.getColumnIndexOrThrow(Things._ID);
+            INDEX_AUTHOR = c.getColumnIndexOrThrow(Things.COLUMN_AUTHOR);
+            INDEX_CREATED_UTC = c.getColumnIndexOrThrow(Things.COLUMN_CREATED_UTC);
+            INDEX_DOMAIN = c.getColumnIndexOrThrow(Things.COLUMN_DOMAIN);
+            INDEX_DOWNS = c.getColumnIndexOrThrow(Things.COLUMN_DOWNS);
+            INDEX_KIND = c.getColumnIndexOrThrow(Things.COLUMN_KIND);
+            INDEX_LIKES = c.getColumnIndexOrThrow(Things.COLUMN_LIKES);
+            INDEX_NUM_COMMENTS = c.getColumnIndexOrThrow(Things.COLUMN_NUM_COMMENTS);
+            INDEX_OVER_18 = c.getColumnIndexOrThrow(Things.COLUMN_OVER_18);
+            INDEX_PERMA_LINK = c.getColumnIndexOrThrow(Things.COLUMN_PERMA_LINK);
+            INDEX_SCORE = c.getColumnIndexOrThrow(Things.COLUMN_SCORE);
+            INDEX_SELF = c.getColumnIndexOrThrow(Things.COLUMN_SELF);
+            INDEX_SUBREDDIT = c.getColumnIndexOrThrow(Things.COLUMN_SUBREDDIT);
+            INDEX_TITLE = c.getColumnIndexOrThrow(Things.COLUMN_TITLE);
+            INDEX_THING_ID = c.getColumnIndexOrThrow(Things.COLUMN_THING_ID);
+            INDEX_THUMBNAIL_URL = c.getColumnIndexOrThrow(Things.COLUMN_THUMBNAIL_URL);
+            INDEX_UPS = c.getColumnIndexOrThrow(Things.COLUMN_UPS);
+            INDEX_URL = c.getColumnIndexOrThrow(Things.COLUMN_URL);
+            INDEX_VOTE = c.getColumnIndexOrThrow(Things.COLUMN_VOTE);
+        }
+    }
+
     private static Bundle makeBundle(Cursor c) {
-        Bundle b = new Bundle(PROJECTION.length - 1);
+        Bundle b = new Bundle(PROJECTION.length);
         b.putLong(Things._ID, c.getLong(INDEX_THING_ID));
         b.putString(Things.COLUMN_AUTHOR, c.getString(INDEX_AUTHOR));
         b.putLong(Things.COLUMN_CREATED_UTC, c.getLong(INDEX_CREATED_UTC));

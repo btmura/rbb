@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.database;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.provider.BaseColumns;
 
 public class Comments implements BaseColumns {
@@ -61,16 +62,32 @@ public class Comments implements BaseColumns {
                 + COLUMN_AUTHOR + " TEXT NOT NULL, "
                 + COLUMN_BODY + " TEXT DEFAULT '', "
                 + COLUMN_CREATED_UTC + " INTEGER NOT NULL, "
-                + COLUMN_DOWNS + " INTEGER NOT NULL, "
+                + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
                 + COLUMN_KIND + " INTEGER NOT NULL, "
-                + COLUMN_LIKES + " INTEGER NOT NULL, "
+                + COLUMN_LIKES + " INTEGER DEFAULT 0, "
                 + COLUMN_NESTING + " INTEGER NOT NULL, "
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "
                 + COLUMN_SEQUENCE + " INTEGER NOT NULL, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
                 + COLUMN_THING_ID + " TEXT, "
-                + COLUMN_TITLE + " TEXT DEFAULT '', "
-                + COLUMN_UPS + " INTEGER NOT NULL)");
+                + COLUMN_TITLE + " TEXT, "
+                + COLUMN_UPS + " INTEGER DEFAULT 0)");
+    }
+
+    public static String getAuthor(Bundle bundle) {
+        return Things.getString(bundle, COLUMN_AUTHOR);
+    }
+
+    public static int getNesting(Bundle bundle) {
+        return Things.getInt(bundle, COLUMN_NESTING);
+    }
+
+    public static int getSequence(Bundle bundle) {
+        return Things.getInt(bundle, COLUMN_SEQUENCE);
+    }
+
+    public static String getSessionId(Bundle bundle) {
+        return Things.getString(bundle, COLUMN_SESSION_ID);
     }
 }

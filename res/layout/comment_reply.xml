@@ -20,7 +20,7 @@
     android:columnCount="1" >
 
     <EditText
-        android:id="@+id/reply"
+        android:id="@+id/body_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/padding"
