@@ -40,6 +40,7 @@ public class CommentAdapter extends CursorAdapter {
             Comments.COLUMN_LIKES,
             Comments.COLUMN_NESTING,
             Comments.COLUMN_NUM_COMMENTS,
+            Comments.COLUMN_SEQUENCE,
             Comments.COLUMN_TITLE,
             Comments.COLUMN_THING_ID,
             Comments.COLUMN_UPS,
@@ -54,6 +55,7 @@ public class CommentAdapter extends CursorAdapter {
     private static int INDEX_LIKES;
     private static int INDEX_NESTING;
     private static int INDEX_NUM_COMMENTS;
+    private static int INDEX_SEQUENCE;
     private static int INDEX_TITLE;
     private static int INDEX_THING_ID;
     private static int INDEX_UPS;
@@ -69,6 +71,7 @@ public class CommentAdapter extends CursorAdapter {
             INDEX_LIKES = c.getColumnIndexOrThrow(Comments.COLUMN_LIKES);
             INDEX_NESTING = c.getColumnIndexOrThrow(Comments.COLUMN_NESTING);
             INDEX_NUM_COMMENTS = c.getColumnIndexOrThrow(Comments.COLUMN_NUM_COMMENTS);
+            INDEX_SEQUENCE = c.getColumnIndexOrThrow(Comments.COLUMN_SEQUENCE);
             INDEX_TITLE = c.getColumnIndexOrThrow(Comments.COLUMN_TITLE);
             INDEX_THING_ID = c.getColumnIndexOrThrow(Comments.COLUMN_THING_ID);
             INDEX_UPS = c.getColumnIndexOrThrow(Comments.COLUMN_UPS);
@@ -125,6 +128,34 @@ public class CommentAdapter extends CursorAdapter {
 
         CommentView cv = (CommentView) view;
         cv.setOnVoteListener(listener);
-        cv.setData(author, body, createdUtc, downs, kind, likes, nesting, nowTimeMs, numComments, title, thingId, ups);
+        cv.setData(author, body, createdUtc, downs, kind, likes, nesting, nowTimeMs, numComments,
+                title, thingId, ups);
+    }
+
+    public String getAuthor(int position) {
+        Cursor c = getCursor();
+        if (c != null && c.moveToPosition(position)) {
+            initColumnIndices(c);
+            return c.getString(INDEX_AUTHOR);
+        }
+        return null;
+    }
+
+    public int getSequence(int position) {
+        Cursor c = getCursor();
+        if (c != null && c.moveToPosition(position)) {
+            initColumnIndices(c);
+            return c.getInt(INDEX_SEQUENCE);
+        }
+        return -1;
+    }
+
+    public String getThingId(int position) {
+        Cursor c = getCursor();
+        if (c != null && c.moveToPosition(position)) {
+            initColumnIndices(c);
+            return c.getString(INDEX_THING_ID);
+        }
+        return null;
     }
 }

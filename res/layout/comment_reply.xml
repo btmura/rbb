@@ -17,20 +17,18 @@
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:columnCount="1"
-    android:paddingBottom="@dimen/padding"
-    android:paddingLeft="@dimen/padding"
-    android:paddingRight="@dimen/padding"
-    android:paddingTop="@dimen/padding" >
-
-    <Spinner
-        android:id="@+id/account_spinner"
-        android:layout_gravity="fill_horizontal"
-        android:layout_marginBottom="@dimen/element_padding" />
+    android:columnCount="1" >
 
     <EditText
-        android:id="@+id/text"
+        android:id="@+id/reply"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding"
+        android:hint="@string/comment_reply_hint" />
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/ok_button_bar" />
 
 </GridLayout>

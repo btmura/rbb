@@ -25,6 +25,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -133,7 +134,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_reply:
-                handleReply();
+                handleReply(mode);
                 return true;
 
             default:
@@ -141,7 +142,26 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         }
     }
 
-    private void handleReply() {
+    private void handleReply(ActionMode mode) {
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int position = -1;
+        int size = checked.size();
+        for (int i = 0; i < size; i++) {
+            if (checked.get(i)) {
+                position = i;
+                break;
+            }
+        }
+
+        if (position != -1) {
+            String author = adapter.getAuthor(position);
+            int sequence = adapter.getSequence(position);
+            String thingId = adapter.getThingId(position);
+            CommentReplyFragment frag = CommentReplyFragment.newInstance(author, sequence, thingId);
+            frag.show(getFragmentManager(), CommentReplyFragment.TAG);
+        }
+
+        mode.finish();
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
