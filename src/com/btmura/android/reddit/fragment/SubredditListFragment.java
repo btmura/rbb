@@ -38,7 +38,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.database.Subreddits;
@@ -50,7 +50,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         MultiChoiceModeListener {
 
     public static final String TAG = "SubredditListFragment";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
@@ -103,7 +102,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         selectedSubreddit = bundle.getParcelable(ARG_SELECTED_SUBREDDIT);
         query = bundle.getString(ARG_QUERY);
         flags = bundle.getInt(ARG_FLAGS);
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreate an:" + accountName + " ss:" + selectedSubreddit
                     + " q:" + query + " f:" + flags);
         }
@@ -130,7 +129,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public void loadIfPossible() {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadIfPossible an:" + accountName + " ss:" + selectedSubreddit
                     + " q:" + query + " f:" + flags);
         }
@@ -311,7 +310,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onSaveInstanceState an:" + accountName + " ss:" + selectedSubreddit
                     + " q:" + query + " f:" + flags);
         }
@@ -330,7 +329,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public void setSelectedSubreddit(Subreddit subreddit) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "setSelectedSubreddit subreddit:" + subreddit);
         }
         this.selectedSubreddit = subreddit;

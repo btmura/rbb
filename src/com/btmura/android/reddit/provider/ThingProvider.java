@@ -31,7 +31,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
@@ -40,7 +40,6 @@ import com.btmura.android.reddit.util.ArrayUtils;
 public class ThingProvider extends BaseProvider {
 
     public static final String TAG = "ThingProvider";
-    public static boolean DEBUG = Debug.DEBUG;
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
@@ -72,7 +71,7 @@ public class ThingProvider extends BaseProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "query uri: " + uri);
         }
         if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
@@ -121,7 +120,7 @@ public class ThingProvider extends BaseProvider {
                 }
                 db.setTransactionSuccessful();
 
-                if (DEBUG) {
+                if (BuildConfig.DEBUG) {
                     long t2 = System.currentTimeMillis();
                     Log.d(TAG, "db: " + (t2 - t1));
                 }
@@ -144,7 +143,7 @@ public class ThingProvider extends BaseProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "insert");
         }
         SQLiteDatabase db = helper.getWritableDatabase();

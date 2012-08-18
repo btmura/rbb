@@ -29,7 +29,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Subreddits;
@@ -37,7 +37,6 @@ import com.btmura.android.reddit.database.Subreddits;
 public class SyncOperationService extends IntentService {
 
     public static final String TAG = "SyncOperationService";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final String[] PROJECTION = {
             Subreddits.COLUMN_ACCOUNT,
@@ -53,7 +52,7 @@ public class SyncOperationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onHandleIntent data:" + intent.getDataString());
         }
 
@@ -73,7 +72,7 @@ public class SyncOperationService extends IntentService {
                 String subreddit = c.getString(1);
                 int state = c.getInt(2);
 
-                if (DEBUG) {
+                if (BuildConfig.DEBUG) {
                     Log.d(TAG, "onHandleIntent an: " + accountName + " s: " + subreddit
                             + " st: " + state);
                 }
@@ -95,7 +94,7 @@ public class SyncOperationService extends IntentService {
                     values.put(Subreddits.COLUMN_EXPIRATION, System.currentTimeMillis()
                             + EXPIRATION_PADDING);
                     int count = cr.update(intent.getData(), values, null, null);
-                    if (DEBUG) {
+                    if (BuildConfig.DEBUG) {
                         Log.d(TAG, "updated: " + count);
                     }
                 }

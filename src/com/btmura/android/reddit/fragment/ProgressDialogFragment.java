@@ -23,12 +23,9 @@ import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 
-import com.btmura.android.reddit.Debug;
-
 public class ProgressDialogFragment extends DialogFragment {
 
     public static final String TAG = "ProgressDialogFragment";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final String ARG_MESSAGE = "m";
 

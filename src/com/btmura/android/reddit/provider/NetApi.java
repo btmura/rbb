@@ -34,7 +34,7 @@ import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.LoginResult;
 import com.btmura.android.reddit.entity.SubmitResult;
@@ -43,7 +43,6 @@ import com.btmura.android.reddit.entity.Subreddit;
 public class NetApi {
 
     public static final String TAG = "NetApi";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final String CHARSET = "UTF-8";
     private static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset="
@@ -183,7 +182,7 @@ public class NetApi {
 
             writeFormData(conn, Urls.subscribeQuery(modhash, subreddit, subscribe));
             in = conn.getInputStream();
-            if (DEBUG) {
+            if (BuildConfig.DEBUG) {
                 logResponse(in);
             }
         } finally {
@@ -204,7 +203,7 @@ public class NetApi {
 
             writeFormData(conn, Urls.voteQuery(modhash, name, vote));
             in = conn.getInputStream();
-            if (DEBUG) {
+            if (BuildConfig.DEBUG) {
                 logResponse(in);
             }
         } finally {

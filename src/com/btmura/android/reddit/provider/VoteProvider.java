@@ -27,14 +27,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.ArrayUtils;
 
 public class VoteProvider extends BaseProvider {
 
     public static final String TAG = "VoteProvider";
-    public static boolean DEBUG = Debug.DEBUG;
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.votes";
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
@@ -59,7 +58,7 @@ public class VoteProvider extends BaseProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "query uri: " + uri);
         }
         int match = MATCHER.match(uri);
@@ -79,7 +78,7 @@ public class VoteProvider extends BaseProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "insert uri: " + uri);
         }
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -99,7 +98,7 @@ public class VoteProvider extends BaseProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "update uri: " + uri);
         }
         int match = MATCHER.match(uri);
@@ -125,7 +124,7 @@ public class VoteProvider extends BaseProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "delete uri: " + uri);
         }
         int match = MATCHER.match(uri);
@@ -184,10 +183,10 @@ public class VoteProvider extends BaseProvider {
                         selectionArgs);
                 if (count == 0) {
                     Uri insertUri = cr.insert(uri, values);
-                    if (DEBUG) {
+                    if (BuildConfig.DEBUG) {
                         Log.d(TAG, "inserted: " + insertUri);
                     }
-                } else if (DEBUG) {
+                } else if (BuildConfig.DEBUG) {
                     Log.d(TAG, "updated: " + count);
                 }
             }

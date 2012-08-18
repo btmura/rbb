@@ -36,7 +36,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
@@ -46,7 +46,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         MultiChoiceModeListener, OnVoteListener {
 
     public static final String TAG = "CommentListFragment";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final String ARG_ACCOUNT_NAME = "an";
     private static final String ARG_THING_ID = "ti";
@@ -110,7 +109,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public void onVote(String thingId, int likes) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLike thingId: " + thingId + " likes: " + likes);
         }
         if (!TextUtils.isEmpty(accountName)) {

@@ -24,13 +24,12 @@ import java.util.ArrayList;
 import android.util.JsonReader;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.entity.SubmitResult;
 
 class SubmitParser {
 
     public static final String TAG = "SubmitParser";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     static SubmitResult parse(InputStream in) throws IOException {
         SubmitResult result = new SubmitResult();
@@ -41,7 +40,7 @@ class SubmitParser {
             if ("json".equals(name)) {
                 parseJson(reader, result);
             } else {
-                if (DEBUG) {
+                if (BuildConfig.DEBUG) {
                     Log.d(TAG, name);
                 }
                 reader.skipValue();
@@ -63,7 +62,7 @@ class SubmitParser {
             } else if ("errors".equals(name)) {
                 parseErrors(reader, result);
             } else {
-                if (DEBUG) {
+                if (BuildConfig.DEBUG) {
                     Log.d(TAG, name);
                 }
                 reader.skipValue();

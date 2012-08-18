@@ -29,7 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -39,7 +39,6 @@ import com.btmura.android.reddit.provider.SubredditProvider;
 public class SettingsActivity extends PreferenceActivity implements LoaderCallbacks<AccountResult> {
 
     public static final String TAG = "SettingsActivity";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final String[] AUTHORITIES = {
             SubredditProvider.AUTHORITY,
@@ -75,7 +74,7 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
 
     @Override
     public void onBuildHeaders(List<Header> target) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onBuildHeaders");
         }
         loadHeadersFromResource(R.xml.settings_headers, target);

@@ -30,7 +30,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Votes;
@@ -39,7 +39,6 @@ import com.btmura.android.reddit.util.ArrayUtils;
 public class CommentProvider extends BaseProvider {
 
     public static final String TAG = "CommentProvider";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.comments";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/");
@@ -66,7 +65,7 @@ public class CommentProvider extends BaseProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "query uri: " + uri);
         }
 
@@ -109,7 +108,7 @@ public class CommentProvider extends BaseProvider {
                 db.endTransaction();
                 db.close();
             }
-            if (DEBUG) {
+            if (BuildConfig.DEBUG) {
                 long t2 = System.currentTimeMillis();
                 Log.d(TAG, "db: " + (t2 - t1));
             }
@@ -128,7 +127,7 @@ public class CommentProvider extends BaseProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "insert");
         }
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -142,7 +141,7 @@ public class CommentProvider extends BaseProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "update");
         }
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -155,7 +154,7 @@ public class CommentProvider extends BaseProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "delete");
         }
         SQLiteDatabase db = helper.getWritableDatabase();

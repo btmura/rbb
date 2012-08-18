@@ -39,14 +39,13 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Subreddits;
 
 public class SyncAdapterService extends Service {
 
     public static final String TAG = "SyncAdapterService";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final String[] PROJECTION = {
             Subreddits._ID,
@@ -194,7 +193,7 @@ public class SyncAdapterService extends Service {
                 syncResult.databaseError = true;
             }
 
-            if (DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.d(TAG, "an:" + account.name + " sr:" + syncResult.toString());
             }
         }

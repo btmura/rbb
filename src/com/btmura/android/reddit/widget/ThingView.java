@@ -24,14 +24,12 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.RelativeTime;
 
 public class ThingView extends View implements OnGestureListener {
 
     public static final String TAG = "ThingView";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     private static float FONT_SCALE;
     private static int PADDING;

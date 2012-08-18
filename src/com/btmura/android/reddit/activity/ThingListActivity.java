@@ -27,7 +27,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -45,7 +45,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
         SubredditNameHolder {
 
     public static final String TAG = "ThingListActivity";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final String EXTRA_SUBREDDIT = "s";
     public static final String EXTRA_FLAGS = "f";
@@ -108,7 +107,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onNavigationItemSelected i:" + itemPosition);
         }
 

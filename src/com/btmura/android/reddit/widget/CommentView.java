@@ -38,7 +38,7 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.RelativeTime;
@@ -47,7 +47,6 @@ import com.btmura.android.reddit.database.Comments;
 public class CommentView extends View implements OnGestureListener {
 
     public static final String TAG = "CommentView";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     private static float FONT_SCALE;
 
@@ -322,12 +321,12 @@ public class CommentView extends View implements OnGestureListener {
             int offset = bodyLayout.getOffsetForHorizontal(line, localX);
             float right = bodyBounds.left + bodyLayout.getLineRight(line);
 
-            if (DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.d(TAG, "b: " + bodyBounds + " x: " + e.getX() + " y: " + e.getY());
             }
 
             if (localX > right) {
-                if (DEBUG) {
+                if (BuildConfig.DEBUG) {
                     Log.d(TAG, "lx: " + localX + " r: " + right);
                 }
                 return false;

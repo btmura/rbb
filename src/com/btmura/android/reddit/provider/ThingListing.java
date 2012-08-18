@@ -31,7 +31,7 @@ import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
@@ -40,7 +40,6 @@ import com.btmura.android.reddit.database.Things;
 class ThingListing extends JsonParser {
 
     public static final String TAG = "ThingListing";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
 
@@ -69,7 +68,7 @@ class ThingListing extends JsonParser {
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingObject(reader);
-            if (DEBUG) {
+            if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();
                 Log.d(TAG, "net: " + (t2 - t1) + " parse: " + (t3 - t2));
             }

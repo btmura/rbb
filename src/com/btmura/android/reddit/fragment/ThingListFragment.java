@@ -37,7 +37,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.data.Flag;
@@ -52,7 +52,6 @@ public class ThingListFragment extends ListFragment implements
         OnVoteListener {
 
     public static final String TAG = "ThingListFragment";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
@@ -135,7 +134,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public void loadIfPossible() {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadIfPossible an:" + accountName + " s:" + subreddit
                     + " q:" + query + " f:" + filter);
         }
@@ -145,7 +144,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoder " + args);
         }
         String accountName = getAccountName();
@@ -156,7 +155,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor things) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished " + (things != null ? things.getCount() : -1));
         }
 
@@ -206,7 +205,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public void onVote(String thingId, int likes) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLike id: " + thingId + " likes: " + likes);
         }
         if (!TextUtils.isEmpty(accountName)) {

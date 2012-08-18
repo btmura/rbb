@@ -25,7 +25,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.Subreddit;
@@ -39,7 +39,6 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
         OnSearchQuerySubmittedListener {
 
     public static final String TAG = "SearchActivity";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final String EXTRA_QUERY = "q";
 
@@ -133,7 +132,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onTabSelected t:" + tab.getText() + " e:" + tabListenerEnabled);
         }
         if (tabListenerEnabled) {
@@ -142,7 +141,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onTabReselected t:" + tab.getText() + " e:" + tabListenerEnabled);
         }
         if (tabListenerEnabled && !isSinglePane) {

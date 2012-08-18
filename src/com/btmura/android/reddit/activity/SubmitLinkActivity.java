@@ -38,7 +38,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.btmura.android.reddit.Debug;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader;
@@ -53,7 +52,6 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
         OnItemSelectedListener, OnCaptchaGuessListener {
 
     public static final String TAG = "SubmitLinkActivity";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     private AccountSpinnerAdapter adapter;
 

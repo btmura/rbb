@@ -28,7 +28,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
@@ -37,7 +37,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         OnAccountsUpdateListener {
 
     public static final String TAG = "AccountLoader";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     public static class AccountResult {
         public String[] accountNames;
@@ -90,7 +89,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     @Override
     public AccountResult loadInBackground() {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
 

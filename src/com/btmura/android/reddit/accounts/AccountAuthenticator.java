@@ -26,13 +26,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 
 public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
     public static final String TAG = "AccountAuthenticator";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     public static final String AUTH_TOKEN_COOKIE = "cookie";
     public static final String AUTH_TOKEN_MODHASH = "modhash";
@@ -52,7 +51,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType,
             String authTokenType, String[] requiredFeatures, Bundle options)
             throws NetworkErrorException {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "addAccount");
         }
 
@@ -67,7 +66,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     @Override
     public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account,
             Bundle options) throws NetworkErrorException {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "confirmCredentials");
         }
         return null;
@@ -75,7 +74,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle editProperties(AccountAuthenticatorResponse response, String accountType) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "editProperties");
         }
         return null;
@@ -84,7 +83,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     @Override
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account,
             String authTokenType, Bundle options) throws NetworkErrorException {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "getAuthToken");
         }
         return null;
@@ -92,7 +91,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public String getAuthTokenLabel(String authTokenType) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "getAuthTokenLabel");
         }
         return null;
@@ -101,7 +100,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     @Override
     public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account,
             String[] features) throws NetworkErrorException {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "hasFeatures");
         }
         return null;
@@ -110,7 +109,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     @Override
     public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account,
             String authTokenType, Bundle options) throws NetworkErrorException {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "updateCredentials");
         }
         return null;

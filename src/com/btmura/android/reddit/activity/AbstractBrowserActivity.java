@@ -40,7 +40,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -67,7 +67,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ThingPagerHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     private static final int ANIMATION_OPEN_NAV = 0;
     private static final int ANIMATION_CLOSE_NAV = 1;
@@ -105,7 +104,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             StrictMode.enableDefaults();
         }
         super.onCreate(savedInstanceState);
@@ -219,7 +218,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void setSubredditListNavigationMultiPane(Subreddit subreddit, String query) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "setSubredditListNavigation q:" + query);
         }
         safePopBackStackImmediate();
@@ -251,7 +250,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void setThingListNavigation(String query) {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "setThingListNavigation q:" + query);
         }
         safePopBackStackImmediate();
@@ -463,7 +462,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private void refreshCheckedItems() {
         ControlFragment cf = getControlFragment();
 
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "refreshCheckedItems subreddit:" + cf.getSubreddit());
         }
 

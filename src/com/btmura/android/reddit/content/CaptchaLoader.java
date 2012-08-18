@@ -23,13 +23,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.btmura.android.reddit.Debug;
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.provider.NetApi;
 
 public class CaptchaLoader extends AsyncTaskLoader<Bitmap> {
 
     public static final String TAG = "CaptchaLoader";
-    public static final boolean DEBUG = Debug.DEBUG;
 
     private final String captchaId;
 
@@ -42,7 +41,7 @@ public class CaptchaLoader extends AsyncTaskLoader<Bitmap> {
 
     @Override
     public Bitmap loadInBackground() {
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
         try {

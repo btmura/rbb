@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -116,7 +117,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         int filter = adapter.getFilter();
         AccountLoader.setLastFilter(prefs, filter);
 
-        if (DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(TAG, "onNavigationItemSelected i:" + itemPosition
                     + " an:" + accountName + " f:" + filter);
         }
