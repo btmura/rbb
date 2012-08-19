@@ -25,7 +25,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.data.RelativeTime;
+import com.btmura.android.reddit.text.RelativeTime;
 
 public class ThingView extends View implements OnGestureListener {
 
