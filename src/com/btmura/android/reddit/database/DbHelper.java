@@ -46,8 +46,9 @@ public class DbHelper extends SQLiteOpenHelper {
             if (version > 1) {
                 createSubredditsV2(db);
                 Comments.createTable(db);
-                Votes.createTable(db);
+                Replies.createTable(db);
                 Things.createTable(db);
+                Votes.createTable(db);
             } else {
                 createSubredditsV1(db);
             }
@@ -115,8 +116,9 @@ public class DbHelper extends SQLiteOpenHelper {
             try {
                 upgradeSubredditsV2(db);
                 Comments.createTable(db);
-                Votes.createTable(db);
+                Replies.createTable(db);
                 Things.createTable(db);
+                Votes.createTable(db);
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
