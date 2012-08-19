@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.data;
+package com.btmura.android.reddit.net;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;

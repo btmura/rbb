@@ -32,8 +32,8 @@ import android.util.JsonToken;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.JsonParser;
 

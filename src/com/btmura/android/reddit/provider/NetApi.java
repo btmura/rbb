@@ -35,10 +35,10 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.entity.LoginResult;
 import com.btmura.android.reddit.entity.SubmitResult;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.net.Urls;
 
 public class NetApi {
 

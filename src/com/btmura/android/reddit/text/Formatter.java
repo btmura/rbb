@@ -19,7 +19,7 @@ package com.btmura.android.reddit.text;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.btmura.android.reddit.data.Urls;
+import com.btmura.android.reddit.net.Urls;
 
 import android.content.Context;
 import android.graphics.Typeface;
