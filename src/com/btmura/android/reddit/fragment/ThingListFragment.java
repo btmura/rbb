@@ -42,6 +42,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.data.Flag;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
@@ -64,7 +65,7 @@ public class ThingListFragment extends ListFragment implements
     private static final String STATE_THING_NAME = "n";
     private static final String STATE_THING_POSITION = "p";
 
-    private static final String LOADER_ARG_MORE_KEY = "m";
+    private static final String LOADER_ARG_MORE = "m";
 
     public interface OnThingSelectedListener {
         void onThingSelected(Bundle thingBundle, int position);
@@ -73,6 +74,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private String accountName;
+    private String sessionId;
     private Subreddit subreddit;
     private int filter;
     private String query;
@@ -81,7 +83,8 @@ public class ThingListFragment extends ListFragment implements
     private OnThingSelectedListener listener;
     private boolean scrollLoading;
 
-    public static ThingListFragment newInstance(String accountName, Subreddit subreddit, int filter,
+    public static ThingListFragment newInstance(String accountName, Subreddit subreddit,
+            int filter,
             String query, int flags) {
         Bundle args = new Bundle(5);
         args.putString(ARG_ACCOUNT_NAME, accountName);
@@ -111,6 +114,7 @@ public class ThingListFragment extends ListFragment implements
         filter = b.getInt(ARG_FILTER);
         query = b.getString(ARG_QUERY);
 
+        sessionId = Subreddit.getName(subreddit) + "-" + System.currentTimeMillis();
         adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), this);
         setHasOptionsMenu(true);
     }
@@ -145,22 +149,29 @@ public class ThingListFragment extends ListFragment implements
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onCreateLoder " + args);
+            Log.d(TAG, "onCreateLoader args: " + args);
         }
         String accountName = getAccountName();
         String subredditName = Subreddit.getName(subreddit);
-        String more = args != null ? args.getString(LOADER_ARG_MORE_KEY) : null;
-        Uri uri = ThingAdapter.createUri(accountName, subredditName, filter, more, true);
-        return ThingAdapter.createLoader(getActivity(), uri, accountName, subredditName);
+        String more = args != null ? args.getString(LOADER_ARG_MORE) : null;
+        if (more != null) {
+            // ThingProvider uses a cursor that deletes its data after it is
+            // closed. Don't delete the data if we are appending more data to
+            // it. This call shouldn't be here, but I'm not sure where else to
+            // put it at this point.
+            ThingProvider.cancelDeletion(adapter.getCursor());
+        }
+        Uri uri = ThingAdapter.createUri(accountName, sessionId, subredditName, filter, more, true);
+        return ThingAdapter.createLoader(getActivity(), uri, sessionId);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor things) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onLoadFinished " + (things != null ? things.getCount() : -1));
+            Log.d(TAG, "onLoadFinished count: " + (things != null ? things.getCount() : -1));
         }
 
-        Uri uri = ThingAdapter.createUri(getAccountName(), Subreddit.getName(subreddit), filter,
-                null, false);
+        Uri uri = ThingAdapter.createUri(getAccountName(), sessionId, Subreddit.getName(subreddit),
+                filter, null, false);
         CursorLoader cursorLoader = (CursorLoader) loader;
         cursorLoader.setUri(uri);
 
@@ -196,7 +207,7 @@ public class ThingListFragment extends ListFragment implements
                     if (!TextUtils.isEmpty(more)) {
                         scrollLoading = true;
                         Bundle b = new Bundle(1);
-                        b.putString(LOADER_ARG_MORE_KEY, more);
+                        b.putString(LOADER_ARG_MORE, more);
                         getLoaderManager().restartLoader(0, b, this);
                     }
                 }

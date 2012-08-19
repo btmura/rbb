@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 
-
 public class Things implements BaseColumns, SyncColumns {
     public static final String TABLE_NAME = "things";
 
@@ -36,9 +35,9 @@ public class Things implements BaseColumns, SyncColumns {
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_OVER_18 = "over18";
-    public static final String COLUMN_PARENT = "parent";
     public static final String COLUMN_PERMA_LINK = "permaLink";
     public static final String COLUMN_SCORE = "score";
+    public static final String COLUMN_SESSION_ID = "sessionId";
     public static final String COLUMN_SELF = "self";
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_TITLE = "title";
@@ -51,10 +50,11 @@ public class Things implements BaseColumns, SyncColumns {
     public static final int KIND_THING = 0;
     public static final int KIND_MORE = 1;
 
-    public static final String SELECTION_BY_ACCOUNT_AND_PARENT =
-            COLUMN_ACCOUNT + " = ? AND " + COLUMN_PARENT + " = ?";
-    public static final String SELECTION_BY_ACCOUNT_AND_PARENT_AND_MORE =
-            SELECTION_BY_ACCOUNT_AND_PARENT + " AND " + COLUMN_KIND + " = " + KIND_MORE;
+    public static final String SELECTION_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
+
+    // TODO: Do we need an index for sessionId and more?
+    public static final String SELECTION_BY_SESSION_ID_AND_MORE =
+            SELECTION_BY_SESSION_ID + " AND " + COLUMN_KIND + " = " + KIND_MORE;
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
@@ -68,22 +68,16 @@ public class Things implements BaseColumns, SyncColumns {
                 + COLUMN_LIKES + " INTEGER DEFAULT 0, "
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
-                + COLUMN_PARENT + " TEXT NOT NULL, "
                 + COLUMN_PERMA_LINK + " TEXT, "
                 + COLUMN_SCORE + " INTEGER DEFAULT 0, "
                 + COLUMN_SELF + " INTEGER DEFAULT 0, "
+                + COLUMN_SESSION_ID + " TEXT NOT NULL, "
                 + COLUMN_SUBREDDIT + " TEXT, "
                 + COLUMN_TITLE + " TEXT, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
                 + COLUMN_THUMBNAIL_URL + " TEXT, "
                 + COLUMN_UPS + " INTEGER DEFAULT 0, "
                 + COLUMN_URL + " TEXT)");
-    }
-
-    // TODO: Rename this method.
-    public static String getId(String name) {
-        int sepIndex = name.indexOf('_');
-        return name.substring(sepIndex + 1);
     }
 
     public static String getSubreddit(Bundle thingBundle) {

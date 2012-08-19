@@ -83,11 +83,13 @@ public class ThingAdapter extends CursorAdapter {
     private final OnVoteListener listener;
     private int thingBodyWidth;
 
-    public static Uri createUri(String accountName, String subredditName, int filter, String more,
+    public static Uri createUri(String accountName, String sessionId, String subredditName,
+            int filter, String more,
             boolean sync) {
         Uri.Builder b = ThingProvider.CONTENT_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(sync))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
+                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
                 .appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subredditName)
                 .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
         if (!TextUtils.isEmpty(more)) {
@@ -96,10 +98,9 @@ public class ThingAdapter extends CursorAdapter {
         return b.build();
     }
 
-    public static CursorLoader createLoader(Context context, Uri uri, String accountName,
-            String subredditName) {
-        return new CursorLoader(context, uri, PROJECTION, Things.SELECTION_BY_ACCOUNT_AND_PARENT,
-                ArrayUtils.toArray(accountName, subredditName), null);
+    public static CursorLoader createLoader(Context context, Uri uri, String sessionId) {
+        return new CursorLoader(context, uri, PROJECTION, Things.SELECTION_BY_SESSION_ID,
+                ArrayUtils.toArray(sessionId), null);
     }
 
     public ThingAdapter(Context context, String parentSubreddit, OnVoteListener listener) {

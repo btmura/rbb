@@ -46,18 +46,19 @@ class ThingListing extends JsonParser {
     private final Formatter formatter = new Formatter();
     private final Context context;
     private final String accountName;
-    private final String cookie;
-    private final String subredditName;
+    private final String sessionId;
     private final URL url;
+    private final String cookie;
+
     private String moreThingId;
 
-    ThingListing(Context context, String accountName, String cookie, String subredditName,
-            int filter, String more) {
+    ThingListing(Context context, String accountName, String sessionId, String subredditName,
+            int filter, String more, String cookie) {
         this.context = context;
         this.accountName = accountName;
-        this.cookie = cookie;
-        this.subredditName = subredditName;
+        this.sessionId = sessionId;
         this.url = Urls.subredditUrl(subredditName, filter, more);
+        this.cookie = cookie;
     }
 
     public void process() throws IOException {
@@ -83,7 +84,7 @@ class ThingListing extends JsonParser {
         ContentValues v = new ContentValues(20);
         v.put(Things.COLUMN_KIND, Things.KIND_THING);
         v.put(Things.COLUMN_ACCOUNT, accountName);
-        v.put(Things.COLUMN_PARENT, subredditName);
+        v.put(Things.COLUMN_SESSION_ID, sessionId);
         values.add(v);
     }
 
@@ -189,7 +190,7 @@ class ThingListing extends JsonParser {
             ContentValues v = new ContentValues(4);
             v.put(Things.COLUMN_KIND, Things.KIND_MORE);
             v.put(Things.COLUMN_ACCOUNT, accountName);
-            v.put(Things.COLUMN_PARENT, subredditName);
+            v.put(Things.COLUMN_SESSION_ID, sessionId);
             v.put(Things.COLUMN_THING_ID, moreThingId);
             values.add(v);
         }

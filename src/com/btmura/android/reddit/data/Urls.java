@@ -61,6 +61,7 @@ public class Urls {
     }
 
     public static URL commentsUrl(String id) {
+        id = removeTag(id);
         return newUrl(resetBuilder().append(BASE_COMMENTS_URL).append(id).append(".json"));
     }
 
@@ -215,5 +216,10 @@ public class Urls {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String removeTag(String id) {
+        int sepIndex = id.indexOf('_');
+        return id.substring(sepIndex + 1);
     }
 }

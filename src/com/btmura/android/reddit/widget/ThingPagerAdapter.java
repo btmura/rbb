@@ -52,7 +52,7 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
 
             case TYPE_COMMENTS:
                 return CommentListFragment.newInstance(accountName,
-                        Things.getId(thingBundle.getString(Things.COLUMN_THING_ID)));
+                        thingBundle.getString(Things.COLUMN_THING_ID));
 
             default:
                 throw new IllegalStateException();

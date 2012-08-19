@@ -28,11 +28,11 @@ import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.SessionCursor;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.ArrayUtils;
@@ -47,6 +47,7 @@ public class ThingProvider extends BaseProvider {
 
     public static final String PARAM_SYNC = "sync";
     public static final String PARAM_ACCOUNT = "account";
+    public static final String PARAM_SESSION_ID = "sessionId";
     public static final String PARAM_SUBREDDIT = "subreddit";
     public static final String PARAM_FILTER = "filter";
     public static final String PARAM_MORE = "more";
@@ -74,18 +75,22 @@ public class ThingProvider extends BaseProvider {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "query uri: " + uri);
         }
+
+        String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
         if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
-            sync(uri);
+            sync(uri, sessionId);
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.query(TABLE_NAME_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, sortOrder);
-        c.setNotificationUri(getContext().getContentResolver(), uri);
-        return c;
+        SessionCursor sc = new SessionCursor(getContext(), ThingProvider.CONTENT_URI,
+                Things.SELECTION_BY_SESSION_ID, ArrayUtils.toArray(sessionId), c);
+        sc.setNotificationUri(getContext().getContentResolver(), uri);
+        return sc;
     }
 
-    private void sync(Uri uri) {
+    private void sync(Uri uri, String sessionId) {
         Cursor c = null;
         try {
             Context context = getContext();
@@ -95,23 +100,18 @@ public class ThingProvider extends BaseProvider {
             String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
             int filter = Integer.parseInt(uri.getQueryParameter(PARAM_FILTER));
             String more = uri.getQueryParameter(PARAM_MORE);
-
-            ThingListing listing = new ThingListing(context, accountName, cookie, subredditName,
-                    filter, more);
+            ThingListing listing = new ThingListing(context, accountName, sessionId, subredditName,
+                    filter, more, cookie);
             listing.process();
 
             long t1 = System.currentTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();
             try {
                 db.beginTransaction();
-                String selection;
-                if (TextUtils.isEmpty(more)) {
-                    selection = Things.SELECTION_BY_ACCOUNT_AND_PARENT;
-                } else {
-                    selection = Things.SELECTION_BY_ACCOUNT_AND_PARENT_AND_MORE;
-                }
-                db.delete(Things.TABLE_NAME, selection,
-                        ArrayUtils.toArray(accountName, subredditName));
+
+                // Delete the loading more element before appending more.
+                db.delete(Things.TABLE_NAME, Things.SELECTION_BY_SESSION_ID_AND_MORE,
+                        ArrayUtils.toArray(sessionId));
 
                 InsertHelper insertHelper = new InsertHelper(db, Things.TABLE_NAME);
                 int count = listing.values.size();
@@ -119,14 +119,13 @@ public class ThingProvider extends BaseProvider {
                     insertHelper.insert(listing.values.get(i));
                 }
                 db.setTransactionSuccessful();
-
-                if (BuildConfig.DEBUG) {
-                    long t2 = System.currentTimeMillis();
-                    Log.d(TAG, "db: " + (t2 - t1));
-                }
             } finally {
                 db.endTransaction();
                 db.close();
+            }
+            if (BuildConfig.DEBUG) {
+                long t2 = System.currentTimeMillis();
+                Log.d(TAG, "db: " + (t2 - t1));
             }
         } catch (IOException e) {
             Log.e(TAG, "sync", e);
@@ -178,5 +177,11 @@ public class ThingProvider extends BaseProvider {
     @Override
     public String getType(Uri uri) {
         return null;
+    }
+
+    public static void cancelDeletion(Cursor cursor) {
+        if (cursor != null) {
+            SessionCursor.cancelDeletion(cursor);
+        }
     }
 }

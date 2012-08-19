@@ -51,8 +51,8 @@ public class Comments implements BaseColumns {
     public static final int KIND_MORE = 2;
 
     public static final String SELECTION_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
-    public static final String SELECTION_BY_THING_ID = COLUMN_THING_ID + " = ?";
 
+    // TODO: Do we need an index for sequence and id?
     public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
 
     static void createTable(SQLiteDatabase db) {

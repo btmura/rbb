@@ -68,17 +68,18 @@ public class CommentAdapter extends CursorAdapter {
     private final long nowTimeMs = System.currentTimeMillis();
     private final OnVoteListener listener;
 
-    public static Uri createUri(String accountName, String thingId, boolean sync) {
+    public static Uri createUri(String accountName, String sessionId, String thingId, boolean sync) {
         return CommentProvider.CONTENT_URI.buildUpon()
                 .appendQueryParameter(CommentProvider.PARAM_SYNC, Boolean.toString(sync))
                 .appendQueryParameter(CommentProvider.PARAM_ACCOUNT_NAME, accountName)
+                .appendQueryParameter(CommentProvider.PARAM_SESSION_ID, sessionId)
                 .appendQueryParameter(CommentProvider.PARAM_THING_ID, thingId)
                 .build();
     }
 
-    public static CursorLoader createLoader(Context context, Uri uri, String thingId) {
+    public static CursorLoader createLoader(Context context, Uri uri, String sessionId) {
         return new CursorLoader(context, uri, PROJECTION, Comments.SELECTION_BY_SESSION_ID,
-                ArrayUtils.toArray(thingId), Comments.SORT_BY_SEQUENCE_AND_ID);
+                ArrayUtils.toArray(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
     }
 
     public CommentAdapter(Context context, OnVoteListener listener) {

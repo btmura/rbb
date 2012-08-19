@@ -45,16 +45,17 @@ class CommentListing extends JsonParser {
     private final Formatter formatter = new Formatter();
     private final Context context;
     private final String accountName;
+    private final String sessionId;
     private final String cookie;
-    private final String thingId;
     private final URL url;
 
-    CommentListing(Context context, String accountName, String cookie, String thingId) {
+    CommentListing(Context context, String accountName, String sessionId, String thingId,
+            String cookie) {
         this.context = context;
         this.accountName = accountName;
-        this.cookie = cookie;
-        this.thingId = thingId;
+        this.sessionId = sessionId;
         this.url = Urls.commentsUrl(thingId);
+        this.cookie = cookie;
     }
 
     public void process() throws IOException {
@@ -165,7 +166,7 @@ class CommentListing extends JsonParser {
     @Override
     public void onEntityEnd(int index) {
         values.get(index).put(Comments.COLUMN_ACCOUNT, accountName);
-        values.get(index).put(Comments.COLUMN_SESSION_ID, thingId);
+        values.get(index).put(Comments.COLUMN_SESSION_ID, sessionId);
     }
 
     @Override

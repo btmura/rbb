@@ -33,6 +33,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.SessionCursor;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.ArrayUtils;
 
@@ -45,6 +46,7 @@ public class CommentProvider extends BaseProvider {
 
     public static final String PARAM_SYNC = "sync";
     public static final String PARAM_ACCOUNT_NAME = "accountName";
+    public static final String PARAM_SESSION_ID = "sessionId";
     public static final String PARAM_THING_ID = "thingId";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
@@ -69,18 +71,21 @@ public class CommentProvider extends BaseProvider {
             Log.d(TAG, "query uri: " + uri);
         }
 
+        String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
         if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
-            sync(uri);
+            sync(uri, sessionId);
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.query(COMMENTS_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, sortOrder);
-        c.setNotificationUri(getContext().getContentResolver(), uri);
-        return c;
+        SessionCursor sc = new SessionCursor(getContext(), CommentProvider.CONTENT_URI,
+                Comments.SELECTION_BY_SESSION_ID, ArrayUtils.toArray(sessionId), c);
+        sc.setNotificationUri(getContext().getContentResolver(), uri);
+        return sc;
     }
 
-    private void sync(Uri uri) {
+    private void sync(Uri uri, String sessionId) {
         Cursor c = null;
         try {
             Context context = getContext();
@@ -88,16 +93,14 @@ public class CommentProvider extends BaseProvider {
             String cookie = AccountUtils.getCookie(context, accountName);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
-            CommentListing listing = new CommentListing(context, accountName, cookie, thingId);
+            CommentListing listing = new CommentListing(context, accountName, sessionId, thingId,
+                    cookie);
             listing.process();
 
             long t1 = System.currentTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();
             try {
                 db.beginTransaction();
-                db.delete(Comments.TABLE_NAME, Comments.SELECTION_BY_SESSION_ID,
-                        ArrayUtils.toArray(thingId));
-
                 InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
                 int count = listing.values.size();
                 for (int i = 0; i < count; i++) {
