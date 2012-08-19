@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.data;
+package com.btmura.android.reddit.text;
 
 public class Formatter_EscapedTest extends AbstractFormatterTest {
 

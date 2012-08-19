@@ -40,9 +40,9 @@ import android.view.View;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.data.RelativeTime;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.text.Formatter;
 
 public class CommentView extends View implements OnGestureListener {
 

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.data;
+package com.btmura.android.reddit.text;
+
+import com.btmura.android.reddit.text.Formatter;
 
 public class FormatterTest extends AbstractFormatterTest {
 

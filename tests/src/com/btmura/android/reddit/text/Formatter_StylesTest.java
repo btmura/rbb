@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.data;
+package com.btmura.android.reddit.text;
 
 import android.graphics.Typeface;
 
-import com.btmura.android.reddit.data.Formatter.Styles;
+import com.btmura.android.reddit.text.Formatter.Styles;
 
 public class Formatter_StylesTest extends AbstractFormatterTest {
 

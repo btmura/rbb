@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.data;
+package com.btmura.android.reddit.text;
 
 import java.util.regex.Matcher;
 
@@ -26,10 +26,12 @@ import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
 
-import com.btmura.android.reddit.data.Formatter.Escaped;
-import com.btmura.android.reddit.data.Formatter.RawLinks;
-import com.btmura.android.reddit.data.Formatter.Styles;
-import com.btmura.android.reddit.data.Formatter.Subreddits;
+import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.SubredditSpan;
+import com.btmura.android.reddit.text.Formatter.Escaped;
+import com.btmura.android.reddit.text.Formatter.RawLinks;
+import com.btmura.android.reddit.text.Formatter.Styles;
+import com.btmura.android.reddit.text.Formatter.Subreddits;
 
 abstract class AbstractFormatterTest extends AndroidTestCase {
 

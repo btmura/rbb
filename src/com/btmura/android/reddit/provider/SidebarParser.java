@@ -21,8 +21,8 @@ import java.io.IOException;
 import android.content.Context;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.data.Formatter;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.JsonParser;
 
 class SidebarParser extends JsonParser {

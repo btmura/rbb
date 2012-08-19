@@ -1,4 +1,6 @@
-package com.btmura.android.reddit.data;
+package com.btmura.android.reddit.text;
+
+import com.btmura.android.reddit.data.RelativeTime;
 
 import android.test.AndroidTestCase;
 
