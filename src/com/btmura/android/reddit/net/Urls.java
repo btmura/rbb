@@ -30,16 +30,17 @@ public class Urls {
     public static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
     private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
+    private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
+    private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
+    private static final String API_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
+    private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
+
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
     private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
-    private static final String BASE_LOGIN_URL = BASE_SSL_URL + "/api/login/";
     private static final String BASE_SEARCH_URL = BASE_URL + "/search.json?q=";
-    private static final String BASE_SUBMIT_URL = BASE_URL + "/api/submit/";
     private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
-    private static final String BASE_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
-    private static final String BASE_VOTE_URL = BASE_URL + "/api/vote/";
 
     private static final StringBuilder S = new StringBuilder(BASE_URL.length() * 3);
 
@@ -72,7 +73,7 @@ public class Urls {
     }
 
     public static URL loginUrl(String userName) {
-        return newUrl(resetBuilder().append(BASE_LOGIN_URL).append(encode(userName)));
+        return newUrl(resetBuilder().append(API_LOGIN_URL).append(encode(userName)));
     }
 
     public static String loginQuery(String userName, String password) {
@@ -105,7 +106,7 @@ public class Urls {
     }
 
     public static URL submitUrl() {
-        return newUrl(BASE_SUBMIT_URL);
+        return newUrl(API_SUBMIT_URL);
     }
 
     public static String submitTextQuery(String modhash, String subreddit, String title,
@@ -174,11 +175,11 @@ public class Urls {
     }
 
     public static URL subscribeUrl() {
-        return newUrl(BASE_SUBSCRIBE_URL);
+        return newUrl(API_SUBSCRIBE_URL);
     }
 
     public static URL voteUrl() {
-        return newUrl(BASE_VOTE_URL);
+        return newUrl(API_VOTE_URL);
     }
 
     public static String voteQuery(String modhash, String id, int vote) {
