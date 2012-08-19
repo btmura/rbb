@@ -40,6 +40,7 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -121,14 +122,16 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.comment_action_menu, menu);
-        return true;
+        boolean hasAccount = AccountUtils.isAccount(accountName);
+        if (hasAccount) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.comment_action_menu, menu);
+        }
+        return hasAccount;
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        int checkedCount = getListView().getCheckedItemCount();
-        boolean showReply = checkedCount == 1;
+        boolean showReply = getListView().getCheckedItemCount() == 1;
         menu.findItem(R.id.menu_reply).setVisible(showReply);
         return true;
     }

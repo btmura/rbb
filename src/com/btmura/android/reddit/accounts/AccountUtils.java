@@ -29,6 +29,10 @@ import android.text.TextUtils;
 
 public class AccountUtils {
 
+    public static boolean isAccount(String accountName) {
+        return !TextUtils.isEmpty(accountName);
+    }
+
     public static String getCookie(Context context, String accountName)
             throws OperationCanceledException, AuthenticatorException, IOException {
         if (TextUtils.isEmpty(accountName)) {
