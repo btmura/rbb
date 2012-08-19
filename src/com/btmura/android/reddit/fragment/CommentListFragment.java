@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.fragment;
 
+import java.util.UUID;
+
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
@@ -69,7 +71,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         super.onCreate(savedInstanceState);
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
         thingId = getArguments().getString(ARG_THING_ID);
-        sessionId = thingId + "-" + System.currentTimeMillis();
+        sessionId = UUID.randomUUID().toString();
         adapter = new CommentAdapter(getActivity(), this);
     }
 
