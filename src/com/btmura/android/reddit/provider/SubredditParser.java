@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.data.JsonParser;
+import com.btmura.android.reddit.util.JsonParser;
 
 class SubredditParser extends JsonParser {
 

@@ -32,9 +32,9 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.data.Formatter;
-import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.data.Urls;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.util.JsonParser;
 
 class CommentListing extends JsonParser {
 

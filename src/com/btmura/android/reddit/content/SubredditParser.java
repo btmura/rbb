@@ -23,8 +23,8 @@ import java.util.List;
 
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.data.JsonParser;
 import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.util.JsonParser;
 
 class SubredditParser extends JsonParser {
 
