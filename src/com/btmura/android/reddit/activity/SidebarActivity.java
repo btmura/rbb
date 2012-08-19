@@ -48,7 +48,7 @@ public class SidebarActivity extends Activity implements SubredditNameHolder {
 
             if (savedInstanceState == null) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(GlobalMenuFragment.newInstance(0), GlobalMenuFragment.TAG);
+                ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
                 ft.commit();
             }
         }

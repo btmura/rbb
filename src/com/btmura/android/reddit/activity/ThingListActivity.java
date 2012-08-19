@@ -71,7 +71,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private void setInitialFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(0), GlobalMenuFragment.TAG);
+            ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
             ft.commit();
         }
     }

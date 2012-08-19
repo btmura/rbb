@@ -31,17 +31,12 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SearchActivity;
 import com.btmura.android.reddit.activity.SettingsActivity;
 import com.btmura.android.reddit.activity.SubmitLinkActivity;
-import com.btmura.android.reddit.data.Flag;
 
 public class GlobalMenuFragment extends Fragment implements
         SearchView.OnFocusChangeListener,
         SearchView.OnQueryTextListener {
 
     public static final String TAG = "GlobalMenuFragment";
-
-    public static final int FLAG_SHOW_MANAGE_ACCOUNTS = 0x1;
-
-    private static final String ARG_FLAGS = "f";
 
     private static final int REQUEST_SEARCH = 0;
 
@@ -53,12 +48,8 @@ public class GlobalMenuFragment extends Fragment implements
     private MenuItem searchItem;
     private SearchView searchView;
 
-    public static GlobalMenuFragment newInstance(int flags) {
-        Bundle args = new Bundle(1);
-        args.putInt(ARG_FLAGS, flags);
-        GlobalMenuFragment f = new GlobalMenuFragment();
-        f.setArguments(args);
-        return f;
+    public static GlobalMenuFragment newInstance() {
+        return new GlobalMenuFragment();
     }
 
     @Override
@@ -83,13 +74,6 @@ public class GlobalMenuFragment extends Fragment implements
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextFocusChangeListener(this);
         searchView.setOnQueryTextListener(this);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_settings).setVisible(showManageAccounts());
-
     }
 
     @Override
@@ -168,13 +152,5 @@ public class GlobalMenuFragment extends Fragment implements
             default:
                 super.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    private boolean showManageAccounts() {
-        return Flag.isEnabled(getFlags(), FLAG_SHOW_MANAGE_ACCOUNTS);
-    }
-
-    private int getFlags() {
-        return getArguments().getInt(ARG_FLAGS);
     }
 }

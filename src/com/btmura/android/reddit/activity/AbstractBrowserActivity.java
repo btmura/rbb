@@ -131,7 +131,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private void setupCommonFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(GlobalMenuFragment.FLAG_SHOW_MANAGE_ACCOUNTS),
+            ft.add(GlobalMenuFragment.newInstance(),
                     GlobalMenuFragment.TAG);
             ft.commit();
         }
