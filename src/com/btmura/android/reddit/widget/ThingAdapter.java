@@ -178,7 +178,9 @@ public class ThingAdapter extends CursorAdapter {
         Cursor c = getCursor();
         if (c != null && c.moveToLast()) {
             initColumnIndices(c);
-            return c.getString(INDEX_THING_ID);
+            if (c.getInt(INDEX_KIND) == Things.KIND_MORE) {
+                return c.getString(INDEX_THING_ID);
+            }
         }
         return null;
     }
