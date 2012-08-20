@@ -138,10 +138,6 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public void loadIfPossible() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadIfPossible an:" + accountName + " s:" + subreddit
-                    + " q:" + query + " f:" + filter);
-        }
         if (accountName != null && (subreddit != null || query != null)) {
             getLoaderManager().initLoader(0, null, this);
         }
@@ -151,23 +147,17 @@ public class ThingListFragment extends ListFragment implements
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
+
         String accountName = getAccountName();
         String subredditName = Subreddit.getName(subreddit);
         String more = args != null ? args.getString(LOADER_ARG_MORE) : null;
-        if (more != null) {
-            // ThingProvider uses a cursor that deletes its data after it is
-            // closed. Don't delete the data if we are appending more data to
-            // it. This call shouldn't be here, but I'm not sure where else to
-            // put it at this point.
-            ThingProvider.cancelDeletion(adapter.getCursor());
-        }
         Uri uri = ThingAdapter.createUri(accountName, sessionId, subredditName, filter, more, true);
         return ThingAdapter.createLoader(getActivity(), uri, sessionId);
     }
 
-    public void onLoadFinished(Loader<Cursor> loader, Cursor things) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onLoadFinished count: " + (things != null ? things.getCount() : -1));
+            Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
 
         Uri uri = ThingAdapter.createUri(getAccountName(), sessionId, Subreddit.getName(subreddit),
@@ -175,9 +165,15 @@ public class ThingListFragment extends ListFragment implements
         CursorLoader cursorLoader = (CursorLoader) loader;
         cursorLoader.setUri(uri);
 
+        // ThingProvider uses a cursor that deletes its data after it is
+        // closed. Don't delete the data if we are updating with a new cursor.
+        // This call shouldn't be here, but I'm not sure where else to
+        // put it at this point.
+        ThingProvider.cancelDeletion(adapter.getCursor());
+
         scrollLoading = false;
-        adapter.swapCursor(things);
-        setEmptyText(getString(things != null ? R.string.empty_list : R.string.error));
+        adapter.swapCursor(cursor);
+        setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
     }
 

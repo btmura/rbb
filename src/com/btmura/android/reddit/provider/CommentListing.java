@@ -28,7 +28,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.util.JsonReader;
 import android.util.JsonToken;
-import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Comments;
@@ -41,6 +40,8 @@ class CommentListing extends JsonParser {
     public static final String TAG = "CommentListing";
 
     final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
+    long networkTimeMs;
+    long parseTimeMs;
 
     private final Formatter formatter = new Formatter();
     private final Context context;
@@ -68,7 +69,8 @@ class CommentListing extends JsonParser {
             parseListingArray(reader);
             if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();
-                Log.d(TAG, "net: " + (t2 - t1) + " parse: " + (t3 - t2));
+                networkTimeMs = t2 - t1;
+                parseTimeMs = t3 - t2;
             }
         } finally {
             input.close();

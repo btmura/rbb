@@ -17,9 +17,6 @@
 package com.btmura.android.reddit.fragment;
 
 import android.app.DialogFragment;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,26 +25,32 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.provider.CommentProvider;
+import com.btmura.android.reddit.provider.ReplyProvider;
 
 public class CommentReplyFragment extends DialogFragment implements OnClickListener {
 
     public static final String TAG = "CommentReplyFragment";
 
     public static final String ARG_ACCOUNT_NAME = "accountName";
-    public static final String ARG_COMMENT_BUNDLE = "commentBundle";
+    public static final String ARG_PARENT_THING_ID = "parentThingId";
+    public static final String ARG_THING_ID = "thingId";
+    public static final String ARG_AUTHOR = "author";
 
     private String accountName;
-    private Bundle commentBundle;
+    private String parentThingId;
+    private String thingId;
+    private String author;
     private EditText bodyText;
     private View cancel;
     private View ok;
 
-    public static CommentReplyFragment newInstance(String accountName, Bundle commentBundle) {
-        Bundle args = new Bundle(2);
+    public static CommentReplyFragment newInstance(String accountName, String parentThingId,
+            String thingId, String author) {
+        Bundle args = new Bundle(4);
         args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putBundle(ARG_COMMENT_BUNDLE, commentBundle);
+        args.putString(ARG_PARENT_THING_ID, parentThingId);
+        args.putString(ARG_THING_ID, thingId);
+        args.putString(ARG_AUTHOR, author);
         CommentReplyFragment frag = new CommentReplyFragment();
         frag.setArguments(args);
         return frag;
@@ -57,12 +60,13 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-        commentBundle = getArguments().getBundle(ARG_COMMENT_BUNDLE);
+        parentThingId = getArguments().getString(ARG_PARENT_THING_ID);
+        thingId = getArguments().getString(ARG_THING_ID);
+        author = getArguments().getString(ARG_AUTHOR);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        String author = Comments.getAuthor(commentBundle);
         getDialog().setTitle(getString(R.string.comment_reply_title, author));
 
         View v = inflater.inflate(R.layout.comment_reply, container, false);
@@ -76,31 +80,12 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
 
     public void onClick(View view) {
         if (view == ok) {
+            ReplyProvider.replyInBackground(getActivity(), accountName, parentThingId, thingId,
+                    bodyText.getText().toString());
             dismiss();
-            AsyncTask.execute(new Runnable() {
-                public void run() {
-                    int sequence = Comments.getSequence(commentBundle);
-                    int nesting = Comments.getNesting(commentBundle);
-                    if (sequence != 0) {
-                        nesting++;
-                    }
-
-                    ContentValues v = new ContentValues(8);
-                    v.put(Comments.COLUMN_ACCOUNT, accountName);
-                    v.put(Comments.COLUMN_AUTHOR, accountName);
-                    v.put(Comments.COLUMN_BODY, bodyText.getText().toString());
-                    v.put(Comments.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000);
-                    v.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
-                    v.put(Comments.COLUMN_NESTING, nesting);
-                    v.put(Comments.COLUMN_SEQUENCE, sequence);
-                    v.put(Comments.COLUMN_SESSION_ID, Comments.getSessionId(commentBundle));
-
-                    ContentResolver cr = getActivity().getContentResolver();
-                    cr.insert(CommentProvider.CONTENT_URI, v);
-                }
-            });
         } else if (view == cancel) {
             dismiss();
         }
+
     }
 }

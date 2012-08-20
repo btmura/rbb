@@ -19,20 +19,24 @@ package com.btmura.android.reddit.provider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Replies;
+import com.btmura.android.reddit.util.ArrayUtils;
 
 public class ReplyProvider extends BaseProvider {
 
     public static final String TAG = "ReplyProvider";
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.replies";
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/");
 
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
@@ -46,7 +50,7 @@ public class ReplyProvider extends BaseProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query uri: " + uri);
+            Log.d(TAG, "query");
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -82,7 +86,11 @@ public class ReplyProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.update(Replies.TABLE_NAME, values, selection, selectionArgs);
         if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            ContentResolver cr = getContext().getContentResolver();
+            cr.notifyChange(uri, null);
+            if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
+                cr.notifyChange(CommentProvider.CONTENT_URI, null);
+            }
         }
         return count;
     }
@@ -95,7 +103,11 @@ public class ReplyProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.delete(Replies.TABLE_NAME, selection, selectionArgs);
         if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            ContentResolver cr = getContext().getContentResolver();
+            cr.notifyChange(uri, null);
+            if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
+                cr.notifyChange(CommentProvider.CONTENT_URI, null);
+            }
         }
         return count;
     }
@@ -103,5 +115,29 @@ public class ReplyProvider extends BaseProvider {
     @Override
     public String getType(Uri uri) {
         return null;
+    }
+
+    public static void replyInBackground(final Context context, final String accountName,
+            final String parentThingId, final String thingId, final String text) {
+        AsyncTask.execute(new Runnable() {
+            public void run() {
+                ContentResolver cr = context.getContentResolver();
+
+                ContentValues v = new ContentValues(4);
+                v.put(Replies.COLUMN_ACCOUNT, accountName);
+                v.put(Replies.COLUMN_PARENT_THING_ID, parentThingId);
+                v.put(Replies.COLUMN_THING_ID, thingId);
+                v.put(Replies.COLUMN_TEXT, text);
+
+                Uri uri = CONTENT_URI.buildUpon()
+                        .appendQueryParameter(PARAM_NOTIFY_OTHERS, Boolean.toString(true))
+                        .build();
+                int count = cr.update(uri, v, Replies.SELECTION_BY_ACCOUNT_AND_THING_ID,
+                        ArrayUtils.toArray(accountName, thingId));
+                if (count == 0) {
+                    cr.insert(uri, v);
+                }
+            }
+        });
     }
 }

@@ -68,7 +68,7 @@ public class CommentProvider extends BaseProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query uri: " + uri);
+            Log.d(TAG, "query");
         }
 
         String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
@@ -113,7 +113,9 @@ public class CommentProvider extends BaseProvider {
             }
             if (BuildConfig.DEBUG) {
                 long t2 = System.currentTimeMillis();
-                Log.d(TAG, "db: " + (t2 - t1));
+                Log.d(TAG, "sync network: " + listing.networkTimeMs
+                        + " parse: " + listing.parseTimeMs
+                        + " db: " + (t2 - t1));
             }
         } catch (OperationCanceledException e) {
             Log.e(TAG, "sync", e);
@@ -171,5 +173,11 @@ public class CommentProvider extends BaseProvider {
     @Override
     public String getType(Uri uri) {
         return null;
+    }
+
+    public static void cancelDeletion(Cursor cursor) {
+        if (cursor != null) {
+            SessionCursor.cancelDeletion(cursor);
+        }
     }
 }

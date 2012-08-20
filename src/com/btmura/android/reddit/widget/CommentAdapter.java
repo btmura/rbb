@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -58,8 +57,6 @@ public class CommentAdapter extends CursorAdapter {
     private static int INDEX_LIKES;
     private static int INDEX_NESTING;
     private static int INDEX_NUM_COMMENTS;
-    private static int INDEX_SEQUENCE;
-    private static int INDEX_SESSION_ID;
     private static int INDEX_TITLE;
     private static int INDEX_THING_ID;
     private static int INDEX_UPS;
@@ -119,11 +116,20 @@ public class CommentAdapter extends CursorAdapter {
                 title, thingId, ups);
     }
 
-    public Bundle getCommentBundle(int position) {
+    public String getAuthor(int position) {
         Cursor c = getCursor();
         if (c != null && c.moveToPosition(position)) {
             initColumnIndices(c);
-            return makeBundle(c);
+            return c.getString(INDEX_AUTHOR);
+        }
+        return null;
+    }
+
+    public String getThingId(int position) {
+        Cursor c = getCursor();
+        if (c != null && c.moveToPosition(position)) {
+            initColumnIndices(c);
+            return c.getString(INDEX_THING_ID);
         }
         return null;
     }
@@ -139,32 +145,10 @@ public class CommentAdapter extends CursorAdapter {
             INDEX_LIKES = c.getColumnIndexOrThrow(Comments.COLUMN_LIKES);
             INDEX_NESTING = c.getColumnIndexOrThrow(Comments.COLUMN_NESTING);
             INDEX_NUM_COMMENTS = c.getColumnIndexOrThrow(Comments.COLUMN_NUM_COMMENTS);
-            INDEX_SEQUENCE = c.getColumnIndexOrThrow(Comments.COLUMN_SEQUENCE);
-            INDEX_SESSION_ID = c.getColumnIndexOrThrow(Comments.COLUMN_SESSION_ID);
             INDEX_TITLE = c.getColumnIndexOrThrow(Comments.COLUMN_TITLE);
             INDEX_THING_ID = c.getColumnIndexOrThrow(Comments.COLUMN_THING_ID);
             INDEX_UPS = c.getColumnIndexOrThrow(Comments.COLUMN_UPS);
             INDEX_VOTE = c.getColumnIndexOrThrow(Comments.COLUMN_VOTE);
         }
-    }
-
-    private static Bundle makeBundle(Cursor c) {
-        Bundle b = new Bundle(PROJECTION.length);
-        b.putLong(Comments._ID, c.getLong(INDEX_ID));
-        b.putString(Comments.COLUMN_AUTHOR, c.getString(INDEX_AUTHOR));
-        b.putString(Comments.COLUMN_BODY, c.getString(INDEX_BODY));
-        b.putLong(Comments.COLUMN_CREATED_UTC, c.getLong(INDEX_CREATED_UTC));
-        b.putInt(Comments.COLUMN_DOWNS, c.getInt(INDEX_DOWNS));
-        b.putInt(Comments.COLUMN_KIND, c.getInt(INDEX_KIND));
-        b.putInt(Comments.COLUMN_LIKES, c.getInt(INDEX_LIKES));
-        b.putInt(Comments.COLUMN_NESTING, c.getInt(INDEX_NESTING));
-        b.putInt(Comments.COLUMN_NUM_COMMENTS, c.getInt(INDEX_NUM_COMMENTS));
-        b.putInt(Comments.COLUMN_SEQUENCE, c.getInt(INDEX_SEQUENCE));
-        b.putString(Comments.COLUMN_SESSION_ID, c.getString(INDEX_SESSION_ID));
-        b.putString(Comments.COLUMN_TITLE, c.getString(INDEX_TITLE));
-        b.putString(Comments.COLUMN_THING_ID, c.getString(INDEX_THING_ID));
-        b.putInt(Comments.COLUMN_UPS, c.getInt(INDEX_UPS));
-        b.putInt(Comments.COLUMN_VOTE, c.getInt(INDEX_VOTE));
-        return b;
     }
 }

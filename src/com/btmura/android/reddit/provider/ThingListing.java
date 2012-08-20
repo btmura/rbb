@@ -29,7 +29,6 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
-import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Things;
@@ -42,6 +41,8 @@ class ThingListing extends JsonParser {
     public static final String TAG = "ThingListing";
 
     final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
+    long networkTimeMs;
+    long parseTimeMs;
 
     private final Formatter formatter = new Formatter();
     private final Context context;
@@ -71,7 +72,8 @@ class ThingListing extends JsonParser {
             parseListingObject(reader);
             if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();
-                Log.d(TAG, "net: " + (t2 - t1) + " parse: " + (t3 - t2));
+                networkTimeMs = t2 - t1;
+                parseTimeMs = t3- t2;
             }
         } finally {
             input.close();

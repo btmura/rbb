@@ -73,7 +73,7 @@ public class ThingProvider extends BaseProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query uri: " + uri);
+            Log.d(TAG, "query");
         }
 
         String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
@@ -125,7 +125,9 @@ public class ThingProvider extends BaseProvider {
             }
             if (BuildConfig.DEBUG) {
                 long t2 = System.currentTimeMillis();
-                Log.d(TAG, "db: " + (t2 - t1));
+                Log.d(TAG, "sync network: " + listing.networkTimeMs
+                        + " parse: " + listing.parseTimeMs
+                        + " db: " + (t2 - t1));
             }
         } catch (IOException e) {
             Log.e(TAG, "sync", e);
@@ -156,6 +158,9 @@ public class ThingProvider extends BaseProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "update");
+        }
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.update(Things.TABLE_NAME, values, selection, selectionArgs);
         if (count > 0) {
@@ -166,6 +171,9 @@ public class ThingProvider extends BaseProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "delete");
+        }
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.delete(Things.TABLE_NAME, selection, selectionArgs);
         if (count > 0) {

@@ -59,7 +59,7 @@ public class VoteProvider extends BaseProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query uri: " + uri);
+            Log.d(TAG, "query");
         }
         int match = MATCHER.match(uri);
         switch (match) {
@@ -79,7 +79,7 @@ public class VoteProvider extends BaseProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "insert uri: " + uri);
+            Log.d(TAG, "insert");
         }
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(Votes.TABLE_NAME, null, values);
@@ -98,7 +98,7 @@ public class VoteProvider extends BaseProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "update uri: " + uri);
+            Log.d(TAG, "update");
         }
         int match = MATCHER.match(uri);
         switch (match) {
@@ -175,18 +175,13 @@ public class VoteProvider extends BaseProvider {
                 values.put(Votes.COLUMN_VOTE, likes);
 
                 Uri uri = CONTENT_URI.buildUpon()
-                        .appendQueryParameter(VoteProvider.PARAM_NOTIFY_OTHERS,
+                        .appendQueryParameter(PARAM_NOTIFY_OTHERS,
                                 Boolean.toString(true))
                         .build();
                 int count = cr.update(uri, values, Votes.SELECTION_BY_ACCOUNT_AND_THING_ID,
                         selectionArgs);
                 if (count == 0) {
-                    Uri insertUri = cr.insert(uri, values);
-                    if (BuildConfig.DEBUG) {
-                        Log.d(TAG, "inserted: " + insertUri);
-                    }
-                } else if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "updated: " + count);
+                    cr.insert(uri, values);
                 }
             }
         });
