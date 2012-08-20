@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.fragment;
 
-import java.util.UUID;
-
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -116,7 +114,7 @@ public class ThingListFragment extends ListFragment implements
         filter = b.getInt(ARG_FILTER);
         query = b.getString(ARG_QUERY);
 
-        sessionId = UUID.randomUUID().toString();
+        sessionId = Subreddit.getName(subreddit) + "-" + System.currentTimeMillis();
         adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), this);
         setHasOptionsMenu(true);
     }
