@@ -73,7 +73,7 @@ public class ThingProvider extends BaseProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query");
+            Log.d(TAG, "query: " + uri.getQuery());
         }
 
         String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
@@ -144,11 +144,11 @@ public class ThingProvider extends BaseProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "insert");
-        }
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(Things.TABLE_NAME, null, values);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "insert id: " + id);
+        }
         if (id != -1) {
             getContext().getContentResolver().notifyChange(uri, null);
             return ContentUris.withAppendedId(uri, id);
@@ -158,11 +158,11 @@ public class ThingProvider extends BaseProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "update");
-        }
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.update(Things.TABLE_NAME, values, selection, selectionArgs);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "update count: " + count);
+        }
         if (count > 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
@@ -171,11 +171,11 @@ public class ThingProvider extends BaseProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "delete");
-        }
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.delete(Things.TABLE_NAME, selection, selectionArgs);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "delete count: " + count);
+        }
         if (count > 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }

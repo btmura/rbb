@@ -102,10 +102,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         selectedSubreddit = bundle.getParcelable(ARG_SELECTED_SUBREDDIT);
         query = bundle.getString(ARG_QUERY);
         flags = bundle.getInt(ARG_FLAGS);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onCreate an:" + accountName + " ss:" + selectedSubreddit
-                    + " q:" + query + " f:" + flags);
-        }
 
         adapter = new SubredditAdapter(getActivity(), query, isSingleChoice());
         adapter.setSelectedSubreddit(selectedSubreddit);
@@ -129,25 +125,27 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public void loadIfPossible() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadIfPossible an:" + accountName + " ss:" + selectedSubreddit
-                    + " q:" + query + " f:" + flags);
-        }
         if (accountName != null) {
             getLoaderManager().initLoader(0, null, this);
         }
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onCreateLoader args: " + args);
+        }
         return SubredditAdapter.createLoader(getActivity().getApplicationContext(),
                 getAccountName(), getQuery());
     }
 
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        adapter.swapCursor(data);
-        setEmptyText(getString(data != null ? R.string.empty_subreddits : R.string.error));
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
+        }
+        adapter.swapCursor(cursor);
+        setEmptyText(getString(cursor != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
-        if (data != null && data.getCount() > 0) {
+        if (cursor != null && cursor.getCount() > 0) {
             Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), 0));
             listener.onInitialSubredditSelected(sr);
         }

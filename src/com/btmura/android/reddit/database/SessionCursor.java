@@ -16,16 +16,12 @@
 
 package com.btmura.android.reddit.database;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-
-import com.btmura.android.reddit.BuildConfig;
 
 /**
  * Cursor that deletes data when it is closed. It can be used to show a
@@ -80,11 +76,7 @@ public class SessionCursor extends CursorWrapper {
             protected Void doInBackground(Void... voidRays) {
                 // May be more efficient to pass in database rather than
                 // resolving the content provider.
-                ContentResolver cr = context.getContentResolver();
-                int count = cr.delete(uri, selection, selectionArgs);
-                if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "close deleted: " + count);
-                }
+                context.getContentResolver().delete(uri, selection, selectionArgs);
                 return null;
             }
         }.execute();

@@ -59,7 +59,7 @@ public class VoteProvider extends BaseProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query");
+            Log.d(TAG, "query: " + uri.getQuery());
         }
         int match = MATCHER.match(uri);
         switch (match) {
@@ -78,11 +78,11 @@ public class VoteProvider extends BaseProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "insert");
-        }
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(Votes.TABLE_NAME, null, values);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "insert id: " + id);
+        }
         if (id != -1) {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(uri, null);
@@ -97,9 +97,6 @@ public class VoteProvider extends BaseProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "update");
-        }
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_ONE_VOTE:
@@ -110,6 +107,9 @@ public class VoteProvider extends BaseProvider {
 
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.update(Votes.TABLE_NAME, values, selection, selectionArgs);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "update count: " + count);
+        }
         if (count > 0) {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(uri, null);
@@ -123,9 +123,6 @@ public class VoteProvider extends BaseProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "delete uri: " + uri);
-        }
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_ONE_VOTE:
@@ -136,6 +133,9 @@ public class VoteProvider extends BaseProvider {
 
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.delete(Votes.TABLE_NAME, selection, selectionArgs);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "delete count: " + count);
+        }
         if (count > 0) {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(uri, null);

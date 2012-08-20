@@ -50,7 +50,7 @@ public class ReplyProvider extends BaseProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query");
+            Log.d(TAG, "query: " + uri.getQuery());
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -62,11 +62,11 @@ public class ReplyProvider extends BaseProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "insert");
-        }
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(Replies.TABLE_NAME, null, values);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "insert id: " + id);
+        }
         if (id != -1) {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(uri, null);
@@ -80,11 +80,11 @@ public class ReplyProvider extends BaseProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "update");
-        }
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.update(Replies.TABLE_NAME, values, selection, selectionArgs);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "update count: " + count);
+        }
         if (count > 0) {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(uri, null);
@@ -97,11 +97,11 @@ public class ReplyProvider extends BaseProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "delete");
-        }
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.delete(Replies.TABLE_NAME, selection, selectionArgs);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "delete count: " + count);
+        }
         if (count > 0) {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(uri, null);
