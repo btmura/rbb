@@ -106,6 +106,11 @@
             android:exported="true"
             android:label="@string/provider_subreddits" />
         <provider
+            android:name=".provider.ReplyProvider"
+            android:authorities="@string/authority_replies"
+            android:exported="false"
+            android:label="@string/provider_replies" />
+        <provider
             android:name=".provider.ThingProvider"
             android:authorities="@string/authority_things"
             android:exported="false"

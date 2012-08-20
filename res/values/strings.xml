@@ -27,6 +27,7 @@
      
     <string name="authority_comments">com.btmura.android.reddit.provider.comments</string>    
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
+    <string name="authority_replies">com.btmura.android.reddit.provider.replies</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
     <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
     
@@ -85,6 +86,7 @@
 
     <string name="provider_comments">Comments</string>    
     <string name="provider_subreddits">Subreddits</string>
+    <string name="provider_replies">Replies</string>
     <string name="provider_things">Things</string>
     <string name="provider_votes">Votes</string>
     
