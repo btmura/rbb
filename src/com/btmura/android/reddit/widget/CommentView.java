@@ -64,26 +64,19 @@ public class CommentView extends View implements OnGestureListener {
     private final GestureDetector detector;
     private OnVoteListener listener;
 
-    private String author;
-    private String body;
-    private long createdUtc;
-    private int downs;
-    private int kind;
     private int likes;
     private int nesting;
-    private long nowTimeMs;
-    private int numComments;
     private String title;
     private String thingId;
-    private int ups;
 
     private CharSequence bodyText;
+    private String scoreText;
+    private CharSequence statusText;
 
     private StaticLayout titleLayout;
     private StaticLayout bodyLayout;
     private BoringLayout statusLayout;
 
-    private String scoreText;
     private final Rect scoreBounds = new Rect();
     private int rightHeight;
     private int minHeight;
@@ -153,19 +146,26 @@ public class CommentView extends View implements OnGestureListener {
             String title,
             String thingId,
             int ups) {
-        this.author = author;
-        this.body = body;
-        this.createdUtc = createdUtc;
-        this.downs = downs;
-        this.kind = kind;
         this.likes = likes;
         this.nesting = nesting;
-        this.nowTimeMs = nowTimeMs;
-        this.numComments = numComments;
         this.title = title;
         this.thingId = thingId;
-        this.ups = ups;
+
+        this.scoreText = VotingArrows.getScoreText(ups - downs + likes);
+        this.bodyText = FORMATTER.formatSpans(getContext(), body);
+        this.statusText = getStatus(getContext(), author, createdUtc, kind, nowTimeMs, numComments);
+
         requestLayout();
+    }
+
+    private static CharSequence getStatus(Context c, String author, long createdUtc, int kind,
+            long nowTimeMs, int numComments) {
+        int resId = kind == Comments.KIND_HEADER ? R.string.comment_header_status
+                : R.string.comment_comment_status;
+        String rt = RelativeTime.format(c, nowTimeMs, createdUtc);
+        String comments = c.getResources().getQuantityString(R.plurals.comments, numComments,
+                numComments);
+        return c.getString(resId, author, rt, comments);
     }
 
     @Override
@@ -186,10 +186,7 @@ public class CommentView extends View implements OnGestureListener {
                 break;
         }
 
-        scoreText = VotingArrows.getScoreText(ups - downs + likes);
         VotingArrows.measureScoreText(scoreText, scoreBounds);
-
-        bodyText = FORMATTER.formatSpans(getContext(), body);
 
         int rightContentWidth = measuredWidth
                 - PADDING - VotingArrows.getWidth() - PADDING
@@ -205,13 +202,13 @@ public class CommentView extends View implements OnGestureListener {
             rightHeight += ELEMENT_PADDING;
         }
 
-        if (!TextUtils.isEmpty(body)) {
+        if (!TextUtils.isEmpty(bodyText)) {
             bodyLayout = createBodyLayout(rightContentWidth);
             rightHeight += bodyLayout.getHeight();
             rightHeight += ELEMENT_PADDING;
         }
 
-        if (!TextUtils.isEmpty("status")) {
+        if (!TextUtils.isEmpty(statusText)) {
             statusLayout = createStatusLayout(rightContentWidth);
             rightHeight += statusLayout.getHeight();
         }
@@ -266,19 +263,9 @@ public class CommentView extends View implements OnGestureListener {
     }
 
     private BoringLayout createStatusLayout(int width) {
-        CharSequence statusText = getStatus(getContext());
         BoringLayout.Metrics m = BoringLayout.isBoring(statusText, TEXT_PAINTS[TEXT_STATUS]);
         return BoringLayout.make(statusText, TEXT_PAINTS[TEXT_STATUS], width,
                 Alignment.ALIGN_NORMAL, 1, 0, m, true, TruncateAt.END, width);
-    }
-
-    private CharSequence getStatus(Context c) {
-        int resId = kind == Comments.KIND_HEADER ? R.string.comment_header_status
-                : R.string.comment_comment_status;
-        String rt = RelativeTime.format(c, nowTimeMs, createdUtc);
-        String comments = c.getResources().getQuantityString(R.plurals.comments, numComments,
-                numComments);
-        return c.getString(resId, author, rt, comments);
     }
 
     @Override

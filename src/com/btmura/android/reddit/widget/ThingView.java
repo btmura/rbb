@@ -45,16 +45,7 @@ public class ThingView extends View implements OnGestureListener {
     private final GestureDetector detector;
     private OnVoteListener listener;
 
-    private String author;
-    private long createdUtc;
-    private String domain;
     private int likes;
-    private long nowTimeMs;
-    private int numComments;
-    private boolean over18;
-    private String parentSubreddit;
-    private int score;
-    private String subreddit;
     private int thingBodyWidth;
     private String thumbnailUrl;
     private String thingId;
@@ -63,6 +54,9 @@ public class ThingView extends View implements OnGestureListener {
     private Bitmap bitmap;
 
     private String scoreText;
+    private CharSequence statusText;
+    private String longDetailsText;
+    private String shortDetailsText;
 
     private Layout titleLayout;
     private Layout statusLayout;
@@ -131,6 +125,7 @@ public class ThingView extends View implements OnGestureListener {
     public void setData(String author,
             long createdUtc,
             String domain,
+            int downs,
             int likes,
             long nowTimeMs,
             int numComments,
@@ -141,22 +136,48 @@ public class ThingView extends View implements OnGestureListener {
             int thingBodyWidth,
             String thingId,
             String thumbnailUrl,
-            String title) {
-        this.author = author;
-        this.createdUtc = createdUtc;
-        this.domain = domain;
+            String title,
+            int ups) {
+
         this.likes = likes;
-        this.nowTimeMs = nowTimeMs;
-        this.numComments = numComments;
-        this.over18 = over18;
-        this.parentSubreddit = parentSubreddit;
-        this.score = score;
-        this.subreddit = subreddit;
         this.thingBodyWidth = thingBodyWidth;
         this.thingId = thingId;
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
+
+        this.scoreText = VotingArrows.getScoreText(score + likes);
+        this.statusText = getStatusText(getContext(), author, createdUtc, nowTimeMs, numComments,
+                over18, parentSubreddit, subreddit);
+        this.longDetailsText = getContext().getString(R.string.thing_details, ups, downs, domain);
+        this.shortDetailsText = domain;
+
         requestLayout();
+    }
+
+    private static CharSequence getStatusText(Context context, String author, long createdUtc,
+            long nowTimeMs,
+            int numComments, boolean over18, String parentSubreddit, String subreddit) {
+        int resId = R.string.thing_status;
+        if (!subreddit.equalsIgnoreCase(parentSubreddit)) {
+            resId = R.string.thing_status_subreddit;
+        }
+
+        String nsfw = "";
+        if (over18) {
+            nsfw = context.getString(R.string.thing_nsfw);
+        }
+
+        String rt = RelativeTime.format(context, nowTimeMs, createdUtc);
+        Resources r = context.getResources();
+        String comments = r.getQuantityString(R.plurals.comments, numComments, numComments);
+
+        CharSequence status = context.getString(resId, subreddit, author, rt, comments, nsfw);
+        if (!nsfw.isEmpty()) {
+            SpannableStringBuilder b = new SpannableStringBuilder(status);
+            b.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);
+            status = b;
+        }
+        return status;
     }
 
     @Override
@@ -177,7 +198,6 @@ public class ThingView extends View implements OnGestureListener {
                 break;
         }
 
-        scoreText = VotingArrows.getScoreText(score + likes);
         VotingArrows.measureScoreText(scoreText, scoreBounds);
 
         int titleWidth;
@@ -189,10 +209,10 @@ public class ThingView extends View implements OnGestureListener {
             int remainingWidth = measuredWidth - thingBodyWidth - PADDING * 2;
             if (remainingWidth > MAX_DETAILS_WIDTH) {
                 detailsWidth = MAX_DETAILS_WIDTH;
-                detailsText = "Details!";
+                detailsText = longDetailsText;
             } else if (remainingWidth > MIN_DETAILS_WIDTH) {
                 detailsWidth = MIN_DETAILS_WIDTH;
-                detailsText = domain;
+                detailsText = shortDetailsText;
             } else {
                 detailsWidth = 0;
                 detailsText = "";
@@ -220,13 +240,11 @@ public class ThingView extends View implements OnGestureListener {
         detailsWidth = Math.max(0, detailsWidth);
 
         titleLayout = makeTitleLayout(titleWidth);
-        statusLayout = makeLayout(TEXT_STATUS, makeStatusText(), statusWidth,
-                Alignment.ALIGN_NORMAL);
+        statusLayout = makeLayout(TEXT_STATUS, statusText, statusWidth, Alignment.ALIGN_NORMAL);
+        detailsLayout = null;
         if (detailsWidth > 0) {
             detailsLayout = makeLayout(TEXT_STATUS, detailsText, detailsWidth,
                     Alignment.ALIGN_OPPOSITE);
-        } else {
-            detailsLayout = null;
         }
 
         int leftHeight = VotingArrows.getHeight();
@@ -247,32 +265,6 @@ public class ThingView extends View implements OnGestureListener {
         }
 
         setMeasuredDimension(measuredWidth, measuredHeight);
-    }
-
-    private CharSequence makeStatusText() {
-        Context c = getContext();
-        Resources r = getResources();
-
-        int resId = R.string.thing_status;
-        if (!subreddit.equalsIgnoreCase(parentSubreddit)) {
-            resId = R.string.thing_status_subreddit;
-        }
-
-        String nsfw = "";
-        if (over18) {
-            nsfw = c.getString(R.string.thing_nsfw);
-        }
-
-        String rt = RelativeTime.format(c, nowTimeMs, createdUtc);
-        String comments = r.getQuantityString(R.plurals.comments, numComments, numComments);
-
-        CharSequence status = c.getString(resId, subreddit, author, rt, comments, nsfw);
-        if (!nsfw.isEmpty()) {
-            SpannableStringBuilder b = new SpannableStringBuilder(status);
-            b.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);
-            status = b;
-        }
-        return status;
     }
 
     private Layout makeTitleLayout(int width) {

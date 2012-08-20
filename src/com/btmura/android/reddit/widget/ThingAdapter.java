@@ -152,6 +152,7 @@ public class ThingAdapter extends CursorAdapter {
             String author = cursor.getString(INDEX_AUTHOR);
             long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
             String domain = cursor.getString(INDEX_DOMAIN);
+            int downs = cursor.getInt(INDEX_DOWNS);
             int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
             boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
             int score = cursor.getInt(INDEX_SCORE);
@@ -159,6 +160,7 @@ public class ThingAdapter extends CursorAdapter {
             String thingId = cursor.getString(INDEX_THING_ID);
             String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
             String title = cursor.getString(INDEX_TITLE);
+            int ups = cursor.getInt(INDEX_UPS);
 
             int likes = cursor.getInt(INDEX_LIKES);
             int vote = cursor.getInt(INDEX_VOTE);
@@ -168,8 +170,9 @@ public class ThingAdapter extends CursorAdapter {
 
             ThingView tv = (ThingView) view;
             tv.setOnVoteListener(listener);
-            tv.setData(author, createdUtc, domain, likes, nowTimeMs, numComments, over18,
-                    parentSubreddit, score, subreddit, thingBodyWidth, thingId, thumbnailUrl, title);
+            tv.setData(author, createdUtc, domain, downs, likes, nowTimeMs, numComments, over18,
+                    parentSubreddit, score, subreddit, thingBodyWidth, thingId, thumbnailUrl,
+                    title, ups);
             thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
         }
     }
