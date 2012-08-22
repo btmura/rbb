@@ -39,7 +39,6 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -109,12 +108,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         Uri uri = CommentAdapter.createUri(accountName, sessionId, thingId, false);
         CursorLoader cursorLoader = (CursorLoader) loader;
         cursorLoader.setUri(uri);
-
-        // CommentProvider uses a cursor that deletes its data after it is
-        // closed. Don't delete the data if we are updating with a new cursor.
-        // This call shouldn't be here, but I'm not sure where else to
-        // put it at this point.
-        CommentProvider.cancelDeletion(adapter.getCursor());
 
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
@@ -187,5 +180,13 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public void onDestroyActionMode(ActionMode mode) {
+    }
+
+    @Override
+    public void onDestroy() {
+        if (!getActivity().isChangingConfigurations()) {
+            CommentAdapter.deleteSessionData(getActivity().getApplicationContext(), sessionId);
+        }
+        super.onDestroy();
     }
 }

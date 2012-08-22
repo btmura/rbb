@@ -41,7 +41,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -165,12 +164,6 @@ public class ThingListFragment extends ListFragment implements
         CursorLoader cursorLoader = (CursorLoader) loader;
         cursorLoader.setUri(uri);
 
-        // ThingProvider uses a cursor that deletes its data after it is
-        // closed. Don't delete the data if we are updating with a new cursor.
-        // This call shouldn't be here, but I'm not sure where else to
-        // put it at this point.
-        ThingProvider.cancelDeletion(adapter.getCursor());
-
         scrollLoading = false;
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
@@ -271,6 +264,14 @@ public class ThingListFragment extends ListFragment implements
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
         intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getSubreddit());
         startActivity(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (!getActivity().isChangingConfigurations()) {
+            ThingAdapter.deleteSessionData(getActivity().getApplicationContext(), sessionId);
+        }
+        super.onDestroy();
     }
 
     private int getThingBodyWidth() {

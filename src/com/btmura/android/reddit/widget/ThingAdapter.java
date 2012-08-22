@@ -16,10 +16,12 @@
 
 package com.btmura.android.reddit.widget;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -101,6 +103,16 @@ public class ThingAdapter extends CursorAdapter {
     public static CursorLoader createLoader(Context context, Uri uri, String sessionId) {
         return new CursorLoader(context, uri, PROJECTION, Things.SELECTION_BY_SESSION_ID,
                 ArrayUtils.toArray(sessionId), null);
+    }
+
+    public static void deleteSessionData(final Context context, final String sessionId) {
+        AsyncTask.execute(new Runnable() {
+            public void run() {
+                ContentResolver cr = context.getContentResolver();
+                cr.delete(ThingProvider.CONTENT_URI, Things.SELECTION_BY_SESSION_ID,
+                        ArrayUtils.toArray(sessionId));
+            }
+        });
     }
 
     public ThingAdapter(Context context, String parentSubreddit, OnVoteListener listener) {

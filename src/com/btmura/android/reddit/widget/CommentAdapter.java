@@ -16,10 +16,12 @@
 
 package com.btmura.android.reddit.widget;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -77,6 +79,16 @@ public class CommentAdapter extends CursorAdapter {
     public static CursorLoader createLoader(Context context, Uri uri, String sessionId) {
         return new CursorLoader(context, uri, PROJECTION, Comments.SELECTION_BY_SESSION_ID,
                 ArrayUtils.toArray(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
+    }
+
+    public static void deleteSessionData(final Context context, final String sessionId) {
+        AsyncTask.execute(new Runnable() {
+            public void run() {
+                ContentResolver cr = context.getContentResolver();
+                cr.delete(CommentProvider.CONTENT_URI, Comments.SELECTION_BY_SESSION_ID,
+                        ArrayUtils.toArray(sessionId));
+            }
+        });
     }
 
     public CommentAdapter(Context context, OnVoteListener listener) {

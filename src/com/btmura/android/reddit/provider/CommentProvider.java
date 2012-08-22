@@ -33,9 +33,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.database.SessionCursor;
 import com.btmura.android.reddit.database.Votes;
-import com.btmura.android.reddit.util.ArrayUtils;
 
 public class CommentProvider extends BaseProvider {
 
@@ -79,10 +77,8 @@ public class CommentProvider extends BaseProvider {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.query(COMMENTS_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, sortOrder);
-        SessionCursor sc = new SessionCursor(getContext(), CommentProvider.CONTENT_URI,
-                Comments.SELECTION_BY_SESSION_ID, ArrayUtils.toArray(sessionId), c);
-        sc.setNotificationUri(getContext().getContentResolver(), uri);
-        return sc;
+        c.setNotificationUri(getContext().getContentResolver(), uri);
+        return c;
     }
 
     private void sync(Uri uri, String sessionId) {
@@ -173,11 +169,5 @@ public class CommentProvider extends BaseProvider {
     @Override
     public String getType(Uri uri) {
         return null;
-    }
-
-    public static void cancelDeletion(Cursor cursor) {
-        if (cursor != null) {
-            SessionCursor.cancelDeletion(cursor);
-        }
     }
 }

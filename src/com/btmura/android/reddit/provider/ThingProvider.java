@@ -32,7 +32,6 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.SessionCursor;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.ArrayUtils;
@@ -84,10 +83,8 @@ public class ThingProvider extends BaseProvider {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.query(TABLE_NAME_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, sortOrder);
-        SessionCursor sc = new SessionCursor(getContext(), ThingProvider.CONTENT_URI,
-                Things.SELECTION_BY_SESSION_ID, ArrayUtils.toArray(sessionId), c);
-        sc.setNotificationUri(getContext().getContentResolver(), uri);
-        return sc;
+        c.setNotificationUri(getContext().getContentResolver(), uri);
+        return c;
     }
 
     private void sync(Uri uri, String sessionId) {
@@ -185,11 +182,5 @@ public class ThingProvider extends BaseProvider {
     @Override
     public String getType(Uri uri) {
         return null;
-    }
-
-    public static void cancelDeletion(Cursor cursor) {
-        if (cursor != null) {
-            SessionCursor.cancelDeletion(cursor);
-        }
     }
 }
