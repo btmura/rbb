@@ -170,8 +170,8 @@ public class CommentProvider extends BaseProvider {
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
     public static void insertPlaceholderInBackground(final Context context,
-            final String accountName,
-            final String body, final int nesting, final int sequence, final String sessionId) {
+            final String accountName, final String body, final int nesting, final int sequence,
+            final String sessionId) {
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentValues v = new ContentValues(7);
