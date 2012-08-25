@@ -66,7 +66,7 @@ public class LinkFragment extends Fragment {
         WebSettings settings = webView.getSettings();
         settings.setBuiltInZoomControls(true);
         settings.setDisplayZoomControls(false);
-        settings.setJavaScriptEnabled(false);
+        settings.setJavaScriptEnabled(true);
         settings.setLoadWithOverviewMode(true);
         settings.setSupportZoom(true);
         settings.setPluginState(PluginState.ON_DEMAND);
