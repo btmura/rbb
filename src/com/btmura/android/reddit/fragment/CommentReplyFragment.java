@@ -45,7 +45,10 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
     /** Author of the thing you are replying to. */
     public static final String ARG_AUTHOR = "author";
 
-    /** Listener fired when the user presses the OK button. */
+    /**
+     * Listener fired when the user presses the OK button and submits a
+     * non-empty comment.
+     */
     interface OnCommentReplyListener {
         /**
          * @param thingId of the thing you are replying to
