@@ -13,7 +13,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="app_name">reddit by brian</string>
         
@@ -30,11 +30,11 @@
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
     <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
     
-    <string name="captcha_guess">Type captcha</string>
     <string name="captcha_image">Captcha image</string>
+    <string name="captcha_guess">Type captcha</string>
     
-    <string name="comment_comment_status">%1$s&#160; %2$s ago</string>
-    <string name="comment_header_status">%1$s&#160; %2$s ago&#160; %3$s</string>    
+    <string name="comment_comment_status">"%1$s  %2$s ago"</string>
+    <string name="comment_header_status">"%1$s  %2$s ago  %3$s"</string>    
     <string name="comment_reply_title">Reply to %s</string>
     <string name="comment_reply_hint">Hello, I would like to subscribe to your newsletter…</string>
     
@@ -100,10 +100,10 @@
     <string name="tab_posts">Posts</string>
     <string name="tab_subreddits">Subreddits</string>
     
-    <string name="thing_details">%1$d ups &#160; %2$d downs &#160; %3$s</string>
-    <string name="thing_nsfw">NSFW&#160;&#160;</string>
-    <string name="thing_status">%5$s%2$s&#160; %3$s ago&#160; %4$s</string>
-    <string name="thing_status_subreddit">%5$s%1$s&#160; %2$s&#160; %3$s ago&#160; %4$s</string>
+    <string name="thing_details">"%1$d ups  %2$d downs  %3$s"</string>
+    <string name="thing_nsfw">"NSFW  "</string>
+    <string name="thing_status" tools:ignore="StringFormatCount">"%5$s%2$s  %3$s ago  %4$s"</string>
+    <string name="thing_status_subreddit">"%5$s%1$s  %2$s  %3$s ago  %4$s"</string>
 
     <string name="subreddit_one_added">%s subreddit added.</string>
     <string name="subreddit_one_deleted">%s subreddit deleted.</string>
