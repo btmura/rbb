@@ -35,6 +35,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.Replies;
 import com.btmura.android.reddit.database.Votes;
 
 public class CommentProvider extends BaseProvider {
@@ -47,6 +48,7 @@ public class CommentProvider extends BaseProvider {
     public static final String PARAM_SYNC = "sync";
     public static final String PARAM_ACCOUNT_NAME = "accountName";
     public static final String PARAM_SESSION_ID = "sessionId";
+    public static final String PARAM_PARENT_THING_ID = "parentThingId";
     public static final String PARAM_THING_ID = "thingId";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
@@ -129,14 +131,36 @@ public class CommentProvider extends BaseProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+        long commentId = -1;
+        long replyId = -1;
         SQLiteDatabase db = helper.getWritableDatabase();
-        long id = db.insert(Comments.TABLE_NAME, null, values);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "insert id: " + id);
+        db.beginTransaction();
+        try {
+            commentId = db.insert(Comments.TABLE_NAME, null, values);
+
+            // Create an entry in the replies table to sync back to reddit.
+            String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
+            String thingId = uri.getQueryParameter(PARAM_THING_ID);
+            if (parentThingId != null && thingId != null) {
+                ContentValues v = new ContentValues(4);
+                v.put(Replies.COLUMN_ACCOUNT, values.getAsString(Comments.COLUMN_ACCOUNT));
+                v.put(Replies.COLUMN_PARENT_THING_ID, parentThingId);
+                v.put(Replies.COLUMN_THING_ID, thingId);
+                v.put(Replies.COLUMN_TEXT, values.getAsString(Comments.COLUMN_BODY));
+                replyId = db.insert(Replies.TABLE_NAME, null, v);
+            }
+
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "insert query: " + uri.getQuery() + " commentId: " + commentId
+                        + " replyId: " + replyId);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
         }
-        if (id != -1) {
+        if (commentId != -1) {
             getContext().getContentResolver().notifyChange(uri, null);
-            return ContentUris.withAppendedId(uri, id);
+            return ContentUris.withAppendedId(uri, commentId);
         }
         return null;
     }
@@ -173,12 +197,17 @@ public class CommentProvider extends BaseProvider {
     }
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
-    public static void insertPlaceholderInBackground(Context context,
-            final String accountName, final String body, final int nesting, final int sequence,
-            final String sessionId) {
+    public static void insertPlaceholderInBackground(Context context, final String accountName,
+            final String body, final int nesting, final String parentThingId, final int sequence,
+            final String sessionId, final String thingId) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
+                Uri uri = CONTENT_URI.buildUpon()
+                        .appendQueryParameter(PARAM_PARENT_THING_ID, parentThingId)
+                        .appendQueryParameter(PARAM_THING_ID, thingId)
+                        .build();
+
                 ContentValues v = new ContentValues(7);
                 v.put(Comments.COLUMN_ACCOUNT, accountName);
                 v.put(Comments.COLUMN_AUTHOR, accountName);
@@ -189,7 +218,7 @@ public class CommentProvider extends BaseProvider {
                 v.put(Comments.COLUMN_SESSION_ID, sessionId);
 
                 ContentResolver cr = appContext.getContentResolver();
-                cr.insert(CONTENT_URI, v);
+                cr.insert(uri, v);
             }
         });
     }

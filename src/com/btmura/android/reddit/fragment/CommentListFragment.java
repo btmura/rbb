@@ -130,14 +130,14 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         adapter.swapCursor(null);
     }
 
-    public void onCommentReply(String thingId, String text, Bundle extras) {
+    public void onCommentReply(String replyThingId, String text, Bundle extras) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCommentReply");
         }
         int nesting = extras.getInt(Comments.COLUMN_NESTING);
         int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
         CommentProvider.insertPlaceholderInBackground(getActivity(), accountName, text, nesting,
-                sequence, sessionId);
+                thingId, sequence, sessionId, replyThingId);
     }
 
     public void onVote(String thingId, int likes) {
