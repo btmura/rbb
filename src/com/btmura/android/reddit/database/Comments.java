@@ -29,7 +29,10 @@ public class Comments implements BaseColumns {
 
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_BODY = "body";
+
+    /** Creation time in seconds that can be 0 for pending replies. */
     public static final String COLUMN_CREATED_UTC = "createdUtc";
+
     public static final String COLUMN_DOWNS = "downs";
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_LIKES = "likes";
@@ -61,7 +64,7 @@ public class Comments implements BaseColumns {
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_AUTHOR + " TEXT NOT NULL, "
                 + COLUMN_BODY + " TEXT DEFAULT '', "
-                + COLUMN_CREATED_UTC + " INTEGER NOT NULL, "
+                + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
                 + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
                 + COLUMN_KIND + " INTEGER NOT NULL, "
                 + COLUMN_LIKES + " INTEGER DEFAULT 0, "

@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -28,6 +29,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -54,13 +56,9 @@ public class CommentProvider extends BaseProvider {
     }
 
     private static final String COMMENTS_WITH_VOTES = Comments.TABLE_NAME
-            + " LEFT OUTER JOIN (SELECT "
-            + Votes.COLUMN_ACCOUNT + ", "
-            + Votes.COLUMN_THING_ID + ", "
-            + Votes.COLUMN_VOTE
-            + " FROM " + Votes.TABLE_NAME + ") USING ("
-            + Votes.COLUMN_ACCOUNT + ", "
-            + Comments.COLUMN_THING_ID + ")";
+            + " LEFT OUTER JOIN (SELECT " + Votes.COLUMN_ACCOUNT + ", " + Votes.COLUMN_THING_ID
+            + ", " + Votes.COLUMN_VOTE + " FROM " + Votes.TABLE_NAME + ") USING ("
+            + Votes.COLUMN_ACCOUNT + ", " + Comments.COLUMN_THING_ID + ")";
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
@@ -75,8 +73,8 @@ public class CommentProvider extends BaseProvider {
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor c = db.query(COMMENTS_WITH_VOTES, projection, selection, selectionArgs,
-                null, null, sortOrder);
+        Cursor c = db.query(COMMENTS_WITH_VOTES, projection, selection, selectionArgs, null, null,
+                sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
     }
@@ -109,9 +107,8 @@ public class CommentProvider extends BaseProvider {
             }
             if (BuildConfig.DEBUG) {
                 long t2 = System.currentTimeMillis();
-                Log.d(TAG, "sync network: " + listing.networkTimeMs
-                        + " parse: " + listing.parseTimeMs
-                        + " db: " + (t2 - t1));
+                Log.d(TAG, "sync network: " + listing.networkTimeMs + " parse: "
+                        + listing.parseTimeMs + " db: " + (t2 - t1));
             }
         } catch (OperationCanceledException e) {
             Log.e(TAG, "sync", e);
@@ -169,5 +166,26 @@ public class CommentProvider extends BaseProvider {
     @Override
     public String getType(Uri uri) {
         return null;
+    }
+
+    /** Inserts a placeholder comment yet to be synced with Reddit. */
+    public static void insertPlaceholderInBackground(final Context context,
+            final String accountName,
+            final String body, final int nesting, final int sequence, final String sessionId) {
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            public void run() {
+                ContentValues v = new ContentValues(7);
+                v.put(Comments.COLUMN_ACCOUNT, accountName);
+                v.put(Comments.COLUMN_AUTHOR, accountName);
+                v.put(Comments.COLUMN_BODY, body);
+                v.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
+                v.put(Comments.COLUMN_NESTING, nesting);
+                v.put(Comments.COLUMN_SEQUENCE, sequence);
+                v.put(Comments.COLUMN_SESSION_ID, sessionId);
+
+                ContentResolver cr = context.getContentResolver();
+                cr.insert(CONTENT_URI, v);
+            }
+        });
     }
 }
