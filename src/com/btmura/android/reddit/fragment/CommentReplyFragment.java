@@ -82,8 +82,8 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof OnCommentReplyListener) {
-            this.listener = (OnCommentReplyListener) activity;
+        if (getTargetFragment() instanceof OnCommentReplyListener) {
+            this.listener = (OnCommentReplyListener) getTargetFragment();
         }
     }
 

@@ -39,7 +39,9 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.fragment.CommentReplyFragment.OnCommentReplyListener;
+import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -120,6 +122,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public void onCommentReply(String thingId, String text, Bundle extras) {
+        int nesting = extras.getInt(Comments.COLUMN_NESTING);
+        int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
+        CommentProvider.insertPlaceholderInBackground(getActivity(), accountName, text, nesting,
+                sequence, sessionId);
     }
 
     public void onVote(String thingId, int likes) {
@@ -171,8 +177,22 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (position != -1) {
             String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
             String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
-            Bundle extras = Bundle.EMPTY;
+
+            // Nest an additional level if this is a response to a comment.
+            int nesting = adapter.getInt(position, CommentAdapter.INDEX_NESTING);
+            if (position != 0) {
+                nesting++;
+            }
+
+            // Use the same sequence so this appears below the comment.
+            int sequence = adapter.getInt(position, CommentAdapter.INDEX_SEQUENCE);
+
+            Bundle extras = new Bundle(2);
+            extras.putInt(Comments.COLUMN_NESTING, nesting);
+            extras.putInt(Comments.COLUMN_SEQUENCE, sequence);
+
             CommentReplyFragment frag = CommentReplyFragment.newInstance(thingId, author, extras);
+            frag.setTargetFragment(this, 0);
             frag.show(getFragmentManager(), CommentReplyFragment.TAG);
         }
 
