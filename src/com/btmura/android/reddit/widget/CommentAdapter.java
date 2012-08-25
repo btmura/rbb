@@ -24,13 +24,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.util.ArrayUtils;
 
-public class CommentAdapter extends CursorAdapter {
+public class CommentAdapter extends BaseCursorAdapter {
 
     private static final String[] PROJECTION = {
             Comments._ID,
@@ -50,19 +49,21 @@ public class CommentAdapter extends CursorAdapter {
             Comments.COLUMN_VOTE,
     };
 
-    private static int INDEX_ID = -1;
-    private static int INDEX_AUTHOR;
-    private static int INDEX_BODY;
-    private static int INDEX_CREATED_UTC;
-    private static int INDEX_DOWNS;
-    private static int INDEX_KIND;
-    private static int INDEX_LIKES;
-    private static int INDEX_NESTING;
-    private static int INDEX_NUM_COMMENTS;
-    private static int INDEX_TITLE;
-    private static int INDEX_THING_ID;
-    private static int INDEX_UPS;
-    private static int INDEX_VOTE;
+    public static int INDEX_ID = 0;
+    public static int INDEX_AUTHOR = 1;
+    public static int INDEX_BODY = 2;
+    public static int INDEX_CREATED_UTC = 3;
+    public static int INDEX_DOWNS = 4;
+    public static int INDEX_KIND = 5;
+    public static int INDEX_LIKES = 6;
+    public static int INDEX_NESTING = 7;
+    public static int INDEX_NUM_COMMENTS = 8;
+    public static int INDEX_SEQUENCE = 9;
+    public static int INDEX_SESSION_ID = 10;
+    public static int INDEX_TITLE = 11;
+    public static int INDEX_THING_ID = 12;
+    public static int INDEX_UPS = 13;
+    public static int INDEX_VOTE = 14;
 
     private final long nowTimeMs = System.currentTimeMillis();
     private final OnVoteListener listener;
@@ -103,8 +104,6 @@ public class CommentAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        initColumnIndices(cursor);
-
         String author = cursor.getString(INDEX_AUTHOR);
         String body = cursor.getString(INDEX_BODY);
         long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
@@ -126,41 +125,5 @@ public class CommentAdapter extends CursorAdapter {
         cv.setOnVoteListener(listener);
         cv.setData(author, body, createdUtc, downs, kind, likes, nesting, nowTimeMs, numComments,
                 title, thingId, ups);
-    }
-
-    public String getAuthor(int position) {
-        Cursor c = getCursor();
-        if (c != null && c.moveToPosition(position)) {
-            initColumnIndices(c);
-            return c.getString(INDEX_AUTHOR);
-        }
-        return null;
-    }
-
-    public String getThingId(int position) {
-        Cursor c = getCursor();
-        if (c != null && c.moveToPosition(position)) {
-            initColumnIndices(c);
-            return c.getString(INDEX_THING_ID);
-        }
-        return null;
-    }
-
-    private static void initColumnIndices(Cursor c) {
-        if (INDEX_ID == -1) {
-            INDEX_ID = c.getColumnIndexOrThrow(Comments._ID);
-            INDEX_AUTHOR = c.getColumnIndexOrThrow(Comments.COLUMN_AUTHOR);
-            INDEX_BODY = c.getColumnIndexOrThrow(Comments.COLUMN_BODY);
-            INDEX_CREATED_UTC = c.getColumnIndexOrThrow(Comments.COLUMN_CREATED_UTC);
-            INDEX_DOWNS = c.getColumnIndexOrThrow(Comments.COLUMN_DOWNS);
-            INDEX_KIND = c.getColumnIndexOrThrow(Comments.COLUMN_KIND);
-            INDEX_LIKES = c.getColumnIndexOrThrow(Comments.COLUMN_LIKES);
-            INDEX_NESTING = c.getColumnIndexOrThrow(Comments.COLUMN_NESTING);
-            INDEX_NUM_COMMENTS = c.getColumnIndexOrThrow(Comments.COLUMN_NUM_COMMENTS);
-            INDEX_TITLE = c.getColumnIndexOrThrow(Comments.COLUMN_TITLE);
-            INDEX_THING_ID = c.getColumnIndexOrThrow(Comments.COLUMN_THING_ID);
-            INDEX_UPS = c.getColumnIndexOrThrow(Comments.COLUMN_UPS);
-            INDEX_VOTE = c.getColumnIndexOrThrow(Comments.COLUMN_VOTE);
-        }
     }
 }

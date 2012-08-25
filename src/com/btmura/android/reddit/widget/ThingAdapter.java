@@ -27,14 +27,13 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.ArrayUtils;
 
-public class ThingAdapter extends CursorAdapter {
+public class ThingAdapter extends BaseCursorAdapter {
 
     private static final String[] PROJECTION = {
             Things._ID,
@@ -58,25 +57,25 @@ public class ThingAdapter extends CursorAdapter {
             Things.COLUMN_VOTE,
     };
 
-    public static int INDEX_ID = -1;
-    public static int INDEX_AUTHOR;
-    public static int INDEX_CREATED_UTC;
-    public static int INDEX_DOMAIN;
-    public static int INDEX_DOWNS;
-    public static int INDEX_KIND;
-    public static int INDEX_LIKES;
-    public static int INDEX_NUM_COMMENTS;
-    public static int INDEX_OVER_18;
-    public static int INDEX_PERMA_LINK;
-    public static int INDEX_SCORE;
-    public static int INDEX_SELF;
-    public static int INDEX_SUBREDDIT;
-    public static int INDEX_TITLE;
-    public static int INDEX_THING_ID;
-    public static int INDEX_THUMBNAIL_URL;
-    public static int INDEX_UPS;
-    public static int INDEX_URL;
-    public static int INDEX_VOTE;
+    public static int INDEX_ID = 0;
+    public static int INDEX_AUTHOR = 1;
+    public static int INDEX_CREATED_UTC = 2;
+    public static int INDEX_DOMAIN = 3;
+    public static int INDEX_DOWNS = 4;
+    public static int INDEX_KIND = 5;
+    public static int INDEX_LIKES = 6;
+    public static int INDEX_NUM_COMMENTS = 7;
+    public static int INDEX_OVER_18 = 8;
+    public static int INDEX_PERMA_LINK = 9;
+    public static int INDEX_SCORE = 10;
+    public static int INDEX_SELF = 11;
+    public static int INDEX_SUBREDDIT = 12;
+    public static int INDEX_TITLE = 13;
+    public static int INDEX_THING_ID = 14;
+    public static int INDEX_THUMBNAIL_URL = 15;
+    public static int INDEX_UPS = 16;
+    public static int INDEX_URL = 17;
+    public static int INDEX_VOTE = 18;
 
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final long nowTimeMs = System.currentTimeMillis();
@@ -133,17 +132,11 @@ public class ThingAdapter extends CursorAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        Cursor c = getCursor();
-        if (c != null && c.moveToPosition(position)) {
-            initColumnIndices(c);
-            return c.getInt(INDEX_KIND);
-        }
-        throw new IllegalStateException();
+        return getInt(position, INDEX_KIND);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        initColumnIndices(cursor);
         int kind = cursor.getInt(INDEX_KIND);
         switch (kind) {
             case Things.KIND_THING:
@@ -160,7 +153,6 @@ public class ThingAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         if (view instanceof ThingView) {
-            initColumnIndices(cursor);
             String author = cursor.getString(INDEX_AUTHOR);
             long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
             String domain = cursor.getString(INDEX_DOMAIN);
@@ -192,7 +184,6 @@ public class ThingAdapter extends CursorAdapter {
     public String getMoreThingId() {
         Cursor c = getCursor();
         if (c != null && c.moveToLast()) {
-            initColumnIndices(c);
             if (c.getInt(INDEX_KIND) == Things.KIND_MORE) {
                 return c.getString(INDEX_THING_ID);
             }
@@ -203,34 +194,9 @@ public class ThingAdapter extends CursorAdapter {
     public Bundle getThingBundle(int position) {
         Cursor c = getCursor();
         if (c != null && c.moveToPosition(position)) {
-            initColumnIndices(c);
             return makeBundle(c);
         }
         return null;
-    }
-
-    private static void initColumnIndices(Cursor c) {
-        if (INDEX_ID == -1) {
-            INDEX_ID = c.getColumnIndexOrThrow(Things._ID);
-            INDEX_AUTHOR = c.getColumnIndexOrThrow(Things.COLUMN_AUTHOR);
-            INDEX_CREATED_UTC = c.getColumnIndexOrThrow(Things.COLUMN_CREATED_UTC);
-            INDEX_DOMAIN = c.getColumnIndexOrThrow(Things.COLUMN_DOMAIN);
-            INDEX_DOWNS = c.getColumnIndexOrThrow(Things.COLUMN_DOWNS);
-            INDEX_KIND = c.getColumnIndexOrThrow(Things.COLUMN_KIND);
-            INDEX_LIKES = c.getColumnIndexOrThrow(Things.COLUMN_LIKES);
-            INDEX_NUM_COMMENTS = c.getColumnIndexOrThrow(Things.COLUMN_NUM_COMMENTS);
-            INDEX_OVER_18 = c.getColumnIndexOrThrow(Things.COLUMN_OVER_18);
-            INDEX_PERMA_LINK = c.getColumnIndexOrThrow(Things.COLUMN_PERMA_LINK);
-            INDEX_SCORE = c.getColumnIndexOrThrow(Things.COLUMN_SCORE);
-            INDEX_SELF = c.getColumnIndexOrThrow(Things.COLUMN_SELF);
-            INDEX_SUBREDDIT = c.getColumnIndexOrThrow(Things.COLUMN_SUBREDDIT);
-            INDEX_TITLE = c.getColumnIndexOrThrow(Things.COLUMN_TITLE);
-            INDEX_THING_ID = c.getColumnIndexOrThrow(Things.COLUMN_THING_ID);
-            INDEX_THUMBNAIL_URL = c.getColumnIndexOrThrow(Things.COLUMN_THUMBNAIL_URL);
-            INDEX_UPS = c.getColumnIndexOrThrow(Things.COLUMN_UPS);
-            INDEX_URL = c.getColumnIndexOrThrow(Things.COLUMN_URL);
-            INDEX_VOTE = c.getColumnIndexOrThrow(Things.COLUMN_VOTE);
-        }
     }
 
     private static Bundle makeBundle(Cursor c) {
