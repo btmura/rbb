@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.fragment;
 
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,30 +26,43 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.provider.ReplyProvider;
 
+/**
+ * {@link DialogFragment} that displays a text box for the user to fill in to
+ * respond to a thing.
+ */
 public class CommentReplyFragment extends DialogFragment implements OnClickListener {
+
+    // This fragment only reports back the user's input and doesn't handle
+    // modifying the database. The caller of this fragment should handle that.
 
     public static final String TAG = "CommentReplyFragment";
 
-    public static final String ARG_ACCOUNT_NAME = "accountName";
-    public static final String ARG_PARENT_THING_ID = "parentThingId";
+    /** Thing id of the thing you are replying to. */
     public static final String ARG_THING_ID = "thingId";
+
+    /** Author of the thing you are replying to. */
     public static final String ARG_AUTHOR = "author";
 
-    private String accountName;
-    private String parentThingId;
-    private String thingId;
-    private String author;
+    /** Listener fired when the user presses the OK button. */
+    interface OnCommentReplyListener {
+        /**
+         * @param thingId of the thing you are replying to
+         * @param text of your reply
+         */
+        void onCommentReply(String thingId, String text);
+    }
+
+    private OnCommentReplyListener listener;
     private EditText bodyText;
-    private View cancel;
     private View ok;
 
-    public static CommentReplyFragment newInstance(String accountName, String parentThingId,
-            String thingId, String author) {
-        Bundle args = new Bundle(4);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_PARENT_THING_ID, parentThingId);
+    /**
+     * @param thingId of the thing the user is replying to
+     * @param author of the thing the user is replying to
+     */
+    public static CommentReplyFragment newInstance(String thingId, String author) {
+        Bundle args = new Bundle(2);
         args.putString(ARG_THING_ID, thingId);
         args.putString(ARG_AUTHOR, author);
         CommentReplyFragment frag = new CommentReplyFragment();
@@ -57,35 +71,31 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-        parentThingId = getArguments().getString(ARG_PARENT_THING_ID);
-        thingId = getArguments().getString(ARG_THING_ID);
-        author = getArguments().getString(ARG_AUTHOR);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnCommentReplyListener) {
+            this.listener = (OnCommentReplyListener) activity;
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        String author = getArguments().getString(ARG_AUTHOR);
         getDialog().setTitle(getString(R.string.comment_reply_title, author));
 
         View v = inflater.inflate(R.layout.comment_reply, container, false);
         bodyText = (EditText) v.findViewById(R.id.body_text);
-        cancel = v.findViewById(R.id.cancel);
-        cancel.setOnClickListener(this);
         ok = v.findViewById(R.id.ok);
         ok.setOnClickListener(this);
+        v.findViewById(R.id.cancel).setOnClickListener(this);
         return v;
     }
 
     public void onClick(View view) {
-        if (view == ok) {
-            ReplyProvider.replyInBackground(getActivity(), accountName, parentThingId, thingId,
-                    bodyText.getText().toString());
-            dismiss();
-        } else if (view == cancel) {
-            dismiss();
+        if (view == ok && listener != null) {
+            String thingId = getArguments().getString(ARG_THING_ID);
+            listener.onCommentReply(thingId, bodyText.getText().toString());
         }
-
+        dismiss();
     }
 }

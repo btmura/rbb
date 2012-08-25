@@ -167,8 +167,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (position != -1) {
             String replyThingId = adapter.getThingId(position);
             String author = adapter.getAuthor(position);
-            CommentReplyFragment frag = CommentReplyFragment.newInstance(accountName,
-                    thingId, replyThingId, author);
+            CommentReplyFragment frag = CommentReplyFragment.newInstance(replyThingId, author);
             frag.show(getFragmentManager(), CommentReplyFragment.TAG);
         }
 
