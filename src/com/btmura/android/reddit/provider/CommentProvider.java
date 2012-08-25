@@ -56,9 +56,13 @@ public class CommentProvider extends BaseProvider {
     }
 
     private static final String COMMENTS_WITH_VOTES = Comments.TABLE_NAME
-            + " LEFT OUTER JOIN (SELECT " + Votes.COLUMN_ACCOUNT + ", " + Votes.COLUMN_THING_ID
-            + ", " + Votes.COLUMN_VOTE + " FROM " + Votes.TABLE_NAME + ") USING ("
-            + Votes.COLUMN_ACCOUNT + ", " + Comments.COLUMN_THING_ID + ")";
+            + " LEFT OUTER JOIN (SELECT "
+            + Votes.COLUMN_ACCOUNT + ", "
+            + Votes.COLUMN_THING_ID + ", "
+            + Votes.COLUMN_VOTE
+            + " FROM " + Votes.TABLE_NAME + ") USING ("
+            + Votes.COLUMN_ACCOUNT + ", "
+            + Comments.COLUMN_THING_ID + ")";
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
