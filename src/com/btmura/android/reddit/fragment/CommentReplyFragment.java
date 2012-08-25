@@ -19,6 +19,7 @@ package com.btmura.android.reddit.fragment;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -92,9 +93,15 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
     }
 
     public void onClick(View view) {
-        if (view == ok && listener != null) {
-            String thingId = getArguments().getString(ARG_THING_ID);
-            listener.onCommentReply(thingId, bodyText.getText().toString());
+        if (view == ok) {
+            if (TextUtils.isEmpty(bodyText.getText())) {
+                bodyText.setError(getString(R.string.error_blank_field));
+                return;
+            }
+            if (listener != null) {
+                String thingId = getArguments().getString(ARG_THING_ID);
+                listener.onCommentReply(thingId, bodyText.getText().toString());
+            }
         }
         dismiss();
     }
