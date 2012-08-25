@@ -173,9 +173,10 @@ public class CommentProvider extends BaseProvider {
     }
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
-    public static void insertPlaceholderInBackground(final Context context,
+    public static void insertPlaceholderInBackground(Context context,
             final String accountName, final String body, final int nesting, final int sequence,
             final String sessionId) {
+        final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentValues v = new ContentValues(7);
@@ -187,7 +188,7 @@ public class CommentProvider extends BaseProvider {
                 v.put(Comments.COLUMN_SEQUENCE, sequence);
                 v.put(Comments.COLUMN_SESSION_ID, sessionId);
 
-                ContentResolver cr = context.getContentResolver();
+                ContentResolver cr = appContext.getContentResolver();
                 cr.insert(CONTENT_URI, v);
             }
         });
