@@ -18,16 +18,11 @@
 
     <dimen name="arrow_head_height">10dp</dimen>
     <dimen name="arrow_stem_width">6dp</dimen>
-    <dimen name="arrow_spacing">4dp</dimen>
     <dimen name="arrow_total_width">14dp</dimen>
     <dimen name="arrow_total_height">18dp</dimen>
-    <dimen name="bubble_horizontal_padding">4dp</dimen>
-    <dimen name="bubble_vertical_padding">2dp</dimen>
-    <dimen name="bubble_spacing">4dp</dimen>
     <dimen name="score_total_height">34dp</dimen>
     <dimen name="element_padding">8dp</dimen>
     <dimen name="max_details_width">300dp</dimen>
-    <dimen name="min_dialog_content_height">72dp</dimen>
     <dimen name="min_details_width">100dp</dimen>
     <dimen name="padding">16dp</dimen>
     <dimen name="subreddit_list_width">150dp</dimen>
