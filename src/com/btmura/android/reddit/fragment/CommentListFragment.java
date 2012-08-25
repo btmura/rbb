@@ -54,6 +54,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_ID = "thingId";
 
+    private static final String STATE_SESSION_ID = "sessionId";
+
     private String accountName;
     private String sessionId;
     private String thingId;
@@ -73,7 +75,14 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         super.onCreate(savedInstanceState);
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
         thingId = getArguments().getString(ARG_THING_ID);
-        sessionId = thingId + "-" + System.currentTimeMillis();
+
+        // Don't create a new session if changing configuration.
+        if (savedInstanceState != null) {
+            sessionId = savedInstanceState.getString(STATE_SESSION_ID);
+        } else {
+            sessionId = thingId + "-" + System.currentTimeMillis();
+        }
+
         adapter = new CommentAdapter(getActivity(), this);
     }
 
@@ -122,6 +131,9 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public void onCommentReply(String thingId, String text, Bundle extras) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onCommentReply");
+        }
         int nesting = extras.getInt(Comments.COLUMN_NESTING);
         int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
         CommentProvider.insertPlaceholderInBackground(getActivity(), accountName, text, nesting,
@@ -204,6 +216,11 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public void onDestroyActionMode(ActionMode mode) {
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(STATE_SESSION_ID, sessionId);
     }
 
     @Override

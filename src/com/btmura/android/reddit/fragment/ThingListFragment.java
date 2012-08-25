@@ -61,8 +61,9 @@ public class ThingListFragment extends ListFragment implements
     private static final String ARG_QUERY = "q";
     private static final String ARG_FLAGS = "l";
 
-    private static final String STATE_THING_NAME = "n";
-    private static final String STATE_THING_POSITION = "p";
+    private static final String STATE_SESSION_ID = "sessionId";
+    private static final String STATE_THING_NAME = "thingName";
+    private static final String STATE_THING_POSITION = "position";
 
     private static final String LOADER_ARG_MORE = "m";
 
@@ -113,7 +114,13 @@ public class ThingListFragment extends ListFragment implements
         filter = b.getInt(ARG_FILTER);
         query = b.getString(ARG_QUERY);
 
-        sessionId = Subreddit.getName(subreddit) + "-" + System.currentTimeMillis();
+        // Don't create a new session when changing configuration.
+        if (savedInstanceState != null) {
+            sessionId = savedInstanceState.getString(STATE_SESSION_ID);
+        } else {
+            sessionId = Subreddit.getName(subreddit) + "-" + System.currentTimeMillis();
+        }
+
         adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), this);
         setHasOptionsMenu(true);
     }
@@ -217,6 +224,7 @@ public class ThingListFragment extends ListFragment implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(ARG_ACCOUNT_NAME, accountName);
+        outState.putString(STATE_SESSION_ID, sessionId);
         outState.putParcelable(ARG_SUBREDDIT, subreddit);
         outState.putInt(ARG_FILTER, filter);
         outState.putString(ARG_QUERY, query);
