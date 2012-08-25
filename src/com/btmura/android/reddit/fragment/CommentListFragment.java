@@ -39,12 +39,13 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.fragment.CommentReplyFragment.OnCommentReplyListener;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
-        MultiChoiceModeListener, OnVoteListener {
+        MultiChoiceModeListener, OnCommentReplyListener, OnVoteListener {
 
     public static final String TAG = "CommentListFragment";
 
@@ -118,6 +119,9 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         adapter.swapCursor(null);
     }
 
+    public void onCommentReply(String thingId, String text, Bundle extras) {
+    }
+
     public void onVote(String thingId, int likes) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLike thingId: " + thingId + " likes: " + likes);
@@ -165,9 +169,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         }
 
         if (position != -1) {
-            String replyThingId = adapter.getThingId(position);
+            String thingId = adapter.getThingId(position);
             String author = adapter.getAuthor(position);
-            CommentReplyFragment frag = CommentReplyFragment.newInstance(replyThingId, author);
+            Bundle extras = Bundle.EMPTY;
+            CommentReplyFragment frag = CommentReplyFragment.newInstance(thingId, author, extras);
             frag.show(getFragmentManager(), CommentReplyFragment.TAG);
         }
 

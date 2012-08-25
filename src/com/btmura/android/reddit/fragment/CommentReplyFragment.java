@@ -39,11 +39,14 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
 
     public static final String TAG = "CommentReplyFragment";
 
-    /** Thing id of the thing you are replying to. */
+    /** String extra with thing id you are replying to. */
     public static final String ARG_THING_ID = "thingId";
 
-    /** Author of the thing you are replying to. */
+    /** String extra specifying author of the thing you are replying to. */
     public static final String ARG_AUTHOR = "author";
+
+    /** Bundle that will be passed back via listener callbacks. */
+    public static final String ARG_EXTRAS = "extras";
 
     /**
      * Listener fired when the user presses the OK button and submits a
@@ -53,8 +56,9 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
         /**
          * @param thingId of the thing you are replying to
          * @param text of your reply
+         * @param extras passed to the fragment
          */
-        void onCommentReply(String thingId, String text);
+        void onCommentReply(String thingId, String text, Bundle extras);
     }
 
     private OnCommentReplyListener listener;
@@ -65,10 +69,11 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
      * @param thingId of the thing the user is replying to
      * @param author of the thing the user is replying to
      */
-    public static CommentReplyFragment newInstance(String thingId, String author) {
-        Bundle args = new Bundle(2);
+    public static CommentReplyFragment newInstance(String thingId, String author, Bundle extras) {
+        Bundle args = new Bundle(3);
         args.putString(ARG_THING_ID, thingId);
         args.putString(ARG_AUTHOR, author);
+        args.putBundle(ARG_EXTRAS, extras);
         CommentReplyFragment frag = new CommentReplyFragment();
         frag.setArguments(args);
         return frag;
@@ -103,7 +108,8 @@ public class CommentReplyFragment extends DialogFragment implements OnClickListe
             }
             if (listener != null) {
                 String thingId = getArguments().getString(ARG_THING_ID);
-                listener.onCommentReply(thingId, bodyText.getText().toString());
+                Bundle extras = getArguments().getBundle(ARG_EXTRAS);
+                listener.onCommentReply(thingId, bodyText.getText().toString(), extras);
             }
         }
         dismiss();
