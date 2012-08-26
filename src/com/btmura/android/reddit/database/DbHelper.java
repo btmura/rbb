@@ -44,6 +44,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 Comments.createTable(db);
                 Replies.createTable(db);
                 Votes.createTable(db);
+                SubredditSearches.createTable(db);
             } else {
                 Subreddits.createSubredditsV1(db);
             }
@@ -64,6 +65,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 Comments.createTable(db);
                 Replies.createTable(db);
                 Votes.createTable(db);
+                SubredditSearches.createTable(db);
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
