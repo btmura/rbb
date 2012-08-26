@@ -76,9 +76,8 @@ public class ThingProvider extends BaseProvider {
             Log.d(TAG, "query: " + uri.getQuery());
         }
 
-        String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
         if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
-            sync(uri, sessionId);
+            sync(uri);
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -88,13 +87,14 @@ public class ThingProvider extends BaseProvider {
         return c;
     }
 
-    private void sync(Uri uri, String sessionId) {
+    private void sync(Uri uri) {
         Cursor c = null;
         try {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String cookie = AccountUtils.getCookie(context, accountName);
 
+            String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
             String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
             int filter = Integer.parseInt(uri.getQueryParameter(PARAM_FILTER));
             String more = uri.getQueryParameter(PARAM_MORE);
@@ -105,9 +105,8 @@ public class ThingProvider extends BaseProvider {
 
             long t1 = System.currentTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();
+            db.beginTransaction();
             try {
-                db.beginTransaction();
-
                 // Delete the loading more element before appending more.
                 db.delete(Things.TABLE_NAME, Things.SELECTION_BY_SESSION_ID_AND_MORE,
                         ArrayUtils.toArray(sessionId));
@@ -120,7 +119,6 @@ public class ThingProvider extends BaseProvider {
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
-                db.close();
             }
             if (BuildConfig.DEBUG) {
                 long t2 = System.currentTimeMillis();

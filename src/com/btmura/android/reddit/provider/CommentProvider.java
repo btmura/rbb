@@ -99,8 +99,8 @@ public class CommentProvider extends BaseProvider {
 
             long t1 = System.currentTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();
+            db.beginTransaction();
             try {
-                db.beginTransaction();
                 InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
                 int count = listing.values.size();
                 for (int i = 0; i < count; i++) {
@@ -109,7 +109,6 @@ public class CommentProvider extends BaseProvider {
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
-                db.close();
             }
             if (BuildConfig.DEBUG) {
                 long t2 = System.currentTimeMillis();
