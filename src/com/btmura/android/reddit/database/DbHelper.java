@@ -36,40 +36,28 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.beginTransaction();
-        try {
-            if (version > 1) {
-                Subreddits.createSubredditsV2(db);
-                Things.createTable(db);
-                Comments.createTable(db);
-                Replies.createTable(db);
-                Votes.createTable(db);
-                SubredditSearches.createTable(db);
-            } else {
-                Subreddits.createSubredditsV1(db);
-            }
-            Subreddits.insertDefaultSubreddits(db);
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
+        if (version > 1) {
+            Subreddits.createSubredditsV2(db);
+            Things.createTable(db);
+            Comments.createTable(db);
+            Replies.createTable(db);
+            Votes.createTable(db);
+            SubredditSearches.createTable(db);
+        } else {
+            Subreddits.createSubredditsV1(db);
         }
+        Subreddits.insertDefaultSubreddits(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion == 1 && newVersion == 2) {
-            db.beginTransaction();
-            try {
-                Subreddits.upgradeSubredditsV2(db);
-                Things.createTable(db);
-                Comments.createTable(db);
-                Replies.createTable(db);
-                Votes.createTable(db);
-                SubredditSearches.createTable(db);
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
-            }
+            Subreddits.upgradeSubredditsV2(db);
+            Things.createTable(db);
+            Comments.createTable(db);
+            Replies.createTable(db);
+            Votes.createTable(db);
+            SubredditSearches.createTable(db);
         }
     }
 }
