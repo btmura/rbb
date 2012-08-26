@@ -101,15 +101,20 @@
             android:exported="false"
             android:label="@string/provider_comments" />
         <provider
+            android:name=".provider.ReplyProvider"
+            android:authorities="@string/authority_replies"
+            android:exported="false"
+            android:label="@string/provider_replies" />
+        <provider
             android:name=".provider.SubredditProvider"
             android:authorities="@string/authority_subreddits"
             android:exported="true"
             android:label="@string/provider_subreddits" />
         <provider
-            android:name=".provider.ReplyProvider"
-            android:authorities="@string/authority_replies"
+            android:name=".provider.SubredditSearchProvider"
+            android:authorities="@string/authority_subreddit_searches"
             android:exported="false"
-            android:label="@string/provider_replies" />
+            android:label="@string/provider_subreddit_searches" />
         <provider
             android:name=".provider.ThingProvider"
             android:authorities="@string/authority_things"
