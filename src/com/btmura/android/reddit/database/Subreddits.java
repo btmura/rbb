@@ -16,8 +16,14 @@
 
 package com.btmura.android.reddit.database;
 
-import android.provider.BaseColumns;
+import java.util.ArrayList;
 
+import com.btmura.android.reddit.util.ArrayUtils;
+
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 
 public class Subreddits implements BaseColumns, SyncColumns {
     public static final String TABLE_NAME = "subreddits";
@@ -31,4 +37,83 @@ public class Subreddits implements BaseColumns, SyncColumns {
 
     public static final String NAME_FRONT_PAGE = "";
     public static final String ACCOUNT_NONE = "";
+
+    static void createSubredditsV2(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + Subreddits.TABLE_NAME + " ("
+                + Subreddits._ID + " INTEGER PRIMARY KEY, "
+                + Subreddits.COLUMN_ACCOUNT + " TEXT DEFAULT '', "
+                + Subreddits.COLUMN_NAME + " TEXT NOT NULL, "
+                + Subreddits.COLUMN_STATE + " INTEGER DEFAULT 0, "
+                + Subreddits.COLUMN_EXPIRATION + " INTEGER DEFAULT 0, "
+                + "UNIQUE (" + Subreddits.COLUMN_ACCOUNT + "," + Subreddits.COLUMN_NAME + "))");
+    }
+
+    static void createSubredditsV1(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + Subreddits.TABLE_NAME + " ("
+                + Subreddits._ID + " INTEGER PRIMARY KEY, "
+                + Subreddits.COLUMN_NAME + " TEXT UNIQUE NOT NULL)");
+        db.execSQL("CREATE UNIQUE INDEX " + Subreddits.COLUMN_NAME
+                + " ON " + Subreddits.TABLE_NAME + " ("
+                + Subreddits.COLUMN_NAME + " ASC)");
+    }
+
+    static void insertDefaultSubreddits(SQLiteDatabase db) {
+        String[] defaultSubreddits = {
+                "",
+                "AdviceAnimals",
+                "announcements",
+                "AskReddit",
+                "askscience",
+                "atheism",
+                "aww",
+                "blog",
+                "funny",
+                "gaming",
+                "IAmA",
+                "movies",
+                "Music",
+                "pics",
+                "politics",
+                "science",
+                "technology",
+                "todayilearned",
+                "videos",
+                "worldnews",
+                "WTF",};
+
+        for (int i = 0; i < defaultSubreddits.length; i++) {
+            ContentValues values = new ContentValues(1);
+            values.put(Subreddits.COLUMN_NAME, defaultSubreddits[i]);
+            db.insert(Subreddits.TABLE_NAME, null, values);
+        }
+    }
+
+    static void upgradeSubredditsV2(SQLiteDatabase db) {
+        // 1. Back up the old subreddit rows into ContentValues.
+        ArrayList<ContentValues> rows = getSubredditNames(db);
+
+        // 2. Drop the old table and index.
+        db.execSQL("DROP INDEX " + Subreddits.COLUMN_NAME);
+        db.execSQL("DROP TABLE " + Subreddits.TABLE_NAME);
+
+        // 3. Create the new table and import the backed up subreddits.
+        createSubredditsV2(db);
+        int count = rows.size();
+        for (int i = 0; i < count; i++) {
+            db.insert(Subreddits.TABLE_NAME, null, rows.get(i));
+        }
+    }
+
+    private static ArrayList<ContentValues> getSubredditNames(SQLiteDatabase db) {
+        Cursor c = db.query(Subreddits.TABLE_NAME, ArrayUtils.toArray(Subreddits.COLUMN_NAME),
+                null, null, null, null, null);
+        ArrayList<ContentValues> rows = new ArrayList<ContentValues>(c.getCount());
+        while (c.moveToNext()) {
+            ContentValues values = new ContentValues(1);
+            values.put(Subreddits.COLUMN_NAME, c.getString(0));
+            rows.add(values);
+        }
+        c.close();
+        return rows;
+    }
 }
