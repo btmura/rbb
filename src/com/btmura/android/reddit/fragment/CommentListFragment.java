@@ -147,17 +147,18 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        boolean hasAccount = AccountUtils.isAccount(accountName);
-        if (hasAccount) {
+        if (AccountUtils.isAccount(accountName)) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.comment_action_menu, menu);
+            return true;
         }
-        return hasAccount;
+        return false;
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        boolean showReply = getListView().getCheckedItemCount() == 1;
-        menu.findItem(R.id.menu_reply).setVisible(showReply);
+        if (!isActionModeValid()) {
+            mode.finish();
+        }
         return true;
     }
 
@@ -173,16 +174,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     private void handleReply(ActionMode mode) {
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        int position = -1;
-        int size = adapter.getCount();
-        for (int i = 0; i < size; i++) {
-            if (checked.get(i)) {
-                position = i;
-                break;
-            }
-        }
-
+        int position = getFirstCheckedPosition();
         if (position != -1) {
             String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
             String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
@@ -226,5 +218,27 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             CommentAdapter.deleteSessionData(getActivity().getApplicationContext(), sessionId);
         }
         super.onDestroy();
+    }
+
+    private boolean isActionModeValid() {
+        if (!AccountUtils.isAccount(accountName)
+                || getListView().getCheckedItemCount() != 1) {
+            return false;
+        }
+
+        int position = getFirstCheckedPosition();
+        String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
+        return !TextUtils.isEmpty(thingId);
+    }
+
+    private int getFirstCheckedPosition() {
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int size = adapter.getCount();
+        for (int i = 0; i < size; i++) {
+            if (checked.get(i)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
