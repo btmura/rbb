@@ -18,6 +18,7 @@ package com.btmura.android.reddit.fragment;
 
 import java.util.regex.Pattern;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -62,6 +63,7 @@ public class LinkFragment extends Fragment {
         return view;
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void setupWebView(WebView webView) {
         WebSettings settings = webView.getSettings();
         settings.setBuiltInZoomControls(true);
