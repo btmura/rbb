@@ -93,8 +93,8 @@ public class CommentProvider extends BaseProvider {
             String cookie = AccountUtils.getCookie(context, accountName);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
-            CommentListing listing = new CommentListing(context, accountName, sessionId, thingId,
-                    cookie);
+            CommentListing listing = new CommentListing(context, helper, accountName, sessionId,
+                    thingId, cookie);
             listing.process();
 
             long t1 = System.currentTimeMillis();

@@ -26,18 +26,33 @@ import java.util.ArrayList;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.Replies;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.util.ArrayUtils;
 import com.btmura.android.reddit.util.JsonParser;
 
 class CommentListing extends JsonParser {
 
     public static final String TAG = "CommentListing";
+
+    private static final String[] PROJECTION = {
+            Replies._ID,
+            Replies.COLUMN_THING_ID,
+            Replies.COLUMN_TEXT,
+    };
+
+    private static final int INDEX_THING_ID = 1;
+    private static final int INDEX_TEXT = 2;
 
     final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
     long networkTimeMs;
@@ -45,22 +60,25 @@ class CommentListing extends JsonParser {
 
     private final Formatter formatter = new Formatter();
     private final Context context;
+    private final SQLiteOpenHelper dbHelper;
     private final String accountName;
     private final String sessionId;
+    private final String thingId;
     private final String cookie;
-    private final URL url;
 
-    CommentListing(Context context, String accountName, String sessionId, String thingId,
-            String cookie) {
+    CommentListing(Context context, SQLiteOpenHelper dbHelper, String accountName,
+            String sessionId, String thingId, String cookie) {
         this.context = context;
+        this.dbHelper = dbHelper;
         this.accountName = accountName;
         this.sessionId = sessionId;
-        this.url = Urls.commentsUrl(thingId);
+        this.thingId = thingId;
         this.cookie = cookie;
     }
 
     public void process() throws IOException {
         long t1 = System.currentTimeMillis();
+        URL url = Urls.commentsUrl(thingId);
         HttpURLConnection conn = NetApi.connect(context, url, cookie);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
@@ -173,6 +191,14 @@ class CommentListing extends JsonParser {
 
     @Override
     public void onParseEnd() {
+        // We don't support loading more comments right now.
+        removeMoreComments();
+
+        // Merge pending replies that haven't been synced yet.
+        mergeReplies();
+    }
+
+    private void removeMoreComments() {
         int size = values.size();
         for (int i = 0; i < size;) {
             ContentValues v = values.get(i);
@@ -183,6 +209,66 @@ class CommentListing extends JsonParser {
             } else {
                 i++;
             }
+        }
+    }
+
+    private void mergeReplies() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(Replies.TABLE_NAME, PROJECTION,
+                Replies.SELECTION_BY_ACCOUNT_AND_PARENT_THING_ID,
+                ArrayUtils.toArray(accountName, thingId),
+                null, null, Replies.SORT_BY_ID);
+
+        // TODO: Take into account the size of replies + values?
+
+        try {
+            while (c.moveToNext()) {
+                int size = values.size();
+                for (int i = 0; i < size; i++) {
+                    ContentValues v = values.get(i);
+                    String thingId = v.getAsString(Comments.COLUMN_THING_ID);
+
+                    // This thing could be a placeholder we previously inserted.
+                    if (TextUtils.isEmpty(thingId)) {
+                        continue;
+                    }
+
+                    String replyId = c.getString(INDEX_THING_ID);
+                    if (thingId.equals(replyId)) {
+                        String body = c.getString(INDEX_TEXT);
+
+                        // TODO: Remove duplicate logic from
+                        // CommentListFragment.
+
+                        // Nest an additional level if this is a response to a
+                        // comment.
+                        int nesting = v.getAsInteger(Comments.COLUMN_NESTING);
+                        if (i != 0) {
+                            nesting++;
+                        }
+
+                        // Use the same sequence so this appears below.
+                        int sequence = v.getAsInteger(Comments.COLUMN_SEQUENCE);
+
+                        ContentValues p = new ContentValues(7);
+                        p.put(Comments.COLUMN_ACCOUNT, accountName);
+                        p.put(Comments.COLUMN_AUTHOR, accountName);
+                        p.put(Comments.COLUMN_BODY, body);
+                        p.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
+                        p.put(Comments.COLUMN_NESTING, nesting);
+                        p.put(Comments.COLUMN_SEQUENCE, sequence);
+                        p.put(Comments.COLUMN_SESSION_ID, sessionId);
+
+                        // Insert the reply after this comment.
+                        values.add(i + 1, p);
+                        size++;
+                        i++;
+                    }
+                }
+
+            }
+        } finally {
+            c.close();
         }
     }
 }

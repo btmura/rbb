@@ -131,9 +131,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public void onCommentReply(String replyThingId, String text, Bundle extras) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onCommentReply");
-        }
         int nesting = extras.getInt(Comments.COLUMN_NESTING);
         int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
         CommentProvider.insertPlaceholderInBackground(getActivity(), accountName, text, nesting,
