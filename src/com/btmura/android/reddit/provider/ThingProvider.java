@@ -50,6 +50,7 @@ public class ThingProvider extends BaseProvider {
     public static final String PARAM_SUBREDDIT = "subreddit";
     public static final String PARAM_FILTER = "filter";
     public static final String PARAM_MORE = "more";
+    public static final String PARAM_QUERY = "query";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_THINGS = 1;
@@ -97,8 +98,9 @@ public class ThingProvider extends BaseProvider {
             String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
             int filter = Integer.parseInt(uri.getQueryParameter(PARAM_FILTER));
             String more = uri.getQueryParameter(PARAM_MORE);
+            String query = uri.getQueryParameter(PARAM_QUERY);
             ThingListing listing = new ThingListing(context, accountName, sessionId, subredditName,
-                    filter, more, cookie);
+                    filter, more, query, cookie);
             listing.process();
 
             long t1 = System.currentTimeMillis();

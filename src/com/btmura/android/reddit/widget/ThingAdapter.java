@@ -85,14 +85,14 @@ public class ThingAdapter extends BaseCursorAdapter {
     private int thingBodyWidth;
 
     public static Uri createUri(String accountName, String sessionId, String subredditName,
-            int filter, String more,
-            boolean sync) {
+            int filter, String more, String query, boolean sync) {
         Uri.Builder b = ThingProvider.CONTENT_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(sync))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
                 .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
                 .appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subredditName)
-                .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
+                .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter))
+                .appendQueryParameter(ThingProvider.PARAM_QUERY, query)
+                .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(sync));
         if (!TextUtils.isEmpty(more)) {
             b.appendQueryParameter(ThingProvider.PARAM_MORE, more);
         }

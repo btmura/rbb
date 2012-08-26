@@ -54,12 +54,16 @@ class ThingListing extends JsonParser {
     private String moreThingId;
 
     ThingListing(Context context, String accountName, String sessionId, String subredditName,
-            int filter, String more, String cookie) {
+            int filter, String more, String query, String cookie) {
         this.context = context;
         this.accountName = accountName;
         this.sessionId = sessionId;
-        this.url = Urls.subredditUrl(subredditName, filter, more);
         this.cookie = cookie;
+        if (!TextUtils.isEmpty(query)) {
+            this.url = Urls.searchUrl(query, more);
+        } else {
+            this.url = Urls.subredditUrl(subredditName, filter, more);
+        }
     }
 
     public void process() throws IOException {
@@ -73,7 +77,7 @@ class ThingListing extends JsonParser {
             if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();
                 networkTimeMs = t2 - t1;
-                parseTimeMs = t3- t2;
+                parseTimeMs = t3 - t2;
             }
         } finally {
             input.close();

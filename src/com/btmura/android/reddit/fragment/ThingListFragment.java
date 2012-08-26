@@ -84,8 +84,7 @@ public class ThingListFragment extends ListFragment implements
     private boolean scrollLoading;
 
     public static ThingListFragment newInstance(String accountName, Subreddit subreddit,
-            int filter,
-            String query, int flags) {
+            int filter, String query, int flags) {
         Bundle args = new Bundle(5);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putParcelable(ARG_SUBREDDIT, subreddit);
@@ -117,6 +116,8 @@ public class ThingListFragment extends ListFragment implements
         // Don't create a new session when changing configuration.
         if (savedInstanceState != null) {
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
+        } else if (!TextUtils.isEmpty(query)) {
+            sessionId = query + "-" + System.currentTimeMillis();
         } else {
             sessionId = Subreddit.getName(subreddit) + "-" + System.currentTimeMillis();
         }
@@ -157,7 +158,8 @@ public class ThingListFragment extends ListFragment implements
         String accountName = getAccountName();
         String subredditName = Subreddit.getName(subreddit);
         String more = args != null ? args.getString(LOADER_ARG_MORE) : null;
-        Uri uri = ThingAdapter.createUri(accountName, sessionId, subredditName, filter, more, true);
+        Uri uri = ThingAdapter.createUri(accountName, sessionId, subredditName, filter, more,
+                query, true);
         return ThingAdapter.createLoader(getActivity(), uri, sessionId);
     }
 
@@ -167,7 +169,7 @@ public class ThingListFragment extends ListFragment implements
         }
 
         Uri uri = ThingAdapter.createUri(getAccountName(), sessionId, Subreddit.getName(subreddit),
-                filter, null, false);
+                filter, null, query, false);
         CursorLoader cursorLoader = (CursorLoader) loader;
         cursorLoader.setUri(uri);
 
