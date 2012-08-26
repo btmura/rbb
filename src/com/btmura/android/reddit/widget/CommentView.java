@@ -160,12 +160,25 @@ public class CommentView extends View implements OnGestureListener {
 
     private static CharSequence getStatus(Context c, String author, long createdUtc, int kind,
             long nowTimeMs, int numComments) {
-        int resId = kind == Comments.KIND_HEADER ? R.string.comment_header_status
-                : R.string.comment_comment_status;
-        String rt = RelativeTime.format(c, nowTimeMs, createdUtc);
-        String comments = c.getResources().getQuantityString(R.plurals.comments, numComments,
-                numComments);
-        return c.getString(resId, author, rt, comments);
+        int resId = R.string.comment_comment_status;
+        if (kind == Comments.KIND_HEADER) {
+            resId = R.string.comment_header_status;
+        } else if (createdUtc == 0) {
+            resId = R.string.comment_pending_comment_status;
+        }
+
+        String relativeTime = null;
+        if (createdUtc != 0) {
+            relativeTime = RelativeTime.format(c, nowTimeMs, createdUtc);
+        }
+
+        String comments = null;
+        if (kind == Comments.KIND_HEADER) {
+            comments = c.getResources().getQuantityString(R.plurals.comments, numComments,
+                    numComments);
+        }
+
+        return c.getString(resId, author, relativeTime, comments);
     }
 
     @Override
