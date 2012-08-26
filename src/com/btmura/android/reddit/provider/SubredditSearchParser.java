@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.content;
+package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import android.util.JsonReader;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.util.JsonParser;
 
-class SubredditParser extends JsonParser {
+class SubredditSearchParser extends JsonParser {
 
     List<Subreddit> results = new ArrayList<Subreddit>();
 

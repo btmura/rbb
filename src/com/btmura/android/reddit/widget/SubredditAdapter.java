@@ -26,10 +26,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.entity.Subreddit;
-import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class SubredditAdapter extends SimpleCursorAdapter {
@@ -40,16 +38,12 @@ public class SubredditAdapter extends SimpleCursorAdapter {
     private static final int[] TO = {};
 
     public static Loader<Cursor> createLoader(Context context, String accountName, String query) {
-        if (query != null) {
-            return new SubredditSearchLoader(context, Urls.subredditSearchUrl(query, null));
-        } else {
-            return new CursorLoader(context,
-                    SubredditProvider.CONTENT_URI,
-                    PROJECTION,
-                    SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
-                    new String[] {accountName},
-                    Subreddits.SORT_BY_NAME);
-        }
+        return new CursorLoader(context,
+                SubredditProvider.CONTENT_URI,
+                PROJECTION,
+                SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
+                new String[] {accountName},
+                Subreddits.SORT_BY_NAME);
     }
 
     private String query;
