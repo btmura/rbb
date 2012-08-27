@@ -29,7 +29,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Votes;
-import com.btmura.android.reddit.util.ArrayUtils;
+import com.btmura.android.reddit.util.Array;
 
 public class VoteProvider extends BaseProvider {
 
@@ -167,7 +167,7 @@ public class VoteProvider extends BaseProvider {
         AsyncTask.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = context.getContentResolver();
-                String[] selectionArgs = ArrayUtils.toArray(accountName, thingId);
+                String[] selectionArgs = Array.of(accountName, thingId);
 
                 ContentValues values = new ContentValues(3);
                 values.put(Votes.COLUMN_ACCOUNT, accountName);

@@ -34,7 +34,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
-import com.btmura.android.reddit.util.ArrayUtils;
+import com.btmura.android.reddit.util.Array;
 
 public class ThingProvider extends BaseProvider {
 
@@ -107,7 +107,7 @@ public class ThingProvider extends BaseProvider {
             try {
                 // Delete the loading more element before appending more.
                 db.delete(Things.TABLE_NAME, Things.SELECTION_BY_SESSION_ID_AND_MORE,
-                        ArrayUtils.toArray(sessionId));
+                        Array.of(sessionId));
 
                 InsertHelper insertHelper = new InsertHelper(db, Things.TABLE_NAME);
                 int count = listing.values.size();

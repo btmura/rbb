@@ -18,7 +18,7 @@ package com.btmura.android.reddit.database;
 
 import java.util.ArrayList;
 
-import com.btmura.android.reddit.util.ArrayUtils;
+import com.btmura.android.reddit.util.Array;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -105,7 +105,7 @@ public class Subreddits implements BaseColumns, SyncColumns {
     }
 
     private static ArrayList<ContentValues> getSubredditNames(SQLiteDatabase db) {
-        Cursor c = db.query(Subreddits.TABLE_NAME, ArrayUtils.toArray(Subreddits.COLUMN_NAME),
+        Cursor c = db.query(Subreddits.TABLE_NAME, Array.of(Subreddits.COLUMN_NAME),
                 null, null, null, null, null);
         ArrayList<ContentValues> rows = new ArrayList<ContentValues>(c.getCount());
         while (c.moveToNext()) {

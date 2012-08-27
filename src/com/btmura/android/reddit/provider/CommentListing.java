@@ -38,7 +38,7 @@ import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Replies;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
-import com.btmura.android.reddit.util.ArrayUtils;
+import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
 
 class CommentListing extends JsonParser {
@@ -218,7 +218,7 @@ class CommentListing extends JsonParser {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(Replies.TABLE_NAME, PROJECTION,
                 Replies.SELECTION_BY_ACCOUNT_AND_PARENT_THING_ID,
-                ArrayUtils.toArray(accountName, thingId),
+                Array.of(accountName, thingId),
                 null, null, Replies.SORT_BY_ID);
 
         // TODO: Take into account the size of replies + values?

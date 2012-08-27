@@ -35,7 +35,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.SubredditSearchProvider;
-import com.btmura.android.reddit.util.ArrayUtils;
+import com.btmura.android.reddit.util.Array;
 
 public class SubredditAdapter extends BaseCursorAdapter {
 
@@ -77,7 +77,7 @@ public class SubredditAdapter extends BaseCursorAdapter {
                 ContentResolver cr = appContext.getContentResolver();
                 cr.delete(SubredditSearchProvider.CONTENT_URI,
                         SubredditSearches.SELECTION_BY_SESSION_ID,
-                        ArrayUtils.toArray(sessionId));
+                        Array.of(sessionId));
             }
         });
     }
@@ -101,12 +101,12 @@ public class SubredditAdapter extends BaseCursorAdapter {
         if (!TextUtils.isEmpty(query)) {
             return new CursorLoader(context, uri, PROJECTION_SEARCH,
                     SubredditSearches.SELECTION_BY_SESSION_ID,
-                    ArrayUtils.toArray(sessionId),
+                    Array.of(sessionId),
                     SubredditSearches.SORT_BY_NAME);
         } else {
             return new CursorLoader(context, uri, PROJECTION_SUBREDDITS,
                     SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
-                    ArrayUtils.toArray(accountName),
+                    Array.of(accountName),
                     Subreddits.SORT_BY_NAME);
         }
     }

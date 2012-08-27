@@ -32,7 +32,7 @@ import android.view.ViewGroup;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.util.ArrayUtils;
+import com.btmura.android.reddit.util.Array;
 
 public class ThingAdapter extends BaseCursorAdapter {
 
@@ -89,7 +89,7 @@ public class ThingAdapter extends BaseCursorAdapter {
             String subreddit, int filter, String more, String query) {
         Uri uri = getUri(accountName, sessionId, subreddit, filter, more, query, true);
         return new CursorLoader(context, uri, PROJECTION, Things.SELECTION_BY_SESSION_ID,
-                ArrayUtils.toArray(sessionId), null);
+                Array.of(sessionId), null);
     }
 
     public static void disableSync(Context context, Loader<Cursor> loader, String accountName,
@@ -109,7 +109,7 @@ public class ThingAdapter extends BaseCursorAdapter {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
                 cr.delete(ThingProvider.CONTENT_URI, Things.SELECTION_BY_SESSION_ID,
-                        ArrayUtils.toArray(sessionId));
+                        Array.of(sessionId));
             }
         });
     }

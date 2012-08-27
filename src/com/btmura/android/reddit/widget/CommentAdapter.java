@@ -28,7 +28,7 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.provider.CommentProvider;
-import com.btmura.android.reddit.util.ArrayUtils;
+import com.btmura.android.reddit.util.Array;
 
 public class CommentAdapter extends BaseCursorAdapter {
 
@@ -73,7 +73,7 @@ public class CommentAdapter extends BaseCursorAdapter {
             String thingId) {
         Uri uri = getUri(accountName, sessionId, thingId, true);
         return new CursorLoader(context, uri, PROJECTION, Comments.SELECTION_BY_SESSION_ID,
-                ArrayUtils.toArray(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
+                Array.of(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
     }
 
     public static void disableSync(Context context, Loader<Cursor> loader, String accountName,
@@ -93,7 +93,7 @@ public class CommentAdapter extends BaseCursorAdapter {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
                 cr.delete(CommentProvider.CONTENT_URI, Comments.SELECTION_BY_SESSION_ID,
-                        ArrayUtils.toArray(sessionId));
+                        Array.of(sessionId));
             }
         });
     }
