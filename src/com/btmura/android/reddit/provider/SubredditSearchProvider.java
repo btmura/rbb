@@ -72,12 +72,12 @@ public class SubredditSearchProvider extends BaseProvider {
 
             Context context = getContext();
             String cookie = AccountUtils.getCookie(context, accountName);
+            SubredditSearchListing listing = SubredditSearchListing.get(context, accountName,
+                    sessionId, query, cookie);
 
             SQLiteDatabase db = helper.getWritableDatabase();
             db.beginTransaction();
             try {
-                SubredditSearchListing listing = SubredditSearchListing.get(context, accountName,
-                        sessionId, query, cookie);
                 InsertHelper insertHelper = new InsertHelper(db, SubredditSearches.TABLE_NAME);
                 int count = listing.values.size();
                 for (int i = 0; i < count; i++) {

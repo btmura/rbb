@@ -54,9 +54,9 @@ class CommentListing extends JsonParser {
     private static final int INDEX_THING_ID = 1;
     private static final int INDEX_TEXT = 2;
 
-    final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
-    long networkTimeMs;
-    long parseTimeMs;
+    public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
+    public long networkTimeMs;
+    public long parseTimeMs;
 
     private final Formatter formatter = new Formatter();
     private final Context context;
@@ -64,19 +64,9 @@ class CommentListing extends JsonParser {
     private final String accountName;
     private final String sessionId;
     private final String thingId;
-    private final String cookie;
 
-    CommentListing(Context context, SQLiteOpenHelper dbHelper, String accountName,
-            String sessionId, String thingId, String cookie) {
-        this.context = context;
-        this.dbHelper = dbHelper;
-        this.accountName = accountName;
-        this.sessionId = sessionId;
-        this.thingId = thingId;
-        this.cookie = cookie;
-    }
-
-    public void process() throws IOException {
+    public static CommentListing get(Context context, SQLiteOpenHelper dbHelper,
+            String accountName, String sessionId, String thingId, String cookie) throws IOException {
         long t1 = System.currentTimeMillis();
         URL url = Urls.commentsUrl(thingId);
         HttpURLConnection conn = NetApi.connect(context, url, cookie);
@@ -84,16 +74,28 @@ class CommentListing extends JsonParser {
         long t2 = System.currentTimeMillis();
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
-            parseListingArray(reader);
+            CommentListing listing = new CommentListing(context, dbHelper, accountName, sessionId,
+                    thingId);
+            listing.parseListingArray(reader);
             if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();
-                networkTimeMs = t2 - t1;
-                parseTimeMs = t3 - t2;
+                listing.networkTimeMs = t2 - t1;
+                listing.parseTimeMs = t3 - t2;
             }
+            return listing;
         } finally {
             input.close();
             conn.disconnect();
         }
+    }
+
+    private CommentListing(Context context, SQLiteOpenHelper dbHelper, String accountName,
+            String sessionId, String thingId) {
+        this.context = context;
+        this.dbHelper = dbHelper;
+        this.accountName = accountName;
+        this.sessionId = sessionId;
+        this.thingId = thingId;
     }
 
     @Override

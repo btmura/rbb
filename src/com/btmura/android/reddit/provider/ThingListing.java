@@ -40,49 +40,49 @@ class ThingListing extends JsonParser {
 
     public static final String TAG = "ThingListing";
 
-    final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
-    long networkTimeMs;
-    long parseTimeMs;
+    public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
+    public long networkTimeMs;
+    public long parseTimeMs;
 
     private final Formatter formatter = new Formatter();
     private final Context context;
     private final String accountName;
     private final String sessionId;
-    private final URL url;
-    private final String cookie;
-
     private String moreThingId;
 
-    ThingListing(Context context, String accountName, String sessionId, String subredditName,
-            int filter, String more, String query, String cookie) {
-        this.context = context;
-        this.accountName = accountName;
-        this.sessionId = sessionId;
-        this.cookie = cookie;
-        if (!TextUtils.isEmpty(query)) {
-            this.url = Urls.searchUrl(query, more);
-        } else {
-            this.url = Urls.subredditUrl(subredditName, filter, more);
-        }
-    }
-
-    public void process() throws IOException {
+    public static ThingListing get(Context context, String accountName, String sessionId,
+            String subredditName, int filter, String more, String query, String cookie)
+            throws IOException {
         long t1 = System.currentTimeMillis();
+        URL url;
+        if (!TextUtils.isEmpty(query)) {
+            url = Urls.searchUrl(query, more);
+        } else {
+            url = Urls.subredditUrl(subredditName, filter, more);
+        }
         HttpURLConnection conn = NetApi.connect(context, url, cookie);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
-            parseListingObject(reader);
+            ThingListing listing = new ThingListing(context, accountName, sessionId);
+            listing.parseListingObject(reader);
             if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();
-                networkTimeMs = t2 - t1;
-                parseTimeMs = t3 - t2;
+                listing.networkTimeMs = t2 - t1;
+                listing.parseTimeMs = t3 - t2;
             }
+            return listing;
         } finally {
             input.close();
             conn.disconnect();
         }
+    }
+
+    private ThingListing(Context context, String accountName, String sessionId) {
+        this.context = context;
+        this.accountName = accountName;
+        this.sessionId = sessionId;
     }
 
     @Override

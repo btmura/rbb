@@ -88,14 +88,13 @@ public class CommentProvider extends BaseProvider {
     private void sync(Uri uri, String sessionId) {
         Cursor c = null;
         try {
-            Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT_NAME);
-            String cookie = AccountUtils.getCookie(context, accountName);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
-            CommentListing listing = new CommentListing(context, helper, accountName, sessionId,
+            Context context = getContext();
+            String cookie = AccountUtils.getCookie(context, accountName);
+            CommentListing listing = CommentListing.get(context, helper, accountName, sessionId,
                     thingId, cookie);
-            listing.process();
 
             long t1 = System.currentTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();

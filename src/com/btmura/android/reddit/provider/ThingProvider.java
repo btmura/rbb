@@ -89,18 +89,17 @@ public class ThingProvider extends BaseProvider {
 
     private void sync(Uri uri) {
         try {
-            Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
-            String cookie = AccountUtils.getCookie(context, accountName);
-
             String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
             String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
             int filter = Integer.parseInt(uri.getQueryParameter(PARAM_FILTER));
             String more = uri.getQueryParameter(PARAM_MORE);
             String query = uri.getQueryParameter(PARAM_QUERY);
-            ThingListing listing = new ThingListing(context, accountName, sessionId, subredditName,
+
+            Context context = getContext();
+            String cookie = AccountUtils.getCookie(context, accountName);
+            ThingListing listing = ThingListing.get(context, accountName, sessionId, subredditName,
                     filter, more, query, cookie);
-            listing.process();
 
             long t1 = System.currentTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();
