@@ -470,11 +470,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (slf != null) {
             slf.setSelectedSubreddit(cf.getSubreddit());
         }
-
-        ThingListFragment tlf = getThingListFragment();
-        if (tlf != null) {
-            tlf.setSelectedThing(cf.getThingBundle(), cf.getThingPosition());
-        }
     }
 
     private void refreshThingPager(Bundle thingBundle) {

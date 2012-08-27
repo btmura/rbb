@@ -40,7 +40,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.VoteProvider;
-import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
@@ -60,8 +59,6 @@ public class ThingListFragment extends ListFragment implements
     private static final String ARG_FLAGS = "l";
 
     private static final String STATE_SESSION_ID = "sessionId";
-    private static final String STATE_THING_NAME = "thingName";
-    private static final String STATE_THING_POSITION = "position";
 
     private static final String LOADER_ARG_MORE = "m";
 
@@ -222,17 +219,6 @@ public class ThingListFragment extends ListFragment implements
         outState.putParcelable(ARG_SUBREDDIT, subreddit);
         outState.putInt(ARG_FILTER, filter);
         outState.putString(ARG_QUERY, query);
-        // outState.putString(STATE_THING_NAME, adapter.getSelectedThingName());
-        // outState.putInt(STATE_THING_POSITION,
-        // adapter.getSelectedThingPosition());
-    }
-
-    public void setSelectedThing(Bundle thingBundle, int position) {
-        // String name = t != null ? t.name : null;
-        // if (!adapter.isSelectedThing(name, position)) {
-        // adapter.setSelectedThing(name, position);
-        // adapter.notifyDataSetChanged();
-        // }
     }
 
     @Override
@@ -306,13 +292,5 @@ public class ThingListFragment extends ListFragment implements
 
     public String getQuery() {
         return query;
-    }
-
-    private int getFlags() {
-        return getArguments().getInt(ARG_FLAGS);
-    }
-
-    private boolean isSingleChoice() {
-        return Flag.isEnabled(getFlags(), FLAG_SINGLE_CHOICE);
     }
 }
