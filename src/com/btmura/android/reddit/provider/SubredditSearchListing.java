@@ -27,31 +27,52 @@ import java.util.ArrayList;
 import android.content.ContentValues;
 import android.content.Context;
 import android.util.JsonReader;
+import android.util.Log;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.SubredditSearches;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.JsonParser;
 
 class SubredditSearchListing extends JsonParser {
 
-    final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
+    public static final String TAG = "SubredditSearchListing";
 
-    public void get(Context context, String query, String cookie) throws IOException {
+    public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(25);
+
+    private final String accountName;
+    private final String sessionId;
+
+    public static SubredditSearchListing get(Context context, String accountName, String sessionId,
+            String query, String cookie) throws IOException {
         URL url = Urls.subredditSearchUrl(query, null);
         HttpURLConnection conn = NetApi.connect(context, url, cookie);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
-            parseListingArray(reader);
+            SubredditSearchListing listing = new SubredditSearchListing(accountName, sessionId);
+            listing.parseListingObject(reader);
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "url: " + url + " values: " + listing.values.size());
+            }
+            return listing;
         } finally {
             input.close();
             conn.disconnect();
         }
     }
 
+    private SubredditSearchListing(String accountName, String sessionId) {
+        this.accountName = accountName;
+        this.sessionId = sessionId;
+    }
+
     @Override
     public void onEntityStart(int index) {
-        values.add(new ContentValues());
+        ContentValues v = new ContentValues(4);
+        v.put(SubredditSearches.COLUMN_ACCOUNT, accountName);
+        v.put(SubredditSearches.COLUMN_SESSION_ID, sessionId);
+        values.add(v);
     }
 
     @Override
@@ -62,9 +83,5 @@ class SubredditSearchListing extends JsonParser {
     @Override
     public void onSubscribers(JsonReader reader, int index) throws IOException {
         values.get(index).put(SubredditSearches.COLUMN_SUBSCRIBERS, reader.nextInt());
-    }
-
-    @Override
-    public void onParseEnd() {
     }
 }

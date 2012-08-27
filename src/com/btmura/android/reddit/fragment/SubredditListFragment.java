@@ -58,6 +58,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private static final String ARG_QUERY = "q";
     private static final String ARG_FLAGS = "f";
 
+    private static final String STATE_SESSION_ID = "sessionId";
+
     public interface OnSubredditSelectedListener {
         void onInitialSubredditSelected(Subreddit subreddit);
 
@@ -68,6 +70,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private Subreddit selectedSubreddit;
     private String query;
     private int flags;
+    private String sessionId;
 
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
@@ -103,6 +106,12 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         query = bundle.getString(ARG_QUERY);
         flags = bundle.getInt(ARG_FLAGS);
 
+        if (savedInstanceState != null) {
+            sessionId = savedInstanceState.getString(STATE_SESSION_ID);
+        } else if (!TextUtils.isEmpty(query)) {
+            sessionId = query + "-" + System.currentTimeMillis();
+        }
+
         adapter = new SubredditAdapter(getActivity(), query, isSingleChoice());
         adapter.setSelectedSubreddit(selectedSubreddit);
     }
@@ -134,14 +143,15 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-        return SubredditAdapter.createLoader(getActivity().getApplicationContext(),
-                getAccountName(), getQuery());
+        return SubredditAdapter.getLoader(getActivity(), accountName, sessionId, query);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
+
+        SubredditAdapter.disableSync(getActivity(), loader, accountName, sessionId, query);
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
@@ -316,6 +326,17 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         outState.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
         outState.putString(ARG_QUERY, query);
         outState.putInt(ARG_FLAGS, flags);
+        outState.putString(STATE_SESSION_ID, sessionId);
+    }
+
+    @Override
+    public void onDestroy() {
+        // Only search queries will have sessions but its ok to always do this.
+        // TODO: Remove deleteSessionData method duplication in adapters.
+        if (!getActivity().isChangingConfigurations()) {
+            SubredditAdapter.deleteSessionData(getActivity(), sessionId);
+        }
+        super.onDestroy();
     }
 
     public String getAccountName() {

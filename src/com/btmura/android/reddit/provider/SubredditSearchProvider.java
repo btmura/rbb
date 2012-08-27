@@ -16,14 +16,21 @@
 
 package com.btmura.android.reddit.provider;
 
+import java.io.IOException;
+
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.SubredditSearches;
 
 public class SubredditSearchProvider extends BaseProvider {
@@ -33,6 +40,12 @@ public class SubredditSearchProvider extends BaseProvider {
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.subredditsearches";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/");
 
+    // Query parameters related to fetching search results before querying.
+    public static final String SYNC_ENABLE = "sync";
+    public static final String SYNC_ACCOUNT = "accountName";
+    public static final String SYNC_SESSION_ID = "sessionId";
+    public static final String SYNC_QUERY = "query";
+
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
@@ -40,11 +53,47 @@ public class SubredditSearchProvider extends BaseProvider {
             Log.d(TAG, "query: " + uri.getQuery());
         }
 
+        if (uri.getBooleanQueryParameter(SYNC_ENABLE, false)) {
+            sync(uri);
+        }
+
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.query(SubredditSearches.TABLE_NAME, projection, selection, selectionArgs,
                 null, null, sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
+    }
+
+    private void sync(Uri uri) {
+        try {
+            String accountName = uri.getQueryParameter(SYNC_ACCOUNT);
+            String sessionId = uri.getQueryParameter(SYNC_SESSION_ID);
+            String query = uri.getQueryParameter(SYNC_QUERY);
+
+            Context context = getContext();
+            String cookie = AccountUtils.getCookie(context, accountName);
+
+            SQLiteDatabase db = helper.getWritableDatabase();
+            db.beginTransaction();
+            try {
+                SubredditSearchListing listing = SubredditSearchListing.get(context, accountName,
+                        sessionId, query, cookie);
+                InsertHelper insertHelper = new InsertHelper(db, SubredditSearches.TABLE_NAME);
+                int count = listing.values.size();
+                for (int i = 0; i < count; i++) {
+                    insertHelper.insert(listing.values.get(i));
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, "sync", e);
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, "sync", e);
+        } catch (IOException e) {
+            Log.e(TAG, "sync", e);
+        }
     }
 
     @Override
