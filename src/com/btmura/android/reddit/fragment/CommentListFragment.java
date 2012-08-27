@@ -215,7 +215,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     @Override
     public void onDestroy() {
         if (!getActivity().isChangingConfigurations()) {
-            CommentAdapter.deleteSessionData(getActivity().getApplicationContext(), sessionId);
+            CommentAdapter.deleteSessionData(getActivity(), sessionId);
         }
         super.onDestroy();
     }

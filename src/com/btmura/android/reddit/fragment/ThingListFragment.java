@@ -279,7 +279,7 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onDestroy() {
         if (!getActivity().isChangingConfigurations()) {
-            ThingAdapter.deleteSessionData(getActivity().getApplicationContext(), sessionId);
+            ThingAdapter.deleteSessionData(getActivity(), sessionId);
         }
         super.onDestroy();
     }
