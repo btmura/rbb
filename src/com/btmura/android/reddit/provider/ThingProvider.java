@@ -88,7 +88,6 @@ public class ThingProvider extends BaseProvider {
     }
 
     private void sync(Uri uri) {
-        Cursor c = null;
         try {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
@@ -132,10 +131,6 @@ public class ThingProvider extends BaseProvider {
             Log.e(TAG, "sync", e);
         } catch (AuthenticatorException e) {
             Log.e(TAG, "sync", e);
-        } finally {
-            if (c != null) {
-                c.close();
-            }
         }
     }
 
