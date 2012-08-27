@@ -19,6 +19,7 @@ package com.btmura.android.reddit.widget;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -68,18 +69,19 @@ public class CommentAdapter extends BaseCursorAdapter {
     private final long nowTimeMs = System.currentTimeMillis();
     private final OnVoteListener listener;
 
-    public static Uri createUri(String accountName, String sessionId, String thingId, boolean sync) {
-        return CommentProvider.CONTENT_URI.buildUpon()
-                .appendQueryParameter(CommentProvider.PARAM_SYNC, Boolean.toString(sync))
-                .appendQueryParameter(CommentProvider.PARAM_ACCOUNT_NAME, accountName)
-                .appendQueryParameter(CommentProvider.PARAM_SESSION_ID, sessionId)
-                .appendQueryParameter(CommentProvider.PARAM_THING_ID, thingId)
-                .build();
-    }
-
-    public static CursorLoader createLoader(Context context, Uri uri, String sessionId) {
+    public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
+            String thingId) {
+        Uri uri = getUri(accountName, sessionId, thingId, true);
         return new CursorLoader(context, uri, PROJECTION, Comments.SELECTION_BY_SESSION_ID,
                 ArrayUtils.toArray(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
+    }
+
+    public static void disableSync(Context context, Loader<Cursor> loader, String accountName,
+            String sessionId, String thingId) {
+        if (loader instanceof CursorLoader) {
+            CursorLoader cl = (CursorLoader) loader;
+            cl.setUri(getUri(accountName, sessionId, thingId, false));
+        }
     }
 
     public static void deleteSessionData(final Context context, final String sessionId) {
@@ -94,6 +96,15 @@ public class CommentAdapter extends BaseCursorAdapter {
                         ArrayUtils.toArray(sessionId));
             }
         });
+    }
+
+    private static Uri getUri(String accountName, String sessionId, String thingId, boolean sync) {
+        return CommentProvider.CONTENT_URI.buildUpon()
+                .appendQueryParameter(CommentProvider.PARAM_SYNC, Boolean.toString(sync))
+                .appendQueryParameter(CommentProvider.PARAM_ACCOUNT_NAME, accountName)
+                .appendQueryParameter(CommentProvider.PARAM_SESSION_ID, sessionId)
+                .appendQueryParameter(CommentProvider.PARAM_THING_ID, thingId)
+                .build();
     }
 
     public CommentAdapter(Context context, OnVoteListener listener) {

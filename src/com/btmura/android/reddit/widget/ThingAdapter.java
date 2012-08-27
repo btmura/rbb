@@ -19,6 +19,7 @@ package com.btmura.android.reddit.widget;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -84,26 +85,19 @@ public class ThingAdapter extends BaseCursorAdapter {
     private final OnVoteListener listener;
     private int thingBodyWidth;
 
-    public static Uri createUri(String accountName, String sessionId, String subredditName,
-            int filter, String more, String query, boolean sync) {
-        Uri.Builder b = ThingProvider.CONTENT_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(sync))
-                .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
-                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
-                .appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subredditName)
-                .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
-        if (!TextUtils.isEmpty(query)) {
-            b.appendQueryParameter(ThingProvider.PARAM_QUERY, query);
-        }
-        if (!TextUtils.isEmpty(more)) {
-            b.appendQueryParameter(ThingProvider.PARAM_MORE, more);
-        }
-        return b.build();
-    }
-
-    public static CursorLoader createLoader(Context context, Uri uri, String sessionId) {
+    public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
+            String subreddit, int filter, String more, String query) {
+        Uri uri = getUri(accountName, sessionId, subreddit, filter, more, query, true);
         return new CursorLoader(context, uri, PROJECTION, Things.SELECTION_BY_SESSION_ID,
                 ArrayUtils.toArray(sessionId), null);
+    }
+
+    public static void disableSync(Context context, Loader<Cursor> loader, String accountName,
+            String sessionId, String subreddit, int filter, String more, String query) {
+        if (loader instanceof CursorLoader) {
+            CursorLoader cl = (CursorLoader) loader;
+            cl.setUri(getUri(accountName, sessionId, subreddit, filter, more, query, false));
+        }
     }
 
     public static void deleteSessionData(final Context context, final String sessionId) {
@@ -118,6 +112,23 @@ public class ThingAdapter extends BaseCursorAdapter {
                         ArrayUtils.toArray(sessionId));
             }
         });
+    }
+
+    private static Uri getUri(String accountName, String sessionId, String subreddit,
+            int filter, String more, String query, boolean sync) {
+        Uri.Builder b = ThingProvider.CONTENT_URI.buildUpon()
+                .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(sync))
+                .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
+                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
+                .appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subreddit)
+                .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
+        if (!TextUtils.isEmpty(query)) {
+            b.appendQueryParameter(ThingProvider.PARAM_QUERY, query);
+        }
+        if (!TextUtils.isEmpty(more)) {
+            b.appendQueryParameter(ThingProvider.PARAM_MORE, more);
+        }
+        return b.build();
     }
 
     public ThingAdapter(Context context, String parentSubreddit, OnVoteListener listener) {

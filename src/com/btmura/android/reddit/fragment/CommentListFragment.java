@@ -18,10 +18,8 @@ package com.btmura.android.reddit.fragment;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -107,20 +105,14 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-
-        Uri uri = CommentAdapter.createUri(accountName, sessionId, thingId, true);
-        return CommentAdapter.createLoader(getActivity(), uri, sessionId);
+        return CommentAdapter.getLoader(getActivity(), accountName, sessionId, thingId);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
-
-        Uri uri = CommentAdapter.createUri(accountName, sessionId, thingId, false);
-        CursorLoader cursorLoader = (CursorLoader) loader;
-        cursorLoader.setUri(uri);
-
+        CommentAdapter.disableSync(getActivity(), loader, accountName, sessionId, thingId);
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
