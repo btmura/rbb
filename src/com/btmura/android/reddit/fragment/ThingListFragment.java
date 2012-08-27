@@ -60,7 +60,7 @@ public class ThingListFragment extends ListFragment implements
 
     private static final String STATE_SESSION_ID = "sessionId";
 
-    private static final String LOADER_ARG_MORE = "m";
+    private static final String LOADER_ARG_MORE = "more";
 
     public interface OnThingSelectedListener {
         void onThingSelected(Bundle thingBundle, int position);
@@ -73,7 +73,7 @@ public class ThingListFragment extends ListFragment implements
     private Subreddit subreddit;
     private int filter;
     private String query;
-
+    private boolean sync;
     private ThingAdapter adapter;
     private OnThingSelectedListener listener;
     private boolean scrollLoading;
@@ -107,6 +107,7 @@ public class ThingListFragment extends ListFragment implements
         subreddit = b.getParcelable(ARG_SUBREDDIT);
         filter = b.getInt(ARG_FILTER);
         query = b.getString(ARG_QUERY);
+        sync = savedInstanceState == null;
 
         // Don't create a new session when changing configuration.
         if (savedInstanceState != null) {
@@ -149,20 +150,21 @@ public class ThingListFragment extends ListFragment implements
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-        String accountName = getAccountName();
         String subredditName = Subreddit.getName(subreddit);
         String more = args != null ? args.getString(LOADER_ARG_MORE) : null;
         return ThingAdapter.getLoader(getActivity(), accountName, sessionId, subredditName, filter,
-                more, query);
+                more, query, sync);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
-        ThingAdapter.disableSync(getActivity(), loader, accountName, sessionId,
-                Subreddit.getName(subreddit), filter, null, query);
+        sync = false;
         scrollLoading = false;
+        ThingAdapter.updateLoader(getActivity(), accountName, sessionId,
+                Subreddit.getName(subreddit), filter, null, query, sync, loader);
+
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
@@ -192,6 +194,7 @@ public class ThingListFragment extends ListFragment implements
                 if (!adapter.isEmpty()) {
                     String more = adapter.getMoreThingId();
                     if (!TextUtils.isEmpty(more)) {
+                        sync = true;
                         scrollLoading = true;
                         Bundle b = new Bundle(1);
                         b.putString(LOADER_ARG_MORE, more);

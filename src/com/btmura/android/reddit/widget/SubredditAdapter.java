@@ -54,16 +54,16 @@ public class SubredditAdapter extends BaseCursorAdapter {
     private static final int INDEX_SUBSCRIBERS = 2;
 
     public static Loader<Cursor> getLoader(Context context, String accountName,
-            String sessionId, String query) {
-        Uri uri = getUri(accountName, sessionId, query, true);
+            String sessionId, String query, boolean sync) {
+        Uri uri = getUri(accountName, sessionId, query, sync);
         return getLoader(context, uri, accountName, sessionId, query);
     }
 
-    public static void disableSync(Context context, Loader<Cursor> loader, String accountName,
-            String sessionId, String query) {
+    public static void updateLoader(Context context, Loader<Cursor> loader, String accountName,
+            String sessionId, String query, boolean sync) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, query, false));
+            cl.setUri(getUri(accountName, sessionId, query, sync));
         }
     }
 

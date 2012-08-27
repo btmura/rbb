@@ -86,17 +86,18 @@ public class ThingAdapter extends BaseCursorAdapter {
     private int thingBodyWidth;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
-            String subreddit, int filter, String more, String query) {
-        Uri uri = getUri(accountName, sessionId, subreddit, filter, more, query, true);
+            String subreddit, int filter, String more, String query, boolean sync) {
+        Uri uri = getUri(accountName, sessionId, subreddit, filter, more, query, sync);
         return new CursorLoader(context, uri, PROJECTION, Things.SELECTION_BY_SESSION_ID,
                 Array.of(sessionId), null);
     }
 
-    public static void disableSync(Context context, Loader<Cursor> loader, String accountName,
-            String sessionId, String subreddit, int filter, String more, String query) {
+    public static void updateLoader(Context context, String accountName, String sessionId,
+            String subreddit, int filter, String more, String query, boolean sync,
+            Loader<Cursor> loader) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, subreddit, filter, more, query, false));
+            cl.setUri(getUri(accountName, sessionId, subreddit, filter, more, query, sync));
         }
     }
 

@@ -70,17 +70,17 @@ public class CommentAdapter extends BaseCursorAdapter {
     private final OnVoteListener listener;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
-            String thingId) {
-        Uri uri = getUri(accountName, sessionId, thingId, true);
+            String thingId, boolean sync) {
+        Uri uri = getUri(accountName, sessionId, thingId, sync);
         return new CursorLoader(context, uri, PROJECTION, Comments.SELECTION_BY_SESSION_ID,
                 Array.of(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
     }
 
-    public static void disableSync(Context context, Loader<Cursor> loader, String accountName,
-            String sessionId, String thingId) {
+    public static void updateLoader(Context context, Loader<Cursor> loader, String accountName,
+            String sessionId, String thingId, boolean sync) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, thingId, false));
+            cl.setUri(getUri(accountName, sessionId, thingId, sync));
         }
     }
 

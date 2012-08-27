@@ -57,6 +57,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private String accountName;
     private String sessionId;
     private String thingId;
+    private boolean sync;
     private CommentAdapter adapter;
 
     public static CommentListFragment newInstance(String accountName, String thingId) {
@@ -73,6 +74,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         super.onCreate(savedInstanceState);
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
         thingId = getArguments().getString(ARG_THING_ID);
+        sync = savedInstanceState == null;
 
         // Don't create a new session if changing configuration.
         if (savedInstanceState != null) {
@@ -105,14 +107,16 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-        return CommentAdapter.getLoader(getActivity(), accountName, sessionId, thingId);
+        return CommentAdapter.getLoader(getActivity(), accountName, sessionId, thingId, sync);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
-        CommentAdapter.disableSync(getActivity(), loader, accountName, sessionId, thingId);
+        sync = false;
+        CommentAdapter.updateLoader(getActivity(), loader, accountName, sessionId, thingId, sync);
+
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);

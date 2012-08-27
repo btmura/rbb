@@ -67,18 +67,16 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     private String accountName;
+    private String sessionId;
     private Subreddit selectedSubreddit;
     private String query;
     private int flags;
-    private String sessionId;
-
+    private boolean sync;
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
 
     public static SubredditListFragment newInstance(String accountName,
-            Subreddit selectedSubreddit,
-            String query,
-            int flags) {
+            Subreddit selectedSubreddit, String query, int flags) {
         Bundle args = new Bundle(4);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
@@ -105,6 +103,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         selectedSubreddit = bundle.getParcelable(ARG_SELECTED_SUBREDDIT);
         query = bundle.getString(ARG_QUERY);
         flags = bundle.getInt(ARG_FLAGS);
+        sync = savedInstanceState == null;
 
         if (savedInstanceState != null) {
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
@@ -143,15 +142,16 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-        return SubredditAdapter.getLoader(getActivity(), accountName, sessionId, query);
+        return SubredditAdapter.getLoader(getActivity(), accountName, sessionId, query, sync);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
+        sync = false;
+        SubredditAdapter.updateLoader(getActivity(), loader, accountName, sessionId, query, sync);
 
-        SubredditAdapter.disableSync(getActivity(), loader, accountName, sessionId, query);
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
