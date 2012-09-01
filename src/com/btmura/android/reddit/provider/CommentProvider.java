@@ -37,8 +37,9 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Replies;
 import com.btmura.android.reddit.database.Votes;
+import com.btmura.android.reddit.util.Array;
 
-public class CommentProvider extends BaseProvider {
+public class CommentProvider extends SessionProvider {
 
     public static final String TAG = "CommentProvider";
 
@@ -96,10 +97,15 @@ public class CommentProvider extends BaseProvider {
             CommentListing listing = CommentListing.get(context, helper, accountName, sessionId,
                     thingId, cookie);
 
+            long cleaned;
             long t1 = System.currentTimeMillis();
             SQLiteDatabase db = helper.getWritableDatabase();
             db.beginTransaction();
             try {
+                // Delete old comments that can't possibly be viewed anymore.
+                cleaned = db.delete(Comments.TABLE_NAME, Comments.SELECTION_BEFORE_CREATION_TIME,
+                        Array.of(getCreationTimeCutoff()));
+
                 InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
                 int count = listing.values.size();
                 for (int i = 0; i < count; i++) {
@@ -111,8 +117,10 @@ public class CommentProvider extends BaseProvider {
             }
             if (BuildConfig.DEBUG) {
                 long t2 = System.currentTimeMillis();
-                Log.d(TAG, "sync network: " + listing.networkTimeMs + " parse: "
-                        + listing.parseTimeMs + " db: " + (t2 - t1));
+                Log.d(TAG, "sync network: " + listing.networkTimeMs
+                        + " parse: " + listing.parseTimeMs
+                        + " db: " + (t2 - t1)
+                        + " cleaned: " + cleaned);
             }
         } catch (OperationCanceledException e) {
             Log.e(TAG, "sync", e);
@@ -197,7 +205,7 @@ public class CommentProvider extends BaseProvider {
     /** Inserts a placeholder comment yet to be synced with Reddit. */
     public static void insertPlaceholderInBackground(Context context, final String accountName,
             final String body, final int nesting, final String parentThingId, final int sequence,
-            final String sessionId, final String thingId) {
+            final String sessionId, final long sessionCreationTime, final String thingId) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
@@ -206,7 +214,7 @@ public class CommentProvider extends BaseProvider {
                         .appendQueryParameter(PARAM_THING_ID, thingId)
                         .build();
 
-                ContentValues v = new ContentValues(7);
+                ContentValues v = new ContentValues(8);
                 v.put(Comments.COLUMN_ACCOUNT, accountName);
                 v.put(Comments.COLUMN_AUTHOR, accountName);
                 v.put(Comments.COLUMN_BODY, body);
@@ -214,6 +222,7 @@ public class CommentProvider extends BaseProvider {
                 v.put(Comments.COLUMN_NESTING, nesting);
                 v.put(Comments.COLUMN_SEQUENCE, sequence);
                 v.put(Comments.COLUMN_SESSION_ID, sessionId);
+                v.put(Comments.COLUMN_SESSION_CREATION_TIME, sessionCreationTime);
 
                 ContentResolver cr = appContext.getContentResolver();
                 cr.insert(uri, v);

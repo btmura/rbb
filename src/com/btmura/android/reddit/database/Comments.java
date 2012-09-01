@@ -40,6 +40,7 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_SELF_TEXT = "selfText";
     public static final String COLUMN_SEQUENCE = "sequence";
+    public static final String COLUMN_SESSION_CREATION_TIME = "sessionCreationTime";
     public static final String COLUMN_SESSION_ID = "sessionId";
     public static final String COLUMN_TITLE = "title";
 
@@ -54,6 +55,9 @@ public class Comments implements BaseColumns {
     public static final int KIND_MORE = 2;
 
     public static final String SELECTION_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
+
+    public static final String SELECTION_BEFORE_CREATION_TIME =
+            COLUMN_SESSION_CREATION_TIME + " < ?";
 
     // TODO: Do we need an index for sequence and id?
     public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
@@ -72,6 +76,7 @@ public class Comments implements BaseColumns {
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "
                 + COLUMN_SEQUENCE + " INTEGER NOT NULL, "
+                + COLUMN_SESSION_CREATION_TIME + " INTEGER NOT NULL, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
                 + COLUMN_THING_ID + " TEXT, "
                 + COLUMN_TITLE + " TEXT, "

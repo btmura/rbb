@@ -38,6 +38,14 @@ abstract class BaseCursorAdapter extends CursorAdapter {
         return -1;
     }
 
+    public long getLong(int position, int columnIndex) {
+        Cursor c = getCursor();
+        if (c != null && c.moveToPosition(position)) {
+            return c.getLong(columnIndex);
+        }
+        return -1;
+    }
+
     public String getString(int position, int columnIndex) {
         Cursor c = getCursor();
         if (c != null && c.moveToPosition(position)) {

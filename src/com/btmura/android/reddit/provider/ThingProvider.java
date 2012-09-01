@@ -36,7 +36,7 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.Array;
 
-public class ThingProvider extends BaseProvider {
+public class ThingProvider extends SessionProvider {
 
     public static final String TAG = "ThingProvider";
 
@@ -68,9 +68,6 @@ public class ThingProvider extends BaseProvider {
             + " FROM " + Votes.TABLE_NAME + ") USING ("
             + Votes.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")";
-
-    /** Sessions created before this cutoff time need to be deleted. */
-    private static long CREATION_TIME_CUTOFF = -1;
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
@@ -110,7 +107,7 @@ public class ThingProvider extends BaseProvider {
             db.beginTransaction();
             try {
                 // Delete old things that can't possibly be viewed anymore.
-                cleaned = db.delete(Things.TABLE_NAME, Things.SELECTION_BY_CREATION_TIME,
+                cleaned = db.delete(Things.TABLE_NAME, Things.SELECTION_BEFORE_CREATION_TIME,
                         Array.of(getCreationTimeCutoff()));
 
                 // Delete the loading more element before appending more.
@@ -185,16 +182,5 @@ public class ThingProvider extends BaseProvider {
     @Override
     public String getType(Uri uri) {
         return null;
-    }
-
-    /** @return cutoff time when all sessions must be created at or after */
-    private static long getCreationTimeCutoff() {
-        // Initialize this once to delete all session data that was created
-        // before the first sync. This allows to clean up any residue in the
-        // database that can no longer be viewed.
-        if (CREATION_TIME_CUTOFF == -1) {
-            CREATION_TIME_CUTOFF = System.currentTimeMillis();
-        }
-        return CREATION_TIME_CUTOFF;
     }
 }

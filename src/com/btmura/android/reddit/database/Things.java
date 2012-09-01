@@ -57,7 +57,7 @@ public class Things implements BaseColumns, SyncColumns {
     public static final String SELECTION_BY_SESSION_ID_AND_MORE =
             SELECTION_BY_SESSION_ID + " AND " + COLUMN_KIND + " = " + KIND_MORE;
 
-    public static final String SELECTION_BY_CREATION_TIME =
+    public static final String SELECTION_BEFORE_CREATION_TIME =
             COLUMN_SESSION_CREATION_TIME + " < ?";
 
     static void createTable(SQLiteDatabase db) {

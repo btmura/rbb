@@ -43,6 +43,7 @@ public class CommentAdapter extends BaseCursorAdapter {
             Comments.COLUMN_NESTING,
             Comments.COLUMN_NUM_COMMENTS,
             Comments.COLUMN_SEQUENCE,
+            Comments.COLUMN_SESSION_CREATION_TIME,
             Comments.COLUMN_SESSION_ID,
             Comments.COLUMN_TITLE,
             Comments.COLUMN_THING_ID,
@@ -60,11 +61,12 @@ public class CommentAdapter extends BaseCursorAdapter {
     public static int INDEX_NESTING = 7;
     public static int INDEX_NUM_COMMENTS = 8;
     public static int INDEX_SEQUENCE = 9;
-    public static int INDEX_SESSION_ID = 10;
-    public static int INDEX_TITLE = 11;
-    public static int INDEX_THING_ID = 12;
-    public static int INDEX_UPS = 13;
-    public static int INDEX_VOTE = 14;
+    public static int INDEX_SESSION_CREATION_TIME = 10;
+    public static int INDEX_SESSION_ID = 11;
+    public static int INDEX_TITLE = 12;
+    public static int INDEX_THING_ID = 13;
+    public static int INDEX_UPS = 14;
+    public static int INDEX_VOTE = 15;
 
     private final long nowTimeMs = System.currentTimeMillis();
     private final OnVoteListener listener;

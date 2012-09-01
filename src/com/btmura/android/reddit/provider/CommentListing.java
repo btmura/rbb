@@ -63,6 +63,7 @@ class CommentListing extends JsonParser {
     private final SQLiteOpenHelper dbHelper;
     private final String accountName;
     private final String sessionId;
+    private final long sessionCreationTime;
     private final String thingId;
 
     public static CommentListing get(Context context, SQLiteOpenHelper dbHelper,
@@ -75,7 +76,7 @@ class CommentListing extends JsonParser {
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             CommentListing listing = new CommentListing(context, dbHelper, accountName, sessionId,
-                    thingId);
+                    t1, thingId);
             listing.parseListingArray(reader);
             if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();
@@ -90,11 +91,12 @@ class CommentListing extends JsonParser {
     }
 
     private CommentListing(Context context, SQLiteOpenHelper dbHelper, String accountName,
-            String sessionId, String thingId) {
+            String sessionId, long sessionCreationTime, String thingId) {
         this.context = context;
         this.dbHelper = dbHelper;
         this.accountName = accountName;
         this.sessionId = sessionId;
+        this.sessionCreationTime = sessionCreationTime;
         this.thingId = thingId;
     }
 
@@ -106,7 +108,10 @@ class CommentListing extends JsonParser {
     @Override
     public void onEntityStart(int index) {
         ContentValues v = new ContentValues(15);
+        v.put(Comments.COLUMN_ACCOUNT, accountName);
         v.put(Comments.COLUMN_SEQUENCE, index);
+        v.put(Comments.COLUMN_SESSION_ID, sessionId);
+        v.put(Comments.COLUMN_SESSION_CREATION_TIME, sessionCreationTime);
         values.add(v);
     }
 
@@ -186,12 +191,6 @@ class CommentListing extends JsonParser {
     }
 
     @Override
-    public void onEntityEnd(int index) {
-        values.get(index).put(Comments.COLUMN_ACCOUNT, accountName);
-        values.get(index).put(Comments.COLUMN_SESSION_ID, sessionId);
-    }
-
-    @Override
     public void onParseEnd() {
         // We don't support loading more comments right now.
         removeMoreComments();
@@ -252,7 +251,7 @@ class CommentListing extends JsonParser {
                         // Use the same sequence so this appears below.
                         int sequence = v.getAsInteger(Comments.COLUMN_SEQUENCE);
 
-                        ContentValues p = new ContentValues(7);
+                        ContentValues p = new ContentValues(8);
                         p.put(Comments.COLUMN_ACCOUNT, accountName);
                         p.put(Comments.COLUMN_AUTHOR, accountName);
                         p.put(Comments.COLUMN_BODY, body);
@@ -260,6 +259,7 @@ class CommentListing extends JsonParser {
                         p.put(Comments.COLUMN_NESTING, nesting);
                         p.put(Comments.COLUMN_SEQUENCE, sequence);
                         p.put(Comments.COLUMN_SESSION_ID, sessionId);
+                        p.put(Comments.COLUMN_SESSION_CREATION_TIME, sessionCreationTime);
 
                         // Insert the reply after this comment.
                         values.add(i + 1, p);
