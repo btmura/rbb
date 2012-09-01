@@ -48,6 +48,7 @@ class ThingListing extends JsonParser {
     private final Context context;
     private final String accountName;
     private final String sessionId;
+    private final long sessionCreationTime;
     private String moreThingId;
 
     public static ThingListing get(Context context, String accountName, String sessionId,
@@ -65,7 +66,7 @@ class ThingListing extends JsonParser {
         long t2 = System.currentTimeMillis();
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
-            ThingListing listing = new ThingListing(context, accountName, sessionId);
+            ThingListing listing = new ThingListing(context, accountName, sessionId, t1);
             listing.parseListingObject(reader);
             if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();
@@ -79,19 +80,18 @@ class ThingListing extends JsonParser {
         }
     }
 
-    private ThingListing(Context context, String accountName, String sessionId) {
+    private ThingListing(Context context, String accountName, String sessionId,
+            long sessionCreationTime) {
         this.context = context;
         this.accountName = accountName;
         this.sessionId = sessionId;
+        this.sessionCreationTime = sessionCreationTime;
     }
 
     @Override
     public void onEntityStart(int index) {
-        ContentValues v = new ContentValues(20);
-        v.put(Things.COLUMN_KIND, Things.KIND_THING);
-        v.put(Things.COLUMN_ACCOUNT, accountName);
-        v.put(Things.COLUMN_SESSION_ID, sessionId);
-        values.add(v);
+        // Pass null for thing ID since we know the thing ID later.
+        values.add(newContentValues(Things.KIND_THING, null, 17));
     }
 
     @Override
@@ -193,12 +193,17 @@ class ThingListing extends JsonParser {
     @Override
     public void onParseEnd() {
         if (!TextUtils.isEmpty(moreThingId)) {
-            ContentValues v = new ContentValues(4);
-            v.put(Things.COLUMN_KIND, Things.KIND_MORE);
-            v.put(Things.COLUMN_ACCOUNT, accountName);
-            v.put(Things.COLUMN_SESSION_ID, sessionId);
-            v.put(Things.COLUMN_THING_ID, moreThingId);
-            values.add(v);
+            values.add(newContentValues(Things.KIND_MORE, moreThingId, 0));
         }
+    }
+
+    private ContentValues newContentValues(int kind, String thingId, int extraCapacity) {
+        ContentValues v = new ContentValues(5 + extraCapacity);
+        v.put(Things.COLUMN_ACCOUNT, accountName);
+        v.put(Things.COLUMN_KIND, kind);
+        v.put(Things.COLUMN_SESSION_ID, sessionId);
+        v.put(Things.COLUMN_SESSION_CREATION_TIME, sessionCreationTime);
+        v.put(Things.COLUMN_THING_ID, thingId);
+        return v;
     }
 }

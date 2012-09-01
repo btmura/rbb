@@ -18,11 +18,11 @@ package com.btmura.android.reddit.util;
 
 public class Array {
 
-    public static String[] of(String... elements) {
+    public static String[] of(Object... elements) {
         int length = elements.length;
         String[] array = new String[length];
         for (int i = 0; i < length; i++) {
-            array[i] = elements[i];
+            array[i] = elements[i].toString();
         }
         return array;
     }

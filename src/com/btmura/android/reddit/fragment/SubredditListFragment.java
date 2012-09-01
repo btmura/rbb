@@ -334,7 +334,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         // Only search queries will have sessions but its ok to always do this.
         // TODO: Remove deleteSessionData method duplication in adapters.
         if (!getActivity().isChangingConfigurations()) {
-            SubredditAdapter.deleteSessionData(getActivity(), sessionId);
+            SubredditAdapter.deleteSessionData(getActivity(), sessionId, query);
         }
         super.onDestroy();
     }

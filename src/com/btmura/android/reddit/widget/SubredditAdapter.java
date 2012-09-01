@@ -67,19 +67,21 @@ public class SubredditAdapter extends BaseCursorAdapter {
         }
     }
 
-    public static void deleteSessionData(final Context context, final String sessionId) {
-        // Use application context to allow activity to be collected and
-        // schedule the session deletion in the background thread pool rather
-        // than serial pool.
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
-            public void run() {
-                ContentResolver cr = appContext.getContentResolver();
-                cr.delete(SubredditSearchProvider.CONTENT_URI,
-                        SubredditSearches.SELECTION_BY_SESSION_ID,
-                        Array.of(sessionId));
-            }
-        });
+    public static void deleteSessionData(final Context context, final String sessionId, String query) {
+        if (!TextUtils.isEmpty(query)) {
+            // Use application context to allow activity to be collected and
+            // schedule the session deletion in the background thread pool rather
+            // than serial pool.
+            final Context appContext = context.getApplicationContext();
+            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+                public void run() {
+                    ContentResolver cr = appContext.getContentResolver();
+                    cr.delete(SubredditSearchProvider.CONTENT_URI,
+                            SubredditSearches.SELECTION_BY_SESSION_ID,
+                            Array.of(sessionId));
+                }
+            });
+        }
     }
 
     private static Uri getUri(String accountName, String sessionId, String query, boolean sync) {
