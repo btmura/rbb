@@ -42,7 +42,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.NetApi;
+import com.btmura.android.reddit.net.RedditApi;
 
 public class SyncAdapterService extends Service {
 
@@ -67,7 +67,7 @@ public class SyncAdapterService extends Service {
 
     public static void initializeAccount(Context context, String login, String cookie)
             throws RemoteException, OperationApplicationException, IOException {
-        ArrayList<String> subreddits = NetApi.querySubreddits(cookie);
+        ArrayList<String> subreddits = RedditApi.querySubreddits(cookie);
         int count = subreddits.size();
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
@@ -114,7 +114,7 @@ public class SyncAdapterService extends Service {
                         AccountAuthenticator.AUTH_TOKEN_COOKIE,
                         true);
 
-                ArrayList<String> subreddits = NetApi.querySubreddits(cookie);
+                ArrayList<String> subreddits = RedditApi.querySubreddits(cookie);
 
                 Cursor c = provider.query(SubredditProvider.CONTENT_URI, PROJECTION,
                         SubredditProvider.SELECTION_ACCOUNT,

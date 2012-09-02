@@ -32,7 +32,7 @@ import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.net.NetApi;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.JsonParser;
@@ -62,7 +62,7 @@ class ThingListing extends JsonParser {
         } else {
             url = Urls.subredditUrl(subredditName, filter, more);
         }
-        HttpURLConnection conn = NetApi.connect(context, url, cookie);
+        HttpURLConnection conn = RedditApi.connect(context, url, cookie);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
         try {

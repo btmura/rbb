@@ -25,7 +25,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.net.NetApi.SubmitResult;
+import com.btmura.android.reddit.net.RedditApi.SubmitResult;
 
 class SubmitParser {
 

@@ -44,8 +44,8 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.fragment.CaptchaDialogFragment;
 import com.btmura.android.reddit.fragment.CaptchaDialogFragment.OnCaptchaGuessListener;
-import com.btmura.android.reddit.net.NetApi;
-import com.btmura.android.reddit.net.NetApi.SubmitResult;
+import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi.SubmitResult;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
 public class SubmitLinkActivity extends Activity implements LoaderCallbacks<AccountResult>,
@@ -180,7 +180,7 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
                 String modhash = manager.blockingGetAuthToken(account,
                         AccountAuthenticator.AUTH_TOKEN_MODHASH,
                         true);
-                return NetApi.submit(subreddit, title, text, captchaId, captchaGuess, cookie,
+                return RedditApi.submit(subreddit, title, text, captchaId, captchaGuess, cookie,
                         modhash);
             } catch (OperationCanceledException e) {
                 Log.e(TAG, "doInBackground", e);

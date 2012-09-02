@@ -31,7 +31,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.SubredditSearches;
-import com.btmura.android.reddit.net.NetApi;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.JsonParser;
 
@@ -47,7 +47,7 @@ class SubredditSearchListing extends JsonParser {
     public static SubredditSearchListing get(Context context, String accountName, String sessionId,
             String query, String cookie) throws IOException {
         URL url = Urls.subredditSearchUrl(query, null);
-        HttpURLConnection conn = NetApi.connect(context, url, cookie);
+        HttpURLConnection conn = RedditApi.connect(context, url, cookie);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));

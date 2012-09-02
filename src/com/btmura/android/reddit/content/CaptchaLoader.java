@@ -24,7 +24,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.net.NetApi;
+import com.btmura.android.reddit.net.RedditApi;
 
 public class CaptchaLoader extends AsyncTaskLoader<Bitmap> {
 
@@ -45,7 +45,7 @@ public class CaptchaLoader extends AsyncTaskLoader<Bitmap> {
             Log.d(TAG, "loadInBackground");
         }
         try {
-            return NetApi.captcha(captchaId);
+            return RedditApi.captcha(captchaId);
         } catch (IOException e) {
             Log.e(TAG, "loadInBackground", e);
             return null;

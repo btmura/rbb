@@ -43,8 +43,8 @@ import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.net.NetApi;
-import com.btmura.android.reddit.net.NetApi.LoginResult;
+import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi.LoginResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.SyncAdapterService;
 import com.btmura.android.reddit.text.InputFilters;
@@ -172,7 +172,7 @@ public class AddAccountFragment extends Fragment implements
         @Override
         protected Bundle doInBackground(Void... params) {
             try {
-                LoginResult result = NetApi.login(getActivity(), login, password);
+                LoginResult result = RedditApi.login(getActivity(), login, password);
                 if (result.error != null) {
                     return errorBundle(R.string.login_reddit_error, result.error);
                 }

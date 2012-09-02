@@ -22,8 +22,8 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
 
-import com.btmura.android.reddit.net.NetApi;
-import com.btmura.android.reddit.net.NetApi.Sidebar;
+import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi.Sidebar;
 
 public class SidebarLoader extends AsyncTaskLoader<Sidebar> {
 
@@ -51,7 +51,7 @@ public class SidebarLoader extends AsyncTaskLoader<Sidebar> {
     @Override
     public Sidebar loadInBackground() {
         try {
-            return NetApi.querySidebar(getContext(), subreddit, null);
+            return RedditApi.querySidebar(getContext(), subreddit, null);
         } catch (IOException e) {
             Log.e(TAG, "loadInBackground", e);
         }

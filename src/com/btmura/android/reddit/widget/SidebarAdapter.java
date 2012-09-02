@@ -25,7 +25,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.net.NetApi.Sidebar;
+import com.btmura.android.reddit.net.RedditApi.Sidebar;
 
 public class SidebarAdapter extends BaseAdapter {
 

@@ -21,7 +21,7 @@ import java.io.IOException;
 import android.content.Context;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.net.NetApi.Sidebar;
+import com.btmura.android.reddit.net.RedditApi.Sidebar;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.JsonParser;
 

@@ -33,7 +33,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.NetApi;
+import com.btmura.android.reddit.net.RedditApi;
 
 public class SyncOperationService extends IntentService {
 
@@ -89,7 +89,7 @@ public class SyncOperationService extends IntentService {
                             true);
 
                     boolean subscribe = state == Subreddits.STATE_INSERTING;
-                    NetApi.subscribe(cookie, modhash, subreddit, subscribe);
+                    RedditApi.subscribe(cookie, modhash, subreddit, subscribe);
 
                     ContentValues values = new ContentValues(1);
                     values.put(Subreddits.COLUMN_EXPIRATION, System.currentTimeMillis()

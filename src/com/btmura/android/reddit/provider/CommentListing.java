@@ -36,7 +36,7 @@ import android.util.JsonToken;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Replies;
-import com.btmura.android.reddit.net.NetApi;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Array;
@@ -71,7 +71,7 @@ class CommentListing extends JsonParser {
             String accountName, String sessionId, String thingId, String cookie) throws IOException {
         long t1 = System.currentTimeMillis();
         URL url = Urls.commentsUrl(thingId);
-        HttpURLConnection conn = NetApi.connect(context, url, cookie);
+        HttpURLConnection conn = RedditApi.connect(context, url, cookie);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
         try {

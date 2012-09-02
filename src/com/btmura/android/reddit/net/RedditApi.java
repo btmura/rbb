@@ -37,9 +37,9 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 
-public class NetApi {
+public class RedditApi {
 
-    public static final String TAG = "NetApi";
+    public static final String TAG = "RedditApi";
 
     private static final String CHARSET = "UTF-8";
     private static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset="
