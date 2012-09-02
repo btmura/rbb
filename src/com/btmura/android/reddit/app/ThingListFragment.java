@@ -40,6 +40,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.util.Flag;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
@@ -106,24 +107,20 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        filter = getArguments().getInt(ARG_FILTER);
+        query = getArguments().getString(ARG_QUERY);
+        sync = savedInstanceState == null;
+
         if (savedInstanceState == null) {
             accountName = getArguments().getString(ARG_ACCOUNT_NAME);
             subreddit = getArguments().getString(ARG_SUBREDDIT);
-            if (!TextUtils.isEmpty(query)) {
-                sessionId = query + "-" + System.currentTimeMillis();
-            } else {
-                sessionId = subreddit + "-" + System.currentTimeMillis();
-            }
+            sessionId = createSessionId();
         } else {
             accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
             subreddit = savedInstanceState.getString(STATE_SUBREDDIT);
             selectedThingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
         }
-
-        filter = getArguments().getInt(ARG_FILTER);
-        query = getArguments().getString(ARG_QUERY);
-        sync = savedInstanceState == null;
 
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
@@ -152,7 +149,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public void loadIfPossible() {
-        if (accountName != null && (subreddit != null || query != null)) {
+        if (accountName != null && sessionId != null && (subreddit != null || query != null)) {
             getLoaderManager().initLoader(0, null, this);
         }
     }
@@ -293,7 +290,10 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public void setSubreddit(String subreddit) {
-        this.subreddit = subreddit;
+        if (!Objects.equalsIgnoreCase(this.subreddit, subreddit)) {
+            this.subreddit = subreddit;
+            this.sessionId = createSessionId();
+        }
     }
 
     public int getFilter() {
@@ -302,5 +302,14 @@ public class ThingListFragment extends ListFragment implements
 
     public String getQuery() {
         return query;
+    }
+
+    private String createSessionId() {
+        if (!TextUtils.isEmpty(query)) {
+            return query + "-" + System.currentTimeMillis();
+        } else if (subreddit != null) {
+            return subreddit + "-" + System.currentTimeMillis();
+        }
+        return null;
     }
 }

@@ -100,6 +100,9 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        query = getArguments().getString(ARG_QUERY);
+        sync = savedInstanceState == null;
+
         if (savedInstanceState == null) {
             accountName = getArguments().getString(ARG_ACCOUNT_NAME);
             selectedSubreddit = getArguments().getString(ARG_SELECTED_SUBREDDIT);
@@ -111,9 +114,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
             selectedSubreddit = savedInstanceState.getString(STATE_SELECTED_SUBREDDIT);
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
         }
-
-        query = getArguments().getString(ARG_QUERY);
-        sync = savedInstanceState == null;
 
         int flags = getArguments().getInt(ARG_FLAGS);
         singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
@@ -135,6 +135,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setListAdapter(adapter);
+        // Only show the spinner if this is a single pane display since showing
+        // two spinners can be annoying.
         setListShown(singleChoice);
         loadIfPossible();
     }
