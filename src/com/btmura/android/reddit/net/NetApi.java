@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -35,7 +36,6 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.entity.SubmitResult;
 
 public class NetApi {
 
@@ -57,6 +57,13 @@ public class NetApi {
         public CharSequence title;
         public int subscribers;
         public CharSequence description;
+    }
+
+    public static class SubmitResult {
+        public String captcha;
+        public List<String[]> errors;
+        public String url;
+        public String fullName;
     }
 
     public static ArrayList<String> querySubreddits(String cookie) throws IOException {

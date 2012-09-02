@@ -42,10 +42,10 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.entity.SubmitResult;
 import com.btmura.android.reddit.fragment.CaptchaDialogFragment;
 import com.btmura.android.reddit.fragment.CaptchaDialogFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.net.NetApi;
+import com.btmura.android.reddit.net.NetApi.SubmitResult;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
 public class SubmitLinkActivity extends Activity implements LoaderCallbacks<AccountResult>,
