@@ -28,8 +28,9 @@ import android.view.View;
 import com.btmura.android.reddit.R;
 
 /**
- * {@link View} that performs shared initialization of dimensions and paints
- * common to most custom views.
+ * {@link View} that performs shared initialization of resources and adds an
+ * additional chosen state that allows views to be highlightable in multiple
+ * choice modal situations.
  */
 abstract class CustomView extends View {
 
@@ -49,8 +50,21 @@ abstract class CustomView extends View {
     static final int COMMENT_STATUS = 6;
     static final TextPaint[] TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
 
+    /**
+     * An additional state set to highlight an item even in a multiple choice
+     * modal situation. The existing activated state doesn't get used in
+     * multiple choice modal, so we need an extra state to be able to highlight
+     * the item.
+     */
+    static final int[] CHOSEN_STATE_SET = {
+            R.attr.state_chosen,
+    };
+
+    private boolean isChosen;
+
     CustomView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        setBackgroundResource(R.drawable.selector);
         init(context);
     }
 
@@ -66,7 +80,7 @@ abstract class CustomView extends View {
             MIN_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.min_details_width);
             MAX_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.max_details_width);
 
-            // We only need these when things change so don't make them static.
+            // We only need these when scale changes so don't make them static.
             int[] styles = new int[] {
                     R.style.SubredditTitleText,
                     R.style.SubredditStatusText,
@@ -92,5 +106,25 @@ abstract class CustomView extends View {
                 a.recycle();
             }
         }
+    }
+
+    @Override
+    protected int[] onCreateDrawableState(int extraSpace) {
+        int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
+        if (isChosen) {
+            mergeDrawableStates(drawableState, CHOSEN_STATE_SET);
+        }
+        return drawableState;
+    }
+
+    public void setChosen(boolean isChosen) {
+        if (this.isChosen != isChosen) {
+            this.isChosen = isChosen;
+            refreshDrawableState();
+        }
+    }
+
+    public boolean isChosen() {
+        return isChosen;
     }
 }

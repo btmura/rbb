@@ -29,12 +29,14 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.database.SubredditSearches;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.SubredditSearchProvider;
 import com.btmura.android.reddit.util.Array;
+import com.btmura.android.reddit.util.Objects;
 
 public class SubredditAdapter extends BaseCursorAdapter {
+
+    public static final String TAG = "SubredditAdapter";
 
     private static final String[] PROJECTION_SUBREDDITS = {
             Subreddits._ID,
@@ -49,6 +51,8 @@ public class SubredditAdapter extends BaseCursorAdapter {
 
     private static final int INDEX_NAME = 1;
     private static final int INDEX_SUBSCRIBERS = 2;
+
+    private String selectedSubreddit;
 
     public static Loader<Cursor> getLoader(Context context, String accountName,
             String sessionId, String query, boolean sync) {
@@ -128,12 +132,17 @@ public class SubredditAdapter extends BaseCursorAdapter {
         int subscribers = query != null ? cursor.getInt(INDEX_SUBSCRIBERS) : -1;
         SubredditView v = (SubredditView) view;
         v.setData(name, subscribers);
+        v.setChosen(name.equalsIgnoreCase(selectedSubreddit));
     }
 
-    public void setSelectedSubreddit(Subreddit sr) {
+    public void setSelectedSubreddit(String subreddit) {
+        if (!Objects.equals(selectedSubreddit, subreddit)) {
+            selectedSubreddit = subreddit;
+            notifyDataSetChanged();
+        }
     }
 
-    public String getName(Context context, int position) {
+    public String getName(int position) {
         return getString(position, INDEX_NAME);
     }
 }

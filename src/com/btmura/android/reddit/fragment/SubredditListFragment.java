@@ -112,7 +112,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         }
 
         adapter = new SubredditAdapter(getActivity(), query, isSingleChoice());
-        adapter.setSelectedSubreddit(selectedSubreddit);
+        adapter.setSelectedSubreddit(Subreddit.getName(selectedSubreddit));
     }
 
     @Override
@@ -156,7 +156,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         setEmptyText(getString(cursor != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
         if (cursor != null && cursor.getCount() > 0) {
-            Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), 0));
+            Subreddit sr = Subreddit.newInstance(adapter.getName(0));
             listener.onInitialSubredditSelected(sr);
         }
     }
@@ -166,11 +166,12 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        Subreddit sr = Subreddit.newInstance(adapter.getName(getActivity(), position));
+    public void onListItemClick(ListView l, View view, int position, long id) {
+        super.onListItemClick(l, view, position, id);
+        String subreddit = adapter.getName(position);
+        Subreddit sr = Subreddit.newInstance(subreddit);
         selectedSubreddit = sr;
-        adapter.setSelectedSubreddit(sr);
+        adapter.setSelectedSubreddit(subreddit);
         listener.onSubredditSelected(sr);
     }
 
@@ -201,7 +202,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         CheckedInfo info = (CheckedInfo) mode.getTag();
         info.checkedCount = getListView().getCheckedItemCount();
-        if (adapter.getName(getActivity(), position).indexOf('+') != -1) {
+        if (adapter.getName(position).indexOf('+') != -1) {
             info.numSplittable = info.numSplittable + (checked ? 1 : -1);
         }
         mode.invalidate();
@@ -250,7 +251,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         for (i = 0, j = 0; i < count; i++) {
             if (positions.get(i)) {
                 values[j] = new ContentValues(1);
-                values[j++].put(Subreddits.COLUMN_NAME, adapter.getName(getActivity(), i));
+                values[j++].put(Subreddits.COLUMN_NAME, adapter.getName(i));
             }
         }
         SubredditProvider.addMultipleSubredditsInBackground(getActivity(), values);
@@ -263,7 +264,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         int count = adapter.getCount();
         for (int i = 0; i < count; i++) {
             if (positions.get(i)) {
-                String name = adapter.getName(getActivity(), i);
+                String name = adapter.getName(i);
                 if (!name.isEmpty()) {
                     names.add(name);
                 }
@@ -306,7 +307,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         int count = adapter.getCount();
         for (int i = 0; i < count; i++) {
             if (checked.get(i)) {
-                String name = adapter.getName(getActivity(), i);
+                String name = adapter.getName(i);
                 if (!name.isEmpty()) {
                     names.add(name);
                 }
@@ -352,7 +353,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
             Log.d(TAG, "setSelectedSubreddit subreddit:" + subreddit);
         }
         this.selectedSubreddit = subreddit;
-        adapter.setSelectedSubreddit(subreddit);
+        adapter.setSelectedSubreddit(subreddit.name);
         adapter.notifyDataSetChanged();
     }
 
