@@ -22,7 +22,7 @@ import java.io.InputStreamReader;
 
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.entity.LoginResult;
+import com.btmura.android.reddit.net.NetApi.LoginResult;
 
 class LoginParser {
 
