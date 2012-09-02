@@ -95,11 +95,15 @@ public class Subreddit implements Parcelable, Comparable<Subreddit> {
         return name.compareToIgnoreCase(another.name);
     }
 
+    public static String getName(Subreddit subreddit) {
+        return subreddit != null ? subreddit.name : null;
+    }
+
     public static boolean isFrontPage(String subreddit) {
         return TextUtils.isEmpty(subreddit);
     }
 
-    public static String getName(Subreddit subreddit) {
-        return subreddit != null ? subreddit.name : null;
+    public static String getTitle(Context c, String subreddit) {
+        return Subreddit.isFrontPage(subreddit) ? c.getString(R.string.front_page) : subreddit;
     }
 }

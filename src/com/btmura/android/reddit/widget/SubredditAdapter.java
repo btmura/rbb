@@ -24,12 +24,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.SubredditSearches;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.entity.Subreddit;
@@ -113,64 +110,27 @@ public class SubredditAdapter extends BaseCursorAdapter {
         }
     }
 
-    private final LayoutInflater inflater;
     private final String query;
-    private final boolean singleChoice;
-    private Subreddit selected;
 
     public SubredditAdapter(Context context, String query, boolean singleChoice) {
         super(context, null, 0);
-        this.inflater = LayoutInflater.from(context);
         this.query = query;
-        this.singleChoice = singleChoice;
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        int layout = query != null ? R.layout.sr_search_row : R.layout.sr_db_row;
-        View v = inflater.inflate(layout, parent, false);
-        ViewHolder h = (ViewHolder) v.getTag();
-        if (h == null) {
-            h = new ViewHolder();
-            h.title = (TextView) v.findViewById(R.id.title);
-            h.status = (TextView) v.findViewById(R.id.status);
-            v.setTag(h);
-        }
-        return v;
+        return new SubredditView(context);
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder h = (ViewHolder) view.getTag();
-
         String name = cursor.getString(INDEX_NAME);
-        if (TextUtils.isEmpty(name)) {
-            h.title.setText(R.string.front_page);
-        } else {
-            h.title.setText(name);
-        }
-
-        if (query != null) {
-            int subscribers = cursor.getInt(INDEX_SUBSCRIBERS);
-            String status = context.getResources().getQuantityString(R.plurals.subscribers,
-                    subscribers, subscribers);
-            h.status.setText(status);
-        }
-
-        if (singleChoice && selected != null && name.equalsIgnoreCase(selected.name)) {
-            view.setBackgroundResource(R.drawable.selector_chosen);
-        } else {
-            view.setBackgroundResource(R.drawable.selector_normal);
-        }
-    }
-
-    static class ViewHolder {
-        TextView title;
-        TextView status;
+        int subscribers = query != null ? cursor.getInt(INDEX_SUBSCRIBERS) : -1;
+        SubredditView v = (SubredditView) view;
+        v.setData(name, subscribers);
     }
 
     public void setSelectedSubreddit(Subreddit sr) {
-        selected = sr;
     }
 
     public String getName(Context context, int position) {
