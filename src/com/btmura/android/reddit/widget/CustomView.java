@@ -36,10 +36,14 @@ abstract class CustomView extends View {
     static float FONT_SCALE = -1;
     static int PADDING;
     static int ELEMENT_PADDING;
+    static int MIN_DETAILS_WIDTH;
+    static int MAX_DETAILS_WIDTH;
 
-    static final int NUM_TEXT_PAINTS = 2;
+    static final int NUM_TEXT_PAINTS = 4;
     static final int SUBREDDIT_TITLE = 0;
     static final int SUBREDDIT_STATUS = 1;
+    static final int THING_TITLE = 2;
+    static final int THING_STATUS = 3;
     static final TextPaint[] TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
 
     CustomView(Context context, AttributeSet attrs, int defStyle) {
@@ -56,11 +60,15 @@ abstract class CustomView extends View {
             FONT_SCALE = fontScale;
             PADDING = r.getDimensionPixelSize(R.dimen.padding);
             ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
+            MIN_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.min_details_width);
+            MAX_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.max_details_width);
 
             // We only need these when things change so don't make them static.
             int[] styles = new int[] {
                     R.style.SubredditTitleText,
                     R.style.SubredditStatusText,
+                    R.style.ThingTitleText,
+                    R.style.ThingStatusText,
             };
             int[] attrs = new int[] {
                     android.R.attr.textSize,

@@ -2,19 +2,15 @@ package com.btmura.android.reddit.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.Resources.Theme;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.Layout.Alignment;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
-import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.style.ForegroundColorSpan;
@@ -22,25 +18,13 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
-import android.view.View;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.text.RelativeTime;
 
-public class ThingView extends View implements OnGestureListener {
+public class ThingView extends CustomView implements OnGestureListener {
 
     public static final String TAG = "ThingView";
-
-    private static float FONT_SCALE;
-    private static int PADDING;
-    private static int ELEMENT_PADDING;
-    private static int MIN_DETAILS_WIDTH;
-    private static int MAX_DETAILS_WIDTH;
-
-    private static TextPaint[] TEXT_PAINTS;
-    private static final int NUM_TEXT_PAINTS = 2;
-    private static final int TEXT_TITLE = 0;
-    private static final int TEXT_STATUS = 1;
 
     private final GestureDetector detector;
     private OnVoteListener listener;
@@ -83,34 +67,6 @@ public class ThingView extends View implements OnGestureListener {
     private void init(Context context) {
         VotingArrows.init(context);
         Thumbnail.init(context);
-        Resources r = context.getResources();
-        float fontScale = r.getConfiguration().fontScale;
-        if (FONT_SCALE != fontScale) {
-            FONT_SCALE = fontScale;
-            PADDING = r.getDimensionPixelSize(R.dimen.padding);
-            ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
-            MIN_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.min_details_width);
-            MAX_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.max_details_width);
-
-            Theme t = context.getTheme();
-            int[] styles = new int[] {
-                    R.style.ThingTitleText,
-                    R.style.ThingStatusText,
-            };
-            int[] attrs = new int[] {
-                    android.R.attr.textSize,
-                    android.R.attr.textColor,
-            };
-
-            TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
-            for (int i = 0; i < NUM_TEXT_PAINTS; i++) {
-                TypedArray a = t.obtainStyledAttributes(styles[i], attrs);
-                TEXT_PAINTS[i] = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-                TEXT_PAINTS[i].setTextSize(a.getDimensionPixelSize(0, 0) * FONT_SCALE);
-                TEXT_PAINTS[i].setColor(a.getColor(1, -1));
-                a.recycle();
-            }
-        }
     }
 
     public void setOnVoteListener(OnVoteListener listener) {
@@ -240,10 +196,10 @@ public class ThingView extends View implements OnGestureListener {
         detailsWidth = Math.max(0, detailsWidth);
 
         titleLayout = makeTitleLayout(titleWidth);
-        statusLayout = makeLayout(TEXT_STATUS, statusText, statusWidth, Alignment.ALIGN_NORMAL);
+        statusLayout = makeLayout(THING_STATUS, statusText, statusWidth, Alignment.ALIGN_NORMAL);
         detailsLayout = null;
         if (detailsWidth > 0) {
-            detailsLayout = makeLayout(TEXT_STATUS, detailsText, detailsWidth,
+            detailsLayout = makeLayout(THING_STATUS, detailsText, detailsWidth,
                     Alignment.ALIGN_OPPOSITE);
         }
 
@@ -268,7 +224,7 @@ public class ThingView extends View implements OnGestureListener {
     }
 
     private Layout makeTitleLayout(int width) {
-        return new StaticLayout(title, TEXT_PAINTS[TEXT_TITLE], width, Alignment.ALIGN_NORMAL, 1f,
+        return new StaticLayout(title, TEXT_PAINTS[THING_TITLE], width, Alignment.ALIGN_NORMAL, 1f,
                 0f, true);
     }
 
