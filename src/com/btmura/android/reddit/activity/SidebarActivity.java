@@ -25,7 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.widget.SidebarPagerAdapter;
@@ -54,7 +54,7 @@ public class SidebarActivity extends Activity implements SubredditNameHolder {
         }
 
         String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
-        setTitle(Subreddit.getTitle(this, subreddit));
+        setTitle(Subreddits.getTitle(this, subreddit));
 
         String[] subreddits = subreddit.split("\\+");
         adapter = new SidebarPagerAdapter(getFragmentManager(), subreddits);

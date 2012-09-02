@@ -16,9 +16,6 @@
 
 package com.btmura.android.reddit.widget;
 
-import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Subreddit;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.text.BoringLayout;
@@ -26,6 +23,9 @@ import android.text.Layout.Alignment;
 import android.text.TextPaint;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
+
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.database.Subreddits;
 
 /**
  * {@link CustomView} for displaying subreddit names. It can show subscriber
@@ -58,7 +58,7 @@ public class SubredditView extends CustomView {
      * @param subscribers or -1 if no subscriber info available
      */
     public void setData(String name, int subscribers) {
-        title = Subreddit.getTitle(getContext(), name);
+        title = Subreddits.getTitle(getContext(), name);
         if (subscribers != -1) {
             status = getResources().getQuantityString(R.plurals.subscribers,
                     subscribers, subscribers);

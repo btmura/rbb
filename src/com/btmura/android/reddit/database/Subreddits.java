@@ -18,12 +18,15 @@ package com.btmura.android.reddit.database;
 
 import java.util.ArrayList;
 
-import com.btmura.android.reddit.util.Array;
-
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
+
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.util.Array;
 
 public class Subreddits implements BaseColumns, SyncColumns {
     public static final String TABLE_NAME = "subreddits";
@@ -37,6 +40,14 @@ public class Subreddits implements BaseColumns, SyncColumns {
 
     public static final String NAME_FRONT_PAGE = "";
     public static final String ACCOUNT_NONE = "";
+
+    public static boolean isFrontPage(String subreddit) {
+        return TextUtils.isEmpty(subreddit);
+    }
+
+    public static String getTitle(Context c, String subreddit) {
+        return isFrontPage(subreddit) ? c.getString(R.string.front_page) : subreddit;
+    }
 
     static void createSubredditsV2(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + Subreddits.TABLE_NAME + " ("

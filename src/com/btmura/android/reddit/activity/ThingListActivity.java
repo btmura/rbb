@@ -31,7 +31,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditNameHolder;
 import com.btmura.android.reddit.fragment.ThingListFragment;
@@ -84,7 +84,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
         subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
         adapter = new FilterAdapter(this);
-        adapter.setTitle(Subreddit.getTitle(this, subreddit));
+        adapter.setTitle(Subreddits.getTitle(this, subreddit));
         bar.setListNavigationCallbacks(adapter, this);
         if (savedInstanceState != null) {
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_NAVIGATION_INDEX));

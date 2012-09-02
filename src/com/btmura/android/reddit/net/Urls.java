@@ -21,7 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class Urls {
@@ -130,7 +130,7 @@ public class Urls {
     public static URL subredditUrl(String subreddit, int filter, String more) {
         StringBuilder b = resetBuilder().append(BASE_URL);
 
-        if (!Subreddit.isFrontPage(subreddit)) {
+        if (!Subreddits.isFrontPage(subreddit)) {
             b.append("/r/").append(encode(subreddit));
         }
 

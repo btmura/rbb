@@ -38,7 +38,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
-import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -240,7 +240,7 @@ public class ThingListFragment extends ListFragment implements
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_list_menu, menu);
         menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(
-                subreddit != null && !Subreddit.isFrontPage(subreddit));
+                subreddit != null && !Subreddits.isFrontPage(subreddit));
     }
 
     @Override

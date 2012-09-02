@@ -27,7 +27,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.database.Subreddits;
 
 public class AccountSpinnerAdapter extends BaseAdapter {
 
@@ -181,7 +181,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         h.accountName.setText(getTitle(accountName));
 
         if (subreddit != null) {
-            h.subreddit.setText(Subreddit.getTitle(context, subreddit));
+            h.subreddit.setText(Subreddits.getTitle(context, subreddit));
             h.subreddit.setVisibility(View.VISIBLE);
         } else {
             h.subreddit.setVisibility(View.GONE);
