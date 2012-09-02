@@ -71,7 +71,7 @@ class CommentListing extends JsonParser {
             String accountName, String sessionId, String thingId, String cookie) throws IOException {
         long t1 = System.currentTimeMillis();
         URL url = Urls.commentsUrl(thingId);
-        HttpURLConnection conn = RedditApi.connect(context, url, cookie);
+        HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
         try {

@@ -67,7 +67,7 @@ public class SyncAdapterService extends Service {
 
     public static void initializeAccount(Context context, String login, String cookie)
             throws RemoteException, OperationApplicationException, IOException {
-        ArrayList<String> subreddits = RedditApi.querySubreddits(cookie);
+        ArrayList<String> subreddits = RedditApi.getSubreddits(cookie);
         int count = subreddits.size();
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
@@ -114,7 +114,7 @@ public class SyncAdapterService extends Service {
                         AccountAuthenticator.AUTH_TOKEN_COOKIE,
                         true);
 
-                ArrayList<String> subreddits = RedditApi.querySubreddits(cookie);
+                ArrayList<String> subreddits = RedditApi.getSubreddits(cookie);
 
                 Cursor c = provider.query(SubredditProvider.CONTENT_URI, PROJECTION,
                         SubredditProvider.SELECTION_ACCOUNT,

@@ -45,7 +45,7 @@ public class CaptchaLoader extends AsyncTaskLoader<Bitmap> {
             Log.d(TAG, "loadInBackground");
         }
         try {
-            return RedditApi.captcha(captchaId);
+            return RedditApi.getCaptcha(captchaId);
         } catch (IOException e) {
             Log.e(TAG, "loadInBackground", e);
             return null;

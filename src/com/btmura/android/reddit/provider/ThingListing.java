@@ -62,7 +62,7 @@ class ThingListing extends JsonParser {
         } else {
             url = Urls.subredditUrl(subredditName, filter, more);
         }
-        HttpURLConnection conn = RedditApi.connect(context, url, cookie);
+        HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
         try {

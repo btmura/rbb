@@ -21,13 +21,13 @@ import java.io.IOException;
 import android.content.Context;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.net.RedditApi.Sidebar;
+import com.btmura.android.reddit.net.RedditApi.SidebarResult;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.JsonParser;
 
 class SidebarParser extends JsonParser {
 
-    final Sidebar results = new Sidebar();
+    final SidebarResult results = new SidebarResult();
 
     private final Formatter formatter = new Formatter();
     private final Context context;

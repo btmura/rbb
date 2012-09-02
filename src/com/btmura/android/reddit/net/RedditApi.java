@@ -52,7 +52,7 @@ public class RedditApi {
         public String error;
     }
 
-    public static class Sidebar {
+    public static class SidebarResult {
         public String subreddit;
         public CharSequence title;
         public int subscribers;
@@ -66,47 +66,65 @@ public class RedditApi {
         public String fullName;
     }
 
-    public static ArrayList<String> querySubreddits(String cookie) throws IOException {
+    public static void comment(String thingId, String text, String cookie, String modhash)
+            throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            URL url = Urls.subredditListUrl();
-            conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, cookie);
-            conn.connect();
+            URL url = Urls.commentsApiUrl();
+            conn = connect(url, cookie, true);
+
+            writeFormData(conn, Urls.commentsApiQuery(thingId, text, modhash));
+            in = conn.getInputStream();
+            logResponse(in);
+        } finally {
+            close(in, conn);
+        }
+    }
+
+    public static Bitmap getCaptcha(String id) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.captchaUrl(id);
+            conn = connect(url, null, false);
+
+            in = conn.getInputStream();
+            return BitmapFactory.decodeStream(in);
+        } finally {
+            close(in, conn);
+        }
+    }
+
+    public static SidebarResult getSidebar(Context context, String subreddit, String cookie)
+            throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.sidebarUrl(subreddit);
+            conn = connect(url, cookie, false);
 
             in = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(in));
-            SubredditParser parser = new SubredditParser();
-            parser.parseListingObject(reader);
+            SidebarParser parser = new SidebarParser(context);
+            parser.parseEntity(reader);
             return parser.results;
         } finally {
             close(in, conn);
         }
     }
 
-    public static HttpURLConnection connect(Context context, URL url, String cookie)
-            throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        setCommonHeaders(conn, cookie);
-        conn.connect();
-        return conn;
-    }
-
-    public static Sidebar querySidebar(Context context, String subreddit, String cookie)
-            throws IOException {
+    public static ArrayList<String> getSubreddits(String cookie) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            URL url = Urls.sidebarUrl(subreddit);
-            conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, cookie);
-            conn.connect();
+            URL url = Urls.subredditListUrl();
+            conn = connect(url, cookie, false);
 
             in = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(in));
-            SidebarParser parser = new SidebarParser(context);
-            parser.parseEntity(reader);
+            SubredditParser parser = new SubredditParser();
+            parser.parseListingObject(reader);
             return parser.results;
         } finally {
             close(in, conn);
@@ -132,69 +150,13 @@ public class RedditApi {
         }
     }
 
-    public static void comment(String thingId, String text, String cookie,
-            String modhash) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            URL url = Urls.commentsApiUrl();
-            conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, cookie);
-            setFormDataHeaders(conn);
-            conn.connect();
-
-            writeFormData(conn, Urls.commentsApiQuery(thingId, text, modhash));
-            in = conn.getInputStream();
-            logResponse(in);
-        } finally {
-            close(in, conn);
-        }
-    }
-
-    public static SubmitResult submit(String subreddit, String title, String text,
-            String captchaId, String captchaGuess, String cookie, String modhash)
-            throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            URL url = Urls.submitUrl();
-            conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, cookie);
-            setFormDataHeaders(conn);
-            conn.connect();
-
-            writeFormData(conn,
-                    Urls.submitTextQuery(modhash, subreddit, title, text, captchaId, captchaGuess));
-            in = conn.getInputStream();
-            return SubmitParser.parse(in);
-        } finally {
-            close(in, conn);
-        }
-    }
-
-    public static Bitmap captcha(String id) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            URL url = Urls.captchaUrl(id);
-            conn = (HttpURLConnection) url.openConnection();
-
-            in = conn.getInputStream();
-            return BitmapFactory.decodeStream(in);
-        } finally {
-            close(in, conn);
-        }
-    }
-
     public static void subscribe(String cookie, String modhash, String subreddit, boolean subscribe)
             throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
             URL url = Urls.subscribeUrl();
-            conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, cookie);
-            setFormDataHeaders(conn);
+            conn = connect(url, cookie, true);
             conn.connect();
 
             writeFormData(conn, Urls.subscribeQuery(modhash, subreddit, subscribe));
@@ -207,16 +169,31 @@ public class RedditApi {
         }
     }
 
+    public static SubmitResult submit(String subreddit, String title, String text,
+            String captchaId, String captchaGuess, String cookie, String modhash)
+            throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            URL url = Urls.submitUrl();
+            conn = connect(url, cookie, true);
+
+            writeFormData(conn,
+                    Urls.submitTextQuery(modhash, subreddit, title, text, captchaId, captchaGuess));
+            in = conn.getInputStream();
+            return SubmitParser.parse(in);
+        } finally {
+            close(in, conn);
+        }
+    }
+
     public static void vote(Context context, String name, int vote, String cookie,
             String modhash) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
             URL url = Urls.voteUrl();
-            conn = (HttpURLConnection) url.openConnection();
-            setCommonHeaders(conn, cookie);
-            setFormDataHeaders(conn);
-            conn.connect();
+            conn = connect(url, cookie, true);
 
             writeFormData(conn, Urls.voteQuery(modhash, name, vote));
             in = conn.getInputStream();
@@ -226,6 +203,17 @@ public class RedditApi {
         } finally {
             close(in, conn);
         }
+    }
+
+    public static HttpURLConnection connect(URL url, String cookie, boolean doOutput)
+            throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        setCommonHeaders(conn, cookie);
+        if (doOutput) {
+            setFormDataHeaders(conn);
+        }
+        conn.connect();
+        return conn;
     }
 
     private static void setCommonHeaders(HttpURLConnection conn, String cookie) {

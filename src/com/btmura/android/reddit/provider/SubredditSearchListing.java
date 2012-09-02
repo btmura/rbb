@@ -47,7 +47,7 @@ class SubredditSearchListing extends JsonParser {
     public static SubredditSearchListing get(Context context, String accountName, String sessionId,
             String query, String cookie) throws IOException {
         URL url = Urls.subredditSearchUrl(query, null);
-        HttpURLConnection conn = RedditApi.connect(context, url, cookie);
+        HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
