@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit;
+package com.btmura.android.reddit.app.backup;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
