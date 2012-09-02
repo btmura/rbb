@@ -33,6 +33,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.net.NetApi;
 
 public class SyncOperationService extends IntentService {
 

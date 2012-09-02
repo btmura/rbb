@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.provider;
+package com.btmura.android.reddit.net;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +37,6 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.entity.LoginResult;
 import com.btmura.android.reddit.entity.SubmitResult;
-import com.btmura.android.reddit.net.Urls;
 
 public class NetApi {
 
@@ -74,7 +73,7 @@ public class NetApi {
         }
     }
 
-    static HttpURLConnection connect(Context context, URL url, String cookie)
+    public static HttpURLConnection connect(Context context, URL url, String cookie)
             throws IOException {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         setCommonHeaders(conn, cookie);
@@ -175,7 +174,7 @@ public class NetApi {
         }
     }
 
-    static void subscribe(String cookie, String modhash, String subreddit, boolean subscribe)
+    public static void subscribe(String cookie, String modhash, String subreddit, boolean subscribe)
             throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;

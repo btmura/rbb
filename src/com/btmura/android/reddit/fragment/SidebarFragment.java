@@ -23,7 +23,7 @@ import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SidebarLoader;
-import com.btmura.android.reddit.provider.NetApi.Sidebar;
+import com.btmura.android.reddit.net.NetApi.Sidebar;
 import com.btmura.android.reddit.widget.SidebarAdapter;
 
 public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sidebar> {

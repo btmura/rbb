@@ -44,7 +44,7 @@ import android.widget.EditText;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.entity.LoginResult;
-import com.btmura.android.reddit.provider.NetApi;
+import com.btmura.android.reddit.net.NetApi;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.SyncAdapterService;
 import com.btmura.android.reddit.text.InputFilters;

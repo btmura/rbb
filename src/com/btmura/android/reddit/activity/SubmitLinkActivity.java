@@ -45,7 +45,7 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.entity.SubmitResult;
 import com.btmura.android.reddit.fragment.CaptchaDialogFragment;
 import com.btmura.android.reddit.fragment.CaptchaDialogFragment.OnCaptchaGuessListener;
-import com.btmura.android.reddit.provider.NetApi;
+import com.btmura.android.reddit.net.NetApi;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
 public class SubmitLinkActivity extends Activity implements LoaderCallbacks<AccountResult>,

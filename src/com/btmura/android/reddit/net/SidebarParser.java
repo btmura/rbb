@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.provider;
+package com.btmura.android.reddit.net;
 
 import java.io.IOException;
 
 import android.content.Context;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.provider.NetApi.Sidebar;
+import com.btmura.android.reddit.net.NetApi.Sidebar;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.JsonParser;
 

@@ -24,7 +24,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.provider.NetApi;
+import com.btmura.android.reddit.net.NetApi;
 
 public class CaptchaLoader extends AsyncTaskLoader<Bitmap> {
 

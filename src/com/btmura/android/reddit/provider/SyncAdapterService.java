@@ -42,6 +42,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.net.NetApi;
 
 public class SyncAdapterService extends Service {
 

@@ -22,8 +22,8 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
 
-import com.btmura.android.reddit.provider.NetApi;
-import com.btmura.android.reddit.provider.NetApi.Sidebar;
+import com.btmura.android.reddit.net.NetApi;
+import com.btmura.android.reddit.net.NetApi.Sidebar;
 
 public class SidebarLoader extends AsyncTaskLoader<Sidebar> {
 
