@@ -27,10 +27,8 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.GlobalMenuFragment.OnSearchQuerySubmittedListener;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.fragment.GlobalMenuFragment.OnSearchQuerySubmittedListener;
-import com.btmura.android.reddit.fragment.SubredditListFragment;
-import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.SearchPagerAdapter;
 

@@ -19,7 +19,6 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.view.KeyEvent;
 
-import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 
 abstract class GlobalMenuActivity extends Activity {
 

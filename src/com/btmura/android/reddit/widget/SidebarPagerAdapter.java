@@ -16,7 +16,7 @@
 
 package com.btmura.android.reddit.widget;
 
-import com.btmura.android.reddit.fragment.SidebarFragment;
+import com.btmura.android.reddit.app.SidebarFragment;
 
 import android.app.Fragment;
 import android.app.FragmentManager;

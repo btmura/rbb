@@ -33,7 +33,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.fragment.AccountPreferenceFragment;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class SettingsActivity extends PreferenceActivity implements LoaderCallbacks<AccountResult> {

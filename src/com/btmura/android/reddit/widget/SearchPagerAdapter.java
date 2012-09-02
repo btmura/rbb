@@ -20,8 +20,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.support.v13.app.FragmentStatePagerAdapter;
 
-import com.btmura.android.reddit.fragment.SubredditListFragment;
-import com.btmura.android.reddit.fragment.ThingListFragment;
+import com.btmura.android.reddit.app.SubredditListFragment;
+import com.btmura.android.reddit.app.ThingListFragment;
 
 public class SearchPagerAdapter extends FragmentStatePagerAdapter {
 

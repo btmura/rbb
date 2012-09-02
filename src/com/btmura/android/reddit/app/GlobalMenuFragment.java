@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.fragment;
+package com.btmura.android.reddit.app;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -28,9 +28,6 @@ import android.view.View;
 import android.widget.SearchView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.SearchActivity;
-import com.btmura.android.reddit.app.SettingsActivity;
-import com.btmura.android.reddit.app.SubmitLinkActivity;
 
 public class GlobalMenuFragment extends Fragment implements
         SearchView.OnFocusChangeListener,

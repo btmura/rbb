@@ -20,8 +20,8 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.fragment.AddAccountFragment;
-import com.btmura.android.reddit.fragment.AddAccountFragment.OnAccountAddedListener;
+import com.btmura.android.reddit.app.AddAccountFragment;
+import com.btmura.android.reddit.app.AddAccountFragment.OnAccountAddedListener;
 
 public class AccountAuthenticatorActivity extends android.accounts.AccountAuthenticatorActivity
         implements OnAccountAddedListener {

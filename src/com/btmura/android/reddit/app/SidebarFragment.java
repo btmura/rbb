@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.fragment;
+package com.btmura.android.reddit.app;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;

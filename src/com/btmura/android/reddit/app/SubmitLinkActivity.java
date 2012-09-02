@@ -40,10 +40,9 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.app.CaptchaDialogFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.fragment.CaptchaDialogFragment;
-import com.btmura.android.reddit.fragment.CaptchaDialogFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.SubmitResult;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;

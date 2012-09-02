@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.fragment;
+package com.btmura.android.reddit.app;
 
 import android.app.Fragment;
 import android.content.ClipData;
@@ -31,7 +31,6 @@ import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.SidebarActivity;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;

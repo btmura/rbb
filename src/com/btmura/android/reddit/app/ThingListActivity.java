@@ -29,13 +29,10 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.fragment.GlobalMenuFragment;
-import com.btmura.android.reddit.fragment.SubredditNameHolder;
-import com.btmura.android.reddit.fragment.ThingListFragment;
-import com.btmura.android.reddit.fragment.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class ThingListActivity extends GlobalMenuActivity implements

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.fragment;
+package com.btmura.android.reddit.app;
 
 public interface SubredditNameHolder {
     CharSequence getSubredditName();

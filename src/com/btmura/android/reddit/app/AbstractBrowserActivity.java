@@ -42,18 +42,12 @@ import android.view.View.OnClickListener;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
+import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.fragment.ControlFragment;
-import com.btmura.android.reddit.fragment.GlobalMenuFragment;
-import com.btmura.android.reddit.fragment.SubredditListFragment;
-import com.btmura.android.reddit.fragment.SubredditListFragment.OnSubredditSelectedListener;
-import com.btmura.android.reddit.fragment.SubredditNameHolder;
-import com.btmura.android.reddit.fragment.ThingListFragment;
-import com.btmura.android.reddit.fragment.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.fragment.ThingMenuFragment;
-import com.btmura.android.reddit.fragment.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
