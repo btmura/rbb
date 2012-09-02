@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.provider;
+package com.btmura.android.reddit.content;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,10 +43,11 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.provider.SubredditProvider;
 
-public class SyncAdapterService extends Service {
+public class SubredditSyncAdapterService extends Service {
 
-    public static final String TAG = "SyncAdapterService";
+    public static final String TAG = "SubredditSyncAdapterService";
 
     private static final String[] PROJECTION = {
             Subreddits._ID,
@@ -62,38 +63,12 @@ public class SyncAdapterService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return new SyncAdapter(this).getSyncAdapterBinder();
+        return new SubredditSyncAdapter(this).getSyncAdapterBinder();
     }
 
-    public static void initializeAccount(Context context, String login, String cookie)
-            throws RemoteException, OperationApplicationException, IOException {
-        ArrayList<String> subreddits = RedditApi.getSubreddits(cookie);
-        int count = subreddits.size();
+    static class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
 
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
-                count + 2);
-        ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
-                .withSelection(SubredditProvider.SELECTION_ACCOUNT, new String[] {login})
-                .build());
-        ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
-                .withValue(Subreddits.COLUMN_ACCOUNT, login)
-                .withValue(Subreddits.COLUMN_NAME, Subreddits.NAME_FRONT_PAGE)
-                .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
-                .build());
-        for (int i = 0; i < count; i++) {
-            ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
-                    .withValue(Subreddits.COLUMN_ACCOUNT, login)
-                    .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
-                    .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
-                    .build());
-        }
-        ContentResolver cr = context.getContentResolver();
-        cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-    }
-
-    static class SyncAdapter extends AbstractThreadedSyncAdapter {
-
-        public SyncAdapter(Context context) {
+        public SubredditSyncAdapter(Context context) {
             super(context, true);
         }
 
@@ -195,7 +170,7 @@ public class SyncAdapterService extends Service {
             }
 
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "an:" + account.name + " sr:" + syncResult.toString());
+                Log.d(TAG, "accountName: " + account.name + " syncResult: " + syncResult.toString());
             }
         }
 
@@ -233,5 +208,31 @@ public class SyncAdapterService extends Service {
                     .withValue(Subreddits.COLUMN_STATE, state)
                     .build();
         }
+    }
+
+    public static void initializeAccount(Context context, String login, String cookie)
+            throws RemoteException, OperationApplicationException, IOException {
+        ArrayList<String> subreddits = RedditApi.getSubreddits(cookie);
+        int count = subreddits.size();
+
+        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
+                count + 2);
+        ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
+                .withSelection(SubredditProvider.SELECTION_ACCOUNT, new String[] {login})
+                .build());
+        ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
+                .withValue(Subreddits.COLUMN_ACCOUNT, login)
+                .withValue(Subreddits.COLUMN_NAME, Subreddits.NAME_FRONT_PAGE)
+                .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
+                .build());
+        for (int i = 0; i < count; i++) {
+            ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
+                    .withValue(Subreddits.COLUMN_ACCOUNT, login)
+                    .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
+                    .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
+                    .build());
+        }
+        ContentResolver cr = context.getContentResolver();
+        cr.applyBatch(SubredditProvider.AUTHORITY, ops);
     }
 }

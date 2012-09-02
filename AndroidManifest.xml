@@ -146,6 +146,18 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
+            android:name=".content.SubredditSyncAdapterService"
+            android:exported="true"
+            android:permission="@string/permission_sync_accounts" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/subreddit_sync_adapter" />
+        </service>
+        <service
             android:name=".content.VoteSyncAdapterService"
             android:exported="true"
             android:permission="@string/permission_sync_accounts" >
@@ -156,18 +168,6 @@
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/vote_sync_adapter" />
-        </service>
-        <service
-            android:name=".provider.SyncAdapterService"
-            android:exported="true"
-            android:permission="@string/permission_sync_accounts" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_adapter" />
         </service>
         <service
             android:name=".provider.SyncOperationService"
