@@ -17,7 +17,7 @@
 package com.btmura.android.reddit.util;
 
 /**
- * Utility class for handling {@link Object}s.
+ * Utility class for handling {@link Object}s and other types.
  */
 public class Objects {
 
@@ -27,6 +27,16 @@ public class Objects {
             return o1.equals(o2);
         } else if (o2 != null) {
             return o2.equals(o1);
+        }
+        return true;
+    }
+
+    /** Check for string equality without case sensitivity. */
+    public static boolean equalsIgnoreCase(String s1, String s2) {
+        if (s1 != null) {
+            return s1.equalsIgnoreCase(s2);
+        } else if (s2 != null) {
+            return s2.equalsIgnoreCase(s1);
         }
         return true;
     }

@@ -40,6 +40,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.VoteProvider;
+import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
@@ -122,7 +123,10 @@ public class ThingListFragment extends ListFragment implements
             sessionId = Subreddit.getName(subreddit) + "-" + System.currentTimeMillis();
         }
 
-        adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), this);
+        int flags = getArguments().getInt(ARG_FLAGS);
+        boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
+
+        adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), this, singleChoice);
         adapter.setSelectedThing(selectedThingId);
         setHasOptionsMenu(true);
     }

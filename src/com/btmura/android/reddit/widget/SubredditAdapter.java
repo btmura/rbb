@@ -71,7 +71,8 @@ public class SubredditAdapter extends BaseCursorAdapter {
     public static void deleteSessionData(final Context context, final String sessionId, String query) {
         if (!TextUtils.isEmpty(query)) {
             // Use application context to allow activity to be collected and
-            // schedule the session deletion in the background thread pool rather
+            // schedule the session deletion in the background thread pool
+            // rather
             // than serial pool.
             final Context appContext = context.getApplicationContext();
             AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
@@ -115,10 +116,12 @@ public class SubredditAdapter extends BaseCursorAdapter {
     }
 
     private final String query;
+    private final boolean singleChoice;
 
     public SubredditAdapter(Context context, String query, boolean singleChoice) {
         super(context, null, 0);
         this.query = query;
+        this.singleChoice = singleChoice;
     }
 
     @Override
@@ -132,7 +135,7 @@ public class SubredditAdapter extends BaseCursorAdapter {
         int subscribers = query != null ? cursor.getInt(INDEX_SUBSCRIBERS) : -1;
         SubredditView v = (SubredditView) view;
         v.setData(name, subscribers);
-        v.setChosen(name.equalsIgnoreCase(selectedSubreddit));
+        v.setChosen(singleChoice && Objects.equalsIgnoreCase(selectedSubreddit, name));
     }
 
     public void setSelectedSubreddit(String subreddit) {

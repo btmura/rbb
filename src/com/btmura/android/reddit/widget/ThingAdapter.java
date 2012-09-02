@@ -86,6 +86,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     private final OnVoteListener listener;
     private String selectedThingId;
     private int thingBodyWidth;
+    private boolean singleChoice;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
             String subreddit, int filter, String more, String query, boolean sync) {
@@ -134,11 +135,13 @@ public class ThingAdapter extends BaseCursorAdapter {
         return b.build();
     }
 
-    public ThingAdapter(Context context, String parentSubreddit, OnVoteListener listener) {
+    public ThingAdapter(Context context, String parentSubreddit, OnVoteListener listener,
+            boolean singleChoice) {
         super(context, null, 0);
         this.inflater = LayoutInflater.from(context);
         this.parentSubreddit = parentSubreddit;
         this.listener = listener;
+        this.singleChoice = singleChoice;
     }
 
     public void setThingBodyWidth(int thingBodyWidth) {
@@ -196,7 +199,7 @@ public class ThingAdapter extends BaseCursorAdapter {
             tv.setData(author, createdUtc, domain, downs, likes, nowTimeMs, numComments, over18,
                     parentSubreddit, score, subreddit, thingBodyWidth, thingId, thumbnailUrl,
                     title, ups);
-            tv.setChosen(Objects.equals(selectedThingId, thingId));
+            tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
             tv.setOnVoteListener(listener);
             thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
         }
