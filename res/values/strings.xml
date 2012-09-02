@@ -58,6 +58,7 @@
     <string name="menu_combine">Combine</string>
     <string name="menu_comments">View comments</string>
     <string name="menu_copy_url">Copy URL</string>
+    <string name="menu_debug">Debug</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_link">View link</string>
     <string name="menu_open">Open in another app</string>

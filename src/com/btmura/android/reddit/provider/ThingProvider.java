@@ -72,10 +72,6 @@ public class ThingProvider extends SessionProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query uri: " + uri.getQuery());
-        }
-
         if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
             sync(uri);
         }
@@ -84,6 +80,9 @@ public class ThingProvider extends SessionProvider {
         Cursor c = db.query(TABLE_NAME_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "query count: " + c.getCount());
+        }
         return c;
     }
 
