@@ -37,7 +37,6 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.entity.LoginResult;
 import com.btmura.android.reddit.entity.SubmitResult;
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.net.Urls;
 
 public class NetApi {
@@ -48,6 +47,13 @@ public class NetApi {
     private static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset="
             + CHARSET;
     private static final String USER_AGENT = "reddit by brian (rbb) for Android by /u/btmura";
+
+    public static class Sidebar {
+        public String subreddit;
+        public CharSequence title;
+        public int subscribers;
+        public CharSequence description;
+    }
 
     public static ArrayList<String> querySubreddits(String cookie) throws IOException {
         HttpURLConnection conn = null;
@@ -76,7 +82,7 @@ public class NetApi {
         return conn;
     }
 
-    public static Subreddit querySidebar(Context context, String subreddit, String cookie)
+    public static Sidebar querySidebar(Context context, String subreddit, String cookie)
             throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;

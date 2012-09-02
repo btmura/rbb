@@ -74,7 +74,7 @@ public class ThingListFragment extends ListFragment implements
 
     private String accountName;
     private String sessionId;
-    private Subreddit subreddit;
+    private String subreddit;
     private int filter;
     private String query;
     private boolean sync;
@@ -84,11 +84,11 @@ public class ThingListFragment extends ListFragment implements
     private OnThingSelectedListener listener;
     private boolean scrollLoading;
 
-    public static ThingListFragment newInstance(String accountName, Subreddit subreddit,
+    public static ThingListFragment newInstance(String accountName, String subreddit,
             int filter, String query, int flags) {
         Bundle args = new Bundle(5);
         args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putParcelable(ARG_SUBREDDIT, subreddit);
+        args.putString(ARG_SUBREDDIT, subreddit);
         args.putInt(ARG_FILTER, filter);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
@@ -109,15 +109,15 @@ public class ThingListFragment extends ListFragment implements
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
             accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-            subreddit = getArguments().getParcelable(ARG_SUBREDDIT);
+            subreddit = getArguments().getString(ARG_SUBREDDIT);
             if (!TextUtils.isEmpty(query)) {
                 sessionId = query + "-" + System.currentTimeMillis();
             } else {
-                sessionId = Subreddit.getName(subreddit) + "-" + System.currentTimeMillis();
+                sessionId = subreddit + "-" + System.currentTimeMillis();
             }
         } else {
             accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
-            subreddit = savedInstanceState.getParcelable(STATE_SUBREDDIT);
+            subreddit = savedInstanceState.getString(STATE_SUBREDDIT);
             selectedThingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
         }
@@ -129,7 +129,7 @@ public class ThingListFragment extends ListFragment implements
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
 
-        adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), this, singleChoice);
+        adapter = new ThingAdapter(getActivity(), subreddit, this, singleChoice);
         adapter.setSelectedThing(selectedThingId);
         setHasOptionsMenu(true);
     }
@@ -162,9 +162,8 @@ public class ThingListFragment extends ListFragment implements
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-        String subredditName = Subreddit.getName(subreddit);
         String more = args != null ? args.getString(LOADER_ARG_MORE) : null;
-        return ThingAdapter.getLoader(getActivity(), accountName, sessionId, subredditName, filter,
+        return ThingAdapter.getLoader(getActivity(), accountName, sessionId, subreddit, filter,
                 more, query, sync);
     }
 
@@ -174,8 +173,8 @@ public class ThingListFragment extends ListFragment implements
         }
         sync = false;
         scrollLoading = false;
-        ThingAdapter.updateLoader(getActivity(), accountName, sessionId,
-                Subreddit.getName(subreddit), filter, null, query, sync, loader);
+        ThingAdapter.updateLoader(getActivity(), accountName, sessionId, subreddit, filter, null,
+                query, sync, loader);
 
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
@@ -233,7 +232,7 @@ public class ThingListFragment extends ListFragment implements
         outState.putString(STATE_ACCOUNT_NAME, accountName);
         outState.putString(STATE_SESSION_ID, sessionId);
         outState.putString(STATE_SELECTED_THING_ID, selectedThingId);
-        outState.putParcelable(STATE_SUBREDDIT, subreddit);
+        outState.putString(STATE_SUBREDDIT, subreddit);
     }
 
     @Override
@@ -241,7 +240,7 @@ public class ThingListFragment extends ListFragment implements
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_list_menu, menu);
         menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(
-                subreddit != null && !subreddit.isFrontPage());
+                subreddit != null && !Subreddit.isFrontPage(subreddit));
     }
 
     @Override
@@ -265,7 +264,7 @@ public class ThingListFragment extends ListFragment implements
 
     private void handleViewSidebar() {
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getSubreddit());
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, subreddit);
         startActivity(intent);
     }
 
@@ -294,12 +293,8 @@ public class ThingListFragment extends ListFragment implements
         return accountName;
     }
 
-    public void setSubreddit(Subreddit subreddit) {
+    public void setSubreddit(String subreddit) {
         this.subreddit = subreddit;
-    }
-
-    public Subreddit getSubreddit() {
-        return subreddit;
     }
 
     public int getFilter() {

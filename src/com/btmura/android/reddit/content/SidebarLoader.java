@@ -22,14 +22,14 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
 
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.NetApi;
+import com.btmura.android.reddit.provider.NetApi.Sidebar;
 
-public class SidebarLoader extends AsyncTaskLoader<Subreddit> {
+public class SidebarLoader extends AsyncTaskLoader<Sidebar> {
 
     public static final String TAG = "SidebarLoader";
 
-    private Subreddit results;
+    private Sidebar results;
 
     private String subreddit;
 
@@ -49,7 +49,7 @@ public class SidebarLoader extends AsyncTaskLoader<Subreddit> {
     }
 
     @Override
-    public Subreddit loadInBackground() {
+    public Sidebar loadInBackground() {
         try {
             return NetApi.querySidebar(getContext(), subreddit, null);
         } catch (IOException e) {

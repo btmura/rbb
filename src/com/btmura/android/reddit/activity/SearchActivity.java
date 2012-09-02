@@ -28,7 +28,6 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment.OnSearchQuerySubmittedListener;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
@@ -180,7 +179,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     @Override
-    protected void refreshActionBar(Subreddit subreddit, Bundle thingBundle) {
+    protected void refreshActionBar(String subreddit, Bundle thingBundle) {
         bar.setTitle(getQuery());
     }
 

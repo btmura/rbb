@@ -46,18 +46,18 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public static final String TAG = "ThingListActivity";
 
-    public static final String EXTRA_SUBREDDIT = "s";
-    public static final String EXTRA_FLAGS = "f";
+    public static final String EXTRA_SUBREDDIT = "subreddit";
+    public static final String EXTRA_FLAGS = "flags";
 
     public static final int FLAG_INSERT_HOME = 0x1;
 
-    private static final String STATE_NAVIGATION_INDEX = "ni";
+    private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
 
     private ActionBar bar;
     private FilterAdapter adapter;
     private String accountName;
     private SharedPreferences prefs;
-    private Subreddit subreddit;
+    private String subreddit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +82,9 @@ public class ThingListActivity extends GlobalMenuActivity implements
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-        subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
+        subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
         adapter = new FilterAdapter(this);
-        adapter.setTitle(subreddit.getTitle(this));
+        adapter.setTitle(Subreddit.getTitle(this, subreddit));
         bar.setListNavigationCallbacks(adapter, this);
         if (savedInstanceState != null) {
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_NAVIGATION_INDEX));
@@ -137,7 +137,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public String getSubredditName() {
-        return subreddit.name;
+        return subreddit;
     }
 
     @Override

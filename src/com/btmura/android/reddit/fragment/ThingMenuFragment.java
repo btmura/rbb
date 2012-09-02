@@ -33,7 +33,6 @@ import android.widget.Toast;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.activity.SidebarActivity;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
@@ -124,9 +123,8 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void handleViewSidebar() {
-        Subreddit sr = Subreddit.newInstance(Things.getSubreddit(thingBundle));
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, sr);
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, Things.getSubreddit(thingBundle));
         startActivity(intent);
     }
 

@@ -32,7 +32,7 @@ import com.btmura.android.reddit.widget.SidebarPagerAdapter;
 
 public class SidebarActivity extends Activity implements SubredditNameHolder {
 
-    public static final String EXTRA_SUBREDDIT = "s";
+    public static final String EXTRA_SUBREDDIT = "subreddit";
 
     private SidebarPagerAdapter adapter;
     private ViewPager pager;
@@ -53,10 +53,10 @@ public class SidebarActivity extends Activity implements SubredditNameHolder {
             }
         }
 
-        Subreddit subreddit = getIntent().getParcelableExtra(EXTRA_SUBREDDIT);
-        setTitle(subreddit.getTitle(this));
+        String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
+        setTitle(Subreddit.getTitle(this, subreddit));
 
-        String[] subreddits = subreddit.name.split("\\+");
+        String[] subreddits = subreddit.split("\\+");
         adapter = new SidebarPagerAdapter(getFragmentManager(), subreddits);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);

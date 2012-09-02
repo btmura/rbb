@@ -21,11 +21,13 @@ import java.io.IOException;
 import android.content.Context;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.provider.NetApi.Sidebar;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.JsonParser;
 
 class SidebarParser extends JsonParser {
+
+    final Sidebar results = new Sidebar();
 
     private final Formatter formatter = new Formatter();
     private final Context context;
@@ -34,16 +36,9 @@ class SidebarParser extends JsonParser {
         this.context = context;
     }
 
-    Subreddit results;
-
-    @Override
-    public void onEntityStart(int index) {
-        results = Subreddit.emptyInstance();
-    }
-
     @Override
     public void onDisplayName(JsonReader reader, int index) throws IOException {
-        results.name = reader.nextString();
+        results.subreddit = reader.nextString();
     }
 
     @Override
@@ -59,10 +54,5 @@ class SidebarParser extends JsonParser {
     @Override
     public void onDescription(JsonReader reader, int index) throws IOException {
         results.description = formatter.formatAll(context, readTrimmedString(reader, ""));
-    }
-
-    @Override
-    public void onEntityEnd(int index) {
-        results.assureFormat(context);
     }
 }

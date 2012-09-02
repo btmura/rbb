@@ -28,7 +28,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
 import com.btmura.android.reddit.fragment.ThingListFragment;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
@@ -49,8 +48,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     protected boolean skipSetup() {
         if (isSinglePane && getIntent().hasExtra(EXTRA_SUBREDDIT_NAME)) {
             String name = getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME);
-            selectSubredditSinglePane(Subreddit.newInstance(name),
-                    ThingListActivity.FLAG_INSERT_HOME);
+            selectSubredditSinglePane(name, ThingListActivity.FLAG_INSERT_HOME);
             finish();
             return true;
         }
@@ -103,7 +101,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
-    protected void refreshActionBar(Subreddit subreddit, Bundle thingBundle) {
+    protected void refreshActionBar(String subreddit, Bundle thingBundle) {
         bar.setDisplayHomeAsUpEnabled(thingBundle != null);
         adapter.setSubreddit(subreddit);
     }
@@ -126,9 +124,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         ThingListFragment tlf = getThingListFragment();
         if (slf == null || !slf.getAccountName().equals(accountName)) {
             String name = getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME);
-            Subreddit subreddit;
+            String subreddit;
             if (!isSinglePane && !TextUtils.isEmpty(name)) {
-                subreddit = Subreddit.newInstance(name);
+                subreddit = name;
             } else {
                 subreddit = null;
             }

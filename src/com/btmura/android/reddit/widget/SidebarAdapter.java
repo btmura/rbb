@@ -25,22 +25,24 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.entity.Subreddit;
+import com.btmura.android.reddit.provider.NetApi.Sidebar;
 
 public class SidebarAdapter extends BaseAdapter {
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_DESCRIPTION = 1;
 
+    private final Context context;
     private final LayoutInflater inflater;
 
-    private Subreddit item;
+    private Sidebar item;
 
     public SidebarAdapter(Context context) {
-        this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.context = context;
+        this.inflater = LayoutInflater.from(context);
     }
 
-    public void swapData(Subreddit item) {
+    public void swapData(Sidebar item) {
         this.item = item;
         notifyDataSetChanged();
     }
@@ -54,7 +56,7 @@ public class SidebarAdapter extends BaseAdapter {
         return item != null ? 2 : 0;
     }
 
-    public Subreddit getItem(int position) {
+    public Sidebar getItem(int position) {
         return item;
     }
 
@@ -78,7 +80,7 @@ public class SidebarAdapter extends BaseAdapter {
             v = inflater.inflate(getLayout(position), parent, false);
         }
 
-        Subreddit sr = getItem(position);
+        Sidebar sr = getItem(position);
         setSubreddit(sr, v, position);
 
         return v;
@@ -97,19 +99,20 @@ public class SidebarAdapter extends BaseAdapter {
         }
     }
 
-    private void setSubreddit(Subreddit sr, View v, int position) {
+    private void setSubreddit(Sidebar sb, View v, int position) {
         switch (getItemViewType(position)) {
             case TYPE_HEADER:
                 TextView title = (TextView) v.findViewById(R.id.title);
-                title.setText(sr.title);
+                title.setText(sb.title);
 
                 TextView status = (TextView) v.findViewById(R.id.status);
-                status.setText(sr.status);
+                status.setText(context.getResources().getQuantityString(R.plurals.subscribers,
+                        sb.subscribers, sb.subscribers));
                 break;
 
             case TYPE_DESCRIPTION:
                 TextView desc = (TextView) v;
-                desc.setText(sr.description);
+                desc.setText(sb.description);
                 desc.setMovementMethod(LinkMovementMethod.getInstance());
                 break;
 

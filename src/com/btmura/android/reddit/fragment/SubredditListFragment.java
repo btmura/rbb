@@ -41,7 +41,6 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.SubredditAdapter;
@@ -63,24 +62,24 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private static final String STATE_SESSION_ID = "sessionId";
 
     public interface OnSubredditSelectedListener {
-        void onInitialSubredditSelected(Subreddit subreddit);
+        void onInitialSubredditSelected(String subreddit);
 
-        void onSubredditSelected(Subreddit subreddit);
+        void onSubredditSelected(String subreddit);
     }
 
     private String accountName;
     private String sessionId;
-    private Subreddit selectedSubreddit;
+    private String selectedSubreddit;
     private String query;
     private boolean sync;
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
 
-    public static SubredditListFragment newInstance(String accountName,
-            Subreddit selectedSubreddit, String query, int flags) {
+    public static SubredditListFragment newInstance(String accountName, String selectedSubreddit,
+            String query, int flags) {
         Bundle args = new Bundle(4);
         args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
+        args.putString(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
 
@@ -102,13 +101,13 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
             accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-            selectedSubreddit = getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
+            selectedSubreddit = getArguments().getString(ARG_SELECTED_SUBREDDIT);
             if (!TextUtils.isEmpty(query)) {
                 sessionId = query + "-" + System.currentTimeMillis();
             }
         } else {
             accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
-            selectedSubreddit = savedInstanceState.getParcelable(STATE_SELECTED_SUBREDDIT);
+            selectedSubreddit = savedInstanceState.getString(STATE_SELECTED_SUBREDDIT);
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
         }
 
@@ -119,7 +118,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
 
         adapter = new SubredditAdapter(getActivity(), query, singleChoice);
-        adapter.setSelectedSubreddit(Subreddit.getName(selectedSubreddit));
+        adapter.setSelectedSubreddit(selectedSubreddit);
     }
 
     @Override
@@ -163,8 +162,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         setEmptyText(getString(cursor != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
         if (cursor != null && cursor.getCount() > 0) {
-            Subreddit sr = Subreddit.newInstance(adapter.getName(0));
-            listener.onInitialSubredditSelected(sr);
+            listener.onInitialSubredditSelected(adapter.getName(0));
         }
     }
 
@@ -174,8 +172,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     @Override
     public void onListItemClick(ListView l, View view, int position, long id) {
-        String subreddit = adapter.setSelectedPosition(position);
-        selectedSubreddit = Subreddit.newInstance(subreddit);
+        selectedSubreddit = adapter.setSelectedPosition(position);
         if (listener != null) {
             listener.onSubredditSelected(selectedSubreddit);
         }
@@ -327,7 +324,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_ACCOUNT_NAME, accountName);
-        outState.putParcelable(STATE_SELECTED_SUBREDDIT, selectedSubreddit);
+        outState.putString(STATE_SELECTED_SUBREDDIT, selectedSubreddit);
         outState.putString(STATE_SESSION_ID, sessionId);
     }
 
@@ -349,12 +346,12 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         return accountName;
     }
 
-    public void setSelectedSubreddit(Subreddit subreddit) {
+    public void setSelectedSubreddit(String subreddit) {
         selectedSubreddit = subreddit;
-        adapter.setSelectedSubreddit(subreddit.name);
+        adapter.setSelectedSubreddit(subreddit);
     }
 
-    public Subreddit getSelectedSubreddit() {
+    public String getSelectedSubreddit() {
         return selectedSubreddit;
     }
 

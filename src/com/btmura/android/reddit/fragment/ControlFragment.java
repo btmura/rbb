@@ -19,8 +19,6 @@ package com.btmura.android.reddit.fragment;
 import android.app.Fragment;
 import android.os.Bundle;
 
-import com.btmura.android.reddit.entity.Subreddit;
-
 public class ControlFragment extends Fragment {
 
     public static final String TAG = "ControlFragment";
@@ -32,16 +30,16 @@ public class ControlFragment extends Fragment {
     private static final String ARG_FILTER = "f";
 
     private String accountName;
-    private Subreddit subreddit;
+    private String subreddit;
     private Bundle thingBundle;
     private int thingPosition;
     private int filter;
 
-    public static ControlFragment newInstance(String accountName, Subreddit sr, Bundle thingBundle,
+    public static ControlFragment newInstance(String accountName, String sr, Bundle thingBundle,
             int thingPosition, int filter) {
         Bundle b = new Bundle(5);
         b.putString(ARG_ACCOUNT_NAME, accountName);
-        b.putParcelable(ARG_SUBREDDIT, sr);
+        b.putString(ARG_SUBREDDIT, sr);
         b.putBundle(ARG_THING_BUNDLE, thingBundle);
         b.putInt(ARG_THING_POSITION, thingPosition);
         b.putInt(ARG_FILTER, filter);
@@ -55,11 +53,11 @@ public class ControlFragment extends Fragment {
         return accountName;
     }
 
-    public Subreddit getSubreddit() {
+    public String getSubreddit() {
         return subreddit;
     }
 
-    public void setSubreddit(Subreddit subreddit) {
+    public void setSubreddit(String subreddit) {
         this.subreddit = subreddit;
     }
 
@@ -81,7 +79,7 @@ public class ControlFragment extends Fragment {
 
         Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
         accountName = b.getString(ARG_ACCOUNT_NAME);
-        subreddit = b.getParcelable(ARG_SUBREDDIT);
+        subreddit = b.getString(ARG_SUBREDDIT);
         thingBundle = b.getBundle(ARG_THING_BUNDLE);
         thingPosition = b.getInt(ARG_THING_POSITION);
         filter = b.getInt(ARG_FILTER);
@@ -91,7 +89,7 @@ public class ControlFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(ARG_ACCOUNT_NAME, accountName);
-        outState.putParcelable(ARG_SUBREDDIT, subreddit);
+        outState.putString(ARG_SUBREDDIT, subreddit);
         outState.putBundle(ARG_THING_BUNDLE, thingBundle);
         outState.putInt(ARG_THING_POSITION, thingPosition);
         outState.putInt(ARG_FILTER, filter);

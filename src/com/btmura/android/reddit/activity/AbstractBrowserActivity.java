@@ -45,7 +45,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.entity.Subreddit;
 import com.btmura.android.reddit.fragment.ControlFragment;
 import com.btmura.android.reddit.fragment.GlobalMenuFragment;
 import com.btmura.android.reddit.fragment.SubredditListFragment;
@@ -199,7 +198,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract boolean hasSubredditList();
 
-    protected void setSubredditListNavigation(Subreddit subreddit, String query) {
+    protected void setSubredditListNavigation(String subreddit, String query) {
         if (isSinglePane) {
             setSubredditListNavigationSinglePane(query);
         } else {
@@ -217,7 +216,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commit();
     }
 
-    private void setSubredditListNavigationMultiPane(Subreddit subreddit, String query) {
+    private void setSubredditListNavigationMultiPane(String subreddit, String query) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setSubredditListNavigation q:" + query);
         }
@@ -282,13 +281,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshViews(null);
     }
 
-    public void onInitialSubredditSelected(Subreddit subreddit) {
+    public void onInitialSubredditSelected(String subreddit) {
         if (!isSinglePane) {
             selectInitialSubredditMultiPane(subreddit);
         }
     }
 
-    protected void selectInitialSubredditMultiPane(Subreddit subreddit) {
+    protected void selectInitialSubredditMultiPane(String subreddit) {
         ControlFragment cf = getControlFragment();
         if (cf != null && cf.getSubreddit() == null) {
             cf.setSubreddit(subreddit);
@@ -304,7 +303,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public void onSubredditSelected(Subreddit subreddit) {
+    public void onSubredditSelected(String subreddit) {
         if (isSinglePane) {
             selectSubredditSinglePane(subreddit, 0);
         } else {
@@ -312,7 +311,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    protected void selectSubredditSinglePane(Subreddit subreddit, int flags) {
+    protected void selectSubredditSinglePane(String subreddit, int flags) {
         Intent intent = new Intent(this, ThingListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
@@ -320,7 +319,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         startActivity(intent);
     }
 
-    protected void selectSubredditMultiPane(Subreddit subreddit) {
+    protected void selectSubredditMultiPane(String subreddit) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
@@ -400,7 +399,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public void onBackStackChanged() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
-            Subreddit subreddit = cf.getSubreddit();
+            String subreddit = cf.getSubreddit();
             Bundle thingBundle = cf.getThingBundle();
             refreshActionBar(subreddit, thingBundle);
             refreshViews(thingBundle);
@@ -414,7 +413,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (!isSinglePane && savedInstanceState != null) {
             ControlFragment cf = getControlFragment();
             if (cf != null) {
-                Subreddit subreddit = cf.getSubreddit();
+                String subreddit = cf.getSubreddit();
                 Bundle thingBundle = cf.getThingBundle();
                 refreshThingPager(thingBundle);
                 refreshActionBar(subreddit, thingBundle);
@@ -457,7 +456,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    protected abstract void refreshActionBar(Subreddit subreddit, Bundle thingBundle);
+    protected abstract void refreshActionBar(String subreddit, Bundle thingBundle);
 
     private void refreshCheckedItems() {
         ControlFragment cf = getControlFragment();
@@ -519,9 +518,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public CharSequence getSubredditName() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
-            Subreddit subreddit = cf.getSubreddit();
+            String subreddit = cf.getSubreddit();
             if (subreddit != null) {
-                return Subreddit.getName(subreddit);
+                return subreddit;
             }
             return Things.getSubreddit(cf.getThingBundle());
         }

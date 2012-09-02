@@ -54,7 +54,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     private final ArrayList<Item> filters;
 
     private String accountName;
-    private Subreddit subreddit;
+    private String subreddit;
     private int filter;
 
     public AccountSpinnerAdapter(Context context, boolean showFilters) {
@@ -127,11 +127,11 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         return -1;
     }
 
-    public Subreddit getSubreddit() {
+    public String getSubreddit() {
         return subreddit;
     }
 
-    public void setSubreddit(Subreddit subreddit) {
+    public void setSubreddit(String subreddit) {
         this.subreddit = subreddit;
         notifyDataSetChanged();
     }
@@ -181,7 +181,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         h.accountName.setText(getTitle(accountName));
 
         if (subreddit != null) {
-            h.subreddit.setText(subreddit.getTitle(context));
+            h.subreddit.setText(Subreddit.getTitle(context, subreddit));
             h.subreddit.setVisibility(View.VISIBLE);
         } else {
             h.subreddit.setVisibility(View.GONE);
