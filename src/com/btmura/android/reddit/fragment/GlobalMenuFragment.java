@@ -28,9 +28,9 @@ import android.view.View;
 import android.widget.SearchView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.activity.SearchActivity;
-import com.btmura.android.reddit.activity.SettingsActivity;
-import com.btmura.android.reddit.activity.SubmitLinkActivity;
+import com.btmura.android.reddit.app.SearchActivity;
+import com.btmura.android.reddit.app.SettingsActivity;
+import com.btmura.android.reddit.app.SubmitLinkActivity;
 
 public class GlobalMenuFragment extends Fragment implements
         SearchView.OnFocusChangeListener,

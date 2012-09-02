@@ -37,7 +37,7 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.activity.SidebarActivity;
+import com.btmura.android.reddit.app.SidebarActivity;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.util.Flag;

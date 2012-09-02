@@ -31,7 +31,7 @@ import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.activity.SidebarActivity;
+import com.btmura.android.reddit.app.SidebarActivity;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;

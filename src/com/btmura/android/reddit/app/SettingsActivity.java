@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.activity;
+package com.btmura.android.reddit.app;
 
 import java.util.List;
 
