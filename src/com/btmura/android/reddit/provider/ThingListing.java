@@ -49,7 +49,7 @@ class ThingListing extends JsonParser {
     private final Context context;
     private final String accountName;
     private final String sessionId;
-    private final long sessionCreationTime;
+    private final long sessionTimestamp;
     private String moreThingId;
 
     public static ThingListing get(Context context, String accountName, String sessionId,
@@ -82,11 +82,11 @@ class ThingListing extends JsonParser {
     }
 
     private ThingListing(Context context, String accountName, String sessionId,
-            long sessionCreationTime) {
+            long sessionTimestamp) {
         this.context = context;
         this.accountName = accountName;
         this.sessionId = sessionId;
-        this.sessionCreationTime = sessionCreationTime;
+        this.sessionTimestamp = sessionTimestamp;
     }
 
     @Override
@@ -203,7 +203,7 @@ class ThingListing extends JsonParser {
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_KIND, kind);
         v.put(Things.COLUMN_SESSION_ID, sessionId);
-        v.put(Things.COLUMN_SESSION_CREATION_TIME, sessionCreationTime);
+        v.put(Things.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
         v.put(Things.COLUMN_THING_ID, thingId);
         return v;
     }

@@ -64,7 +64,7 @@ class CommentListing extends JsonParser {
     private final SQLiteOpenHelper dbHelper;
     private final String accountName;
     private final String sessionId;
-    private final long sessionCreationTime;
+    private final long sessionTimestamp;
     private final String thingId;
 
     public static CommentListing get(Context context, SQLiteOpenHelper dbHelper,
@@ -92,12 +92,12 @@ class CommentListing extends JsonParser {
     }
 
     private CommentListing(Context context, SQLiteOpenHelper dbHelper, String accountName,
-            String sessionId, long sessionCreationTime, String thingId) {
+            String sessionId, long sessionTimestamp, String thingId) {
         this.context = context;
         this.dbHelper = dbHelper;
         this.accountName = accountName;
         this.sessionId = sessionId;
-        this.sessionCreationTime = sessionCreationTime;
+        this.sessionTimestamp = sessionTimestamp;
         this.thingId = thingId;
     }
 
@@ -112,7 +112,7 @@ class CommentListing extends JsonParser {
         v.put(Comments.COLUMN_ACCOUNT, accountName);
         v.put(Comments.COLUMN_SEQUENCE, index);
         v.put(Comments.COLUMN_SESSION_ID, sessionId);
-        v.put(Comments.COLUMN_SESSION_CREATION_TIME, sessionCreationTime);
+        v.put(Comments.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
         values.add(v);
     }
 
@@ -260,7 +260,7 @@ class CommentListing extends JsonParser {
                         p.put(Comments.COLUMN_NESTING, nesting);
                         p.put(Comments.COLUMN_SEQUENCE, sequence);
                         p.put(Comments.COLUMN_SESSION_ID, sessionId);
-                        p.put(Comments.COLUMN_SESSION_CREATION_TIME, sessionCreationTime);
+                        p.put(Comments.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
 
                         // Insert the reply after this comment.
                         values.add(i + 1, p);

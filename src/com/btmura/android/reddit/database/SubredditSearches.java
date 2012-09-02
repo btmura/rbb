@@ -32,6 +32,9 @@ public class SubredditSearches implements BaseColumns {
     /** Subreddit name like AskReddit. */
     public static final String COLUMN_NAME = "name";
 
+    /** Timestamp for this session used when pruning expired data. */
+    public static final String COLUMN_SESSION_TIMESTAMP = "sessionTimestamp";
+
     /** Session id for this result set. */
     public static final String COLUMN_SESSION_ID = "sessionId";
 
@@ -39,6 +42,8 @@ public class SubredditSearches implements BaseColumns {
     public static final String COLUMN_SUBSCRIBERS = "subscribers";
 
     public static final String SELECTION_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
+
+    public static final String SELECTION_BEFORE_TIMESTAMP = COLUMN_SESSION_TIMESTAMP + " < ?";
 
     public static final String SORT_BY_NAME = SubredditSearches.COLUMN_NAME + " COLLATE NOCASE ASC";
 
@@ -48,6 +53,7 @@ public class SubredditSearches implements BaseColumns {
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_NAME + " TEXT NOT NULL, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
+                + COLUMN_SESSION_TIMESTAMP + " INTEGER NOT NULL, "
                 + COLUMN_SUBSCRIBERS + " INTEGER DEFAULT 0)");
     }
 }

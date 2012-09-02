@@ -129,7 +129,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public void onCommentReply(String replyThingId, String text, Bundle extras) {
         int nesting = extras.getInt(Comments.COLUMN_NESTING);
         int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
-        long sessionCreationTime = extras.getLong(Comments.COLUMN_SESSION_CREATION_TIME);
+        long sessionCreationTime = extras.getLong(Comments.COLUMN_SESSION_TIMESTAMP);
         CommentProvider.insertPlaceholderInBackground(getActivity(), accountName, text, nesting,
                 thingId, sequence, sessionId, sessionCreationTime, replyThingId);
     }
@@ -190,7 +190,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             Bundle extras = new Bundle(2);
             extras.putInt(Comments.COLUMN_NESTING, nesting);
             extras.putInt(Comments.COLUMN_SEQUENCE, sequence);
-            extras.putLong(Comments.COLUMN_SESSION_CREATION_TIME, sessionCreationTime);
+            extras.putLong(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime);
 
             CommentReplyFragment frag = CommentReplyFragment.newInstance(thingId, author, extras);
             frag.setTargetFragment(this, 0);

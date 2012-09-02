@@ -37,8 +37,8 @@ public class Things implements BaseColumns, SyncColumns {
     public static final String COLUMN_OVER_18 = "over18";
     public static final String COLUMN_PERMA_LINK = "permaLink";
     public static final String COLUMN_SCORE = "score";
-    public static final String COLUMN_SESSION_CREATION_TIME = "sessionCreationTime";
     public static final String COLUMN_SESSION_ID = "sessionId";
+    public static final String COLUMN_SESSION_TIMESTAMP = "sessionTimestamp";
     public static final String COLUMN_SELF = "self";
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_TITLE = "title";
@@ -57,8 +57,8 @@ public class Things implements BaseColumns, SyncColumns {
     public static final String SELECTION_BY_SESSION_ID_AND_MORE =
             SELECTION_BY_SESSION_ID + " AND " + COLUMN_KIND + " = " + KIND_MORE;
 
-    public static final String SELECTION_BEFORE_CREATION_TIME =
-            COLUMN_SESSION_CREATION_TIME + " < ?";
+    public static final String SELECTION_BEFORE_TIMESTAMP =
+            COLUMN_SESSION_TIMESTAMP + " < ?";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
@@ -75,7 +75,7 @@ public class Things implements BaseColumns, SyncColumns {
                 + COLUMN_PERMA_LINK + " TEXT, "
                 + COLUMN_SCORE + " INTEGER DEFAULT 0, "
                 + COLUMN_SELF + " INTEGER DEFAULT 0, "
-                + COLUMN_SESSION_CREATION_TIME + " INTEGER NOT NULL, "
+                + COLUMN_SESSION_TIMESTAMP + " INTEGER NOT NULL, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
                 + COLUMN_SUBREDDIT + " TEXT, "
                 + COLUMN_TITLE + " TEXT, "

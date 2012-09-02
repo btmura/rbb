@@ -32,8 +32,9 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.SubredditSearches;
+import com.btmura.android.reddit.util.Array;
 
-public class SubredditSearchProvider extends BaseProvider {
+public class SubredditSearchProvider extends SessionProvider {
 
     public static final String TAG = "SubredditSearchProvider";
 
@@ -75,9 +76,14 @@ public class SubredditSearchProvider extends BaseProvider {
             SubredditSearchListing listing = SubredditSearchListing.get(context, accountName,
                     sessionId, query, cookie);
 
+            long cleaned;
             SQLiteDatabase db = helper.getWritableDatabase();
             db.beginTransaction();
             try {
+                // Delete old results that can't be possibly viewed anymore.
+                cleaned = db.delete(SubredditSearches.TABLE_NAME,
+                        SubredditSearches.SELECTION_BEFORE_TIMESTAMP,
+                        Array.of(getCreationTimeCutoff()));
                 InsertHelper insertHelper = new InsertHelper(db, SubredditSearches.TABLE_NAME);
                 int count = listing.values.size();
                 for (int i = 0; i < count; i++) {
@@ -86,6 +92,9 @@ public class SubredditSearchProvider extends BaseProvider {
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
+            }
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "cleaned: " + cleaned);
             }
         } catch (OperationCanceledException e) {
             Log.e(TAG, "sync", e);

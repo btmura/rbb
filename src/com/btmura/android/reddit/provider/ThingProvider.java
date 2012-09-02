@@ -106,7 +106,7 @@ public class ThingProvider extends SessionProvider {
             db.beginTransaction();
             try {
                 // Delete old things that can't possibly be viewed anymore.
-                cleaned = db.delete(Things.TABLE_NAME, Things.SELECTION_BEFORE_CREATION_TIME,
+                cleaned = db.delete(Things.TABLE_NAME, Things.SELECTION_BEFORE_TIMESTAMP,
                         Array.of(getCreationTimeCutoff()));
 
                 // Delete the loading more element before appending more.

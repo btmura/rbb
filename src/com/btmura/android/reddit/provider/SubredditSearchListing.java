@@ -43,15 +43,17 @@ class SubredditSearchListing extends JsonParser {
 
     private final String accountName;
     private final String sessionId;
+    private final long sessionTimestamp;
 
     public static SubredditSearchListing get(Context context, String accountName, String sessionId,
             String query, String cookie) throws IOException {
+        long t1 = System.currentTimeMillis();
         URL url = Urls.subredditSearchUrl(query, null);
         HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
-            SubredditSearchListing listing = new SubredditSearchListing(accountName, sessionId);
+            SubredditSearchListing listing = new SubredditSearchListing(accountName, sessionId, t1);
             listing.parseListingObject(reader);
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "url: " + url + " values: " + listing.values.size());
@@ -63,16 +65,18 @@ class SubredditSearchListing extends JsonParser {
         }
     }
 
-    private SubredditSearchListing(String accountName, String sessionId) {
+    private SubredditSearchListing(String accountName, String sessionId, long sessionTimestamp) {
         this.accountName = accountName;
         this.sessionId = sessionId;
+        this.sessionTimestamp = sessionTimestamp;
     }
 
     @Override
     public void onEntityStart(int index) {
-        ContentValues v = new ContentValues(4);
+        ContentValues v = new ContentValues(5);
         v.put(SubredditSearches.COLUMN_ACCOUNT, accountName);
         v.put(SubredditSearches.COLUMN_SESSION_ID, sessionId);
+        v.put(SubredditSearches.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
         values.add(v);
     }
 

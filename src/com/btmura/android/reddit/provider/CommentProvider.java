@@ -103,7 +103,7 @@ public class CommentProvider extends SessionProvider {
             db.beginTransaction();
             try {
                 // Delete old comments that can't possibly be viewed anymore.
-                cleaned = db.delete(Comments.TABLE_NAME, Comments.SELECTION_BEFORE_CREATION_TIME,
+                cleaned = db.delete(Comments.TABLE_NAME, Comments.SELECTION_BEFORE_TIMESTAMP,
                         Array.of(getCreationTimeCutoff()));
 
                 InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
@@ -222,7 +222,7 @@ public class CommentProvider extends SessionProvider {
                 v.put(Comments.COLUMN_NESTING, nesting);
                 v.put(Comments.COLUMN_SEQUENCE, sequence);
                 v.put(Comments.COLUMN_SESSION_ID, sessionId);
-                v.put(Comments.COLUMN_SESSION_CREATION_TIME, sessionCreationTime);
+                v.put(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime);
 
                 ContentResolver cr = appContext.getContentResolver();
                 cr.insert(uri, v);
