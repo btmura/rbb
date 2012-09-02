@@ -72,6 +72,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private String selectedSubreddit;
     private String query;
     private boolean sync;
+    private boolean singleChoice;
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
 
@@ -115,7 +116,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         sync = savedInstanceState == null;
 
         int flags = getArguments().getInt(ARG_FLAGS);
-        boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
+        singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
 
         adapter = new SubredditAdapter(getActivity(), query, singleChoice);
         adapter.setSelectedSubreddit(selectedSubreddit);
@@ -134,7 +135,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setListAdapter(adapter);
-        setListShown(false);
+        setListShown(singleChoice);
         loadIfPossible();
     }
 
