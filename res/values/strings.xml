@@ -70,6 +70,7 @@
     <string name="menu_split">Split</string>
     <string name="menu_submit_link">Submit link</string>
     <string name="menu_view_sidebar">View sidebar</string>
+    <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
     <string name="provider_comments">Comments</string>
     <string name="provider_replies">Replies</string>
     <string name="provider_subreddits">Subreddits</string>    

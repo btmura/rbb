@@ -115,7 +115,7 @@
         <provider
             android:name=".provider.SubredditProvider"
             android:authorities="@string/authority_subreddits"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/provider_subreddits" />
         <provider
             android:name=".provider.SubredditSearchProvider"
@@ -146,9 +146,21 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
+            android:name=".content.VoteSyncAdapterService"
+            android:exported="true"
+            android:permission="@string/permission_sync_accounts" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/vote_sync_adapter" />
+        </service>
+        <service
             android:name=".provider.SyncAdapterService"
             android:exported="true"
-            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS" >
+            android:permission="@string/permission_sync_accounts" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>

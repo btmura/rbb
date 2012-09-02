@@ -85,7 +85,10 @@ public class VoteProvider extends BaseProvider {
         }
         if (id != -1) {
             ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(uri, null);
+
+            // Sync new votes back to the reddit backend.
+            cr.notifyChange(uri, null, true);
+
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
                 cr.notifyChange(ThingProvider.CONTENT_URI, null);
                 cr.notifyChange(CommentProvider.CONTENT_URI, null);
@@ -112,7 +115,11 @@ public class VoteProvider extends BaseProvider {
         }
         if (count > 0) {
             ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(uri, null);
+
+            // Sync new votes back to the reddit backend.
+            // TODO: Figure out whether this will conflict with the inserts.
+            cr.notifyChange(uri, null, true);
+
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
                 cr.notifyChange(ThingProvider.CONTENT_URI, null);
                 cr.notifyChange(CommentProvider.CONTENT_URI, null);

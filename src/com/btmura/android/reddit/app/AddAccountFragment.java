@@ -47,6 +47,7 @@ import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.LoginResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.SyncAdapterService;
+import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.text.InputFilters;
 
 public class AddAccountFragment extends Fragment implements
@@ -192,6 +193,7 @@ public class AddAccountFragment extends Fragment implements
                         result.modhash);
 
                 ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
+                ContentResolver.setSyncAutomatically(account, VoteProvider.AUTHORITY, true);
 
                 Bundle b = new Bundle(2);
                 b.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
