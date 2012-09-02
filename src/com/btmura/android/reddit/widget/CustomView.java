@@ -39,11 +39,14 @@ abstract class CustomView extends View {
     static int MIN_DETAILS_WIDTH;
     static int MAX_DETAILS_WIDTH;
 
-    static final int NUM_TEXT_PAINTS = 4;
+    static final int NUM_TEXT_PAINTS = 7;
     static final int SUBREDDIT_TITLE = 0;
     static final int SUBREDDIT_STATUS = 1;
     static final int THING_TITLE = 2;
     static final int THING_STATUS = 3;
+    static final int COMMENT_TITLE = 4;
+    static final int COMMENT_BODY = 5;
+    static final int COMMENT_STATUS = 6;
     static final TextPaint[] TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
 
     CustomView(Context context, AttributeSet attrs, int defStyle) {
@@ -69,10 +72,14 @@ abstract class CustomView extends View {
                     R.style.SubredditStatusText,
                     R.style.ThingTitleText,
                     R.style.ThingStatusText,
+                    R.style.CommentTitleText,
+                    R.style.CommentBodyText,
+                    R.style.CommentStatusText,
             };
             int[] attrs = new int[] {
                     android.R.attr.textSize,
                     android.R.attr.textColor,
+                    android.R.attr.textColorLink,
             };
 
             Theme t = context.getTheme();
@@ -81,6 +88,7 @@ abstract class CustomView extends View {
                 TEXT_PAINTS[i] = new TextPaint(Paint.ANTI_ALIAS_FLAG);
                 TEXT_PAINTS[i].setTextSize(a.getDimensionPixelSize(0, 0) * fontScale);
                 TEXT_PAINTS[i].setColor(a.getColor(1, -1));
+                TEXT_PAINTS[i].linkColor = a.getColor(2, -1);
                 a.recycle();
             }
         }

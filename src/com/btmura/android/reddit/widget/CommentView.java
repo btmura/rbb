@@ -17,9 +17,6 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.Resources.Theme;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -27,7 +24,6 @@ import android.text.BoringLayout;
 import android.text.Layout.Alignment;
 import android.text.Spannable;
 import android.text.StaticLayout;
-import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.style.ClickableSpan;
@@ -36,7 +32,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
-import android.view.View;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
@@ -44,20 +39,9 @@ import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
 
-public class CommentView extends View implements OnGestureListener {
+public class CommentView extends CustomView implements OnGestureListener {
 
     public static final String TAG = "CommentView";
-
-    private static float FONT_SCALE;
-
-    private static int PADDING;
-    private static int ELEMENT_PADDING;
-
-    private static TextPaint[] TEXT_PAINTS;
-    private static final int NUM_TEXT_PAINTS = 3;
-    private static final int TEXT_TITLE = 0;
-    private static final int TEXT_BODY = 1;
-    private static final int TEXT_STATUS = 2;
 
     private static final Formatter FORMATTER = new Formatter();
 
@@ -99,35 +83,6 @@ public class CommentView extends View implements OnGestureListener {
 
     private void init(Context context) {
         VotingArrows.init(context);
-        Resources r = context.getResources();
-        float fontScale = r.getConfiguration().fontScale;
-        if (FONT_SCALE != fontScale) {
-            FONT_SCALE = fontScale;
-            PADDING = r.getDimensionPixelSize(R.dimen.padding);
-            ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
-
-            Theme t = context.getTheme();
-            int[] styles = new int[] {
-                    R.style.CommentTitleText,
-                    R.style.CommentBodyText,
-                    R.style.CommentStatusText,
-            };
-            int[] attrs = new int[] {
-                    android.R.attr.textSize,
-                    android.R.attr.textColor,
-                    android.R.attr.textColorLink,
-            };
-
-            TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
-            for (int i = 0; i < NUM_TEXT_PAINTS; i++) {
-                TypedArray a = t.obtainStyledAttributes(styles[i], attrs);
-                TEXT_PAINTS[i] = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-                TEXT_PAINTS[i].setTextSize(a.getDimensionPixelSize(0, 0) * FONT_SCALE);
-                TEXT_PAINTS[i].setColor(a.getColor(1, -1));
-                TEXT_PAINTS[i].linkColor = a.getColor(2, -1);
-                a.recycle();
-            }
-        }
     }
 
     public void setOnVoteListener(OnVoteListener listener) {
@@ -266,18 +221,18 @@ public class CommentView extends View implements OnGestureListener {
     }
 
     private StaticLayout createTitleLayout(int width) {
-        return new StaticLayout(title, TEXT_PAINTS[TEXT_TITLE],
+        return new StaticLayout(title, TEXT_PAINTS[COMMENT_TITLE],
                 width, Alignment.ALIGN_NORMAL, 1, 0, true);
     }
 
     private StaticLayout createBodyLayout(int width) {
-        return new StaticLayout(bodyText, TEXT_PAINTS[TEXT_BODY],
+        return new StaticLayout(bodyText, TEXT_PAINTS[COMMENT_BODY],
                 width, Alignment.ALIGN_NORMAL, 1, 0, true);
     }
 
     private BoringLayout createStatusLayout(int width) {
-        BoringLayout.Metrics m = BoringLayout.isBoring(statusText, TEXT_PAINTS[TEXT_STATUS]);
-        return BoringLayout.make(statusText, TEXT_PAINTS[TEXT_STATUS], width,
+        BoringLayout.Metrics m = BoringLayout.isBoring(statusText, TEXT_PAINTS[COMMENT_STATUS]);
+        return BoringLayout.make(statusText, TEXT_PAINTS[COMMENT_STATUS], width,
                 Alignment.ALIGN_NORMAL, 1, 0, m, true, TruncateAt.END, width);
     }
 
