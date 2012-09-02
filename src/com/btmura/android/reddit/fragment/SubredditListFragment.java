@@ -53,11 +53,13 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
-    private static final String ARG_ACCOUNT_NAME = "an";
-    private static final String ARG_SELECTED_SUBREDDIT = "ss";
-    private static final String ARG_QUERY = "q";
-    private static final String ARG_FLAGS = "f";
+    private static final String ARG_ACCOUNT_NAME = "accountName";
+    private static final String ARG_SELECTED_SUBREDDIT = "selectedSubreddit";
+    private static final String ARG_QUERY = "query";
+    private static final String ARG_FLAGS = "fags";
 
+    private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
+    private static final String STATE_SELECTED_SUBREDDIT = ARG_SELECTED_SUBREDDIT;
     private static final String STATE_SESSION_ID = "sessionId";
 
     public interface OnSubredditSelectedListener {
@@ -70,7 +72,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private String sessionId;
     private Subreddit selectedSubreddit;
     private String query;
-    private int flags;
     private boolean sync;
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
@@ -99,21 +100,25 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Bundle bundle = savedInstanceState != null ? savedInstanceState : getArguments();
-        accountName = bundle.getString(ARG_ACCOUNT_NAME);
-        selectedSubreddit = bundle.getParcelable(ARG_SELECTED_SUBREDDIT);
-        query = bundle.getString(ARG_QUERY);
-        flags = bundle.getInt(ARG_FLAGS);
-        sync = savedInstanceState == null;
-
-        if (savedInstanceState != null) {
+        if (savedInstanceState == null) {
+            accountName = getArguments().getString(ARG_ACCOUNT_NAME);
+            selectedSubreddit = getArguments().getParcelable(ARG_SELECTED_SUBREDDIT);
+            if (!TextUtils.isEmpty(query)) {
+                sessionId = query + "-" + System.currentTimeMillis();
+            }
+        } else {
+            accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
+            selectedSubreddit = savedInstanceState.getParcelable(STATE_SELECTED_SUBREDDIT);
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
-        } else if (!TextUtils.isEmpty(query)) {
-            sessionId = query + "-" + System.currentTimeMillis();
         }
 
-        adapter = new SubredditAdapter(getActivity(), query, isSingleChoice());
+        query = getArguments().getString(ARG_QUERY);
+        sync = savedInstanceState == null;
+
+        int flags = getArguments().getInt(ARG_FLAGS);
+        boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
+
+        adapter = new SubredditAdapter(getActivity(), query, singleChoice);
         adapter.setSelectedSubreddit(Subreddit.getName(selectedSubreddit));
     }
 
@@ -186,17 +191,18 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        boolean isQuery = query != null;
         CheckedInfo info = (CheckedInfo) mode.getTag();
-        menu.findItem(R.id.menu_add).setVisible(isQuery());
-        menu.findItem(R.id.menu_add_combined).setVisible(isQuery() && info.checkedCount > 1);
-        menu.findItem(R.id.menu_combine).setVisible(!isQuery()
+        menu.findItem(R.id.menu_add).setVisible(isQuery);
+        menu.findItem(R.id.menu_add_combined).setVisible(isQuery && info.checkedCount > 1);
+        menu.findItem(R.id.menu_combine).setVisible(!isQuery
                 && TextUtils.isEmpty(getAccountName())
                 && info.checkedCount > 1);
-        menu.findItem(R.id.menu_split).setVisible(!isQuery()
+        menu.findItem(R.id.menu_split).setVisible(!isQuery
                 && TextUtils.isEmpty(getAccountName())
                 && info.checkedCount == 1
                 && info.numSplittable > 0);
-        menu.findItem(R.id.menu_delete).setVisible(!isQuery());
+        menu.findItem(R.id.menu_delete).setVisible(!isQuery);
         return true;
     }
 
@@ -320,10 +326,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(ARG_ACCOUNT_NAME, accountName);
-        outState.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
-        outState.putString(ARG_QUERY, query);
-        outState.putInt(ARG_FLAGS, flags);
+        outState.putString(STATE_ACCOUNT_NAME, accountName);
+        outState.putParcelable(STATE_SELECTED_SUBREDDIT, selectedSubreddit);
         outState.putString(STATE_SESSION_ID, sessionId);
     }
 
@@ -337,12 +341,12 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         super.onDestroy();
     }
 
-    public String getAccountName() {
-        return accountName;
-    }
-
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+    }
+
+    public String getAccountName() {
+        return accountName;
     }
 
     public void setSelectedSubreddit(Subreddit subreddit) {
@@ -356,13 +360,5 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     public String getQuery() {
         return query;
-    }
-
-    private boolean isQuery() {
-        return query != null;
-    }
-
-    private boolean isSingleChoice() {
-        return Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
     }
 }

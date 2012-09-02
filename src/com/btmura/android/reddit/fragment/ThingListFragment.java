@@ -53,14 +53,16 @@ public class ThingListFragment extends ListFragment implements
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
-    private static final String ARG_ACCOUNT_NAME = "an";
-    private static final String ARG_SUBREDDIT = "s";
-    private static final String ARG_FILTER = "f";
-    private static final String ARG_QUERY = "q";
-    private static final String ARG_FLAGS = "l";
+    private static final String ARG_ACCOUNT_NAME = "accountName";
+    private static final String ARG_SUBREDDIT = "subreddit";
+    private static final String ARG_FILTER = "filter";
+    private static final String ARG_QUERY = "query";
+    private static final String ARG_FLAGS = "flags";
 
+    private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
     private static final String STATE_SESSION_ID = "sessionId";
     private static final String STATE_SELECTED_THING_ID = "selectedThingId";
+    private static final String STATE_SUBREDDIT = ARG_SUBREDDIT;
 
     private static final String LOADER_ARG_MORE = "more";
 
@@ -105,23 +107,24 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
-        accountName = b.getString(ARG_ACCOUNT_NAME);
-        subreddit = b.getParcelable(ARG_SUBREDDIT);
-        filter = b.getInt(ARG_FILTER);
-        query = b.getString(ARG_QUERY);
-        sync = savedInstanceState == null;
-        selectedThingId = b.getString(STATE_SELECTED_THING_ID);
-
-        // Don't create a new session when changing configuration.
-        if (savedInstanceState != null) {
-            sessionId = savedInstanceState.getString(STATE_SESSION_ID);
-        } else if (!TextUtils.isEmpty(query)) {
-            sessionId = query + "-" + System.currentTimeMillis();
+        if (savedInstanceState == null) {
+            accountName = getArguments().getString(ARG_ACCOUNT_NAME);
+            subreddit = getArguments().getParcelable(ARG_SUBREDDIT);
+            if (!TextUtils.isEmpty(query)) {
+                sessionId = query + "-" + System.currentTimeMillis();
+            } else {
+                sessionId = Subreddit.getName(subreddit) + "-" + System.currentTimeMillis();
+            }
         } else {
-            sessionId = Subreddit.getName(subreddit) + "-" + System.currentTimeMillis();
+            accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
+            subreddit = savedInstanceState.getParcelable(STATE_SUBREDDIT);
+            selectedThingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
+            sessionId = savedInstanceState.getString(STATE_SESSION_ID);
         }
+
+        filter = getArguments().getInt(ARG_FILTER);
+        query = getArguments().getString(ARG_QUERY);
+        sync = savedInstanceState == null;
 
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
@@ -227,12 +230,10 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(ARG_ACCOUNT_NAME, accountName);
+        outState.putString(STATE_ACCOUNT_NAME, accountName);
         outState.putString(STATE_SESSION_ID, sessionId);
-        outState.putParcelable(ARG_SUBREDDIT, subreddit);
-        outState.putInt(ARG_FILTER, filter);
-        outState.putString(ARG_QUERY, query);
         outState.putString(STATE_SELECTED_THING_ID, selectedThingId);
+        outState.putParcelable(STATE_SUBREDDIT, subreddit);
     }
 
     @Override
@@ -280,36 +281,32 @@ public class ThingListFragment extends ListFragment implements
         return listener.onMeasureThingBody();
     }
 
-    public String getAccountName() {
-        return accountName;
+    public void setSelectedThing(String thingId) {
+        selectedThingId = thingId;
+        adapter.setSelectedThing(thingId);
     }
 
     public void setAccountName(String accountName) {
         this.accountName = accountName;
     }
 
-    public Subreddit getSubreddit() {
-        return subreddit;
+    public String getAccountName() {
+        return accountName;
     }
 
     public void setSubreddit(Subreddit subreddit) {
         this.subreddit = subreddit;
     }
 
+    public Subreddit getSubreddit() {
+        return subreddit;
+    }
+
     public int getFilter() {
         return filter;
     }
 
-    public void setFilter(int filter) {
-        this.filter = filter;
-    }
-
     public String getQuery() {
         return query;
-    }
-
-    public void setSelectedThing(String thingId) {
-        selectedThingId = thingId;
-        adapter.setSelectedThing(thingId);
     }
 }
