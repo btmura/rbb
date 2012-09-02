@@ -91,7 +91,9 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        listener = (OnSubredditSelectedListener) activity;
+        if (activity instanceof OnSubredditSelectedListener) {
+            listener = (OnSubredditSelectedListener) activity;
+        }
     }
 
     @Override
@@ -167,12 +169,11 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
 
     @Override
     public void onListItemClick(ListView l, View view, int position, long id) {
-        super.onListItemClick(l, view, position, id);
-        String subreddit = adapter.getName(position);
-        Subreddit sr = Subreddit.newInstance(subreddit);
-        selectedSubreddit = sr;
-        adapter.setSelectedSubreddit(subreddit);
-        listener.onSubredditSelected(sr);
+        String subreddit = adapter.setSelectedPosition(position);
+        selectedSubreddit = Subreddit.newInstance(subreddit);
+        if (listener != null) {
+            listener.onSubredditSelected(selectedSubreddit);
+        }
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -319,10 +320,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onSaveInstanceState an:" + accountName + " ss:" + selectedSubreddit
-                    + " q:" + query + " f:" + flags);
-        }
         outState.putString(ARG_ACCOUNT_NAME, accountName);
         outState.putParcelable(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
         outState.putString(ARG_QUERY, query);
@@ -349,12 +346,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public void setSelectedSubreddit(Subreddit subreddit) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "setSelectedSubreddit subreddit:" + subreddit);
-        }
-        this.selectedSubreddit = subreddit;
+        selectedSubreddit = subreddit;
         adapter.setSelectedSubreddit(subreddit.name);
-        adapter.notifyDataSetChanged();
     }
 
     public Subreddit getSelectedSubreddit() {

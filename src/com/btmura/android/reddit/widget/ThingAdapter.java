@@ -33,6 +33,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
+import com.btmura.android.reddit.util.Objects;
 
 public class ThingAdapter extends BaseCursorAdapter {
 
@@ -83,6 +84,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     private final LayoutInflater inflater;
     private final String parentSubreddit;
     private final OnVoteListener listener;
+    private String selectedThingId;
     private int thingBodyWidth;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
@@ -191,12 +193,26 @@ public class ThingAdapter extends BaseCursorAdapter {
             }
 
             ThingView tv = (ThingView) view;
-            tv.setOnVoteListener(listener);
             tv.setData(author, createdUtc, domain, downs, likes, nowTimeMs, numComments, over18,
                     parentSubreddit, score, subreddit, thingBodyWidth, thingId, thumbnailUrl,
                     title, ups);
+            tv.setChosen(Objects.equals(selectedThingId, thingId));
+            tv.setOnVoteListener(listener);
             thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
         }
+    }
+
+    public void setSelectedThing(String thingId) {
+        if (!Objects.equals(selectedThingId, thingId)) {
+            selectedThingId = thingId;
+            notifyDataSetChanged();
+        }
+    }
+
+    public String setSelectedPosition(int position) {
+        String thingId = getString(position, INDEX_THING_ID);
+        setSelectedThing(thingId);
+        return thingId;
     }
 
     public String getMoreThingId() {

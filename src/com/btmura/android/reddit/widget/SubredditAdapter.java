@@ -142,6 +142,12 @@ public class SubredditAdapter extends BaseCursorAdapter {
         }
     }
 
+    public String setSelectedPosition(int position) {
+        String subreddit = getString(position, INDEX_NAME);
+        setSelectedSubreddit(subreddit);
+        return subreddit;
+    }
+
     public String getName(int position) {
         return getString(position, INDEX_NAME);
     }

@@ -59,6 +59,7 @@ public class ThingListFragment extends ListFragment implements
     private static final String ARG_FLAGS = "l";
 
     private static final String STATE_SESSION_ID = "sessionId";
+    private static final String STATE_SELECTED_THING_ID = "selectedThingId";
 
     private static final String LOADER_ARG_MORE = "more";
 
@@ -74,6 +75,8 @@ public class ThingListFragment extends ListFragment implements
     private int filter;
     private String query;
     private boolean sync;
+
+    private String selectedThingId;
     private ThingAdapter adapter;
     private OnThingSelectedListener listener;
     private boolean scrollLoading;
@@ -108,6 +111,7 @@ public class ThingListFragment extends ListFragment implements
         filter = b.getInt(ARG_FILTER);
         query = b.getString(ARG_QUERY);
         sync = savedInstanceState == null;
+        selectedThingId = b.getString(STATE_SELECTED_THING_ID);
 
         // Don't create a new session when changing configuration.
         if (savedInstanceState != null) {
@@ -119,6 +123,7 @@ public class ThingListFragment extends ListFragment implements
         }
 
         adapter = new ThingAdapter(getActivity(), Subreddit.getName(subreddit), this);
+        adapter.setSelectedThing(selectedThingId);
         setHasOptionsMenu(true);
     }
 
@@ -176,6 +181,7 @@ public class ThingListFragment extends ListFragment implements
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        selectedThingId = adapter.setSelectedPosition(position);
         if (listener != null) {
             listener.onThingSelected(adapter.getThingBundle(position), position);
         }
@@ -222,6 +228,7 @@ public class ThingListFragment extends ListFragment implements
         outState.putParcelable(ARG_SUBREDDIT, subreddit);
         outState.putInt(ARG_FILTER, filter);
         outState.putString(ARG_QUERY, query);
+        outState.putString(STATE_SELECTED_THING_ID, selectedThingId);
     }
 
     @Override
@@ -295,5 +302,10 @@ public class ThingListFragment extends ListFragment implements
 
     public String getQuery() {
         return query;
+    }
+
+    public void setSelectedThing(String thingId) {
+        selectedThingId = thingId;
+        adapter.setSelectedThing(thingId);
     }
 }

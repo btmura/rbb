@@ -117,6 +117,10 @@ public class Things implements BaseColumns, SyncColumns {
         return getCharSequence(thingBundle, COLUMN_TITLE);
     }
 
+    public static String getThingId(Bundle thingBundle) {
+        return getString(thingBundle, COLUMN_THING_ID);
+    }
+
     public static String getThumbnail(Bundle thingBundle) {
         return getString(thingBundle, COLUMN_THUMBNAIL_URL);
     }
