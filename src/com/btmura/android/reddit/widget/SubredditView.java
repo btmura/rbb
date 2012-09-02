@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.widget;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.entity.Subreddit;
 
 import android.content.Context;
@@ -36,6 +37,10 @@ public class SubredditView extends CustomView {
     private BoringLayout.Metrics titleMetrics;
     private BoringLayout titleLayout;
 
+    private String status;
+    private BoringLayout.Metrics statusMetrics;
+    private BoringLayout statusLayout;
+
     public SubredditView(Context context) {
         this(context, null);
     }
@@ -53,7 +58,14 @@ public class SubredditView extends CustomView {
      * @param subscribers or -1 if no subscriber info available
      */
     public void setData(String name, int subscribers) {
-        this.title = Subreddit.getTitle(getContext(), name);
+        title = Subreddit.getTitle(getContext(), name);
+        if (subscribers != -1) {
+            status = getResources().getQuantityString(R.plurals.subscribers,
+                    subscribers, subscribers);
+        } else {
+            // Don't null the corresponding layout to avoid GC.
+            status = null;
+        }
         requestLayout();
     }
 
@@ -75,7 +87,11 @@ public class SubredditView extends CustomView {
                 break;
         }
 
-        setTitleLayout(measuredWidth - PADDING * 2);
+        int remains = measuredWidth - PADDING * 2;
+        setTitleLayout(remains);
+        if (status != null) {
+            setStatusLayout(remains);
+        }
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -97,21 +113,41 @@ public class SubredditView extends CustomView {
     protected void onDraw(Canvas c) {
         c.translate(PADDING, PADDING);
         titleLayout.draw(c);
+        if (status != null) {
+            c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
+            statusLayout.draw(c);
+        }
     }
 
     private void setTitleLayout(int width) {
         TextPaint titlePaint = TEXT_PAINTS[SUBREDDIT_TITLE];
         titleMetrics = BoringLayout.isBoring(title, titlePaint, titleMetrics);
         if (titleLayout == null) {
-            titleLayout = BoringLayout.make(title, titlePaint, width, Alignment.ALIGN_NORMAL, 1f,
-                    0f, titleMetrics, false, TruncateAt.END, width);
+            titleLayout = BoringLayout.make(title, titlePaint, width, Alignment.ALIGN_NORMAL,
+                    1f, 0f, titleMetrics, false, TruncateAt.END, width);
         } else {
-            titleLayout.replaceOrMake(title, titlePaint, width, Alignment.ALIGN_NORMAL, 1f,
-                    0f, titleMetrics, false, TruncateAt.END, width);
+            titleLayout.replaceOrMake(title, titlePaint, width, Alignment.ALIGN_NORMAL,
+                    1f, 0f, titleMetrics, false, TruncateAt.END, width);
+        }
+    }
+
+    private void setStatusLayout(int width) {
+        TextPaint statusPaint = TEXT_PAINTS[SUBREDDIT_STATUS];
+        statusMetrics = BoringLayout.isBoring(status, statusPaint, statusMetrics);
+        if (statusLayout == null) {
+            statusLayout = BoringLayout.make(status, statusPaint, width, Alignment.ALIGN_NORMAL,
+                    1f, 0f, statusMetrics, false, TruncateAt.END, width);
+        } else {
+            statusLayout.replaceOrMake(status, statusPaint, width, Alignment.ALIGN_NORMAL,
+                    1f, 0f, statusMetrics, false, TruncateAt.END, width);
         }
     }
 
     private int getMinimumHeight() {
-        return PADDING + titleLayout.getHeight() + PADDING;
+        int height = PADDING + titleLayout.getHeight();
+        if (status != null) {
+            height += ELEMENT_PADDING + statusLayout.getHeight();
+        }
+        return height + PADDING;
     }
 }
