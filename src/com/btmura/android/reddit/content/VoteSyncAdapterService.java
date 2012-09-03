@@ -16,40 +16,14 @@
 
 package com.btmura.android.reddit.content;
 
-import com.btmura.android.reddit.BuildConfig;
-
-import android.accounts.Account;
 import android.app.Service;
-import android.content.AbstractThreadedSyncAdapter;
-import android.content.ContentProviderClient;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SyncResult;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 
 public class VoteSyncAdapterService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
         return new VoteSyncAdapter(this).getSyncAdapterBinder();
-    }
-
-    static class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
-
-        public static final String TAG = "VoteSyncAdapter";
-
-        public VoteSyncAdapter(Context context) {
-            super(context, true);
-        }
-
-        @Override
-        public void onPerformSync(Account account, Bundle extras, String authority,
-                ContentProviderClient provider, SyncResult syncResult) {
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "onPerformSync");
-            }
-        }
     }
 }
