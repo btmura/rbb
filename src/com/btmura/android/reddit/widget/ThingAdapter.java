@@ -37,6 +37,8 @@ import com.btmura.android.reddit.util.Objects;
 
 public class ThingAdapter extends BaseCursorAdapter {
 
+    public static final String TAG = "ThingAdapter";
+
     private static final String[] PROJECTION = {
             Things._ID,
             Things.COLUMN_AUTHOR,
@@ -189,10 +191,15 @@ public class ThingAdapter extends BaseCursorAdapter {
             String title = cursor.getString(INDEX_TITLE);
             int ups = cursor.getInt(INDEX_UPS);
 
+            // Reconcile local and remote votes.
             int likes = cursor.getInt(INDEX_LIKES);
-            int vote = cursor.getInt(INDEX_VOTE);
-            if (likes != vote) {
-                likes = vote;
+            if (!cursor.isNull(INDEX_VOTE)) {
+                // Local votes take precedence over those from reddit.
+                likes = cursor.getInt(INDEX_VOTE);
+
+                // Modify the score since the vote is still pending and don't go
+                // below 0 since reddit doesn't seem to do that.
+                score = Math.max(0, score + likes);
             }
 
             ThingView tv = (ThingView) view;

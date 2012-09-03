@@ -92,21 +92,20 @@ public class CommentView extends CustomView implements OnGestureListener {
     public void setData(String author,
             String body,
             long createdUtc,
-            int downs,
             int kind,
             int likes,
             int nesting,
             long nowTimeMs,
             int numComments,
+            int score,
             String title,
-            String thingId,
-            int ups) {
+            String thingId) {
         this.likes = likes;
         this.nesting = nesting;
         this.title = title;
         this.thingId = thingId;
 
-        this.scoreText = VotingArrows.getScoreText(ups - downs + likes);
+        this.scoreText = VotingArrows.getScoreText(score);
         this.bodyText = FORMATTER.formatSpans(getContext(), body);
         this.statusText = getStatus(getContext(), author, createdUtc, kind, nowTimeMs, numComments);
 

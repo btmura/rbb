@@ -132,15 +132,24 @@ public class CommentAdapter extends BaseCursorAdapter {
         String thingId = cursor.getString(INDEX_THING_ID);
         int ups = cursor.getInt(INDEX_UPS);
 
+        // Comments don't have a score so calculate our own.
+        int score = ups - downs;
+
+        // TODO: Remove code duplication with ThingAdapter.
+        // Local votes take precedence over those from reddit.
         int likes = cursor.getInt(INDEX_LIKES);
-        int vote = cursor.getInt(INDEX_VOTE);
-        if (likes != vote) {
-            likes = vote;
+        if (!cursor.isNull(INDEX_VOTE)) {
+            // Local votes take precedence over those from reddit.
+            likes = cursor.getInt(INDEX_VOTE);
+
+            // Modify the score since the vote is still pending and don't go
+            // below 0 since reddit doesn't seem to do that.
+            score = Math.max(0, score + likes);
         }
 
         CommentView cv = (CommentView) view;
         cv.setOnVoteListener(listener);
-        cv.setData(author, body, createdUtc, downs, kind, likes, nesting, nowTimeMs, numComments,
-                title, thingId, ups);
+        cv.setData(author, body, createdUtc, kind, likes, nesting, nowTimeMs, numComments, score,
+                title, thingId);
     }
 }

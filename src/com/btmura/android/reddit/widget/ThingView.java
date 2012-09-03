@@ -101,7 +101,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
 
-        this.scoreText = VotingArrows.getScoreText(score + likes);
+        this.scoreText = VotingArrows.getScoreText(score);
         this.statusText = getStatusText(getContext(), author, createdUtc, nowTimeMs, numComments,
                 over18, parentSubreddit, subreddit);
         this.longDetailsText = getContext().getString(R.string.thing_details, ups, downs, domain);
