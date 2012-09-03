@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.util;
 
+import java.util.Arrays;
+
 public class Array {
 
     public static String[] of(Object... elements) {
@@ -25,5 +27,12 @@ public class Array {
             array[i] = elements[i].toString();
         }
         return array;
+    }
+
+    public static <T> T[] ensureLength(T[] original, int capacity) {
+        if (original.length < capacity) {
+            original = Arrays.copyOf(original, capacity);
+        }
+        return original;
     }
 }

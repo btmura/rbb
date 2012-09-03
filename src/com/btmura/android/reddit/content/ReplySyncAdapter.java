@@ -41,6 +41,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Replies;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi.Result;
 import com.btmura.android.reddit.provider.ReplyProvider;
 import com.btmura.android.reddit.util.Array;
 
@@ -89,7 +90,7 @@ public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
 
             ArrayList<ContentProviderOperation> ops =
                     new ArrayList<ContentProviderOperation>(c.getCount());
-            while (c.moveToNext()) {
+            for (int i = 0; c.moveToNext(); i++) {
                 long id = c.getLong(INDEX_ID);
                 String thingId = c.getString(INDEX_THING_ID);
                 String text = c.getString(INDEX_TEXT);
@@ -97,10 +98,30 @@ public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
                 // Sync the reply with the server. If successful then schedule
                 // deletion of the database row.
                 try {
-                    RedditApi.comment(thingId, text, cookie, modhash);
-                    ops.add(ContentProviderOperation.newDelete(ReplyProvider.CONTENT_URI)
-                            .withSelection(ReplyProvider.ID_SELECTION, Array.of(id))
-                            .build());
+                    Result result = RedditApi.comment(thingId, text, cookie, modhash);
+                    if (!result.hasErrors()) {
+                        ops.add(ContentProviderOperation.newDelete(ReplyProvider.CONTENT_URI)
+                                .withSelection(ReplyProvider.ID_SELECTION, Array.of(id))
+                                .build());
+                    } else {
+                        if (BuildConfig.DEBUG) {
+                            result.logErrors(TAG);
+                        }
+                        if (result.rateLimit > 0) {
+                            syncResult.delayUntil += result.rateLimit;
+                            if (BuildConfig.DEBUG) {
+                                Log.d(TAG, "delayUntil: " + syncResult.delayUntil
+                                        + " rateLimit: " + result.rateLimit);
+                            }
+                            // If a rate limit was given then we should hold
+                            // back on updating any more entries and mark the
+                            // current request and the rest as skipped.
+                            syncResult.stats.numSkippedEntries += c.getCount() - i;
+                            break;
+                        } else {
+                            syncResult.stats.numSkippedEntries++;
+                        }
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, e.getMessage(), e);
                     syncResult.stats.numIoExceptions++;

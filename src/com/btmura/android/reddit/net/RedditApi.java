@@ -46,6 +46,30 @@ public class RedditApi {
             + CHARSET;
     private static final String USER_AGENT = "reddit by brian (rbb) for Android by /u/btmura";
 
+    /** Generic result that only reports the errors that happened. */
+    public static class Result {
+        public double rateLimit;
+        public String[][] errors;
+
+        public boolean hasErrors() {
+            return errors != null && errors.length > 0;
+        }
+
+        public void logErrors(String tag) {
+            StringBuilder line = new StringBuilder();
+            for (int i = 0; i < errors.length; i++) {
+                line.delete(0, line.length());
+                for (int j = 0; j < errors[i].length; j++) {
+                    line.append(errors[i][j]);
+                    if (j + 1 < errors[i].length) {
+                        line.append(" ");
+                    }
+                }
+                Log.d(tag, line.toString());
+            }
+        }
+    }
+
     public static class LoginResult {
         public String cookie;
         public String modhash;
@@ -66,11 +90,7 @@ public class RedditApi {
         public String fullName;
     }
 
-    // TODO: Parse response and return error value.
-    // 09-02 22:01:05.404: D/RedditApi(7752): {"json": {"ratelimit": 595.005724,
-    // "errors": [["RATELIMIT",
-    // "you are doing that too much. try again in 9 minutes.", "ratelimit"]]}}
-    public static void comment(String thingId, String text, String cookie, String modhash)
+    public static Result comment(String thingId, String text, String cookie, String modhash)
             throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
@@ -80,7 +100,7 @@ public class RedditApi {
 
             writeFormData(conn, Urls.commentsApiQuery(thingId, text, modhash));
             in = conn.getInputStream();
-            logResponse(in);
+            return ResponseParser.parseResponse(in);
         } finally {
             close(in, conn);
         }
@@ -191,7 +211,7 @@ public class RedditApi {
         }
     }
 
-    public static void vote(Context context, String name, int vote, String cookie,
+    public static Result vote(Context context, String name, int vote, String cookie,
             String modhash) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
@@ -201,9 +221,7 @@ public class RedditApi {
 
             writeFormData(conn, Urls.voteQuery(modhash, name, vote));
             in = conn.getInputStream();
-            if (BuildConfig.DEBUG) {
-                logResponse(in);
-            }
+            return ResponseParser.parseResponse(in);
         } finally {
             close(in, conn);
         }
