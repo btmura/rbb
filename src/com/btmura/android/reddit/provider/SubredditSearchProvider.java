@@ -67,6 +67,10 @@ public class SubredditSearchProvider extends SessionProvider {
 
     private void sync(Uri uri) {
         try {
+            // Determine the cutoff first to avoid deleting synced data.
+            long timestampCutoff = getSessionTimestampCutoff();
+            long sessionTimestamp = System.currentTimeMillis();
+
             String accountName = uri.getQueryParameter(SYNC_ACCOUNT);
             String sessionId = uri.getQueryParameter(SYNC_SESSION_ID);
             String query = uri.getQueryParameter(SYNC_QUERY);
@@ -74,7 +78,7 @@ public class SubredditSearchProvider extends SessionProvider {
             Context context = getContext();
             String cookie = AccountUtils.getCookie(context, accountName);
             SubredditSearchListing listing = SubredditSearchListing.get(context, accountName,
-                    sessionId, query, cookie);
+                    sessionId, sessionTimestamp, query, cookie);
 
             long cleaned;
             SQLiteDatabase db = helper.getWritableDatabase();
@@ -83,7 +87,7 @@ public class SubredditSearchProvider extends SessionProvider {
                 // Delete old results that can't be possibly viewed anymore.
                 cleaned = db.delete(SubredditSearches.TABLE_NAME,
                         SubredditSearches.SELECTION_BEFORE_TIMESTAMP,
-                        Array.of(getCreationTimeCutoff()));
+                        Array.of(timestampCutoff));
                 InsertHelper insertHelper = new InsertHelper(db, SubredditSearches.TABLE_NAME);
                 int count = listing.values.size();
                 for (int i = 0; i < count; i++) {
@@ -97,11 +101,11 @@ public class SubredditSearchProvider extends SessionProvider {
                 Log.d(TAG, "cleaned: " + cleaned);
             }
         } catch (OperationCanceledException e) {
-            Log.e(TAG, "sync", e);
+            Log.e(TAG, e.getMessage(), e);
         } catch (AuthenticatorException e) {
-            Log.e(TAG, "sync", e);
+            Log.e(TAG, e.getMessage(), e);
         } catch (IOException e) {
-            Log.e(TAG, "sync", e);
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 

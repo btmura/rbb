@@ -68,7 +68,8 @@ class CommentListing extends JsonParser {
     private final String thingId;
 
     public static CommentListing get(Context context, SQLiteOpenHelper dbHelper,
-            String accountName, String sessionId, String thingId, String cookie) throws IOException {
+            String accountName, String sessionId, long sessionTimestamp, String thingId,
+            String cookie) throws IOException {
         long t1 = System.currentTimeMillis();
         URL url = Urls.commentsUrl(thingId);
         HttpURLConnection conn = RedditApi.connect(url, cookie, false);
@@ -77,7 +78,7 @@ class CommentListing extends JsonParser {
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             CommentListing listing = new CommentListing(context, dbHelper, accountName, sessionId,
-                    t1, thingId);
+                    sessionTimestamp, thingId);
             listing.parseListingArray(reader);
             if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();

@@ -87,15 +87,18 @@ public class CommentProvider extends SessionProvider {
     }
 
     private void sync(Uri uri, String sessionId) {
-        Cursor c = null;
         try {
+            // Determine the cutoff first to avoid deleting synced data.
+            long timestampCutoff = getSessionTimestampCutoff();
+            long sessionTimestamp = System.currentTimeMillis();
+
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT_NAME);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
             Context context = getContext();
             String cookie = AccountUtils.getCookie(context, accountName);
             CommentListing listing = CommentListing.get(context, helper, accountName, sessionId,
-                    thingId, cookie);
+                    sessionTimestamp, thingId, cookie);
 
             long cleaned;
             long t1 = System.currentTimeMillis();
@@ -104,7 +107,7 @@ public class CommentProvider extends SessionProvider {
             try {
                 // Delete old comments that can't possibly be viewed anymore.
                 cleaned = db.delete(Comments.TABLE_NAME, Comments.SELECTION_BEFORE_TIMESTAMP,
-                        Array.of(getCreationTimeCutoff()));
+                        Array.of(timestampCutoff));
 
                 InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
                 int count = listing.values.size();
@@ -123,15 +126,11 @@ public class CommentProvider extends SessionProvider {
                         + " cleaned: " + cleaned);
             }
         } catch (OperationCanceledException e) {
-            Log.e(TAG, "sync", e);
+            Log.e(TAG, e.getMessage(), e);
         } catch (AuthenticatorException e) {
-            Log.e(TAG, "sync", e);
+            Log.e(TAG, e.getMessage(), e);
         } catch (IOException e) {
-            Log.e(TAG, "sync", e);
-        } finally {
-            if (c != null) {
-                c.close();
-            }
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 

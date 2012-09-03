@@ -53,8 +53,8 @@ class ThingListing extends JsonParser {
     private String moreThingId;
 
     public static ThingListing get(Context context, String accountName, String sessionId,
-            String subredditName, int filter, String more, String query, String cookie)
-            throws IOException {
+            long sessionTimestamp, String subredditName, int filter, String more, String query,
+            String cookie) throws IOException {
         long t1 = System.currentTimeMillis();
         URL url;
         if (!TextUtils.isEmpty(query)) {
@@ -67,7 +67,8 @@ class ThingListing extends JsonParser {
         long t2 = System.currentTimeMillis();
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
-            ThingListing listing = new ThingListing(context, accountName, sessionId, t1);
+            ThingListing listing = new ThingListing(context, accountName, sessionId,
+                    sessionTimestamp);
             listing.parseListingObject(reader);
             if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();

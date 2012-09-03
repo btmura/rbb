@@ -29,7 +29,7 @@ abstract class SessionProvider extends BaseProvider {
      *
      * @return cutoff time when all sessions must be created at or after
      */
-    static long getCreationTimeCutoff() {
+    static long getSessionTimestampCutoff() {
         // Initialize this once to delete all session data that was created
         // before the first sync. This allows to clean up any residue in the
         // database that can no longer be viewed.

@@ -88,6 +88,13 @@ public class ThingProvider extends SessionProvider {
 
     private void sync(Uri uri) {
         try {
+            // Determine the cutoff first to avoid deleting synced data when
+            // appending more data.
+            long timestampCutoff = getSessionTimestampCutoff();
+
+            // Appended data may have a different timestamp but that is OK.
+            long sessionTimestamp = System.currentTimeMillis();
+
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
             String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
@@ -97,8 +104,8 @@ public class ThingProvider extends SessionProvider {
 
             Context context = getContext();
             String cookie = AccountUtils.getCookie(context, accountName);
-            ThingListing listing = ThingListing.get(context, accountName, sessionId, subredditName,
-                    filter, more, query, cookie);
+            ThingListing listing = ThingListing.get(context, accountName, sessionId,
+                    sessionTimestamp, subredditName, filter, more, query, cookie);
 
             long cleaned;
             long t1 = System.currentTimeMillis();
@@ -107,7 +114,7 @@ public class ThingProvider extends SessionProvider {
             try {
                 // Delete old things that can't possibly be viewed anymore.
                 cleaned = db.delete(Things.TABLE_NAME, Things.SELECTION_BEFORE_TIMESTAMP,
-                        Array.of(getCreationTimeCutoff()));
+                        Array.of(timestampCutoff));
 
                 // Delete the loading more element before appending more.
                 db.delete(Things.TABLE_NAME, Things.SELECTION_BY_SESSION_ID_AND_MORE,
@@ -130,11 +137,11 @@ public class ThingProvider extends SessionProvider {
                         + " cleaned: " + cleaned);
             }
         } catch (IOException e) {
-            Log.e(TAG, "sync", e);
+            Log.e(TAG, e.getMessage(), e);
         } catch (OperationCanceledException e) {
-            Log.e(TAG, "sync", e);
+            Log.e(TAG, e.getMessage(), e);
         } catch (AuthenticatorException e) {
-            Log.e(TAG, "sync", e);
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 

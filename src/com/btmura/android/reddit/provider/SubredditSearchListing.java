@@ -46,14 +46,14 @@ class SubredditSearchListing extends JsonParser {
     private final long sessionTimestamp;
 
     public static SubredditSearchListing get(Context context, String accountName, String sessionId,
-            String query, String cookie) throws IOException {
-        long t1 = System.currentTimeMillis();
+            long sessionTimestamp, String query, String cookie) throws IOException {
         URL url = Urls.subredditSearchUrl(query, null);
         HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
-            SubredditSearchListing listing = new SubredditSearchListing(accountName, sessionId, t1);
+            SubredditSearchListing listing = new SubredditSearchListing(accountName, sessionId,
+                    sessionTimestamp);
             listing.parseListingObject(reader);
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "url: " + url + " values: " + listing.values.size());
