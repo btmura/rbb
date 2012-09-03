@@ -46,6 +46,7 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.SubredditSyncAdapter;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.LoginResult;
+import com.btmura.android.reddit.provider.ReplyProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.text.InputFilters;
@@ -192,6 +193,7 @@ public class AddAccountFragment extends Fragment implements
                 manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH,
                         result.modhash);
 
+                ContentResolver.setSyncAutomatically(account, ReplyProvider.AUTHORITY, true);
                 ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
                 ContentResolver.setSyncAutomatically(account, VoteProvider.AUTHORITY, true);
 
