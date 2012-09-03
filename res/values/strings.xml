@@ -77,8 +77,8 @@
     <string name="provider_subreddit_searches">Subreddit searches</string>
     <string name="provider_things">Things</string>
     <string name="provider_votes">Votes</string>
-    <string name="settings_browse_content_title">Browse content providers</string>
-    <string name="settings_browse_content_summary">Take a peek inside the database"</string>
+    <string name="settings_application_details">Application details</string>
+    <string name="settings_browse_content">Browse content providers</string>
     <string name="settings_developer_options">Developer options</string>
     <string name="settings_label">Settings</string>
     <string name="settings_sync_settings">Sync settings</string>

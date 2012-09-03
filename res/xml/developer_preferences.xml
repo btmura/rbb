@@ -16,12 +16,15 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <PreferenceScreen
-        android:summary="@string/settings_browse_content_summary"
-        android:title="@string/settings_browse_content_title" >
+    <PreferenceScreen android:title="@string/settings_browse_content" >
         <intent
             android:targetClass="com.btmura.android.reddit.app.ContentBrowserActivity"
             android:targetPackage="com.btmura.android.reddit" />
+    </PreferenceScreen>
+    <PreferenceScreen android:title="@string/settings_application_details" >
+        <intent
+            android:action="android.settings.APPLICATION_DETAILS_SETTINGS"
+            android:data="package:com.btmura.android.reddit" />
     </PreferenceScreen>
 
 </PreferenceScreen>
