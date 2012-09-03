@@ -28,10 +28,12 @@ import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -46,9 +48,16 @@ import com.btmura.android.reddit.util.Array;
  * {@link AbstractThreadedSyncAdapter} that syncs pending votes to the reddit
  * backend servers.
  */
-class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
+public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "VoteSyncAdapter";
+
+    public static class Service extends android.app.Service {
+        @Override
+        public IBinder onBind(Intent intent) {
+            return new VoteSyncAdapter(this).getSyncAdapterBinder();
+        }
+    }
 
     private static final String[] PROJECTION = {
             Votes._ID,
