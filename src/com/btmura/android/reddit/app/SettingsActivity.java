@@ -25,11 +25,9 @@ import android.content.Loader;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -73,9 +71,6 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
 
     @Override
     public void onBuildHeaders(List<Header> target) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onBuildHeaders");
-        }
         loadHeadersFromResource(R.xml.settings_headers, target);
         if (result != null) {
             String[] accountNames = result.accountNames;
