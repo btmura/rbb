@@ -94,7 +94,7 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
                 String thingId = c.getString(INDEX_THING_ID);
                 int vote = c.getInt(INDEX_VOTE);
 
-                // Sync the vote with reddit.com. If successful then schedule
+                // Sync the vote with the server. If successful then schedule
                 // deletion of the database row.
                 try {
                     RedditApi.vote(getContext(), thingId, vote, cookie, modhash);
@@ -102,12 +102,14 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
                             .withSelection(VoteProvider.ID_SELECTION, Array.of(id))
                             .build());
                 } catch (IOException e) {
-                    Log.e(TAG, "Couldn't vote", e);
+                    Log.e(TAG, e.getMessage(), e);
                     syncResult.stats.numIoExceptions++;
                 }
             }
             c.close();
 
+            // Now delete the rows from the database. The server shows the
+            // updates immediately.
             ContentProviderResult[] results = provider.applyBatch(ops);
             int count = results.length;
             for (int i = 0; i < count; i++) {

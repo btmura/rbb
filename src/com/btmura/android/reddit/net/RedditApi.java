@@ -66,6 +66,10 @@ public class RedditApi {
         public String fullName;
     }
 
+    // TODO: Parse response and return error value.
+    // 09-02 22:01:05.404: D/RedditApi(7752): {"json": {"ratelimit": 595.005724,
+    // "errors": [["RATELIMIT",
+    // "you are doing that too much. try again in 9 minutes.", "ratelimit"]]}}
     public static void comment(String thingId, String text, String cookie, String modhash)
             throws IOException {
         HttpURLConnection conn = null;

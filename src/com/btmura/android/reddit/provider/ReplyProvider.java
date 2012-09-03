@@ -66,7 +66,10 @@ public class ReplyProvider extends BaseProvider {
         }
         if (id != -1) {
             ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(uri, null);
+
+            // Sync new replies back to the server.
+            cr.notifyChange(uri, null, true);
+
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
                 cr.notifyChange(CommentProvider.CONTENT_URI, null);
             }
@@ -84,7 +87,11 @@ public class ReplyProvider extends BaseProvider {
         }
         if (count > 0) {
             ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(uri, null);
+
+            // Sync updated replies back to the server.
+            // TODO: Figure out whether this conflicts with inserts.
+            cr.notifyChange(uri, null, true);
+
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
                 cr.notifyChange(CommentProvider.CONTENT_URI, null);
             }

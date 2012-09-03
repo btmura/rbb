@@ -137,37 +137,32 @@ public class CommentProvider extends SessionProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        long commentId = -1;
-        long replyId = -1;
         SQLiteDatabase db = helper.getWritableDatabase();
-        db.beginTransaction();
-        try {
-            commentId = db.insert(Comments.TABLE_NAME, null, values);
-
-            // Create an entry in the replies table to sync back to reddit.
-            String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
-            String thingId = uri.getQueryParameter(PARAM_THING_ID);
-            if (parentThingId != null && thingId != null) {
-                ContentValues v = new ContentValues(4);
-                v.put(Replies.COLUMN_ACCOUNT, values.getAsString(Comments.COLUMN_ACCOUNT));
-                v.put(Replies.COLUMN_PARENT_THING_ID, parentThingId);
-                v.put(Replies.COLUMN_THING_ID, thingId);
-                v.put(Replies.COLUMN_TEXT, values.getAsString(Comments.COLUMN_BODY));
-                replyId = db.insert(Replies.TABLE_NAME, null, v);
-            }
-
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "insert query: " + uri.getQuery() + " commentId: " + commentId
-                        + " replyId: " + replyId);
-            }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
+        long commentId = db.insert(Comments.TABLE_NAME, null, values);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "insert query: " + uri.getQuery() + " commentId: " + commentId);
         }
+
+        // Create an entry in the replies table to sync back to reddit.
+        // TODO: Write comment and reply in singe transaction.
+        String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
+        String thingId = uri.getQueryParameter(PARAM_THING_ID);
+        if (parentThingId != null && thingId != null) {
+            ContentValues v = new ContentValues(4);
+            v.put(Replies.COLUMN_ACCOUNT, values.getAsString(Comments.COLUMN_ACCOUNT));
+            v.put(Replies.COLUMN_PARENT_THING_ID, parentThingId);
+            v.put(Replies.COLUMN_THING_ID, thingId);
+            v.put(Replies.COLUMN_TEXT, values.getAsString(Comments.COLUMN_BODY));
+
+            ContentResolver cr = getContext().getContentResolver();
+            cr.insert(ReplyProvider.CONTENT_URI, v);
+        }
+
         if (commentId != -1) {
             getContext().getContentResolver().notifyChange(uri, null);
             return ContentUris.withAppendedId(uri, commentId);
         }
+
         return null;
     }
 

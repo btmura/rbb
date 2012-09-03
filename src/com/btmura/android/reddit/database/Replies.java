@@ -42,8 +42,10 @@ public class Replies implements BaseColumns {
     /** Text of the reply. */
     public static final String COLUMN_TEXT = "text";
 
+    public static final String SELECTION_BY_ACCOUNT = COLUMN_ACCOUNT + " = ?";
+
     public static final String SELECTION_BY_ACCOUNT_AND_PARENT_THING_ID =
-            COLUMN_ACCOUNT + " = ? AND " + COLUMN_PARENT_THING_ID + " = ?";
+            SELECTION_BY_ACCOUNT + " AND " + COLUMN_PARENT_THING_ID + " = ?";
 
     public static final String SORT_BY_ID = _ID + " ASC";
 
