@@ -146,7 +146,7 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
-            android:name=".content.SubredditSyncAdapterService"
+            android:name=".content.SubredditSyncAdapter$Service"
             android:exported="true"
             android:permission="@string/permission_sync_accounts" >
             <intent-filter>

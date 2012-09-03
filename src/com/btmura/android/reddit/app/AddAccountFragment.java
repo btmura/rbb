@@ -43,7 +43,7 @@ import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.content.SubredditSyncAdapterService;
+import com.btmura.android.reddit.content.SubredditSyncAdapter;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.LoginResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
@@ -179,7 +179,7 @@ public class AddAccountFragment extends Fragment implements
                 }
 
                 publishProgress(R.string.login_importing_subreddits);
-                SubredditSyncAdapterService.initializeAccount(getActivity(), login, result.cookie);
+                SubredditSyncAdapter.initializeAccount(getActivity(), login, result.cookie);
 
                 publishProgress(R.string.login_adding_account);
 
