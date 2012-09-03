@@ -16,35 +16,19 @@
 
 package com.btmura.android.reddit.app;
 
-import android.content.Intent;
+import com.btmura.android.reddit.R;
+
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
-import android.provider.Settings;
 import android.view.Menu;
 
-import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.provider.SubredditProvider;
-
-public class GeneralSettingsFragment extends PreferenceFragment {
+public class DeveloperOptionsFragment extends PreferenceFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        // TODO: Figure out to specify extras in the XML.
-        Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
-        intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {SubredditProvider.AUTHORITY});
-
-        Preference pref = new Preference(getActivity());
-        pref.setTitle(R.string.settings_sync_settings);
-        pref.setIntent(intent);
-
-        PreferenceScreen prefScreen = getPreferenceManager().createPreferenceScreen(getActivity());
-        prefScreen.addPreference(pref);
-        setPreferenceScreen(prefScreen);
+        addPreferencesFromResource(R.xml.developer_preferences);
     }
 
     @Override

@@ -27,8 +27,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +40,7 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class AccountPreferenceFragment extends PreferenceFragment {
 
@@ -51,6 +55,18 @@ public class AccountPreferenceFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
+
+        // TODO: Figure out to specify extras in the XML.
+        Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
+        intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {SubredditProvider.AUTHORITY});
+
+        Preference pref = new Preference(getActivity());
+        pref.setTitle(R.string.settings_sync_settings);
+        pref.setIntent(intent);
+
+        PreferenceScreen prefScreen = getPreferenceManager().createPreferenceScreen(getActivity());
+        prefScreen.addPreference(pref);
+        setPreferenceScreen(prefScreen);
     }
 
     @Override

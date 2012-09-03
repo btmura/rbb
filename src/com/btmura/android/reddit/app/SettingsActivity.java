@@ -113,10 +113,6 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
                 handleAddAccount();
                 return true;
 
-            case R.id.menu_debug:
-                handleDebug();
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -125,11 +121,6 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
     private void handleAddAccount() {
         Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
         intent.putExtra(Settings.EXTRA_AUTHORITIES, AUTHORITIES);
-        startActivity(intent);
-    }
-
-    private void handleDebug() {
-        Intent intent = new Intent(this, ContentBrowserActivity.class);
         startActivity(intent);
     }
 }
