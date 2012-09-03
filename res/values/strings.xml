@@ -35,6 +35,7 @@
     <string name="comment_pending_comment_status">"%1$s"</string>
     <string name="comment_reply_title">Reply to %s</string>
     <string name="comment_reply_hint">Hello, I would like to subscribe to your newsletter…</string>
+    <string name="content_browser">Content Providers</string>
     <string name="empty_list">Nothing to see here…</string>
     <string name="empty_subreddits">You haven\'t added any subreddits.</string>
     <string name="error">Something went wrong…</string>

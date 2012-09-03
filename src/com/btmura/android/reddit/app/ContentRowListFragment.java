@@ -45,6 +45,7 @@ public class ContentRowListFragment extends ListFragment implements LoaderCallba
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().setTitle(getArguments().getString(ARG_URI));
         adapter = new ContentAdapter(getActivity());
     }
 

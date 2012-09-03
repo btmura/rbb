@@ -53,7 +53,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".app.ContentBrowserActivity" >
+        <activity
+            android:name=".app.ContentBrowserActivity"
+            android:label="@string/content_browser" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -148,14 +150,14 @@
         <service
             android:name=".content.ReplySyncAdapter$Service"
             android:exported="true"
-            android:permission="@string/permission_sync_accounts">
+            android:permission="@string/permission_sync_accounts" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
 
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/reply_sync_adapter" />            
+                android:resource="@xml/reply_sync_adapter" />
         </service>
         <service
             android:name=".content.SubredditSyncAdapter$Service"

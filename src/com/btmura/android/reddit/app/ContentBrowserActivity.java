@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ContentUriListFragment.OnUriClickListener;
@@ -30,6 +31,7 @@ public class ContentBrowserActivity extends Activity implements OnUriClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_browser);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -43,5 +45,17 @@ public class ContentBrowserActivity extends Activity implements OnUriClickListen
         ft.replace(R.id.single_container, ContentRowListFragment.newInstance(uri));
         ft.addToBackStack(null);
         ft.commit();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
