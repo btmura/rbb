@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.content;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -25,11 +24,9 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -47,6 +44,9 @@ import com.btmura.android.reddit.util.Array;
 
 /**
  * {@link AbstractThreadedSyncAdapter} that syncs pending replies to the server.
+ * It processes one reply at a time to avoid hitting the rate limit. It
+ * schedules a periodic sync when it needs to sync the remaining pending
+ * replies.
  */
 public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -58,6 +58,9 @@ public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
             return new ReplySyncAdapter(this).getSyncAdapterBinder();
         }
     }
+
+    /** Rate limit in seconds if the server doesn't suggest one. */
+    private static final int RATE_LIMIT_SECONDS = 60;
 
     private static final String[] PROJECTION = {
             Replies._ID,
@@ -83,63 +86,79 @@ public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
             String modhash = manager.blockingGetAuthToken(account,
                     AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
 
-            // Get all pending replies for this account that haven't been
-            // synced.
+            // Get all pending replies that have not been synced.
             Cursor c = provider.query(ReplyProvider.CONTENT_URI, PROJECTION,
-                    Replies.SELECTION_BY_ACCOUNT, Array.of(account.name), null);
+                    Replies.SELECTION_BY_ACCOUNT, Array.of(account.name), Replies.SORT_BY_ID);
 
-            ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(c.getCount());
-            for (int i = 0; c.moveToNext(); i++) {
-                long id = c.getLong(INDEX_ID);
-                String thingId = c.getString(INDEX_THING_ID);
-                String text = c.getString(INDEX_TEXT);
+            int count = c.getCount();
 
-                // Sync the reply with the server. If successful then schedule
-                // deletion of the database row.
+            // Process one reply at a time to avoid rate limit.
+            long id = -1;
+            String thingId = null;
+            String text = null;
+            if (c.moveToNext()) {
+                id = c.getLong(INDEX_ID);
+                thingId = c.getString(INDEX_THING_ID);
+                text = c.getString(INDEX_TEXT);
+            }
+
+            // Close cursor before making network request.
+            c.close();
+
+            // Don't exit early so that the log statement at the end is shown.
+            if (id != -1) {
                 try {
+                    // Try to sync the comment with the server.
                     Result result = RedditApi.comment(thingId, text, cookie, modhash);
                     if (!result.hasErrors()) {
-                        ops.add(ContentProviderOperation.newDelete(ReplyProvider.CONTENT_URI)
-                                .withSelection(ReplyProvider.ID_SELECTION, Array.of(id))
-                                .build());
+                        syncResult.stats.numDeletes += provider.delete(ReplyProvider.CONTENT_URI,
+                                ReplyProvider.ID_SELECTION, Array.of(id));
+                        count--;
+                    } else if (BuildConfig.DEBUG) {
+                        result.logErrors(TAG);
+                    }
+
+                    // Record the number skipped for stats purposes only.
+                    syncResult.stats.numSkippedEntries += count;
+
+                    // Respect suggested rate limit or assign our own.
+                    long rateLimit = RATE_LIMIT_SECONDS;
+                    if (result.rateLimit > 0) {
+                        rateLimit = Math.round(result.rateLimit);
+                    }
+
+                    // SyncManager code seems to be using delayUntil as a
+                    // timestamp even though the docs say its more of a
+                    // duration.
+                    syncResult.delayUntil = System.currentTimeMillis() / 1000 + rateLimit;
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "rateLimit: " + rateLimit
+                                + " delayUntil: " + syncResult.delayUntil);
+                    }
+
+                    // Use a periodic sync to sync the remaining replies.
+                    if (count > 0) {
+                        if (BuildConfig.DEBUG) {
+                            Log.d(TAG, "adding periodic sync with rate limit: " + rateLimit);
+                        }
+                        ContentResolver.addPeriodicSync(account, authority,
+                                Bundle.EMPTY, rateLimit);
                     } else {
                         if (BuildConfig.DEBUG) {
-                            result.logErrors(TAG);
+                            Log.d(TAG, "removing periodic sync");
                         }
-                        if (result.rateLimit > 0) {
-                            syncResult.delayUntil += result.rateLimit;
-                            if (BuildConfig.DEBUG) {
-                                Log.d(TAG, "delayUntil: " + syncResult.delayUntil
-                                        + " rateLimit: " + result.rateLimit);
-                            }
-                            // If a rate limit was given then we should hold
-                            // back on updating any more entries and mark the
-                            // current request and the rest as skipped.
-                            syncResult.stats.numSkippedEntries += c.getCount() - i;
-                            break;
-                        } else {
-                            syncResult.stats.numSkippedEntries++;
-                        }
+                        ContentResolver.removePeriodicSync(account, authority,
+                                Bundle.EMPTY);
                     }
                 } catch (IOException e) {
+                    // If we had a network problem then increment the exception
+                    // count to indicate a soft error. The sync manager will
+                    // keep retrying this with exponential back-off.
                     Log.e(TAG, e.getMessage(), e);
                     syncResult.stats.numIoExceptions++;
                 }
             }
-            c.close();
-
-            // Now delete the rows from the database. The server shows the
-            // updates immediately.
-            ContentProviderResult[] results = provider.applyBatch(ops);
-            int count = results.length;
-            for (int i = 0; i < count; i++) {
-                syncResult.stats.numDeletes += results[i].count;
-            }
         } catch (RemoteException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
-        } catch (OperationApplicationException e) {
             Log.e(TAG, e.getMessage(), e);
             syncResult.databaseError = true;
         } catch (OperationCanceledException e) {
@@ -150,11 +169,11 @@ public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
             syncResult.stats.numAuthExceptions++;
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
-            syncResult.stats.numAuthExceptions++;
+            syncResult.stats.numIoExceptions++;
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onPerformSync syncResult: " + syncResult);
+            Log.d(TAG, "onPerformSync account: " + account.name + " syncResult: " + syncResult);
         }
     }
 }
