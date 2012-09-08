@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 
-public class Things implements BaseColumns, SyncColumns {
+public class Things implements BaseColumns {
     public static final String TABLE_NAME = "things";
 
     /** Account for joining with the votes table. */
