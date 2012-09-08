@@ -30,6 +30,9 @@ public class CommentActions implements BaseColumns {
     /** Account that created or deleted this comment. */
     public static final String COLUMN_ACCOUNT = Votes.COLUMN_ACCOUNT;
 
+    /** Action this row represents like adding or deleting. */
+    public static final String COLUMN_ACTION = "action";
+
     /**
      * ID of the thing that is the parent of the thing we are commenting on. It
      * could be the same as the thing we are replying to. This is used to merge
@@ -37,7 +40,7 @@ public class CommentActions implements BaseColumns {
      */
     public static final String COLUMN_PARENT_THING_ID = "parentThingId";
 
-    /** ID of the thing that we are commenting on. */
+    /** ID of the thing that we are commenting on or deleting. */
     public static final String COLUMN_THING_ID = "thingId";
 
     /** Text of the reply. */
@@ -50,9 +53,16 @@ public class CommentActions implements BaseColumns {
 
     public static final String SORT_BY_ID = _ID + " ASC";
 
+    /** Action meaning the user has responded to another comment. */
+    public static final int ACTION_INSERT = 0;
+
+    /** Action meaning the user has deleted one of their own comments. */
+    public static final int ACTION_DELETE = 1;
+
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
+                + COLUMN_ACTION + " INTEGER NOT NULL, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_PARENT_THING_ID + " TEXT NOT NULL, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "

@@ -147,7 +147,8 @@ public class CommentProvider extends SessionProvider {
         String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
         String thingId = uri.getQueryParameter(PARAM_THING_ID);
         if (parentThingId != null && thingId != null) {
-            ContentValues v = new ContentValues(4);
+            ContentValues v = new ContentValues(5);
+            v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
             v.put(CommentActions.COLUMN_ACCOUNT, values.getAsString(Comments.COLUMN_ACCOUNT));
             v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
             v.put(CommentActions.COLUMN_THING_ID, thingId);
