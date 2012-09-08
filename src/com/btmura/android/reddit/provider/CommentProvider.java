@@ -30,6 +30,7 @@ import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -47,6 +48,9 @@ public class CommentProvider extends SessionProvider {
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/");
 
     public static final String PARAM_SYNC = "sync";
+    public static final String PARAM_REPLY = "reply";
+    public static final String PARAM_DELETE = "delete";
+
     public static final String PARAM_ACCOUNT_NAME = "accountName";
     public static final String PARAM_SESSION_ID = "sessionId";
     public static final String PARAM_PARENT_THING_ID = "parentThingId";
@@ -73,12 +77,7 @@ public class CommentProvider extends SessionProvider {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "query: " + uri.getQuery());
         }
-
-        String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
-        if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
-            sync(uri, sessionId);
-        }
-
+        processUri(uri, null);
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.query(COMMENTS_WITH_VOTES, projection, selection, selectionArgs, null, null,
                 sortOrder);
@@ -86,12 +85,103 @@ public class CommentProvider extends SessionProvider {
         return c;
     }
 
-    private void sync(Uri uri, String sessionId) {
+    @Override
+    public Uri insert(Uri uri, ContentValues values) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        long commentId = db.insert(Comments.TABLE_NAME, null, values);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "insert query: " + uri.getQuery() + " commentId: " + commentId);
+        }
+        processUri(uri, values);
+        if (commentId != -1) {
+            getContext().getContentResolver().notifyChange(uri, null);
+            return ContentUris.withAppendedId(uri, commentId);
+        }
+
+        return null;
+    }
+
+    @Override
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        int count = db.update(Comments.TABLE_NAME, values, selection, selectionArgs);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "update count: " + count);
+        }
+        processUri(uri, null);
+        if (count > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return count;
+    }
+
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        int count = db.delete(Comments.TABLE_NAME, selection, selectionArgs);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "delete count: " + count);
+        }
+        processUri(uri, null);
+        if (count > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return count;
+    }
+
+    @Override
+    public String getType(Uri uri) {
+        return null;
+    }
+
+    /** Inserts a placeholder comment yet to be synced with Reddit. */
+    public static void insertPlaceholderInBackground(Context context, final String accountName,
+            final String body, final int nesting, final String parentThingId, final int sequence,
+            final String sessionId, final long sessionCreationTime, final String thingId) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            public void run() {
+                Uri uri = CONTENT_URI.buildUpon()
+                        .appendQueryParameter(PARAM_REPLY, Boolean.toString(true))
+                        .appendQueryParameter(PARAM_PARENT_THING_ID, parentThingId)
+                        .appendQueryParameter(PARAM_THING_ID, thingId)
+                        .build();
+
+                ContentValues v = new ContentValues(8);
+                v.put(Comments.COLUMN_ACCOUNT, accountName);
+                v.put(Comments.COLUMN_AUTHOR, accountName);
+                v.put(Comments.COLUMN_BODY, body);
+                v.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
+                v.put(Comments.COLUMN_NESTING, nesting);
+                v.put(Comments.COLUMN_SEQUENCE, sequence);
+                v.put(Comments.COLUMN_SESSION_ID, sessionId);
+                v.put(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime);
+
+                ContentResolver cr = appContext.getContentResolver();
+                cr.insert(uri, v);
+            }
+        });
+    }
+
+    /** Process the uri which may have additional instructions. */
+    private void processUri(Uri uri, ContentValues values) {
+        if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
+            handleSyncUri(uri);
+        } else if (uri.getBooleanQueryParameter(PARAM_REPLY, false)) {
+            handleReplyUri(uri, values);
+        } else if (uri.getBooleanQueryParameter(PARAM_DELETE, false)) {
+            handleDeleteUri(uri, values);
+        }
+    }
+
+    /** Sync the comments specified in the uri. */
+    private void handleSyncUri(Uri uri) {
         try {
             // Determine the cutoff first to avoid deleting synced data.
             long timestampCutoff = getSessionTimestampCutoff();
             long sessionTimestamp = System.currentTimeMillis();
 
+            String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT_NAME);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
@@ -134,19 +224,12 @@ public class CommentProvider extends SessionProvider {
         }
     }
 
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        long commentId = db.insert(Comments.TABLE_NAME, null, values);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "insert query: " + uri.getQuery() + " commentId: " + commentId);
-        }
-
-        // Create an entry in the replies table to sync back to reddit.
-        // TODO: Write comment and reply in singe transaction.
+    /** Schedule a reply to a comment. */
+    private void handleReplyUri(Uri uri, ContentValues values) {
+        // TODO: Write comment and reply in single transaction.
         String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
         String thingId = uri.getQueryParameter(PARAM_THING_ID);
-        if (parentThingId != null && thingId != null) {
+        if (!TextUtils.isEmpty(parentThingId) && !TextUtils.isEmpty(thingId)) {
             ContentValues v = new ContentValues(5);
             v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
             v.put(CommentActions.COLUMN_ACCOUNT, values.getAsString(Comments.COLUMN_ACCOUNT));
@@ -157,71 +240,19 @@ public class CommentProvider extends SessionProvider {
             ContentResolver cr = getContext().getContentResolver();
             cr.insert(CommentActionProvider.CONTENT_URI, v);
         }
-
-        if (commentId != -1) {
-            getContext().getContentResolver().notifyChange(uri, null);
-            return ContentUris.withAppendedId(uri, commentId);
-        }
-
-        return null;
     }
 
-    @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.update(Comments.TABLE_NAME, values, selection, selectionArgs);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "update count: " + count);
+    /** Schedule a delete of a existing comment. */
+    private void handleDeleteUri(Uri uri, ContentValues values) {
+        String thingId = uri.getQueryParameter(PARAM_THING_ID);
+        if (!TextUtils.isEmpty(thingId)) {
+            ContentValues v = new ContentValues(3);
+            v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE);
+            v.put(CommentActions.COLUMN_ACCOUNT, values.getAsString(Comments.COLUMN_ACCOUNT));
+            v.put(CommentActions.COLUMN_THING_ID, thingId);
+
+            ContentResolver cr = getContext().getContentResolver();
+            cr.insert(CommentActionProvider.CONTENT_URI, v);
         }
-        if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
-        }
-        return count;
-    }
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.delete(Comments.TABLE_NAME, selection, selectionArgs);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "delete count: " + count);
-        }
-        if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
-        }
-        return count;
-    }
-
-    @Override
-    public String getType(Uri uri) {
-        return null;
-    }
-
-    /** Inserts a placeholder comment yet to be synced with Reddit. */
-    public static void insertPlaceholderInBackground(Context context, final String accountName,
-            final String body, final int nesting, final String parentThingId, final int sequence,
-            final String sessionId, final long sessionCreationTime, final String thingId) {
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            public void run() {
-                Uri uri = CONTENT_URI.buildUpon()
-                        .appendQueryParameter(PARAM_PARENT_THING_ID, parentThingId)
-                        .appendQueryParameter(PARAM_THING_ID, thingId)
-                        .build();
-
-                ContentValues v = new ContentValues(8);
-                v.put(Comments.COLUMN_ACCOUNT, accountName);
-                v.put(Comments.COLUMN_AUTHOR, accountName);
-                v.put(Comments.COLUMN_BODY, body);
-                v.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
-                v.put(Comments.COLUMN_NESTING, nesting);
-                v.put(Comments.COLUMN_SEQUENCE, sequence);
-                v.put(Comments.COLUMN_SESSION_ID, sessionId);
-                v.put(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime);
-
-                ContentResolver cr = appContext.getContentResolver();
-                cr.insert(uri, v);
-            }
-        });
     }
 }

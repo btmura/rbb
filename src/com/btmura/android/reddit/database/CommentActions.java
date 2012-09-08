@@ -64,8 +64,8 @@ public class CommentActions implements BaseColumns {
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACTION + " INTEGER NOT NULL, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
-                + COLUMN_PARENT_THING_ID + " TEXT NOT NULL, "
+                + COLUMN_PARENT_THING_ID + " TEXT, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
-                + COLUMN_TEXT + " TEXT NOT NULL)");
+                + COLUMN_TEXT + " TEXT)");
     }
 }
