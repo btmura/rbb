@@ -28,11 +28,11 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.CommentActions;
 
-public class ReplyProvider extends BaseProvider {
+public class CommentActionProvider extends BaseProvider {
 
-    public static final String TAG = "ReplyProvider";
+    public static final String TAG = "CommentActionProvider";
 
-    public static final String AUTHORITY = "com.btmura.android.reddit.provider.replies";
+    public static final String AUTHORITY = "com.btmura.android.reddit.provider.commentActions";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/");
 
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";

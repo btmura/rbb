@@ -22,8 +22,8 @@
     <string name="add_front_page">Add front page</string>
     <string name="add_subreddit">Add subreddit</string>
     <string name="app_name">reddit by brian</string>
+    <string name="authority_comment_actions">com.btmura.android.reddit.provider.commentActions</string>
     <string name="authority_comments">com.btmura.android.reddit.provider.comments</string>
-    <string name="authority_replies">com.btmura.android.reddit.provider.replies</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
     <string name="authority_subreddit_searches">com.btmura.android.reddit.provider.subredditsearches</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
@@ -71,8 +71,9 @@
     <string name="menu_submit_link">Submit link</string>
     <string name="menu_view_sidebar">View sidebar</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
+    <!-- Appear as "Comments" in sync settings. -->
+    <string name="provider_comment_actions">Comments</string>
     <string name="provider_comments">Comments</string>
-    <string name="provider_replies">Replies</string>
     <string name="provider_subreddits">Subreddits</string>
     <string name="provider_subreddit_searches">Subreddit searches</string>
     <string name="provider_things">Things</string>

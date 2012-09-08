@@ -39,7 +39,7 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
-import com.btmura.android.reddit.provider.ReplyProvider;
+import com.btmura.android.reddit.provider.CommentActionProvider;
 import com.btmura.android.reddit.util.Array;
 
 /**
@@ -48,14 +48,14 @@ import com.btmura.android.reddit.util.Array;
  * schedules a periodic sync when it needs to sync the remaining pending
  * replies.
  */
-public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
+public class CommentActionSyncAdapter extends AbstractThreadedSyncAdapter {
 
-    public static final String TAG = "ReplySyncAdapter";
+    public static final String TAG = "CommentActionSyncAdapter";
 
     public static class Service extends android.app.Service {
         @Override
         public IBinder onBind(Intent intent) {
-            return new ReplySyncAdapter(this).getSyncAdapterBinder();
+            return new CommentActionSyncAdapter(this).getSyncAdapterBinder();
         }
     }
 
@@ -72,7 +72,7 @@ public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INDEX_THING_ID = 1;
     private static final int INDEX_TEXT = 2;
 
-    public ReplySyncAdapter(Context context) {
+    public CommentActionSyncAdapter(Context context) {
         super(context, true);
     }
 
@@ -87,8 +87,9 @@ public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
                     AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
 
             // Get all pending replies that have not been synced.
-            Cursor c = provider.query(ReplyProvider.CONTENT_URI, PROJECTION,
-                    CommentActions.SELECTION_BY_ACCOUNT, Array.of(account.name), CommentActions.SORT_BY_ID);
+            Cursor c = provider.query(CommentActionProvider.CONTENT_URI, PROJECTION,
+                    CommentActions.SELECTION_BY_ACCOUNT, Array.of(account.name),
+                    CommentActions.SORT_BY_ID);
 
             int count = c.getCount();
 
@@ -111,8 +112,9 @@ public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
                     // Try to sync the comment with the server.
                     Result result = RedditApi.comment(thingId, text, cookie, modhash);
                     if (!result.hasErrors()) {
-                        syncResult.stats.numDeletes += provider.delete(ReplyProvider.CONTENT_URI,
-                                ReplyProvider.ID_SELECTION, Array.of(id));
+                        syncResult.stats.numDeletes += provider.delete(
+                                CommentActionProvider.CONTENT_URI,
+                                CommentActionProvider.ID_SELECTION, Array.of(id));
                         count--;
                     } else if (BuildConfig.DEBUG) {
                         result.logErrors(TAG);

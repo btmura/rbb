@@ -154,7 +154,7 @@ public class CommentProvider extends SessionProvider {
             v.put(CommentActions.COLUMN_TEXT, values.getAsString(Comments.COLUMN_BODY));
 
             ContentResolver cr = getContext().getContentResolver();
-            cr.insert(ReplyProvider.CONTENT_URI, v);
+            cr.insert(CommentActionProvider.CONTENT_URI, v);
         }
 
         if (commentId != -1) {
