@@ -35,7 +35,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.database.Replies;
+import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.Array;
 
@@ -148,10 +148,10 @@ public class CommentProvider extends SessionProvider {
         String thingId = uri.getQueryParameter(PARAM_THING_ID);
         if (parentThingId != null && thingId != null) {
             ContentValues v = new ContentValues(4);
-            v.put(Replies.COLUMN_ACCOUNT, values.getAsString(Comments.COLUMN_ACCOUNT));
-            v.put(Replies.COLUMN_PARENT_THING_ID, parentThingId);
-            v.put(Replies.COLUMN_THING_ID, thingId);
-            v.put(Replies.COLUMN_TEXT, values.getAsString(Comments.COLUMN_BODY));
+            v.put(CommentActions.COLUMN_ACCOUNT, values.getAsString(Comments.COLUMN_ACCOUNT));
+            v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
+            v.put(CommentActions.COLUMN_THING_ID, thingId);
+            v.put(CommentActions.COLUMN_TEXT, values.getAsString(Comments.COLUMN_BODY));
 
             ContentResolver cr = getContext().getContentResolver();
             cr.insert(ReplyProvider.CONTENT_URI, v);

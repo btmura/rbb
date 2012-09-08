@@ -20,23 +20,24 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
- * Table for pending replies that have not been synced with the reddit backend.
+ * Table for storing pending actions like adding or deleting comments. The
+ * actions will be processed one by one in the background.
  */
-public class Replies implements BaseColumns {
+public class CommentActions implements BaseColumns {
 
-    public static final String TABLE_NAME = "replies";
+    public static final String TABLE_NAME = "commentActions";
 
-    /** Account that authored this reply. */
+    /** Account that created or deleted this comment. */
     public static final String COLUMN_ACCOUNT = Votes.COLUMN_ACCOUNT;
 
     /**
-     * ID of the thing that is the parent of the thing we are replying to. It
+     * ID of the thing that is the parent of the thing we are commenting on. It
      * could be the same as the thing we are replying to. This is used to merge
      * pending replies with the current comments.
      */
     public static final String COLUMN_PARENT_THING_ID = "parentThingId";
 
-    /** ID of the thing that we are replying to. */
+    /** ID of the thing that we are commenting on. */
     public static final String COLUMN_THING_ID = "thingId";
 
     /** Text of the reply. */

@@ -36,7 +36,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.database.Replies;
+import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
 import com.btmura.android.reddit.provider.ReplyProvider;
@@ -63,9 +63,9 @@ public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int RATE_LIMIT_SECONDS = 60;
 
     private static final String[] PROJECTION = {
-            Replies._ID,
-            Replies.COLUMN_THING_ID,
-            Replies.COLUMN_TEXT,
+            CommentActions._ID,
+            CommentActions.COLUMN_THING_ID,
+            CommentActions.COLUMN_TEXT,
     };
 
     private static final int INDEX_ID = 0;
@@ -88,7 +88,7 @@ public class ReplySyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Get all pending replies that have not been synced.
             Cursor c = provider.query(ReplyProvider.CONTENT_URI, PROJECTION,
-                    Replies.SELECTION_BY_ACCOUNT, Array.of(account.name), Replies.SORT_BY_ID);
+                    CommentActions.SELECTION_BY_ACCOUNT, Array.of(account.name), CommentActions.SORT_BY_ID);
 
             int count = c.getCount();
 

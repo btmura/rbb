@@ -35,7 +35,7 @@ import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.database.Replies;
+import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
@@ -47,9 +47,9 @@ class CommentListing extends JsonParser {
     public static final String TAG = "CommentListing";
 
     private static final String[] PROJECTION = {
-            Replies._ID,
-            Replies.COLUMN_THING_ID,
-            Replies.COLUMN_TEXT,
+            CommentActions._ID,
+            CommentActions.COLUMN_THING_ID,
+            CommentActions.COLUMN_TEXT,
     };
 
     private static final int INDEX_THING_ID = 1;
@@ -217,10 +217,10 @@ class CommentListing extends JsonParser {
 
     private void mergeReplies() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query(Replies.TABLE_NAME, PROJECTION,
-                Replies.SELECTION_BY_ACCOUNT_AND_PARENT_THING_ID,
+        Cursor c = db.query(CommentActions.TABLE_NAME, PROJECTION,
+                CommentActions.SELECTION_BY_ACCOUNT_AND_PARENT_THING_ID,
                 Array.of(accountName, thingId),
-                null, null, Replies.SORT_BY_ID);
+                null, null, CommentActions.SORT_BY_ID);
 
         // TODO: Take into account the size of replies + values?
 

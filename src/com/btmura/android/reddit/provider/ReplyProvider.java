@@ -26,7 +26,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.Replies;
+import com.btmura.android.reddit.database.CommentActions;
 
 public class ReplyProvider extends BaseProvider {
 
@@ -40,7 +40,7 @@ public class ReplyProvider extends BaseProvider {
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_ALL_REPLIES = 1;
     static {
-        MATCHER.addURI(AUTHORITY, Replies.TABLE_NAME, MATCH_ALL_REPLIES);
+        MATCHER.addURI(AUTHORITY, CommentActions.TABLE_NAME, MATCH_ALL_REPLIES);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ReplyProvider extends BaseProvider {
         }
 
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor c = db.query(Replies.TABLE_NAME, projection, selection, selectionArgs,
+        Cursor c = db.query(CommentActions.TABLE_NAME, projection, selection, selectionArgs,
                 null, null, sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
@@ -60,7 +60,7 @@ public class ReplyProvider extends BaseProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        long id = db.insert(Replies.TABLE_NAME, null, values);
+        long id = db.insert(CommentActions.TABLE_NAME, null, values);
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "insert id: " + id);
         }
@@ -81,7 +81,7 @@ public class ReplyProvider extends BaseProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.update(Replies.TABLE_NAME, values, selection, selectionArgs);
+        int count = db.update(CommentActions.TABLE_NAME, values, selection, selectionArgs);
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "update count: " + count);
         }
@@ -102,7 +102,7 @@ public class ReplyProvider extends BaseProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.delete(Replies.TABLE_NAME, selection, selectionArgs);
+        int count = db.delete(CommentActions.TABLE_NAME, selection, selectionArgs);
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "delete count: " + count);
         }
