@@ -144,19 +144,95 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        if (AccountUtils.isAccount(accountName)) {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.comment_action_menu, menu);
-            return true;
+        // You need an account to either reply or delete comments.
+        if (!AccountUtils.isAccount(accountName)) {
+            return false;
         }
-        return false;
+
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.comment_action_menu, menu);
+        return true;
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        if (!isActionModeValid()) {
+        boolean showReply = isReplyItemVisible();
+        boolean showDelete = isDeleteItemVisible();
+
+        // If both items are not visible then don't show the action mode.
+        if (!showReply && !showDelete) {
             mode.finish();
+            return true;
+        }
+
+        menu.findItem(R.id.menu_reply).setVisible(showReply);
+        menu.findItem(R.id.menu_delete).setVisible(showDelete);
+        return true;
+    }
+
+    private boolean isReplyItemVisible() {
+        // You need an account to reply to some comment.
+        if (!AccountUtils.isAccount(accountName)) {
+            return false;
+        }
+
+        // You can only reply to one comment at a time.
+        if (getListView().getCheckedItemCount() != 1) {
+            return false;
+        }
+
+        // The single comment must have a valid id.
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int count = adapter.getCount();
+        for (int i = 0; i < count; i++) {
+            if (checked.get(i)) {
+                String thingId = adapter.getString(i, CommentAdapter.INDEX_THING_ID);
+                return !TextUtils.isEmpty(thingId);
+            }
         }
         return true;
+    }
+
+    private boolean isDeleteItemVisible() {
+        // You need an account to delete items.
+        if (!AccountUtils.isAccount(accountName)) {
+            return false;
+        }
+
+        // We can delete as many items we want.
+        if (getListView().getCheckedItemCount() == 0) {
+            return false;
+        }
+
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int count = adapter.getCount();
+        for (int i = 0; i < count; i++) {
+            if (checked.get(i)) {
+
+                // All items must be authored by the current account.
+                String author = adapter.getString(i, CommentAdapter.INDEX_AUTHOR);
+                if (!author.equals(accountName)) {
+                    return false;
+                }
+
+                // All items must have a valid id.
+                String thingId = adapter.getString(i, CommentAdapter.INDEX_THING_ID);
+                if (TextUtils.isEmpty(thingId)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private int getFirstCheckedPosition() {
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int size = adapter.getCount();
+        for (int i = 0; i < size; i++) {
+            if (checked.get(i)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -218,27 +294,5 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             CommentAdapter.deleteSessionData(getActivity(), sessionId);
         }
         super.onDestroy();
-    }
-
-    private boolean isActionModeValid() {
-        if (!AccountUtils.isAccount(accountName)
-                || getListView().getCheckedItemCount() != 1) {
-            return false;
-        }
-
-        int position = getFirstCheckedPosition();
-        String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
-        return !TextUtils.isEmpty(thingId);
-    }
-
-    private int getFirstCheckedPosition() {
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        int size = adapter.getCount();
-        for (int i = 0; i < size; i++) {
-            if (checked.get(i)) {
-                return i;
-            }
-        }
-        return -1;
     }
 }
