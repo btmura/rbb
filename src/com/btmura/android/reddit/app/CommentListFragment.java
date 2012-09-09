@@ -126,14 +126,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         adapter.swapCursor(null);
     }
 
-    public void onCommentReply(String replyThingId, String text, Bundle extras) {
-        int nesting = extras.getInt(Comments.COLUMN_NESTING);
-        int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
-        long sessionCreationTime = extras.getLong(Comments.COLUMN_SESSION_TIMESTAMP);
-        CommentProvider.insertPlaceholderInBackground(getActivity(), accountName, text, nesting,
-                thingId, sequence, sessionId, sessionCreationTime, replyThingId);
-    }
-
     public void onVote(String thingId, int likes) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLike thingId: " + thingId + " likes: " + likes);
@@ -224,17 +216,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         return true;
     }
 
-    private int getFirstCheckedPosition() {
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        int size = adapter.getCount();
-        for (int i = 0; i < size; i++) {
-            if (checked.get(i)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_reply:
@@ -274,6 +255,25 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         }
 
         mode.finish();
+    }
+
+    private int getFirstCheckedPosition() {
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int size = adapter.getCount();
+        for (int i = 0; i < size; i++) {
+            if (checked.get(i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void onCommentReply(String replyThingId, String text, Bundle extras) {
+        int nesting = extras.getInt(Comments.COLUMN_NESTING);
+        int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
+        long sessionCreationTime = extras.getLong(Comments.COLUMN_SESSION_TIMESTAMP);
+        CommentProvider.insertPlaceholderInBackground(getActivity(), accountName, text, nesting,
+                thingId, sequence, sessionId, sessionCreationTime, replyThingId);
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
