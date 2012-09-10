@@ -89,7 +89,7 @@ public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
                     AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
 
             // Get all pending replies that have not been synced.
-            Cursor c = provider.query(CommentProvider.ACTIONS_CONTENT_URI, PROJECTION,
+            Cursor c = provider.query(CommentProvider.ACTIONS_URI, PROJECTION,
                     CommentActions.SELECTION_BY_ACCOUNT, Array.of(account.name),
                     CommentActions.SORT_BY_ID);
 
@@ -123,7 +123,7 @@ public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     if (!result.hasErrors()) {
                         syncResult.stats.numDeletes += provider.delete(
-                                CommentProvider.ACTIONS_CONTENT_URI,
+                                CommentProvider.ACTIONS_URI,
                                 CommentProvider.ID_SELECTION, Array.of(id));
                         count--;
                     } else if (BuildConfig.DEBUG) {

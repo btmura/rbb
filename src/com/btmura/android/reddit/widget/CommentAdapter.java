@@ -94,14 +94,14 @@ public class CommentAdapter extends BaseCursorAdapter {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
-                cr.delete(CommentProvider.CONTENT_URI, Comments.SELECTION_BY_SESSION_ID,
+                cr.delete(CommentProvider.COMMENTS_URI, Comments.SELECTION_BY_SESSION_ID,
                         Array.of(sessionId));
             }
         });
     }
 
     private static Uri getUri(String accountName, String sessionId, String thingId, boolean sync) {
-        return CommentProvider.CONTENT_URI.buildUpon()
+        return CommentProvider.COMMENTS_URI.buildUpon()
                 .appendQueryParameter(CommentProvider.PARAM_SYNC, Boolean.toString(sync))
                 .appendQueryParameter(CommentProvider.PARAM_ACCOUNT_NAME, accountName)
                 .appendQueryParameter(CommentProvider.PARAM_SESSION_ID, sessionId)
