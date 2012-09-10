@@ -37,8 +37,9 @@ public class VoteProvider extends BaseProvider {
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.votes";
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
-    public static final Uri CONTENT_URI = Uri.parse(VoteProvider.BASE_AUTHORITY_URI
-            + Votes.TABLE_NAME);
+    static final String PATH_ACTIONS = "actions";
+    public static final Uri ACTIONS_URI = Uri.parse(VoteProvider.BASE_AUTHORITY_URI
+            + PATH_ACTIONS);
 
     static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
             + VoteProvider.AUTHORITY + "." + Votes.TABLE_NAME;
@@ -48,11 +49,11 @@ public class VoteProvider extends BaseProvider {
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_ALL_VOTES = 1;
-    private static final int MATCH_ONE_VOTE = 2;
+    private static final int MATCH_ALL_ACTIONS = 1;
+    private static final int MATCH_ONE_ACTION = 2;
     static {
-        MATCHER.addURI(AUTHORITY, Votes.TABLE_NAME, MATCH_ALL_VOTES);
-        MATCHER.addURI(AUTHORITY, Votes.TABLE_NAME + "/#", MATCH_ONE_VOTE);
+        MATCHER.addURI(AUTHORITY, PATH_ACTIONS, MATCH_ALL_ACTIONS);
+        MATCHER.addURI(AUTHORITY, PATH_ACTIONS + "/#", MATCH_ONE_ACTION);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class VoteProvider extends BaseProvider {
         }
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ONE_VOTE:
+            case MATCH_ONE_ACTION:
                 selection = appendIdSelection(selection);
                 selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
@@ -102,7 +103,7 @@ public class VoteProvider extends BaseProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ONE_VOTE:
+            case MATCH_ONE_ACTION:
                 selection = appendIdSelection(selection);
                 selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
@@ -132,7 +133,7 @@ public class VoteProvider extends BaseProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ONE_VOTE:
+            case MATCH_ONE_ACTION:
                 selection = appendIdSelection(selection);
                 selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
@@ -158,10 +159,10 @@ public class VoteProvider extends BaseProvider {
     public String getType(Uri uri) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ALL_VOTES:
+            case MATCH_ALL_ACTIONS:
                 return MIME_TYPE_DIR;
 
-            case MATCH_ONE_VOTE:
+            case MATCH_ONE_ACTION:
                 return MIME_TYPE_ITEM;
 
             default:
@@ -181,7 +182,7 @@ public class VoteProvider extends BaseProvider {
                 values.put(Votes.COLUMN_THING_ID, thingId);
                 values.put(Votes.COLUMN_VOTE, likes);
 
-                Uri uri = CONTENT_URI.buildUpon()
+                Uri uri = ACTIONS_URI.buildUpon()
                         .appendQueryParameter(PARAM_NOTIFY_OTHERS,
                                 Boolean.toString(true))
                         .build();

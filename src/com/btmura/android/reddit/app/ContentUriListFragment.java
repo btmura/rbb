@@ -63,7 +63,7 @@ public class ContentUriListFragment extends ListFragment {
         adapter.add(CommentProvider.SESSIONS_URI);
         adapter.add(CommentProvider.ACTIONS_URI);
         adapter.add(SubredditSearchProvider.CONTENT_URI);
-        adapter.add(VoteProvider.CONTENT_URI);
+        adapter.add(VoteProvider.ACTIONS_URI);
         setListAdapter(adapter);
     }
 
