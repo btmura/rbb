@@ -23,7 +23,6 @@ import android.accounts.OperationCanceledException;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
@@ -42,7 +41,9 @@ public class ThingProvider extends SessionProvider {
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
-    public static final Uri CONTENT_URI = Uri.parse(BASE_AUTHORITY_URI);
+    static final String PATH_SESSIONS = "sessions";
+    public static final Uri SESSIONS_URI = Uri.parse(BASE_AUTHORITY_URI
+            + PATH_SESSIONS);
 
     public static final String PARAM_SYNC = "sync";
     public static final String PARAM_ACCOUNT = "account";
@@ -51,14 +52,6 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_FILTER = "filter";
     public static final String PARAM_MORE = "more";
     public static final String PARAM_QUERY = "query";
-
-    private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_ALL_THINGS = 1;
-    private static final int MATCH_ONE_THING = 2;
-    static {
-        MATCHER.addURI(AUTHORITY, Things.TABLE_NAME, MATCH_ALL_THINGS);
-        MATCHER.addURI(AUTHORITY, Things.TABLE_NAME + "/#", MATCH_ONE_THING);
-    }
 
     private static final String TABLE_NAME_WITH_VOTES = Things.TABLE_NAME
             + " LEFT OUTER JOIN (SELECT "

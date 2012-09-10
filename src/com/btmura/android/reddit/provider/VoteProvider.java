@@ -90,7 +90,7 @@ public class VoteProvider extends BaseProvider {
             cr.notifyChange(uri, null, true);
 
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
-                cr.notifyChange(ThingProvider.CONTENT_URI, null);
+                cr.notifyChange(ThingProvider.SESSIONS_URI, null);
                 cr.notifyChange(CommentProvider.SESSIONS_URI, null);
             }
             return ContentUris.withAppendedId(uri, id);
@@ -121,7 +121,7 @@ public class VoteProvider extends BaseProvider {
             cr.notifyChange(uri, null, true);
 
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
-                cr.notifyChange(ThingProvider.CONTENT_URI, null);
+                cr.notifyChange(ThingProvider.SESSIONS_URI, null);
                 cr.notifyChange(CommentProvider.SESSIONS_URI, null);
             }
         }
@@ -147,7 +147,7 @@ public class VoteProvider extends BaseProvider {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(uri, null);
             if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
-                cr.notifyChange(ThingProvider.CONTENT_URI, null);
+                cr.notifyChange(ThingProvider.SESSIONS_URI, null);
                 cr.notifyChange(CommentProvider.SESSIONS_URI, null);
             }
         }
