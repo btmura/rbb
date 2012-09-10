@@ -22,15 +22,15 @@
     <string name="add_front_page">Add front page</string>
     <string name="add_subreddit">Add subreddit</string>
     <string name="app_name">reddit by brian</string>
-    <string name="authority_comment_actions">com.btmura.android.reddit.provider.commentActions</string>
     <string name="authority_comments">com.btmura.android.reddit.provider.comments</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
     <string name="authority_subreddit_searches">com.btmura.android.reddit.provider.subredditsearches</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
     <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
     <string name="captcha_image">Captcha image</string>
-    <string name="captcha_guess">Type captcha</string>
+    <string name="captcha_guess">Type captcha</string>    
     <string name="comment_comment_status">"%1$s  %2$s ago"</string>
+    <string name="comment_deleted">[deleted]</string>
     <string name="comment_header_status">"%1$s  %2$s ago  %3$s"</string>
     <string name="comment_pending_comment_status">"%1$s"</string>
     <string name="comment_reply_title">Reply to %s</string>
@@ -71,8 +71,6 @@
     <string name="menu_submit_link">Submit link</string>
     <string name="menu_view_sidebar">View sidebar</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
-    <!-- Appear as "Comments" in sync settings. -->
-    <string name="provider_comment_actions">Comments</string>
     <string name="provider_comments">Comments</string>
     <string name="provider_subreddits">Subreddits</string>
     <string name="provider_subreddit_searches">Subreddit searches</string>

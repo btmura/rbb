@@ -39,7 +39,7 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
-import com.btmura.android.reddit.provider.CommentActionProvider;
+import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.util.Array;
 
 /**
@@ -48,14 +48,14 @@ import com.btmura.android.reddit.util.Array;
  * schedules a periodic sync when it needs to sync the remaining pending
  * replies.
  */
-public class CommentActionSyncAdapter extends AbstractThreadedSyncAdapter {
+public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
 
-    public static final String TAG = "CommentActionSyncAdapter";
+    public static final String TAG = "CommentSyncAdapter";
 
     public static class Service extends android.app.Service {
         @Override
         public IBinder onBind(Intent intent) {
-            return new CommentActionSyncAdapter(this).getSyncAdapterBinder();
+            return new CommentSyncAdapter(this).getSyncAdapterBinder();
         }
     }
 
@@ -64,15 +64,17 @@ public class CommentActionSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private static final String[] PROJECTION = {
             CommentActions._ID,
+            CommentActions.COLUMN_ACTION,
             CommentActions.COLUMN_THING_ID,
             CommentActions.COLUMN_TEXT,
     };
 
     private static final int INDEX_ID = 0;
-    private static final int INDEX_THING_ID = 1;
-    private static final int INDEX_TEXT = 2;
+    private static final int INDEX_ACTION = 1;
+    private static final int INDEX_THING_ID = 2;
+    private static final int INDEX_TEXT = 3;
 
-    public CommentActionSyncAdapter(Context context) {
+    public CommentSyncAdapter(Context context) {
         super(context, true);
     }
 
@@ -87,7 +89,7 @@ public class CommentActionSyncAdapter extends AbstractThreadedSyncAdapter {
                     AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
 
             // Get all pending replies that have not been synced.
-            Cursor c = provider.query(CommentActionProvider.CONTENT_URI, PROJECTION,
+            Cursor c = provider.query(CommentProvider.ACTIONS_CONTENT_URI, PROJECTION,
                     CommentActions.SELECTION_BY_ACCOUNT, Array.of(account.name),
                     CommentActions.SORT_BY_ID);
 
@@ -95,10 +97,12 @@ public class CommentActionSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Process one reply at a time to avoid rate limit.
             long id = -1;
+            int action = -1;
             String thingId = null;
             String text = null;
             if (c.moveToNext()) {
                 id = c.getLong(INDEX_ID);
+                action = c.getInt(INDEX_ACTION);
                 thingId = c.getString(INDEX_THING_ID);
                 text = c.getString(INDEX_TEXT);
             }
@@ -110,11 +114,17 @@ public class CommentActionSyncAdapter extends AbstractThreadedSyncAdapter {
             if (id != -1) {
                 try {
                     // Try to sync the comment with the server.
-                    Result result = RedditApi.comment(thingId, text, cookie, modhash);
+                    Result result = null;
+                    if (action == CommentActions.ACTION_INSERT) {
+                        result = RedditApi.comment(thingId, text, cookie, modhash);
+                    } else if (action == CommentActions.ACTION_DELETE) {
+                        result = RedditApi.delete(thingId, cookie, modhash);
+                    }
+
                     if (!result.hasErrors()) {
                         syncResult.stats.numDeletes += provider.delete(
-                                CommentActionProvider.CONTENT_URI,
-                                CommentActionProvider.ID_SELECTION, Array.of(id));
+                                CommentProvider.ACTIONS_CONTENT_URI,
+                                CommentProvider.ID_SELECTION, Array.of(id));
                         count--;
                     } else if (BuildConfig.DEBUG) {
                         result.logErrors(TAG);

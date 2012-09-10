@@ -106,6 +106,19 @@ public class RedditApi {
         }
     }
 
+    public static Result delete(String thingId, String cookie, String modhash) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            conn = connect(Urls.deleteApiUrl(), cookie, true);
+            writeFormData(conn, Urls.deleteApiQuery(thingId, modhash));
+            in = conn.getInputStream();
+            return ResponseParser.parseResponse(in);
+        } finally {
+            close(in, conn);
+        }
+    }
+
     public static Bitmap getCaptcha(String id) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;

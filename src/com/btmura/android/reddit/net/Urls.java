@@ -24,12 +24,14 @@ import java.net.URLEncoder;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
+// TODO: Fix this class to be thread safe.
 public class Urls {
 
     public static final String BASE_URL = "http://www.reddit.com";
     public static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
     private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
+    private static final String API_DELETE_URL = BASE_URL + "/api/del";
     private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
     private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
     private static final String API_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
@@ -64,6 +66,18 @@ public class Urls {
     public static URL commentsUrl(String id) {
         id = removeTag(id);
         return newUrl(resetBuilder().append(BASE_COMMENTS_URL).append(id).append(".json"));
+    }
+
+    public static URL deleteApiUrl() {
+        return newUrl(API_DELETE_URL);
+    }
+
+    public static String deleteApiQuery(String thingId, String modhash) {
+        StringBuilder b = resetBuilder();
+        b.append("id=").append(encode(thingId));
+        b.append("&uh=").append(encode(modhash));
+        b.append("&api_type=json");
+        return b.toString();
     }
 
     public static String loginCookie(String cookie) {

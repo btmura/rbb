@@ -110,11 +110,6 @@
             android:exported="false"
             android:label="@string/provider_comments" />
         <provider
-            android:name=".provider.CommentActionProvider"
-            android:authorities="@string/authority_comment_actions"
-            android:exported="false"
-            android:label="@string/provider_comment_actions" />
-        <provider
             android:name=".provider.SubredditProvider"
             android:authorities="@string/authority_subreddits"
             android:exported="false"
@@ -148,7 +143,7 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
-            android:name=".content.CommentActionSyncAdapter$Service"
+            android:name=".content.CommentSyncAdapter$Service"
             android:exported="true"
             android:permission="@string/permission_sync_accounts" >
             <intent-filter>
@@ -157,7 +152,7 @@
 
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/comment_action_sync_adapter" />
+                android:resource="@xml/comment_sync_adapter" />
         </service>
         <service
             android:name=".content.SubredditSyncAdapter$Service"

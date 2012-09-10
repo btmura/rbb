@@ -34,6 +34,7 @@ import android.util.JsonReader;
 import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.net.RedditApi;
@@ -48,12 +49,14 @@ class CommentListing extends JsonParser {
 
     private static final String[] PROJECTION = {
             CommentActions._ID,
+            CommentActions.COLUMN_ACTION,
             CommentActions.COLUMN_THING_ID,
             CommentActions.COLUMN_TEXT,
     };
 
-    private static final int INDEX_THING_ID = 1;
-    private static final int INDEX_TEXT = 2;
+    private static final int INDEX_ACTION = 1;
+    private static final int INDEX_THING_ID = 2;
+    private static final int INDEX_TEXT = 3;
 
     public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
     public long networkTimeMs;
@@ -197,8 +200,8 @@ class CommentListing extends JsonParser {
         // We don't support loading more comments right now.
         removeMoreComments();
 
-        // Merge pending replies that haven't been synced yet.
-        mergeReplies();
+        // Merge local inserts and deletes that haven't been synced yet.
+        mergeActions();
     }
 
     private void removeMoreComments() {
@@ -215,64 +218,115 @@ class CommentListing extends JsonParser {
         }
     }
 
-    private void mergeReplies() {
+    private void mergeActions() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(CommentActions.TABLE_NAME, PROJECTION,
                 CommentActions.SELECTION_BY_ACCOUNT_AND_PARENT_THING_ID,
                 Array.of(accountName, thingId),
                 null, null, CommentActions.SORT_BY_ID);
-
-        // TODO: Take into account the size of replies + values?
-
         try {
             while (c.moveToNext()) {
-                int size = values.size();
-                for (int i = 0; i < size; i++) {
-                    ContentValues v = values.get(i);
-                    String thingId = v.getAsString(Comments.COLUMN_THING_ID);
+                int action = c.getInt(INDEX_ACTION);
+                String id = c.getString(INDEX_THING_ID);
+                String text = c.getString(INDEX_TEXT);
+                switch (action) {
+                    case CommentActions.ACTION_INSERT:
+                        insertThing(id, text);
+                        break;
 
-                    // This thing could be a placeholder we previously inserted.
-                    if (TextUtils.isEmpty(thingId)) {
-                        continue;
-                    }
+                    case CommentActions.ACTION_DELETE:
+                        deleteThing(id);
+                        break;
 
-                    String replyId = c.getString(INDEX_THING_ID);
-                    if (thingId.equals(replyId)) {
-                        String body = c.getString(INDEX_TEXT);
-
-                        // TODO: Remove duplicate logic from
-                        // CommentListFragment.
-
-                        // Nest an additional level if this is a response to a
-                        // comment.
-                        int nesting = v.getAsInteger(Comments.COLUMN_NESTING);
-                        if (i != 0) {
-                            nesting++;
-                        }
-
-                        // Use the same sequence so this appears below.
-                        int sequence = v.getAsInteger(Comments.COLUMN_SEQUENCE);
-
-                        ContentValues p = new ContentValues(8);
-                        p.put(Comments.COLUMN_ACCOUNT, accountName);
-                        p.put(Comments.COLUMN_AUTHOR, accountName);
-                        p.put(Comments.COLUMN_BODY, body);
-                        p.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
-                        p.put(Comments.COLUMN_NESTING, nesting);
-                        p.put(Comments.COLUMN_SEQUENCE, sequence);
-                        p.put(Comments.COLUMN_SESSION_ID, sessionId);
-                        p.put(Comments.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
-
-                        // Insert the reply after this comment.
-                        values.add(i + 1, p);
-                        size++;
-                        i++;
-                    }
+                    default:
+                        throw new IllegalStateException();
                 }
-
             }
         } finally {
             c.close();
+        }
+    }
+
+    private void insertThing(String replyId, String body) {
+        int size = values.size();
+        for (int i = 0; i < size; i++) {
+            ContentValues v = values.get(i);
+            String id = v.getAsString(Comments.COLUMN_THING_ID);
+
+            // This thing could be a placeholder we previously inserted.
+            if (TextUtils.isEmpty(id)) {
+                continue;
+            }
+
+            if (id.equals(replyId)) {
+                // TODO: Remove duplicate logic from CommentListFragment.
+
+                // Nest an additional level if this is a response to a comment.
+                int nesting = v.getAsInteger(Comments.COLUMN_NESTING);
+                if (i != 0) {
+                    nesting++;
+                }
+
+                // Use the same sequence so this appears below.
+                int sequence = v.getAsInteger(Comments.COLUMN_SEQUENCE);
+
+                ContentValues p = new ContentValues(8);
+                p.put(Comments.COLUMN_ACCOUNT, accountName);
+                p.put(Comments.COLUMN_AUTHOR, accountName);
+                p.put(Comments.COLUMN_BODY, body);
+                p.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
+                p.put(Comments.COLUMN_NESTING, nesting);
+                p.put(Comments.COLUMN_SEQUENCE, sequence);
+                p.put(Comments.COLUMN_SESSION_ID, sessionId);
+                p.put(Comments.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
+
+                // Insert the reply after this comment.
+                values.add(i + 1, p);
+                size++;
+
+                // No reason a reply would appear twice so break out.
+                break;
+            }
+        }
+    }
+
+    private void deleteThing(String deleteId) {
+        String deleted = context.getString(R.string.comment_deleted);
+        int size = values.size();
+        for (int i = 0; i < size; i++) {
+            ContentValues v = values.get(i);
+            String id = v.getAsString(Comments.COLUMN_THING_ID);
+
+            // This thing could be a placeholder we previously inserted.
+            if (TextUtils.isEmpty(id)) {
+                continue;
+            }
+
+            if (deleteId.equals(id)) {
+                // Check nesting to see if there are children.
+                boolean hasChildren = false;
+                int childNesting = v.getAsInteger(Comments.COLUMN_NESTING) + 1;
+                for (int j = i + 1; j < size; j++) {
+                    ContentValues v2 = values.get(j);
+                    int nesting = v2.getAsInteger(Comments.COLUMN_NESTING);
+                    if (nesting == childNesting) {
+                        hasChildren = true;
+                        break;
+                    }
+                }
+
+                // If there are children then just change author and text.
+                // If there are NO children then remove the comment.
+                if (hasChildren) {
+                    v.put(Comments.COLUMN_AUTHOR, deleted);
+                    v.put(Comments.COLUMN_BODY, deleted);
+                } else {
+                    values.remove(i);
+                }
+
+                // No reason why we would need to delete twice so break out.
+                break;
+            }
         }
     }
 }

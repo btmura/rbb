@@ -26,7 +26,6 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.provider.CommentProvider;
-import com.btmura.android.reddit.provider.CommentActionProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.SubredditSearchProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -62,8 +61,8 @@ public class ContentUriListFragment extends ListFragment {
         adapter.add(SubredditProvider.CONTENT_URI);
         adapter.add(ThingProvider.CONTENT_URI);
         adapter.add(CommentProvider.CONTENT_URI);
+        adapter.add(CommentProvider.ACTIONS_CONTENT_URI);
         adapter.add(SubredditSearchProvider.CONTENT_URI);
-        adapter.add(CommentActionProvider.CONTENT_URI);
         adapter.add(VoteProvider.CONTENT_URI);
         setListAdapter(adapter);
     }

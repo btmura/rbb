@@ -219,15 +219,17 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_reply:
-                handleReply(mode);
-                return true;
+                return handleReply(mode);
+
+            case R.id.menu_delete:
+                return handleDelete(mode);
 
             default:
                 return false;
         }
     }
 
-    private void handleReply(ActionMode mode) {
+    private boolean handleReply(ActionMode mode) {
         int position = getFirstCheckedPosition();
         if (position != -1) {
             String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
@@ -244,7 +246,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             // Use the same sequence so this appears below the comment.
             int sequence = adapter.getInt(position, CommentAdapter.INDEX_SEQUENCE);
 
-            Bundle extras = new Bundle(2);
+            Bundle extras = new Bundle(3);
             extras.putInt(Comments.COLUMN_NESTING, nesting);
             extras.putInt(Comments.COLUMN_SEQUENCE, sequence);
             extras.putLong(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime);
@@ -255,6 +257,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         }
 
         mode.finish();
+        return true;
     }
 
     private int getFirstCheckedPosition() {
@@ -274,6 +277,26 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         long sessionCreationTime = extras.getLong(Comments.COLUMN_SESSION_TIMESTAMP);
         CommentProvider.insertPlaceholderInBackground(getActivity(), accountName, text, nesting,
                 thingId, sequence, sessionId, sessionCreationTime, replyThingId);
+    }
+
+    private boolean handleDelete(ActionMode mode) {
+        long[] ids = getListView().getCheckedItemIds();
+        String[] thingIds = getCheckedThingIds();
+        CommentProvider.deleteInBackground(getActivity(), accountName, thingId, ids, thingIds);
+        return true;
+    }
+
+    private String[] getCheckedThingIds() {
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        String[] thingIds = new String[getListView().getCheckedItemCount()];
+        int count = adapter.getCount();
+        int j = 0;
+        for (int i = 0; i < count; i++) {
+            if (checked.get(i)) {
+                thingIds[j++] = adapter.getString(i, CommentAdapter.INDEX_THING_ID);
+            }
+        }
+        return thingIds;
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
