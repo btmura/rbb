@@ -105,30 +105,9 @@
         </activity-alias>
 
         <provider
-            android:name=".provider.CommentProvider"
-            android:authorities="@string/authority_comments"
-            android:exported="false"
-            android:label="@string/provider_comments" />
-        <provider
-            android:name=".provider.SubredditProvider"
-            android:authorities="@string/authority_subreddits"
-            android:exported="false"
-            android:label="@string/provider_subreddits" />
-        <provider
-            android:name=".provider.SubredditSearchProvider"
-            android:authorities="@string/authority_subreddit_searches"
-            android:exported="false"
-            android:label="@string/provider_subreddit_searches" />
-        <provider
-            android:name=".provider.ThingProvider"
-            android:authorities="@string/authority_things"
-            android:exported="false"
-            android:label="@string/provider_things" />
-        <provider
-            android:name=".provider.VoteProvider"
-            android:authorities="@string/authority_votes"
-            android:exported="false"
-            android:label="@string/provider_votes" />
+            android:name=".provider.Provider"
+            android:authorities="@string/provider_authorities"
+            android:exported="false" />
 
         <service
             android:name=".accounts.AccountAuthenticatorService"

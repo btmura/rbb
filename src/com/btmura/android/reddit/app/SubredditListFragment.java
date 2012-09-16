@@ -41,7 +41,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
@@ -261,7 +261,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
                 values[j++].put(Subreddits.COLUMN_NAME, adapter.getName(i));
             }
         }
-        SubredditProvider.addMultipleSubredditsInBackground(getActivity(), values);
+        Provider.addMultipleSubredditsInBackground(getActivity(), values);
         mode.finish();
     }
 
@@ -277,7 +277,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
                 }
             }
         }
-        SubredditProvider.combineInBackground(getActivity(), names, null);
+        Provider.combineSubredditsInBackground(getActivity(), names, null);
         mode.finish();
     }
 
@@ -290,20 +290,20 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         }
 
         long[] ids = getListView().getCheckedItemIds();
-        SubredditProvider.combineInBackground(getActivity(), names, ids);
+        Provider.combineSubredditsInBackground(getActivity(), names, ids);
         mode.finish();
     }
 
     private void handleSplit(ActionMode mode) {
         ArrayList<String> names = getCheckedNames();
         long[] ids = getListView().getCheckedItemIds();
-        SubredditProvider.splitInBackground(getActivity(), names.get(0), ids[0]);
+        Provider.splitSubredditsInBackground(getActivity(), names.get(0), ids[0]);
         mode.finish();
     }
 
     private void handleDelete(ActionMode mode) {
         long[] ids = getListView().getCheckedItemIds();
-        SubredditProvider.deleteInBackground(getActivity(), getAccountName(), ids);
+        Provider.deleteSubredditInBackground(getActivity(), getAccountName(), ids);
         mode.finish();
     }
 

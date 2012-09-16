@@ -39,8 +39,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.CommentReplyFragment.OnCommentReplyListener;
 import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.provider.CommentProvider;
-import com.btmura.android.reddit.provider.VoteProvider;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
@@ -131,7 +130,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             Log.d(TAG, "onLike thingId: " + thingId + " likes: " + likes);
         }
         if (!TextUtils.isEmpty(accountName)) {
-            VoteProvider.voteInBackground(getActivity(), accountName, thingId, likes);
+            Provider.voteInBackground(getActivity(), accountName, thingId, likes);
         }
     }
 
@@ -275,14 +274,14 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         int nesting = extras.getInt(Comments.COLUMN_NESTING);
         int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
         long sessionCreationTime = extras.getLong(Comments.COLUMN_SESSION_TIMESTAMP);
-        CommentProvider.insertPlaceholderInBackground(getActivity(), accountName, text, nesting,
+        Provider.insertCommentPlaceholderInBackground(getActivity(), accountName, text, nesting,
                 thingId, sequence, sessionId, sessionCreationTime, replyThingId);
     }
 
     private boolean handleDelete(ActionMode mode) {
         long[] ids = getListView().getCheckedItemIds();
         String[] thingIds = getCheckedThingIds();
-        CommentProvider.deleteInBackground(getActivity(), accountName, thingId, ids, thingIds);
+        Provider.deleteCommentInBackground(getActivity(), accountName, thingId, ids, thingIds);
         return true;
     }
 

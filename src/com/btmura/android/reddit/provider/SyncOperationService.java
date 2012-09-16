@@ -59,7 +59,7 @@ public class SyncOperationService extends IntentService {
 
         ContentResolver cr = getContentResolver();
         String type = cr.getType(intent.getData());
-        if (SubredditProvider.MIME_TYPE_ITEM.equals(type)) {
+        if (Provider.SUBREDDITS_MIME_TYPE_ITEM.equals(type)) {
             syncSubredditOp(intent);
         }
     }

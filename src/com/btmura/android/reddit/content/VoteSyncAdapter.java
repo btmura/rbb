@@ -41,7 +41,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.provider.VoteProvider;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Array;
 
 /**
@@ -84,7 +84,7 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
                     AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
 
             // Get all pending votes for this account that haven't been synced.
-            Cursor c = provider.query(VoteProvider.ACTIONS_URI, PROJECTION,
+            Cursor c = provider.query(Provider.VOTE_ACTIONS_URI, PROJECTION,
                     Votes.SELECTION_BY_ACCOUNT, Array.of(account.name), null);
 
             ArrayList<ContentProviderOperation> ops =
@@ -98,8 +98,8 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
                 // deletion of the database row.
                 try {
                     RedditApi.vote(getContext(), thingId, vote, cookie, modhash);
-                    ops.add(ContentProviderOperation.newDelete(VoteProvider.ACTIONS_URI)
-                            .withSelection(VoteProvider.ID_SELECTION, Array.of(id))
+                    ops.add(ContentProviderOperation.newDelete(Provider.VOTE_ACTIONS_URI)
+                            .withSelection(Provider.ID_SELECTION, Array.of(id))
                             .build());
                 } catch (IOException e) {
                     Log.e(TAG, e.getMessage(), e);

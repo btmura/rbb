@@ -31,14 +31,14 @@ import android.view.MenuItem;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.Provider;
 
 public class SettingsActivity extends PreferenceActivity implements LoaderCallbacks<AccountResult> {
 
     public static final String TAG = "SettingsActivity";
 
     private static final String[] AUTHORITIES = {
-            SubredditProvider.AUTHORITY,
+            Provider.SUBREDDITS_AUTHORITY,
     };
 
     private AccountResult result;

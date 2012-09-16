@@ -40,7 +40,8 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.util.Array;
 
 public class AccountPreferenceFragment extends PreferenceFragment {
 
@@ -58,7 +59,7 @@ public class AccountPreferenceFragment extends PreferenceFragment {
 
         // TODO: Figure out to specify extras in the XML.
         Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
-        intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {SubredditProvider.AUTHORITY});
+        intent.putExtra(Settings.EXTRA_AUTHORITIES, Array.of(Provider.SUBREDDITS_AUTHORITY));
 
         Preference pref = new Preference(getActivity());
         pref.setTitle(R.string.settings_sync_settings);
