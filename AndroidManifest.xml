@@ -106,7 +106,7 @@
 
         <provider
             android:name=".provider.Provider"
-            android:authorities="@string/provider_authorities"
+            android:authorities="@string/provider_authority"
             android:exported="false" />
 
         <service
