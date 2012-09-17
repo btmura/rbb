@@ -16,7 +16,12 @@
 
 package com.btmura.android.reddit.content;
 
+import java.io.IOException;
+
 import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
@@ -24,8 +29,13 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
+
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
+
+    public static final String TAG = "SyncAdapter";
 
     public static class Service extends android.app.Service {
         @Override
@@ -41,8 +51,34 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
             ContentProviderClient provider, SyncResult syncResult) {
-        SubredditSyncAdapter.sync(getContext(), account, authority, provider, syncResult);
-        CommentSyncAdapter.sync(getContext(), account, authority, provider, syncResult);
-        VoteSyncAdapter.sync(getContext(), account, authority, provider, syncResult);
+        try {
+            AccountManager manager = AccountManager.get(getContext());
+            String cookie = manager.blockingGetAuthToken(account,
+                    AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
+            String modhash = manager.blockingGetAuthToken(account,
+                    AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
+
+            if (cookie == null || modhash == null) {
+                syncResult.stats.numAuthExceptions++;
+                return;
+            }
+
+            SubredditSyncAdapter.sync(getContext(), account, cookie, provider,
+                    syncResult);
+            CommentSyncAdapter.sync(getContext(), account, cookie, modhash, authority, provider,
+                    syncResult);
+            VoteSyncAdapter.sync(getContext(), account, cookie, modhash, authority, provider,
+                    syncResult);
+
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.stats.numAuthExceptions++;
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.stats.numAuthExceptions++;
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.stats.numIoExceptions++;
+        }
     }
 }

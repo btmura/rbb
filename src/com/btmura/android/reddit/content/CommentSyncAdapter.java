@@ -19,9 +19,6 @@ package com.btmura.android.reddit.content;
 import java.io.IOException;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
@@ -33,7 +30,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
@@ -65,15 +61,9 @@ class CommentSyncAdapter {
     private static final int INDEX_THING_ID = 2;
     private static final int INDEX_TEXT = 3;
 
-    static void sync(Context context, Account account, String authority,
-            ContentProviderClient provider, SyncResult syncResult) {
+    static void sync(Context context, Account account, String cookie, String modhash,
+            String authority, ContentProviderClient provider, SyncResult syncResult) {
         try {
-            AccountManager manager = AccountManager.get(context);
-            String cookie = manager.blockingGetAuthToken(account,
-                    AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
-            String modhash = manager.blockingGetAuthToken(account,
-                    AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
-
             // Get all pending replies that have not been synced.
             Cursor c = provider.query(Provider.COMMENT_ACTIONS_URI, PROJECTION,
                     CommentActions.SELECTION_BY_ACCOUNT, Array.of(account.name),
@@ -159,15 +149,6 @@ class CommentSyncAdapter {
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
             syncResult.databaseError = true;
-        } catch (OperationCanceledException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.stats.numAuthExceptions++;
-        } catch (AuthenticatorException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.stats.numAuthExceptions++;
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.stats.numIoExceptions++;
         }
 
         if (BuildConfig.DEBUG) {

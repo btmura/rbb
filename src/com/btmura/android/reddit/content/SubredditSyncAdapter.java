@@ -21,9 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.Context;
@@ -34,7 +31,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.Provider;
@@ -56,7 +52,7 @@ class SubredditSyncAdapter {
     private static final int INDEX_STATE = 2;
     private static final int INDEX_EXPIRATION = 3;
 
-    static void sync(Context context, Account account, String authority,
+    static void sync(Context context, Account account, String cookie,
             ContentProviderClient provider, SyncResult syncResult) {
 
         int numInserts = 0;
@@ -64,14 +60,9 @@ class SubredditSyncAdapter {
         int numDeletes = 0;
         int numEntries = 0;
 
-        AccountManager manager = AccountManager.get(context);
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 
         try {
-            String cookie = manager.blockingGetAuthToken(account,
-                    AccountAuthenticator.AUTH_TOKEN_COOKIE,
-                    true);
-
             ArrayList<String> subreddits = RedditApi.getSubreddits(cookie);
 
             Cursor c = provider.query(Provider.SUBREDDITS_URI, PROJECTION,
@@ -134,12 +125,6 @@ class SubredditSyncAdapter {
             syncResult.stats.numDeletes += numDeletes;
             syncResult.stats.numEntries += numEntries;
 
-        } catch (OperationCanceledException e) {
-            Log.e(TAG, "onPerformSync", e);
-            syncResult.stats.numAuthExceptions++;
-        } catch (AuthenticatorException e) {
-            Log.e(TAG, "onPerformSync", e);
-            syncResult.stats.numAuthExceptions++;
         } catch (IOException e) {
             Log.e(TAG, "onPerformSync", e);
             syncResult.stats.numIoExceptions++;
