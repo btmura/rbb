@@ -43,7 +43,7 @@ import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.content.SubredditSyncAdapter;
+import com.btmura.android.reddit.content.SyncAdapter;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.LoginResult;
 import com.btmura.android.reddit.provider.Provider;
@@ -178,7 +178,7 @@ public class AddAccountFragment extends Fragment implements
                 }
 
                 publishProgress(R.string.login_importing_subreddits);
-                SubredditSyncAdapter.initializeAccount(getActivity(), login, result.cookie);
+                SyncAdapter.initializeAccount(getActivity(), login, result.cookie);
 
                 publishProgress(R.string.login_adding_account);
 
@@ -191,9 +191,7 @@ public class AddAccountFragment extends Fragment implements
                 manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH,
                         result.modhash);
 
-                ContentResolver.setSyncAutomatically(account, Provider.SUBREDDITS_AUTHORITY, true);
-                ContentResolver.setSyncAutomatically(account, Provider.COMMENTS_AUTHORITY, true);
-                ContentResolver.setSyncAutomatically(account, Provider.VOTES_AUTHORITY, true);
+                ContentResolver.setSyncAutomatically(account, Provider.AUTHORITY, true);
 
                 Bundle b = new Bundle(2);
                 b.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);

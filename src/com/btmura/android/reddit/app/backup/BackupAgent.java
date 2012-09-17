@@ -101,7 +101,7 @@ public class BackupAgent extends android.app.backup.BackupAgent {
                     .withValue(Subreddits.COLUMN_NAME, in.readUTF()).build());
         }
         try {
-            getContentResolver().applyBatch(Provider.SUBREDDITS_AUTHORITY, ops);
+            getContentResolver().applyBatch(Provider.AUTHORITY, ops);
         } catch (RemoteException e) {
             throw new IOException(e);
         } catch (OperationApplicationException e) {

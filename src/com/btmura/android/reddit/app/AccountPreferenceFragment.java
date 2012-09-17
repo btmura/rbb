@@ -59,7 +59,7 @@ public class AccountPreferenceFragment extends PreferenceFragment {
 
         // TODO: Figure out to specify extras in the XML.
         Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
-        intent.putExtra(Settings.EXTRA_AUTHORITIES, Array.of(Provider.SUBREDDITS_AUTHORITY));
+        intent.putExtra(Settings.EXTRA_AUTHORITIES, Array.of(Provider.AUTHORITY));
 
         Preference pref = new Preference(getActivity());
         pref.setTitle(R.string.settings_sync_settings);

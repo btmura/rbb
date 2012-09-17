@@ -28,12 +28,9 @@ import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.Context;
-import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.database.Cursor;
-import android.os.Bundle;
-import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -48,16 +45,9 @@ import com.btmura.android.reddit.util.Array;
  * {@link AbstractThreadedSyncAdapter} that syncs pending votes to the reddit
  * backend servers.
  */
-public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
+class VoteSyncAdapter {
 
     public static final String TAG = "VoteSyncAdapter";
-
-    public static class Service extends android.app.Service {
-        @Override
-        public IBinder onBind(Intent intent) {
-            return new VoteSyncAdapter(this).getSyncAdapterBinder();
-        }
-    }
 
     private static final String[] PROJECTION = {
             Votes._ID,
@@ -69,15 +59,10 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INDEX_THING_ID = 1;
     private static final int INDEX_VOTE = 2;
 
-    public VoteSyncAdapter(Context context) {
-        super(context, true);
-    }
-
-    @Override
-    public void onPerformSync(Account account, Bundle extras, String authority,
+    static void sync(Context context, Account account, String authority,
             ContentProviderClient provider, SyncResult syncResult) {
         try {
-            AccountManager manager = AccountManager.get(getContext());
+            AccountManager manager = AccountManager.get(context);
             String cookie = manager.blockingGetAuthToken(account,
                     AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
             String modhash = manager.blockingGetAuthToken(account,
@@ -97,7 +82,7 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
                 // Sync the vote with the server. If successful then schedule
                 // deletion of the database row.
                 try {
-                    RedditApi.vote(getContext(), thingId, vote, cookie, modhash);
+                    RedditApi.vote(context, thingId, vote, cookie, modhash);
                     ops.add(ContentProviderOperation.newDelete(Provider.VOTE_ACTIONS_URI)
                             .withSelection(Provider.ID_SELECTION, Array.of(id))
                             .build());

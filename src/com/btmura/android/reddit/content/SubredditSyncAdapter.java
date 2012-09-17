@@ -24,17 +24,12 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.database.Cursor;
-import android.os.Bundle;
-import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -45,16 +40,9 @@ import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Array;
 
-public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
+class SubredditSyncAdapter {
 
     public static final String TAG = "SubredditSyncAdapter";
-
-    public static class Service extends android.app.Service {
-        @Override
-        public IBinder onBind(Intent intent) {
-            return new SubredditSyncAdapter(this).getSyncAdapterBinder();
-        }
-    }
 
     private static final String[] PROJECTION = {
             Subreddits._ID,
@@ -68,12 +56,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INDEX_STATE = 2;
     private static final int INDEX_EXPIRATION = 3;
 
-    public SubredditSyncAdapter(Context context) {
-        super(context, true);
-    }
-
-    @Override
-    public void onPerformSync(Account account, Bundle extras, String authority,
+    static void sync(Context context, Account account, String authority,
             ContentProviderClient provider, SyncResult syncResult) {
 
         int numInserts = 0;
@@ -81,7 +64,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         int numDeletes = 0;
         int numEntries = 0;
 
-        AccountManager manager = AccountManager.get(getContext());
+        AccountManager manager = AccountManager.get(context);
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 
         try {
@@ -144,8 +127,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
 
-            ContentResolver cr = getContext().getContentResolver();
-            cr.applyBatch(Provider.SUBREDDITS_AUTHORITY, ops);
+            provider.applyBatch(ops);
 
             syncResult.stats.numInserts += numInserts;
             syncResult.stats.numUpdates += numUpdates;
@@ -172,32 +154,6 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "accountName: " + account.name + " syncResult: " + syncResult.toString());
         }
-    }
-
-    public static void initializeAccount(Context context, String login, String cookie)
-            throws RemoteException, OperationApplicationException, IOException {
-        ArrayList<String> subreddits = RedditApi.getSubreddits(cookie);
-        int count = subreddits.size();
-
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
-                count + 2);
-        ops.add(ContentProviderOperation.newDelete(Provider.SUBREDDITS_URI)
-                .withSelection(Subreddits.SELECTION_ACCOUNT, new String[] {login})
-                .build());
-        ops.add(ContentProviderOperation.newInsert(Provider.SUBREDDITS_URI)
-                .withValue(Subreddits.COLUMN_ACCOUNT, login)
-                .withValue(Subreddits.COLUMN_NAME, Subreddits.NAME_FRONT_PAGE)
-                .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
-                .build());
-        for (int i = 0; i < count; i++) {
-            ops.add(ContentProviderOperation.newInsert(Provider.SUBREDDITS_URI)
-                    .withValue(Subreddits.COLUMN_ACCOUNT, login)
-                    .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
-                    .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
-                    .build());
-        }
-        ContentResolver cr = context.getContentResolver();
-        cr.applyBatch(Provider.SUBREDDITS_AUTHORITY, ops);
     }
 
     private static int find(List<String> subreddits, String name) {

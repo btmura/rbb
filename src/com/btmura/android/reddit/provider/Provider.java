@@ -20,17 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.CommentActions;
-import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.database.SubredditSearches;
-import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.database.Votes;
-import com.btmura.android.reddit.util.Array;
-
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.backup.BackupManager;
@@ -53,18 +42,22 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.SubredditSearches;
+import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.database.Votes;
+import com.btmura.android.reddit.util.Array;
+
 public class Provider extends SessionProvider {
 
     public static final String TAG = "Provider";
 
-    static final String BASE_AUTHORITY = "com.btmura.android.reddit.provider.";
-    public static final String SUBREDDITS_AUTHORITY = BASE_AUTHORITY + "subreddits";
-    public static final String THINGS_AUTHORITY = BASE_AUTHORITY + "things";
-    public static final String COMMENTS_AUTHORITY = BASE_AUTHORITY + "comments";
-    public static final String VOTES_AUTHORITY = BASE_AUTHORITY + "votes";
-
-    private static final String ACTIONS_PATH = "actions";
-    private static final String SESSIONS_PATH = "sessions";
+    public static final String AUTHORITY = "com.btmura.android.reddit.provider";
 
     public static final String ACCOUNT_PARAM = "account";
     public static final String FILTER_PARAM = "filter";
@@ -85,43 +78,44 @@ public class Provider extends SessionProvider {
 
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
-    public static final Uri SUBREDDITS_URI = Uri.parse("content://" + SUBREDDITS_AUTHORITY
-            + "/" + Subreddits.TABLE_NAME);
-    public static final Uri SUBREDDIT_SEARCHES_URI = Uri.parse("content://" + SUBREDDITS_AUTHORITY
-            + "/" + SubredditSearches.TABLE_NAME);
-    public static final Uri THING_SESSIONS_URI = Uri.parse("content://" + THINGS_AUTHORITY
-            + "/" + SESSIONS_PATH);
-    public static final Uri COMMENT_ACTIONS_URI = Uri.parse("content://" + COMMENTS_AUTHORITY
-            + "/" + ACTIONS_PATH);
-    public static final Uri COMMENT_SESSIONS_URI = Uri.parse("content://" + COMMENTS_AUTHORITY
-            + "/" + SESSIONS_PATH);
-    public static final Uri VOTE_ACTIONS_URI = Uri.parse("content://" + VOTES_AUTHORITY
-            + "/" + ACTIONS_PATH);
+    static final String BASE_URI = "content://" + AUTHORITY;
+    public static final Uri SUBREDDITS_URI = Uri.parse(BASE_URI + "/subreddits");
+    public static final Uri SUBREDDIT_SEARCHES_URI = Uri.parse(BASE_URI + "/subreddits/search");
+    public static final Uri THING_SESSIONS_URI = Uri.parse(BASE_URI + "/things/sessions");
+    public static final Uri COMMENT_ACTIONS_URI = Uri.parse(BASE_URI + "/comments/actions");
+    public static final Uri COMMENT_SESSIONS_URI = Uri.parse(BASE_URI + "/comments/sessions");
+    public static final Uri VOTE_ACTIONS_URI = Uri.parse(BASE_URI + "/votes/actions");
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_ALL_SUBREDDITS = 1;
-    private static final int MATCH_ONE_SUBREDDIT = 2;
-    private static final int MATCH_SUBREDDIT_SEARCH = 3;
-    private static final int MATCH_THING_SESSIONS = 4;
-    private static final int MATCH_COMMENT_ACTIONS = 5;
-    private static final int MATCH_COMMENT_SESSIONS = 6;
-    private static final int MATCH_ALL_VOTE_ACTIONS = 7;
-    private static final int MATCH_ONE_VOTE_ACTION = 8;
+    private static final int MATCH_SUBREDDIT_DIR = 1;
+    private static final int MATCH_SUBREDDIT_ITEM = 2;
+    private static final int MATCH_SUBREDDIT_SEARCH_DIR = 3;
+    private static final int MATCH_THING_SESSION_DIR = 4;
+    private static final int MATCH_THING_SESSION_ITEM = 5;
+    private static final int MATCH_COMMENT_ACTION_DIR = 6;
+    private static final int MATCH_COMMENT_ACTION_ITEM = 7;
+    private static final int MATCH_COMMENT_SESSION_DIR = 8;
+    private static final int MATCH_COMMENT_SESSION_ITEM = 9;
+    private static final int MATCH_VOTE_ACTION_DIR = 10;
+    private static final int MATCH_VOTE_ACTION_ITEM = 11;
     static {
-        MATCHER.addURI(SUBREDDITS_AUTHORITY, Subreddits.TABLE_NAME, MATCH_ALL_SUBREDDITS);
-        MATCHER.addURI(SUBREDDITS_AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
-        MATCHER.addURI(SUBREDDITS_AUTHORITY, SubredditSearches.TABLE_NAME, MATCH_SUBREDDIT_SEARCH);
-        MATCHER.addURI(THINGS_AUTHORITY, SESSIONS_PATH, MATCH_THING_SESSIONS);
-        MATCHER.addURI(COMMENTS_AUTHORITY, ACTIONS_PATH, MATCH_COMMENT_ACTIONS);
-        MATCHER.addURI(COMMENTS_AUTHORITY, SESSIONS_PATH, MATCH_COMMENT_SESSIONS);
-        MATCHER.addURI(VOTES_AUTHORITY, ACTIONS_PATH, MATCH_ALL_VOTE_ACTIONS);
-        MATCHER.addURI(VOTES_AUTHORITY, ACTIONS_PATH + "/#", MATCH_ONE_VOTE_ACTION);
+        MATCHER.addURI(AUTHORITY, "subreddits", MATCH_SUBREDDIT_DIR);
+        MATCHER.addURI(AUTHORITY, "subreddits/#", MATCH_SUBREDDIT_ITEM);
+        MATCHER.addURI(AUTHORITY, "subreddits/search", MATCH_SUBREDDIT_SEARCH_DIR);
+        MATCHER.addURI(AUTHORITY, "things/sessions", MATCH_THING_SESSION_DIR);
+        MATCHER.addURI(AUTHORITY, "things/sessions/#", MATCH_THING_SESSION_ITEM);
+        MATCHER.addURI(AUTHORITY, "comments/actions", MATCH_COMMENT_ACTION_DIR);
+        MATCHER.addURI(AUTHORITY, "comments/actions/#", MATCH_COMMENT_ACTION_ITEM);
+        MATCHER.addURI(AUTHORITY, "comments/sessions", MATCH_COMMENT_SESSION_DIR);
+        MATCHER.addURI(AUTHORITY, "comments/sessions/#", MATCH_COMMENT_SESSION_ITEM);
+        MATCHER.addURI(AUTHORITY, "votes/actions", MATCH_VOTE_ACTION_DIR);
+        MATCHER.addURI(AUTHORITY, "votes/actions/#", MATCH_VOTE_ACTION_ITEM);
     }
 
-    static final String SUBREDDITS_MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
-            + SUBREDDITS_AUTHORITY + "." + Subreddits.TABLE_NAME;
-    static final String SUBREDDITS_MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
-            + SUBREDDITS_AUTHORITY + "." + Subreddits.TABLE_NAME;
+    static final String BASE_MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE
+            + "/" + AUTHORITY + ".";
+    static final String BASE_MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE
+            + "/" + AUTHORITY + ".";
 
     private static final String THINGS_WITH_VOTES = Things.TABLE_NAME
             + " LEFT OUTER JOIN (SELECT "
@@ -148,8 +142,11 @@ public class Provider extends SessionProvider {
 
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ONE_SUBREDDIT:
-            case MATCH_ONE_VOTE_ACTION:
+            case MATCH_SUBREDDIT_ITEM:
+            case MATCH_THING_SESSION_ITEM:
+            case MATCH_COMMENT_ACTION_ITEM:
+            case MATCH_COMMENT_SESSION_ITEM:
+            case MATCH_VOTE_ACTION_ITEM:
                 selection = appendIdSelection(selection);
                 selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
@@ -196,8 +193,11 @@ public class Provider extends SessionProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ONE_SUBREDDIT:
-            case MATCH_ONE_VOTE_ACTION:
+            case MATCH_SUBREDDIT_ITEM:
+            case MATCH_THING_SESSION_ITEM:
+            case MATCH_COMMENT_ACTION_ITEM:
+            case MATCH_COMMENT_SESSION_ITEM:
+            case MATCH_VOTE_ACTION_ITEM:
                 selection = appendIdSelection(selection);
                 selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
@@ -228,7 +228,11 @@ public class Provider extends SessionProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ONE_SUBREDDIT:
+            case MATCH_SUBREDDIT_ITEM:
+            case MATCH_THING_SESSION_ITEM:
+            case MATCH_COMMENT_ACTION_ITEM:
+            case MATCH_COMMENT_SESSION_ITEM:
+            case MATCH_VOTE_ACTION_ITEM:
                 selection = appendIdSelection(selection);
                 selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
                 break;
@@ -265,11 +269,31 @@ public class Provider extends SessionProvider {
     public String getType(Uri uri) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ALL_SUBREDDITS:
-                return SUBREDDITS_MIME_TYPE_DIR;
+            case MATCH_SUBREDDIT_DIR:
+            case MATCH_SUBREDDIT_SEARCH_DIR:
+                return BASE_MIME_TYPE_DIR + "subreddits";
+            case MATCH_SUBREDDIT_ITEM:
+                return BASE_MIME_TYPE_ITEM + "subreddits";
 
-            case MATCH_ONE_SUBREDDIT:
-                return SUBREDDITS_MIME_TYPE_ITEM;
+            case MATCH_THING_SESSION_DIR:
+                return BASE_MIME_TYPE_DIR + "things";
+            case MATCH_THING_SESSION_ITEM:
+                return BASE_MIME_TYPE_ITEM + "things";
+
+            case MATCH_COMMENT_ACTION_DIR:
+                return BASE_MIME_TYPE_DIR + "commentActions";
+            case MATCH_COMMENT_ACTION_ITEM:
+                return BASE_MIME_TYPE_ITEM + "commentActions";
+
+            case MATCH_COMMENT_SESSION_DIR:
+                return BASE_MIME_TYPE_DIR + "comments";
+            case MATCH_COMMENT_SESSION_ITEM:
+                return BASE_MIME_TYPE_ITEM + "comments";
+
+            case MATCH_VOTE_ACTION_DIR:
+                return BASE_MIME_TYPE_DIR + "votes";
+            case MATCH_VOTE_ACTION_ITEM:
+                return BASE_MIME_TYPE_ITEM + "votes";
 
             default:
                 return null;
@@ -296,7 +320,7 @@ public class Provider extends SessionProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    ContentProviderResult[] r = cr.applyBatch(SUBREDDITS_AUTHORITY, ops);
+                    ContentProviderResult[] r = cr.applyBatch(AUTHORITY, ops);
                     startSyncOperation(context, accountName, r[1].uri);
                 } catch (RemoteException e) {
                     Log.e(TAG, "addInBackground", e);
@@ -332,7 +356,7 @@ public class Provider extends SessionProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    cr.applyBatch(SUBREDDITS_AUTHORITY, ops);
+                    cr.applyBatch(AUTHORITY, ops);
                     startSyncOperation(context, accountName, uris);
                 } catch (RemoteException e) {
                     Log.e(TAG, "deleteInBackground", e);
@@ -378,7 +402,7 @@ public class Provider extends SessionProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    cr.applyBatch(SUBREDDITS_AUTHORITY, ops);
+                    cr.applyBatch(AUTHORITY, ops);
                 } catch (RemoteException e) {
                     Log.e(TAG, "combineInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -418,7 +442,7 @@ public class Provider extends SessionProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    cr.applyBatch(SUBREDDITS_AUTHORITY, ops);
+                    cr.applyBatch(AUTHORITY, ops);
                 } catch (RemoteException e) {
                     Log.e(TAG, "splitInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -536,7 +560,7 @@ public class Provider extends SessionProvider {
 
                 ContentResolver cr = appContext.getContentResolver();
                 try {
-                    cr.applyBatch(COMMENTS_AUTHORITY, ops);
+                    cr.applyBatch(AUTHORITY, ops);
                 } catch (RemoteException e) {
                     Log.e(TAG, e.getMessage(), e);
                 } catch (OperationApplicationException e) {
@@ -574,24 +598,24 @@ public class Provider extends SessionProvider {
     private String getTableName(Uri uri, boolean joinVotes) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_ALL_SUBREDDITS:
-            case MATCH_ONE_SUBREDDIT:
+            case MATCH_SUBREDDIT_DIR:
+            case MATCH_SUBREDDIT_ITEM:
                 return Subreddits.TABLE_NAME;
 
-            case MATCH_SUBREDDIT_SEARCH:
+            case MATCH_SUBREDDIT_SEARCH_DIR:
                 return SubredditSearches.TABLE_NAME;
 
-            case MATCH_THING_SESSIONS:
+            case MATCH_THING_SESSION_DIR:
                 return joinVotes ? THINGS_WITH_VOTES : Things.TABLE_NAME;
 
-            case MATCH_COMMENT_ACTIONS:
+            case MATCH_COMMENT_ACTION_DIR:
                 return CommentActions.TABLE_NAME;
 
-            case MATCH_COMMENT_SESSIONS:
+            case MATCH_COMMENT_SESSION_DIR:
                 return joinVotes ? COMMENTS_WITH_VOTES : Comments.TABLE_NAME;
 
-            case MATCH_ALL_VOTE_ACTIONS:
-            case MATCH_ONE_VOTE_ACTION:
+            case MATCH_VOTE_ACTION_DIR:
+            case MATCH_VOTE_ACTION_ITEM:
                 return Votes.TABLE_NAME;
 
             default:
@@ -602,15 +626,15 @@ public class Provider extends SessionProvider {
     private void processQueryUri(Uri uri) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_SUBREDDIT_SEARCH:
+            case MATCH_SUBREDDIT_SEARCH_DIR:
                 processSubredditSearchQuery(uri);
                 break;
 
-            case MATCH_THING_SESSIONS:
+            case MATCH_THING_SESSION_DIR:
                 processThingQuery(uri);
                 break;
 
-            case MATCH_COMMENT_SESSIONS:
+            case MATCH_COMMENT_SESSION_DIR:
                 processCommentQuery(uri);
                 break;
         }
@@ -781,10 +805,10 @@ public class Provider extends SessionProvider {
     private boolean processInsertUri(Uri uri, SQLiteDatabase db, ContentValues values) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_COMMENT_ACTIONS:
+            case MATCH_COMMENT_ACTION_DIR:
                 return processCommentActionInsert(uri, db, values);
 
-            case MATCH_ALL_VOTE_ACTIONS:
+            case MATCH_VOTE_ACTION_DIR:
                 return true;
         }
         return false;
@@ -811,7 +835,7 @@ public class Provider extends SessionProvider {
     private boolean processDeleteUri(Uri uri, SQLiteDatabase db) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_COMMENT_ACTIONS:
+            case MATCH_COMMENT_ACTION_DIR:
                 return processCommentActionDelete(uri, db);
         }
         return false;

@@ -38,7 +38,7 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
     public static final String TAG = "SettingsActivity";
 
     private static final String[] AUTHORITIES = {
-            Provider.SUBREDDITS_AUTHORITY,
+            Provider.AUTHORITY,
     };
 
     private AccountResult result;
