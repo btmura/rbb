@@ -16,25 +16,14 @@
 
 package com.btmura.android.reddit.content;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import android.accounts.Account;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentProviderOperation;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.RemoteException;
-
-import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.provider.Provider;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 

@@ -24,12 +24,10 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.backup.BackupManager;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -320,8 +318,7 @@ public class Provider extends SessionProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    ContentProviderResult[] r = cr.applyBatch(AUTHORITY, ops);
-                    startSyncOperation(context, accountName, r[1].uri);
+                    cr.applyBatch(AUTHORITY, ops);
                 } catch (RemoteException e) {
                     Log.e(TAG, "addInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -357,7 +354,6 @@ public class Provider extends SessionProvider {
                 ContentResolver cr = context.getContentResolver();
                 try {
                     cr.applyBatch(AUTHORITY, ops);
-                    startSyncOperation(context, accountName, uris);
                 } catch (RemoteException e) {
                     Log.e(TAG, "deleteInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -496,16 +492,6 @@ public class Provider extends SessionProvider {
     private static void scheduleBackup(Context context, String accountName) {
         if (TextUtils.isEmpty(accountName)) {
             new BackupManager(context).dataChanged();
-        }
-    }
-
-    private static void startSyncOperation(Context context, String accountName, Uri... uris) {
-        if (!TextUtils.isEmpty(accountName)) {
-            for (int i = 0; i < uris.length; i++) {
-                Intent intent = new Intent(context, SyncOperationService.class);
-                intent.setData(uris[i]);
-                context.startService(intent);
-            }
         }
     }
 
