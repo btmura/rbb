@@ -22,14 +22,32 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DbHelper extends SQLiteOpenHelper {
 
-    public static final String DATABASE_REDDIT = "reddit";
-    public static final String DATABASE_TEST = "test";
-    public static final int LATEST_VERSION = 2;
+    static final String DATABASE_REDDIT = "reddit";
+    static final String DATABASE_TEST = "test";
+    static final int LATEST_VERSION = 2;
+
+    /** Singleton instances accessible via {@link #getInstance(Context)}. */
+    private static DbHelper INSTANCE;
+
+    /**
+     * Return singleton instance of {@link DbHelper} that all users should use
+     * to avoid database locked errors. Make sure to do database writes in
+     * serial though.
+     */
+    public static DbHelper getInstance(Context context) {
+        synchronized (DbHelper.class) {
+            if (INSTANCE == null) {
+                INSTANCE = new DbHelper(context, DATABASE_REDDIT, LATEST_VERSION);
+            }
+            return INSTANCE;
+        }
+    }
 
     /** Version kept to control what tables are created mostly for testing. */
     private final int version;
 
-    public DbHelper(Context context, String name, int version) {
+    /** Test constructor. Use {@link #getInstance(Context, String, int)}. */
+    DbHelper(Context context, String name, int version) {
         super(context, name, null, version);
         this.version = version;
     }

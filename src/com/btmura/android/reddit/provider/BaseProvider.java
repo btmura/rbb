@@ -35,7 +35,7 @@ abstract class BaseProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        helper = new DbHelper(getContext(), DbHelper.DATABASE_REDDIT, DbHelper.LATEST_VERSION);
+        helper = DbHelper.getInstance(getContext());
         return true;
     }
 
