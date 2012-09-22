@@ -19,21 +19,27 @@ package com.btmura.android.reddit.content;
 import java.io.IOException;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
-import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.util.Array;
 
 /**
@@ -42,9 +48,16 @@ import com.btmura.android.reddit.util.Array;
  * schedules a periodic sync when it needs to sync the remaining pending
  * replies.
  */
-class CommentSyncAdapter {
+public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "CommentSyncAdapter";
+
+    public static class Service extends android.app.Service {
+        @Override
+        public IBinder onBind(Intent intent) {
+            return new CommentSyncAdapter(this).getSyncAdapterBinder();
+        }
+    }
 
     /** Rate limit in seconds if the server doesn't suggest one. */
     private static final int RATE_LIMIT_SECONDS = 60;
@@ -61,11 +74,22 @@ class CommentSyncAdapter {
     private static final int INDEX_THING_ID = 2;
     private static final int INDEX_TEXT = 3;
 
-    static void sync(Context context, Account account, String cookie, String modhash,
-            String authority, ContentProviderClient provider, SyncResult syncResult) {
+    public CommentSyncAdapter(Context context) {
+        super(context, true);
+    }
+
+    @Override
+    public void onPerformSync(Account account, Bundle extras, String authority,
+            ContentProviderClient provider, SyncResult syncResult) {
         try {
+            AccountManager manager = AccountManager.get(getContext());
+            String cookie = manager.blockingGetAuthToken(account,
+                    AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
+            String modhash = manager.blockingGetAuthToken(account,
+                    AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
+
             // Get all pending replies that have not been synced.
-            Cursor c = provider.query(Provider.COMMENT_ACTIONS_URI, PROJECTION,
+            Cursor c = provider.query(CommentProvider.ACTIONS_URI, PROJECTION,
                     CommentActions.SELECTION_BY_ACCOUNT, Array.of(account.name),
                     CommentActions.SORT_BY_ID);
 
@@ -99,8 +123,8 @@ class CommentSyncAdapter {
 
                     if (!result.hasErrors()) {
                         syncResult.stats.numDeletes += provider.delete(
-                                Provider.COMMENT_ACTIONS_URI,
-                                Provider.ID_SELECTION, Array.of(id));
+                                CommentProvider.ACTIONS_URI,
+                                CommentProvider.ID_SELECTION, Array.of(id));
                         count--;
                     } else if (BuildConfig.DEBUG) {
                         result.logErrors(TAG);
@@ -149,6 +173,15 @@ class CommentSyncAdapter {
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
             syncResult.databaseError = true;
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.stats.numAuthExceptions++;
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.stats.numAuthExceptions++;
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.stats.numIoExceptions++;
         }
 
         if (BuildConfig.DEBUG) {

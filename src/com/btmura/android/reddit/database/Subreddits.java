@@ -36,12 +36,6 @@ public class Subreddits implements BaseColumns, SyncColumns {
     public static final String COLUMN_STATE = "state";
     public static final String COLUMN_EXPIRATION = "expiration";
 
-    public static final String SELECTION_ACCOUNT = COLUMN_ACCOUNT + "= ?";
-    public static final String SELECTION_ACCOUNT_NOT_DELETED = SELECTION_ACCOUNT + " AND "
-            + COLUMN_STATE + "!= " + STATE_DELETING;
-    public static final String SELECTION_ACCOUNT_AND_NAME = SELECTION_ACCOUNT + " AND "
-            + COLUMN_NAME + "= ?";
-
     public static final String SORT_BY_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
 
     public static final String NAME_FRONT_PAGE = "";

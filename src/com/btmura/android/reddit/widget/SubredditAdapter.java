@@ -29,7 +29,8 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.database.SubredditSearches;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.SubredditSearchProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
@@ -77,7 +78,7 @@ public class SubredditAdapter extends BaseCursorAdapter {
             AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
                 public void run() {
                     ContentResolver cr = appContext.getContentResolver();
-                    cr.delete(Provider.SUBREDDIT_SEARCHES_URI,
+                    cr.delete(SubredditSearchProvider.CONTENT_URI,
                             SubredditSearches.SELECTION_BY_SESSION_ID,
                             Array.of(sessionId));
                 }
@@ -88,14 +89,14 @@ public class SubredditAdapter extends BaseCursorAdapter {
     private static Uri getUri(String accountName, String sessionId, String query, boolean sync) {
         if (!TextUtils.isEmpty(query)) {
             String syncVal = Boolean.toString(sync);
-            return Provider.SUBREDDIT_SEARCHES_URI.buildUpon()
-                    .appendQueryParameter(Provider.SYNC_PARAM, syncVal)
-                    .appendQueryParameter(Provider.ACCOUNT_PARAM, accountName)
-                    .appendQueryParameter(Provider.SESSION_ID_PARAM, sessionId)
-                    .appendQueryParameter(Provider.QUERY_PARAM, query)
+            return SubredditSearchProvider.CONTENT_URI.buildUpon()
+                    .appendQueryParameter(SubredditSearchProvider.SYNC_ENABLE, syncVal)
+                    .appendQueryParameter(SubredditSearchProvider.SYNC_ACCOUNT, accountName)
+                    .appendQueryParameter(SubredditSearchProvider.SYNC_SESSION_ID, sessionId)
+                    .appendQueryParameter(SubredditSearchProvider.SYNC_QUERY, query)
                     .build();
         } else {
-            return Provider.SUBREDDITS_URI;
+            return SubredditProvider.CONTENT_URI;
         }
     }
 
@@ -108,7 +109,7 @@ public class SubredditAdapter extends BaseCursorAdapter {
                     SubredditSearches.SORT_BY_NAME);
         } else {
             return new CursorLoader(context, uri, PROJECTION_SUBREDDITS,
-                    Subreddits.SELECTION_ACCOUNT_NOT_DELETED,
+                    SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
                     Array.of(accountName),
                     Subreddits.SORT_BY_NAME);
         }

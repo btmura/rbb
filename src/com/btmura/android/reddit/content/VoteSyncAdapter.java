@@ -20,30 +20,44 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.os.Bundle;
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.util.Array;
 
 /**
  * {@link AbstractThreadedSyncAdapter} that syncs pending votes to the reddit
  * backend servers.
  */
-class VoteSyncAdapter {
+public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "VoteSyncAdapter";
+
+    public static class Service extends android.app.Service {
+        @Override
+        public IBinder onBind(Intent intent) {
+            return new VoteSyncAdapter(this).getSyncAdapterBinder();
+        }
+    }
 
     private static final String[] PROJECTION = {
             Votes._ID,
@@ -55,11 +69,22 @@ class VoteSyncAdapter {
     private static final int INDEX_THING_ID = 1;
     private static final int INDEX_VOTE = 2;
 
-    static void sync(Context context, Account account, String cookie, String modhash,
-            String authority, ContentProviderClient provider, SyncResult syncResult) {
+    public VoteSyncAdapter(Context context) {
+        super(context, true);
+    }
+
+    @Override
+    public void onPerformSync(Account account, Bundle extras, String authority,
+            ContentProviderClient provider, SyncResult syncResult) {
         try {
+            AccountManager manager = AccountManager.get(getContext());
+            String cookie = manager.blockingGetAuthToken(account,
+                    AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
+            String modhash = manager.blockingGetAuthToken(account,
+                    AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
+
             // Get all pending votes for this account that haven't been synced.
-            Cursor c = provider.query(Provider.VOTE_ACTIONS_URI, PROJECTION,
+            Cursor c = provider.query(VoteProvider.ACTIONS_URI, PROJECTION,
                     Votes.SELECTION_BY_ACCOUNT, Array.of(account.name), null);
 
             ArrayList<ContentProviderOperation> ops =
@@ -72,9 +97,9 @@ class VoteSyncAdapter {
                 // Sync the vote with the server. If successful then schedule
                 // deletion of the database row.
                 try {
-                    RedditApi.vote(context, thingId, vote, cookie, modhash);
-                    ops.add(ContentProviderOperation.newDelete(Provider.VOTE_ACTIONS_URI)
-                            .withSelection(Provider.ID_SELECTION, Array.of(id))
+                    RedditApi.vote(getContext(), thingId, vote, cookie, modhash);
+                    ops.add(ContentProviderOperation.newDelete(VoteProvider.ACTIONS_URI)
+                            .withSelection(VoteProvider.ID_SELECTION, Array.of(id))
                             .build());
                 } catch (IOException e) {
                     Log.e(TAG, e.getMessage(), e);
@@ -96,6 +121,15 @@ class VoteSyncAdapter {
         } catch (OperationApplicationException e) {
             Log.e(TAG, e.getMessage(), e);
             syncResult.databaseError = true;
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.stats.numAuthExceptions++;
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.stats.numAuthExceptions++;
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.stats.numAuthExceptions++;
         }
 
         if (BuildConfig.DEBUG) {

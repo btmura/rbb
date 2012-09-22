@@ -14,7 +14,11 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accountType="@string/account_type"
-    android:contentAuthority="@string/provider_authority"
-    android:isAlwaysSyncable="true" />
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/title"
+    style="@style/SubredditTitleText"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ellipsize="end"
+    android:padding="@dimen/padding"
+    android:singleLine="true" />

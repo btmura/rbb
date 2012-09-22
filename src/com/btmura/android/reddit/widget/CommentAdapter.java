@@ -27,7 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.util.Array;
 
 public class CommentAdapter extends BaseCursorAdapter {
@@ -94,18 +94,18 @@ public class CommentAdapter extends BaseCursorAdapter {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
-                cr.delete(Provider.COMMENT_SESSIONS_URI, Comments.SELECTION_BY_SESSION_ID,
+                cr.delete(CommentProvider.SESSIONS_URI, Comments.SELECTION_BY_SESSION_ID,
                         Array.of(sessionId));
             }
         });
     }
 
     private static Uri getUri(String accountName, String sessionId, String thingId, boolean sync) {
-        return Provider.COMMENT_SESSIONS_URI.buildUpon()
-                .appendQueryParameter(Provider.PARAM_SYNC, Boolean.toString(sync))
-                .appendQueryParameter(Provider.PARAM_ACCOUNT_NAME, accountName)
-                .appendQueryParameter(Provider.PARAM_SESSION_ID, sessionId)
-                .appendQueryParameter(Provider.PARAM_THING_ID, thingId)
+        return CommentProvider.SESSIONS_URI.buildUpon()
+                .appendQueryParameter(CommentProvider.PARAM_SYNC, Boolean.toString(sync))
+                .appendQueryParameter(CommentProvider.PARAM_ACCOUNT_NAME, accountName)
+                .appendQueryParameter(CommentProvider.PARAM_SESSION_ID, sessionId)
+                .appendQueryParameter(CommentProvider.PARAM_THING_ID, thingId)
                 .build();
     }
 

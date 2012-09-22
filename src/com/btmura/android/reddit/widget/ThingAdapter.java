@@ -31,7 +31,7 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
@@ -114,7 +114,7 @@ public class ThingAdapter extends BaseCursorAdapter {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
-                cr.delete(Provider.THING_SESSIONS_URI, Things.SELECTION_BY_SESSION_ID,
+                cr.delete(ThingProvider.SESSIONS_URI, Things.SELECTION_BY_SESSION_ID,
                         Array.of(sessionId));
             }
         });
@@ -122,17 +122,17 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     private static Uri getUri(String accountName, String sessionId, String subreddit,
             int filter, String more, String query, boolean sync) {
-        Uri.Builder b = Provider.THING_SESSIONS_URI.buildUpon()
-                .appendQueryParameter(Provider.SYNC_PARAM, Boolean.toString(sync))
-                .appendQueryParameter(Provider.ACCOUNT_PARAM, accountName)
-                .appendQueryParameter(Provider.SESSION_ID_PARAM, sessionId)
-                .appendQueryParameter(Provider.SUBREDDIT_PARAM, subreddit)
-                .appendQueryParameter(Provider.FILTER_PARAM, Integer.toString(filter));
+        Uri.Builder b = ThingProvider.SESSIONS_URI.buildUpon()
+                .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(sync))
+                .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
+                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
+                .appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subreddit)
+                .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
         if (!TextUtils.isEmpty(query)) {
-            b.appendQueryParameter(Provider.QUERY_PARAM, query);
+            b.appendQueryParameter(ThingProvider.PARAM_QUERY, query);
         }
         if (!TextUtils.isEmpty(more)) {
-            b.appendQueryParameter(Provider.MORE_PARAM, more);
+            b.appendQueryParameter(ThingProvider.PARAM_MORE, more);
         }
         return b.build();
     }

@@ -105,9 +105,30 @@
         </activity-alias>
 
         <provider
-            android:name=".provider.Provider"
-            android:authorities="@string/provider_authority"
-            android:exported="false" />
+            android:name=".provider.CommentProvider"
+            android:authorities="@string/authority_comments"
+            android:exported="false"
+            android:label="@string/provider_comments" />
+        <provider
+            android:name=".provider.SubredditProvider"
+            android:authorities="@string/authority_subreddits"
+            android:exported="false"
+            android:label="@string/provider_subreddits" />
+        <provider
+            android:name=".provider.SubredditSearchProvider"
+            android:authorities="@string/authority_subreddit_searches"
+            android:exported="false"
+            android:label="@string/provider_subreddit_searches" />
+        <provider
+            android:name=".provider.ThingProvider"
+            android:authorities="@string/authority_things"
+            android:exported="false"
+            android:label="@string/provider_things" />
+        <provider
+            android:name=".provider.VoteProvider"
+            android:authorities="@string/authority_votes"
+            android:exported="false"
+            android:label="@string/provider_votes" />
 
         <service
             android:name=".accounts.AccountAuthenticatorService"
@@ -122,7 +143,7 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
-            android:name=".content.SyncAdapter$Service"
+            android:name=".content.CommentSyncAdapter$Service"
             android:exported="true"
             android:permission="@string/permission_sync_accounts" >
             <intent-filter>
@@ -131,7 +152,31 @@
 
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_adapter" />
+                android:resource="@xml/comment_sync_adapter" />
+        </service>
+        <service
+            android:name=".content.SubredditSyncAdapter$Service"
+            android:exported="true"
+            android:permission="@string/permission_sync_accounts" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/subreddit_sync_adapter" />
+        </service>
+        <service
+            android:name=".content.VoteSyncAdapter$Service"
+            android:exported="true"
+            android:permission="@string/permission_sync_accounts" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/vote_sync_adapter" />
         </service>
         <service
             android:name=".provider.SyncOperationService"

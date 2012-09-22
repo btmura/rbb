@@ -21,24 +21,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
+import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.os.Bundle;
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.util.Array;
+import com.btmura.android.reddit.provider.SubredditProvider;
 
-class SubredditSyncAdapter {
+public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "SubredditSyncAdapter";
+
+    public static class Service extends android.app.Service {
+        @Override
+        public IBinder onBind(Intent intent) {
+            return new SubredditSyncAdapter(this).getSyncAdapterBinder();
+        }
+    }
 
     private static final String[] PROJECTION = {
             Subreddits._ID,
@@ -52,7 +67,12 @@ class SubredditSyncAdapter {
     private static final int INDEX_STATE = 2;
     private static final int INDEX_EXPIRATION = 3;
 
-    static void sync(Context context, Account account, String cookie,
+    public SubredditSyncAdapter(Context context) {
+        super(context, true);
+    }
+
+    @Override
+    public void onPerformSync(Account account, Bundle extras, String authority,
             ContentProviderClient provider, SyncResult syncResult) {
 
         int numInserts = 0;
@@ -60,13 +80,18 @@ class SubredditSyncAdapter {
         int numDeletes = 0;
         int numEntries = 0;
 
+        AccountManager manager = AccountManager.get(getContext());
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 
         try {
+            String cookie = manager.blockingGetAuthToken(account,
+                    AccountAuthenticator.AUTH_TOKEN_COOKIE,
+                    true);
+
             ArrayList<String> subreddits = RedditApi.getSubreddits(cookie);
 
-            Cursor c = provider.query(Provider.SUBREDDITS_URI, PROJECTION,
-                    Subreddits.SELECTION_ACCOUNT,
+            Cursor c = provider.query(SubredditProvider.CONTENT_URI, PROJECTION,
+                    SubredditProvider.SELECTION_ACCOUNT,
                     new String[] {account.name},
                     null);
             while (c.moveToNext()) {
@@ -118,13 +143,20 @@ class SubredditSyncAdapter {
                 }
             }
 
-            provider.applyBatch(ops);
+            ContentResolver cr = getContext().getContentResolver();
+            cr.applyBatch(SubredditProvider.AUTHORITY, ops);
 
             syncResult.stats.numInserts += numInserts;
             syncResult.stats.numUpdates += numUpdates;
             syncResult.stats.numDeletes += numDeletes;
             syncResult.stats.numEntries += numEntries;
 
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, "onPerformSync", e);
+            syncResult.stats.numAuthExceptions++;
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, "onPerformSync", e);
+            syncResult.stats.numAuthExceptions++;
         } catch (IOException e) {
             Log.e(TAG, "onPerformSync", e);
             syncResult.stats.numIoExceptions++;
@@ -141,6 +173,32 @@ class SubredditSyncAdapter {
         }
     }
 
+    public static void initializeAccount(Context context, String login, String cookie)
+            throws RemoteException, OperationApplicationException, IOException {
+        ArrayList<String> subreddits = RedditApi.getSubreddits(cookie);
+        int count = subreddits.size();
+
+        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
+                count + 2);
+        ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
+                .withSelection(SubredditProvider.SELECTION_ACCOUNT, new String[] {login})
+                .build());
+        ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
+                .withValue(Subreddits.COLUMN_ACCOUNT, login)
+                .withValue(Subreddits.COLUMN_NAME, Subreddits.NAME_FRONT_PAGE)
+                .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
+                .build());
+        for (int i = 0; i < count; i++) {
+            ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
+                    .withValue(Subreddits.COLUMN_ACCOUNT, login)
+                    .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
+                    .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
+                    .build());
+        }
+        ContentResolver cr = context.getContentResolver();
+        cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+    }
+
     private static int find(List<String> subreddits, String name) {
         int count = subreddits.size();
         for (int i = 0; i < count; i++) {
@@ -152,22 +210,24 @@ class SubredditSyncAdapter {
     }
 
     private static ContentProviderOperation newUpdateToNormalState(long id) {
-        return ContentProviderOperation.newUpdate(Provider.SUBREDDITS_URI)
-                .withSelection(Provider.ID_SELECTION, Array.of(id))
+        return ContentProviderOperation.newUpdate(SubredditProvider.CONTENT_URI)
+                .withSelection(SubredditProvider.ID_SELECTION,
+                        new String[] {Long.toString(id)})
                 .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
                 .withValue(Subreddits.COLUMN_EXPIRATION, 0)
                 .build();
     }
 
     private static ContentProviderOperation newDeleteById(long id) {
-        return ContentProviderOperation.newDelete(Provider.SUBREDDITS_URI)
-                .withSelection(Provider.ID_SELECTION, Array.of(id))
+        return ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
+                .withSelection(SubredditProvider.ID_SELECTION,
+                        new String[] {Long.toString(id)})
                 .build();
     }
 
     private static ContentProviderOperation newInsert(String accountName, String subredditName,
             int state) {
-        return ContentProviderOperation.newInsert(Provider.SUBREDDITS_URI)
+        return ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
                 .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                 .withValue(Subreddits.COLUMN_NAME, subredditName)
                 .withValue(Subreddits.COLUMN_STATE, state)
