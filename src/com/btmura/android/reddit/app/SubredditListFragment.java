@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -184,53 +182,23 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.sr_action_menu, menu);
-        if (mode.getTag() == null) {
-            mode.setTag(new CheckedInfo());
-        }
         return true;
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         boolean isQuery = query != null;
-        CheckedInfo info = (CheckedInfo) mode.getTag();
         menu.findItem(R.id.menu_add).setVisible(isQuery);
-        menu.findItem(R.id.menu_add_combined).setVisible(isQuery && info.checkedCount > 1);
-        menu.findItem(R.id.menu_combine).setVisible(!isQuery
-                && TextUtils.isEmpty(getAccountName())
-                && info.checkedCount > 1);
-        menu.findItem(R.id.menu_split).setVisible(!isQuery
-                && TextUtils.isEmpty(getAccountName())
-                && info.checkedCount == 1
-                && info.numSplittable > 0);
         menu.findItem(R.id.menu_delete).setVisible(!isQuery);
         return true;
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        CheckedInfo info = (CheckedInfo) mode.getTag();
-        info.checkedCount = getListView().getCheckedItemCount();
-        if (adapter.getName(position).indexOf('+') != -1) {
-            info.numSplittable = info.numSplittable + (checked ? 1 : -1);
-        }
-        mode.invalidate();
     }
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
                 handleActionAdd(mode);
-                return true;
-
-            case R.id.menu_add_combined:
-                handleActionAddCombined(mode);
-                return true;
-
-            case R.id.menu_combine:
-                handleCombine(mode);
-                return true;
-
-            case R.id.menu_split:
-                handleSplit(mode);
                 return true;
 
             case R.id.menu_delete:
@@ -243,11 +211,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public void onDestroyActionMode(ActionMode mode) {
-    }
-
-    static class CheckedInfo {
-        int checkedCount;
-        int numSplittable;
     }
 
     private void handleActionAdd(ActionMode mode) {
@@ -265,62 +228,10 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         mode.finish();
     }
 
-    private void handleActionAddCombined(ActionMode mode) {
-        SparseBooleanArray positions = getListView().getCheckedItemPositions();
-        ArrayList<String> names = new ArrayList<String>();
-        int count = adapter.getCount();
-        for (int i = 0; i < count; i++) {
-            if (positions.get(i)) {
-                String name = adapter.getName(i);
-                if (!name.isEmpty()) {
-                    names.add(name);
-                }
-            }
-        }
-        SubredditProvider.combineInBackground(getActivity(), names, null);
-        mode.finish();
-    }
-
-    private void handleCombine(ActionMode mode) {
-        ArrayList<String> names = getCheckedNames();
-        int size = names.size();
-        if (size <= 1) {
-            mode.finish();
-            return;
-        }
-
-        long[] ids = getListView().getCheckedItemIds();
-        SubredditProvider.combineInBackground(getActivity(), names, ids);
-        mode.finish();
-    }
-
-    private void handleSplit(ActionMode mode) {
-        ArrayList<String> names = getCheckedNames();
-        long[] ids = getListView().getCheckedItemIds();
-        SubredditProvider.splitInBackground(getActivity(), names.get(0), ids[0]);
-        mode.finish();
-    }
-
     private void handleDelete(ActionMode mode) {
         long[] ids = getListView().getCheckedItemIds();
         SubredditProvider.deleteInBackground(getActivity(), getAccountName(), ids);
         mode.finish();
-    }
-
-    private ArrayList<String> getCheckedNames() {
-        int checkedCount = getListView().getCheckedItemCount();
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        ArrayList<String> names = new ArrayList<String>(checkedCount);
-        int count = adapter.getCount();
-        for (int i = 0; i < count; i++) {
-            if (checked.get(i)) {
-                String name = adapter.getName(i);
-                if (!name.isEmpty()) {
-                    names.add(name);
-                }
-            }
-        }
-        return names;
     }
 
     @Override

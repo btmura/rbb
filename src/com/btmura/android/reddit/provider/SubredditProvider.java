@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.provider;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.app.backup.BackupManager;
 import android.content.ContentProviderOperation;
@@ -234,89 +233,6 @@ public class SubredditProvider extends BaseProvider {
         }.execute();
     }
 
-    public static void combineInBackground(final Context context,
-            final List<String> subredditNames, final long[] ids) {
-        new AsyncTask<Void, Void, Integer>() {
-            @Override
-            protected Integer doInBackground(Void... params) {
-                int size = subredditNames.size();
-                StringBuilder combinedName = new StringBuilder();
-                for (int i = 0; i < size; i++) {
-                    combinedName.append(subredditNames.get(i));
-                    if (i + 1 < size) {
-                        combinedName.append("+");
-                    }
-                }
-
-                int count = ids.length;
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
-                        count + 1);
-                for (int i = 0; i < count; i++) {
-                    ops.add(ContentProviderOperation.newDelete(CONTENT_URI)
-                            .withSelection(ID_SELECTION, new String[] {Long.toString(ids[i])})
-                            .build());
-                }
-                ops.add(ContentProviderOperation.newInsert(CONTENT_URI)
-                        .withValue(Subreddits.COLUMN_NAME, combinedName.toString())
-                        .build());
-
-                ContentResolver cr = context.getContentResolver();
-                try {
-                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-                } catch (RemoteException e) {
-                    Log.e(TAG, "combineInBackground", e);
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, "combineInBackground", e);
-                }
-                return size;
-            }
-
-            @Override
-            protected void onPostExecute(Integer deleted) {
-                showChangeToast(context, 1);
-                scheduleBackup(context, null);
-            }
-        }.execute();
-    }
-
-    public static void splitInBackground(final Context context, final String subredditName,
-            final long id) {
-        new AsyncTask<Void, Void, Integer>() {
-            @Override
-            protected Integer doInBackground(Void... params) {
-                String[] parts = subredditName.split("\\+");
-                int numParts = parts.length;
-
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
-                        numParts + 1);
-                for (int i = 0; i < numParts; i++) {
-                    ops.add(ContentProviderOperation.newInsert(CONTENT_URI)
-                            .withValue(Subreddits.COLUMN_NAME, parts[i])
-                            .build());
-                }
-
-                ops.add(ContentProviderOperation.newDelete(CONTENT_URI)
-                        .withSelection(ID_SELECTION, new String[] {Long.toString(id)})
-                        .build());
-
-                ContentResolver cr = context.getContentResolver();
-                try {
-                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-                } catch (RemoteException e) {
-                    Log.e(TAG, "splitInBackground", e);
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, "splitInBackground", e);
-                }
-                return numParts;
-            }
-
-            @Override
-            protected void onPostExecute(Integer added) {
-                showChangeToast(context, added);
-                scheduleBackup(context, null);
-            }
-        }.execute();
-    }
 
     public static void addMultipleSubredditsInBackground(final Context context,
             final ContentValues[] values) {
