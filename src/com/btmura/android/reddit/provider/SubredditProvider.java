@@ -37,6 +37,7 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.util.Array;
 
 public class SubredditProvider extends BaseProvider {
 
@@ -49,6 +50,10 @@ public class SubredditProvider extends BaseProvider {
 
     /** Sync changes back to the network. Don't set this in sync adapters. */
     public static final String PARAM_SYNC = "syncToNetwork";
+
+    public static final Uri SYNC_URI = CONTENT_URI.buildUpon()
+            .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
+            .build();
 
     static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
             + SubredditProvider.AUTHORITY + "." + Subreddits.TABLE_NAME;
@@ -161,93 +166,50 @@ public class SubredditProvider extends BaseProvider {
         getContext().getContentResolver().notifyChange(uri, null, sync);
     }
 
-    public static void addInBackground(final Context context, final String accountName,
-            final String subredditName) {
+    public static void insertInBackground(Context context, String accountName, String... subreddits) {
+        modifyInBackground(context, accountName, subreddits, true);
+    }
+
+    public static void deleteInBackground(Context context, String accountName, String... subreddits) {
+        modifyInBackground(context, accountName, subreddits, false);
+    }
+
+    private static void modifyInBackground(Context context, final String accountName,
+            final String[] subreddits, final boolean add) {
+        final Context appContext = context.getApplicationContext();
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(2);
-                ops.add(ContentProviderOperation.newDelete(CONTENT_URI)
-                        .withSelection(SELECTION_ACCOUNT_AND_NAME, new String[] {
-                                accountName,
-                                subredditName,
-                        })
-                        .build());
-                ops.add(ContentProviderOperation.newInsert(CONTENT_URI)
-                        .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
-                        .withValue(Subreddits.COLUMN_NAME, subredditName)
-                        .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
-                        .build());
-
-                ContentResolver cr = context.getContentResolver();
-                try {
-                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-                } catch (RemoteException e) {
-                    Log.e(TAG, "addInBackground", e);
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, "addInBackground", e);
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                showChangeToast(context, 1);
-                scheduleBackup(context, accountName);
-            }
-        }.execute();
-    }
-
-    public static void deleteInBackground(final Context context, final String accountName,
-            final long[] ids) {
-        new AsyncTask<Void, Void, Integer>() {
-            @Override
-            protected Integer doInBackground(Void... params) {
-                int count = ids.length;
-                Uri[] uris = new Uri[count];
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
-                        count);
+                int count = subreddits.length;
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(count * 2);
+                int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
                 for (int i = 0; i < count; i++) {
-                    uris[i] = ContentUris.withAppendedId(CONTENT_URI, ids[i]);
-                    ops.add(ContentProviderOperation.newUpdate(uris[i])
-                            .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_DELETING)
+                    ops.add(ContentProviderOperation.newDelete(SYNC_URI)
+                            .withSelection(SELECTION_ACCOUNT_AND_NAME,
+                                    Array.of(accountName, subreddits[i]))
+                            .build());
+                    ops.add(ContentProviderOperation.newInsert(SYNC_URI)
+                            .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
+                            .withValue(Subreddits.COLUMN_NAME, subreddits[i])
+                            .withValue(Subreddits.COLUMN_STATE, state)
                             .build());
                 }
 
-                ContentResolver cr = context.getContentResolver();
                 try {
-                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
+                    appContext.getContentResolver().applyBatch(SubredditProvider.AUTHORITY, ops);
                 } catch (RemoteException e) {
-                    Log.e(TAG, "deleteInBackground", e);
+                    Log.e(TAG, e.getMessage(), e);
                 } catch (OperationApplicationException e) {
-                    Log.e(TAG, "deleteInBackground", e);
+                    Log.e(TAG, e.getMessage(), e);
                 }
-                return count;
-            }
-
-            @Override
-            protected void onPostExecute(Integer count) {
-                showChangeToast(context, -count);
-                scheduleBackup(context, accountName);
-            }
-        }.execute();
-    }
-
-
-    public static void addMultipleSubredditsInBackground(final Context context,
-            final ContentValues[] values) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                ContentResolver cr = context.getContentResolver();
-                cr.bulkInsert(CONTENT_URI, values);
                 return null;
             }
 
             @Override
-            protected void onPostExecute(Void result) {
-                showChangeToast(context, values.length);
-                scheduleBackup(context, null);
+            protected void onPostExecute(Void intoTheVoid) {
+                showChangeToast(appContext, add ? subreddits.length : -subreddits.length);
+                scheduleBackup(appContext, accountName);
             }
         }.execute();
     }

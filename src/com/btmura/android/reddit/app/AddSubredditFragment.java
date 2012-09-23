@@ -176,7 +176,7 @@ public class AddSubredditFragment extends DialogFragment implements
         }
 
         String accountName = adapter.getAccountName();
-        SubredditProvider.addInBackground(getActivity(), accountName, subredditName);
+        SubredditProvider.insertInBackground(getActivity(), accountName, subredditName);
         dismiss();
     }
 }

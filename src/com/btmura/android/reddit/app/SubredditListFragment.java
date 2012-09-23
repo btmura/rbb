@@ -19,7 +19,6 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.ContentValues;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -38,7 +37,6 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.SubredditAdapter;
@@ -198,12 +196,10 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
-                handleActionAdd(mode);
-                return true;
+                return handleAdd(mode);
 
             case R.id.menu_delete:
-                handleDelete(mode);
-                return true;
+                return handleDelete(mode);
 
             default:
                 return false;
@@ -213,25 +209,31 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public void onDestroyActionMode(ActionMode mode) {
     }
 
-    private void handleActionAdd(ActionMode mode) {
-        SparseBooleanArray positions = getListView().getCheckedItemPositions();
-        ContentValues[] values = new ContentValues[positions.size()];
-        int count = adapter.getCount();
-        int i, j;
-        for (i = 0, j = 0; i < count; i++) {
-            if (positions.get(i)) {
-                values[j] = new ContentValues(1);
-                values[j++].put(Subreddits.COLUMN_NAME, adapter.getName(i));
-            }
-        }
-        SubredditProvider.addMultipleSubredditsInBackground(getActivity(), values);
+    private boolean handleAdd(ActionMode mode) {
+        String[] subreddits = getCheckedSubreddits();
+        SubredditProvider.insertInBackground(getActivity(), getAccountName(), subreddits);
         mode.finish();
+        return true;
     }
 
-    private void handleDelete(ActionMode mode) {
-        long[] ids = getListView().getCheckedItemIds();
-        SubredditProvider.deleteInBackground(getActivity(), getAccountName(), ids);
+    private boolean handleDelete(ActionMode mode) {
+        String[] subreddits = getCheckedSubreddits();
+        SubredditProvider.deleteInBackground(getActivity(), getAccountName(), subreddits);
         mode.finish();
+        return true;
+    }
+
+    private String[] getCheckedSubreddits() {
+        SparseBooleanArray positions = getListView().getCheckedItemPositions();
+        int checkedCount = getListView().getCheckedItemCount();
+        String[] subreddits = new String[checkedCount];
+        int i = 0, j = 0, count = adapter.getCount();
+        for (; i < count; i++) {
+            if (positions.get(i)) {
+                subreddits[j++] = adapter.getName(i);
+            }
+        }
+        return subreddits;
     }
 
     @Override
