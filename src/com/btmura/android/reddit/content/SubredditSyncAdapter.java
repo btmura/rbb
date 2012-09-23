@@ -67,6 +67,8 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INDEX_STATE = 2;
     private static final int INDEX_EXPIRATION = 3;
 
+    private static final int EXPIRATION_PADDING = 5 * 60 * 1000; // 5 minutes
+
     public SubredditSyncAdapter(Context context) {
         super(context, true);
     }

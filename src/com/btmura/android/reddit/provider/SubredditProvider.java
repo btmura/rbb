@@ -21,12 +21,10 @@ import java.util.List;
 
 import android.app.backup.BackupManager;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -49,6 +47,9 @@ public class SubredditProvider extends BaseProvider {
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
     public static final Uri CONTENT_URI = Uri.parse(SubredditProvider.BASE_AUTHORITY_URI
             + Subreddits.TABLE_NAME);
+
+    /** Sync changes back to the network. Don't set this in sync adapters. */
+    public static final String PARAM_SYNC = "syncToNetwork";
 
     static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
             + SubredditProvider.AUTHORITY + "." + Subreddits.TABLE_NAME;
@@ -99,7 +100,7 @@ public class SubredditProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = db.insert(Subreddits.TABLE_NAME, null, values);
         if (id != -1) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            notifyChange(uri);
             return ContentUris.withAppendedId(uri, id);
         }
         return null;
@@ -118,7 +119,7 @@ public class SubredditProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.update(Subreddits.TABLE_NAME, values, selection, selectionArgs);
         if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            notifyChange(uri);
         }
         return count;
     }
@@ -136,7 +137,7 @@ public class SubredditProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = db.delete(Subreddits.TABLE_NAME, selection, selectionArgs);
         if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            notifyChange(uri);
         }
         return count;
     }
@@ -154,6 +155,11 @@ public class SubredditProvider extends BaseProvider {
             default:
                 return null;
         }
+    }
+
+    private void notifyChange(Uri uri) {
+        boolean sync = uri.getBooleanQueryParameter(PARAM_SYNC, false);
+        getContext().getContentResolver().notifyChange(uri, null, sync);
     }
 
     public static void addInBackground(final Context context, final String accountName,
@@ -176,8 +182,7 @@ public class SubredditProvider extends BaseProvider {
 
                 ContentResolver cr = context.getContentResolver();
                 try {
-                    ContentProviderResult[] r = cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-                    startSyncOperation(context, accountName, r[1].uri);
+                    cr.applyBatch(SubredditProvider.AUTHORITY, ops);
                 } catch (RemoteException e) {
                     Log.e(TAG, "addInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -213,7 +218,6 @@ public class SubredditProvider extends BaseProvider {
                 ContentResolver cr = context.getContentResolver();
                 try {
                     cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-                    startSyncOperation(context, accountName, uris);
                 } catch (RemoteException e) {
                     Log.e(TAG, "deleteInBackground", e);
                 } catch (OperationApplicationException e) {
@@ -350,16 +354,6 @@ public class SubredditProvider extends BaseProvider {
     private static void scheduleBackup(Context context, String accountName) {
         if (TextUtils.isEmpty(accountName)) {
             new BackupManager(context).dataChanged();
-        }
-    }
-
-    private static void startSyncOperation(Context context, String accountName, Uri... uris) {
-        if (!TextUtils.isEmpty(accountName)) {
-            for (int i = 0; i < uris.length; i++) {
-                Intent intent = new Intent(context, SyncOperationService.class);
-                intent.setData(uris[i]);
-                context.startService(intent);
-            }
         }
     }
 }
