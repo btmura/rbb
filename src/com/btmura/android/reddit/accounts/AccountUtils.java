@@ -18,8 +18,6 @@ package com.btmura.android.reddit.accounts;
 
 import java.io.IOException;
 
-import com.btmura.android.reddit.R;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
@@ -33,22 +31,20 @@ public class AccountUtils {
         return !TextUtils.isEmpty(accountName);
     }
 
+    public static String getCookie(Context context, Account account)
+            throws OperationCanceledException, AuthenticatorException, IOException {
+        AccountManager manager = AccountManager.get(context);
+        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
+    }
+
     public static String getCookie(Context context, String accountName)
             throws OperationCanceledException, AuthenticatorException, IOException {
-        if (TextUtils.isEmpty(accountName)) {
+        if (isAccount(accountName)) {
             return null;
         }
 
-        AccountManager manager = AccountManager.get(context);
-        Account[] accounts = manager.getAccountsByType(context.getString(R.string.account_type));
-        for (int i = 0; i < accounts.length; i++) {
-            if (accounts[i].name.equals(accountName)) {
-                return manager.blockingGetAuthToken(accounts[i],
-                        AccountAuthenticator.AUTH_TOKEN_COOKIE,
-                        true);
-            }
-        }
-        return null;
+        Account account = new Account(accountName, AccountAuthenticator.getAccountType(context));
+        return getCookie(context, account);
     }
 
     private AccountUtils() {

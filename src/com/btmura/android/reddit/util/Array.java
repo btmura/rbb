@@ -20,6 +20,14 @@ import java.util.Arrays;
 
 public class Array {
 
+    /**
+     * Returns one element string array with the long in it. Hopefully avoids
+     * auto-boxing into a Long object.
+     */
+    public static String[] of(Long oneLong) {
+        return new String[] {Long.toString(oneLong)};
+    }
+
     public static String[] of(Object... elements) {
         int length = elements.length;
         String[] array = new String[length];
