@@ -31,11 +31,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Array;
 
@@ -51,13 +51,13 @@ public class SubredditProvider extends BaseProvider {
     /** Sync changes back to the network. Don't set this in sync adapters. */
     public static final String PARAM_SYNC = "syncToNetwork";
 
-    public static final Uri SYNC_URI = CONTENT_URI.buildUpon()
+    private static final Uri SYNC_URI = CONTENT_URI.buildUpon()
             .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
             .build();
 
-    static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
+    private static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
             + SubredditProvider.AUTHORITY + "." + Subreddits.TABLE_NAME;
-    static final String MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
+    private static final String MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
             + SubredditProvider.AUTHORITY + "." + Subreddits.TABLE_NAME;
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
@@ -88,13 +88,8 @@ public class SubredditProvider extends BaseProvider {
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor c = db.query(Subreddits.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder);
+        Cursor c = db.query(Subreddits.TABLE_NAME, projection, selection, selectionArgs, null,
+                null, sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
     }
@@ -166,11 +161,13 @@ public class SubredditProvider extends BaseProvider {
         getContext().getContentResolver().notifyChange(uri, null, sync);
     }
 
-    public static void insertInBackground(Context context, String accountName, String... subreddits) {
+    public static void
+            insertInBackground(Context context, String accountName, String... subreddits) {
         modifyInBackground(context, accountName, subreddits, true);
     }
 
-    public static void deleteInBackground(Context context, String accountName, String... subreddits) {
+    public static void
+            deleteInBackground(Context context, String accountName, String... subreddits) {
         modifyInBackground(context, accountName, subreddits, false);
     }
 
@@ -181,8 +178,8 @@ public class SubredditProvider extends BaseProvider {
             @Override
             protected Void doInBackground(Void... params) {
                 int count = subreddits.length;
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(count * 2);
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
+                        count * 2);
                 int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
                 for (int i = 0; i < count; i++) {
                     ops.add(ContentProviderOperation.newDelete(SYNC_URI)
@@ -208,29 +205,20 @@ public class SubredditProvider extends BaseProvider {
 
             @Override
             protected void onPostExecute(Void intoTheVoid) {
-                showChangeToast(appContext, add ? subreddits.length : -subreddits.length);
+                showChangeToast(appContext, add, subreddits.length);
                 scheduleBackup(appContext, accountName);
             }
         }.execute();
     }
 
-    private static void showChangeToast(Context context, int count) {
-        int resId;
-        if (count == 1) {
-            resId = R.string.subreddit_one_added;
-        } else if (count == -1) {
-            resId = R.string.subreddit_one_deleted;
-        } else if (count >= 0) {
-            resId = R.string.subreddit_x_added;
-        } else {
-            resId = R.string.subreddit_x_deleted;
-        }
-        Toast.makeText(context, context.getString(resId, Math.abs(count)), Toast.LENGTH_SHORT)
-                .show();
+    private static void showChangeToast(Context context, boolean added, int count) {
+        int resId = added ? R.plurals.subreddits_added : R.plurals.subreddits_deleted;
+        CharSequence text = context.getResources().getQuantityString(resId, count, count);
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 
     private static void scheduleBackup(Context context, String accountName) {
-        if (TextUtils.isEmpty(accountName)) {
+        if (!AccountUtils.isAccount(accountName)) {
             new BackupManager(context).dataChanged();
         }
     }

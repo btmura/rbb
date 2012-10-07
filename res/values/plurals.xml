@@ -20,6 +20,14 @@
         <item quantity="one">1 comment</item>
         <item quantity="other">%1$d comments</item>
     </plurals>
+    <plurals name="subreddits_added">
+        <item quantity="one">1 subreddit added</item>
+        <item quantity="other">%1$d subreddits added</item>
+    </plurals>
+    <plurals name="subreddits_deleted">
+        <item quantity="one">1 subreddit deleted</item>
+        <item quantity="other">$1%d subreddits deleted</item>
+    </plurals>
     <plurals name="subscribers">
         <item quantity="one">1 subscriber</item>
         <item quantity="other">%1$d subscribers</item>
