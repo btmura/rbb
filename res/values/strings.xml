@@ -28,7 +28,7 @@
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
     <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
     <string name="captcha_image">Captcha image</string>
-    <string name="captcha_guess">Type captcha</string>    
+    <string name="captcha_guess">Type captcha</string>
     <string name="comment_comment_status">"%1$s  %2$s ago"</string>
     <string name="comment_deleted">[deleted]</string>
     <string name="comment_header_status">"%1$s  %2$s ago  %3$s"</string>
@@ -54,9 +54,7 @@
     <string name="login_reddit_error">Reddit says: %1$s</string>
     <string name="menu_add">Add</string>
     <string name="menu_add_account">Add account</string>
-    <string name="menu_add_combined">Add combined</string>
     <string name="menu_add_subreddit">Add subreddit</string>
-    <string name="menu_combine">Combine</string>
     <string name="menu_comments">View comments</string>
     <string name="menu_copy_url">Copy URL</string>
     <string name="menu_delete">Delete</string>
@@ -67,7 +65,6 @@
     <string name="menu_search">Search</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_share">Share</string>
-    <string name="menu_split">Split</string>
     <string name="menu_submit_link">Submit link</string>
     <string name="menu_view_sidebar">View sidebar</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
@@ -93,10 +90,6 @@
     <string name="thing_nsfw">"NSFW  "</string>
     <string name="thing_status" tools:ignore="StringFormatCount">"%5$s%2$s  %3$s ago  %4$s"</string>
     <string name="thing_status_subreddit">"%5$s%1$s  %2$s  %3$s ago  %4$s"</string>
-    <string name="subreddit_one_added">%s subreddit added.</string>
-    <string name="subreddit_one_deleted">%s subreddit deleted.</string>
-    <string name="subreddit_x_added">%d subreddits added.</string>
-    <string name="subreddit_x_deleted">%d subreddits deleted.</string>
     <string name="type_login">Type login</string>
     <string name="type_password">Type password</string>
     <string name="type_subreddit_name">Type subreddit name</string>
