@@ -106,11 +106,11 @@ public class ThingProvider extends SessionProvider {
             db.beginTransaction();
             try {
                 // Delete old things that can't possibly be viewed anymore.
-                cleaned = db.delete(Things.TABLE_NAME, Things.SELECTION_BEFORE_TIMESTAMP,
+                cleaned = db.delete(Things.TABLE_NAME, Things.SELECT_BEFORE_TIMESTAMP,
                         Array.of(timestampCutoff));
 
                 // Delete the loading more element before appending more.
-                db.delete(Things.TABLE_NAME, Things.SELECTION_BY_SESSION_ID_AND_MORE,
+                db.delete(Things.TABLE_NAME, Things.SELECT_BY_SESSION_ID_AND_MORE,
                         Array.of(sessionId));
 
                 InsertHelper insertHelper = new InsertHelper(db, Things.TABLE_NAME);

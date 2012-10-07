@@ -51,13 +51,13 @@ public class Things implements BaseColumns {
     public static final int KIND_THING = 0;
     public static final int KIND_MORE = 1;
 
-    public static final String SELECTION_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
+    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
 
     // TODO: Do we need an index for sessionId and more?
-    public static final String SELECTION_BY_SESSION_ID_AND_MORE =
-            SELECTION_BY_SESSION_ID + " AND " + COLUMN_KIND + " = " + KIND_MORE;
+    public static final String SELECT_BY_SESSION_ID_AND_MORE =
+            SELECT_BY_SESSION_ID + " AND " + COLUMN_KIND + " = " + KIND_MORE;
 
-    public static final String SELECTION_BEFORE_TIMESTAMP =
+    public static final String SELECT_BEFORE_TIMESTAMP =
             COLUMN_SESSION_TIMESTAMP + " < ?";
 
     static void createTable(SQLiteDatabase db) {

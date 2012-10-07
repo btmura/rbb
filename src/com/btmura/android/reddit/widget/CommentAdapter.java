@@ -74,7 +74,7 @@ public class CommentAdapter extends BaseCursorAdapter {
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
             String thingId, boolean sync) {
         Uri uri = getUri(accountName, sessionId, thingId, sync);
-        return new CursorLoader(context, uri, PROJECTION, Comments.SELECTION_BY_SESSION_ID,
+        return new CursorLoader(context, uri, PROJECTION, Comments.SELECT_BY_SESSION_ID,
                 Array.of(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
     }
 
@@ -94,7 +94,7 @@ public class CommentAdapter extends BaseCursorAdapter {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
-                cr.delete(CommentProvider.SESSIONS_URI, Comments.SELECTION_BY_SESSION_ID,
+                cr.delete(CommentProvider.SESSIONS_URI, Comments.SELECT_BY_SESSION_ID,
                         Array.of(sessionId));
             }
         });

@@ -93,7 +93,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
             String subreddit, int filter, String more, String query, boolean sync) {
         Uri uri = getUri(accountName, sessionId, subreddit, filter, more, query, sync);
-        return new CursorLoader(context, uri, PROJECTION, Things.SELECTION_BY_SESSION_ID,
+        return new CursorLoader(context, uri, PROJECTION, Things.SELECT_BY_SESSION_ID,
                 Array.of(sessionId), null);
     }
 
@@ -114,7 +114,7 @@ public class ThingAdapter extends BaseCursorAdapter {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
-                cr.delete(ThingProvider.SESSIONS_URI, Things.SELECTION_BY_SESSION_ID,
+                cr.delete(ThingProvider.SESSIONS_URI, Things.SELECT_BY_SESSION_ID,
                         Array.of(sessionId));
             }
         });

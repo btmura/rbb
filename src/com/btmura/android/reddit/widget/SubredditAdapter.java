@@ -79,7 +79,7 @@ public class SubredditAdapter extends BaseCursorAdapter {
                 public void run() {
                     ContentResolver cr = appContext.getContentResolver();
                     cr.delete(SubredditSearchProvider.CONTENT_URI,
-                            SubredditSearches.SELECTION_BY_SESSION_ID,
+                            SubredditSearches.SELECT_BY_SESSION_ID,
                             Array.of(sessionId));
                 }
             });
@@ -104,7 +104,7 @@ public class SubredditAdapter extends BaseCursorAdapter {
             String sessionId, String query) {
         if (!TextUtils.isEmpty(query)) {
             return new CursorLoader(context, uri, PROJECTION_SEARCH,
-                    SubredditSearches.SELECTION_BY_SESSION_ID,
+                    SubredditSearches.SELECT_BY_SESSION_ID,
                     Array.of(sessionId),
                     SubredditSearches.SORT_BY_NAME);
         } else {

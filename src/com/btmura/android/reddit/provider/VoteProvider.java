@@ -186,7 +186,7 @@ public class VoteProvider extends BaseProvider {
                         .appendQueryParameter(PARAM_NOTIFY_OTHERS,
                                 Boolean.toString(true))
                         .build();
-                int count = cr.update(uri, values, Votes.SELECTION_BY_ACCOUNT_AND_THING_ID,
+                int count = cr.update(uri, values, Votes.SELECT_BY_ACCOUNT_AND_THING_ID,
                         selectionArgs);
                 if (count == 0) {
                     cr.insert(uri, values);

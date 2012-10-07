@@ -54,9 +54,9 @@ public class Comments implements BaseColumns {
     public static final int KIND_COMMENT = 1;
     public static final int KIND_MORE = 2;
 
-    public static final String SELECTION_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
+    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
 
-    public static final String SELECTION_BEFORE_TIMESTAMP =
+    public static final String SELECT_BEFORE_TIMESTAMP =
             COLUMN_SESSION_TIMESTAMP + " < ?";
 
     // TODO: Do we need an index for sequence and id?

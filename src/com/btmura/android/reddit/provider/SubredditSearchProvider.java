@@ -86,7 +86,7 @@ public class SubredditSearchProvider extends SessionProvider {
             try {
                 // Delete old results that can't be possibly viewed anymore.
                 cleaned = db.delete(SubredditSearches.TABLE_NAME,
-                        SubredditSearches.SELECTION_BEFORE_TIMESTAMP,
+                        SubredditSearches.SELECT_BEFORE_TIMESTAMP,
                         Array.of(timestampCutoff));
                 InsertHelper insertHelper = new InsertHelper(db, SubredditSearches.TABLE_NAME);
                 int count = listing.values.size();

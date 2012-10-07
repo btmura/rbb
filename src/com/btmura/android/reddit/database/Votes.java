@@ -31,10 +31,10 @@ public class Votes implements BaseColumns {
     public static final int VOTE_UP = 1;
     public static final int VOTE_DOWN = -1;
 
-    public static final String SELECTION_BY_ACCOUNT = COLUMN_ACCOUNT + " = ?";
+    public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + " = ?";
 
-    public static final String SELECTION_BY_ACCOUNT_AND_THING_ID =
-            SELECTION_BY_ACCOUNT + " AND " + COLUMN_THING_ID + " = ?";
+    public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
+            SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + " = ?";
 
     static void createTable(SQLiteDatabase db) {
         // TODO: Add unique constraint for account + thingId

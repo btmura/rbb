@@ -41,9 +41,9 @@ public class SubredditSearches implements BaseColumns {
     /** Number of subscribers to this subreddit. */
     public static final String COLUMN_SUBSCRIBERS = "subscribers";
 
-    public static final String SELECTION_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
+    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
 
-    public static final String SELECTION_BEFORE_TIMESTAMP = COLUMN_SESSION_TIMESTAMP + " < ?";
+    public static final String SELECT_BEFORE_TIMESTAMP = COLUMN_SESSION_TIMESTAMP + " < ?";
 
     public static final String SORT_BY_NAME = SubredditSearches.COLUMN_NAME + " COLLATE NOCASE ASC";
 

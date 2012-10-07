@@ -85,7 +85,7 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Get all pending votes for this account that haven't been synced.
             Cursor c = provider.query(VoteProvider.ACTIONS_URI, PROJECTION,
-                    Votes.SELECTION_BY_ACCOUNT, Array.of(account.name), null);
+                    Votes.SELECT_BY_ACCOUNT, Array.of(account.name), null);
 
             ArrayList<ContentProviderOperation> ops =
                     new ArrayList<ContentProviderOperation>(c.getCount());

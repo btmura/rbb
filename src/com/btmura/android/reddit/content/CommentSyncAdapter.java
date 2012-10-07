@@ -90,7 +90,7 @@ public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Get all pending replies that have not been synced.
             Cursor c = provider.query(CommentProvider.ACTIONS_URI, PROJECTION,
-                    CommentActions.SELECTION_BY_ACCOUNT, Array.of(account.name),
+                    CommentActions.SELECT_BY_ACCOUNT, Array.of(account.name),
                     CommentActions.SORT_BY_ID);
 
             int count = c.getCount();

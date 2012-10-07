@@ -221,7 +221,7 @@ class CommentListing extends JsonParser {
     private void mergeActions() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(CommentActions.TABLE_NAME, PROJECTION,
-                CommentActions.SELECTION_BY_ACCOUNT_AND_PARENT_THING_ID,
+                CommentActions.SELECT_BY_ACCOUNT_AND_PARENT_THING_ID,
                 Array.of(accountName, thingId),
                 null, null, CommentActions.SORT_BY_ID);
         try {

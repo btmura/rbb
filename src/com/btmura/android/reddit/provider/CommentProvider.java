@@ -265,7 +265,7 @@ public class CommentProvider extends SessionProvider {
             db.beginTransaction();
             try {
                 // Delete old comments that can't possibly be viewed anymore.
-                cleaned = db.delete(Comments.TABLE_NAME, Comments.SELECTION_BEFORE_TIMESTAMP,
+                cleaned = db.delete(Comments.TABLE_NAME, Comments.SELECT_BEFORE_TIMESTAMP,
                         Array.of(timestampCutoff));
 
                 InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
