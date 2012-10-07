@@ -155,6 +155,12 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         long expiration = c.getLong(INDEX_EXPIRATION);
         int state = c.getInt(INDEX_STATE);
 
+        // Front page is a synthetic subreddit we don't need to sync.
+        if (Subreddits.isFrontPage(name)) {
+            return;
+        }
+
+        // Remove subreddit from the list, since it's now new.
         String found = find(subreddits, name);
         if (found != null) {
             subreddits.remove(found);
@@ -166,12 +172,14 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
                     if (!name.equals(found)) {
                         ops.add(ContentProviderOperation.newUpdate(SubredditProvider.CONTENT_URI)
                                 .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
-                                .withValue(Subreddits.COLUMN_NAME, found).build());
+                                .withValue(Subreddits.COLUMN_NAME, found)
+                                .build());
                         opCounts[OP_UPDATES]++;
                     }
                 } else {
                     ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
-                            .withSelection(SubredditProvider.ID_SELECTION, Array.of(id)).build());
+                            .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
+                            .build());
                     opCounts[OP_DELETES]++;
                 }
                 break;
@@ -185,7 +193,8 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
                         long newExpiration = System.currentTimeMillis() + EXPIRATION_PADDING;
                         ops.add(ContentProviderOperation.newUpdate(SubredditProvider.CONTENT_URI)
                                 .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
-                                .withValue(Subreddits.COLUMN_EXPIRATION, newExpiration).build());
+                                .withValue(Subreddits.COLUMN_EXPIRATION, newExpiration)
+                                .build());
                         opCounts[OP_UPDATES]++;
                     } catch (IOException e) {
                         syncResult.stats.numIoExceptions++;
@@ -195,7 +204,8 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
                         ops.add(ContentProviderOperation.newUpdate(SubredditProvider.CONTENT_URI)
                                 .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
                                 .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
-                                .withValue(Subreddits.COLUMN_EXPIRATION, 0).build());
+                                .withValue(Subreddits.COLUMN_EXPIRATION, 0)
+                                .build());
                         opCounts[OP_UPDATES]++;
                     } else if (state == Subreddits.STATE_DELETING) {
                         ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
@@ -219,7 +229,8 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
                     .withValue(Subreddits.COLUMN_ACCOUNT, account.name)
                     .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
                     .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
-                    .withValue(Subreddits.COLUMN_EXPIRATION, 0).build());
+                    .withValue(Subreddits.COLUMN_EXPIRATION, 0)
+                    .build());
             opCounts[OP_INSERTS]++;
         }
     }
@@ -242,16 +253,19 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 2);
         ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
-                .withSelection(SubredditProvider.SELECTION_ACCOUNT, new String[] {login}).build());
+                .withSelection(SubredditProvider.SELECTION_ACCOUNT, new String[] {login})
+                .build());
         ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
                 .withValue(Subreddits.COLUMN_ACCOUNT, login)
                 .withValue(Subreddits.COLUMN_NAME, Subreddits.NAME_FRONT_PAGE)
-                .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING).build());
+                .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
+                .build());
         for (int i = 0; i < count; i++) {
             ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
                     .withValue(Subreddits.COLUMN_ACCOUNT, login)
                     .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
-                    .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL).build());
+                    .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
+                    .build());
         }
         ContentResolver cr = context.getContentResolver();
         cr.applyBatch(SubredditProvider.AUTHORITY, ops);
