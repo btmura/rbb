@@ -66,7 +66,7 @@ public class BackupAgent extends android.app.backup.BackupAgent {
         ByteArrayOutputStream b = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(b);
 
-        Cursor c = getContentResolver().query(SubredditProvider.CONTENT_URI,
+        Cursor c = getContentResolver().query(SubredditProvider.SUBREDDITS_URI,
                 PROJECTION,
                 Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED,
                 Array.of(Subreddits.ACCOUNT_NONE),
@@ -96,9 +96,9 @@ public class BackupAgent extends android.app.backup.BackupAgent {
         int count = in.readInt();
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 1);
-        ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI).build());
+        ops.add(ContentProviderOperation.newDelete(SubredditProvider.SUBREDDITS_URI).build());
         for (int i = 0; i < count; i++) {
-            ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
+            ops.add(ContentProviderOperation.newInsert(SubredditProvider.SUBREDDITS_URI)
                     .withValue(Subreddits.COLUMN_NAME, in.readUTF()).build());
         }
         try {

@@ -120,11 +120,6 @@
             android:exported="false"
             android:label="@string/provider_subreddits" />
         <provider
-            android:name=".provider.SubredditSearchProvider"
-            android:authorities="@string/authority_subreddit_searches"
-            android:exported="false"
-            android:label="@string/provider_subreddit_searches" />
-        <provider
             android:name=".provider.ThingProvider"
             android:authorities="@string/authority_things"
             android:exported="false"

@@ -16,17 +16,20 @@
 
 package com.btmura.android.reddit.provider;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.backup.BackupManager;
 import android.content.ContentProviderOperation;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,56 +37,119 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.SubredditSearches;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Array;
 
-public class SubredditProvider extends BaseProvider {
+public class SubredditProvider extends SessionProvider {
 
     public static final String TAG = "SubredditProvider";
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.subreddits";
+
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
-    public static final Uri CONTENT_URI = Uri.parse(SubredditProvider.BASE_AUTHORITY_URI
-            + Subreddits.TABLE_NAME);
+    static final String PATH_SUBREDDITS = "subreddits";
+    static final String PATH_SEARCHES = "searches";
+
+    public static final Uri SUBREDDITS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_SUBREDDITS);
+    public static final Uri SEARCHES_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_SEARCHES);
+
+    // Query parameters related to fetching search results before querying.
+    public static final String SYNC_ENABLE = "sync";
+    public static final String SYNC_ACCOUNT = "accountName";
+    public static final String SYNC_SESSION_ID = "sessionId";
+    public static final String SYNC_QUERY = "query";
 
     /** Sync changes back to the network. Don't set this in sync adapters. */
     public static final String PARAM_SYNC = "syncToNetwork";
 
-    private static final Uri SYNC_URI = CONTENT_URI.buildUpon()
-            .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
-            .build();
-
-    private static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
-            + SubredditProvider.AUTHORITY + "." + Subreddits.TABLE_NAME;
-    private static final String MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
-            + SubredditProvider.AUTHORITY + "." + Subreddits.TABLE_NAME;
-
     private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_ALL_SUBREDDITS = 1;
-    private static final int MATCH_ONE_SUBREDDIT = 2;
+    private static final int MATCH_SUBREDDITS = 1;
+    private static final int MATCH_SEARCHES = 2;
     static {
-        MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME, MATCH_ALL_SUBREDDITS);
-        MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
+        MATCHER.addURI(AUTHORITY, PATH_SUBREDDITS, MATCH_SUBREDDITS);
+        MATCHER.addURI(AUTHORITY, PATH_SEARCHES, MATCH_SEARCHES);
     }
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ONE_SUBREDDIT:
-                selection = appendIdSelection(selection);
-                selectionArgs = Array.append(selectionArgs, uri.getLastPathSegment());
-                break;
+        processQueryUri(uri);
+        String tableName = getTableName(uri);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "query table: " + tableName);
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor c = db.query(Subreddits.TABLE_NAME, projection, selection, selectionArgs, null,
-                null, sortOrder);
+        Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
+    }
+
+    private void processQueryUri(Uri uri) {
+        if (MATCHER.match(uri) != MATCH_SEARCHES
+                || !uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
+            return;
+        }
+
+        try {
+            // Determine the cutoff first to avoid deleting synced data.
+            long timestampCutoff = getSessionTimestampCutoff();
+            long sessionTimestamp = System.currentTimeMillis();
+
+            String accountName = uri.getQueryParameter(SYNC_ACCOUNT);
+            String sessionId = uri.getQueryParameter(SYNC_SESSION_ID);
+            String query = uri.getQueryParameter(SYNC_QUERY);
+
+            Context context = getContext();
+            String cookie = AccountUtils.getCookie(context, accountName);
+            SubredditSearchListing listing = SubredditSearchListing.get(context, accountName,
+                    sessionId, sessionTimestamp, query, cookie);
+
+            long cleaned;
+            SQLiteDatabase db = helper.getWritableDatabase();
+            db.beginTransaction();
+            try {
+                // Delete old results that can't be possibly viewed anymore.
+                cleaned = db.delete(SubredditSearches.TABLE_NAME,
+                        SubredditSearches.SELECT_BEFORE_TIMESTAMP,
+                        Array.of(timestampCutoff));
+                InsertHelper insertHelper = new InsertHelper(db, SubredditSearches.TABLE_NAME);
+                int count = listing.values.size();
+                for (int i = 0; i < count; i++) {
+                    insertHelper.insert(listing.values.get(i));
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "cleaned: " + cleaned);
+            }
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    private String getTableName(Uri uri) {
+        int match = MATCHER.match(uri);
+        switch (match) {
+            case MATCH_SUBREDDITS:
+                return Subreddits.TABLE_NAME;
+
+            case MATCH_SEARCHES:
+                return SubredditSearches.TABLE_NAME;
+
+            default:
+                throw new IllegalArgumentException("uri: " + uri);
+        }
     }
 
     @Override
@@ -99,16 +165,8 @@ public class SubredditProvider extends BaseProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ONE_SUBREDDIT:
-                selection = appendIdSelection(selection);
-                selectionArgs = Array.append(selectionArgs, uri.getLastPathSegment());
-                break;
-        }
-
         SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.update(Subreddits.TABLE_NAME, values, selection, selectionArgs);
+        int count = db.update(getTableName(uri), values, selection, selectionArgs);
         if (count > 0) {
             notifyChange(uri);
         }
@@ -117,16 +175,8 @@ public class SubredditProvider extends BaseProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ONE_SUBREDDIT:
-                selection = appendIdSelection(selection);
-                selectionArgs = Array.append(selectionArgs, uri.getLastPathSegment());
-                break;
-        }
-
         SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.delete(Subreddits.TABLE_NAME, selection, selectionArgs);
+        int count = db.delete(getTableName(uri), selection, selectionArgs);
         if (count > 0) {
             notifyChange(uri);
         }
@@ -135,17 +185,7 @@ public class SubredditProvider extends BaseProvider {
 
     @Override
     public String getType(Uri uri) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ALL_SUBREDDITS:
-                return MIME_TYPE_DIR;
-
-            case MATCH_ONE_SUBREDDIT:
-                return MIME_TYPE_ITEM;
-
-            default:
-                return null;
-        }
+        return null;
     }
 
     private void notifyChange(Uri uri) {
@@ -169,16 +209,20 @@ public class SubredditProvider extends BaseProvider {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
+                Uri syncUri = SUBREDDITS_URI.buildUpon()
+                        .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
+                        .build();
+
                 int count = subreddits.length;
                 ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
                         count * 2);
                 int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
                 for (int i = 0; i < count; i++) {
-                    ops.add(ContentProviderOperation.newDelete(SYNC_URI)
+                    ops.add(ContentProviderOperation.newDelete(syncUri)
                             .withSelection(Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
                                     Array.of(accountName, subreddits[i]))
                             .build());
-                    ops.add(ContentProviderOperation.newInsert(SYNC_URI)
+                    ops.add(ContentProviderOperation.newInsert(syncUri)
                             .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                             .withValue(Subreddits.COLUMN_NAME, subreddits[i])
                             .withValue(Subreddits.COLUMN_STATE, state)

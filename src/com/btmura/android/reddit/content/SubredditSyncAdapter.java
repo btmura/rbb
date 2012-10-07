@@ -139,7 +139,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
     private void syncDatabase(Account account, ContentProviderClient provider, String cookie,
             String modhash, ArrayList<String> subreddits, ArrayList<ContentProviderOperation> ops,
             int[] opCounts, SyncResult syncResult) throws RemoteException {
-        Cursor c = provider.query(SubredditProvider.CONTENT_URI, PROJECTION,
+        Cursor c = provider.query(SubredditProvider.SUBREDDITS_URI, PROJECTION,
                 Subreddits.SELECT_BY_ACCOUNT, Array.of(account.name), null);
         while (c.moveToNext()) {
             syncRow(c, cookie, modhash, subreddits, ops, opCounts, syncResult);
@@ -170,14 +170,14 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
             case Subreddits.STATE_NORMAL:
                 if (found != null) {
                     if (!name.equals(found)) {
-                        ops.add(ContentProviderOperation.newUpdate(SubredditProvider.CONTENT_URI)
+                        ops.add(ContentProviderOperation.newUpdate(SubredditProvider.SUBREDDITS_URI)
                                 .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
                                 .withValue(Subreddits.COLUMN_NAME, found)
                                 .build());
                         opCounts[OP_UPDATES]++;
                     }
                 } else {
-                    ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
+                    ops.add(ContentProviderOperation.newDelete(SubredditProvider.SUBREDDITS_URI)
                             .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
                             .build());
                     opCounts[OP_DELETES]++;
@@ -191,7 +191,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
                         boolean subscribe = state == Subreddits.STATE_INSERTING;
                         RedditApi.subscribe(cookie, modhash, name, subscribe);
                         long newExpiration = System.currentTimeMillis() + EXPIRATION_PADDING;
-                        ops.add(ContentProviderOperation.newUpdate(SubredditProvider.CONTENT_URI)
+                        ops.add(ContentProviderOperation.newUpdate(SubredditProvider.SUBREDDITS_URI)
                                 .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
                                 .withValue(Subreddits.COLUMN_EXPIRATION, newExpiration)
                                 .build());
@@ -201,14 +201,14 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
                 } else if (System.currentTimeMillis() >= expiration) {
                     if (state == Subreddits.STATE_INSERTING) {
-                        ops.add(ContentProviderOperation.newUpdate(SubredditProvider.CONTENT_URI)
+                        ops.add(ContentProviderOperation.newUpdate(SubredditProvider.SUBREDDITS_URI)
                                 .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
                                 .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
                                 .withValue(Subreddits.COLUMN_EXPIRATION, 0)
                                 .build());
                         opCounts[OP_UPDATES]++;
                     } else if (state == Subreddits.STATE_DELETING) {
-                        ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
+                        ops.add(ContentProviderOperation.newDelete(SubredditProvider.SUBREDDITS_URI)
                                 .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
                                 .build());
                         opCounts[OP_DELETES]++;
@@ -225,7 +225,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
             ArrayList<ContentProviderOperation> ops, int[] opCounts) {
         int size = subreddits.size();
         for (int i = 0; i < size; i++) {
-            ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
+            ops.add(ContentProviderOperation.newInsert(SubredditProvider.SUBREDDITS_URI)
                     .withValue(Subreddits.COLUMN_ACCOUNT, account.name)
                     .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
                     .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
@@ -252,16 +252,16 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         int count = subreddits.size();
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 2);
-        ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
+        ops.add(ContentProviderOperation.newDelete(SubredditProvider.SUBREDDITS_URI)
                 .withSelection(Subreddits.SELECT_BY_ACCOUNT, Array.of(login))
                 .build());
-        ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
+        ops.add(ContentProviderOperation.newInsert(SubredditProvider.SUBREDDITS_URI)
                 .withValue(Subreddits.COLUMN_ACCOUNT, login)
                 .withValue(Subreddits.COLUMN_NAME, Subreddits.NAME_FRONT_PAGE)
                 .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
                 .build());
         for (int i = 0; i < count; i++) {
-            ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
+            ops.add(ContentProviderOperation.newInsert(SubredditProvider.SUBREDDITS_URI)
                     .withValue(Subreddits.COLUMN_ACCOUNT, login)
                     .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
                     .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)

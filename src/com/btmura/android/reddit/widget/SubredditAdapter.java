@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 import com.btmura.android.reddit.database.SubredditSearches;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.SubredditProvider;
-import com.btmura.android.reddit.provider.SubredditSearchProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
@@ -79,7 +78,7 @@ public class SubredditAdapter extends BaseCursorAdapter {
             AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
                 public void run() {
                     ContentResolver cr = appContext.getContentResolver();
-                    cr.delete(SubredditSearchProvider.CONTENT_URI,
+                    cr.delete(SubredditProvider.SEARCHES_URI,
                             SubredditSearches.SELECT_BY_SESSION_ID,
                             Array.of(sessionId));
                 }
@@ -90,14 +89,14 @@ public class SubredditAdapter extends BaseCursorAdapter {
     private static Uri getUri(String accountName, String sessionId, String query, boolean sync) {
         if (!TextUtils.isEmpty(query)) {
             String syncVal = Boolean.toString(sync);
-            return SubredditSearchProvider.CONTENT_URI.buildUpon()
-                    .appendQueryParameter(SubredditSearchProvider.SYNC_ENABLE, syncVal)
-                    .appendQueryParameter(SubredditSearchProvider.SYNC_ACCOUNT, accountName)
-                    .appendQueryParameter(SubredditSearchProvider.SYNC_SESSION_ID, sessionId)
-                    .appendQueryParameter(SubredditSearchProvider.SYNC_QUERY, query)
+            return SubredditProvider.SEARCHES_URI.buildUpon()
+                    .appendQueryParameter(SubredditProvider.SYNC_ENABLE, syncVal)
+                    .appendQueryParameter(SubredditProvider.SYNC_ACCOUNT, accountName)
+                    .appendQueryParameter(SubredditProvider.SYNC_SESSION_ID, sessionId)
+                    .appendQueryParameter(SubredditProvider.SYNC_QUERY, query)
                     .build();
         } else {
-            return SubredditProvider.CONTENT_URI;
+            return SubredditProvider.SUBREDDITS_URI;
         }
     }
 
