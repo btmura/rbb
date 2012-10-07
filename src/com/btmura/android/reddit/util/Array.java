@@ -29,12 +29,7 @@ public class Array {
     }
 
     public static String[] of(String... elements) {
-        int length = elements.length;
-        String[] array = new String[length];
-        for (int i = 0; i < length; i++) {
-            array[i] = elements[i];
-        }
-        return array;
+        return elements;
     }
 
     public static String[] append(String[] original, String element) {
