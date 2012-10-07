@@ -14,16 +14,19 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <item
         android:id="@+id/menu_view_thing_sidebar"
         android:title="@string/menu_view_sidebar"/>
+    <!-- Ignore usability warning since we want Share to be shown no matter what. -->
     <item
         android:id="@+id/menu_share"
         android:actionProviderClass="android.widget.ShareActionProvider"
         android:showAsAction="always"
-        android:title="@string/menu_share"/>
+        android:title="@string/menu_share"
+        tools:ignore="AlwaysShowAction"/>
     <item
         android:id="@+id/menu_link"
         android:icon="@drawable/ic_action_link"

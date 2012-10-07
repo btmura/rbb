@@ -15,6 +15,7 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.btmura.android.reddit"
     android:versionCode="3"
     android:versionName="2.0" >
@@ -37,34 +38,43 @@
             android:name=".accounts.AccountAuthenticatorActivity"
             android:label="@string/add_account"
             android:theme="@android:style/Theme.Holo.Light.Dialog" />
+        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.BrowserActivity"
-            android:clearTaskOnLaunch="true" >
+            android:clearTaskOnLaunch="true"
+            tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.ContentBrowserActivity"
-            android:label="@string/content_browser" >
+            android:label="@string/content_browser"
+            tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".app.SearchActivity" >
+        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
+        <activity
+            android:name=".app.SearchActivity"
+            tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.SettingsActivity"
-            android:label="@string/settings_label" >
+            android:label="@string/settings_label"
+            tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -74,10 +84,12 @@
         <activity
             android:name=".app.SidebarActivity"
             android:theme="@android:style/Theme.Holo.Light.DialogWhenLarge" />
+        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.SubmitLinkActivity"
             android:label="@string/submit_link_label"
-            android:theme="@android:style/Theme.Holo.Light.DialogWhenLarge" >
+            android:theme="@android:style/Theme.Holo.Light.DialogWhenLarge"
+            tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
