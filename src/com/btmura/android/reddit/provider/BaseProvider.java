@@ -18,14 +18,14 @@ package com.btmura.android.reddit.provider;
 
 import java.util.ArrayList;
 
-import com.btmura.android.reddit.database.DbHelper;
-
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.OperationApplicationException;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+
+import com.btmura.android.reddit.database.DbHelper;
 
 abstract class BaseProvider extends ContentProvider {
 
@@ -58,25 +58,6 @@ abstract class BaseProvider extends ContentProvider {
             return ID_SELECTION;
         } else {
             return selection + " AND " + ID_SELECTION;
-        }
-    }
-
-    static String[] idSelectionArg(long id) {
-        return appendIdSelectionArg(null, id);
-    }
-
-    static String[] appendIdSelectionArg(String[] selectionArgs, long id) {
-        return appendIdSelectionArg(selectionArgs, Long.toString(id));
-    }
-
-    static String[] appendIdSelectionArg(String[] selectionArgs, String id) {
-        if (selectionArgs == null) {
-            return new String[] {id};
-        } else {
-            String[] newSelectionArgs = new String[selectionArgs.length + 1];
-            System.arraycopy(selectionArgs, 0, newSelectionArgs, 0, selectionArgs.length);
-            newSelectionArgs[newSelectionArgs.length - 1] = id;
-            return newSelectionArgs;
         }
     }
 }

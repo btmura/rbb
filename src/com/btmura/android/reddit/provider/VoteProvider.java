@@ -66,7 +66,7 @@ public class VoteProvider extends BaseProvider {
         switch (match) {
             case MATCH_ONE_ACTION:
                 selection = appendIdSelection(selection);
-                selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
+                selectionArgs = Array.append(selectionArgs, uri.getLastPathSegment());
                 break;
         }
 
@@ -105,7 +105,7 @@ public class VoteProvider extends BaseProvider {
         switch (match) {
             case MATCH_ONE_ACTION:
                 selection = appendIdSelection(selection);
-                selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
+                selectionArgs = Array.append(selectionArgs, uri.getLastPathSegment());
                 break;
         }
 
@@ -135,7 +135,7 @@ public class VoteProvider extends BaseProvider {
         switch (match) {
             case MATCH_ONE_ACTION:
                 selection = appendIdSelection(selection);
-                selectionArgs = appendIdSelectionArg(selectionArgs, uri.getLastPathSegment());
+                selectionArgs = Array.append(selectionArgs, uri.getLastPathSegment());
                 break;
         }
 

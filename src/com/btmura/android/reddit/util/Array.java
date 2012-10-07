@@ -28,13 +28,23 @@ public class Array {
         return new String[] {Long.toString(oneLong)};
     }
 
-    public static String[] of(Object... elements) {
+    public static String[] of(String... elements) {
         int length = elements.length;
         String[] array = new String[length];
         for (int i = 0; i < length; i++) {
-            array[i] = elements[i].toString();
+            array[i] = elements[i];
         }
         return array;
+    }
+
+    public static String[] append(String[] original, String element) {
+        if (original == null) {
+            return new String[] {element};
+        } else {
+            original = ensureLength(original, original.length + 1);
+            original[original.length - 1] = element;
+            return original;
+        }
     }
 
     public static <T> T[] ensureLength(T[] original, int capacity) {
