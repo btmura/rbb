@@ -38,8 +38,9 @@ public class Subreddits implements BaseColumns {
 
     public static final String SORT_BY_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
 
-    public static final String NAME_FRONT_PAGE = "";
     public static final String ACCOUNT_NONE = "";
+
+    public static final String NAME_FRONT_PAGE = "";
 
     public static final int STATE_NORMAL = 0;
     public static final int STATE_INSERTING = 1;
@@ -74,7 +75,7 @@ public class Subreddits implements BaseColumns {
 
     static void insertDefaultSubreddits(SQLiteDatabase db) {
         String[] defaultSubreddits = {
-                "",
+                NAME_FRONT_PAGE,
                 "AdviceAnimals",
                 "announcements",
                 "AskReddit",
