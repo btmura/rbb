@@ -28,7 +28,7 @@ import android.text.TextUtils;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.util.Array;
 
-public class Subreddits implements BaseColumns, SyncColumns {
+public class Subreddits implements BaseColumns {
     public static final String TABLE_NAME = "subreddits";
 
     public static final String COLUMN_ACCOUNT = "account";
@@ -40,6 +40,10 @@ public class Subreddits implements BaseColumns, SyncColumns {
 
     public static final String NAME_FRONT_PAGE = "";
     public static final String ACCOUNT_NONE = "";
+
+    public static final int STATE_NORMAL = 0;
+    public static final int STATE_INSERTING = 1;
+    public static final int STATE_DELETING = 2;
 
     public static boolean isFrontPage(String subreddit) {
         return TextUtils.isEmpty(subreddit);
