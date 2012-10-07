@@ -36,6 +36,12 @@ public class Subreddits implements BaseColumns {
     public static final String COLUMN_STATE = "state";
     public static final String COLUMN_EXPIRATION = "expiration";
 
+    public static final String SELECT_BY_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
+    public static final String SELECT_BY_ACCOUNT_NOT_DELETED = SELECT_BY_ACCOUNT + " AND "
+            + Subreddits.COLUMN_STATE + "!= " + Subreddits.STATE_DELETING;
+    public static final String SELECT_BY_ACCOUNT_AND_NAME = SELECT_BY_ACCOUNT + " AND "
+            + Subreddits.COLUMN_NAME + "= ?";
+
     public static final String SORT_BY_NAME = Subreddits.COLUMN_NAME + " COLLATE NOCASE ASC";
 
     public static final String ACCOUNT_NONE = "";

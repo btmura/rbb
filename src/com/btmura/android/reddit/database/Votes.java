@@ -32,7 +32,6 @@ public class Votes implements BaseColumns {
     public static final int VOTE_DOWN = -1;
 
     public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + " = ?";
-
     public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
             SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + " = ?";
 

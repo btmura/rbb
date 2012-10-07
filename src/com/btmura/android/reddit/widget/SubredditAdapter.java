@@ -68,7 +68,8 @@ public class SubredditAdapter extends BaseCursorAdapter {
         }
     }
 
-    public static void deleteSessionData(final Context context, final String sessionId, String query) {
+    public static void
+            deleteSessionData(final Context context, final String sessionId, String query) {
         if (!TextUtils.isEmpty(query)) {
             // Use application context to allow activity to be collected and
             // schedule the session deletion in the background thread pool
@@ -109,7 +110,7 @@ public class SubredditAdapter extends BaseCursorAdapter {
                     SubredditSearches.SORT_BY_NAME);
         } else {
             return new CursorLoader(context, uri, PROJECTION_SUBREDDITS,
-                    SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
+                    Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED,
                     Array.of(accountName),
                     Subreddits.SORT_BY_NAME);
         }

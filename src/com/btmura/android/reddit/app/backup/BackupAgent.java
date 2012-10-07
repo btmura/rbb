@@ -33,6 +33,7 @@ import android.os.RemoteException;
 
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.util.Array;
 
 public class BackupAgent extends android.app.backup.BackupAgent {
 
@@ -67,8 +68,8 @@ public class BackupAgent extends android.app.backup.BackupAgent {
 
         Cursor c = getContentResolver().query(SubredditProvider.CONTENT_URI,
                 PROJECTION,
-                SubredditProvider.SELECTION_ACCOUNT_NOT_DELETED,
-                new String[] {Subreddits.ACCOUNT_NONE},
+                Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED,
+                Array.of(Subreddits.ACCOUNT_NONE),
                 Subreddits.SORT_BY_NAME);
         try {
             out.writeInt(c.getCount());

@@ -140,7 +140,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
             String modhash, ArrayList<String> subreddits, ArrayList<ContentProviderOperation> ops,
             int[] opCounts, SyncResult syncResult) throws RemoteException {
         Cursor c = provider.query(SubredditProvider.CONTENT_URI, PROJECTION,
-                SubredditProvider.SELECTION_ACCOUNT, Array.of(account.name), null);
+                Subreddits.SELECT_BY_ACCOUNT, Array.of(account.name), null);
         while (c.moveToNext()) {
             syncRow(c, cookie, modhash, subreddits, ops, opCounts, syncResult);
         }
@@ -253,7 +253,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
 
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 2);
         ops.add(ContentProviderOperation.newDelete(SubredditProvider.CONTENT_URI)
-                .withSelection(SubredditProvider.SELECTION_ACCOUNT, new String[] {login})
+                .withSelection(Subreddits.SELECT_BY_ACCOUNT, Array.of(login))
                 .build());
         ops.add(ContentProviderOperation.newInsert(SubredditProvider.CONTENT_URI)
                 .withValue(Subreddits.COLUMN_ACCOUNT, login)

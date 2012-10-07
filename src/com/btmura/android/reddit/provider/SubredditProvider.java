@@ -68,14 +68,6 @@ public class SubredditProvider extends BaseProvider {
         MATCHER.addURI(AUTHORITY, Subreddits.TABLE_NAME + "/#", MATCH_ONE_SUBREDDIT);
     }
 
-    public static final String SELECTION_ACCOUNT = Subreddits.COLUMN_ACCOUNT + "= ?";
-
-    public static final String SELECTION_ACCOUNT_NOT_DELETED = SELECTION_ACCOUNT + " AND "
-            + Subreddits.COLUMN_STATE + "!= " + Subreddits.STATE_DELETING;
-
-    public static final String SELECTION_ACCOUNT_AND_NAME = SELECTION_ACCOUNT + " AND "
-            + Subreddits.COLUMN_NAME + "= ?";
-
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
@@ -183,7 +175,7 @@ public class SubredditProvider extends BaseProvider {
                 int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
                 for (int i = 0; i < count; i++) {
                     ops.add(ContentProviderOperation.newDelete(SYNC_URI)
-                            .withSelection(SELECTION_ACCOUNT_AND_NAME,
+                            .withSelection(Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
                                     Array.of(accountName, subreddits[i]))
                             .build());
                     ops.add(ContentProviderOperation.newInsert(SYNC_URI)
