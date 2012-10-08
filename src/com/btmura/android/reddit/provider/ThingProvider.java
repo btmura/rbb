@@ -41,9 +41,8 @@ public class ThingProvider extends SessionProvider {
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
-    static final String PATH_SESSIONS = "sessions";
-    public static final Uri SESSIONS_URI = Uri.parse(BASE_AUTHORITY_URI
-            + PATH_SESSIONS);
+    static final String PATH_THINGS = "things";
+    public static final Uri THINGS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_THINGS);
 
     public static final String PARAM_SYNC = "sync";
     public static final String PARAM_ACCOUNT = "account";

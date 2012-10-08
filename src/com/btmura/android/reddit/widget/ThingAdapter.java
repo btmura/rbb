@@ -114,7 +114,7 @@ public class ThingAdapter extends BaseCursorAdapter {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
-                cr.delete(ThingProvider.SESSIONS_URI, Things.SELECT_BY_SESSION_ID,
+                cr.delete(ThingProvider.THINGS_URI, Things.SELECT_BY_SESSION_ID,
                         Array.of(sessionId));
             }
         });
@@ -122,7 +122,7 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     private static Uri getUri(String accountName, String sessionId, String subreddit,
             int filter, String more, String query, boolean sync) {
-        Uri.Builder b = ThingProvider.SESSIONS_URI.buildUpon()
+        Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(sync))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
                 .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)

@@ -59,8 +59,8 @@ public class ContentUriListFragment extends ListFragment {
         adapter = new ArrayAdapter<Uri>(getActivity(), R.layout.content_uri_row);
         adapter.add(SubredditProvider.SUBREDDITS_URI);
         adapter.add(SubredditProvider.SEARCHES_URI);
-        adapter.add(ThingProvider.SESSIONS_URI);
-        adapter.add(CommentProvider.SESSIONS_URI);
+        adapter.add(ThingProvider.THINGS_URI);
+        adapter.add(CommentProvider.COMMENTS_URI);
         adapter.add(CommentProvider.ACTIONS_URI);
         adapter.add(VoteProvider.ACTIONS_URI);
         setListAdapter(adapter);

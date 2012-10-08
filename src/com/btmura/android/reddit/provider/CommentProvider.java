@@ -49,12 +49,10 @@ public class CommentProvider extends SessionProvider {
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.comments";
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
-    static final String PATH_SESSIONS = "sessions";
+    static final String PATH_COMMENTS = "comments";
     static final String PATH_ACTIONS = "actions";
-    public static final Uri SESSIONS_URI = Uri.parse(BASE_AUTHORITY_URI
-            + PATH_SESSIONS);
-    public static final Uri ACTIONS_URI = Uri.parse(BASE_AUTHORITY_URI
-            + PATH_ACTIONS);
+    public static final Uri COMMENTS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_COMMENTS);
+    public static final Uri ACTIONS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_ACTIONS);
 
     public static final String PARAM_SYNC = "sync";
     public static final String PARAM_REPLY = "reply";
@@ -66,10 +64,10 @@ public class CommentProvider extends SessionProvider {
     public static final String PARAM_THING_ID = "thingId";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_SESSIONS = 1;
+    private static final int MATCH_COMMENTS = 1;
     private static final int MATCH_ACTIONS = 2;
     static {
-        MATCHER.addURI(AUTHORITY, PATH_SESSIONS, MATCH_SESSIONS);
+        MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENTS);
         MATCHER.addURI(AUTHORITY, PATH_ACTIONS, MATCH_ACTIONS);
     }
 
@@ -100,7 +98,7 @@ public class CommentProvider extends SessionProvider {
     private String getTableName(Uri uri, boolean joinVotes) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_SESSIONS:
+            case MATCH_COMMENTS:
                 return joinVotes ? COMMENTS_WITH_VOTES : Comments.TABLE_NAME;
 
             case MATCH_ACTIONS:
@@ -187,7 +185,7 @@ public class CommentProvider extends SessionProvider {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                Uri uri = SESSIONS_URI.buildUpon()
+                Uri uri = COMMENTS_URI.buildUpon()
                         .appendQueryParameter(PARAM_REPLY, Boolean.toString(true))
                         .appendQueryParameter(PARAM_PARENT_THING_ID, parentThingId)
                         .appendQueryParameter(PARAM_THING_ID, thingId)
@@ -217,7 +215,7 @@ public class CommentProvider extends SessionProvider {
                 ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
                 int count = ids.length;
                 for (int i = 0; i < count; i++) {
-                    Uri uri = SESSIONS_URI.buildUpon()
+                    Uri uri = COMMENTS_URI.buildUpon()
                             .appendQueryParameter(PARAM_DELETE, Boolean.toString(true))
                             .appendQueryParameter(PARAM_ACCOUNT_NAME, accountName)
                             .appendQueryParameter(PARAM_PARENT_THING_ID, parentThingId)
