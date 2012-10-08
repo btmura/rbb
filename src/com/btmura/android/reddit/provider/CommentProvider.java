@@ -306,7 +306,7 @@ public class CommentProvider extends SessionProvider {
         v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
         v.put(CommentActions.COLUMN_THING_ID, thingId);
         v.put(CommentActions.COLUMN_TEXT, values.getAsString(Comments.COLUMN_BODY));
-        db.insert(CommentActions.TABLE_NAME, null, values);
+        db.insert(CommentActions.TABLE_NAME, null, v);
         return true;
     }
 
