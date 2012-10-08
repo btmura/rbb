@@ -87,7 +87,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View
+            onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         ListView l = (ListView) v.findViewById(android.R.id.list);
         l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -243,8 +244,12 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
                 nesting++;
             }
 
-            // Use the same sequence so this appears below the comment.
+            // Use the same sequence so this appears below the comment or place
+            // it at the end if it's a response to the header.
             int sequence = adapter.getInt(position, CommentAdapter.INDEX_SEQUENCE);
+            if (position == 0) {
+                sequence = adapter.getInt(adapter.getCount() - 1, CommentAdapter.INDEX_SEQUENCE);
+            }
 
             Bundle extras = new Bundle(3);
             extras.putInt(Comments.COLUMN_NESTING, nesting);
