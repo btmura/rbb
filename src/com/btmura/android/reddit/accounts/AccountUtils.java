@@ -39,7 +39,7 @@ public class AccountUtils {
 
     public static String getCookie(Context context, String accountName)
             throws OperationCanceledException, AuthenticatorException, IOException {
-        if (isAccount(accountName)) {
+        if (!isAccount(accountName)) {
             return null;
         }
 
