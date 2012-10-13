@@ -64,10 +64,7 @@ public class ThingProvider extends SessionProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
-        if (uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
-            sync(uri);
-        }
-
+        processQueryUri(uri);
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.query(TABLE_NAME_WITH_VOTES, projection, selection, selectionArgs,
                 null, null, sortOrder);
@@ -78,7 +75,11 @@ public class ThingProvider extends SessionProvider {
         return c;
     }
 
-    private void sync(Uri uri) {
+    private void processQueryUri(Uri uri) {
+        if (!uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
+            return;
+        }
+
         try {
             // Determine the cutoff first to avoid deleting synced data when
             // appending more data.
