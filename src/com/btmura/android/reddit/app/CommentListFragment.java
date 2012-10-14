@@ -41,11 +41,13 @@ import com.btmura.android.reddit.app.CommentReplyFragment.OnCommentReplyListener
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
+import com.btmura.android.reddit.util.CommentLogic;
+import com.btmura.android.reddit.util.CommentLogic.CommentList;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
-        MultiChoiceModeListener, OnCommentReplyListener, OnVoteListener {
+        MultiChoiceModeListener, OnCommentReplyListener, OnVoteListener, CommentList {
 
     public static final String TAG = "CommentListFragment";
 
@@ -238,22 +240,9 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             long sessionCreationTime = adapter.getLong(position,
                     CommentAdapter.INDEX_SESSION_CREATION_TIME);
 
-            // Nest an additional level if this is a response to a comment.
-            int nesting = adapter.getInt(position, CommentAdapter.INDEX_NESTING);
-            if (position != 0) {
-                nesting++;
-            }
-
-            // Use the same sequence so this appears below the comment or place
-            // it at the end if it's a response to the header.
-            int sequence = adapter.getInt(position, CommentAdapter.INDEX_SEQUENCE);
-            if (position == 0) {
-                sequence = adapter.getInt(adapter.getCount() - 1, CommentAdapter.INDEX_SEQUENCE);
-            }
-
             Bundle extras = new Bundle(3);
-            extras.putInt(Comments.COLUMN_NESTING, nesting);
-            extras.putInt(Comments.COLUMN_SEQUENCE, sequence);
+            extras.putInt(Comments.COLUMN_NESTING, CommentLogic.getInsertNesting(this, position));
+            extras.putInt(Comments.COLUMN_SEQUENCE, CommentLogic.getInsertSequence(this, position));
             extras.putLong(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime);
 
             CommentReplyFragment frag = CommentReplyFragment.newInstance(thingId, author, extras);
@@ -322,5 +311,17 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             CommentAdapter.deleteSessionData(getActivity(), sessionId);
         }
         super.onDestroy();
+    }
+
+    public int getCommentCount() {
+        return adapter.getCount();
+    }
+
+    public int getCommentNesting(int position) {
+        return adapter.getInt(position, CommentAdapter.INDEX_NESTING);
+    }
+
+    public int getCommentSequence(int position) {
+        return adapter.getInt(position, CommentAdapter.INDEX_SEQUENCE);
     }
 }

@@ -35,15 +35,17 @@ import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Array;
+import com.btmura.android.reddit.util.CommentLogic;
+import com.btmura.android.reddit.util.CommentLogic.CommentList;
 import com.btmura.android.reddit.util.JsonParser;
 
-class CommentListing extends JsonParser {
+class CommentListing extends JsonParser implements CommentList {
 
     public static final String TAG = "CommentListing";
 
@@ -259,29 +261,17 @@ class CommentListing extends JsonParser {
             }
 
             if (id.equals(replyId)) {
-                // TODO: Remove duplicate logic from CommentListFragment.
-
-                // Nest an additional level if this is a response to a comment.
-                int nesting = v.getAsInteger(Comments.COLUMN_NESTING);
-                if (i != 0) {
-                    nesting++;
-                }
-
-                // Use the same sequence so this appears below.
-                int sequence = v.getAsInteger(Comments.COLUMN_SEQUENCE);
-
                 ContentValues p = new ContentValues(8);
                 p.put(Comments.COLUMN_ACCOUNT, accountName);
                 p.put(Comments.COLUMN_AUTHOR, accountName);
                 p.put(Comments.COLUMN_BODY, body);
                 p.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
-                p.put(Comments.COLUMN_NESTING, nesting);
-                p.put(Comments.COLUMN_SEQUENCE, sequence);
+                p.put(Comments.COLUMN_NESTING, CommentLogic.getInsertNesting(this, i));
+                p.put(Comments.COLUMN_SEQUENCE, CommentLogic.getInsertSequence(this, i));
                 p.put(Comments.COLUMN_SESSION_ID, sessionId);
                 p.put(Comments.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
 
-                // Insert the reply after this comment.
-                values.add(i + 1, p);
+                values.add(CommentLogic.getInsertPosition(this, i), p);
                 size++;
 
                 // No reason a reply would appear twice so break out.
@@ -328,5 +318,17 @@ class CommentListing extends JsonParser {
                 break;
             }
         }
+    }
+
+    public int getCommentCount() {
+        return values.size();
+    }
+
+    public int getCommentNesting(int position) {
+        return values.get(position).getAsInteger(Comments.COLUMN_NESTING);
+    }
+
+    public int getCommentSequence(int position) {
+        return values.get(position).getAsInteger(Comments.COLUMN_SEQUENCE);
     }
 }
