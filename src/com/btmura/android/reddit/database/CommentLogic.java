@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.util;
+package com.btmura.android.reddit.database;
 
 /** Class containing logic for inserting new comments. */
 public class CommentLogic {

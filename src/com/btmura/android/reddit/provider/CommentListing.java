@@ -36,13 +36,13 @@ import android.util.JsonToken;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.CommentLogic.CommentList;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Array;
-import com.btmura.android.reddit.util.CommentLogic;
-import com.btmura.android.reddit.util.CommentLogic.CommentList;
 import com.btmura.android.reddit.util.JsonParser;
 
 class CommentListing extends JsonParser implements CommentList {

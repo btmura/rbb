@@ -38,11 +38,11 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.CommentReplyFragment.OnCommentReplyListener;
+import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.CommentLogic.CommentList;
 import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
-import com.btmura.android.reddit.util.CommentLogic;
-import com.btmura.android.reddit.util.CommentLogic.CommentList;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
