@@ -24,7 +24,6 @@
     <string name="app_name">reddit by brian</string>
     <string name="authority_comments">com.btmura.android.reddit.provider.comments</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
-    <string name="authority_subreddit_searches">com.btmura.android.reddit.provider.subredditsearches</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
     <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
     <string name="captcha_image">Captcha image</string>
@@ -70,7 +69,6 @@
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
     <string name="provider_comments">Comments</string>
     <string name="provider_subreddits">Subreddits</string>
-    <string name="provider_subreddit_searches">Subreddit searches</string>
     <string name="provider_things">Things</string>
     <string name="provider_votes">Votes</string>
     <string name="settings_application_details">Application details</string>
