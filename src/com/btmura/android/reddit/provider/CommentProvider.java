@@ -179,7 +179,7 @@ public class CommentProvider extends SessionProvider {
     }
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
-    public static void insertPlaceholderInBackground(Context context, final String accountName,
+    public static void insertInBackground(Context context, final String accountName,
             final String body, final int nesting, final String parentThingId, final int sequence,
             final String sessionId, final long sessionCreationTime, final String thingId) {
         final Context appContext = context.getApplicationContext();

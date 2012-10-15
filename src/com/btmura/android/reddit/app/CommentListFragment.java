@@ -269,7 +269,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         int nesting = extras.getInt(Comments.COLUMN_NESTING);
         int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
         long sessionCreationTime = extras.getLong(Comments.COLUMN_SESSION_TIMESTAMP);
-        CommentProvider.insertPlaceholderInBackground(getActivity(), accountName, text, nesting,
+        CommentProvider.insertInBackground(getActivity(), accountName, text, nesting,
                 thingId, sequence, sessionId, sessionCreationTime, replyThingId);
     }
 
