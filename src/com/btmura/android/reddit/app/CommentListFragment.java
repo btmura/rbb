@@ -275,22 +275,26 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     private boolean handleDelete(ActionMode mode) {
         long[] ids = getListView().getCheckedItemIds();
-        String[] thingIds = getCheckedThingIds();
-        CommentProvider.deleteInBackground(getActivity(), accountName, thingId, ids, thingIds);
+        String[] thingIds = new String[ids.length];
+        boolean[] hasChildren = new boolean[ids.length];
+        fillCheckedInfo(thingIds, hasChildren);
+        CommentProvider.deleteInBackground(getActivity(), accountName, thingId, ids, thingIds,
+                hasChildren);
+        mode.finish();
         return true;
     }
 
-    private String[] getCheckedThingIds() {
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        String[] thingIds = new String[getListView().getCheckedItemCount()];
+    private void fillCheckedInfo(String[] thingIds, boolean[] hasChildren) {
+        SparseBooleanArray checkedPositions = getListView().getCheckedItemPositions();
         int count = adapter.getCount();
         int j = 0;
         for (int i = 0; i < count; i++) {
-            if (checked.get(i)) {
-                thingIds[j++] = adapter.getString(i, CommentAdapter.INDEX_THING_ID);
+            if (checkedPositions.get(i)) {
+                thingIds[j] = adapter.getString(i, CommentAdapter.INDEX_THING_ID);
+                hasChildren[j] = CommentLogic.hasChildren(this, i);
+                j++;
             }
         }
-        return thingIds;
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {

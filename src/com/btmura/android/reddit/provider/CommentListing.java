@@ -286,34 +286,14 @@ class CommentListing extends JsonParser implements CommentList {
         for (int i = 0; i < size; i++) {
             ContentValues v = values.get(i);
             String id = v.getAsString(Comments.COLUMN_THING_ID);
-
-            // This thing could be a placeholder we previously inserted.
-            if (TextUtils.isEmpty(id)) {
-                continue;
-            }
-
             if (deleteId.equals(id)) {
-                // Check nesting to see if there are children.
-                boolean hasChildren = false;
-                int childNesting = v.getAsInteger(Comments.COLUMN_NESTING) + 1;
-                for (int j = i + 1; j < size; j++) {
-                    ContentValues v2 = values.get(j);
-                    int nesting = v2.getAsInteger(Comments.COLUMN_NESTING);
-                    if (nesting == childNesting) {
-                        hasChildren = true;
-                        break;
-                    }
-                }
-
-                // If there are children then just change author and text.
-                // If there are NO children then remove the comment.
-                if (hasChildren) {
+                if (CommentLogic.hasChildren(this, i)) {
                     v.put(Comments.COLUMN_AUTHOR, deleted);
                     v.put(Comments.COLUMN_BODY, deleted);
                 } else {
                     values.remove(i);
+                    size--;
                 }
-
                 // No reason why we would need to delete twice so break out.
                 break;
             }

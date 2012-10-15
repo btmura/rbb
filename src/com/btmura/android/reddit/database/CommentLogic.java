@@ -16,7 +16,9 @@
 
 package com.btmura.android.reddit.database;
 
-/** Class containing logic for inserting new comments. */
+/**
+ * Class containing logic for inserting and deleting new comments.
+ */
 public class CommentLogic {
 
     public interface CommentList {
@@ -73,6 +75,33 @@ public class CommentLogic {
             }
             return position + 1;
         }
+    }
+
+    /**
+     * @return whether a comment is completely removable. If it has children,
+     *         then we will show [deleted] rather than erasing it completely.
+     */
+    public static boolean hasChildren(CommentList list, int position) {
+        int nesting = list.getCommentNesting(position);
+        if (position + 1 < list.getCommentCount()) {
+            int nextNesting = list.getCommentNesting(position + 1);
+
+            // If the next comment has the same nesting, then this comment must
+            // have no children. It's safe to remove completely.
+            if (nesting == nextNesting) {
+                return false;
+            }
+
+            // If the next comment is nested once more, then it's reply to this
+            // comment, so we want to just mark this comment as [deleted].
+            if (nesting + 1 == nextNesting) {
+                return true;
+            }
+        }
+
+        // If this is the last comment, then there are no replies. It's safe to
+        // remove completely.
+        return false;
     }
 
     private CommentLogic() {
