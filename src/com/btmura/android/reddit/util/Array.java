@@ -21,6 +21,13 @@ import java.util.Arrays;
 public class Array {
 
     /**
+     * Returns true if the array is null or empty
+     */
+    public static <T> boolean isEmpty(T[] array) {
+        return array == null || array.length == 0;
+    }
+
+    /**
      * Returns one element string array with the long in it. Hopefully avoids
      * auto-boxing into a Long object.
      */

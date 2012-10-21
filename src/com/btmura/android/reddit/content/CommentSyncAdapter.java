@@ -121,16 +121,19 @@ public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
                         result = RedditApi.delete(thingId, cookie, modhash);
                     }
 
-                    if (!result.hasErrors()) {
+                    // Log any errors if there were any.
+                    if (BuildConfig.DEBUG) {
+                        result.logErrors(TAG);
+                    }
+
+                    if (!result.shouldRetry()) {
                         syncResult.stats.numDeletes += provider.delete(
                                 CommentProvider.ACTIONS_URI,
                                 CommentProvider.ID_SELECTION, Array.of(id));
                         count--;
-                    } else if (BuildConfig.DEBUG) {
-                        result.logErrors(TAG);
                     }
 
-                    // Record the number skipped for stats purposes only.
+                    // Record the number of entries left for stats purposes only.
                     syncResult.stats.numSkippedEntries += count;
 
                     // Respect suggested rate limit or assign our own.

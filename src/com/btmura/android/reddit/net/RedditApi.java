@@ -51,8 +51,17 @@ public class RedditApi {
         public double rateLimit;
         public String[][] errors;
 
-        public boolean hasErrors() {
-            return errors != null && errors.length > 0;
+        public boolean shouldRetry() {
+            return hasRateLimitError();
+        }
+
+        private boolean hasRateLimitError() {
+            for (int i = 0; i < errors.length; i++) {
+                if ("RATE_LIMIT".equals(errors[i][0])) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void logErrors(String tag) {
@@ -187,8 +196,9 @@ public class RedditApi {
         }
     }
 
-    public static void subscribe(String cookie, String modhash, String subreddit, boolean subscribe)
-            throws IOException {
+    public static void
+            subscribe(String cookie, String modhash, String subreddit, boolean subscribe)
+                    throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
