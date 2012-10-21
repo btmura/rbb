@@ -121,9 +121,9 @@ public class ThingAdapter extends BaseCursorAdapter {
     }
 
     private static Uri getUri(String accountName, String sessionId, String subreddit,
-            int filter, String more, String query, boolean sync) {
+            int filter, String more, String query, boolean fetch) {
         Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(sync))
+                .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
                 .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
                 .appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subreddit)

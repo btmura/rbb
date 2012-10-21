@@ -88,16 +88,14 @@ public class SubredditAdapter extends BaseCursorAdapter {
 
     private static Uri getUri(String accountName, String sessionId, String query, boolean sync) {
         if (!TextUtils.isEmpty(query)) {
-            String syncVal = Boolean.toString(sync);
             return SubredditProvider.SEARCHES_URI.buildUpon()
-                    .appendQueryParameter(SubredditProvider.SYNC_ENABLE, syncVal)
-                    .appendQueryParameter(SubredditProvider.SYNC_ACCOUNT, accountName)
-                    .appendQueryParameter(SubredditProvider.SYNC_SESSION_ID, sessionId)
-                    .appendQueryParameter(SubredditProvider.SYNC_QUERY, query)
+                    .appendQueryParameter(SubredditProvider.PARAM_FETCH, Boolean.toString(sync))
+                    .appendQueryParameter(SubredditProvider.PARAM_ACCOUNT, accountName)
+                    .appendQueryParameter(SubredditProvider.PARAM_SESSION_ID, sessionId)
+                    .appendQueryParameter(SubredditProvider.PARAM_QUERY, query)
                     .build();
-        } else {
-            return SubredditProvider.SUBREDDITS_URI;
         }
+        return SubredditProvider.SUBREDDITS_URI;
     }
 
     private static Loader<Cursor> getLoader(Context context, Uri uri, String accountName,
@@ -107,12 +105,11 @@ public class SubredditAdapter extends BaseCursorAdapter {
                     SubredditSearches.SELECT_BY_SESSION_ID,
                     Array.of(sessionId),
                     SubredditSearches.SORT_BY_NAME);
-        } else {
-            return new CursorLoader(context, uri, PROJECTION_SUBREDDITS,
-                    Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED,
-                    Array.of(accountName),
-                    Subreddits.SORT_BY_NAME);
         }
+        return new CursorLoader(context, uri, PROJECTION_SUBREDDITS,
+                Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED,
+                Array.of(accountName),
+                Subreddits.SORT_BY_NAME);
     }
 
     private final String query;

@@ -23,12 +23,10 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
-import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -55,11 +53,12 @@ public class CommentProvider extends SessionProvider {
     public static final Uri COMMENTS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_COMMENTS);
     public static final Uri ACTIONS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_ACTIONS);
 
-    public static final String PARAM_SYNC = "sync";
+    public static final String PARAM_FETCH = "fetch";
     public static final String PARAM_REPLY = "reply";
     public static final String PARAM_DELETE = "delete";
+    public static final String PARAM_SYNC = "sync";
 
-    public static final String PARAM_ACCOUNT_NAME = "accountName";
+    public static final String PARAM_ACCOUNT = "account";
     public static final String PARAM_SESSION_ID = "sessionId";
     public static final String PARAM_PARENT_THING_ID = "parentThingId";
     public static final String PARAM_THING_ID = "thingId";
@@ -81,26 +80,15 @@ public class CommentProvider extends SessionProvider {
             + Votes.COLUMN_ACCOUNT + ", "
             + Comments.COLUMN_THING_ID + ")";
 
-    @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-            String sortOrder) {
-        processQueryUri(uri);
-        String tableName = getTableName(uri, true);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query tableName: " + tableName);
-        }
-
-        SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
-        c.setNotificationUri(getContext().getContentResolver(), uri);
-        return c;
+    public CommentProvider() {
+        super(TAG);
     }
 
-    private String getTableName(Uri uri, boolean joinVotes) {
+    protected String getTable(Uri uri, boolean isQuery) {
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_COMMENTS:
-                return joinVotes ? COMMENTS_WITH_VOTES : Comments.TABLE_NAME;
+                return isQuery ? COMMENTS_WITH_VOTES : Comments.TABLE_NAME;
 
             case MATCH_ACTIONS:
                 return CommentActions.TABLE_NAME;
@@ -110,88 +98,88 @@ public class CommentProvider extends SessionProvider {
         }
     }
 
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        long id = -1;
-        boolean syncToNetwork = false;
-        String table = getTableName(uri, false);
-        SQLiteDatabase db = helper.getWritableDatabase();
-
-        db.beginTransaction();
-        try {
-            syncToNetwork = processUri(uri, db, values);
-            id = db.insert(table, null, values);
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
+    protected void processUri(Uri uri, SQLiteDatabase db, ContentValues values) {
+        if (uri.getBooleanQueryParameter(PARAM_FETCH, false)) {
+            handleFetch(uri, db);
+        } else if (uri.getBooleanQueryParameter(PARAM_REPLY, false)) {
+            handleReply(uri, db, values);
+        } else if (uri.getBooleanQueryParameter(PARAM_DELETE, false)) {
+            handleDelete(uri, db);
         }
-
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "insert table: " + table + " id: " + id
-                    + " syncToNetwork: " + syncToNetwork);
-        }
-        if (id != -1) {
-            getContext().getContentResolver().notifyChange(uri, null, syncToNetwork);
-            return ContentUris.withAppendedId(uri, id);
-        }
-        return null;
     }
 
-    @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        int count = 0;
-        boolean syncToNetwork = false;
-        String table = getTableName(uri, false);
-        SQLiteDatabase db = helper.getWritableDatabase();
-
-        db.beginTransaction();
+    private void handleFetch(Uri uri, SQLiteDatabase db) {
         try {
-            syncToNetwork = processUri(uri, db, values);
-            count = db.update(table, values, selection, selectionArgs);
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+            // Determine the cutoff first to avoid deleting synced data.
+            long timestampCutoff = getSessionTimestampCutoff();
+            long sessionTimestamp = System.currentTimeMillis();
 
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "update table: " + table + " count: " + count
-                    + " syncToNetwork: " + syncToNetwork);
+            String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
+            String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
+            String thingId = uri.getQueryParameter(PARAM_THING_ID);
+
+            Context context = getContext();
+            String cookie = AccountUtils.getCookie(context, accountName);
+            CommentListing listing = CommentListing.get(context, helper, accountName, sessionId,
+                    sessionTimestamp, thingId, cookie);
+
+            long cleaned;
+            long t1 = System.currentTimeMillis();
+            db.beginTransaction();
+            try {
+                // Delete old comments that can't possibly be viewed anymore.
+                cleaned = db.delete(Comments.TABLE_NAME, Comments.SELECT_BEFORE_TIMESTAMP,
+                        Array.of(timestampCutoff));
+
+                InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
+                int count = listing.values.size();
+                for (int i = 0; i < count; i++) {
+                    insertHelper.insert(listing.values.get(i));
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+            if (BuildConfig.DEBUG) {
+                long t2 = System.currentTimeMillis();
+                Log.d(TAG, "sync network: " + listing.networkTimeMs
+                        + " parse: " + listing.parseTimeMs
+                        + " db: " + (t2 - t1)
+                        + " cleaned: " + cleaned);
+            }
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
         }
-        if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null, syncToNetwork);
-        }
-        return count;
     }
 
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        int count = 0;
-        boolean syncToNetwork = false;
-        String table = getTableName(uri, false);
-        SQLiteDatabase db = helper.getWritableDatabase();
+    private void handleReply(Uri uri, SQLiteDatabase db, ContentValues values) {
+        String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
+        String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
-        db.beginTransaction();
-        try {
-            syncToNetwork = processUri(uri, db, null);
-            count = db.delete(table, selection, selectionArgs);
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
-
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "delete tableName: " + table + " count: " + count
-                    + " syncToNetwork: " + syncToNetwork);
-        }
-        if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null, syncToNetwork);
-        }
-        return count;
+        ContentValues v = new ContentValues(5);
+        v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
+        v.put(CommentActions.COLUMN_ACCOUNT, values.getAsString(Comments.COLUMN_ACCOUNT));
+        v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
+        v.put(CommentActions.COLUMN_THING_ID, thingId);
+        v.put(CommentActions.COLUMN_TEXT, values.getAsString(Comments.COLUMN_BODY));
+        db.insert(CommentActions.TABLE_NAME, null, v);
     }
 
-    @Override
-    public String getType(Uri uri) {
-        return null;
+    private void handleDelete(Uri uri, SQLiteDatabase db) {
+        String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
+        String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
+        String thingId = uri.getQueryParameter(PARAM_THING_ID);
+
+        ContentValues v = new ContentValues(4);
+        v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE);
+        v.put(CommentActions.COLUMN_ACCOUNT, accountName);
+        v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
+        v.put(CommentActions.COLUMN_THING_ID, thingId);
+        db.insert(CommentActions.TABLE_NAME, null, v);
     }
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
@@ -203,6 +191,7 @@ public class CommentProvider extends SessionProvider {
             public void run() {
                 Uri uri = COMMENTS_URI.buildUpon()
                         .appendQueryParameter(PARAM_REPLY, Boolean.toString(true))
+                        .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
                         .appendQueryParameter(PARAM_PARENT_THING_ID, parentThingId)
                         .appendQueryParameter(PARAM_THING_ID, thingId)
                         .build();
@@ -236,7 +225,8 @@ public class CommentProvider extends SessionProvider {
                 for (int i = 0; i < count; i++) {
                     Uri uri = COMMENTS_URI.buildUpon()
                             .appendQueryParameter(PARAM_DELETE, Boolean.toString(true))
-                            .appendQueryParameter(PARAM_ACCOUNT_NAME, accountName)
+                            .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
+                            .appendQueryParameter(PARAM_ACCOUNT, accountName)
                             .appendQueryParameter(PARAM_PARENT_THING_ID, parentThingId)
                             .appendQueryParameter(PARAM_THING_ID, thingIds[i])
                             .build();
@@ -263,94 +253,5 @@ public class CommentProvider extends SessionProvider {
                 }
             }
         });
-    }
-
-    /** Sync comments for a thing if specified in the uri. */
-    private void processQueryUri(Uri uri) {
-        if (!uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
-            return;
-        }
-        try {
-            // Determine the cutoff first to avoid deleting synced data.
-            long timestampCutoff = getSessionTimestampCutoff();
-            long sessionTimestamp = System.currentTimeMillis();
-
-            String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
-            String accountName = uri.getQueryParameter(PARAM_ACCOUNT_NAME);
-            String thingId = uri.getQueryParameter(PARAM_THING_ID);
-
-            Context context = getContext();
-            String cookie = AccountUtils.getCookie(context, accountName);
-            CommentListing listing = CommentListing.get(context, helper, accountName, sessionId,
-                    sessionTimestamp, thingId, cookie);
-
-            long cleaned;
-            long t1 = System.currentTimeMillis();
-            SQLiteDatabase db = helper.getWritableDatabase();
-            db.beginTransaction();
-            try {
-                // Delete old comments that can't possibly be viewed anymore.
-                cleaned = db.delete(Comments.TABLE_NAME, Comments.SELECT_BEFORE_TIMESTAMP,
-                        Array.of(timestampCutoff));
-
-                InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
-                int count = listing.values.size();
-                for (int i = 0; i < count; i++) {
-                    insertHelper.insert(listing.values.get(i));
-                }
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
-            }
-            if (BuildConfig.DEBUG) {
-                long t2 = System.currentTimeMillis();
-                Log.d(TAG, "sync network: " + listing.networkTimeMs
-                        + " parse: " + listing.parseTimeMs
-                        + " db: " + (t2 - t1)
-                        + " cleaned: " + cleaned);
-            }
-        } catch (OperationCanceledException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (AuthenticatorException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
-
-    /**
-     * @return whether to sync changes to the network
-     */
-    private boolean processUri(Uri uri, SQLiteDatabase db, ContentValues values) {
-        if (uri.getBooleanQueryParameter(PARAM_REPLY, false)) {
-            String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
-            String thingId = uri.getQueryParameter(PARAM_THING_ID);
-
-            ContentValues v = new ContentValues(5);
-            v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
-            v.put(CommentActions.COLUMN_ACCOUNT, values.getAsString(Comments.COLUMN_ACCOUNT));
-            v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
-            v.put(CommentActions.COLUMN_THING_ID, thingId);
-            v.put(CommentActions.COLUMN_TEXT, values.getAsString(Comments.COLUMN_BODY));
-            db.insert(CommentActions.TABLE_NAME, null, v);
-            return true;
-        }
-
-        if (uri.getBooleanQueryParameter(PARAM_DELETE, false)) {
-            String accountName = uri.getQueryParameter(PARAM_ACCOUNT_NAME);
-            String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
-            String thingId = uri.getQueryParameter(PARAM_THING_ID);
-
-            ContentValues v = new ContentValues(4);
-            v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE);
-            v.put(CommentActions.COLUMN_ACCOUNT, accountName);
-            v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
-            v.put(CommentActions.COLUMN_THING_ID, thingId);
-            db.insert(CommentActions.TABLE_NAME, null, v);
-
-            return true;
-        }
-
-        return false;
     }
 }

@@ -23,12 +23,10 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.backup.BackupManager;
 import android.content.ContentProviderOperation;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
-import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -57,14 +55,10 @@ public class SubredditProvider extends SessionProvider {
     public static final Uri SUBREDDITS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_SUBREDDITS);
     public static final Uri SEARCHES_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_SEARCHES);
 
-    // Query parameters related to fetching search results before querying.
-    public static final String SYNC_ENABLE = "sync";
-    public static final String SYNC_ACCOUNT = "accountName";
-    public static final String SYNC_SESSION_ID = "sessionId";
-    public static final String SYNC_QUERY = "query";
-
-    /** Sync changes back to the network. Don't set this in sync adapters. */
-    public static final String PARAM_SYNC = "syncToNetwork";
+    public static final String PARAM_FETCH = "fetch";
+    public static final String PARAM_ACCOUNT = "account";
+    public static final String PARAM_SESSION_ID = "sessionId";
+    public static final String PARAM_QUERY = "query";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_SUBREDDITS = 1;
@@ -74,35 +68,39 @@ public class SubredditProvider extends SessionProvider {
         MATCHER.addURI(AUTHORITY, PATH_SEARCHES, MATCH_SEARCHES);
     }
 
-    @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-            String sortOrder) {
-        processQueryUri(uri);
-        String tableName = getTableName(uri);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query table: " + tableName);
-        }
-
-        SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor c = db.query(tableName, projection, selection, selectionArgs, null, null, sortOrder);
-        c.setNotificationUri(getContext().getContentResolver(), uri);
-        return c;
+    public SubredditProvider() {
+        super(TAG);
     }
 
-    private void processQueryUri(Uri uri) {
-        if (MATCHER.match(uri) != MATCH_SEARCHES
-                || !uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
-            return;
-        }
+    protected String getTable(Uri uri, boolean isQuery) {
+        int match = MATCHER.match(uri);
+        switch (match) {
+            case MATCH_SUBREDDITS:
+                return Subreddits.TABLE_NAME;
 
+            case MATCH_SEARCHES:
+                return SubredditSearches.TABLE_NAME;
+
+            default:
+                throw new IllegalArgumentException("uri: " + uri);
+        }
+    }
+
+    protected void processUri(Uri uri, SQLiteDatabase db, ContentValues values) {
+        if (uri.getBooleanQueryParameter(PARAM_FETCH, false)) {
+            handleFetch(uri, db);
+        }
+    }
+
+    private void handleFetch(Uri uri, SQLiteDatabase db) {
         try {
             // Determine the cutoff first to avoid deleting synced data.
             long timestampCutoff = getSessionTimestampCutoff();
             long sessionTimestamp = System.currentTimeMillis();
 
-            String accountName = uri.getQueryParameter(SYNC_ACCOUNT);
-            String sessionId = uri.getQueryParameter(SYNC_SESSION_ID);
-            String query = uri.getQueryParameter(SYNC_QUERY);
+            String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
+            String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
+            String query = uri.getQueryParameter(PARAM_QUERY);
 
             Context context = getContext();
             String cookie = AccountUtils.getCookie(context, accountName);
@@ -110,7 +108,6 @@ public class SubredditProvider extends SessionProvider {
                     sessionId, sessionTimestamp, query, cookie);
 
             long cleaned;
-            SQLiteDatabase db = helper.getWritableDatabase();
             db.beginTransaction();
             try {
                 // Delete old results that can't be possibly viewed anymore.
@@ -136,61 +133,6 @@ public class SubredditProvider extends SessionProvider {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
         }
-    }
-
-    private String getTableName(Uri uri) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_SUBREDDITS:
-                return Subreddits.TABLE_NAME;
-
-            case MATCH_SEARCHES:
-                return SubredditSearches.TABLE_NAME;
-
-            default:
-                throw new IllegalArgumentException("uri: " + uri);
-        }
-    }
-
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        long id = db.insert(Subreddits.TABLE_NAME, null, values);
-        if (id != -1) {
-            notifyChange(uri);
-            return ContentUris.withAppendedId(uri, id);
-        }
-        return null;
-    }
-
-    @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.update(getTableName(uri), values, selection, selectionArgs);
-        if (count > 0) {
-            notifyChange(uri);
-        }
-        return count;
-    }
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.delete(getTableName(uri), selection, selectionArgs);
-        if (count > 0) {
-            notifyChange(uri);
-        }
-        return count;
-    }
-
-    @Override
-    public String getType(Uri uri) {
-        return null;
-    }
-
-    private void notifyChange(Uri uri) {
-        boolean sync = uri.getBooleanQueryParameter(PARAM_SYNC, false);
-        getContext().getContentResolver().notifyChange(uri, null, sync);
     }
 
     public static void

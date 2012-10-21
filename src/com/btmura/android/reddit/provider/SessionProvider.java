@@ -24,6 +24,10 @@ abstract class SessionProvider extends BaseProvider {
     /** Sessions created before this cutoff time need to be deleted. */
     private static long CREATION_TIME_CUTOFF = -1;
 
+    SessionProvider(String logTag) {
+        super(logTag);
+    }
+
     /**
      * Gets the creation time cutoff. This method is not thread safe.
      *

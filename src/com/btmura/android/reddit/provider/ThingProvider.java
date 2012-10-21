@@ -20,10 +20,8 @@ import java.io.IOException;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -44,7 +42,7 @@ public class ThingProvider extends SessionProvider {
     static final String PATH_THINGS = "things";
     public static final Uri THINGS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_THINGS);
 
-    public static final String PARAM_SYNC = "sync";
+    public static final String PARAM_FETCH = "fetch";
     public static final String PARAM_ACCOUNT = "account";
     public static final String PARAM_SESSION_ID = "sessionId";
     public static final String PARAM_SUBREDDIT = "subreddit";
@@ -61,25 +59,23 @@ public class ThingProvider extends SessionProvider {
             + Votes.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")";
 
-    @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-            String sortOrder) {
-        processQueryUri(uri);
-        SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor c = db.query(TABLE_NAME_WITH_VOTES, projection, selection, selectionArgs,
-                null, null, sortOrder);
-        c.setNotificationUri(getContext().getContentResolver(), uri);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query count: " + c.getCount());
-        }
-        return c;
+    public ThingProvider() {
+        super(TAG);
     }
 
-    private void processQueryUri(Uri uri) {
-        if (!uri.getBooleanQueryParameter(PARAM_SYNC, false)) {
-            return;
-        }
+    @Override
+    protected String getTable(Uri uri, boolean isQuery) {
+        return isQuery ? TABLE_NAME_WITH_VOTES : Things.TABLE_NAME;
+    }
 
+    @Override
+    protected void processUri(Uri uri, SQLiteDatabase db, ContentValues values) {
+        if (uri.getBooleanQueryParameter(PARAM_FETCH, false)) {
+            handleFetch(uri, db);
+        }
+    }
+
+    private void handleFetch(Uri uri, SQLiteDatabase db) {
         try {
             // Determine the cutoff first to avoid deleting synced data when
             // appending more data.
@@ -102,7 +98,6 @@ public class ThingProvider extends SessionProvider {
 
             long cleaned;
             long t1 = System.currentTimeMillis();
-            SQLiteDatabase db = helper.getWritableDatabase();
             db.beginTransaction();
             try {
                 // Delete old things that can't possibly be viewed anymore.
@@ -138,48 +133,4 @@ public class ThingProvider extends SessionProvider {
         }
     }
 
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        long id = db.insert(Things.TABLE_NAME, null, values);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "insert id: " + id);
-        }
-        if (id != -1) {
-            getContext().getContentResolver().notifyChange(uri, null);
-            return ContentUris.withAppendedId(uri, id);
-        }
-        return null;
-    }
-
-    @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.update(Things.TABLE_NAME, values, selection, selectionArgs);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "update count: " + count);
-        }
-        if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
-        }
-        return count;
-    }
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.delete(Things.TABLE_NAME, selection, selectionArgs);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "delete count: " + count);
-        }
-        if (count > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
-        }
-        return count;
-    }
-
-    @Override
-    public String getType(Uri uri) {
-        return null;
-    }
 }

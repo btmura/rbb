@@ -100,10 +100,10 @@ public class CommentAdapter extends BaseCursorAdapter {
         });
     }
 
-    private static Uri getUri(String accountName, String sessionId, String thingId, boolean sync) {
+    private static Uri getUri(String accountName, String sessionId, String thingId, boolean fetch) {
         return CommentProvider.COMMENTS_URI.buildUpon()
-                .appendQueryParameter(CommentProvider.PARAM_SYNC, Boolean.toString(sync))
-                .appendQueryParameter(CommentProvider.PARAM_ACCOUNT_NAME, accountName)
+                .appendQueryParameter(CommentProvider.PARAM_FETCH, Boolean.toString(fetch))
+                .appendQueryParameter(CommentProvider.PARAM_ACCOUNT, accountName)
                 .appendQueryParameter(CommentProvider.PARAM_SESSION_ID, sessionId)
                 .appendQueryParameter(CommentProvider.PARAM_THING_ID, thingId)
                 .build();

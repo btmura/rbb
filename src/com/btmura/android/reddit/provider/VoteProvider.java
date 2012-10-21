@@ -17,17 +17,12 @@
 package com.btmura.android.reddit.provider;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.UriMatcher;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.Array;
 
@@ -38,135 +33,32 @@ public class VoteProvider extends BaseProvider {
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.votes";
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
     static final String PATH_ACTIONS = "actions";
-    public static final Uri ACTIONS_URI = Uri.parse(VoteProvider.BASE_AUTHORITY_URI
-            + PATH_ACTIONS);
+    public static final Uri ACTIONS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_ACTIONS);
 
-    static final String MIME_TYPE_DIR = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
-            + VoteProvider.AUTHORITY + "." + Votes.TABLE_NAME;
-    static final String MIME_TYPE_ITEM = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
-            + VoteProvider.AUTHORITY + "." + Votes.TABLE_NAME;
-
+    /** Whether to notify ThingProvider and CommentProvider about a vote. */
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
-    private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_ALL_ACTIONS = 1;
-    private static final int MATCH_ONE_ACTION = 2;
-    static {
-        MATCHER.addURI(AUTHORITY, PATH_ACTIONS, MATCH_ALL_ACTIONS);
-        MATCHER.addURI(AUTHORITY, PATH_ACTIONS + "/#", MATCH_ONE_ACTION);
+    public VoteProvider() {
+        super(TAG);
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-            String sortOrder) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "query: " + uri.getQuery());
-        }
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ONE_ACTION:
-                selection = appendIdSelection(selection);
-                selectionArgs = Array.append(selectionArgs, uri.getLastPathSegment());
-                break;
-        }
-
-        SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor c = db.query(Votes.TABLE_NAME, projection, selection, selectionArgs,
-                null, null, sortOrder);
-        c.setNotificationUri(getContext().getContentResolver(), uri);
-        return c;
+    protected String getTable(Uri uri, boolean isQuery) {
+        return Votes.TABLE_NAME;
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        long id = db.insert(Votes.TABLE_NAME, null, values);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "insert id: " + id);
-        }
-        if (id != -1) {
+    protected void processUri(Uri uri, SQLiteDatabase db, ContentValues values) {
+        // No uri commands supported in this provider.
+    }
+
+    @Override
+    protected void notifyChange(Uri uri) {
+        super.notifyChange(uri);
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
             ContentResolver cr = getContext().getContentResolver();
-
-            // Sync new votes back to the server.
-            cr.notifyChange(uri, null, true);
-
-            if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
-                cr.notifyChange(ThingProvider.THINGS_URI, null);
-                cr.notifyChange(CommentProvider.COMMENTS_URI, null);
-            }
-            return ContentUris.withAppendedId(uri, id);
-        }
-        return null;
-    }
-
-    @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ONE_ACTION:
-                selection = appendIdSelection(selection);
-                selectionArgs = Array.append(selectionArgs, uri.getLastPathSegment());
-                break;
-        }
-
-        SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.update(Votes.TABLE_NAME, values, selection, selectionArgs);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "update count: " + count);
-        }
-        if (count > 0) {
-            ContentResolver cr = getContext().getContentResolver();
-
-            // Sync updated votes back to the server.
-            // TODO: Figure out whether this will conflict with inserts.
-            cr.notifyChange(uri, null, true);
-
-            if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
-                cr.notifyChange(ThingProvider.THINGS_URI, null);
-                cr.notifyChange(CommentProvider.COMMENTS_URI, null);
-            }
-        }
-        return count;
-    }
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ONE_ACTION:
-                selection = appendIdSelection(selection);
-                selectionArgs = Array.append(selectionArgs, uri.getLastPathSegment());
-                break;
-        }
-
-        SQLiteDatabase db = helper.getWritableDatabase();
-        int count = db.delete(Votes.TABLE_NAME, selection, selectionArgs);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "delete count: " + count);
-        }
-        if (count > 0) {
-            ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(uri, null);
-            if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
-                cr.notifyChange(ThingProvider.THINGS_URI, null);
-                cr.notifyChange(CommentProvider.COMMENTS_URI, null);
-            }
-        }
-        return count;
-    }
-
-    @Override
-    public String getType(Uri uri) {
-        int match = MATCHER.match(uri);
-        switch (match) {
-            case MATCH_ALL_ACTIONS:
-                return MIME_TYPE_DIR;
-
-            case MATCH_ONE_ACTION:
-                return MIME_TYPE_ITEM;
-
-            default:
-                return null;
+            cr.notifyChange(ThingProvider.THINGS_URI, null);
+            cr.notifyChange(CommentProvider.COMMENTS_URI, null);
         }
     }
 
@@ -175,20 +67,18 @@ public class VoteProvider extends BaseProvider {
         AsyncTask.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = context.getContentResolver();
-                String[] selectionArgs = Array.of(accountName, thingId);
+                Uri uri = ACTIONS_URI.buildUpon()
+                        .appendQueryParameter(PARAM_NOTIFY_OTHERS, Boolean.toString(true))
+                        .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
+                        .build();
 
                 ContentValues values = new ContentValues(3);
                 values.put(Votes.COLUMN_ACCOUNT, accountName);
                 values.put(Votes.COLUMN_THING_ID, thingId);
                 values.put(Votes.COLUMN_VOTE, likes);
 
-                Uri uri = ACTIONS_URI.buildUpon()
-                        .appendQueryParameter(PARAM_NOTIFY_OTHERS,
-                                Boolean.toString(true))
-                        .build();
-                int count = cr.update(uri, values, Votes.SELECT_BY_ACCOUNT_AND_THING_ID,
-                        selectionArgs);
-                if (count == 0) {
+                String[] selectionArgs = Array.of(accountName, thingId);
+                if (cr.update(uri, values, Votes.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs) == 0) {
                     cr.insert(uri, values);
                 }
             }
