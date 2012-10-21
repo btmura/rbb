@@ -175,13 +175,21 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             return false;
         }
 
-        // The single comment must have a valid id.
+        // The single comment must have a valid id and not be deleted.
         SparseBooleanArray checked = getListView().getCheckedItemPositions();
         int count = adapter.getCount();
         for (int i = 0; i < count; i++) {
             if (checked.get(i)) {
                 String thingId = adapter.getString(i, CommentAdapter.INDEX_THING_ID);
-                return !TextUtils.isEmpty(thingId);
+                if (TextUtils.isEmpty(thingId)) {
+                    return false;
+                }
+
+                String deleted = getString(R.string.comment_deleted);
+                String author = adapter.getString(i, CommentAdapter.INDEX_AUTHOR);
+                if (deleted.equals(author)) {
+                    return false;
+                }
             }
         }
         return true;
