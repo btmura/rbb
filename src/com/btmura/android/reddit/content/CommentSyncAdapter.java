@@ -123,7 +123,7 @@ public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     // Log any errors if there were any.
                     if (BuildConfig.DEBUG) {
-                        result.logErrors(TAG);
+                        result.logAnyErrors(TAG);
                     }
 
                     if (!result.shouldRetry()) {

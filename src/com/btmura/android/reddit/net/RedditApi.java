@@ -36,6 +36,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.util.Array;
 
 public class RedditApi {
 
@@ -64,17 +65,19 @@ public class RedditApi {
             return false;
         }
 
-        public void logErrors(String tag) {
-            StringBuilder line = new StringBuilder();
-            for (int i = 0; i < errors.length; i++) {
-                line.delete(0, line.length());
-                for (int j = 0; j < errors[i].length; j++) {
-                    line.append(errors[i][j]);
-                    if (j + 1 < errors[i].length) {
-                        line.append(" ");
+        public void logAnyErrors(String tag) {
+            if (!Array.isEmpty(errors)) {
+                StringBuilder line = new StringBuilder();
+                for (int i = 0; i < errors.length; i++) {
+                    line.delete(0, line.length());
+                    for (int j = 0; j < errors[i].length; j++) {
+                        line.append(errors[i][j]);
+                        if (j + 1 < errors[i].length) {
+                            line.append(" ");
+                        }
                     }
+                    Log.d(tag, line.toString());
                 }
-                Log.d(tag, line.toString());
             }
         }
     }
