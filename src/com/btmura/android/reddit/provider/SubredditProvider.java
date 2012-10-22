@@ -95,7 +95,7 @@ public class SubredditProvider extends SessionProvider {
     private void handleFetch(Uri uri, SQLiteDatabase db) {
         try {
             // Determine the cutoff first to avoid deleting synced data.
-            long timestampCutoff = getSessionTimestampCutoff();
+            long timestampCutoff = getSessionTimestamp();
             long sessionTimestamp = System.currentTimeMillis();
 
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);

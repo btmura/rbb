@@ -110,9 +110,7 @@ public class CommentProvider extends SessionProvider {
 
     private void handleFetch(Uri uri, SQLiteDatabase db) {
         try {
-            // Determine the cutoff first to avoid deleting synced data.
-            long timestampCutoff = getSessionTimestampCutoff();
-            long sessionTimestamp = System.currentTimeMillis();
+            long sessionTimestamp = getSessionTimestamp();
 
             String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
@@ -129,7 +127,7 @@ public class CommentProvider extends SessionProvider {
             try {
                 // Delete old comments that can't possibly be viewed anymore.
                 cleaned = db.delete(Comments.TABLE_NAME, Comments.SELECT_BEFORE_TIMESTAMP,
-                        Array.of(timestampCutoff));
+                        Array.of(sessionTimestamp));
 
                 InsertHelper insertHelper = new InsertHelper(db, Comments.TABLE_NAME);
                 int count = listing.values.size();

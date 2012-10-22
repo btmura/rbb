@@ -111,7 +111,7 @@ public class ThingAdapter extends BaseCursorAdapter {
         // schedule the session deletion in the background thread pool rather
         // than serial pool.
         final Context appContext = context.getApplicationContext();
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
                 cr.delete(ThingProvider.THINGS_URI, Things.SELECT_BY_SESSION_ID,

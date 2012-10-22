@@ -21,25 +21,23 @@ package com.btmura.android.reddit.provider;
  */
 abstract class SessionProvider extends BaseProvider {
 
-    /** Sessions created before this cutoff time need to be deleted. */
-    private static long CREATION_TIME_CUTOFF = -1;
+    /** Timestamp to apply to all data so we can clean it up later if necessary. */
+    private static long SESSION_TIMESTAMP = -1;
 
     SessionProvider(String logTag) {
         super(logTag);
     }
 
     /**
-     * Gets the creation time cutoff. This method is not thread safe.
-     *
-     * @return cutoff time when all sessions must be created at or after
+     * Return the session timestamp to mark the data.
      */
-    static long getSessionTimestampCutoff() {
+    static long getSessionTimestamp() {
         // Initialize this once to delete all session data that was created
-        // before the first sync. This allows to clean up any residue in the
+        // before this time. This allows to clean up any residue in the
         // database that can no longer be viewed.
-        if (CREATION_TIME_CUTOFF == -1) {
-            CREATION_TIME_CUTOFF = System.currentTimeMillis();
+        if (SESSION_TIMESTAMP == -1) {
+            SESSION_TIMESTAMP = System.currentTimeMillis();
         }
-        return CREATION_TIME_CUTOFF;
+        return SESSION_TIMESTAMP;
     }
 }

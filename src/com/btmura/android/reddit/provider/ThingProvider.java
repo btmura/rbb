@@ -77,12 +77,7 @@ public class ThingProvider extends SessionProvider {
 
     private void handleFetch(Uri uri, SQLiteDatabase db) {
         try {
-            // Determine the cutoff first to avoid deleting synced data when
-            // appending more data.
-            long timestampCutoff = getSessionTimestampCutoff();
-
-            // Appended data may have a different timestamp but that is OK.
-            long sessionTimestamp = System.currentTimeMillis();
+            long sessionTimestamp = getSessionTimestamp();
 
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
@@ -102,7 +97,7 @@ public class ThingProvider extends SessionProvider {
             try {
                 // Delete old things that can't possibly be viewed anymore.
                 cleaned = db.delete(Things.TABLE_NAME, Things.SELECT_BEFORE_TIMESTAMP,
-                        Array.of(timestampCutoff));
+                        Array.of(sessionTimestamp));
 
                 // Delete the loading more element before appending more.
                 db.delete(Things.TABLE_NAME, Things.SELECT_BY_SESSION_ID_AND_MORE,
