@@ -21,7 +21,7 @@
         <item name="android:textAppearance">@android:style/TextAppearance.Holo.Inverse</item>
     </style>
 
-    <style name="SlimProgressBar" parent="@android:style/Widget.Holo.Light.ProgressBar.Horizontal">
+    <style name="SlimProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
         <item name="android:minHeight">4dp</item>
         <item name="android:maxHeight">4dp</item>
     </style>
@@ -34,7 +34,7 @@
 
     <style name="ButtonBar" parent="@android:style/Holo.ButtonBar.AlertDialog" />
 
-    <style name="ButtonBarButton" parent="@android:style/Widget.Holo.Light.Button.Borderless.Small">
+    <style name="ButtonBarButton" parent="@android:style/Widget.Holo.Button.Borderless.Small">
         <item name="android:textAllCaps">true</item>
     </style>
 
