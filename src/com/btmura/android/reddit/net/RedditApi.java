@@ -57,9 +57,11 @@ public class RedditApi {
         }
 
         private boolean hasRateLimitError() {
-            for (int i = 0; i < errors.length; i++) {
-                if ("RATE_LIMIT".equals(errors[i][0])) {
-                    return true;
+            if (!Array.isEmpty(errors)) {
+                for (int i = 0; i < errors.length; i++) {
+                    if ("RATE_LIMIT".equals(errors[i][0])) {
+                        return true;
+                    }
                 }
             }
             return false;
