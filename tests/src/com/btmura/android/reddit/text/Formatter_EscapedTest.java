@@ -46,9 +46,13 @@ public class Formatter_EscapedTest extends AbstractFormatterTest {
         assertEscapedFormat("nbsp &nbsp;", "nbsp  ");
     }
 
+    public void testFormat_mdash() {
+        assertEscapedFormat("mdash &mdash;", "mdash —");
+    }
+
     public void testFormat_multipleEscapes() {
         assertEscapedFormat("gt &gt; lt &lt;", "gt > lt <");
-        assertEscapedFormat("&lt;3 &apos;Quote&apos;", "<3 'Quote'");
+        assertEscapedFormat("&lt;3 &apos;Quote&apos; &mdash;", "<3 'Quote' —");
     }
 
     public void testFormat_escapedEscapes() {
