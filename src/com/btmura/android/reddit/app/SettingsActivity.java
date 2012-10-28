@@ -19,6 +19,7 @@ package com.btmura.android.reddit.app;
 import java.util.List;
 
 import android.app.ActionBar;
+import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
@@ -71,23 +72,27 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
 
     @Override
     public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.settings_headers, target);
         if (result != null) {
-            String[] accountNames = result.accountNames;
-            int length = accountNames.length;
+            int length = result.accountNames.length;
             for (int i = 0; i < length; i++) {
-                Header header = new Header();
-                header.breadCrumbTitle = accountNames[i];
-                header.breadCrumbShortTitle = accountNames[i];
-                header.title = accountNames[i];
-                header.fragment = AccountPreferenceFragment.class.getName();
-
+                String accountName = result.accountNames[i];
                 Bundle args = new Bundle(1);
-                args.putString(AccountPreferenceFragment.ARG_ACCOUNT_NAME, accountNames[i]);
-                header.fragmentArguments = args;
-                target.add(header);
+                args.putString(AccountPreferenceFragment.ARG_ACCOUNT_NAME, accountName);
+                addHeader(0, accountName, AccountPreferenceFragment.class, args, target);
             }
         }
+        addHeader(R.string.settings_developer_options, null, DeveloperOptionsFragment.class,
+                Bundle.EMPTY, target);
+    }
+
+    private void addHeader(int titleRes, String title, Class<? extends Fragment> fragClass,
+            Bundle fragArgs, List<Header> target) {
+        Header header = new Header();
+        header.titleRes = header.breadCrumbTitleRes = header.breadCrumbShortTitleRes = titleRes;
+        header.title = header.breadCrumbTitle = header.breadCrumbShortTitle = title;
+        header.fragment = fragClass.getName();
+        header.fragmentArguments = fragArgs;
+        target.add(header);
     }
 
     @Override
