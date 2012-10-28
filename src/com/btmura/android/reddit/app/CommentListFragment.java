@@ -85,7 +85,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             sessionId = thingId + "-" + System.currentTimeMillis();
         }
 
-        adapter = new CommentAdapter(getActivity(), this);
+        adapter = new CommentAdapter(getActivity(), accountName, this);
     }
 
     @Override

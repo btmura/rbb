@@ -70,6 +70,7 @@ public class CommentAdapter extends BaseCursorAdapter {
     public static int INDEX_VOTE = 15;
 
     private final long nowTimeMs = System.currentTimeMillis();
+    private final String accountName;
     private final OnVoteListener listener;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
@@ -110,8 +111,9 @@ public class CommentAdapter extends BaseCursorAdapter {
                 .build();
     }
 
-    public CommentAdapter(Context context, OnVoteListener listener) {
+    public CommentAdapter(Context context, String accountName, OnVoteListener listener) {
         super(context, null, 0);
+        this.accountName = accountName;
         this.listener = listener;
     }
 
@@ -132,7 +134,7 @@ public class CommentAdapter extends BaseCursorAdapter {
         String title = cursor.getString(INDEX_TITLE);
         String thingId = cursor.getString(INDEX_THING_ID);
         int ups = cursor.getInt(INDEX_UPS);
-        boolean votable = CommentLogic.isVotable(context, author);
+        boolean votable = CommentLogic.isVotable(accountName, author);
 
         // Comments don't have a score so calculate our own.
         int score = ups - downs;

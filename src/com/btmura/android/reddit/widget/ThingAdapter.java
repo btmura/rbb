@@ -86,6 +86,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     private final LayoutInflater inflater;
     private final String parentSubreddit;
     private final OnVoteListener listener;
+    private String accountName;
     private String selectedThingId;
     private int thingBodyWidth;
     private boolean singleChoice;
@@ -137,13 +138,18 @@ public class ThingAdapter extends BaseCursorAdapter {
         return b.build();
     }
 
-    public ThingAdapter(Context context, String parentSubreddit, OnVoteListener listener,
-            boolean singleChoice) {
+    public ThingAdapter(Context context, String accountName, String parentSubreddit,
+            boolean singleChoice, OnVoteListener listener) {
         super(context, null, 0);
         this.inflater = LayoutInflater.from(context);
+        this.accountName = accountName;
         this.parentSubreddit = parentSubreddit;
-        this.listener = listener;
         this.singleChoice = singleChoice;
+        this.listener = listener;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 
     public void setThingBodyWidth(int thingBodyWidth) {
@@ -190,6 +196,7 @@ public class ThingAdapter extends BaseCursorAdapter {
             String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
             String title = cursor.getString(INDEX_TITLE);
             int ups = cursor.getInt(INDEX_UPS);
+            boolean votable = Things.isVotable(accountName);
 
             // Reconcile local and remote votes.
             int likes = cursor.getInt(INDEX_LIKES);
@@ -205,7 +212,7 @@ public class ThingAdapter extends BaseCursorAdapter {
             ThingView tv = (ThingView) view;
             tv.setData(author, createdUtc, domain, downs, likes, nowTimeMs, numComments, over18,
                     parentSubreddit, score, subreddit, thingBodyWidth, thingId, thumbnailUrl,
-                    title, ups);
+                    title, ups, votable);
             tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
             tv.setOnVoteListener(listener);
             thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);

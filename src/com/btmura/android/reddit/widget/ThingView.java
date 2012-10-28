@@ -34,6 +34,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private String thumbnailUrl;
     private String thingId;
     private String title;
+    private boolean votable;
 
     private Bitmap bitmap;
 
@@ -93,13 +94,14 @@ public class ThingView extends CustomView implements OnGestureListener {
             String thingId,
             String thumbnailUrl,
             String title,
-            int ups) {
-
+            int ups,
+            boolean votable) {
         this.likes = likes;
         this.thingBodyWidth = thingBodyWidth;
         this.thingId = thingId;
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
+        this.votable = votable;
 
         this.scoreText = VotingArrows.getScoreText(score);
         this.statusText = getStatusText(getContext(), author, createdUtc, nowTimeMs, numComments,
@@ -154,8 +156,6 @@ public class ThingView extends CustomView implements OnGestureListener {
                 break;
         }
 
-        VotingArrows.measureScoreText(scoreText, scoreBounds);
-
         int titleWidth;
         int detailsWidth;
         CharSequence detailsText;
@@ -179,9 +179,13 @@ public class ThingView extends CustomView implements OnGestureListener {
             detailsText = "";
         }
 
-        int width = VotingArrows.getWidth() + PADDING;
+        int width = 0;
+        if (votable) {
+            width += VotingArrows.getWidth(votable) + PADDING;
+            VotingArrows.measureScoreText(scoreText, scoreBounds);
+        }
         if (!TextUtils.isEmpty(thumbnailUrl)) {
-            width += PADDING + Thumbnail.getWidth();
+            width += Thumbnail.getWidth() + PADDING;
         }
         titleWidth -= width;
 
@@ -203,7 +207,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                     Alignment.ALIGN_OPPOSITE);
         }
 
-        int leftHeight = VotingArrows.getHeight();
+        int leftHeight = Math.max(VotingArrows.getHeight(votable), Thumbnail.getHeight());
         rightHeight = titleLayout.getHeight() + ELEMENT_PADDING + statusLayout.getHeight();
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
@@ -244,12 +248,13 @@ public class ThingView extends CustomView implements OnGestureListener {
             c.translate(-dx, -dy);
         }
 
-        boolean hasThumb = !TextUtils.isEmpty(thumbnailUrl);
         c.translate(PADDING, PADDING);
-        VotingArrows.draw(c, bitmap, hasThumb, scoreText, scoreBounds, likes);
-        c.translate(VotingArrows.getWidth() + PADDING, 0);
+        if (votable) {
+            VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes);
+            c.translate(VotingArrows.getWidth(votable) + PADDING, 0);
+        }
 
-        if (hasThumb) {
+        if (!TextUtils.isEmpty(thumbnailUrl)) {
             Thumbnail.draw(c, bitmap);
             c.translate(Thumbnail.getWidth() + PADDING, 0);
         }
@@ -274,11 +279,11 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, 0);
+        return VotingArrows.onDown(e, 0, votable);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, 0, listener, thingId);
+        return VotingArrows.onSingleTapUp(e, 0, votable, listener, thingId);
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

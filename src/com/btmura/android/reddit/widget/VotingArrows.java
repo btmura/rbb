@@ -129,7 +129,7 @@ class VotingArrows {
         }
     }
 
-    static void draw(Canvas c, Bitmap thumb, boolean hasThumb, String scoreText, Rect scoreBounds,
+    static void draw(Canvas c, Bitmap thumb, String scoreText, Rect scoreBounds,
             int likes) {
         int upPaintIndex = NEUTRAL;
         int scorePaintIndex = NEUTRAL;
@@ -173,21 +173,22 @@ class VotingArrows {
         TEXT_PAINTS[NEUTRAL].getTextBounds(scoreText, 0, scoreText.length(), bounds);
     }
 
-    static int getWidth() {
-        return ARROW_TOTAL_WIDTH;
+    static int getWidth(boolean votable) {
+        return votable ? ARROW_TOTAL_WIDTH : 0;
     }
 
-    static int getHeight() {
-        return ARROW_TOTAL_HEIGHT + SCORE_TOTAL_HEIGHT + ARROW_TOTAL_HEIGHT;
+    static int getHeight(boolean votable) {
+        return votable ? ARROW_TOTAL_HEIGHT + SCORE_TOTAL_HEIGHT + ARROW_TOTAL_HEIGHT : 0;
     }
 
-    static boolean onDown(MotionEvent e, float left) {
-        return getEvent(e, left) != EVENT_NONE;
+    static boolean onDown(MotionEvent e, float left, boolean votable) {
+        return getEvent(e, left, votable) != EVENT_NONE;
     }
 
-    static boolean onSingleTapUp(MotionEvent e, float left, OnVoteListener listener, String thingId) {
+    static boolean onSingleTapUp(MotionEvent e, float left, boolean votable,
+            OnVoteListener listener, String thingId) {
         if (listener != null) {
-            int event = getEvent(e, left);
+            int event = getEvent(e, left, votable);
             switch (event) {
                 case EVENT_UPVOTE:
                     listener.onVote(thingId, Votes.VOTE_UP);
@@ -201,16 +202,16 @@ class VotingArrows {
         return false;
     }
 
-    private static int getEvent(MotionEvent e, float left) {
-        float right = left + PADDING + getWidth() + PADDING;
-        if (e.getX() > left && e.getX() < right) {
+    private static int getEvent(MotionEvent e, float left, boolean votable) {
+        float right = left + PADDING + getWidth(votable) + PADDING;
+        if (votable && e.getX() > left && e.getX() < right) {
             float upBottom = PADDING + ARROW_TOTAL_HEIGHT + PADDING;
             if (e.getY() < upBottom) {
                 return EVENT_UPVOTE;
             }
 
-            float downTop = PADDING + getHeight() - ARROW_TOTAL_HEIGHT - PADDING;
-            float downBottom = PADDING + getHeight() + PADDING * 2;
+            float downTop = PADDING + getHeight(true) - ARROW_TOTAL_HEIGHT - PADDING;
+            float downBottom = PADDING + getHeight(true) + PADDING * 2;
             if (e.getY() > downTop && e.getY() < downBottom) {
                 return EVENT_DOWNVOTE;
             }

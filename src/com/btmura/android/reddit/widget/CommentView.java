@@ -158,7 +158,7 @@ public class CommentView extends CustomView implements OnGestureListener {
 
         int rightContentWidth = measuredWidth - PADDING * (2 + nesting); // 2 = left + right margin
         if (votable) {
-            rightContentWidth -= VotingArrows.getWidth() + PADDING;
+            rightContentWidth -= VotingArrows.getWidth(votable) + PADDING;
             VotingArrows.measureScoreText(scoreText, scoreBounds);
         }
 
@@ -183,14 +183,14 @@ public class CommentView extends CustomView implements OnGestureListener {
             rightHeight += statusLayout.getHeight();
         }
 
-        int leftHeight = votable ? VotingArrows.getHeight() : 0;
+        int leftHeight = VotingArrows.getHeight(votable);
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         bodyBounds.setEmpty();
 
         int rx = PADDING * (1 + nesting);
         if (votable) {
-            rx += VotingArrows.getWidth() + PADDING;
+            rx += VotingArrows.getWidth(votable) + PADDING;
         }
         if (bodyLayout != null) {
             bodyBounds.left = rx;
@@ -245,11 +245,11 @@ public class CommentView extends CustomView implements OnGestureListener {
     protected void onDraw(Canvas c) {
         c.translate(PADDING * (1 + nesting), PADDING);
         if (votable) {
-            VotingArrows.draw(c, null, false, scoreText, scoreBounds, likes);
+            VotingArrows.draw(c, null, scoreText, scoreBounds, likes);
         }
         c.translate(0, -PADDING);
 
-        int dx = votable ? VotingArrows.getWidth() + PADDING : 0;
+        int dx = votable ? VotingArrows.getWidth(votable) + PADDING : 0;
         int dy = (minHeight - rightHeight) / 2;
         c.translate(dx, dy);
 
@@ -308,11 +308,11 @@ public class CommentView extends CustomView implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return votable && VotingArrows.onDown(e, getCommentLeft());
+        return VotingArrows.onDown(e, getCommentLeft(), votable);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return votable && VotingArrows.onSingleTapUp(e, getCommentLeft(), listener, thingId);
+        return VotingArrows.onSingleTapUp(e, getCommentLeft(), votable, listener, thingId);
     }
 
     private float getCommentLeft() {

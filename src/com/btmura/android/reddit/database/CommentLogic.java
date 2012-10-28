@@ -16,7 +16,7 @@
 
 package com.btmura.android.reddit.database;
 
-import android.content.Context;
+import com.btmura.android.reddit.accounts.AccountUtils;
 
 /**
  * Class containing logic for inserting and deleting new comments.
@@ -109,8 +109,8 @@ public class CommentLogic {
     /**
      * @return whether this comment can be voted upon
      */
-    public static boolean isVotable(Context context, String author) {
-        return !Comments.DELETED.equals(author);
+    public static boolean isVotable(String accountName, String author) {
+        return AccountUtils.isAccount(accountName) && !Comments.DELETED.equals(author);
     }
 
     private CommentLogic() {

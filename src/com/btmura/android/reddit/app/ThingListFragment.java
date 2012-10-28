@@ -125,13 +125,14 @@ public class ThingListFragment extends ListFragment implements
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
 
-        adapter = new ThingAdapter(getActivity(), subreddit, this, singleChoice);
+        adapter = new ThingAdapter(getActivity(), accountName, subreddit, singleChoice, this);
         adapter.setSelectedThing(selectedThingId);
         setHasOptionsMenu(true);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View
+            onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         ListView l = (ListView) v.findViewById(android.R.id.list);
         l.setVerticalScrollBarEnabled(false);
@@ -276,13 +277,14 @@ public class ThingListFragment extends ListFragment implements
         return listener.onMeasureThingBody();
     }
 
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+        adapter.setAccountName(accountName);
+    }
+
     public void setSelectedThing(String thingId) {
         selectedThingId = thingId;
         adapter.setSelectedThing(thingId);
-    }
-
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
     }
 
     public String getAccountName() {
