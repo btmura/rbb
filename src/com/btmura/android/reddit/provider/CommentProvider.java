@@ -35,7 +35,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
@@ -216,8 +215,6 @@ public class CommentProvider extends SessionProvider {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                String deleted = appContext.getString(R.string.comment_deleted);
-
                 ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
                 int count = ids.length;
                 for (int i = 0; i < count; i++) {
@@ -230,8 +227,8 @@ public class CommentProvider extends SessionProvider {
                             .build();
                     if (hasChildren[i]) {
                         ops.add(ContentProviderOperation.newUpdate(uri)
-                                .withValue(Comments.COLUMN_AUTHOR, deleted)
-                                .withValue(Comments.COLUMN_BODY, deleted)
+                                .withValue(Comments.COLUMN_AUTHOR, Comments.DELETED)
+                                .withValue(Comments.COLUMN_BODY, Comments.DELETED)
                                 .withSelection(ID_SELECTION, Array.of(ids[i]))
                                 .build());
                     } else {

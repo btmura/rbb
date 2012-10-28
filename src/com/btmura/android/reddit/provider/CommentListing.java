@@ -34,11 +34,10 @@ import android.util.JsonReader;
 import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.CommentLogic;
-import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
@@ -281,15 +280,14 @@ class CommentListing extends JsonParser implements CommentList {
     }
 
     private void deleteThing(String deleteId) {
-        String deleted = context.getString(R.string.comment_deleted);
         int size = values.size();
         for (int i = 0; i < size; i++) {
             ContentValues v = values.get(i);
             String id = v.getAsString(Comments.COLUMN_THING_ID);
             if (deleteId.equals(id)) {
                 if (CommentLogic.hasChildren(this, i)) {
-                    v.put(Comments.COLUMN_AUTHOR, deleted);
-                    v.put(Comments.COLUMN_BODY, deleted);
+                    v.put(Comments.COLUMN_AUTHOR, Comments.DELETED);
+                    v.put(Comments.COLUMN_BODY, Comments.DELETED);
                 } else {
                     values.remove(i);
                     size--;

@@ -185,9 +185,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
                     return false;
                 }
 
-                String deleted = getString(R.string.comment_deleted);
                 String author = adapter.getString(i, CommentAdapter.INDEX_AUTHOR);
-                if (deleted.equals(author)) {
+                if (Comments.DELETED.equals(author)) {
                     return false;
                 }
             }

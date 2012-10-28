@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.database;
 
+import android.content.Context;
+
 /**
  * Class containing logic for inserting and deleting new comments.
  */
@@ -102,6 +104,13 @@ public class CommentLogic {
         // If this is the last comment, then there are no replies. It's safe to
         // remove completely.
         return false;
+    }
+
+    /**
+     * @return whether this comment can be voted upon
+     */
+    public static boolean isVotable(Context context, String author) {
+        return !Comments.DELETED.equals(author);
     }
 
     private CommentLogic() {

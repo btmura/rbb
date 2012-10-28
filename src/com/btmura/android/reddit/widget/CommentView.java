@@ -52,6 +52,7 @@ public class CommentView extends CustomView implements OnGestureListener {
     private int nesting;
     private String title;
     private String thingId;
+    private boolean votable;
 
     private CharSequence bodyText;
     private String scoreText;
@@ -99,11 +100,13 @@ public class CommentView extends CustomView implements OnGestureListener {
             int numComments,
             int score,
             String title,
-            String thingId) {
+            String thingId,
+            boolean votable) {
         this.likes = likes;
         this.nesting = nesting;
         this.title = title;
         this.thingId = thingId;
+        this.votable = votable;
 
         this.scoreText = VotingArrows.getScoreText(score);
         this.bodyText = FORMATTER.formatSpans(getContext(), body);
@@ -153,11 +156,11 @@ public class CommentView extends CustomView implements OnGestureListener {
                 break;
         }
 
-        VotingArrows.measureScoreText(scoreText, scoreBounds);
-
-        int rightContentWidth = measuredWidth
-                - PADDING - VotingArrows.getWidth() - PADDING
-                - PADDING * nesting - PADDING;
+        int rightContentWidth = measuredWidth - PADDING * (2 + nesting); // 2 = left + right margin
+        if (votable) {
+            rightContentWidth -= VotingArrows.getWidth() + PADDING;
+            VotingArrows.measureScoreText(scoreText, scoreBounds);
+        }
 
         titleLayout = null;
         bodyLayout = null;
@@ -180,12 +183,15 @@ public class CommentView extends CustomView implements OnGestureListener {
             rightHeight += statusLayout.getHeight();
         }
 
-        int leftHeight = VotingArrows.getHeight();
+        int leftHeight = votable ? VotingArrows.getHeight() : 0;
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         bodyBounds.setEmpty();
 
-        int rx = PADDING * (1 + nesting) + VotingArrows.getWidth() + PADDING;
+        int rx = PADDING * (1 + nesting);
+        if (votable) {
+            rx += VotingArrows.getWidth() + PADDING;
+        }
         if (bodyLayout != null) {
             bodyBounds.left = rx;
             rx += bodyLayout.getWidth();
@@ -238,10 +244,12 @@ public class CommentView extends CustomView implements OnGestureListener {
     @Override
     protected void onDraw(Canvas c) {
         c.translate(PADDING * (1 + nesting), PADDING);
-        VotingArrows.draw(c, null, false, scoreText, scoreBounds, likes);
+        if (votable) {
+            VotingArrows.draw(c, null, false, scoreText, scoreBounds, likes);
+        }
         c.translate(0, -PADDING);
 
-        int dx = VotingArrows.getWidth() + PADDING;
+        int dx = votable ? VotingArrows.getWidth() + PADDING : 0;
         int dy = (minHeight - rightHeight) / 2;
         c.translate(dx, dy);
 
@@ -300,11 +308,11 @@ public class CommentView extends CustomView implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, getCommentLeft());
+        return votable && VotingArrows.onDown(e, getCommentLeft());
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, getCommentLeft(), listener, thingId);
+        return votable && VotingArrows.onSingleTapUp(e, getCommentLeft(), listener, thingId);
     }
 
     private float getCommentLeft() {

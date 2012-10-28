@@ -50,6 +50,9 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_UPS = "ups";
     public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
+    /** Deleted comments have an author and body with this string. */
+    public static final String DELETED = "[deleted]";
+
     public static final int KIND_HEADER = 0;
     public static final int KIND_COMMENT = 1;
     public static final int KIND_MORE = 2;
