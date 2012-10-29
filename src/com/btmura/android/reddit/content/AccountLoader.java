@@ -48,7 +48,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
 
         public String getLastAccount() {
-            String accountName = prefs.getString(AccountLoader.PREF_LAST_ACCOUNT,
+            String accountName = prefs.getString(AccountLoader.GLOBAL_PREF_LAST_ACCOUNT,
                     Subreddits.ACCOUNT_NONE);
             for (int i = 0; i < accountNames.length; i++) {
                 if (accountNames[i].equals(accountName)) {
@@ -59,7 +59,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
 
         public int getLastFilter() {
-            return prefs.getInt(PREF_LAST_FILTER, 0);
+            return prefs.getInt(GLOBAL_PREF_LAST_FILTER, 0);
         }
     }
 
@@ -70,8 +70,9 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
     };
 
     private static final String PREFS = "accountPreferences";
-    private static final String PREF_LAST_ACCOUNT = "lastAccount";
-    private static final String PREF_LAST_FILTER = "lastFilter";
+    private static final String GLOBAL_PREF_LAST_ACCOUNT = "lastAccount";
+    private static final String GLOBAL_PREF_LAST_FILTER = "lastFilter";
+    private static final String ACCOUNT_PREF_LAST_SUBREDDIT = "lastSubreddit";
 
     private SharedPreferences prefs;
     private AccountManager manager;
@@ -116,7 +117,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
 
         // Get a preference to make sure the loading thread is done.
-        prefs.getString(PREF_LAST_ACCOUNT, null);
+        prefs.getString(GLOBAL_PREF_LAST_ACCOUNT, null);
 
         return new AccountResult(accountNames, prefs);
     }
@@ -156,14 +157,25 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
     }
 
     public static void setLastAccount(SharedPreferences prefs, String accountName) {
-        Editor editor = prefs.edit();
-        editor.putString(AccountLoader.PREF_LAST_ACCOUNT, accountName);
-        editor.apply();
+        prefs.edit().putString(GLOBAL_PREF_LAST_ACCOUNT, accountName).apply();
     }
 
     public static void setLastFilter(SharedPreferences prefs, int filter) {
-        Editor editor = prefs.edit();
-        editor.putInt(AccountLoader.PREF_LAST_FILTER, filter);
-        editor.apply();
+        prefs.edit().putInt(GLOBAL_PREF_LAST_FILTER, filter).apply();
+    }
+
+    public static String getLastSubreddit(SharedPreferences prefs, String accountName) {
+        return prefs.getString(getAccountPreferenceKey(accountName, ACCOUNT_PREF_LAST_SUBREDDIT),
+                Subreddits.NAME_FRONT_PAGE);
+    }
+
+    public static void setLastSubreddit(SharedPreferences prefs, String accountName,
+            String subreddit) {
+        prefs.edit().putString(getAccountPreferenceKey(accountName, ACCOUNT_PREF_LAST_SUBREDDIT),
+                subreddit).apply();
+    }
+
+    private static String getAccountPreferenceKey(String accountName, String prefName) {
+        return accountName + "." + prefName;
     }
 }

@@ -126,7 +126,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             if (!isSinglePane && !TextUtils.isEmpty(name)) {
                 subreddit = name;
             } else {
-                subreddit = null;
+                subreddit = AccountLoader.getLastSubreddit(prefs, accountName);
             }
             setSubredditListNavigation(subreddit, null);
         } else if (tlf != null && tlf.getFilter() != filter) {
@@ -134,5 +134,11 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         }
 
         return true;
+    }
+
+    @Override
+    public void onSubredditSelected(String subreddit) {
+        super.onSubredditSelected(subreddit);
+        AccountLoader.setLastSubreddit(prefs, getAccountName(), subreddit);
     }
 }
