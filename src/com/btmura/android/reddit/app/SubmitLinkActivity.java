@@ -54,6 +54,7 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
 
     private AccountSpinnerAdapter adapter;
 
+    private View buttonBar;
     private EditText subreddit;
     private EditText title;
     private EditText text;
@@ -62,16 +63,16 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.submit_link);
-        setupActionBar();
-        setupAccountSpinner();
         setupViews();
+        setupAccountSpinner();
+        setupActionBar();
     }
 
-    private void setupActionBar() {
-        ActionBar bar = getActionBar();
-        if (bar != null) {
-            bar.setDisplayHomeAsUpEnabled(true);
-        }
+    private void setupViews() {
+        buttonBar = findViewById(R.id.button_bar);
+        subreddit = (EditText) findViewById(R.id.subreddit);
+        title = (EditText) findViewById(R.id.title);
+        text = (EditText) findViewById(R.id.text);
     }
 
     private void setupAccountSpinner() {
@@ -82,14 +83,16 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
         getLoaderManager().initLoader(0, null, this);
     }
 
-    private void setupViews() {
-        subreddit = (EditText) findViewById(R.id.subreddit);
-        title = (EditText) findViewById(R.id.title);
-        text = (EditText) findViewById(R.id.text);
+    private void setupActionBar() {
+        ActionBar bar = getActionBar();
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
+        buttonBar.setVisibility(bar != null ? View.GONE : View.VISIBLE);
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true);
+        return new AccountLoader(this, false);
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
@@ -118,27 +121,30 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_submit:
-                handleSubmit(null, null);
+            case android.R.id.home:
+                finish();
                 return true;
+
+            case R.id.menu_submit:
+                return handleSubmit(null, null);
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void handleSubmit(String captchaId, String captchaGuess) {
+    private boolean handleSubmit(String captchaId, String captchaGuess) {
         if (subreddit.getText().length() <= 0) {
             subreddit.setError(getString(R.string.error_blank_field));
-            return;
+            return true;
         }
         if (title.getText().length() <= 0) {
             title.setError(getString(R.string.error_blank_field));
-            return;
+            return true;
         }
         if (text.getText().length() <= 0) {
             text.setError(getString(R.string.error_blank_field));
-            return;
+            return true;
         }
 
         new SubmitTask(adapter.getAccountName(),
@@ -147,6 +153,8 @@ public class SubmitLinkActivity extends Activity implements LoaderCallbacks<Acco
                 text.getText().toString(),
                 captchaId,
                 captchaGuess).execute();
+
+        return true;
     }
 
     class SubmitTask extends AsyncTask<Void, Void, SubmitResult> {

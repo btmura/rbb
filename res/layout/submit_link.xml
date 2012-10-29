@@ -14,44 +14,62 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:columnCount="1"
-    android:paddingBottom="@dimen/padding"
-    android:paddingLeft="@dimen/padding"
-    android:paddingRight="@dimen/padding"
-    android:paddingTop="@dimen/padding" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
     <Spinner
         android:id="@+id/account_spinner"
-        android:layout_gravity="fill_horizontal"
-        android:layout_marginBottom="@dimen/element_padding" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:paddingLeft="@dimen/spinner_padding"
+        android:paddingTop="@dimen/padding" />
 
     <EditText
         android:id="@+id/subreddit"
-        android:layout_gravity="fill_horizontal"
-        android:layout_marginBottom="@dimen/element_padding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
         android:hint="@string/submit_link_subreddit"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
+        android:paddingTop="@dimen/element_padding"
         android:singleLine="true" />
 
     <EditText
         android:id="@+id/title"
-        android:layout_gravity="fill_horizontal"
-        android:layout_marginBottom="@dimen/element_padding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
         android:hint="@string/submit_link_title"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
+        android:paddingTop="@dimen/element_padding"
         android:singleLine="true" />
 
     <EditText
         android:id="@+id/text"
-        android:layout_gravity="fill_horizontal"
-        android:layout_marginBottom="@dimen/element_padding"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_weight="1"
+        android:gravity="top"
         android:hint="@string/submit_link_text"
         android:imeOptions="flagNoFullscreen"
-        android:inputType="textNoSuggestions" />
+        android:inputType="textNoSuggestions"
+        android:paddingTop="@dimen/element_padding" />
 
-</GridLayout>
+    <include
+        android:id="@+id/button_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/ok_button_bar" />
+
+</LinearLayout>
