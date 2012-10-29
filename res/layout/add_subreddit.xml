@@ -36,7 +36,8 @@
 
         <Spinner
             android:id="@+id/account_spinner"
-            android:layout_gravity="fill_horizontal" />
+            android:layout_gravity="fill_horizontal"
+            android:paddingLeft="@dimen/spinner_padding" />
 
         <TextView
             android:id="@+id/subreddit_text"
