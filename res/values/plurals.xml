@@ -20,6 +20,10 @@
         <item quantity="one">1 comment</item>
         <item quantity="other">%1$d comments</item>
     </plurals>
+    <plurals name="points">
+        <item quantity="one">1 point</item>
+        <item quantity="other">%1$d points</item>
+    </plurals>
     <plurals name="subreddits_added">
         <item quantity="one">1 subreddit added</item>
         <item quantity="other">%1$d subreddits added</item>
@@ -55,6 +59,14 @@
     <plurals name="time_years">
         <item quantity="one">1 year</item>
         <item quantity="other">%1$d years</item>
+    </plurals>
+    <plurals name="votes_down">
+        <item quantity="one">1 down</item>
+        <item quantity="other">%1$d downs</item>
+    </plurals>
+    <plurals name="votes_up">
+        <item quantity="one">1 up</item>
+        <item quantity="other">%1$d ups</item>
     </plurals>
 
 </resources>

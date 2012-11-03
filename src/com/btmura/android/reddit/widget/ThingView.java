@@ -39,8 +39,8 @@ public class ThingView extends CustomView implements OnGestureListener {
     private Bitmap bitmap;
 
     private String scoreText;
-    private CharSequence statusText;
-    private String longDetailsText;
+    private final SpannableStringBuilder statusText = new SpannableStringBuilder();
+    private final SpannableStringBuilder longDetailsText = new SpannableStringBuilder();
     private String shortDetailsText;
 
     private Layout titleLayout;
@@ -103,39 +103,59 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.title = title;
         this.votable = votable;
 
-        this.scoreText = VotingArrows.getScoreText(score);
-        this.statusText = getStatusText(getContext(), author, createdUtc, nowTimeMs, numComments,
-                over18, parentSubreddit, subreddit);
-        this.longDetailsText = getContext().getString(R.string.thing_details, ups, downs, domain);
-        this.shortDetailsText = domain;
+        setScoreText(score, votable);
+        setStatusText(author, createdUtc, nowTimeMs, numComments, over18, parentSubreddit, score,
+                subreddit, votable);
+        setDetailsText(domain, downs, ups);
 
         requestLayout();
     }
 
-    private static CharSequence getStatusText(Context context, String author, long createdUtc,
-            long nowTimeMs,
-            int numComments, boolean over18, String parentSubreddit, String subreddit) {
-        int resId = R.string.thing_status;
-        if (!subreddit.equalsIgnoreCase(parentSubreddit)) {
-            resId = R.string.thing_status_subreddit;
+    private void setScoreText(int score, boolean votable) {
+        // Only set the score text when there will be voting arrows.
+        if (votable) {
+            scoreText = VotingArrows.getScoreText(score);
         }
+    }
 
-        String nsfw = "";
+    private void setStatusText(String author, long createdUtc, long nowTimeMs, int numComments,
+            boolean over18, String parentSubreddit, int score, String subreddit, boolean votable) {
+        Context c = getContext();
+        Resources r = getResources();
+
+        statusText.clear();
+        statusText.clearSpans();
+
         if (over18) {
-            nsfw = context.getString(R.string.thing_nsfw);
+            String nsfw = c.getString(R.string.nsfw);
+            statusText.append(nsfw).append("  ");
+            statusText.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);
         }
 
-        String rt = RelativeTime.format(context, nowTimeMs, createdUtc);
-        Resources r = context.getResources();
-        String comments = r.getQuantityString(R.plurals.comments, numComments, numComments);
-
-        CharSequence status = context.getString(resId, subreddit, author, rt, comments, nsfw);
-        if (!nsfw.isEmpty()) {
-            SpannableStringBuilder b = new SpannableStringBuilder(status);
-            b.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);
-            status = b;
+        if (!subreddit.equalsIgnoreCase(parentSubreddit)) {
+            statusText.append(subreddit).append("  ");
         }
-        return status;
+
+        statusText.append(author).append("  ");
+
+        if (!votable) {
+            statusText.append(r.getQuantityString(R.plurals.points, score, score)).append("  ");
+        }
+
+        statusText.append(RelativeTime.format(c, nowTimeMs, createdUtc)).append("  ");
+        statusText.append(r.getQuantityString(R.plurals.comments, numComments, numComments));
+    }
+
+    private void setDetailsText(String domain, int downs, int ups) {
+        Resources r = getResources();
+
+        longDetailsText.clear();
+        longDetailsText.append(r.getQuantityString(R.plurals.votes_up, ups, ups)).append("  ");
+        longDetailsText.append(r.getQuantityString(R.plurals.votes_down, downs, downs))
+                .append("  ");
+        longDetailsText.append(domain);
+
+        shortDetailsText = domain;
     }
 
     @Override

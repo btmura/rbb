@@ -65,6 +65,7 @@
     <string name="menu_share">Share</string>
     <string name="menu_submit_link">Submit a link</string>
     <string name="menu_view_sidebar">View sidebar</string>
+    <string name="nsfw">"NSFW"</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
     <string name="provider_comments">Comments</string>
     <string name="provider_subreddits">Subreddits</string>
@@ -83,10 +84,6 @@
     <string name="subreddit">Subreddit</string>
     <string name="tab_posts">Posts</string>
     <string name="tab_subreddits">Subreddits</string>
-    <string name="thing_details">"%1$d ups  %2$d downs  %3$s"</string>
-    <string name="thing_nsfw">"NSFW  "</string>
-    <string name="thing_status" tools:ignore="StringFormatCount">"%5$s%2$s  %3$s ago  %4$s"</string>
-    <string name="thing_status_subreddit">"%5$s%1$s  %2$s  %3$s ago  %4$s"</string>
     <string name="type_login">Type login</string>
     <string name="type_password">Type password</string>
     <string name="type_subreddit_name">Type subreddit name</string>
