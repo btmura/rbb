@@ -17,12 +17,14 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.BoringLayout;
 import android.text.Layout.Alignment;
 import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
@@ -57,7 +59,7 @@ public class CommentView extends CustomView implements OnGestureListener {
 
     private CharSequence bodyText;
     private String scoreText;
-    private CharSequence statusText;
+    private final SpannableStringBuilder statusText = new SpannableStringBuilder();
 
     private StaticLayout titleLayout;
     private StaticLayout bodyLayout;
@@ -113,32 +115,29 @@ public class CommentView extends CustomView implements OnGestureListener {
 
         this.scoreText = VotingArrows.getScoreText(score);
         this.bodyText = FORMATTER.formatSpans(getContext(), body);
-        this.statusText = getStatus(getContext(), author, createdUtc, kind, nowTimeMs, numComments);
+        setStatusText(author, createdUtc, kind, nowTimeMs, numComments, score);
 
         requestLayout();
     }
 
-    private static CharSequence getStatus(Context c, String author, long createdUtc, int kind,
-            long nowTimeMs, int numComments) {
-        int resId = R.string.comment_comment_status;
-        if (kind == Comments.KIND_HEADER) {
-            resId = R.string.comment_header_status;
-        } else if (createdUtc == 0) {
-            resId = R.string.comment_pending_comment_status;
-        }
+    private void setStatusText(String author, long createdUtc, int kind, long nowTimeMs,
+            int numComments, int score) {
+        Context c = getContext();
+        Resources r = getResources();
 
-        String relativeTime = null;
+        statusText.clear();
+        statusText.clearSpans();
+        statusText.append(author).append("  ");
+
         if (createdUtc != 0) {
-            relativeTime = RelativeTime.format(c, nowTimeMs, createdUtc);
+            statusText.append(r.getQuantityString(R.plurals.points, score, score)).append("  ");
+            statusText.append(RelativeTime.format(c, nowTimeMs, createdUtc)).append("  ");
         }
 
-        String comments = null;
         if (kind == Comments.KIND_HEADER) {
-            comments = c.getResources().getQuantityString(R.plurals.comments, numComments,
-                    numComments);
+            statusText.append(r.getQuantityString(R.plurals.comments, numComments, numComments))
+                    .append("  ");
         }
-
-        return c.getString(resId, author, relativeTime, comments);
     }
 
     @Override

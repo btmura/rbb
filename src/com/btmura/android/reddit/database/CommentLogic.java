@@ -61,7 +61,7 @@ public class CommentLogic {
             if (moveToPosition(position)) {
                 return getLong(idIndex);
             }
-                throw new IllegalArgumentException();
+            throw new IllegalArgumentException();
         }
 
         public int getCommentNesting(int position) {
@@ -183,9 +183,10 @@ public class CommentLogic {
     }
 
     /**
+     * @param accountName of the user in the application not of the comment
      * @return whether this comment can be voted upon
      */
-    public static boolean isVotable(String accountName, String author) {
+    public static boolean isVotable(String accountName, String author, long createdUtc) {
         return AccountUtils.isAccount(accountName) && !Comments.DELETED.equals(author);
     }
 

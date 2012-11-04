@@ -137,7 +137,7 @@ public class CommentAdapter extends BaseCursorAdapter {
         String title = cursor.getString(INDEX_TITLE);
         String thingId = cursor.getString(INDEX_THING_ID);
         int ups = cursor.getInt(INDEX_UPS);
-        boolean votable = CommentLogic.isVotable(accountName, author);
+        boolean votable = CommentLogic.isVotable(accountName, author, createdUtc);
 
         // Comments don't have a score so calculate our own.
         int score = ups - downs;
