@@ -30,6 +30,14 @@ abstract class BaseCursorAdapter extends CursorAdapter {
         super(context, c, flags);
     }
 
+    public boolean getBoolean(int position, int columnIndex) {
+        Cursor c = getCursor();
+        if (c != null && c.moveToPosition(position)) {
+            return c.getInt(columnIndex) != 0;
+        }
+        return false;
+    }
+
     public int getInt(int position, int columnIndex) {
         Cursor c = getCursor();
         if (c != null && c.moveToPosition(position)) {

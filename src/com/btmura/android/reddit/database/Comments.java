@@ -34,7 +34,10 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_CREATED_UTC = "createdUtc";
 
     public static final String COLUMN_DOWNS = "downs";
+
+    /** Column to indicate whether this comment is expanded. */
     public static final String COLUMN_EXPANDED = "expanded";
+
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_NESTING = "nesting";
@@ -49,6 +52,13 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
 
     public static final String COLUMN_UPS = "ups";
+
+    /**
+     * Column to indicate whether this comment is visible. A comment whose
+     * parent is collapsed will have expanded to true but visible to false.
+     */
+    public static final String COLUMN_VISIBLE = "visible";
+
     public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
     /** Deleted comments have an author and body with this string. */
@@ -59,6 +69,9 @@ public class Comments implements BaseColumns {
     public static final int KIND_MORE = 2;
 
     public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
+
+    public static final String SELECT_VISIBLE_BY_SESSION_ID = SELECT_BY_SESSION_ID
+            + " AND " + COLUMN_VISIBLE + " = 1";
 
     public static final String SELECT_BEFORE_TIMESTAMP =
             COLUMN_SESSION_TIMESTAMP + " < ?";
@@ -85,7 +98,8 @@ public class Comments implements BaseColumns {
                 + COLUMN_SESSION_TIMESTAMP + " INTEGER NOT NULL, "
                 + COLUMN_THING_ID + " TEXT, "
                 + COLUMN_TITLE + " TEXT, "
-                + COLUMN_UPS + " INTEGER DEFAULT 0)");
+                + COLUMN_UPS + " INTEGER DEFAULT 0,"
+                + COLUMN_VISIBLE + " INTEGER DEFAULT 1)");
     }
 
     public static String getAuthor(Bundle bundle) {

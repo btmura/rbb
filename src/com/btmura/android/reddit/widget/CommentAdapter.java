@@ -39,6 +39,7 @@ public class CommentAdapter extends BaseCursorAdapter {
             Comments.COLUMN_BODY,
             Comments.COLUMN_CREATED_UTC,
             Comments.COLUMN_DOWNS,
+            Comments.COLUMN_EXPANDED,
             Comments.COLUMN_KIND,
             Comments.COLUMN_LIKES,
             Comments.COLUMN_NESTING,
@@ -57,17 +58,18 @@ public class CommentAdapter extends BaseCursorAdapter {
     public static int INDEX_BODY = 2;
     public static int INDEX_CREATED_UTC = 3;
     public static int INDEX_DOWNS = 4;
-    public static int INDEX_KIND = 5;
-    public static int INDEX_LIKES = 6;
-    public static int INDEX_NESTING = 7;
-    public static int INDEX_NUM_COMMENTS = 8;
-    public static int INDEX_SEQUENCE = 9;
-    public static int INDEX_SESSION_ID = 10;
-    public static int INDEX_SESSION_CREATION_TIME = 11;
-    public static int INDEX_TITLE = 12;
-    public static int INDEX_THING_ID = 13;
-    public static int INDEX_UPS = 14;
-    public static int INDEX_VOTE = 15;
+    public static int INDEX_EXPANDED = 5;
+    public static int INDEX_KIND = 6;
+    public static int INDEX_LIKES = 7;
+    public static int INDEX_NESTING = 8;
+    public static int INDEX_NUM_COMMENTS = 9;
+    public static int INDEX_SEQUENCE = 10;
+    public static int INDEX_SESSION_ID = 11;
+    public static int INDEX_SESSION_CREATION_TIME = 12;
+    public static int INDEX_TITLE = 13;
+    public static int INDEX_THING_ID = 14;
+    public static int INDEX_UPS = 15;
+    public static int INDEX_VOTE = 16;
 
     private final long nowTimeMs = System.currentTimeMillis();
     private final String accountName;
@@ -76,7 +78,7 @@ public class CommentAdapter extends BaseCursorAdapter {
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
             String thingId, boolean sync) {
         Uri uri = getUri(accountName, sessionId, thingId, sync);
-        return new CursorLoader(context, uri, PROJECTION, Comments.SELECT_BY_SESSION_ID,
+        return new CursorLoader(context, uri, PROJECTION, Comments.SELECT_VISIBLE_BY_SESSION_ID,
                 Array.of(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
     }
 

@@ -145,9 +145,23 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        menu.findItem(R.id.menu_expand).setVisible(isExpandOrCollapseVisible(true));
+        menu.findItem(R.id.menu_collapse).setVisible(isExpandOrCollapseVisible(false));
         menu.findItem(R.id.menu_reply).setVisible(isReplyItemVisible());
         menu.findItem(R.id.menu_delete).setVisible(isDeleteItemVisible());
         return true;
+    }
+
+    private boolean isExpandOrCollapseVisible(boolean expand) {
+        // Allow collapse only when one item is selected.
+        if (getListView().getCheckedItemCount() != 1) {
+            return false;
+        }
+
+        // Only comments (not the header or more entries) can be expanded or collapsed.
+        int position = getFirstCheckedPosition();
+        return adapter.getInt(position, CommentAdapter.INDEX_KIND) == Comments.KIND_COMMENT
+                && adapter.getBoolean(position, CommentAdapter.INDEX_EXPANDED) != expand;
     }
 
     private boolean isReplyItemVisible() {
@@ -162,21 +176,17 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         }
 
         // The single comment must have a valid id and not be deleted.
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        int count = adapter.getCount();
-        for (int i = 0; i < count; i++) {
-            if (checked.get(i)) {
-                String thingId = adapter.getString(i, CommentAdapter.INDEX_THING_ID);
-                if (TextUtils.isEmpty(thingId)) {
-                    return false;
-                }
-
-                String author = adapter.getString(i, CommentAdapter.INDEX_AUTHOR);
-                if (Comments.DELETED.equals(author)) {
-                    return false;
-                }
-            }
+        int position = getFirstCheckedPosition();
+        String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
+        if (TextUtils.isEmpty(thingId)) {
+            return false;
         }
+
+        String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
+        if (Comments.DELETED.equals(author)) {
+            return false;
+        }
+
         return true;
     }
 
