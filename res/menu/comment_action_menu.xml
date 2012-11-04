@@ -17,6 +17,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_expand"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_expand"/>
+    <item
+        android:id="@+id/menu_collapse"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_collapse"/>
+    <item
         android:id="@+id/menu_reply"
         android:showAsAction="ifRoom"
         android:title="@string/menu_reply"/>

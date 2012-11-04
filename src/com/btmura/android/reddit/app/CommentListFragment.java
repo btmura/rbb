@@ -139,28 +139,14 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        // You need an account to either reply or delete comments.
-        if (!AccountUtils.isAccount(accountName)) {
-            return false;
-        }
-
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.comment_action_menu, menu);
         return true;
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        boolean showReply = isReplyItemVisible();
-        boolean showDelete = isDeleteItemVisible();
-
-        // If both items are not visible then don't show the action mode.
-        if (!showReply && !showDelete) {
-            mode.finish();
-            return true;
-        }
-
-        menu.findItem(R.id.menu_reply).setVisible(showReply);
-        menu.findItem(R.id.menu_delete).setVisible(showDelete);
+        menu.findItem(R.id.menu_reply).setVisible(isReplyItemVisible());
+        menu.findItem(R.id.menu_delete).setVisible(isDeleteItemVisible());
         return true;
     }
 
