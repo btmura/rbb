@@ -224,6 +224,12 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_expand:
+                return handleExpand(mode);
+
+            case R.id.menu_collapse:
+                return handleCollapse(mode);
+
             case R.id.menu_reply:
                 return handleReply(mode);
 
@@ -233,6 +239,19 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             default:
                 return false;
         }
+    }
+
+    private boolean handleExpand(ActionMode mode) {
+        return true;
+    }
+
+    private boolean handleCollapse(ActionMode mode) {
+        int position = getFirstCheckedPosition();
+        long id = getCommentId(position);
+        long[] childIds = CommentLogic.getChildren(this, position);
+        CommentProvider.collapseInBackground(getActivity(), id, childIds);
+        mode.finish();
+        return true;
     }
 
     private boolean handleReply(ActionMode mode) {
@@ -322,6 +341,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     public int getCommentCount() {
         return adapter.getCount();
+    }
+
+    public long getCommentId(int position) {
+        return adapter.getLong(position, CommentAdapter.INDEX_ID);
     }
 
     public int getCommentNesting(int position) {

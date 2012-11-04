@@ -302,6 +302,10 @@ class CommentListing extends JsonParser implements CommentList {
         return values.size();
     }
 
+    public long getCommentId(int position) {
+        return values.get(position).getAsLong(Comments._ID);
+    }
+
     public int getCommentNesting(int position) {
         return values.get(position).getAsInteger(Comments.COLUMN_NESTING);
     }

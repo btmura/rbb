@@ -249,4 +249,37 @@ public class CommentProvider extends SessionProvider {
             }
         });
     }
+
+    public static void collapseInBackground(Context context, final long id,
+            final long[] childIds) {
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            public void run() {
+                int childCount = childIds != null ? childIds.length : 0;
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(childCount + 1);
+
+                ops.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
+                        .withSelection(ID_SELECTION, Array.of(id))
+                        .withValue(Comments.COLUMN_EXPANDED, false)
+                        .build());
+
+                for (int i = 0; i < childCount; i++) {
+                    ops.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
+                            .withSelection(ID_SELECTION, Array.of(childIds[i]))
+                            .withValue(Comments.COLUMN_EXPANDED, true)
+                            .withValue(Comments.COLUMN_VISIBLE, false)
+                            .build());
+                }
+
+                try {
+                    cr.applyBatch(AUTHORITY, ops);
+                } catch (RemoteException e) {
+                    Log.e(TAG, e.getMessage(), e);
+                } catch (OperationApplicationException e) {
+                    Log.e(TAG, e.getMessage(), e);
+                }
+            }
+        });
+    }
 }

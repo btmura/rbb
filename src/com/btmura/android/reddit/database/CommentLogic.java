@@ -27,6 +27,9 @@ public class CommentLogic {
         /** @return number of comments in this listing */
         int getCommentCount();
 
+        /** @return id of the comment at the given position */
+        long getCommentId(int position);
+
         /** @return nesting of the comment at the given position */
         int getCommentNesting(int position);
 
@@ -104,6 +107,37 @@ public class CommentLogic {
         // If this is the last comment, then there are no replies. It's safe to
         // remove completely.
         return false;
+    }
+
+    /**
+     * @return null or non-empty array of ids of children of the comment at
+     *         given position
+     */
+    public static long[] getChildren(CommentList list, int position) {
+        // First, figure out how many consecutive children there are to avoid
+        // unnecessary array resizing allocations...
+        int nesting = list.getCommentNesting(position);
+        int numChildren = 0;
+        int count = list.getCommentCount();
+        for (int i = position + 1; i < count; i++) {
+            int nextNesting = list.getCommentNesting(i);
+            if (nextNesting > nesting) {
+                numChildren++;
+                continue;
+            }
+            break;
+        }
+
+        // Now fill up the array with the ids if there are any children.
+        long[] childIds = null;
+        if (numChildren > 0) {
+            childIds = new long[numChildren];
+            int j = 0;
+            for (int i = position + 1; i < count && j < numChildren; i++, j++) {
+                childIds[j] = list.getCommentId(i);
+            }
+        }
+        return childIds;
     }
 
     /**
