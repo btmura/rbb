@@ -21,6 +21,7 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.text.BoringLayout;
 import android.text.Layout.Alignment;
 import android.text.Spannable;
@@ -29,6 +30,7 @@ import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.style.ClickableSpan;
+import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -115,13 +117,13 @@ public class CommentView extends CustomView implements OnGestureListener {
 
         this.scoreText = VotingArrows.getScoreText(score);
         this.bodyText = FORMATTER.formatSpans(getContext(), body);
-        setStatusText(author, createdUtc, kind, nowTimeMs, numComments, score);
+        setStatusText(author, createdUtc, expanded, kind, nowTimeMs, numComments, score);
 
         requestLayout();
     }
 
-    private void setStatusText(String author, long createdUtc, int kind, long nowTimeMs,
-            int numComments, int score) {
+    private void setStatusText(String author, long createdUtc, boolean expanded, int kind,
+            long nowTimeMs, int numComments, int score) {
         Context c = getContext();
         Resources r = getResources();
 
@@ -137,6 +139,10 @@ public class CommentView extends CustomView implements OnGestureListener {
         if (kind == Comments.KIND_HEADER) {
             statusText.append(r.getQuantityString(R.plurals.comments, numComments, numComments))
                     .append("  ");
+        }
+
+        if (!expanded) {
+            statusText.setSpan(new StyleSpan(Typeface.ITALIC), 0, statusText.length(), 0);
         }
     }
 
