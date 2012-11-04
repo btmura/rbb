@@ -94,7 +94,7 @@ public class SubredditProvider extends SessionProvider {
 
     private void handleFetch(Uri uri, SQLiteDatabase db) {
         try {
-            long sessionTimestamp = System.currentTimeMillis();
+            long sessionTimestamp = getSessionTimestamp();
 
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
