@@ -37,28 +37,28 @@
         <item quantity="other">%1$d subscribers</item>
     </plurals>
     <plurals name="time_seconds">
-        <item quantity="one">1 second</item>
-        <item quantity="other">%1$d seconds</item>
+        <item quantity="one">1 second ago</item>
+        <item quantity="other">%1$d seconds ago</item>
     </plurals>
     <plurals name="time_minutes">
-        <item quantity="one">1 minute</item>
-        <item quantity="other">%1$d minutes</item>
+        <item quantity="one">1 minute ago</item>
+        <item quantity="other">%1$d minutes ago</item>
     </plurals>
     <plurals name="time_hours">
-        <item quantity="one">1 hour</item>
-        <item quantity="other">%1$d hours</item>
+        <item quantity="one">1 hour ago</item>
+        <item quantity="other">%1$d hours ago</item>
     </plurals>
     <plurals name="time_days">
-        <item quantity="one">1 day</item>
-        <item quantity="other">%1$d days</item>
+        <item quantity="one">1 day ago</item>
+        <item quantity="other">%1$d days ago</item>
     </plurals>
     <plurals name="time_months">
-        <item quantity="one">1 month</item>
-        <item quantity="other">%1$d months</item>
+        <item quantity="one">1 month ago</item>
+        <item quantity="other">%1$d months ago</item>
     </plurals>
     <plurals name="time_years">
-        <item quantity="one">1 year</item>
-        <item quantity="other">%1$d years</item>
+        <item quantity="one">1 year ago</item>
+        <item quantity="other">%1$d years ago </item>
     </plurals>
     <plurals name="votes_down">
         <item quantity="one">1 down</item>
