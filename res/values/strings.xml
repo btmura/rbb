@@ -28,9 +28,6 @@
     <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
     <string name="captcha_image">Captcha image</string>
     <string name="captcha_guess">Type captcha</string>
-    <string name="comment_comment_status">"%1$s  %2$s ago"</string>
-    <string name="comment_header_status">"%1$s  %2$s ago  %3$s"</string>
-    <string name="comment_pending_comment_status">"%1$s"</string>
     <string name="comment_reply_title">Reply to %s</string>
     <string name="comment_reply_hint">Hello, I would like to subscribe to your newsletter…</string>
     <string name="content_browser">Content Providers</string>
@@ -57,7 +54,7 @@
     <string name="menu_comments">View comments</string>
     <string name="menu_copy_url">Copy URL</string>
     <string name="menu_delete">Delete</string>
-    <string name="menu_expand">Expand</string>    
+    <string name="menu_expand">Expand</string>
     <string name="menu_link">View link</string>
     <string name="menu_open">Open in another app</string>
     <string name="menu_remove_account">Remove account</string>
