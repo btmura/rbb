@@ -130,6 +130,7 @@ public class CommentAdapter extends BaseCursorAdapter {
         String body = cursor.getString(INDEX_BODY);
         long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
         int downs = cursor.getInt(INDEX_DOWNS);
+        boolean expanded = cursor.getInt(INDEX_EXPANDED) == 1;
         int kind = cursor.getInt(INDEX_KIND);
         int nesting = cursor.getInt(INDEX_NESTING);
         int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
@@ -155,7 +156,7 @@ public class CommentAdapter extends BaseCursorAdapter {
 
         CommentView cv = (CommentView) view;
         cv.setOnVoteListener(listener);
-        cv.setData(author, body, createdUtc, kind, likes, nesting, nowTimeMs, numComments, score,
-                title, thingId, votable);
+        cv.setData(author, body, createdUtc, expanded, kind, likes, nesting, nowTimeMs,
+                numComments, score, title, thingId, votable);
     }
 }

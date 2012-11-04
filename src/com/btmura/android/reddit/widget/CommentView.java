@@ -48,6 +48,7 @@ public class CommentView extends CustomView implements OnGestureListener {
     private final GestureDetector detector;
     private OnVoteListener listener;
 
+    private boolean expanded;
     private int likes;
     private int nesting;
     private String title;
@@ -93,6 +94,7 @@ public class CommentView extends CustomView implements OnGestureListener {
     public void setData(String author,
             String body,
             long createdUtc,
+            boolean expanded,
             int kind,
             int likes,
             int nesting,
@@ -102,11 +104,12 @@ public class CommentView extends CustomView implements OnGestureListener {
             String title,
             String thingId,
             boolean votable) {
+        this.expanded = expanded;
         this.likes = likes;
         this.nesting = nesting;
         this.title = title;
         this.thingId = thingId;
-        this.votable = votable;
+        this.votable = votable && expanded;
 
         this.scoreText = VotingArrows.getScoreText(score);
         this.bodyText = FORMATTER.formatSpans(getContext(), body);
@@ -156,7 +159,8 @@ public class CommentView extends CustomView implements OnGestureListener {
                 break;
         }
 
-        int rightContentWidth = measuredWidth - PADDING * (2 + nesting); // 2 = left + right margin
+        // 2 = left + right margin
+        int rightContentWidth = measuredWidth - PADDING * (2 + nesting);
         if (votable) {
             rightContentWidth -= VotingArrows.getWidth(votable) + PADDING;
             VotingArrows.measureScoreText(scoreText, scoreBounds);
@@ -166,13 +170,13 @@ public class CommentView extends CustomView implements OnGestureListener {
         bodyLayout = null;
         rightHeight = 0;
 
-        if (!TextUtils.isEmpty(title)) {
+        if (expanded && !TextUtils.isEmpty(title)) {
             titleLayout = createTitleLayout(rightContentWidth);
             rightHeight += titleLayout.getHeight();
             rightHeight += ELEMENT_PADDING;
         }
 
-        if (!TextUtils.isEmpty(bodyText)) {
+        if (expanded && !TextUtils.isEmpty(bodyText)) {
             bodyLayout = createBodyLayout(rightContentWidth);
             rightHeight += bodyLayout.getHeight();
             rightHeight += ELEMENT_PADDING;
