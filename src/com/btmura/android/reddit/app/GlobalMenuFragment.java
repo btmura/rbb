@@ -19,7 +19,9 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
+import android.content.Loader;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,10 +30,14 @@ import android.view.View;
 import android.widget.SearchView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.util.Array;
 
 public class GlobalMenuFragment extends Fragment implements
         SearchView.OnFocusChangeListener,
-        SearchView.OnQueryTextListener {
+        SearchView.OnQueryTextListener,
+        LoaderCallbacks<AccountResult> {
 
     public static final String TAG = "GlobalMenuFragment";
 
@@ -44,6 +50,7 @@ public class GlobalMenuFragment extends Fragment implements
     private OnSearchQuerySubmittedListener listener;
     private MenuItem searchItem;
     private SearchView searchView;
+    private boolean hasAccounts;
 
     public static GlobalMenuFragment newInstance() {
         return new GlobalMenuFragment();
@@ -64,6 +71,26 @@ public class GlobalMenuFragment extends Fragment implements
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(getActivity(), false);
+    }
+
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        hasAccounts = !Array.isEmpty(result.accountNames);
+        getActivity().invalidateOptionsMenu();
+    }
+
+    public void onLoaderReset(Loader<AccountResult> loader) {
+        hasAccounts = false;
+        getActivity().invalidateOptionsMenu();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.global_menu, menu);
@@ -71,6 +98,12 @@ public class GlobalMenuFragment extends Fragment implements
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextFocusChangeListener(this);
         searchView.setOnQueryTextListener(this);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.menu_submit_link).setVisible(hasAccounts);
     }
 
     @Override
