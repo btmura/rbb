@@ -27,6 +27,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
+import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -37,8 +38,10 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Votes;
+import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.util.Array;
 
 public class CommentProvider extends SessionProvider {
@@ -250,6 +253,59 @@ public class CommentProvider extends SessionProvider {
         });
     }
 
+    /** Projection used by {@link #expandInBackground(Context, long)}. */
+    private static final String[] EXPAND_PROJECTION = {
+            Comments._ID,
+            Comments.COLUMN_EXPANDED,
+            Comments.COLUMN_NESTING,
+    };
+
+    public static void expandInBackground(Context context, final String sessionId, final long id) {
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            public void run() {
+                Cursor c = cr.query(COMMENTS_URI, EXPAND_PROJECTION, Comments.SELECT_BY_SESSION_ID,
+                        Array.of(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
+                try {
+                    long[] childIds = null;
+                    CursorCommentList cl = new CursorCommentList(c, 0, 2, -1);
+                    int count = cl.getCommentCount();
+                    for (int i = 0; i < count; i++) {
+                        if (cl.getCommentId(i) == id) {
+                            childIds = CommentLogic.getChildren(cl, i);
+                            break;
+                        }
+                    }
+
+                    int childCount = childIds != null ? childIds.length : 0;
+                    ArrayList<ContentProviderOperation> ops =
+                            new ArrayList<ContentProviderOperation>(childCount + 1);
+                    ops.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
+                            .withSelection(ID_SELECTION, Array.of(id))
+                            .withValue(Comments.COLUMN_EXPANDED, true)
+                            .build());
+                    for (int i = 0; i < childCount; i++) {
+                        ops.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
+                                .withSelection(ID_SELECTION, Array.of(childIds[i]))
+                                .withValue(Comments.COLUMN_EXPANDED, true)
+                                .withValue(Comments.COLUMN_VISIBLE, true)
+                                .build());
+                    }
+
+                    try {
+                        cr.applyBatch(AUTHORITY, ops);
+                    } catch (RemoteException e) {
+                        Log.e(TAG, e.getMessage(), e);
+                    } catch (OperationApplicationException e) {
+                        Log.e(TAG, e.getMessage(), e);
+                    }
+                } finally {
+                    c.close();
+                }
+            }
+        });
+    }
+
     public static void collapseInBackground(Context context, final long id,
             final long[] childIds) {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
@@ -258,12 +314,10 @@ public class CommentProvider extends SessionProvider {
                 int childCount = childIds != null ? childIds.length : 0;
                 ArrayList<ContentProviderOperation> ops =
                         new ArrayList<ContentProviderOperation>(childCount + 1);
-
                 ops.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
                         .withSelection(ID_SELECTION, Array.of(id))
                         .withValue(Comments.COLUMN_EXPANDED, false)
                         .build());
-
                 for (int i = 0; i < childCount; i++) {
                     ops.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
                             .withSelection(ID_SELECTION, Array.of(childIds[i]))

@@ -242,6 +242,9 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     private boolean handleExpand(ActionMode mode) {
+        long id = getCommentId(getFirstCheckedPosition());
+        CommentProvider.expandInBackground(getActivity(), sessionId, id);
+        mode.finish();
         return true;
     }
 

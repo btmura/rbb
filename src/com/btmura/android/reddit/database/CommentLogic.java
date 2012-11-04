@@ -16,6 +16,9 @@
 
 package com.btmura.android.reddit.database;
 
+import android.database.Cursor;
+import android.database.CursorWrapper;
+
 import com.btmura.android.reddit.accounts.AccountUtils;
 
 /**
@@ -35,6 +38,45 @@ public class CommentLogic {
 
         /** @return sequence of the comment at the given position */
         int getCommentSequence(int position);
+    }
+
+    public static class CursorCommentList extends CursorWrapper implements CommentList {
+
+        private final int idIndex;
+        private final int nestingIndex;
+        private final int sequenceIndex;
+
+        public CursorCommentList(Cursor cursor, int idIndex, int nestingIndex, int sequenceIndex) {
+            super(cursor);
+            this.idIndex = idIndex;
+            this.nestingIndex = nestingIndex;
+            this.sequenceIndex = sequenceIndex;
+        }
+
+        public int getCommentCount() {
+            return getCount();
+        }
+
+        public long getCommentId(int position) {
+            if (moveToPosition(position)) {
+                return getLong(idIndex);
+            }
+                throw new IllegalArgumentException();
+        }
+
+        public int getCommentNesting(int position) {
+            if (moveToPosition(position)) {
+                return getInt(nestingIndex);
+            }
+            throw new IllegalArgumentException();
+        }
+
+        public int getCommentSequence(int position) {
+            if (moveToPosition(position)) {
+                return getInt(sequenceIndex);
+            }
+            throw new IllegalArgumentException();
+        }
     }
 
     /**
