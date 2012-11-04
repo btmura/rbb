@@ -46,10 +46,12 @@ public class SubredditAdapter extends BaseCursorAdapter {
             SubredditSearches._ID,
             SubredditSearches.COLUMN_NAME,
             SubredditSearches.COLUMN_SUBSCRIBERS,
+            SubredditSearches.COLUMN_OVER_18,
     };
 
     private static final int INDEX_NAME = 1;
     private static final int INDEX_SUBSCRIBERS = 2;
+    private static final int INDEX_OVER_18 = 3;
 
     private String selectedSubreddit;
 
@@ -70,17 +72,12 @@ public class SubredditAdapter extends BaseCursorAdapter {
     public static void
             deleteSessionData(final Context context, final String sessionId, String query) {
         if (!TextUtils.isEmpty(query)) {
-            // Use application context to allow activity to be collected and
-            // schedule the session deletion in the background thread pool
-            // rather
-            // than serial pool.
             final Context appContext = context.getApplicationContext();
-            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
                 public void run() {
                     ContentResolver cr = appContext.getContentResolver();
                     cr.delete(SubredditProvider.SEARCHES_URI,
-                            SubredditSearches.SELECT_BY_SESSION_ID,
-                            Array.of(sessionId));
+                            SubredditSearches.SELECT_BY_SESSION_ID, Array.of(sessionId));
                 }
             });
         }
@@ -130,8 +127,9 @@ public class SubredditAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         String name = cursor.getString(INDEX_NAME);
         int subscribers = query != null ? cursor.getInt(INDEX_SUBSCRIBERS) : -1;
+        boolean over18 = query != null && cursor.getInt(INDEX_OVER_18) == 1;
         SubredditView v = (SubredditView) view;
-        v.setData(name, subscribers);
+        v.setData(name, over18, subscribers);
         v.setChosen(singleChoice && Objects.equalsIgnoreCase(selectedSubreddit, name));
     }
 

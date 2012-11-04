@@ -32,6 +32,9 @@ public class SubredditSearches implements BaseColumns {
     /** Subreddit name like AskReddit. */
     public static final String COLUMN_NAME = "name";
 
+    /** Indicates that this subreddit has content for 18+. */
+    public static final String COLUMN_OVER_18 = "over18";
+
     /** Timestamp for this session used when pruning expired data. */
     public static final String COLUMN_SESSION_TIMESTAMP = "sessionTimestamp";
 
@@ -52,6 +55,7 @@ public class SubredditSearches implements BaseColumns {
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_NAME + " TEXT NOT NULL, "
+                + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
                 + COLUMN_SESSION_TIMESTAMP + " INTEGER NOT NULL, "
                 + COLUMN_SUBSCRIBERS + " INTEGER DEFAULT 0)");

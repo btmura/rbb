@@ -94,8 +94,6 @@ public class SubredditProvider extends SessionProvider {
 
     private void handleFetch(Uri uri, SQLiteDatabase db) {
         try {
-            // Determine the cutoff first to avoid deleting synced data.
-            long timestampCutoff = getSessionTimestamp();
             long sessionTimestamp = System.currentTimeMillis();
 
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
@@ -113,7 +111,7 @@ public class SubredditProvider extends SessionProvider {
                 // Delete old results that can't be possibly viewed anymore.
                 cleaned = db.delete(SubredditSearches.TABLE_NAME,
                         SubredditSearches.SELECT_BEFORE_TIMESTAMP,
-                        Array.of(timestampCutoff));
+                        Array.of(sessionTimestamp));
                 InsertHelper insertHelper = new InsertHelper(db, SubredditSearches.TABLE_NAME);
                 int count = listing.values.size();
                 for (int i = 0; i < count; i++) {

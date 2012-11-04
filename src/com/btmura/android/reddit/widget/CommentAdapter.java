@@ -91,9 +91,6 @@ public class CommentAdapter extends BaseCursorAdapter {
     }
 
     public static void deleteSessionData(final Context context, final String sessionId) {
-        // Use application context to allow activity to be collected and
-        // schedule the session deletion in the background thread pool rather
-        // than serial pool.
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {

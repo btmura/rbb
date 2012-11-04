@@ -17,11 +17,15 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.text.BoringLayout;
 import android.text.Layout.Alignment;
+import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils.TruncateAt;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 
 import com.btmura.android.reddit.R;
@@ -37,7 +41,7 @@ public class SubredditView extends CustomView {
     private BoringLayout.Metrics titleMetrics;
     private BoringLayout titleLayout;
 
-    private String status;
+    private SpannableStringBuilder statusText;
     private BoringLayout.Metrics statusMetrics;
     private BoringLayout statusLayout;
 
@@ -55,18 +59,35 @@ public class SubredditView extends CustomView {
 
     /**
      * @param name of the subreddit or empty string for front page
+     * @param over18 of the subreddit's content
      * @param subscribers or -1 if no subscriber info available
      */
-    public void setData(String name, int subscribers) {
+    public void setData(String name, boolean over18, int subscribers) {
         title = Subreddits.getTitle(getContext(), name);
-        if (subscribers != -1) {
-            status = getResources().getQuantityString(R.plurals.subscribers,
-                    subscribers, subscribers);
-        } else {
-            // Don't null the corresponding layout to avoid GC.
-            status = null;
-        }
+        setStatusText(over18, subscribers);
         requestLayout();
+    }
+
+    private void setStatusText(boolean over18, int subscribers) {
+        // If negative subscribers, then it's just a list without status.
+        if (subscribers != -1) {
+            Resources r = getResources();
+
+            if (statusText == null) {
+                statusText = new SpannableStringBuilder();
+            } else {
+                statusText.clear();
+                statusText.clearSpans();
+            }
+
+            if (over18) {
+                String nsfw = r.getString(R.string.nsfw);
+                statusText.append(nsfw).append("  ");
+                statusText.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);
+            }
+
+            statusText.append(r.getQuantityString(R.plurals.subscribers, subscribers, subscribers));
+        }
     }
 
     @Override
@@ -89,7 +110,7 @@ public class SubredditView extends CustomView {
 
         int remains = measuredWidth - PADDING * 2;
         setTitleLayout(remains);
-        if (status != null) {
+        if (statusText != null) {
             setStatusLayout(remains);
         }
 
@@ -113,7 +134,7 @@ public class SubredditView extends CustomView {
     protected void onDraw(Canvas c) {
         c.translate(PADDING, PADDING);
         titleLayout.draw(c);
-        if (status != null) {
+        if (statusText != null) {
             c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
             statusLayout.draw(c);
         }
@@ -133,19 +154,19 @@ public class SubredditView extends CustomView {
 
     private void setStatusLayout(int width) {
         TextPaint statusPaint = TEXT_PAINTS[SUBREDDIT_STATUS];
-        statusMetrics = BoringLayout.isBoring(status, statusPaint, statusMetrics);
+        statusMetrics = BoringLayout.isBoring(statusText, statusPaint, statusMetrics);
         if (statusLayout == null) {
-            statusLayout = BoringLayout.make(status, statusPaint, width, Alignment.ALIGN_NORMAL,
+            statusLayout = BoringLayout.make(statusText, statusPaint, width, Alignment.ALIGN_NORMAL,
                     1f, 0f, statusMetrics, false, TruncateAt.END, width);
         } else {
-            statusLayout.replaceOrMake(status, statusPaint, width, Alignment.ALIGN_NORMAL,
+            statusLayout.replaceOrMake(statusText, statusPaint, width, Alignment.ALIGN_NORMAL,
                     1f, 0f, statusMetrics, false, TruncateAt.END, width);
         }
     }
 
     private int getMinimumHeight() {
         int height = PADDING + titleLayout.getHeight();
-        if (status != null) {
+        if (statusText != null) {
             height += ELEMENT_PADDING + statusLayout.getHeight();
         }
         return height + PADDING;

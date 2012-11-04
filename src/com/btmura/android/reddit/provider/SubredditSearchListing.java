@@ -73,7 +73,7 @@ class SubredditSearchListing extends JsonParser {
 
     @Override
     public void onEntityStart(int index) {
-        ContentValues v = new ContentValues(5);
+        ContentValues v = new ContentValues(6);
         v.put(SubredditSearches.COLUMN_ACCOUNT, accountName);
         v.put(SubredditSearches.COLUMN_SESSION_ID, sessionId);
         v.put(SubredditSearches.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
@@ -86,7 +86,18 @@ class SubredditSearchListing extends JsonParser {
     }
 
     @Override
+    public void onOver18(JsonReader reader, int index) throws IOException {
+        values.get(index).put(SubredditSearches.COLUMN_OVER_18, reader.nextBoolean());
+    }
+
+    @Override
     public void onSubscribers(JsonReader reader, int index) throws IOException {
         values.get(index).put(SubredditSearches.COLUMN_SUBSCRIBERS, reader.nextInt());
+    }
+
+    @Override
+    public void onEntityEnd(int index) {
+        super.onEntityEnd(index);
+        Log.d(TAG, "v: " + values.get(index));
     }
 }

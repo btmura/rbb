@@ -137,7 +137,7 @@ public class JsonParser {
                 onName(r, i);
             } else if ("title".equals(name)) {
                 onTitle(r, i);
-            } else if ("over_18".equals(name)) {
+            } else if ("over_18".equals(name) || "over18".equals(name)) {
                 onOver18(r, i);
             } else if ("author".equals(name)) {
                 onAuthor(r, i);
