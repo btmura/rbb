@@ -34,6 +34,7 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_CREATED_UTC = "createdUtc";
 
     public static final String COLUMN_DOWNS = "downs";
+    public static final String COLUMN_EXPANDED = "expanded";
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_NESTING = "nesting";
@@ -73,6 +74,7 @@ public class Comments implements BaseColumns {
                 + COLUMN_BODY + " TEXT DEFAULT '', "
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
                 + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
+                + COLUMN_EXPANDED + " INTEGER DEFAULT 1, "
                 + COLUMN_KIND + " INTEGER NOT NULL, "
                 + COLUMN_LIKES + " INTEGER DEFAULT 0, "
                 + COLUMN_NESTING + " INTEGER NOT NULL, "
