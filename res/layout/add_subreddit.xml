@@ -19,47 +19,36 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <GridLayout
+    <Spinner
+        android:id="@+id/account_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnCount="2"
-        android:paddingBottom="@dimen/padding"
-        android:paddingLeft="@dimen/padding"
-        android:paddingRight="@dimen/padding"
-        android:paddingTop="@dimen/padding" >
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:paddingLeft="@dimen/spinner_padding" />
 
-        <TextView
-            android:id="@+id/account_text"
-            android:layout_gravity="center_vertical|right"
-            android:layout_marginRight="@dimen/element_padding"
-            android:text="@string/account" />
+    <EditText
+        android:id="@+id/subreddit_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
+        android:hint="@string/type_subreddit_name"
+        android:imeOptions="flagNoFullscreen"
+        android:inputType="textNoSuggestions"
+        android:singleLine="true" />
 
-        <Spinner
-            android:id="@+id/account_spinner"
-            android:layout_gravity="fill_horizontal"
-            android:paddingLeft="@dimen/spinner_padding" />
-
-        <TextView
-            android:id="@+id/subreddit_text"
-            android:layout_gravity="center_vertical|right"
-            android:layout_marginBottom="@dimen/element_padding"
-            android:layout_marginRight="@dimen/element_padding"
-            android:text="@string/subreddit" />
-
-        <EditText
-            android:id="@+id/subreddit_name"
-            android:layout_gravity="fill_horizontal"
-            android:layout_marginBottom="@dimen/element_padding"
-            android:hint="@string/type_subreddit_name"
-            android:imeOptions="flagNoFullscreen"
-            android:inputType="textNoSuggestions"
-            android:singleLine="true" />
-
-        <CheckBox
-            android:id="@+id/add_front_page"
-            android:layout_column="1"
-            android:text="@string/add_front_page" />
-    </GridLayout>
+    <CheckBox
+        android:id="@+id/add_front_page"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
+        android:text="@string/add_front_page" />
 
     <include
         android:layout_width="match_parent"

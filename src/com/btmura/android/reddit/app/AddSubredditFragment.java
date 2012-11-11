@@ -61,10 +61,6 @@ public class AddSubredditFragment extends DialogFragment implements
     private Button cancel;
     private Button ok;
 
-    private View accountText;
-
-    private View subredditText;
-
     public static AddSubredditFragment newInstance() {
         return new AddSubredditFragment();
     }
@@ -85,12 +81,10 @@ public class AddSubredditFragment extends DialogFragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View
+            onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setTitle(R.string.add_subreddit);
         View v = inflater.inflate(R.layout.add_subreddit, container, false);
-
-        accountText = v.findViewById(R.id.account_text);
-        subredditText = v.findViewById(R.id.subreddit_text);
 
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
         accountSpinner.setAdapter(adapter);
@@ -126,8 +120,6 @@ public class AddSubredditFragment extends DialogFragment implements
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         int visiblility = result.accountNames.length > 1 ? View.VISIBLE : View.GONE;
-        accountText.setVisibility(visiblility);
-        subredditText.setVisibility(visiblility);
         accountSpinner.setVisibility(visiblility);
         adapter.setAccountNames(result.accountNames);
         if (!restoringState) {
