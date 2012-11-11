@@ -54,6 +54,7 @@ public class AddSubredditFragment extends DialogFragment implements
 
     private SubredditNameHolder subredditNameHolder;
     private AccountNameAdapter adapter;
+    private boolean restoringState;
     private Spinner accountSpinner;
     private EditText nameField;
     private CheckBox addFrontPage;
@@ -71,13 +72,16 @@ public class AddSubredditFragment extends DialogFragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        subredditNameHolder = (SubredditNameHolder) activity;
+        if (activity instanceof SubredditNameHolder) {
+            subredditNameHolder = (SubredditNameHolder) activity;
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adapter = new AccountNameAdapter(getActivity());
+        restoringState = savedInstanceState != null;
     }
 
     @Override
@@ -126,6 +130,9 @@ public class AddSubredditFragment extends DialogFragment implements
         subredditText.setVisibility(visiblility);
         accountSpinner.setVisibility(visiblility);
         adapter.setAccountNames(result.accountNames);
+        if (!restoringState) {
+            accountSpinner.setSelection(adapter.findAccountName(result.getLastAccount()));
+        }
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {

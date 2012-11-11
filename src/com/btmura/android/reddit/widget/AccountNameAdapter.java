@@ -44,6 +44,16 @@ public class AccountNameAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public int findAccountName(String accountName) {
+        int count = accountNames.length;
+        for (int i = 0; i < count; i++) {
+            if (accountName.equals(accountNames[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public int getCount() {
         return accountNames.length;
     }
