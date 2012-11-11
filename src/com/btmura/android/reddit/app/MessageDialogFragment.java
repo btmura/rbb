@@ -28,9 +28,9 @@ public class MessageDialogFragment extends DialogFragment {
 
     private static final String ARG_MESSAGE = "m";
 
-    public static final MessageDialogFragment showMessage(FragmentManager fm, String message) {
+    public static final MessageDialogFragment showMessage(FragmentManager fm, CharSequence message) {
         Bundle args = new Bundle(1);
-        args.putString(ARG_MESSAGE, message);
+        args.putCharSequence(ARG_MESSAGE, message);
         MessageDialogFragment frag = new MessageDialogFragment();
         frag.setArguments(args);
         frag.show(fm, TAG);
@@ -41,7 +41,7 @@ public class MessageDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity())
                 .setPositiveButton(android.R.string.ok, null)
-                .setMessage(getArguments().getString(ARG_MESSAGE))
+                .setMessage(getArguments().getCharSequence(ARG_MESSAGE))
                 .create();
     }
 }

@@ -14,12 +14,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <item
-        android:id="@+id/menu_submit"
-        android:icon="@drawable/ic_action_send"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_submit_link"/>
-
-</menu>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/AccountNameText"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />

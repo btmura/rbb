@@ -56,6 +56,10 @@ class ResponseParser {
                 result.errors = parseErrorsArray(reader);
             } else if ("ratelimit".equals(name)) {
                 result.rateLimit = reader.nextDouble();
+            } else if ("captcha".equals(name)) {
+                result.captcha = reader.nextString();
+            } else if ("data".equals(name)) {
+                parseData(reader, result);
             } else {
                 reader.skipValue();
             }
@@ -89,5 +93,22 @@ class ResponseParser {
         }
         reader.endArray();
         return error;
+    }
+
+    private static void parseData(JsonReader reader, Result result) throws IOException {
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if ("iden".equals(name)) {
+                result.iden = reader.nextString();
+            } else if ("url".equals(name)) {
+                result.url = reader.nextString();
+            } else if ("name".equals(name)) {
+                result.name = reader.nextString();
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
     }
 }

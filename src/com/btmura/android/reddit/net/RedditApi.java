@@ -23,7 +23,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -36,6 +35,7 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.util.Array;
 
 public class RedditApi {
@@ -47,10 +47,44 @@ public class RedditApi {
             + CHARSET;
     private static final String USER_AGENT = "reddit by brian (rbb) for Android by /u/btmura";
 
-    /** Generic result that only reports the errors that happened. */
     public static class Result {
         public double rateLimit;
+
+        /** Example: [["BAD_CAPTCHA", "care to try these again?", "captcha"]] */
         public String[][] errors;
+
+        /** Example: D5GggaXa0GWshObkjzzEPzzrK8zpQfeB */
+        public String captcha;
+
+        public String iden;
+
+        /** Example: http://www.reddit.com/r/rbb/comments/w5mhh/test/ */
+        public String url;
+
+        /** Example: t3_w5mhh */
+        public String name;
+
+        public CharSequence getErrorMessage(Context context) {
+            if (Array.isEmpty(errors)) {
+                return "";
+            }
+            StringBuilder b = new StringBuilder();
+
+            // Append a newline if there are multiple errors.
+            if (errors.length > 1) {
+                b.append("\n");
+            }
+
+            for (int i = 0; i < errors.length; i++) {
+                b.append(context.getString(R.string.reddit_error_line,
+                        errors[i][0], errors[i][1]));
+                if (i + 1 < errors.length) {
+                    b.append("\n");
+                }
+            }
+
+            return context.getString(R.string.reddit_error, b);
+        }
 
         public boolean shouldRetry() {
             return hasRateLimitError();
@@ -84,24 +118,19 @@ public class RedditApi {
         }
     }
 
+    // TODO: Merge with Result.
     public static class LoginResult {
         public String cookie;
         public String modhash;
         public String error;
     }
 
+    // TODO: Merge with Result.
     public static class SidebarResult {
         public String subreddit;
         public CharSequence title;
         public int subscribers;
         public CharSequence description;
-    }
-
-    public static class SubmitResult {
-        public String captcha;
-        public List<String[]> errors;
-        public String url;
-        public String fullName;
     }
 
     public static Result comment(String thingId, String text, String cookie, String modhash)
@@ -142,6 +171,19 @@ public class RedditApi {
 
             in = conn.getInputStream();
             return BitmapFactory.decodeStream(in);
+        } finally {
+            close(in, conn);
+        }
+    }
+
+    public static Result newCaptcha() throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            conn = connect(Urls.newCaptchaUrl(), null, true);
+            writeFormData(conn, Urls.newCaptchaQuery());
+            in = conn.getInputStream();
+            return ResponseParser.parseResponse(in);
         } finally {
             close(in, conn);
         }
@@ -201,9 +243,8 @@ public class RedditApi {
         }
     }
 
-    public static void
-            subscribe(String cookie, String modhash, String subreddit, boolean subscribe)
-                    throws IOException {
+    public static void subscribe(String cookie, String modhash, String subreddit,
+            boolean subscribe) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
@@ -221,19 +262,18 @@ public class RedditApi {
         }
     }
 
-    public static SubmitResult submit(String subreddit, String title, String text,
-            String captchaId, String captchaGuess, String cookie, String modhash)
-            throws IOException {
+    public static Result submit(String subreddit, String title, String text, String captchaId,
+            String captchaGuess, String cookie, String modhash) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
             URL url = Urls.submitUrl();
             conn = connect(url, cookie, true);
 
-            writeFormData(conn,
-                    Urls.submitTextQuery(modhash, subreddit, title, text, captchaId, captchaGuess));
+            writeFormData(conn, Urls.submitTextQuery(modhash, subreddit, title, text,
+                    captchaId, captchaGuess));
             in = conn.getInputStream();
-            return SubmitParser.parse(in);
+            return ResponseParser.parseResponse(in);
         } finally {
             close(in, conn);
         }

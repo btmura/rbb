@@ -24,50 +24,58 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.content.CaptchaLoader.CaptchaResult;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.RedditApi.Result;
 
-public class CaptchaLoader extends AsyncTaskLoader<Bitmap> {
+public class CaptchaLoader extends AsyncTaskLoader<CaptchaResult> {
 
     public static final String TAG = "CaptchaLoader";
 
-    private final String captchaId;
+    public static class CaptchaResult {
+        public String iden;
+        public Bitmap captchaBitmap;
+    }
 
-    private Bitmap result;
+    private CaptchaResult result;
 
-    public CaptchaLoader(Context context, String captchaId) {
+    public CaptchaLoader(Context context) {
         super(context);
-        this.captchaId = captchaId;
     }
 
     @Override
-    public Bitmap loadInBackground() {
+    public CaptchaResult loadInBackground() {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
         try {
-            return RedditApi.getCaptcha(captchaId);
+            CaptchaResult captchaResult = new CaptchaResult();
+            Result result = RedditApi.newCaptcha();
+            captchaResult.iden = result.iden;
+            captchaResult.captchaBitmap = RedditApi.getCaptcha(result.iden);
+            return captchaResult;
         } catch (IOException e) {
-            Log.e(TAG, "loadInBackground", e);
+            Log.e(TAG, e.getMessage(), e);
             return null;
         }
     }
 
     @Override
-    public void deliverResult(Bitmap newResult) {
+    public void deliverResult(CaptchaResult newResult) {
         if (isReset()) {
-            newResult.recycle();
+            newResult.captchaBitmap.recycle();
             return;
         }
 
-        Bitmap oldResult = result;
+        CaptchaResult oldResult = result;
         result = newResult;
 
         if (isStarted()) {
             super.deliverResult(newResult);
         }
 
-        if (oldResult != null && oldResult != newResult && !oldResult.isRecycled()) {
-            oldResult.recycle();
+        if (oldResult != null && oldResult != newResult && !oldResult.captchaBitmap.isRecycled()) {
+            oldResult.captchaBitmap.recycle();
         }
     }
 
@@ -87,9 +95,9 @@ public class CaptchaLoader extends AsyncTaskLoader<Bitmap> {
     }
 
     @Override
-    public void onCanceled(Bitmap result) {
-        if (result != null && !result.isRecycled()) {
-            result.recycle();
+    public void onCanceled(CaptchaResult result) {
+        if (result != null && !result.captchaBitmap.isRecycled()) {
+            result.captchaBitmap.recycle();
         }
     }
 
@@ -97,8 +105,8 @@ public class CaptchaLoader extends AsyncTaskLoader<Bitmap> {
     protected void onReset() {
         super.onReset();
         onStopLoading();
-        if (result != null && !result.isRecycled()) {
-            result.recycle();
+        if (result != null && !result.captchaBitmap.isRecycled()) {
+            result.captchaBitmap.recycle();
         }
         result = null;
     }

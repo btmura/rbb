@@ -176,7 +176,7 @@ public class AddAccountFragment extends Fragment implements
             try {
                 LoginResult result = RedditApi.login(getActivity(), login, password);
                 if (result.error != null) {
-                    return errorBundle(R.string.login_reddit_error, result.error);
+                    return errorBundle(R.string.reddit_error, result.error);
                 }
 
                 publishProgress(R.string.login_importing_subreddits);

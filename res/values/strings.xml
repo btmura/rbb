@@ -28,6 +28,7 @@
     <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
     <string name="captcha_image">Captcha image</string>
     <string name="captcha_guess">Type captcha</string>
+    <string name="captcha_title">Are you a robot?</string>
     <string name="comment_reply_title">Reply to %s</string>
     <string name="comment_reply_hint">Hello, I would like to subscribe to your newsletter…</string>
     <string name="content_browser">Content Providers</string>
@@ -46,7 +47,6 @@
     <string name="login_error">There was a problem: %1$s</string>
     <string name="login_importing_subreddits">Importing subreddits…</string>
     <string name="login_logging_in">Logging in…</string>
-    <string name="login_reddit_error">Reddit says: %1$s</string>
     <string name="menu_add">Add</string>
     <string name="menu_add_account">Add account</string>
     <string name="menu_add_subreddit">Add subreddit</string>
@@ -62,6 +62,7 @@
     <string name="menu_search">Search</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_share">Share</string>
+    <string name="menu_submit">Submit</string>
     <string name="menu_submit_link">Submit a link</string>
     <string name="menu_view_sidebar">View sidebar</string>
     <string name="nsfw">"NSFW"</string>
@@ -70,6 +71,8 @@
     <string name="provider_subreddits">Subreddits</string>
     <string name="provider_things">Things</string>
     <string name="provider_votes">Votes</string>
+    <string name="reddit_error">Reddit says: %1$s</string>
+    <string name="reddit_error_line">%1$s - %2$s</string>
     <string name="settings_application_details">Application details</string>
     <string name="settings_browse_content">Browse content providers</string>
     <string name="settings_developer_options">Developer options</string>
@@ -80,6 +83,7 @@
     <string name="submit_link_subreddit">Subreddit</string>
     <string name="submit_link_title">Title</string>
     <string name="submit_link_text">Text</string>
+    <string name="submit_link_submitting">Submitting…</string>
     <string name="subreddit">Subreddit</string>
     <string name="tab_posts">Posts</string>
     <string name="tab_subreddits">Subreddits</string>

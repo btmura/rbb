@@ -20,6 +20,8 @@ import java.util.Arrays;
 
 public class Array {
 
+    public static final String[] EMPTY_STRING_ARRAY = new String[0];
+
     /**
      * Returns true if the array is null or empty
      */

@@ -16,14 +16,10 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="PagerTitleStrip">
-        <item name="android:background">#666666</item>
-        <item name="android:textAppearance">@android:style/TextAppearance.Holo.Inverse</item>
-    </style>
+    <style name="AccountNameText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title" />
 
-    <style name="SlimProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
-        <item name="android:minHeight">4dp</item>
-        <item name="android:maxHeight">4dp</item>
+    <style name="AccountNameDropdownText" parent="@style/AccountNameText">
+        <item name="android:padding">@dimen/padding</item>
     </style>
 
     <style name="ButtonBarContainer">
@@ -36,6 +32,16 @@
 
     <style name="ButtonBarButton" parent="@android:style/Widget.Holo.Button.Borderless.Small">
         <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="PagerTitleStrip">
+        <item name="android:background">#666666</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Holo.Inverse</item>
+    </style>
+
+    <style name="SlimProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
+        <item name="android:minHeight">4dp</item>
+        <item name="android:maxHeight">4dp</item>
     </style>
 
     <style name="SubredditTitleText" parent="@android:style/TextAppearance.Holo.Medium">
@@ -51,7 +57,7 @@
     <style name="ThingStatusText" parent="@style/SubredditStatusText" />
 
     <style name="ThingNeutralScoreText" parent="@style/SubredditStatusText">
-        <item name="android:textColor">@color/score_text_neutral</item>        
+        <item name="android:textColor">@color/score_text_neutral</item>
     </style>
 
     <style name="ThingUpScoreText" parent="@style/SubredditStatusText">

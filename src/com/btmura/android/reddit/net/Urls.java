@@ -33,6 +33,7 @@ public class Urls {
     private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
     private static final String API_DELETE_URL = BASE_URL + "/api/del";
     private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
+    private static final String API_NEW_CAPTCHA_URL = BASE_URL + "/api/new_captcha";
     private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
     private static final String API_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
     private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
@@ -95,6 +96,16 @@ public class Urls {
         b.append("user=").append(encode(userName));
         b.append("&passwd=").append(encode(password));
         b.append("&api_type=json");
+        return b.toString();
+    }
+
+    public static URL newCaptchaUrl() {
+        return newUrl(API_NEW_CAPTCHA_URL);
+    }
+
+    public static String newCaptchaQuery() {
+        StringBuilder b = resetBuilder();
+        b.append("api_type=json");
         return b.toString();
     }
 

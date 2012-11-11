@@ -18,7 +18,6 @@ package com.btmura.android.reddit.app;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
@@ -139,14 +138,11 @@ public class GlobalMenuFragment extends Fragment implements
     }
 
     private void handleSubmitLink() {
-        Intent intent = new Intent(getActivity(), SubmitLinkActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(getActivity(), SubmitLinkActivity.class));
     }
 
     private void handleAddSubreddit() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(AddSubredditFragment.newInstance(), AddSubredditFragment.TAG);
-        ft.commit();
+        AddSubredditFragment.newInstance().show(getFragmentManager(), AddSubredditFragment.TAG);
     }
 
     public void onFocusChange(View v, boolean hasFocus) {

@@ -25,16 +25,26 @@ import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.btmura.android.reddit.R;
+
 public class AccountUtils {
 
     public static boolean isAccount(String accountName) {
         return !TextUtils.isEmpty(accountName);
     }
 
+    public static Account getAccount(Context context, String accountName) {
+        return new Account(accountName, context.getString(R.string.account_type));
+    }
+
+    public static String getCookie(AccountManager manager, Account account)
+            throws OperationCanceledException, AuthenticatorException, IOException {
+        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
+    }
+
     public static String getCookie(Context context, Account account)
             throws OperationCanceledException, AuthenticatorException, IOException {
-        AccountManager manager = AccountManager.get(context);
-        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
+        return getCookie(AccountManager.get(context), account);
     }
 
     public static String getCookie(Context context, String accountName)
@@ -45,6 +55,17 @@ public class AccountUtils {
 
         Account account = new Account(accountName, AccountAuthenticator.getAccountType(context));
         return getCookie(context, account);
+    }
+
+    public static String getModhash(AccountManager manager, Account account)
+            throws OperationCanceledException, AuthenticatorException, IOException {
+        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
+    }
+
+    public static String getModhash(Context context, Account account)
+            throws OperationCanceledException, AuthenticatorException, IOException {
+        AccountManager manager = AccountManager.get(context);
+        return manager.blockingGetAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
     }
 
     private AccountUtils() {
