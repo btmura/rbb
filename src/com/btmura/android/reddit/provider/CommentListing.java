@@ -50,14 +50,16 @@ class CommentListing extends JsonParser implements CommentList {
 
     private static final String[] PROJECTION = {
             CommentActions._ID,
+            CommentActions.COLUMN_ACCOUNT,
             CommentActions.COLUMN_ACTION,
             CommentActions.COLUMN_THING_ID,
             CommentActions.COLUMN_TEXT,
     };
 
-    private static final int INDEX_ACTION = 1;
-    private static final int INDEX_THING_ID = 2;
-    private static final int INDEX_TEXT = 3;
+    private static final int INDEX_ACCOUNT_NAME = 1;
+    private static final int INDEX_ACTION = 2;
+    private static final int INDEX_THING_ID = 3;
+    private static final int INDEX_TEXT = 4;
 
     public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
     public long networkTimeMs;
@@ -222,17 +224,17 @@ class CommentListing extends JsonParser implements CommentList {
     private void mergeActions() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(CommentActions.TABLE_NAME, PROJECTION,
-                CommentActions.SELECT_BY_ACCOUNT_AND_PARENT_THING_ID,
-                Array.of(accountName, thingId),
+                CommentActions.SELECT_BY_PARENT_THING_ID, Array.of(thingId),
                 null, null, CommentActions.SORT_BY_ID);
         try {
             while (c.moveToNext()) {
+                String actionAccountName = c.getString(INDEX_ACCOUNT_NAME);
                 int action = c.getInt(INDEX_ACTION);
                 String id = c.getString(INDEX_THING_ID);
                 String text = c.getString(INDEX_TEXT);
                 switch (action) {
                     case CommentActions.ACTION_INSERT:
-                        insertThing(id, text);
+                        insertThing(actionAccountName, id, text);
                         break;
 
                     case CommentActions.ACTION_DELETE:
@@ -248,7 +250,7 @@ class CommentListing extends JsonParser implements CommentList {
         }
     }
 
-    private void insertThing(String replyId, String body) {
+    private void insertThing(String actionAccountName, String replyId, String body) {
         int size = values.size();
         for (int i = 0; i < size; i++) {
             ContentValues v = values.get(i);
@@ -261,8 +263,8 @@ class CommentListing extends JsonParser implements CommentList {
 
             if (id.equals(replyId)) {
                 ContentValues p = new ContentValues(8);
-                p.put(Comments.COLUMN_ACCOUNT, accountName);
-                p.put(Comments.COLUMN_AUTHOR, accountName);
+                p.put(Comments.COLUMN_ACCOUNT, actionAccountName);
+                p.put(Comments.COLUMN_AUTHOR, actionAccountName);
                 p.put(Comments.COLUMN_BODY, body);
                 p.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
                 p.put(Comments.COLUMN_NESTING, CommentLogic.getInsertNesting(this, i));
