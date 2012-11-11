@@ -20,6 +20,7 @@
     <dimen name="arrow_stem_width">6dp</dimen>
     <dimen name="arrow_total_width">14dp</dimen>
     <dimen name="arrow_total_height">18dp</dimen>
+    <dimen name="captcha_min_height">100dp</dimen>
     <dimen name="score_total_height">34dp</dimen>
     <dimen name="spinner_padding">12dp</dimen>
     <dimen name="element_padding">8dp</dimen>
