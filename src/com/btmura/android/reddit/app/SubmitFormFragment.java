@@ -27,7 +27,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
@@ -40,7 +42,7 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
 public class SubmitFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
-        OnCheckedChangeListener {
+        OnCheckedChangeListener, OnClickListener {
 
     public static final String TAG = "SubmitFormFragment";
 
@@ -55,6 +57,8 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
     private RadioButton linkButton;
     private RadioButton textButton;
     private EditText textText;
+    private View ok;
+    private View cancel;
 
     public interface OnSubmitFormListener {
         void onSubmitForm(Bundle submitExtras);
@@ -108,6 +112,16 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
         textButton.setOnCheckedChangeListener(this);
 
         textText = (EditText) v.findViewById(R.id.text);
+
+        if (getActivity().getActionBar() == null) {
+            ViewStub vs = (ViewStub) v.findViewById(R.id.button_bar_stub);
+            View buttonBar = vs.inflate();
+            ok = buttonBar.findViewById(R.id.ok);
+            ok.setOnClickListener(this);
+            cancel = buttonBar.findViewById(R.id.cancel);
+            cancel.setOnClickListener(this);
+        }
+
         return v;
     }
 
@@ -142,6 +156,14 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
             } else if (textButton == buttonView) {
                 textText.setHint(R.string.submit_form_text);
             }
+        }
+    }
+
+    public void onClick(View v) {
+        if (v == ok) {
+            handleSubmit();
+        } else if (v == cancel && submitFormListener != null) {
+            submitFormListener.onSubmitFormCancelled();
         }
     }
 

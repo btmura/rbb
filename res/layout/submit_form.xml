@@ -90,4 +90,10 @@
         android:inputType="textNoSuggestions"
         android:paddingTop="@dimen/element_padding" />
 
+    <ViewStub
+        android:id="@+id/button_bar_stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout="@layout/ok_button_bar" />
+
 </LinearLayout>

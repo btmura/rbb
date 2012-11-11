@@ -45,15 +45,16 @@ public class SubmitLinkActivity extends Activity implements OnSubmitFormListener
 
     private void setupActionBar() {
         ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     private void setupFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.single_container, SubmitFormFragment.newInstance(subreddit),
-                    SubmitFormFragment.TAG);
+            ft.replace(R.id.single_container, SubmitFormFragment.newInstance(subreddit));
             ft.commit();
         }
     }
