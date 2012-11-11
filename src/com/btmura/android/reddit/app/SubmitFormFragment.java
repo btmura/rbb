@@ -126,7 +126,7 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.submit_thing_menu, menu);
+        inflater.inflate(R.menu.submit_form_menu, menu);
     }
 
     @Override
