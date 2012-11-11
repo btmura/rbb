@@ -98,6 +98,7 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
 
         ok = (Button) v.findViewById(R.id.ok);
         ok.setOnClickListener(this);
+        ok.setEnabled(false);
         return v;
     }
 
@@ -114,6 +115,7 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     public void onLoadFinished(Loader<CaptchaResult> loader, CaptchaResult result) {
         captchaId = result.iden;
         captcha.setImageBitmap(result.captchaBitmap);
+        ok.setEnabled(true);
     }
 
     public void onLoaderReset(Loader<CaptchaResult> loader) {
