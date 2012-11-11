@@ -45,7 +45,8 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
 
     public static final String TAG = "SubmitFormFragment";
 
-    private SubredditNameHolder subredditNameHolder;
+    private static final String ARG_SUBREDDIT = "subreddit";
+
     private OnSubmitFormListener submitFormListener;
     private AccountNameAdapter adapter;
 
@@ -62,16 +63,17 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
         void onSubmitFormCancelled();
     }
 
-    public static SubmitFormFragment newInstance() {
-        return new SubmitFormFragment();
+    public static SubmitFormFragment newInstance(String subreddit) {
+        Bundle args  = new Bundle(1);
+        args.putString(ARG_SUBREDDIT, subreddit);
+        SubmitFormFragment frag = new SubmitFormFragment();
+        frag.setArguments(args);
+        return frag;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof SubredditNameHolder) {
-            subredditNameHolder = (SubredditNameHolder) activity;
-        }
         if (activity instanceof OnSubmitFormListener) {
             submitFormListener = (OnSubmitFormListener) activity;
         }
@@ -92,9 +94,7 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
         accountSpinner.setAdapter(adapter);
 
         subredditText = (EditText) v.findViewById(R.id.subreddit_text);
-        if (subredditNameHolder != null) {
-            subredditText.setText(subredditNameHolder.getSubredditName());
-        }
+        subredditText.setText(getArguments().getString(ARG_SUBREDDIT));
 
         titleText = (EditText) v.findViewById(R.id.title);
         if (!TextUtils.isEmpty(subredditText.getText())) {

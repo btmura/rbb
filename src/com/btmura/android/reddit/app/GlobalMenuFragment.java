@@ -46,6 +46,7 @@ public class GlobalMenuFragment extends Fragment implements
         boolean onSearchQuerySubmitted(String query);
     }
 
+    private SubredditNameHolder subredditNameHolder;
     private OnSearchQuerySubmittedListener listener;
     private MenuItem searchItem;
     private SearchView searchView;
@@ -58,6 +59,9 @@ public class GlobalMenuFragment extends Fragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        if (activity instanceof SubredditNameHolder) {
+            subredditNameHolder = (SubredditNameHolder) activity;
+        }
         if (activity instanceof OnSearchQuerySubmittedListener) {
             listener = (OnSearchQuerySubmittedListener) activity;
         }
@@ -138,7 +142,11 @@ public class GlobalMenuFragment extends Fragment implements
     }
 
     private void handleSubmitLink() {
-        startActivity(new Intent(getActivity(), SubmitLinkActivity.class));
+        Intent intent = new Intent(getActivity(), SubmitLinkActivity.class);
+        if (subredditNameHolder != null) {
+            intent.putExtra(SubmitLinkActivity.EXTRA_SUBREDDIT, subredditNameHolder.getSubredditName());
+        }
+        startActivity(intent);
     }
 
     private void handleAddSubreddit() {
