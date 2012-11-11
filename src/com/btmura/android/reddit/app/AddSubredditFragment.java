@@ -137,6 +137,7 @@ public class AddSubredditFragment extends DialogFragment implements
 
     public void onLoaderReset(Loader<AccountResult> loader) {
         adapter.setAccountNames(null);
+        dismiss();
     }
 
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

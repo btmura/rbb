@@ -28,8 +28,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
@@ -37,7 +37,6 @@ import android.widget.Spinner;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
 public class SubmitFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
@@ -49,7 +48,7 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
 
     private OnSubmitFormListener submitFormListener;
     private AccountNameAdapter adapter;
-
+    private boolean restoringState;
     private Spinner accountSpinner;
     private EditText subredditText;
     private EditText titleText;
@@ -84,6 +83,7 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         adapter = new AccountNameAdapter(getActivity());
+        restoringState = savedInstanceState != null;
     }
 
     @Override
@@ -122,16 +122,15 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        setAccountNames(result.accountNames);
+        adapter.setAccountNames(result.accountNames);
+        if (!restoringState) {
+            accountSpinner.setSelection(adapter.findAccountName(result.getLastAccount()));
+        }
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-        setAccountNames(null);
-    }
-
-    private void setAccountNames(String[] accountNames) {
-        adapter.setAccountNames(accountNames);
-        if (Array.isEmpty(accountNames) && submitFormListener != null) {
+        adapter.setAccountNames(null);
+        if (submitFormListener != null) {
             submitFormListener.onSubmitFormCancelled();
         }
     }
