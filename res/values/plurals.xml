@@ -18,55 +18,55 @@
 
     <plurals name="comments">
         <item quantity="one">1 comment</item>
-        <item quantity="other">%1$d comments</item>
+        <item quantity="other">%1$,d comments</item>
     </plurals>
     <plurals name="points">
         <item quantity="one">1 point</item>
-        <item quantity="other">%1$d points</item>
+        <item quantity="other">%1$,d points</item>
     </plurals>
     <plurals name="subreddits_added">
         <item quantity="one">1 subreddit added</item>
-        <item quantity="other">%1$d subreddits added</item>
+        <item quantity="other">%1$,d subreddits added</item>
     </plurals>
     <plurals name="subreddits_deleted">
         <item quantity="one">1 subreddit deleted</item>
-        <item quantity="other">%1$d subreddits deleted</item>
+        <item quantity="other">%1$,d subreddits deleted</item>
     </plurals>
     <plurals name="subscribers">
         <item quantity="one">1 subscriber</item>
-        <item quantity="other">%1$d subscribers</item>
+        <item quantity="other">%1$,d subscribers</item>
     </plurals>
     <plurals name="time_seconds">
         <item quantity="one">1 second ago</item>
-        <item quantity="other">%1$d seconds ago</item>
+        <item quantity="other">%1$,d seconds ago</item>
     </plurals>
     <plurals name="time_minutes">
         <item quantity="one">1 minute ago</item>
-        <item quantity="other">%1$d minutes ago</item>
+        <item quantity="other">%1$,d minutes ago</item>
     </plurals>
     <plurals name="time_hours">
         <item quantity="one">1 hour ago</item>
-        <item quantity="other">%1$d hours ago</item>
+        <item quantity="other">%1$,d hours ago</item>
     </plurals>
     <plurals name="time_days">
         <item quantity="one">1 day ago</item>
-        <item quantity="other">%1$d days ago</item>
+        <item quantity="other">%1$,d days ago</item>
     </plurals>
     <plurals name="time_months">
         <item quantity="one">1 month ago</item>
-        <item quantity="other">%1$d months ago</item>
+        <item quantity="other">%1$,d months ago</item>
     </plurals>
     <plurals name="time_years">
         <item quantity="one">1 year ago</item>
-        <item quantity="other">%1$d years ago </item>
+        <item quantity="other">%1$,d years ago </item>
     </plurals>
     <plurals name="votes_down">
         <item quantity="one">1 down</item>
-        <item quantity="other">%1$d downs</item>
+        <item quantity="other">%1$,d downs</item>
     </plurals>
     <plurals name="votes_up">
         <item quantity="one">1 up</item>
-        <item quantity="other">%1$d ups</item>
+        <item quantity="other">%1$,d ups</item>
     </plurals>
 
 </resources>
