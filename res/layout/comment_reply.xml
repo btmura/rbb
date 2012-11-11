@@ -19,11 +19,23 @@
     android:layout_height="wrap_content"
     android:columnCount="1" >
 
+    <Spinner
+        android:id="@+id/account_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:paddingLeft="@dimen/spinner_padding" />
+
     <EditText
         android:id="@+id/body_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
         android:hint="@string/comment_reply_hint" />
 
     <include

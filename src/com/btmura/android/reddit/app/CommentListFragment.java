@@ -158,7 +158,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             return false;
         }
 
-        // Only comments (not the header or more entries) can be expanded or collapsed.
+        // Only comments (not the header or more entries) can be expanded or
+        // collapsed.
         int position = getFirstCheckedPosition();
         return adapter.getInt(position, CommentAdapter.INDEX_KIND) == Comments.KIND_COMMENT
                 && adapter.getBoolean(position, CommentAdapter.INDEX_EXPANDED) != expand;
@@ -290,11 +291,12 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         return -1;
     }
 
-    public void onCommentReply(String replyThingId, String text, Bundle extras) {
+    public void onCommentReply(String replyAccountName, String replyThingId,
+            String text, Bundle extras) {
         int nesting = extras.getInt(Comments.COLUMN_NESTING);
         int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
         long sessionCreationTime = extras.getLong(Comments.COLUMN_SESSION_TIMESTAMP);
-        CommentProvider.insertInBackground(getActivity(), accountName, text, nesting,
+        CommentProvider.insertInBackground(getActivity(), replyAccountName, text, nesting,
                 thingId, sequence, sessionId, sessionCreationTime, replyThingId);
     }
 
