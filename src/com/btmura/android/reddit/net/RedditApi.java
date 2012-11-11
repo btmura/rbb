@@ -138,9 +138,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            URL url = Urls.commentsApiUrl();
-            conn = connect(url, cookie, true);
-
+            conn = connect(Urls.commentsApiUrl(), cookie, true);
             writeFormData(conn, Urls.commentsApiQuery(thingId, text, modhash));
             in = conn.getInputStream();
             return ResponseParser.parseResponse(in);
@@ -166,9 +164,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            URL url = Urls.captchaUrl(id);
-            conn = connect(url, null, false);
-
+            conn = connect(Urls.captchaUrl(id), null, false);
             in = conn.getInputStream();
             return BitmapFactory.decodeStream(in);
         } finally {
@@ -211,8 +207,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            URL url = Urls.subredditListUrl();
-            conn = connect(url, cookie, false);
+            conn = connect(Urls.subredditListUrl(), cookie, false);
 
             in = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(in));
@@ -248,8 +243,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            URL url = Urls.subscribeUrl();
-            conn = connect(url, cookie, true);
+            conn = connect(Urls.subscribeUrl(), cookie, true);
             conn.connect();
 
             writeFormData(conn, Urls.subscribeQuery(modhash, subreddit, subscribe));
@@ -262,15 +256,14 @@ public class RedditApi {
         }
     }
 
-    public static Result submit(String subreddit, String title, String text, String captchaId,
-            String captchaGuess, String cookie, String modhash) throws IOException {
+    public static Result submit(String subreddit, String title, String text, String url,
+            String captchaId, String captchaGuess, String cookie, String modhash)
+            throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            URL url = Urls.submitUrl();
-            conn = connect(url, cookie, true);
-
-            writeFormData(conn, Urls.submitTextQuery(modhash, subreddit, title, text,
+            conn = connect(Urls.submitUrl(), cookie, true);
+            writeFormData(conn, Urls.submitQuery(modhash, subreddit, title, text, url,
                     captchaId, captchaGuess));
             in = conn.getInputStream();
             return ResponseParser.parseResponse(in);
@@ -284,9 +277,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            URL url = Urls.voteUrl();
-            conn = connect(url, cookie, true);
-
+            conn = connect(Urls.voteUrl(), cookie, true);
             writeFormData(conn, Urls.voteQuery(modhash, name, vote));
             in = conn.getInputStream();
             return ResponseParser.parseResponse(in);

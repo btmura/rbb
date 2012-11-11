@@ -21,6 +21,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import android.text.TextUtils;
+
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
@@ -134,18 +136,23 @@ public class Urls {
         return newUrl(API_SUBMIT_URL);
     }
 
-    public static String submitTextQuery(String modhash, String subreddit, String title,
-            String text, String captchaId, String captchaGuess) {
+    public static String submitQuery(String modhash, String subreddit, String title, String text,
+            String url, String captchaId, String captchaGuess) {
         StringBuilder b = resetBuilder();
         b.append("kind=self");
         b.append("&uh=").append(encode(modhash));
         b.append("&sr=").append(encode(subreddit));
         b.append("&title=").append(encode(title));
-        b.append("&text=").append(encode(text));
-        if (captchaId != null) {
+        if (!TextUtils.isEmpty(text)) {
+            b.append("&text=").append(encode(text));
+        }
+        if (!TextUtils.isEmpty(url)) {
+            b.append("&url=").append(encode(url));
+        }
+        if (!TextUtils.isEmpty(captchaId)) {
             b.append("&iden=").append(encode(captchaId));
         }
-        if (captchaGuess != null) {
+        if (!TextUtils.isEmpty(captchaGuess)) {
             b.append("&captcha=").append(encode(captchaGuess));
         }
         b.append("&api_type=json");

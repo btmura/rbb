@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.app;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -42,6 +43,7 @@ public class SubmitLinkFragment extends Fragment {
     private static final String ARG_SUBREDDIT = "subreddit";
     private static final String ARG_TITLE = "title";
     private static final String ARG_TEXT = "text";
+    private static final String ARG_URL = "url";
     private static final String ARG_CAPTCHA_ID = "captchaId";
     private static final String ARG_CAPTCHA_GUESS = "captchaGuess";
 
@@ -50,6 +52,7 @@ public class SubmitLinkFragment extends Fragment {
     private String subreddit;
     private String title;
     private String text;
+    private String url;
     private String captchaId;
     private String captchaGuess;
     private SubmitTask submitTask;
@@ -61,22 +64,24 @@ public class SubmitLinkFragment extends Fragment {
     }
 
     public static Bundle newSubmitExtras(String accountName, String subreddit,
-            String title, String text) {
-        Bundle args = new Bundle(4);
+            String title, String text, String url) {
+        Bundle args = new Bundle(5);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putString(ARG_TITLE, title);
         args.putString(ARG_TEXT, text);
+        args.putString(ARG_URL, url);
         return args;
     }
 
     public static SubmitLinkFragment newInstance(Bundle submitExtras, String captchaId,
             String captchaGuess) {
-        Bundle args = new Bundle(6);
+        Bundle args = new Bundle(7);
         args.putString(ARG_ACCOUNT_NAME, submitExtras.getString(ARG_ACCOUNT_NAME));
         args.putString(ARG_SUBREDDIT, submitExtras.getString(ARG_SUBREDDIT));
         args.putString(ARG_TITLE, submitExtras.getString(ARG_TITLE));
         args.putString(ARG_TEXT, submitExtras.getString(ARG_TEXT));
+        args.putString(ARG_URL, submitExtras.getString(ARG_URL));
         args.putString(ARG_CAPTCHA_ID, captchaId);
         args.putString(ARG_CAPTCHA_GUESS, captchaGuess);
 
@@ -101,6 +106,7 @@ public class SubmitLinkFragment extends Fragment {
         subreddit = getArguments().getString(ARG_SUBREDDIT);
         title = getArguments().getString(ARG_TITLE);
         text = getArguments().getString(ARG_TEXT);
+        url = getArguments().getString(ARG_URL);
         captchaId = getArguments().getString(ARG_CAPTCHA_ID);
         captchaGuess = getArguments().getString(ARG_CAPTCHA_GUESS);
     }
@@ -113,6 +119,8 @@ public class SubmitLinkFragment extends Fragment {
             submitTask.execute();
         }
     }
+
+    static Pattern LINK_PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9+-.]*?://");
 
     class SubmitTask extends AsyncTask<Void, Void, Result> {
 
@@ -136,9 +144,8 @@ public class SubmitLinkFragment extends Fragment {
                 if (modhash == null) {
                     return null;
                 }
-
-                return RedditApi.submit(subreddit, title, text, captchaId, captchaGuess,
-                        cookie, modhash);
+                return RedditApi.submit(subreddit, title, text, url,
+                        captchaId, captchaGuess, cookie, modhash);
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage(), e);
             } catch (OperationCanceledException e) {

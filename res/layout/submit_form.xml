@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
-        android:hint="@string/submit_link_subreddit"
+        android:hint="@string/submit_form_subreddit"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:paddingTop="@dimen/element_padding"
@@ -46,11 +46,35 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
-        android:hint="@string/submit_link_title"
+        android:hint="@string/submit_form_title"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:paddingTop="@dimen/element_padding"
         android:singleLine="true" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/element_padding" >
+
+        <RadioButton
+            android:id="@+id/link_radio_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="@string/submit_form_link" />
+
+        <RadioButton
+            android:id="@+id/text_radio_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/submit_form_text" />
+    </RadioGroup>
 
     <EditText
         android:id="@+id/text"
@@ -61,7 +85,7 @@
         android:layout_marginRight="@dimen/padding"
         android:layout_weight="1"
         android:gravity="top"
-        android:hint="@string/submit_link_text"
+        android:hint="@string/submit_form_link"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:paddingTop="@dimen/element_padding" />

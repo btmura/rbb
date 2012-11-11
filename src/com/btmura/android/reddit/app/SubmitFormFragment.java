@@ -28,7 +28,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
 import com.btmura.android.reddit.R;
@@ -37,7 +40,8 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
-public class SubmitFormFragment extends Fragment implements LoaderCallbacks<AccountResult> {
+public class SubmitFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
+        OnCheckedChangeListener {
 
     public static final String TAG = "SubmitFormFragment";
 
@@ -48,10 +52,13 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
     private Spinner accountSpinner;
     private EditText subredditText;
     private EditText titleText;
+    private RadioButton linkButton;
+    private RadioButton textButton;
     private EditText textText;
 
     public interface OnSubmitFormListener {
         void onSubmitForm(Bundle submitExtras);
+
         void onSubmitFormCancelled();
     }
 
@@ -94,6 +101,12 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
             titleText.requestFocus();
         }
 
+        linkButton = (RadioButton) v.findViewById(R.id.link_radio_button);
+        linkButton.setOnCheckedChangeListener(this);
+
+        textButton = (RadioButton) v.findViewById(R.id.text_radio_button);
+        textButton.setOnCheckedChangeListener(this);
+
         textText = (EditText) v.findViewById(R.id.text);
         return v;
     }
@@ -120,6 +133,16 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
         adapter.setAccountNames(accountNames);
         if (Array.isEmpty(accountNames) && submitFormListener != null) {
             submitFormListener.onSubmitFormCancelled();
+        }
+    }
+
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            if (linkButton == buttonView) {
+                textText.setHint(R.string.submit_form_link);
+            } else if (textButton == buttonView) {
+                textText.setHint(R.string.submit_form_text);
+            }
         }
     }
 
@@ -154,11 +177,13 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
             return true;
         }
         if (submitFormListener != null) {
-            Bundle submitExtras = SubmitLinkFragment.newSubmitExtras(
-                    adapter.getItem(accountSpinner.getSelectedItemPosition()),
-                    subredditText.getText().toString(),
-                    titleText.getText().toString(),
-                    textText.getText().toString());
+            String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
+            String subreddit = subredditText.getText().toString();
+            String title = titleText.getText().toString();
+            String text = textButton.isChecked() ? textText.getText().toString() : null;
+            String link = linkButton.isChecked() ? textText.getText().toString() : null;
+            Bundle submitExtras = SubmitLinkFragment.newSubmitExtras(accountName, subreddit,
+                    title, text, link);
             submitFormListener.onSubmitForm(submitExtras);
         }
         return true;
