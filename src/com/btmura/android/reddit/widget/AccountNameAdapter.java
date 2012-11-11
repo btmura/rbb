@@ -24,6 +24,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.util.Array;
 
 /**
@@ -57,14 +58,23 @@ public class AccountNameAdapter extends BaseAdapter {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView tv = (TextView) inflater.inflate(R.layout.account_name_row, parent, false);
-        tv.setText(getItem(position));
+        setDisplayName(tv, position);
         return tv;
     }
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         TextView tv = (TextView) inflater.inflate(R.layout.account_name_dropdown_row, parent, false);
-        tv.setText(getItem(position));
+        setDisplayName(tv, position);
         return tv;
+    }
+
+    private void setDisplayName(TextView tv, int position) {
+        String accountName = getItem(position);
+        if (AccountUtils.isAccount(accountName)) {
+            tv.setText(accountName);
+        } else {
+            tv.setText(R.string.app_name);
+        }
     }
 }

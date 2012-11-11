@@ -39,7 +39,7 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.text.InputFilters;
-import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
+import com.btmura.android.reddit.widget.AccountNameAdapter;
 
 public class AddSubredditFragment extends DialogFragment implements
         LoaderCallbacks<AccountResult>,
@@ -53,9 +53,7 @@ public class AddSubredditFragment extends DialogFragment implements
     };
 
     private SubredditNameHolder subredditNameHolder;
-    private AccountSpinnerAdapter adapter;
-    private boolean restoringState;
-
+    private AccountNameAdapter adapter;
     private Spinner accountSpinner;
     private EditText nameField;
     private CheckBox addFrontPage;
@@ -79,7 +77,7 @@ public class AddSubredditFragment extends DialogFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new AccountSpinnerAdapter(getActivity(), false);
+        adapter = new AccountNameAdapter(getActivity());
     }
 
     @Override
@@ -115,7 +113,6 @@ public class AddSubredditFragment extends DialogFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        restoringState = savedInstanceState != null;
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -128,15 +125,7 @@ public class AddSubredditFragment extends DialogFragment implements
         accountText.setVisibility(visiblility);
         subredditText.setVisibility(visiblility);
         accountSpinner.setVisibility(visiblility);
-
         adapter.setAccountNames(result.accountNames);
-        if (!restoringState) {
-            String accountName = result.getLastAccount();
-            adapter.setAccountName(accountName);
-
-            int index = adapter.findAccountName(accountName);
-            accountSpinner.setSelection(index);
-        }
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
@@ -175,7 +164,7 @@ public class AddSubredditFragment extends DialogFragment implements
             return;
         }
 
-        String accountName = adapter.getAccountName();
+        String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
         SubredditProvider.insertInBackground(getActivity(), accountName, subredditName);
         dismiss();
     }
