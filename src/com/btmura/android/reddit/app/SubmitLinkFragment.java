@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -119,8 +118,6 @@ public class SubmitLinkFragment extends Fragment {
             submitTask.execute();
         }
     }
-
-    static Pattern LINK_PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9+-.]*?://");
 
     class SubmitTask extends AsyncTask<Void, Void, Result> {
 

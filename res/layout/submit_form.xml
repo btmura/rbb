@@ -34,10 +34,10 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
         android:hint="@string/submit_form_subreddit"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
-        android:paddingTop="@dimen/element_padding"
         android:singleLine="true" />
 
     <EditText
@@ -46,10 +46,10 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
         android:hint="@string/submit_form_title"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
-        android:paddingTop="@dimen/element_padding"
         android:singleLine="true" />
 
     <RadioGroup
@@ -57,23 +57,24 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
-        android:orientation="horizontal"
-        android:paddingTop="@dimen/element_padding" >
+        android:layout_marginTop="@dimen/element_padding"
+        android:orientation="horizontal" >
 
         <RadioButton
             android:id="@+id/link_radio_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:checked="true"
-            android:text="@string/submit_form_link" />
+            android:paddingRight="@dimen/padding"
+            android:text="@string/submit_form_link"
+            android:textAllCaps="true" />
 
         <RadioButton
             android:id="@+id/text_radio_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/submit_form_text" />
+            android:text="@string/submit_form_text"
+            android:textAllCaps="true" />
     </RadioGroup>
 
     <EditText
@@ -83,12 +84,12 @@
         android:layout_marginBottom="@dimen/padding"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
         android:layout_weight="1"
         android:gravity="top"
         android:hint="@string/submit_form_link"
         android:imeOptions="flagNoFullscreen"
-        android:inputType="textNoSuggestions"
-        android:paddingTop="@dimen/element_padding" />
+        android:inputType="textNoSuggestions" />
 
     <ViewStub
         android:id="@+id/button_bar_stub"
