@@ -16,7 +16,6 @@
 -->
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="account">Account</string>
     <string name="account_type">com.btmura.android.reddit.account</string>
     <string name="add_account">Add account</string>
     <string name="add_front_page">Add front page</string>
@@ -84,7 +83,6 @@
     <string name="submit_form_text">Text or link</string>
     <string name="submit_link_label">Submit a link</string>
     <string name="submit_link_submitting">Submitting…</string>
-    <string name="subreddit">Subreddit</string>
     <string name="tab_posts">Posts</string>
     <string name="tab_subreddits">Subreddits</string>
     <string name="type_login">Type login</string>
