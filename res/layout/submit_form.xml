@@ -52,31 +52,6 @@
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
 
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/padding"
-        android:layout_marginRight="@dimen/padding"
-        android:layout_marginTop="@dimen/element_padding"
-        android:orientation="horizontal" >
-
-        <RadioButton
-            android:id="@+id/link_radio_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:paddingRight="@dimen/padding"
-            android:text="@string/submit_form_link"
-            android:textAllCaps="true" />
-
-        <RadioButton
-            android:id="@+id/text_radio_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/submit_form_text"
-            android:textAllCaps="true" />
-    </RadioGroup>
-
     <EditText
         android:id="@+id/text"
         android:layout_width="match_parent"

@@ -256,14 +256,14 @@ public class RedditApi {
         }
     }
 
-    public static Result submit(String subreddit, String title, String text, String url,
+    public static Result submit(String subreddit, String title, String text, boolean link,
             String captchaId, String captchaGuess, String cookie, String modhash)
             throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
             conn = connect(Urls.submitUrl(), cookie, true);
-            writeFormData(conn, Urls.submitQuery(modhash, subreddit, title, text, url,
+            writeFormData(conn, Urls.submitQuery(modhash, subreddit, title, text, link,
                     captchaId, captchaGuess));
             in = conn.getInputStream();
             return ResponseParser.parseResponse(in);

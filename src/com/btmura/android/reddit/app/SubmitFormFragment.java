@@ -16,12 +16,15 @@
 
 package com.btmura.android.reddit.app;
 
+import java.util.regex.Pattern;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,23 +33,23 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
 public class SubmitFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
-        OnCheckedChangeListener, OnClickListener {
+        OnClickListener {
 
     public static final String TAG = "SubmitFormFragment";
 
     private static final String ARG_SUBREDDIT = "subreddit";
+
+    private static final Pattern LINK_PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9+-.]*?://[^ ]+");
 
     private OnSubmitFormListener submitFormListener;
     private AccountNameAdapter adapter;
@@ -54,8 +57,6 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
     private Spinner accountSpinner;
     private EditText subredditText;
     private EditText titleText;
-    private RadioButton linkButton;
-    private RadioButton textButton;
     private EditText textText;
     private View ok;
     private View cancel;
@@ -67,7 +68,7 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
     }
 
     public static SubmitFormFragment newInstance(String subreddit) {
-        Bundle args  = new Bundle(1);
+        Bundle args = new Bundle(1);
         args.putString(ARG_SUBREDDIT, subreddit);
         SubmitFormFragment frag = new SubmitFormFragment();
         frag.setArguments(args);
@@ -105,12 +106,6 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
             titleText.requestFocus();
         }
 
-        linkButton = (RadioButton) v.findViewById(R.id.link_radio_button);
-        linkButton.setOnCheckedChangeListener(this);
-
-        textButton = (RadioButton) v.findViewById(R.id.text_radio_button);
-        textButton.setOnCheckedChangeListener(this);
-
         textText = (EditText) v.findViewById(R.id.text);
 
         if (getActivity().getActionBar() == null) {
@@ -146,16 +141,6 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
         adapter.setAccountNames(null);
         if (submitFormListener != null) {
             submitFormListener.onSubmitFormCancelled();
-        }
-    }
-
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            if (linkButton == buttonView) {
-                textText.setHint(R.string.submit_form_link);
-            } else if (textButton == buttonView) {
-                textText.setHint(R.string.submit_form_text);
-            }
         }
     }
 
@@ -198,13 +183,17 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
             return true;
         }
         if (submitFormListener != null) {
-            String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
-            String subreddit = subredditText.getText().toString();
-            String title = titleText.getText().toString();
-            String text = textButton.isChecked() ? textText.getText().toString() : null;
-            String link = linkButton.isChecked() ? textText.getText().toString() : null;
-            Bundle submitExtras = SubmitLinkFragment.newSubmitExtras(accountName, subreddit,
-                    title, text, link);
+            String textOrLink = textText.getText().toString().trim();
+            boolean isLink = LINK_PATTERN.matcher(textOrLink).matches();
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "isLink: " + isLink);
+            }
+            Bundle submitExtras = SubmitLinkFragment.newSubmitExtras(
+                    adapter.getItem(accountSpinner.getSelectedItemPosition()),
+                    subredditText.getText().toString(),
+                    titleText.getText().toString(),
+                    textOrLink,
+                    isLink);
             submitFormListener.onSubmitForm(submitExtras);
         }
         return true;

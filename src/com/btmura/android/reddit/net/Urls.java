@@ -137,18 +137,13 @@ public class Urls {
     }
 
     public static String submitQuery(String modhash, String subreddit, String title, String text,
-            String url, String captchaId, String captchaGuess) {
+            boolean link, String captchaId, String captchaGuess) {
         StringBuilder b = resetBuilder();
-        b.append("kind=self");
+        b.append(link ? "kind=link" : "kind=self");
         b.append("&uh=").append(encode(modhash));
         b.append("&sr=").append(encode(subreddit));
         b.append("&title=").append(encode(title));
-        if (!TextUtils.isEmpty(text)) {
-            b.append("&text=").append(encode(text));
-        }
-        if (!TextUtils.isEmpty(url)) {
-            b.append("&url=").append(encode(url));
-        }
+        b.append(link ? "&url=" : "&text=").append(encode(text));
         if (!TextUtils.isEmpty(captchaId)) {
             b.append("&iden=").append(encode(captchaId));
         }
