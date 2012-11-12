@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import android.util.JsonReader;
+import android.util.JsonToken;
 
 import com.btmura.android.reddit.net.RedditApi.Result;
 import com.btmura.android.reddit.util.Array;
@@ -85,11 +86,16 @@ class ResponseParser {
 
     private static String[] parseSingleErrorArray(JsonReader reader) throws IOException {
         // There should only be 3 elements per error but permit expansion.
+        // Some parts of the array can be null.
         String[] error = new String[3];
         reader.beginArray();
         for (int i = 0; reader.hasNext(); i++) {
             error = Array.ensureLength(error, i + 1);
-            error[i] = reader.nextString();
+            if (reader.peek() == JsonToken.STRING) {
+                error[i] = reader.nextString();
+            } else {
+                reader.skipValue();
+            }
         }
         reader.endArray();
         return error;

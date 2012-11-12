@@ -26,9 +26,16 @@ import com.btmura.android.reddit.net.RedditApi.Result;
 
 public class ResponseParserTest extends AndroidTestCase {
 
-    public void testEmptyErrors() throws IOException {
+    public void testErrors_empty() throws IOException {
         Result result = parse("{\"json\": {\"errors\": []}}");
         assertNull(result.errors);
+    }
+
+    public void testErrors_nullToken() throws IOException {
+        Result result = parse("{\"json\": {\"errors\": [[\"QUOTA_FILLED\","
+                + " \"You've submitted too many links recently. Please try again in an hour.\","
+                + " null]]}}");
+        assertNotNull(result.errors);
     }
 
     private Result parse(String json) throws IOException {
