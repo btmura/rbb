@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.net;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -323,12 +325,30 @@ public class RedditApi {
         }
     }
 
-    private static void logResponse(InputStream in) {
+    /**
+     * Logs entire response and returns a fresh InputStream as if nothing
+     * happened. Make sure to delete all usages of this method, since it is only
+     * for debugging.
+     */
+    private static InputStream logResponse(InputStream in) throws IOException {
+        // Make a copy of the InputStream.
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        for (int read = 0; (read = in.read(buffer)) != -1;) {
+            out.write(buffer, 0, read);
+        }
+        in.close();
+
+        // Print out the response for debugging purposes.
+        in = new ByteArrayInputStream(out.toByteArray());
         Scanner sc = new Scanner(in);
         while (sc.hasNextLine()) {
             Log.d(TAG, sc.nextLine());
         }
         sc.close();
+
+        // Return a new InputStream as if nothing happened...
+        return new ByteArrayInputStream(out.toByteArray());
     }
 
     private static void close(InputStream in, HttpURLConnection conn) throws IOException {
