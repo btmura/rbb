@@ -62,7 +62,7 @@
         android:layout_marginTop="@dimen/element_padding"
         android:layout_weight="1"
         android:gravity="top"
-        android:hint="@string/submit_form_link"
+        android:hint="@string/submit_form_text"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions" />
 
