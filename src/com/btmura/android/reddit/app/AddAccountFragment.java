@@ -23,6 +23,7 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.OperationApplicationException;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -99,7 +100,8 @@ public class AddAccountFragment extends Fragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.add_account, container, false);
 
         login = (EditText) v.findViewById(R.id.login);
@@ -151,16 +153,18 @@ public class AddAccountFragment extends Fragment implements
             return;
         }
         if (login.getError() == null && password.getError() == null && listener != null) {
-            new LoginTask(login.getText().toString(), password.getText().toString()).execute();
+            new LoginTask(getActivity(), login.getText().toString(), password.getText().toString()).execute();
         }
     }
 
     class LoginTask extends AsyncTask<Void, Integer, Bundle> {
 
+        private final Context context;
         private final String login;
         private final String password;
 
-        LoginTask(String login, String password) {
+        LoginTask(Context context, String login, String password) {
+            this.context = context.getApplicationContext();
             this.login = login;
             this.password = password;
         }
@@ -168,26 +172,26 @@ public class AddAccountFragment extends Fragment implements
         @Override
         protected void onPreExecute() {
             ProgressDialogFragment.showDialog(getFragmentManager(),
-                    getString(R.string.login_logging_in));
+                    context.getString(R.string.login_logging_in));
         }
 
         @Override
         protected Bundle doInBackground(Void... params) {
             try {
-                LoginResult result = RedditApi.login(getActivity(), login, password);
+                LoginResult result = RedditApi.login(context, login, password);
                 if (result.error != null) {
                     return errorBundle(R.string.reddit_error, result.error);
                 }
 
                 publishProgress(R.string.login_importing_subreddits);
-                SubredditSyncAdapter.initializeAccount(getActivity(), login, result.cookie);
+                SubredditSyncAdapter.initializeAccount(context, login, result.cookie);
 
                 publishProgress(R.string.login_adding_account);
 
-                String accountType = AccountAuthenticator.getAccountType(getActivity());
+                String accountType = AccountAuthenticator.getAccountType(context);
                 Account account = new Account(login, accountType);
 
-                AccountManager manager = AccountManager.get(getActivity());
+                AccountManager manager = AccountManager.get(context);
                 manager.addAccountExplicitly(account, null, null);
                 manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_COOKIE, result.cookie);
                 manager.setAuthToken(account, AccountAuthenticator.AUTH_TOKEN_MODHASH,
@@ -216,7 +220,7 @@ public class AddAccountFragment extends Fragment implements
 
         @Override
         protected void onProgressUpdate(Integer... resIds) {
-            ProgressDialogFragment.showDialog(getFragmentManager(), getString(resIds[0]));
+            ProgressDialogFragment.showDialog(getFragmentManager(), context.getString(resIds[0]));
         }
 
         @Override
@@ -238,7 +242,8 @@ public class AddAccountFragment extends Fragment implements
 
         private Bundle errorBundle(int resId, String... formatArgs) {
             Bundle b = new Bundle(1);
-            b.putString(AccountManager.KEY_ERROR_MESSAGE, getString(resId, (Object[]) formatArgs));
+            b.putString(AccountManager.KEY_ERROR_MESSAGE,
+                    context.getString(resId, (Object[]) formatArgs));
             return b;
         }
     }

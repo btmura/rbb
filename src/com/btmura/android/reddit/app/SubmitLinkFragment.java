@@ -115,12 +115,18 @@ public class SubmitLinkFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (submitTask == null) {
-            submitTask = new SubmitTask();
+            submitTask = new SubmitTask(getActivity());
             submitTask.execute();
         }
     }
 
     class SubmitTask extends AsyncTask<Void, Void, Result> {
+
+        private Context context;
+
+        SubmitTask(Context context) {
+            this.context = context.getApplicationContext();
+        }
 
         @Override
         protected void onPreExecute() {
@@ -131,7 +137,6 @@ public class SubmitLinkFragment extends Fragment {
         @Override
         protected Result doInBackground(Void... params) {
             try {
-                Context context = getActivity().getApplicationContext();
                 AccountManager manager = AccountManager.get(context);
                 Account account = AccountUtils.getAccount(context, accountName);
                 String cookie = AccountUtils.getCookie(manager, account);
@@ -159,7 +164,7 @@ public class SubmitLinkFragment extends Fragment {
             ProgressDialogFragment.dismissDialog(getFragmentManager());
             if (result.errors != null) {
                 MessageDialogFragment.showMessage(getFragmentManager(),
-                        result.getErrorMessage(getActivity()));
+                        result.getErrorMessage(context));
             } else if (listener != null) {
                 listener.onSubmitLink(result.name, result.url);
             }
