@@ -40,6 +40,8 @@ public class LinkFragment extends Fragment {
 
     private static final String ARG_URL = "url";
 
+    private static final String STATE_URL = "url";
+
     private static final Pattern PATTERN_IMAGE = Pattern.compile(".*\\.(jpg|png|gif)$",
             Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
@@ -100,7 +102,12 @@ public class LinkFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        String url = getArguments().getString(ARG_URL);
+        String url;
+        if (savedInstanceState != null) {
+            url = savedInstanceState.getString(STATE_URL);
+        } else {
+            url = getArguments().getString(ARG_URL);
+        }
         if (PATTERN_IMAGE.matcher(url).matches()) {
             String img = String.format("<img src=\"%s\" width=\"100%%\" />", url);
             webView.loadData(img, "text/html", null);
@@ -117,15 +124,21 @@ public class LinkFragment extends Fragment {
 
     @Override
     public void onPause() {
-        super.onPause();
         webView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_URL, webView.getUrl());
     }
 
     @Override
     public void onDetach() {
-        super.onDetach();
         webView.destroy();
         webView = null;
         progress = null;
+        super.onDetach();
     }
 }
