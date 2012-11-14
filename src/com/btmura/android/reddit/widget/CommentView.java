@@ -69,7 +69,7 @@ public class CommentView extends CustomView implements OnGestureListener {
     private StaticLayout bodyLayout;
     private BoringLayout statusLayout;
 
-    private final Rect scoreBounds = new Rect();
+    private Rect scoreBounds;
     private int rightHeight;
     private int minHeight;
 
@@ -118,7 +118,13 @@ public class CommentView extends CustomView implements OnGestureListener {
         this.thingId = thingId;
         this.votable = votable && expanded;
 
-        this.scoreText = VotingArrows.getScoreText(score);
+        if (votable) {
+            if (scoreBounds == null) {
+                scoreBounds = new Rect();
+            }
+            scoreText = VotingArrows.getScoreText(score);
+        }
+
         this.bodyText = FORMATTER.formatSpans(getContext(), body);
         setStatusText(author, createdUtc, nowTimeMs, numComments, score);
 
