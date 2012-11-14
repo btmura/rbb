@@ -35,7 +35,7 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
 
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.single_container, AddAccountFragment.newInstance());
+            ft.replace(R.id.account_authenticator_container, AddAccountFragment.newInstance());
             ft.commit();
         }
     }

@@ -54,7 +54,7 @@ public class SubmitLinkActivity extends Activity implements OnSubmitFormListener
         if (savedInstanceState == null) {
             String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.single_container, SubmitFormFragment.newInstance(subreddit));
+            ft.replace(R.id.submit_link_container, SubmitFormFragment.newInstance(subreddit));
             ft.commit();
         }
     }

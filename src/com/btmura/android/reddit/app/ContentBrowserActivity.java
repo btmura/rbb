@@ -35,14 +35,14 @@ public class ContentBrowserActivity extends Activity implements OnUriClickListen
 
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.single_container, ContentUriListFragment.newInstance());
+            ft.replace(R.id.content_browser_container, ContentUriListFragment.newInstance());
             ft.commit();
         }
     }
 
     public void onUriClick(Uri uri) {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.single_container, ContentRowListFragment.newInstance(uri));
+        ft.replace(R.id.content_browser_container, ContentRowListFragment.newInstance(uri));
         ft.addToBackStack(null);
         ft.commit();
     }
