@@ -31,7 +31,7 @@
     <string name="captcha_title">Are you a robot?</string>
     <string name="comment_reply_title">Reply to %s</string>
     <string name="comment_reply_hint">Type comment</string>
-    <string name="content_browser">Content Providers</string>
+    <string name="content_browser">Content providers</string>
     <string name="empty_list">Nothing to see here…</string>
     <string name="empty_subreddits">You haven\'t added any subreddits.</string>
     <string name="error">Something went wrong…</string>
