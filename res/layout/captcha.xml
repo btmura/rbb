@@ -49,6 +49,7 @@
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/element_padding"
         android:hint="@string/captcha_guess"
+        android:inputType="textNoSuggestions"
         android:singleLine="true" />
 
     <include
