@@ -19,7 +19,6 @@ package com.btmura.android.reddit.widget;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +26,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
 
 public class AccountSpinnerAdapter extends BaseAdapter {
@@ -178,7 +178,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
             v = makeView(parent);
         }
         ViewHolder h = (ViewHolder) v.getTag();
-        h.accountName.setText(getTitle(accountName));
+        h.accountName.setText(getTitle(accountName, false));
 
         if (subreddit != null) {
             h.subreddit.setText(Subreddits.getTitle(context, subreddit));
@@ -218,7 +218,13 @@ public class AccountSpinnerAdapter extends BaseAdapter {
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        return setView(getDropDownLayout(position), position, convertView, parent);
+        TextView tv = (TextView) convertView;
+        if (tv == null) {
+            tv = (TextView) inflater.inflate(getDropDownLayout(position), parent, false);
+        }
+        Item item = getItem(position);
+        tv.setText(getTitle(item.text, true));
+        return tv;
     }
 
     private int getDropDownLayout(int position) {
@@ -235,21 +241,13 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         }
     }
 
-    private View setView(int layout, int position, View convertView, ViewGroup parent) {
-        TextView tv = (TextView) convertView;
-        if (tv == null) {
-            tv = (TextView) inflater.inflate(layout, parent, false);
-        }
-        Item item = getItem(position);
-        tv.setText(getTitle(item.text));
-        return tv;
-    }
-
-    private String getTitle(String accountName) {
-        if (TextUtils.isEmpty(accountName)) {
-            return context.getString(R.string.app_name);
-        } else {
+    private String getTitle(String accountName, boolean dropdown) {
+        if (AccountUtils.isAccount(accountName)) {
             return accountName;
+        } else if (dropdown) {
+            return context.getString(R.string.account_app_storage);
+        } else {
+            return context.getString(R.string.app_name);
         }
     }
 }

@@ -16,6 +16,7 @@
 -->
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="account_app_storage">App storage</string>
     <string name="account_type">com.btmura.android.reddit.account</string>
     <string name="add_account">Add account</string>
     <string name="add_front_page">Add front page</string>

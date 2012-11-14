@@ -84,7 +84,7 @@ public class AccountNameAdapter extends BaseAdapter {
         if (AccountUtils.isAccount(accountName)) {
             tv.setText(accountName);
         } else {
-            tv.setText(R.string.app_name);
+            tv.setText(R.string.account_app_storage);
         }
     }
 }
