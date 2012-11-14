@@ -35,7 +35,7 @@
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/element_padding"
-        android:hint="@string/submit_form_subreddit"
+        android:hint="@string/hint_subreddit"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
@@ -47,7 +47,7 @@
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/element_padding"
-        android:hint="@string/submit_form_title"
+        android:hint="@string/hint_title"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
@@ -62,7 +62,7 @@
         android:layout_marginTop="@dimen/element_padding"
         android:layout_weight="1"
         android:gravity="top"
-        android:hint="@string/submit_form_text"
+        android:hint="@string/hint_text_or_link"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions" />
 

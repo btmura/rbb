@@ -26,7 +26,7 @@
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/padding"
-        android:hint="@string/type_login"
+        android:hint="@string/hint_login"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
@@ -37,7 +37,7 @@
         android:layout_marginBottom="@dimen/element_padding"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
-        android:hint="@string/type_password"
+        android:hint="@string/hint_password"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textPassword"
         android:singleLine="true" />

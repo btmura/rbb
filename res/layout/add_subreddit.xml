@@ -35,7 +35,7 @@
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/element_padding"
-        android:hint="@string/type_subreddit_name"
+        android:hint="@string/hint_subreddit"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
