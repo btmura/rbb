@@ -63,6 +63,7 @@ public class CommentView extends CustomView implements OnGestureListener {
     private CharSequence bodyText;
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
+    private StyleSpan italicSpan;
 
     private StaticLayout titleLayout;
     private StaticLayout bodyLayout;
@@ -119,13 +120,13 @@ public class CommentView extends CustomView implements OnGestureListener {
 
         this.scoreText = VotingArrows.getScoreText(score);
         this.bodyText = FORMATTER.formatSpans(getContext(), body);
-        setStatusText(author, createdUtc, expanded, kind, nowTimeMs, numComments, score);
+        setStatusText(author, createdUtc, nowTimeMs, numComments, score);
 
         requestLayout();
     }
 
-    private void setStatusText(String author, long createdUtc, boolean expanded, int kind,
-            long nowTimeMs, int numComments, int score) {
+    private void setStatusText(String author, long createdUtc, long nowTimeMs, int numComments,
+            int score) {
         Context c = getContext();
         Resources r = getResources();
 
@@ -144,7 +145,10 @@ public class CommentView extends CustomView implements OnGestureListener {
         }
 
         if (!expanded) {
-            statusText.setSpan(new StyleSpan(Typeface.ITALIC), 0, statusText.length(), 0);
+            if (italicSpan == null) {
+                italicSpan = new StyleSpan(Typeface.ITALIC);
+            }
+            statusText.setSpan(italicSpan, 0, statusText.length(), 0);
         }
     }
 
