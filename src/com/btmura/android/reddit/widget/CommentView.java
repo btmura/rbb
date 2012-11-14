@@ -53,6 +53,7 @@ public class CommentView extends CustomView implements OnGestureListener {
     private OnVoteListener listener;
 
     private boolean expanded;
+    private int kind;
     private int likes;
     private int nesting;
     private String title;
@@ -109,6 +110,7 @@ public class CommentView extends CustomView implements OnGestureListener {
             String thingId,
             boolean votable) {
         this.expanded = expanded;
+        this.kind = kind;
         this.likes = likes;
         this.nesting = nesting;
         this.title = title;
@@ -207,15 +209,21 @@ public class CommentView extends CustomView implements OnGestureListener {
             bodyBounds.right = rx;
         }
 
+        // Move to the top edge where we will start drawing.
         int ry = (minHeight - rightHeight) / 2;
+
+        // Move down by title height if header. Otherwise, move down by status.
         if (titleLayout != null) {
             ry += titleLayout.getHeight() + ELEMENT_PADDING;
+        } else {
+            ry += statusLayout.getHeight() + ELEMENT_PADDING;
         }
+
+        // Now assign the bounds of the body for detecting link clicks.
         if (bodyLayout != null) {
             bodyBounds.top = ry;
             ry += bodyLayout.getHeight();
             bodyBounds.bottom = ry;
-            ry += ELEMENT_PADDING;
         }
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -262,17 +270,30 @@ public class CommentView extends CustomView implements OnGestureListener {
         int dy = (minHeight - rightHeight) / 2;
         c.translate(dx, dy);
 
-        if (titleLayout != null) {
+        if (kind == Comments.KIND_HEADER) {
+            // Draw the title and move down.
             titleLayout.draw(c);
             c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
-        }
 
-        if (bodyLayout != null) {
-            bodyLayout.draw(c);
-            c.translate(0, bodyLayout.getHeight() + ELEMENT_PADDING);
-        }
+            // Draw the body text if there is any and then move down.
+            if (bodyLayout != null) {
+                bodyLayout.draw(c);
+                c.translate(0, bodyLayout.getHeight() + ELEMENT_PADDING);
+            }
 
-        statusLayout.draw(c);
+            // Draw the status which is mandatory.
+            statusLayout.draw(c);
+
+        } else {
+            // Draw the status at the top for collapsing then move down.
+            statusLayout.draw(c);
+            c.translate(0, statusLayout.getHeight() + ELEMENT_PADDING);
+
+            // Draw the body text if there is any. Probably mandatory...
+            if (bodyLayout != null) {
+                bodyLayout.draw(c);
+            }
+        }
     }
 
     @Override
