@@ -49,11 +49,9 @@
     <string name="menu_add">Add</string>
     <string name="menu_add_account">Add account</string>
     <string name="menu_add_subreddit">Add subreddit</string>
-    <string name="menu_collapse">Collapse</string>
     <string name="menu_comments">View comments</string>
     <string name="menu_copy_url">Copy URL</string>
     <string name="menu_delete">Delete</string>
-    <string name="menu_expand">Expand</string>
     <string name="menu_link">View link</string>
     <string name="menu_open">Open in another app</string>
     <string name="menu_remove_account">Remove account</string>

@@ -163,25 +163,11 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        menu.findItem(R.id.menu_expand).setVisible(isExpandOrCollapseVisible(true));
-        menu.findItem(R.id.menu_collapse).setVisible(isExpandOrCollapseVisible(false));
         menu.findItem(R.id.menu_reply).setVisible(isReplyItemVisible());
         menu.findItem(R.id.menu_delete).setVisible(isDeleteItemVisible());
         return true;
     }
 
-    private boolean isExpandOrCollapseVisible(boolean expand) {
-        // Allow collapse only when one item is selected.
-        if (getListView().getCheckedItemCount() != 1) {
-            return false;
-        }
-
-        // Only comments (not the header or more entries) can be expanded or
-        // collapsed.
-        int position = getFirstCheckedPosition();
-        return adapter.getInt(position, CommentAdapter.INDEX_KIND) == Comments.KIND_COMMENT
-                && adapter.getBoolean(position, CommentAdapter.INDEX_EXPANDED) != expand;
-    }
 
     private boolean isReplyItemVisible() {
         // You need an account to reply to some comment.
@@ -243,12 +229,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_expand:
-                return handleExpand(mode);
-
-            case R.id.menu_collapse:
-                return handleCollapse(mode);
-
             case R.id.menu_reply:
                 return handleReply(mode);
 
@@ -258,22 +238,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             default:
                 return false;
         }
-    }
-
-    private boolean handleExpand(ActionMode mode) {
-        long id = getCommentId(getFirstCheckedPosition());
-        CommentProvider.expandInBackground(getActivity(), sessionId, id);
-        mode.finish();
-        return true;
-    }
-
-    private boolean handleCollapse(ActionMode mode) {
-        int position = getFirstCheckedPosition();
-        long id = getCommentId(position);
-        long[] childIds = CommentLogic.getChildren(this, position);
-        CommentProvider.collapseInBackground(getActivity(), id, childIds);
-        mode.finish();
-        return true;
     }
 
     private boolean handleReply(ActionMode mode) {
