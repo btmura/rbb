@@ -89,8 +89,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     @Override
-    public View
-            onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         ListView l = (ListView) v.findViewById(android.R.id.list);
         l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -127,6 +127,24 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        // Only comments can be expanded and collapsed.
+        if (adapter.getInt(position, CommentAdapter.INDEX_KIND) != Comments.KIND_COMMENT) {
+            return;
+        }
+
+        // Collapse if expanded. Expand if collapsed.
+        if (adapter.getBoolean(position, CommentAdapter.INDEX_EXPANDED)) {
+            long[] childIds = CommentLogic.getChildren(this, position);
+            CommentProvider.collapseInBackground(getActivity(), id, childIds);
+        } else {
+            CommentProvider.expandInBackground(getActivity(), sessionId, id);
+        }
     }
 
     public void onVote(String thingId, int likes) {
