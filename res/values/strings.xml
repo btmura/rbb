@@ -27,7 +27,6 @@
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
     <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
     <string name="captcha_image">Captcha image</string>
-    <string name="captcha_guess">Type captcha</string>
     <string name="captcha_title">Are you a robot?</string>
     <string name="comment_reply_title">Reply to %s</string>
     <string name="comment_reply_hint">Type comment</string>
@@ -42,6 +41,7 @@
     <string name="filter_controversial">controversial</string>
     <string name="filter_top">top</string>
     <string name="front_page">front page</string>
+    <string name="hint_captcha">Captcha</string>
     <string name="hint_login">Login</string>
     <string name="hint_password">Password</string>
     <string name="hint_subreddit">Subreddit</string>
