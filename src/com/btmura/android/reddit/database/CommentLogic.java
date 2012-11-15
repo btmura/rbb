@@ -18,6 +18,7 @@ package com.btmura.android.reddit.database;
 
 import android.database.Cursor;
 import android.database.CursorWrapper;
+import android.text.TextUtils;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
 
@@ -184,10 +185,16 @@ public class CommentLogic {
 
     /**
      * @param accountName of the user in the application not of the comment
+     * @param author of the comment to see whether it has been deleted
+     * @param expanded to avoid triggering vote listener when collapsed
+     * @param thingId to avoid trying to vote on a pending comment
+     *
      * @return whether this comment can be voted upon
      */
-    public static boolean isVotable(String accountName, String author, long createdUtc) {
-        return AccountUtils.isAccount(accountName) && !Comments.DELETED.equals(author);
+    public static boolean isVotable(String accountName, String author, boolean expanded,
+            String thingId) {
+        return AccountUtils.isAccount(accountName) && !Comments.DELETED.equals(author) && expanded
+                && !TextUtils.isEmpty(thingId);
     }
 
     private CommentLogic() {

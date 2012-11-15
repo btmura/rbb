@@ -119,9 +119,9 @@ public class CommentView extends CustomView implements OnGestureListener {
         this.nesting = nesting;
         this.title = title;
         this.thingId = thingId;
-        this.votable = votable && expanded;
+        this.votable = votable;
+        this.drawScore = this.votable && kind == Comments.KIND_HEADER;
 
-        drawScore = votable && kind == Comments.KIND_HEADER;
         if (drawScore) {
             if (scoreBounds == null) {
                 scoreBounds = new Rect();

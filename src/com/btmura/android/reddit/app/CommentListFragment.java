@@ -151,7 +151,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLike thingId: " + thingId + " likes: " + likes);
         }
-        if (!TextUtils.isEmpty(accountName)) {
+        if (AccountUtils.isAccount(accountName)) {
             VoteProvider.voteInBackground(getActivity(), accountName, thingId, likes);
         }
     }
