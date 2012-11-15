@@ -227,7 +227,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                     Alignment.ALIGN_OPPOSITE);
         }
 
-        int leftHeight = Math.max(VotingArrows.getHeight(votable), Thumbnail.getHeight());
+        int leftHeight = Math.max(VotingArrows.getHeight(votable, true), Thumbnail.getHeight());
         rightHeight = titleLayout.getHeight() + ELEMENT_PADDING + statusLayout.getHeight();
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
@@ -270,7 +270,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         c.translate(PADDING, PADDING);
         if (votable) {
-            VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes);
+            VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes, true);
             c.translate(VotingArrows.getWidth(votable) + PADDING, 0);
         }
 
@@ -299,11 +299,11 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, 0, votable);
+        return VotingArrows.onDown(e, 0, votable, true);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, 0, votable, listener, thingId);
+        return VotingArrows.onSingleTapUp(e, 0, votable, true, listener, thingId);
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

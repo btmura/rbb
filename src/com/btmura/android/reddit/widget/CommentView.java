@@ -60,8 +60,10 @@ public class CommentView extends CustomView implements OnGestureListener {
     private String thingId;
     private boolean votable;
 
+
     private CharSequence bodyText;
     private String scoreText;
+    private boolean drawScore;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
     private StyleSpan italicSpan;
 
@@ -124,6 +126,7 @@ public class CommentView extends CustomView implements OnGestureListener {
             }
             scoreText = VotingArrows.getScoreText(score);
         }
+        this.drawScore = kind == Comments.KIND_HEADER;
 
         this.bodyText = FORMATTER.formatSpans(getContext(), body);
         setStatusText(author, createdUtc, nowTimeMs, numComments, score);
@@ -204,7 +207,7 @@ public class CommentView extends CustomView implements OnGestureListener {
             rightHeight += statusLayout.getHeight();
         }
 
-        int leftHeight = VotingArrows.getHeight(votable);
+        int leftHeight = VotingArrows.getHeight(votable, drawScore);
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         bodyBounds.setEmpty();
@@ -272,7 +275,7 @@ public class CommentView extends CustomView implements OnGestureListener {
     protected void onDraw(Canvas c) {
         c.translate(PADDING * (1 + nesting), PADDING);
         if (votable) {
-            VotingArrows.draw(c, null, scoreText, scoreBounds, likes);
+            VotingArrows.draw(c, null, scoreText, scoreBounds, likes, drawScore);
         }
         c.translate(0, -PADDING);
 
@@ -348,11 +351,11 @@ public class CommentView extends CustomView implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, getCommentLeft(), votable);
+        return VotingArrows.onDown(e, getCommentLeft(), votable, drawScore);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, getCommentLeft(), votable, listener, thingId);
+        return VotingArrows.onSingleTapUp(e, getCommentLeft(), votable, drawScore, listener, thingId);
     }
 
     private float getCommentLeft() {
