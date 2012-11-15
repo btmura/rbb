@@ -39,6 +39,7 @@ import android.view.MotionEvent;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
@@ -59,7 +60,6 @@ public class CommentView extends CustomView implements OnGestureListener {
     private String title;
     private String thingId;
     private boolean votable;
-
 
     private CharSequence bodyText;
     private String scoreText;
@@ -99,7 +99,8 @@ public class CommentView extends CustomView implements OnGestureListener {
         this.listener = listener;
     }
 
-    public void setData(String author,
+    public void setData(String accountName,
+            String author,
             String body,
             long createdUtc,
             boolean expanded,
@@ -120,22 +121,22 @@ public class CommentView extends CustomView implements OnGestureListener {
         this.thingId = thingId;
         this.votable = votable && expanded;
 
-        if (votable) {
+        drawScore = votable && kind == Comments.KIND_HEADER;
+        if (drawScore) {
             if (scoreBounds == null) {
                 scoreBounds = new Rect();
             }
             scoreText = VotingArrows.getScoreText(score);
         }
-        this.drawScore = kind == Comments.KIND_HEADER;
 
         this.bodyText = FORMATTER.formatSpans(getContext(), body);
-        setStatusText(author, createdUtc, nowTimeMs, numComments, score);
+        setStatusText(accountName, author, createdUtc, nowTimeMs, numComments, score);
 
         requestLayout();
     }
 
-    private void setStatusText(String author, long createdUtc, long nowTimeMs, int numComments,
-            int score) {
+    private void setStatusText(String accountName, String author, long createdUtc, long nowTimeMs,
+            int numComments, int score) {
         Context c = getContext();
         Resources r = getResources();
 
@@ -144,7 +145,9 @@ public class CommentView extends CustomView implements OnGestureListener {
         statusText.append(author).append("  ");
 
         if (createdUtc != 0) {
-            statusText.append(r.getQuantityString(R.plurals.points, score, score)).append("  ");
+            if (!AccountUtils.isAccount(accountName) || kind == Comments.KIND_COMMENT) {
+                statusText.append(r.getQuantityString(R.plurals.points, score, score)).append("  ");
+            }
             statusText.append(RelativeTime.format(c, nowTimeMs, createdUtc)).append("  ");
         }
 
@@ -183,7 +186,9 @@ public class CommentView extends CustomView implements OnGestureListener {
         int rightContentWidth = measuredWidth - PADDING * (2 + nesting);
         if (votable) {
             rightContentWidth -= VotingArrows.getWidth(votable) + PADDING;
-            VotingArrows.measureScoreText(scoreText, scoreBounds);
+            if (drawScore) {
+                VotingArrows.measureScoreText(scoreText, scoreBounds);
+            }
         }
 
         titleLayout = null;
@@ -355,7 +360,8 @@ public class CommentView extends CustomView implements OnGestureListener {
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, getCommentLeft(), votable, drawScore, listener, thingId);
+        return VotingArrows.onSingleTapUp(e, getCommentLeft(), votable, drawScore, listener,
+                thingId);
     }
 
     private float getCommentLeft() {

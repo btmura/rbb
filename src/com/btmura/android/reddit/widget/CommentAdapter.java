@@ -153,7 +153,7 @@ public class CommentAdapter extends BaseCursorAdapter {
 
         CommentView cv = (CommentView) view;
         cv.setOnVoteListener(listener);
-        cv.setData(author, body, createdUtc, expanded, kind, likes, nesting, nowTimeMs,
-                numComments, score, title, thingId, votable);
+        cv.setData(accountName, author, body, createdUtc, expanded, kind, likes, nesting,
+                nowTimeMs, numComments, score, title, thingId, votable);
     }
 }
