@@ -46,7 +46,6 @@ import android.widget.EditText;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.accounts.AccountPreferences;
-import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.SubredditSyncAdapter;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.LoginResult;
