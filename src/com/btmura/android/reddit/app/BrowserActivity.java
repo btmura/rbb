@@ -26,7 +26,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
@@ -108,10 +108,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         adapter.updateState(itemPosition);
 
         String accountName = adapter.getAccountName();
-        AccountLoader.setLastAccount(prefs, accountName);
+        AccountPreferences.setLastAccount(prefs, accountName);
 
         int filter = adapter.getFilter();
-        AccountLoader.setLastFilter(prefs, filter);
+        AccountPreferences.setLastFilter(prefs, filter);
 
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onNavigationItemSelected i:" + itemPosition
@@ -126,7 +126,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             if (!isSinglePane && !TextUtils.isEmpty(name)) {
                 subreddit = name;
             } else {
-                subreddit = AccountLoader.getLastSubreddit(prefs, accountName);
+                subreddit = AccountPreferences.getLastSubreddit(prefs, accountName);
             }
             setSubredditListNavigation(subreddit, null);
         } else if (tlf != null && tlf.getFilter() != filter) {
@@ -139,6 +139,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     public void onSubredditSelected(String subreddit) {
         super.onSubredditSelected(subreddit);
-        AccountLoader.setLastSubreddit(prefs, getAccountName(), subreddit);
+        AccountPreferences.setLastSubreddit(prefs, getAccountName(), subreddit);
     }
 }

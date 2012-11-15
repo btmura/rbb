@@ -29,6 +29,7 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -109,7 +110,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         }
 
         int filter = adapter.getFilter(itemPosition);
-        AccountLoader.setLastFilter(prefs, filter);
+        AccountPreferences.setLastFilter(prefs, filter);
 
         ThingListFragment f = getThingListFragment();
         if (f == null || !f.getAccountName().equals(accountName)
