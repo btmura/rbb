@@ -157,6 +157,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        if (adapter.getCursor() == null) {
+            getListView().clearChoices();
+            return false;
+        }
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.comment_action_menu, menu);
         return true;
