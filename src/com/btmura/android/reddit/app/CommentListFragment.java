@@ -163,11 +163,13 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        int count = getListView().getCheckedItemCount();
+        mode.setTitle(getResources().getQuantityString(R.plurals.comments, count, count));
+
         menu.findItem(R.id.menu_reply).setVisible(isReplyItemVisible());
         menu.findItem(R.id.menu_delete).setVisible(isDeleteItemVisible());
         return true;
     }
-
 
     private boolean isReplyItemVisible() {
         // You need an account to reply to some comment.

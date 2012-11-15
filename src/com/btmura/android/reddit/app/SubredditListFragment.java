@@ -184,6 +184,9 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        int count = getListView().getCheckedItemCount();
+        mode.setTitle(getResources().getQuantityString(R.plurals.subreddits, count, count));
+
         boolean isQuery = query != null;
         menu.findItem(R.id.menu_add).setVisible(isQuery);
         menu.findItem(R.id.menu_delete).setVisible(!isQuery);
@@ -191,6 +194,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        mode.invalidate();
     }
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {

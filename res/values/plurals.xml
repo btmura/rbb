@@ -24,6 +24,10 @@
         <item quantity="one">1 point</item>
         <item quantity="other">%1$,d points</item>
     </plurals>
+    <plurals name="subreddits">
+        <item quantity="one">1 subreddit</item>
+        <item quantity="other">%1$,d subreddits</item>
+    </plurals>
     <plurals name="subreddits_added">
         <item quantity="one">1 subreddit added</item>
         <item quantity="other">%1$,d subreddits added</item>
