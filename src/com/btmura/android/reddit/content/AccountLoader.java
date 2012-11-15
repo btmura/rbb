@@ -29,6 +29,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 
@@ -47,8 +48,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
 
         public String getLastAccount() {
-            String accountName = prefs.getString(AccountLoader.GLOBAL_PREF_LAST_ACCOUNT,
-                    Subreddits.ACCOUNT_NONE);
+            String accountName = AccountPreferences.getLastAccount(prefs, Subreddits.ACCOUNT_NONE);
             for (int i = 0; i < accountNames.length; i++) {
                 if (accountNames[i].equals(accountName)) {
                     return accountName;
@@ -58,7 +58,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
 
         public int getLastFilter() {
-            return prefs.getInt(GLOBAL_PREF_LAST_FILTER, 0);
+            return AccountPreferences.getLastFilter(prefs, 0);
         }
     }
 
@@ -68,11 +68,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
     };
 
-    private static final String PREFS = "accountPreferences";
-    private static final String GLOBAL_PREF_LAST_ACCOUNT = "lastAccount";
-    private static final String GLOBAL_PREF_LAST_FILTER = "lastFilter";
-    private static final String ACCOUNT_PREF_LAST_SUBREDDIT = "lastSubreddit";
-
     private SharedPreferences prefs;
     private AccountManager manager;
     private boolean includeNoAccount;
@@ -81,7 +76,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     public AccountLoader(Context context, boolean includeNoAccount) {
         super(context);
-        this.prefs = getContext().getSharedPreferences(PREFS, 0);
+        this.prefs = AccountPreferences.getPreferences(context);
         this.manager = AccountManager.get(getContext());
         this.manager.addOnAccountsUpdatedListener(this, null, false);
         this.includeNoAccount = includeNoAccount;
@@ -116,7 +111,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
 
         // Get a preference to make sure the loading thread is done.
-        prefs.getString(GLOBAL_PREF_LAST_ACCOUNT, null);
+        AccountPreferences.getLastAccount(prefs, null);
 
         return new AccountResult(accountNames, prefs);
     }
@@ -153,28 +148,5 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     public void onAccountsUpdated(Account[] accounts) {
         onContentChanged();
-    }
-
-    public static void setLastAccount(SharedPreferences prefs, String accountName) {
-        prefs.edit().putString(GLOBAL_PREF_LAST_ACCOUNT, accountName).apply();
-    }
-
-    public static void setLastFilter(SharedPreferences prefs, int filter) {
-        prefs.edit().putInt(GLOBAL_PREF_LAST_FILTER, filter).apply();
-    }
-
-    public static String getLastSubreddit(SharedPreferences prefs, String accountName) {
-        return prefs.getString(getAccountPreferenceKey(accountName, ACCOUNT_PREF_LAST_SUBREDDIT),
-                Subreddits.NAME_FRONT_PAGE);
-    }
-
-    public static void setLastSubreddit(SharedPreferences prefs, String accountName,
-            String subreddit) {
-        prefs.edit().putString(getAccountPreferenceKey(accountName, ACCOUNT_PREF_LAST_SUBREDDIT),
-                subreddit).apply();
-    }
-
-    private static String getAccountPreferenceKey(String accountName, String prefName) {
-        return accountName + "." + prefName;
     }
 }

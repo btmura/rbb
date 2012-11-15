@@ -25,6 +25,7 @@ import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -44,6 +45,8 @@ import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.accounts.AccountPreferences;
+import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.SubredditSyncAdapter;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.LoginResult;
@@ -188,6 +191,13 @@ public class AddAccountFragment extends Fragment implements
 
                 publishProgress(R.string.login_adding_account);
 
+                // Set this account as the last account to make the UI switch to
+                // the new account after the user returns to the app. If somehow
+                // we crash before the account is added, that is ok, because the
+                // AccountLoader will fall back to the app storage account.
+                SharedPreferences prefs = AccountPreferences.getPreferences(context);
+                AccountPreferences.setLastAccount(prefs, login);
+
                 String accountType = AccountAuthenticator.getAccountType(context);
                 Account account = new Account(login, accountType);
 
@@ -207,13 +217,13 @@ public class AddAccountFragment extends Fragment implements
                 return b;
 
             } catch (IOException e) {
-                Log.e(TAG, "doInBackground", e);
+                Log.e(TAG, e.getMessage(), e);
                 return errorBundle(R.string.login_error, e.getMessage());
             } catch (RemoteException e) {
-                Log.e(TAG, "doInBackground", e);
+                Log.e(TAG, e.getMessage(), e);
                 return errorBundle(R.string.login_error, e.getMessage());
             } catch (OperationApplicationException e) {
-                Log.e(TAG, "doInBackground", e);
+                Log.e(TAG, e.getMessage(), e);
                 return errorBundle(R.string.login_error, e.getMessage());
             }
         }
