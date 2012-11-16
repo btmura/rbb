@@ -61,8 +61,7 @@
         android:layout_marginTop="@dimen/element_padding"
         android:layout_weight="1"
         android:gravity="top"
-        android:hint="@string/hint_text_or_link"
-        android:imeOptions="flagNoFullscreen" />
+        android:hint="@string/hint_text_or_link" />
 
     <ViewStub
         android:id="@+id/button_bar_stub"

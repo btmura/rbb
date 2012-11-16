@@ -18,14 +18,19 @@ package com.btmura.android.reddit.app;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -38,13 +43,13 @@ import com.btmura.android.reddit.widget.AccountNameAdapter;
  * {@link DialogFragment} that displays a text box for the user to fill in to
  * respond to a thing.
  */
-public class CommentReplyFragment extends DialogFragment implements LoaderCallbacks<AccountResult>,
-        OnClickListener {
+public class CommentReplyFormFragment extends Fragment implements
+        LoaderCallbacks<AccountResult>, OnClickListener {
 
     // This fragment only reports back the user's input and doesn't handle
     // modifying the database. The caller of this fragment should handle that.
 
-    public static final String TAG = "CommentReplyFragment";
+    public static final String TAG = "CommentReplyFormFragment";
 
     /** String extra with thing id you are replying to. */
     public static final String ARG_THING_ID = "thingId";
@@ -59,7 +64,7 @@ public class CommentReplyFragment extends DialogFragment implements LoaderCallba
      * Listener fired when the user presses the OK button and submits a
      * non-empty comment.
      */
-    interface OnCommentReplyListener {
+    interface OnCommentReplyFormListener {
         /**
          * @param accountName of the account selected
          * @param thingId of the thing you are replying to
@@ -67,25 +72,29 @@ public class CommentReplyFragment extends DialogFragment implements LoaderCallba
          * @param extras passed to the fragment
          */
         void onCommentReply(String accountName, String thingId, String text, Bundle extras);
+
+        void onCommentReplyCancelled();
     }
 
-    private OnCommentReplyListener listener;
+    private OnCommentReplyFormListener listener;
     private AccountNameAdapter adapter;
     private boolean restoringState;
     private Spinner accountSpinner;
     private EditText bodyText;
     private View ok;
+    private View cancel;
 
     /**
      * @param thingId of the thing the user is replying to
      * @param author of the thing the user is replying to
      */
-    public static CommentReplyFragment newInstance(String thingId, String author, Bundle extras) {
+    public static CommentReplyFormFragment newInstance(String thingId, String author,
+            Bundle extras) {
         Bundle args = new Bundle(3);
         args.putString(ARG_THING_ID, thingId);
         args.putString(ARG_AUTHOR, author);
         args.putBundle(ARG_EXTRAS, extras);
-        CommentReplyFragment frag = new CommentReplyFragment();
+        CommentReplyFormFragment frag = new CommentReplyFormFragment();
         frag.setArguments(args);
         return frag;
     }
@@ -93,14 +102,15 @@ public class CommentReplyFragment extends DialogFragment implements LoaderCallba
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (getTargetFragment() instanceof OnCommentReplyListener) {
-            this.listener = (OnCommentReplyListener) getTargetFragment();
+        if (activity instanceof OnCommentReplyFormListener) {
+            this.listener = (OnCommentReplyFormListener) activity;
         }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         adapter = new AccountNameAdapter(getActivity());
         restoringState = savedInstanceState != null;
     }
@@ -108,17 +118,21 @@ public class CommentReplyFragment extends DialogFragment implements LoaderCallba
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        String author = getArguments().getString(ARG_AUTHOR);
-        getDialog().setTitle(getString(R.string.comment_reply_title, author));
-
-        View v = inflater.inflate(R.layout.comment_reply, container, false);
+        View v = inflater.inflate(R.layout.comment_reply_form, container, false);
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
         accountSpinner.setAdapter(adapter);
 
         bodyText = (EditText) v.findViewById(R.id.body_text);
-        ok = v.findViewById(R.id.ok);
-        ok.setOnClickListener(this);
-        v.findViewById(R.id.cancel).setOnClickListener(this);
+
+        if (getActivity().getActionBar() == null) {
+            ViewStub vs = (ViewStub) v.findViewById(R.id.button_bar_stub);
+            View buttonBar = vs.inflate();
+            ok = buttonBar.findViewById(R.id.ok);
+            ok.setOnClickListener(this);
+            cancel = buttonBar.findViewById(R.id.cancel);
+            cancel.setOnClickListener(this);
+        }
+
         return v;
     }
 
@@ -141,23 +155,48 @@ public class CommentReplyFragment extends DialogFragment implements LoaderCallba
 
     public void onLoaderReset(Loader<AccountResult> loader) {
         adapter.setAccountNames(null);
-        dismiss();
+        if (listener != null) {
+            listener.onCommentReplyCancelled();
+        }
     }
 
-    public void onClick(View view) {
-        if (view == ok) {
-            if (TextUtils.isEmpty(bodyText.getText())) {
-                bodyText.setError(getString(R.string.error_blank_field));
-                return;
-            }
-            if (listener != null) {
-                String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
-                String thingId = getArguments().getString(ARG_THING_ID);
-                String body = bodyText.getText().toString();
-                Bundle extras = getArguments().getBundle(ARG_EXTRAS);
-                listener.onCommentReply(accountName, thingId, body, extras);
-            }
+    public void onClick(View v) {
+        if (v == ok) {
+            handleSubmit();
+        } else if (v == cancel && listener != null) {
+            listener.onCommentReplyCancelled();
         }
-        dismiss();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.comment_reply_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_submit:
+                return handleSubmit();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private boolean handleSubmit() {
+        if (TextUtils.isEmpty(bodyText.getText())) {
+            bodyText.setError(getString(R.string.error_blank_field));
+            return true;
+        }
+        if (listener != null) {
+            String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
+            String thingId = getArguments().getString(ARG_THING_ID);
+            String body = bodyText.getText().toString();
+            Bundle extras = getArguments().getBundle(ARG_EXTRAS);
+            listener.onCommentReply(accountName, thingId, body, extras);
+        }
+        return true;
     }
 }

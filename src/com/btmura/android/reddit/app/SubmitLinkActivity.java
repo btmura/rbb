@@ -26,7 +26,7 @@ import android.widget.Toast;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.app.SubmitLinkFragment.OnSubmitLinkListener;
-import com.btmura.android.reddit.app.SubmitFormFragment.OnSubmitFormListener;
+import com.btmura.android.reddit.app.SubmitLinkFormFragment.OnSubmitFormListener;
 
 public class SubmitLinkActivity extends Activity implements OnSubmitFormListener,
         OnCaptchaGuessListener, OnSubmitLinkListener {
@@ -54,7 +54,7 @@ public class SubmitLinkActivity extends Activity implements OnSubmitFormListener
         if (savedInstanceState == null) {
             String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.submit_link_container, SubmitFormFragment.newInstance(subreddit));
+            ft.replace(R.id.submit_link_container, SubmitLinkFormFragment.newInstance(subreddit));
             ft.commit();
         }
     }

@@ -18,6 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -37,17 +38,16 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.app.CommentReplyFragment.OnCommentReplyListener;
 import com.btmura.android.reddit.database.CommentLogic;
-import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
-        MultiChoiceModeListener, OnCommentReplyListener, OnVoteListener, CommentList {
+        MultiChoiceModeListener, OnVoteListener, CommentList {
 
     public static final String TAG = "CommentListFragment";
 
@@ -254,14 +254,17 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             long sessionCreationTime = adapter.getLong(position,
                     CommentAdapter.INDEX_SESSION_CREATION_TIME);
 
-            Bundle extras = new Bundle(3);
+            Bundle extras = new Bundle(4);
             extras.putInt(Comments.COLUMN_NESTING, CommentLogic.getInsertNesting(this, position));
             extras.putInt(Comments.COLUMN_SEQUENCE, CommentLogic.getInsertSequence(this, position));
+            extras.putString(Comments.COLUMN_SESSION_ID, sessionId);
             extras.putLong(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime);
 
-            CommentReplyFragment frag = CommentReplyFragment.newInstance(thingId, author, extras);
-            frag.setTargetFragment(this, 0);
-            frag.show(getFragmentManager(), CommentReplyFragment.TAG);
+            Intent intent = new Intent(getActivity(), CommentReplyActivity.class);
+            intent.putExtra(CommentReplyActivity.EXTRA_THING_ID, thingId);
+            intent.putExtra(CommentReplyActivity.EXTRA_AUTHOR, author);
+            intent.putExtra(CommentReplyActivity.EXTRA_PASS_THROUGH, extras);
+            startActivity(intent);
         }
 
         mode.finish();
@@ -277,15 +280,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             }
         }
         return -1;
-    }
-
-    public void onCommentReply(String replyAccountName, String replyThingId,
-            String text, Bundle extras) {
-        int nesting = extras.getInt(Comments.COLUMN_NESTING);
-        int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
-        long sessionCreationTime = extras.getLong(Comments.COLUMN_SESSION_TIMESTAMP);
-        CommentProvider.insertInBackground(getActivity(), replyAccountName, text, nesting,
-                thingId, sequence, sessionId, sessionCreationTime, replyThingId);
     }
 
     private boolean handleDelete(ActionMode mode) {

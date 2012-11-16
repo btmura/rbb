@@ -51,6 +51,17 @@
         </activity>
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
+            android:name=".app.CommentReplyActivity"
+            android:theme="@android:style/Theme.Holo.DialogWhenLarge"
+            tools:ignore="ExportedActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
+        <activity
             android:name=".app.ContentBrowserActivity"
             android:label="@string/content_browser"
             tools:ignore="ExportedActivity" >

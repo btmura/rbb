@@ -42,16 +42,16 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
-public class SubmitFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
+public class SubmitLinkFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
         OnClickListener {
 
-    public static final String TAG = "SubmitFormFragment";
+    public static final String TAG = "SubmitLinkFormFragment";
 
     private static final String ARG_SUBREDDIT = "subreddit";
 
     private static final Pattern LINK_PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9+-.]*?://[^ ]+");
 
-    private OnSubmitFormListener submitFormListener;
+    private OnSubmitFormListener listener;
     private AccountNameAdapter adapter;
     private boolean restoringState;
     private Spinner accountSpinner;
@@ -67,10 +67,10 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
         void onSubmitFormCancelled();
     }
 
-    public static SubmitFormFragment newInstance(String subreddit) {
+    public static SubmitLinkFormFragment newInstance(String subreddit) {
         Bundle args = new Bundle(1);
         args.putString(ARG_SUBREDDIT, subreddit);
-        SubmitFormFragment frag = new SubmitFormFragment();
+        SubmitLinkFormFragment frag = new SubmitLinkFormFragment();
         frag.setArguments(args);
         return frag;
     }
@@ -79,7 +79,7 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         if (activity instanceof OnSubmitFormListener) {
-            submitFormListener = (OnSubmitFormListener) activity;
+            listener = (OnSubmitFormListener) activity;
         }
     }
 
@@ -94,7 +94,7 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.submit_form, container, false);
+        View v = inflater.inflate(R.layout.submit_link_form, container, false);
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
         accountSpinner.setAdapter(adapter);
 
@@ -139,16 +139,16 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
 
     public void onLoaderReset(Loader<AccountResult> loader) {
         adapter.setAccountNames(null);
-        if (submitFormListener != null) {
-            submitFormListener.onSubmitFormCancelled();
+        if (listener != null) {
+            listener.onSubmitFormCancelled();
         }
     }
 
     public void onClick(View v) {
         if (v == ok) {
             handleSubmit();
-        } else if (v == cancel && submitFormListener != null) {
-            submitFormListener.onSubmitFormCancelled();
+        } else if (v == cancel && listener != null) {
+            listener.onSubmitFormCancelled();
         }
     }
 
@@ -170,19 +170,19 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
     }
 
     private boolean handleSubmit() {
-        if (subredditText.getText().length() <= 0) {
+        if (TextUtils.isEmpty(subredditText.getText())) {
             subredditText.setError(getString(R.string.error_blank_field));
             return true;
         }
-        if (titleText.getText().length() <= 0) {
+        if (TextUtils.isEmpty(titleText.getText())) {
             titleText.setError(getString(R.string.error_blank_field));
             return true;
         }
-        if (textText.getText().length() <= 0) {
+        if (TextUtils.isEmpty(textText.getText())) {
             textText.setError(getString(R.string.error_blank_field));
             return true;
         }
-        if (submitFormListener != null) {
+        if (listener != null) {
             String textOrLink = textText.getText().toString().trim();
             boolean isLink = LINK_PATTERN.matcher(textOrLink).matches();
             if (BuildConfig.DEBUG) {
@@ -194,7 +194,7 @@ public class SubmitFormFragment extends Fragment implements LoaderCallbacks<Acco
                     titleText.getText().toString(),
                     textOrLink,
                     isLink);
-            submitFormListener.onSubmitForm(submitExtras);
+            listener.onSubmitForm(submitExtras);
         }
         return true;
     }
