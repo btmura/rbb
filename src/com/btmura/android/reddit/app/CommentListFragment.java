@@ -38,9 +38,11 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.content.ClipHelper;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.widget.CommentAdapter;
@@ -52,21 +54,28 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public static final String TAG = "CommentListFragment";
 
     private static final String ARG_ACCOUNT_NAME = "accountName";
+    private static final String ARG_TITLE = "title";
     private static final String ARG_THING_ID = "thingId";
+    private static final String ARG_PERMA_LINK = "permaLink";
 
     private static final String STATE_SESSION_ID = "sessionId";
 
     private String accountName;
-    private String sessionId;
+    private CharSequence title;
     private String thingId;
+    private String permaLink;
+    private String sessionId;
     private boolean sync;
     private CommentAdapter adapter;
 
-    public static CommentListFragment newInstance(String accountName, String thingId) {
+    public static CommentListFragment newInstance(String accountName, CharSequence title,
+            String thingId, String permaLink) {
         CommentListFragment frag = new CommentListFragment();
-        Bundle b = new Bundle(2);
+        Bundle b = new Bundle(4);
         b.putString(ARG_ACCOUNT_NAME, accountName);
+        b.putCharSequence(ARG_TITLE, title);
         b.putString(ARG_THING_ID, thingId);
+        b.putString(ARG_PERMA_LINK, permaLink);
         frag.setArguments(b);
         return frag;
     }
@@ -75,7 +84,9 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
+        title = getArguments().getCharSequence(ARG_TITLE);
         thingId = getArguments().getString(ARG_THING_ID);
+        permaLink = getArguments().getString(ARG_PERMA_LINK);
         sync = savedInstanceState == null;
 
         // Don't create a new session if changing configuration.
@@ -172,6 +183,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
         menu.findItem(R.id.menu_reply).setVisible(isReplyItemVisible());
         menu.findItem(R.id.menu_delete).setVisible(isDeleteItemVisible());
+        menu.findItem(R.id.menu_copy_url).setVisible(isCopyUrlItemVisible());
         return true;
     }
 
@@ -233,6 +245,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         return true;
     }
 
+    private boolean isCopyUrlItemVisible() {
+        return getListView().getCheckedItemCount() == 1;
+    }
+
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_reply:
@@ -240,6 +256,9 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
             case R.id.menu_delete:
                 return handleDelete(mode);
+
+            case R.id.menu_copy_url:
+                return handleCopyUrl(mode);
 
             default:
                 return false;
@@ -304,6 +323,20 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
                 j++;
             }
         }
+    }
+
+    private boolean handleCopyUrl(ActionMode mode) {
+        // Append additional id if the selected item is not the header.
+        String thingId = null;
+        int position = getFirstCheckedPosition();
+        if (position != 0) {
+            thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
+        }
+
+        // Copy to the clipboard and present a toast.
+        String text = Urls.permaUrl(permaLink, thingId).toExternalForm();
+        ClipHelper.setClipToast(getActivity(), title, text);
+        return true;
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {

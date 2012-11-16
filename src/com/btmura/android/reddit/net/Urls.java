@@ -120,8 +120,12 @@ public class Urls {
         return b.toString();
     }
 
-    public static URL permaUrl(String permaLink) {
-        return newUrl(resetBuilder().append(BASE_URL).append(permaLink));
+    public static URL permaUrl(String permaLink, String thingId) {
+        StringBuilder b = resetBuilder().append(BASE_URL).append(permaLink);
+        if (!TextUtils.isEmpty(thingId)) {
+            b.append(removeTag(thingId));
+        }
+        return newUrl(b);
     }
 
     public static URL searchUrl(String query, String more) {
@@ -248,6 +252,9 @@ public class Urls {
 
     private static String removeTag(String id) {
         int sepIndex = id.indexOf('_');
-        return id.substring(sepIndex + 1);
+        if (sepIndex != -1) {
+            return id.substring(sepIndex + 1);
+        }
+        return id;
     }
 }

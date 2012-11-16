@@ -17,9 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Fragment;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,9 +25,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ShareActionProvider;
-import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.ClipHelper;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
@@ -136,13 +133,7 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void handleCopyUrl() {
-        CharSequence text = getLink();
-        ClipData data = ClipData.newPlainText(Things.getTitle(thingBundle), text);
-
-        ClipboardManager clipboard =
-                (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-        clipboard.setPrimaryClip(data);
-        Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+        ClipHelper.setClipToast(getActivity(), Things.getTitle(thingBundle), getLink());
     }
 
     private void handleOpen() {
@@ -160,7 +151,7 @@ public class ThingMenuFragment extends Fragment {
         if (isShowingLink()) {
             return Things.getUrl(thingBundle);
         } else {
-            return Urls.permaUrl(Things.getPermaLink(thingBundle)).toExternalForm();
+            return Urls.permaUrl(Things.getPermaLink(thingBundle), null).toExternalForm();
         }
     }
 
