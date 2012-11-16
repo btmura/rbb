@@ -211,7 +211,7 @@ class CommentListing extends JsonParser implements CommentList {
         int size = values.size();
         for (int i = 0; i < size;) {
             ContentValues v = values.get(i);
-            Integer type = v.getAsInteger(Comments.COLUMN_KIND);
+            Integer type = (Integer) v.get(Comments.COLUMN_KIND);
             if (type.intValue() == Comments.KIND_MORE) {
                 values.remove(i);
                 size--;
@@ -222,6 +222,9 @@ class CommentListing extends JsonParser implements CommentList {
     }
 
     private void mergeActions() {
+        // Track the fake number of insertions and deletions.
+        int delta = 0;
+
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(CommentActions.TABLE_NAME, PROJECTION,
                 CommentActions.SELECT_BY_PARENT_THING_ID, Array.of(thingId),
@@ -234,11 +237,15 @@ class CommentListing extends JsonParser implements CommentList {
                 String text = c.getString(INDEX_TEXT);
                 switch (action) {
                     case CommentActions.ACTION_INSERT:
-                        insertThing(actionAccountName, id, text);
+                        if (insertThing(actionAccountName, id, text)) {
+                            delta++;
+                        }
                         break;
 
                     case CommentActions.ACTION_DELETE:
-                        deleteThing(id);
+                        if (deleteThing(id)) {
+                            delta--;
+                        }
                         break;
 
                     default:
@@ -248,9 +255,13 @@ class CommentListing extends JsonParser implements CommentList {
         } finally {
             c.close();
         }
+
+        // Update the header comment count with our fake inserts and deletes.
+        Integer numComments = (Integer) values.get(0).get(Comments.COLUMN_NUM_COMMENTS);
+        values.get(0).put(Comments.COLUMN_NUM_COMMENTS, numComments.intValue() + delta);
     }
 
-    private void insertThing(String actionAccountName, String replyId, String body) {
+    private boolean insertThing(String actionAccountName, String replyId, String body) {
         int size = values.size();
         for (int i = 0; i < size; i++) {
             ContentValues v = values.get(i);
@@ -275,13 +286,13 @@ class CommentListing extends JsonParser implements CommentList {
                 values.add(CommentLogic.getInsertPosition(this, i), p);
                 size++;
 
-                // No reason a reply would appear twice so break out.
-                break;
+                return true;
             }
         }
+        return false;
     }
 
-    private void deleteThing(String deleteId) {
+    private boolean deleteThing(String deleteId) {
         int size = values.size();
         for (int i = 0; i < size; i++) {
             ContentValues v = values.get(i);
@@ -290,14 +301,15 @@ class CommentListing extends JsonParser implements CommentList {
                 if (CommentLogic.hasChildren(this, i)) {
                     v.put(Comments.COLUMN_AUTHOR, Comments.DELETED);
                     v.put(Comments.COLUMN_BODY, Comments.DELETED);
+                    return false;
                 } else {
                     values.remove(i);
                     size--;
+                    return true;
                 }
-                // No reason why we would need to delete twice so break out.
-                break;
             }
         }
+        return false;
     }
 
     public int getCommentCount() {
@@ -305,14 +317,17 @@ class CommentListing extends JsonParser implements CommentList {
     }
 
     public long getCommentId(int position) {
-        return values.get(position).getAsLong(Comments._ID);
+        // Cast to avoid auto-boxing in the getAsLong method.
+        return ((Long) values.get(position).get(Comments._ID)).longValue();
     }
 
     public int getCommentNesting(int position) {
-        return values.get(position).getAsInteger(Comments.COLUMN_NESTING);
+        // Cast to avoid auto-boxing in the getAsInteger method.
+        return ((Integer) values.get(position).get(Comments.COLUMN_NESTING)).intValue();
     }
 
     public int getCommentSequence(int position) {
-        return values.get(position).getAsInteger(Comments.COLUMN_SEQUENCE);
+        // Cast to avoid auto-boxing in the getAsInteger method.
+        return ((Integer) values.get(position).get(Comments.COLUMN_SEQUENCE)).intValue();
     }
 }
