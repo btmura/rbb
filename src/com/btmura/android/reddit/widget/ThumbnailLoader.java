@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.widget;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -97,19 +98,34 @@ public class ThumbnailLoader {
         @Override
         protected Bitmap doInBackground(Void... params) {
             HttpURLConnection conn = null;
+            Bitmap original = null;
             try {
                 URL u = new URL(url);
                 conn = (HttpURLConnection) u.openConnection();
-                Bitmap original = BitmapFactory.decodeStream(conn.getInputStream());
-                Bitmap rounded = getThumbnailBitmap(original);
-                original.recycle();
-                return rounded;
+                if (isCancelled()) {
+                    return null;
+                }
+
+                InputStream is = conn.getInputStream();
+                if (isCancelled()) {
+                    return null;
+                }
+
+                original = BitmapFactory.decodeStream(is);
+                if (isCancelled()) {
+                    return null;
+                }
+
+                return getThumbnailBitmap(original);
 
             } catch (MalformedURLException e) {
-                Log.e(TAG, "doInBackground", e);
+                Log.e(TAG, e.getMessage(), e);
             } catch (IOException e) {
-                Log.e(TAG, "doInBackground", e);
+                Log.e(TAG, e.getMessage(), e);
             } finally {
+                if (original != null) {
+                    original.recycle();
+                }
                 if (conn != null) {
                     conn.disconnect();
                 }
