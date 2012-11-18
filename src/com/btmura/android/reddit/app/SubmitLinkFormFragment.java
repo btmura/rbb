@@ -40,6 +40,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
 public class SubmitLinkFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
@@ -100,6 +101,7 @@ public class SubmitLinkFormFragment extends Fragment implements LoaderCallbacks<
 
         subredditText = (EditText) v.findViewById(R.id.subreddit_text);
         subredditText.setText(getArguments().getString(ARG_SUBREDDIT));
+        subredditText.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
 
         titleText = (EditText) v.findViewById(R.id.title);
         if (!TextUtils.isEmpty(subredditText.getText())) {

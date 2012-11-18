@@ -21,7 +21,6 @@ import android.app.DialogFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
-import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,10 +44,6 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
         OnCheckedChangeListener, OnClickListener {
 
     public static final String TAG = "AddSubredditFragment";
-
-    private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
-            InputFilters.SUBREDDIT_NAME_FILTER,
-    };
 
     private SubredditNameHolder subredditNameHolder;
     private AccountNameAdapter adapter;
@@ -92,7 +87,7 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
         nameField = (EditText) v.findViewById(R.id.subreddit_name);
         nameField.setText(name);
         nameField.setSelection(length, length);
-        nameField.setFilters(INPUT_FILTERS);
+        nameField.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
 
         addFrontPage = (CheckBox) v.findViewById(R.id.add_front_page);
         addFrontPage.setOnCheckedChangeListener(this);
