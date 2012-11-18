@@ -149,9 +149,13 @@ public class SubredditProvider extends SessionProvider {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                Uri syncUri = SUBREDDITS_URI.buildUpon()
-                        .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
-                        .build();
+                // Only trigger a sync on real accounts.
+                Uri syncUri = SUBREDDITS_URI;
+                if (AccountUtils.isAccount(accountName)) {
+                    syncUri = syncUri.buildUpon()
+                            .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
+                            .build();
+                }
 
                 int count = subreddits.length;
                 ArrayList<ContentProviderOperation> ops =
