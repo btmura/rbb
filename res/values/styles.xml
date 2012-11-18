@@ -83,7 +83,12 @@
     <style name="SidebarDescriptionText" parent="@style/CommentBodyText" />
 
     <style name="AccountLoginText" parent="@style/SubredditTitleText" />
-    
-    <style name="ContentUriText" parent="@style/SubredditTitleText" />
+
+    <style name="ContentUriRowText" parent="@style/SubredditTitleText" />
+
+    <style name="ContentRowText">
+        <item name="android:typeface">monospace</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 
 </resources>
