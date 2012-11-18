@@ -74,6 +74,8 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private static final int EXPIRATION_PADDING = 5 * 60 * 1000; // 5 minutes
 
+    private static final int POLL_FREQUENCY_SECONDS = 24 * 60 * 60; // 1 day
+
     public SubredditSyncAdapter(Context context) {
         super(context, true);
     }
@@ -86,6 +88,9 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "accountName: " + account.name + " syncResult: " + syncResult.toString());
         }
+
+        // Always schedule the next sync to get new subreddits added.
+        ContentResolver.addPeriodicSync(account, authority, extras, POLL_FREQUENCY_SECONDS);
     }
 
     private void doSync(Account account, Bundle extras, String authority,
