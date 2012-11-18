@@ -16,6 +16,9 @@
 
 package com.btmura.android.reddit.widget;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,29 +28,38 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.util.Array;
 
 /**
  * {@link BaseAdapter} for showing a list of account names.
  */
 public class AccountNameAdapter extends BaseAdapter {
 
+    private final ArrayList<String> accountNames = new ArrayList<String>();
     private final LayoutInflater inflater;
-    private String[] accountNames = Array.EMPTY_STRING_ARRAY;
 
     public AccountNameAdapter(Context context) {
-        this.inflater = LayoutInflater.from(context.getApplicationContext());
+        inflater = LayoutInflater.from(context.getApplicationContext());
     }
 
-    public void setAccountNames(String[] accountNames) {
-        this.accountNames = accountNames != null ? accountNames : Array.EMPTY_STRING_ARRAY;
+    public void clear() {
+        accountNames.clear();
+        notifyDataSetChanged();
+    }
+
+    public void add(String accountName) {
+        accountNames.add(accountName);
+        notifyDataSetChanged();
+    }
+
+    public void addAll(String[] accountNames) {
+        Collections.addAll(this.accountNames, accountNames);
         notifyDataSetChanged();
     }
 
     public int findAccountName(String accountName) {
-        int count = accountNames.length;
+        int count = getCount();
         for (int i = 0; i < count; i++) {
-            if (accountName.equals(accountNames[i])) {
+            if (accountName.equals(getItem(i))) {
                 return i;
             }
         }
@@ -55,11 +67,11 @@ public class AccountNameAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return accountNames.length;
+        return accountNames.size();
     }
 
     public String getItem(int position) {
-        return accountNames[position];
+        return accountNames.get(position);
     }
 
     public long getItemId(int position) {

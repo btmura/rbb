@@ -89,6 +89,7 @@ public class SubmitLinkFormFragment extends Fragment implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         adapter = new AccountNameAdapter(getActivity());
+        adapter.add(getString(R.string.loading));
         restoringState = savedInstanceState != null;
     }
 
@@ -96,7 +97,9 @@ public class SubmitLinkFormFragment extends Fragment implements LoaderCallbacks<
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.submit_link_form, container, false);
+
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
+        accountSpinner.setEnabled(false);
         accountSpinner.setAdapter(adapter);
 
         subredditText = (EditText) v.findViewById(R.id.subreddit_text);
@@ -115,6 +118,7 @@ public class SubmitLinkFormFragment extends Fragment implements LoaderCallbacks<
             View buttonBar = vs.inflate();
             ok = buttonBar.findViewById(R.id.ok);
             ok.setOnClickListener(this);
+            ok.setEnabled(false);
             cancel = buttonBar.findViewById(R.id.cancel);
             cancel.setOnClickListener(this);
         }
@@ -133,14 +137,20 @@ public class SubmitLinkFormFragment extends Fragment implements LoaderCallbacks<
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        adapter.setAccountNames(result.accountNames);
+        if (ok != null) {
+            ok.setEnabled(true);
+        }
+        accountSpinner.setEnabled(true);
+        adapter.clear();
+        adapter.addAll(result.accountNames);
         if (!restoringState) {
             accountSpinner.setSelection(adapter.findAccountName(result.getLastAccount()));
         }
+        getActivity().invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-        adapter.setAccountNames(null);
+        adapter.clear();
         if (listener != null) {
             listener.onSubmitFormCancelled();
         }
@@ -158,6 +168,12 @@ public class SubmitLinkFormFragment extends Fragment implements LoaderCallbacks<
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.submit_form_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.menu_submit).setEnabled(accountSpinner.isEnabled());
     }
 
     @Override

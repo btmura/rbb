@@ -25,6 +25,7 @@ import android.accounts.OnAccountsUpdateListener;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;

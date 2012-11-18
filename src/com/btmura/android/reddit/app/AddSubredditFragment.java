@@ -70,6 +70,7 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adapter = new AccountNameAdapter(getActivity());
+        adapter.add(getString(R.string.loading));
         restoringState = savedInstanceState != null;
     }
 
@@ -80,6 +81,7 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
         View v = inflater.inflate(R.layout.add_subreddit, container, false);
 
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
+        accountSpinner.setEnabled(false);
         accountSpinner.setAdapter(adapter);
 
         CharSequence name = subredditNameHolder.getSubredditName();
@@ -97,6 +99,7 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
 
         ok = (Button) v.findViewById(R.id.ok);
         ok.setOnClickListener(this);
+        ok.setEnabled(false);
 
         return v;
     }
@@ -114,14 +117,17 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         int visiblility = result.accountNames.length > 1 ? View.VISIBLE : View.GONE;
         accountSpinner.setVisibility(visiblility);
-        adapter.setAccountNames(result.accountNames);
+        accountSpinner.setEnabled(true);
+        ok.setEnabled(true);
+        adapter.clear();
+        adapter.addAll(result.accountNames);
         if (!restoringState) {
             accountSpinner.setSelection(adapter.findAccountName(result.getLastAccount()));
         }
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-        adapter.setAccountNames(null);
+        adapter.clear();
         dismiss();
     }
 

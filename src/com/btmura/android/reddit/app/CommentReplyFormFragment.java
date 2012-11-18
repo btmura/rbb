@@ -112,6 +112,7 @@ public class CommentReplyFormFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         adapter = new AccountNameAdapter(getActivity());
+        adapter.add(getString(R.string.loading));
         restoringState = savedInstanceState != null;
     }
 
@@ -119,7 +120,9 @@ public class CommentReplyFormFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.comment_reply_form, container, false);
+
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
+        accountSpinner.setEnabled(false);
         accountSpinner.setAdapter(adapter);
 
         bodyText = (EditText) v.findViewById(R.id.body_text);
@@ -129,6 +132,7 @@ public class CommentReplyFormFragment extends Fragment implements
             View buttonBar = vs.inflate();
             ok = buttonBar.findViewById(R.id.ok);
             ok.setOnClickListener(this);
+            ok.setEnabled(false);
             cancel = buttonBar.findViewById(R.id.cancel);
             cancel.setOnClickListener(this);
         }
@@ -147,14 +151,20 @@ public class CommentReplyFormFragment extends Fragment implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        adapter.setAccountNames(result.accountNames);
+        if (ok != null) {
+            ok.setEnabled(true);
+        }
+        accountSpinner.setEnabled(true);
+        adapter.clear();
+        adapter.addAll(result.accountNames);
         if (!restoringState) {
             accountSpinner.setSelection(adapter.findAccountName(result.getLastAccount()));
         }
+        getActivity().invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-        adapter.setAccountNames(null);
+        adapter.clear();
         if (listener != null) {
             listener.onCommentReplyCancelled();
         }
@@ -172,6 +182,12 @@ public class CommentReplyFormFragment extends Fragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.comment_reply_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.menu_submit).setEnabled(accountSpinner.isEnabled());
     }
 
     @Override
