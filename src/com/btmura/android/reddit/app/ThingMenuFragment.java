@@ -43,7 +43,6 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private Bundle thingBundle;
-    private ShareActionProvider shareProvider;
 
     public static ThingMenuFragment newInstance(Bundle thingBundle) {
         Bundle args = new Bundle(1);
@@ -64,7 +63,7 @@ public class ThingMenuFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_menu, menu);
-        shareProvider = (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();
+
     }
 
     @Override
@@ -79,7 +78,7 @@ public class ThingMenuFragment extends Fragment {
         menu.findItem(R.id.menu_link).setVisible(showLink);
         menu.findItem(R.id.menu_comments).setVisible(showComments);
 
-        updateShareProvider();
+        updateShareProvider(menu);
     }
 
     @Override
@@ -110,12 +109,15 @@ public class ThingMenuFragment extends Fragment {
         }
     }
 
-    private void updateShareProvider() {
+    private void updateShareProvider(Menu menu) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_SUBJECT, Things.getTitle(thingBundle));
         intent.putExtra(Intent.EXTRA_TEXT, getLink());
-        shareProvider.setShareIntent(intent);
+
+        ShareActionProvider shareActionProvider =
+                (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();
+        shareActionProvider.setShareIntent(intent);
     }
 
     private void handleViewSidebar() {
