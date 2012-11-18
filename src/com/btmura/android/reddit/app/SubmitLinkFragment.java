@@ -162,7 +162,10 @@ public class SubmitLinkFragment extends Fragment {
         @Override
         protected void onPostExecute(Result result) {
             ProgressDialogFragment.dismissDialog(getFragmentManager());
-            if (result.errors != null) {
+            if (result == null) {
+                MessageDialogFragment.showMessage(getFragmentManager(),
+                        getString(R.string.error));
+            } else if (result.errors != null) {
                 MessageDialogFragment.showMessage(getFragmentManager(),
                         result.getErrorMessage(context));
             } else if (listener != null) {
