@@ -128,7 +128,6 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
 
     public void onLoaderReset(Loader<AccountResult> loader) {
         adapter.clear();
-        dismiss();
     }
 
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
