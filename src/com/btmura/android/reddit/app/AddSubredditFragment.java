@@ -41,10 +41,8 @@ import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
-public class AddSubredditFragment extends DialogFragment implements
-        LoaderCallbacks<AccountResult>,
-        OnCheckedChangeListener,
-        OnClickListener {
+public class AddSubredditFragment extends DialogFragment implements LoaderCallbacks<AccountResult>,
+        OnCheckedChangeListener, OnClickListener {
 
     public static final String TAG = "AddSubredditFragment";
 
@@ -81,8 +79,8 @@ public class AddSubredditFragment extends DialogFragment implements
     }
 
     @Override
-    public View
-            onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         getDialog().setTitle(R.string.add_subreddit);
         View v = inflater.inflate(R.layout.add_subreddit, container, false);
 
