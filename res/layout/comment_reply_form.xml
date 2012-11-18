@@ -38,7 +38,8 @@
         android:layout_marginTop="@dimen/element_padding"
         android:layout_weight="1"
         android:gravity="top"
-        android:hint="@string/hint_comment" />
+        android:hint="@string/hint_comment"
+        android:inputType="textCapSentences" />
 
     <ViewStub
         android:id="@+id/button_bar_stub"
