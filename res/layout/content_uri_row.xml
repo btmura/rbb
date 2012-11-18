@@ -15,6 +15,9 @@
      limitations under the License.
 -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/ContentUriText"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/padding" />
+    android:ellipsize="middle"
+    android:padding="@dimen/padding"
+    android:singleLine="true" />

@@ -83,5 +83,7 @@
     <style name="SidebarDescriptionText" parent="@style/CommentBodyText" />
 
     <style name="AccountLoginText" parent="@style/SubredditTitleText" />
+    
+    <style name="ContentUriText" parent="@style/SubredditTitleText" />
 
 </resources>
