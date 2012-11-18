@@ -22,13 +22,13 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.view.Menu;
 
-public class DeveloperOptionsFragment extends PreferenceFragment {
+public class DebugFragment extends PreferenceFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        addPreferencesFromResource(R.xml.developer_preferences);
+        addPreferencesFromResource(R.xml.debug_preferences);
     }
 
     @Override

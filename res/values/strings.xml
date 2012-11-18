@@ -76,9 +76,9 @@
     <string name="provider_votes">Votes</string>
     <string name="reddit_error">Reddit says: %1$s</string>
     <string name="reddit_error_line">%1$s - %2$s</string>
-    <string name="settings_application_details">Application details</string>
-    <string name="settings_browse_content">Browse content providers</string>
-    <string name="settings_developer_options">Developer options</string>
+    <string name="settings_app_info">App info</string>
+    <string name="settings_content_providers">Content providers</string>
+    <string name="settings_debug">Debug</string>
     <string name="settings_label">Settings</string>
     <string name="settings_sync_settings">Sync settings</string>
     <string name="show_password">Show password</string>
