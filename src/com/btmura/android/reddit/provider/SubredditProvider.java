@@ -166,11 +166,16 @@ public class SubredditProvider extends SessionProvider {
                             .withSelection(Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
                                     Array.of(accountName, subreddits[i]))
                             .build());
-                    ops.add(ContentProviderOperation.newInsert(syncUri)
-                            .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
-                            .withValue(Subreddits.COLUMN_NAME, subreddits[i])
-                            .withValue(Subreddits.COLUMN_STATE, state)
-                            .build());
+
+                    // Don't insert deletion rows for app storage account,
+                    // since they don't need to be synced back.
+                    if (AccountUtils.isAccount(accountName) || add) {
+                        ops.add(ContentProviderOperation.newInsert(syncUri)
+                                .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
+                                .withValue(Subreddits.COLUMN_NAME, subreddits[i])
+                                .withValue(Subreddits.COLUMN_STATE, state)
+                                .build());
+                    }
                 }
 
                 try {
