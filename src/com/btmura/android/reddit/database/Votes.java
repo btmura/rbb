@@ -27,6 +27,7 @@ public class Votes implements BaseColumns {
 
     public static final String COLUMN_THING_ID = "thingId";
     public static final String COLUMN_VOTE = "vote";
+    public static final String COLUMN_EXPIRATION = "expiration";
 
     public static final int VOTE_UP = 1;
     public static final int VOTE_DOWN = -1;
@@ -42,6 +43,7 @@ public class Votes implements BaseColumns {
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
-                + COLUMN_VOTE + " INTEGER NOT NULL)");
+                + COLUMN_VOTE + " INTEGER NOT NULL, "
+                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0)");
     }
 }

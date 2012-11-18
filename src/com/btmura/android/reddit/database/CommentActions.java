@@ -46,6 +46,9 @@ public class CommentActions implements BaseColumns {
     /** Text of the reply. */
     public static final String COLUMN_TEXT = "text";
 
+    /** Unused long column for expiration of this row. */
+    public static final String COLUMN_EXPIRATION = "expiration";
+
     public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + " = ?";
 
     public static final String SELECT_BY_PARENT_THING_ID = COLUMN_PARENT_THING_ID + " = ?";
@@ -65,6 +68,7 @@ public class CommentActions implements BaseColumns {
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_PARENT_THING_ID + " TEXT, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
-                + COLUMN_TEXT + " TEXT)");
+                + COLUMN_TEXT + " TEXT, "
+                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0)");
     }
 }
