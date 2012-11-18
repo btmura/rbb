@@ -26,7 +26,6 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.util.Array;
@@ -134,7 +133,6 @@ public class CommentAdapter extends BaseCursorAdapter {
         String title = cursor.getString(INDEX_TITLE);
         String thingId = cursor.getString(INDEX_THING_ID);
         int ups = cursor.getInt(INDEX_UPS);
-        boolean votable = CommentLogic.isVotable(accountName, author, expanded, thingId);
 
         // Comments don't have a score so calculate our own.
         int score = ups - downs;
@@ -154,6 +152,6 @@ public class CommentAdapter extends BaseCursorAdapter {
         CommentView cv = (CommentView) view;
         cv.setOnVoteListener(listener);
         cv.setData(accountName, author, body, createdUtc, expanded, kind, likes, nesting,
-                nowTimeMs, numComments, score, title, thingId, votable);
+                nowTimeMs, numComments, score, title, thingId);
     }
 }

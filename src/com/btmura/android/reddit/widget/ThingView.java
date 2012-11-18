@@ -20,6 +20,7 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.text.RelativeTime;
 
 public class ThingView extends CustomView implements OnGestureListener {
@@ -34,9 +35,9 @@ public class ThingView extends CustomView implements OnGestureListener {
     private String thumbnailUrl;
     private String thingId;
     private String title;
-    private boolean votable;
 
     private Bitmap bitmap;
+    private boolean drawVotingArrows;
 
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
@@ -79,7 +80,8 @@ public class ThingView extends CustomView implements OnGestureListener {
         invalidate();
     }
 
-    public void setData(String author,
+    public void setData(String accountName,
+            String author,
             long createdUtc,
             String domain,
             int downs,
@@ -94,18 +96,17 @@ public class ThingView extends CustomView implements OnGestureListener {
             String thingId,
             String thumbnailUrl,
             String title,
-            int ups,
-            boolean votable) {
+            int ups) {
         this.likes = likes;
         this.thingBodyWidth = thingBodyWidth;
         this.thingId = thingId;
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
-        this.votable = votable;
 
-        setScoreText(score, votable);
+        this.drawVotingArrows = AccountUtils.isAccount(accountName);
+        setScoreText(score, drawVotingArrows);
         setStatusText(author, createdUtc, nowTimeMs, numComments, over18, parentSubreddit, score,
-                subreddit, votable);
+                subreddit, drawVotingArrows);
         setDetailsText(domain, downs, ups);
 
         requestLayout();
@@ -200,8 +201,8 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         int width = 0;
-        if (votable) {
-            width += VotingArrows.getWidth(votable) + PADDING;
+        if (drawVotingArrows) {
+            width += VotingArrows.getWidth(drawVotingArrows) + PADDING;
             VotingArrows.measureScoreText(scoreText, scoreBounds);
         }
         if (!TextUtils.isEmpty(thumbnailUrl)) {
@@ -227,7 +228,8 @@ public class ThingView extends CustomView implements OnGestureListener {
                     Alignment.ALIGN_OPPOSITE);
         }
 
-        int leftHeight = Math.max(VotingArrows.getHeight(votable, true), Thumbnail.getHeight());
+        int leftHeight = Math.max(VotingArrows.getHeight(drawVotingArrows, true),
+                Thumbnail.getHeight());
         rightHeight = titleLayout.getHeight() + ELEMENT_PADDING + statusLayout.getHeight();
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
@@ -269,9 +271,9 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         c.translate(PADDING, PADDING);
-        if (votable) {
-            VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes, true);
-            c.translate(VotingArrows.getWidth(votable) + PADDING, 0);
+        if (drawVotingArrows) {
+            VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes, true, true);
+            c.translate(VotingArrows.getWidth(drawVotingArrows) + PADDING, 0);
         }
 
         if (!TextUtils.isEmpty(thumbnailUrl)) {
@@ -293,17 +295,16 @@ public class ThingView extends CustomView implements OnGestureListener {
     public boolean onTouchEvent(MotionEvent event) {
         if (detector.onTouchEvent(event)) {
             return true;
-        } else {
-            return super.onTouchEvent(event);
         }
+        return super.onTouchEvent(event);
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, 0, votable, true);
+        return VotingArrows.onDown(e, 0, drawVotingArrows, true, true);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, 0, votable, true, listener, thingId);
+        return VotingArrows.onSingleTapUp(e, 0, drawVotingArrows, true, true, listener, thingId);
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

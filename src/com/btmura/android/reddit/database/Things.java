@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.database;
 
-import com.btmura.android.reddit.accounts.AccountUtils;
-
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -145,9 +143,5 @@ public class Things implements BaseColumns {
 
     static String getString(Bundle bundle, String columnName) {
         return bundle != null ? bundle.getString(columnName) : null;
-    }
-
-    public static boolean isVotable(String accountName) {
-        return AccountUtils.isAccount(accountName);
     }
 }

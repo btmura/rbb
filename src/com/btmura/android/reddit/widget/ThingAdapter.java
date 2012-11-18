@@ -196,7 +196,6 @@ public class ThingAdapter extends BaseCursorAdapter {
             String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
             String title = cursor.getString(INDEX_TITLE);
             int ups = cursor.getInt(INDEX_UPS);
-            boolean votable = Things.isVotable(accountName);
 
             // Reconcile local and remote votes.
             int likes = cursor.getInt(INDEX_LIKES);
@@ -210,9 +209,9 @@ public class ThingAdapter extends BaseCursorAdapter {
             }
 
             ThingView tv = (ThingView) view;
-            tv.setData(author, createdUtc, domain, downs, likes, nowTimeMs, numComments, over18,
-                    parentSubreddit, score, subreddit, thingBodyWidth, thingId, thumbnailUrl,
-                    title, ups, votable);
+            tv.setData(accountName, author, createdUtc, domain, downs, likes, nowTimeMs,
+                    numComments, over18, parentSubreddit, score, subreddit, thingBodyWidth,
+                    thingId, thumbnailUrl, title, ups);
             tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
             tv.setOnVoteListener(listener);
             thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);

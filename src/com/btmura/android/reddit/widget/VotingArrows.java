@@ -23,6 +23,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.text.TextPaint;
@@ -46,6 +47,7 @@ class VotingArrows {
     private static int ELEMENT_PADDING;
 
     private static Paint[] PAINTS;
+    private static Paint[] STROKE_PAINTS;
     private static TextPaint[] TEXT_PAINTS;
 
     private static final int NUM_PAINTS = 3;
@@ -79,6 +81,13 @@ class VotingArrows {
             for (int i = 0; i < NUM_PAINTS; i++) {
                 PAINTS[i] = new Paint(Paint.ANTI_ALIAS_FLAG);
                 PAINTS[i].setColor(r.getColor(colorIds[i]));
+            }
+
+            STROKE_PAINTS = new Paint[NUM_PAINTS];
+            for (int i = 0; i < NUM_PAINTS; i++) {
+                STROKE_PAINTS[i] = new Paint(Paint.ANTI_ALIAS_FLAG);
+                STROKE_PAINTS[i].setColor(PAINTS[i].getColor());
+                STROKE_PAINTS[i].setStyle(Style.STROKE);
             }
 
             int[] styles = new int[] {
@@ -132,7 +141,7 @@ class VotingArrows {
     }
 
     static void draw(Canvas c, Bitmap thumb, String scoreText, Rect scoreBounds, int likes,
-            boolean drawScore) {
+            boolean drawScore, boolean isVotable) {
         int upPaintIndex = NEUTRAL;
         int scorePaintIndex = NEUTRAL;
         int downPaintIndex = NEUTRAL;
@@ -148,7 +157,8 @@ class VotingArrows {
 
         c.save();
 
-        c.drawPath(PATH_UPVOTE, PAINTS[upPaintIndex]);
+        Paint[] arrowPaints = isVotable ? PAINTS : STROKE_PAINTS;
+        c.drawPath(PATH_UPVOTE, arrowPaints[upPaintIndex]);
         c.translate(0, ARROW_TOTAL_HEIGHT);
 
         if (drawScore) {
@@ -162,7 +172,7 @@ class VotingArrows {
             c.translate(0, SCORELESS_TOTAL_HEIGHT);
         }
 
-        c.drawPath(PATH_DOWNVOTE, PAINTS[downPaintIndex]);
+        c.drawPath(PATH_DOWNVOTE, arrowPaints[downPaintIndex]);
         c.restore();
     }
 
@@ -189,14 +199,15 @@ class VotingArrows {
         return 0;
     }
 
-    static boolean onDown(MotionEvent e, float left, boolean votable, boolean drawScore) {
-        return getEvent(e, left, votable, drawScore) != EVENT_NONE;
+    static boolean onDown(MotionEvent e, float left, boolean drawArrows, boolean drawScore,
+            boolean isVotable) {
+        return getEvent(e, left, drawArrows, drawScore, isVotable) != EVENT_NONE;
     }
 
-    static boolean onSingleTapUp(MotionEvent e, float left, boolean votable, boolean drawScore,
-            OnVoteListener listener, String thingId) {
+    static boolean onSingleTapUp(MotionEvent e, float left, boolean drawArrows, boolean drawScore,
+            boolean isVotable, OnVoteListener listener, String thingId) {
         if (listener != null) {
-            int event = getEvent(e, left, votable, drawScore);
+            int event = getEvent(e, left, drawArrows, drawScore, isVotable);
             switch (event) {
                 case EVENT_UPVOTE:
                     listener.onVote(thingId, Votes.VOTE_UP);
@@ -210,18 +221,21 @@ class VotingArrows {
         return false;
     }
 
-    private static int getEvent(MotionEvent e, float left, boolean votable, boolean drawScore) {
-        float right = left + PADDING + getWidth(votable) + PADDING;
-        if (votable && e.getX() > left && e.getX() < right) {
-            float upBottom = PADDING + ARROW_TOTAL_HEIGHT + PADDING;
-            if (e.getY() < upBottom) {
-                return EVENT_UPVOTE;
-            }
+    private static int getEvent(MotionEvent e, float left, boolean drawArrows, boolean drawScore,
+            boolean isVotable) {
+        if (isVotable) {
+            float right = left + PADDING + getWidth(drawArrows) + PADDING;
+            if (drawArrows && e.getX() > left && e.getX() < right) {
+                float upBottom = PADDING + ARROW_TOTAL_HEIGHT + PADDING;
+                if (e.getY() < upBottom) {
+                    return EVENT_UPVOTE;
+                }
 
-            float downTop = PADDING + getHeight(true, drawScore) - ARROW_TOTAL_HEIGHT - PADDING;
-            float downBottom = PADDING + getHeight(true, drawScore) + PADDING * 2;
-            if (e.getY() > downTop && e.getY() < downBottom) {
-                return EVENT_DOWNVOTE;
+                float downTop = PADDING + getHeight(true, drawScore) - ARROW_TOTAL_HEIGHT - PADDING;
+                float downBottom = PADDING + getHeight(true, drawScore) + PADDING * 2;
+                if (e.getY() > downTop && e.getY() < downBottom) {
+                    return EVENT_DOWNVOTE;
+                }
             }
         }
         return EVENT_NONE;

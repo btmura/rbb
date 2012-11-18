@@ -59,11 +59,14 @@ public class CommentView extends CustomView implements OnGestureListener {
     private int nesting;
     private String title;
     private String thingId;
-    private boolean votable;
+
+    private boolean drawVotingArrows;
+    private boolean drawScore;
+    private boolean isVotable;
 
     private CharSequence bodyText;
     private String scoreText;
-    private boolean drawScore;
+
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
     private StyleSpan italicSpan;
 
@@ -111,16 +114,18 @@ public class CommentView extends CustomView implements OnGestureListener {
             int numComments,
             int score,
             String title,
-            String thingId,
-            boolean votable) {
+            String thingId) {
         this.expanded = expanded;
         this.kind = kind;
         this.likes = likes;
         this.nesting = nesting;
         this.title = title;
         this.thingId = thingId;
-        this.votable = votable;
-        this.drawScore = this.votable && kind == Comments.KIND_HEADER;
+
+        this.drawVotingArrows = AccountUtils.isAccount(accountName) && expanded;
+        this.drawScore = drawVotingArrows && kind == Comments.KIND_HEADER;
+        this.isVotable = drawVotingArrows && !Comments.DELETED.equals(author)
+                && !TextUtils.isEmpty(thingId);
 
         if (drawScore) {
             if (scoreBounds == null) {
@@ -184,8 +189,8 @@ public class CommentView extends CustomView implements OnGestureListener {
 
         // 2 = left + right margin
         int rightContentWidth = measuredWidth - PADDING * (2 + nesting);
-        if (votable) {
-            rightContentWidth -= VotingArrows.getWidth(votable) + PADDING;
+        if (drawVotingArrows) {
+            rightContentWidth -= VotingArrows.getWidth(drawVotingArrows) + PADDING;
             if (drawScore) {
                 VotingArrows.measureScoreText(scoreText, scoreBounds);
             }
@@ -212,14 +217,14 @@ public class CommentView extends CustomView implements OnGestureListener {
             rightHeight += statusLayout.getHeight();
         }
 
-        int leftHeight = VotingArrows.getHeight(votable, drawScore);
+        int leftHeight = VotingArrows.getHeight(drawVotingArrows, drawScore);
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         bodyBounds.setEmpty();
 
         int rx = PADDING * (1 + nesting);
-        if (votable) {
-            rx += VotingArrows.getWidth(votable) + PADDING;
+        if (drawVotingArrows) {
+            rx += VotingArrows.getWidth(drawVotingArrows) + PADDING;
         }
         if (bodyLayout != null) {
             bodyBounds.left = rx;
@@ -279,12 +284,12 @@ public class CommentView extends CustomView implements OnGestureListener {
     @Override
     protected void onDraw(Canvas c) {
         c.translate(PADDING * (1 + nesting), PADDING);
-        if (votable) {
-            VotingArrows.draw(c, null, scoreText, scoreBounds, likes, drawScore);
+        if (drawVotingArrows) {
+            VotingArrows.draw(c, null, scoreText, scoreBounds, likes, drawScore, isVotable);
         }
         c.translate(0, -PADDING);
 
-        int dx = votable ? VotingArrows.getWidth(votable) + PADDING : 0;
+        int dx = drawVotingArrows ? VotingArrows.getWidth(drawVotingArrows) + PADDING : 0;
         int dy = (minHeight - rightHeight) / 2;
         c.translate(dx, dy);
 
@@ -356,12 +361,12 @@ public class CommentView extends CustomView implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, getCommentLeft(), votable, drawScore);
+        return VotingArrows.onDown(e, getCommentLeft(), drawVotingArrows, drawScore, isVotable);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, getCommentLeft(), votable, drawScore, listener,
-                thingId);
+        return VotingArrows.onSingleTapUp(e, getCommentLeft(), drawVotingArrows, drawScore,
+                isVotable, listener, thingId);
     }
 
     private float getCommentLeft() {
