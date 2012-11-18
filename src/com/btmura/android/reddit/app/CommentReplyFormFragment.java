@@ -51,14 +51,8 @@ public class CommentReplyFormFragment extends Fragment implements
 
     public static final String TAG = "CommentReplyFormFragment";
 
-    /** String extra with thing id you are replying to. */
-    public static final String ARG_THING_ID = "thingId";
-
-    /** String extra specifying author of the thing you are replying to. */
-    public static final String ARG_AUTHOR = "author";
-
-    /** Bundle that will be passed back via listener callbacks. */
-    public static final String ARG_EXTRAS = "extras";
+    /** String extra with the parent thing ID. */
+    public static final String ARG_REPLY_ARGS = "replyArgs";
 
     /**
      * Listener fired when the user presses the OK button and submits a
@@ -66,12 +60,11 @@ public class CommentReplyFormFragment extends Fragment implements
      */
     interface OnCommentReplyFormListener {
         /**
-         * @param accountName of the account selected
-         * @param thingId of the thing you are replying to
-         * @param text of your reply
-         * @param extras passed to the fragment
+         * @param replyArgs passed to the fragment
+         * @param accountName of the account selected to make the comment
+         * @param comment text to reply with
          */
-        void onCommentReply(String accountName, String thingId, String text, Bundle extras);
+        void onCommentReply(Bundle replyArgs, String accountName, String comment);
 
         void onCommentReplyCancelled();
     }
@@ -85,15 +78,13 @@ public class CommentReplyFormFragment extends Fragment implements
     private View cancel;
 
     /**
-     * @param thingId of the thing the user is replying to
+     * @param parentThingId is the ID of the thing containing the comments
+     * @param replyThingId of the thing the user is replying to
      * @param author of the thing the user is replying to
      */
-    public static CommentReplyFormFragment newInstance(String thingId, String author,
-            Bundle extras) {
-        Bundle args = new Bundle(3);
-        args.putString(ARG_THING_ID, thingId);
-        args.putString(ARG_AUTHOR, author);
-        args.putBundle(ARG_EXTRAS, extras);
+    public static CommentReplyFormFragment newInstance(Bundle replyArgs) {
+        Bundle args = new Bundle(1);
+        args.putBundle(ARG_REPLY_ARGS, replyArgs);
         CommentReplyFormFragment frag = new CommentReplyFormFragment();
         frag.setArguments(args);
         return frag;
@@ -207,11 +198,10 @@ public class CommentReplyFormFragment extends Fragment implements
             return true;
         }
         if (listener != null) {
+            Bundle replyArgs = getArguments().getBundle(ARG_REPLY_ARGS);
             String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
-            String thingId = getArguments().getString(ARG_THING_ID);
             String body = bodyText.getText().toString();
-            Bundle extras = getArguments().getBundle(ARG_EXTRAS);
-            listener.onCommentReply(accountName, thingId, body, extras);
+            listener.onCommentReply(replyArgs, accountName, body);
         }
         return true;
     }

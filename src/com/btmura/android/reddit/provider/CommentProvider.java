@@ -184,16 +184,16 @@ public class CommentProvider extends SessionProvider {
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
     public static void insertInBackground(Context context,
+            final long parentId,
+            final int parentNumComments,
+            final String parentThingId,
+            final String replyThingId,
             final String accountName,
-            final long headerId,
-            final int headerNumComments,
             final String body,
             final int nesting,
-            final String parentThingId,
             final int sequence,
             final String sessionId,
-            final long sessionCreationTime,
-            final String thingId) {
+            final long sessionTimestamp) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
@@ -202,8 +202,8 @@ public class CommentProvider extends SessionProvider {
 
                 // Increment the header's number of comments.
                 ops.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
-                        .withSelection(ID_SELECTION, Array.of(headerId))
-                        .withValue(Comments.COLUMN_NUM_COMMENTS, headerNumComments + 1)
+                        .withSelection(ID_SELECTION, Array.of(parentId))
+                        .withValue(Comments.COLUMN_NUM_COMMENTS, parentNumComments + 1)
                         .build());
 
                 // Insert the placeholder comment.
@@ -211,7 +211,7 @@ public class CommentProvider extends SessionProvider {
                         .appendQueryParameter(PARAM_REPLY, Boolean.toString(true))
                         .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
                         .appendQueryParameter(PARAM_PARENT_THING_ID, parentThingId)
-                        .appendQueryParameter(PARAM_THING_ID, thingId)
+                        .appendQueryParameter(PARAM_THING_ID, replyThingId)
                         .build();
                 ops.add(ContentProviderOperation.newInsert(uri)
                         .withValue(Comments.COLUMN_ACCOUNT, accountName)
@@ -221,7 +221,7 @@ public class CommentProvider extends SessionProvider {
                         .withValue(Comments.COLUMN_NESTING, nesting)
                         .withValue(Comments.COLUMN_SEQUENCE, sequence)
                         .withValue(Comments.COLUMN_SESSION_ID, sessionId)
-                        .withValue(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime)
+                        .withValue(Comments.COLUMN_SESSION_TIMESTAMP, sessionTimestamp)
                         .build());
 
                 try {

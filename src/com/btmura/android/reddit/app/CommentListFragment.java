@@ -268,26 +268,20 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private boolean handleReply(ActionMode mode) {
         int position = getFirstCheckedPosition();
         if (position != -1) {
-            String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
-            String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
-            long sessionCreationTime = adapter.getLong(position,
+            long parentId = adapter.getLong(0, CommentAdapter.INDEX_ID);
+            int parentNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
+            String replyAuthor = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
+            String replyThingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
+            int nesting = CommentLogic.getInsertNesting(this, position);
+            int sequence = CommentLogic.getInsertSequence(this, position);
+            long sessionTimestamp = adapter.getLong(position,
                     CommentAdapter.INDEX_SESSION_CREATION_TIME);
 
-            long headerId = adapter.getLong(0, CommentAdapter.INDEX_ID);
-            int headerNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
-
-            Bundle extras = new Bundle(6);
-            extras.putLong(Comments._ID, headerId);
-            extras.putInt(Comments.COLUMN_NUM_COMMENTS, headerNumComments);
-            extras.putInt(Comments.COLUMN_NESTING, CommentLogic.getInsertNesting(this, position));
-            extras.putInt(Comments.COLUMN_SEQUENCE, CommentLogic.getInsertSequence(this, position));
-            extras.putString(Comments.COLUMN_SESSION_ID, sessionId);
-            extras.putLong(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime);
+            Bundle args = CommentReplyActivity.newArgs(parentId, parentNumComments, thingId,
+                    replyAuthor, replyThingId, nesting, sequence, sessionId, sessionTimestamp);
 
             Intent intent = new Intent(getActivity(), CommentReplyActivity.class);
-            intent.putExtra(CommentReplyActivity.EXTRA_THING_ID, thingId);
-            intent.putExtra(CommentReplyActivity.EXTRA_AUTHOR, author);
-            intent.putExtra(CommentReplyActivity.EXTRA_PASS_THROUGH, extras);
+            intent.putExtra(CommentReplyActivity.EXTRA_ARGS, args);
             startActivity(intent);
         }
 
