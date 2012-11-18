@@ -73,11 +73,13 @@ public class CommentReplyActivity extends Activity implements OnCommentReplyForm
     }
 
     public void onCommentReply(String accountName, String thingId, String text, Bundle extras) {
+        long headerId = extras.getLong(Comments._ID);
+        int numComments = extras.getInt(Comments.COLUMN_NUM_COMMENTS);
         int nesting = extras.getInt(Comments.COLUMN_NESTING);
         int sequence = extras.getInt(Comments.COLUMN_SEQUENCE);
         String sessionId = extras.getString(Comments.COLUMN_SESSION_ID);
         long sessionCreationTime = extras.getLong(Comments.COLUMN_SESSION_TIMESTAMP);
-        CommentProvider.insertInBackground(this, accountName, text, nesting,
+        CommentProvider.insertInBackground(this, accountName, headerId, numComments, text, nesting,
                 thingId, sequence, sessionId, sessionCreationTime, thingId);
         finish();
     }

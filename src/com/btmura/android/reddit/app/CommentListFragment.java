@@ -273,7 +273,12 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             long sessionCreationTime = adapter.getLong(position,
                     CommentAdapter.INDEX_SESSION_CREATION_TIME);
 
-            Bundle extras = new Bundle(4);
+            long headerId = adapter.getLong(0, CommentAdapter.INDEX_ID);
+            int headerNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
+
+            Bundle extras = new Bundle(6);
+            extras.putLong(Comments._ID, headerId);
+            extras.putInt(Comments.COLUMN_NUM_COMMENTS, headerNumComments);
             extras.putInt(Comments.COLUMN_NESTING, CommentLogic.getInsertNesting(this, position));
             extras.putInt(Comments.COLUMN_SEQUENCE, CommentLogic.getInsertSequence(this, position));
             extras.putString(Comments.COLUMN_SESSION_ID, sessionId);
@@ -302,12 +307,15 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     private boolean handleDelete(ActionMode mode) {
+        long headerId = adapter.getLong(0, CommentAdapter.INDEX_ID);
+        int headerNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
+
         long[] ids = getListView().getCheckedItemIds();
         String[] thingIds = new String[ids.length];
         boolean[] hasChildren = new boolean[ids.length];
         fillCheckedInfo(thingIds, hasChildren);
-        CommentProvider.deleteInBackground(getActivity(), accountName, thingId, ids, thingIds,
-                hasChildren);
+        CommentProvider.deleteInBackground(getActivity(), accountName, headerId, headerNumComments,
+                thingId, ids, thingIds, hasChildren);
         mode.finish();
         return true;
     }

@@ -39,9 +39,9 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.CommentLogic;
+import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Votes;
-import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.util.Array;
 
 public class CommentProvider extends SessionProvider {
@@ -183,43 +183,76 @@ public class CommentProvider extends SessionProvider {
     }
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
-    public static void insertInBackground(Context context, final String accountName,
-            final String body, final int nesting, final String parentThingId, final int sequence,
-            final String sessionId, final long sessionCreationTime, final String thingId) {
+    public static void insertInBackground(Context context,
+            final String accountName,
+            final long headerId,
+            final int headerNumComments,
+            final String body,
+            final int nesting,
+            final String parentThingId,
+            final int sequence,
+            final String sessionId,
+            final long sessionCreationTime,
+            final String thingId) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(2);
+
+                // Increment the header's number of comments.
+                ops.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
+                        .withSelection(ID_SELECTION, Array.of(headerId))
+                        .withValue(Comments.COLUMN_NUM_COMMENTS, headerNumComments + 1)
+                        .build());
+
+                // Insert the placeholder comment.
                 Uri uri = COMMENTS_URI.buildUpon()
                         .appendQueryParameter(PARAM_REPLY, Boolean.toString(true))
                         .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
                         .appendQueryParameter(PARAM_PARENT_THING_ID, parentThingId)
                         .appendQueryParameter(PARAM_THING_ID, thingId)
                         .build();
+                ops.add(ContentProviderOperation.newInsert(uri)
+                        .withValue(Comments.COLUMN_ACCOUNT, accountName)
+                        .withValue(Comments.COLUMN_AUTHOR, accountName)
+                        .withValue(Comments.COLUMN_BODY, body)
+                        .withValue(Comments.COLUMN_KIND, Comments.KIND_COMMENT)
+                        .withValue(Comments.COLUMN_NESTING, nesting)
+                        .withValue(Comments.COLUMN_SEQUENCE, sequence)
+                        .withValue(Comments.COLUMN_SESSION_ID, sessionId)
+                        .withValue(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime)
+                        .build());
 
-                ContentValues v = new ContentValues(8);
-                v.put(Comments.COLUMN_ACCOUNT, accountName);
-                v.put(Comments.COLUMN_AUTHOR, accountName);
-                v.put(Comments.COLUMN_BODY, body);
-                v.put(Comments.COLUMN_KIND, Comments.KIND_COMMENT);
-                v.put(Comments.COLUMN_NESTING, nesting);
-                v.put(Comments.COLUMN_SEQUENCE, sequence);
-                v.put(Comments.COLUMN_SESSION_ID, sessionId);
-                v.put(Comments.COLUMN_SESSION_TIMESTAMP, sessionCreationTime);
-
-                ContentResolver cr = appContext.getContentResolver();
-                cr.insert(uri, v);
+                try {
+                    appContext.getContentResolver().applyBatch(AUTHORITY, ops);
+                } catch (RemoteException e) {
+                    Log.e(TAG, e.getMessage(), e);
+                } catch (OperationApplicationException e) {
+                    Log.e(TAG, e.getMessage(), e);
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage(), e);
+                }
             }
         });
     }
 
-    public static void deleteInBackground(Context context, final String accountName,
-            final String parentThingId, final long[] ids, final String[] thingIds,
+    public static void deleteInBackground(Context context,
+            final String accountName,
+            final long headerId,
+            final int headerNumComments,
+            final String parentThingId,
+            final long[] ids,
+            final String[] thingIds,
             final boolean[] hasChildren) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
                 int count = ids.length;
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(count + 1);
+
+                int numDeletes = 0;
                 for (int i = 0; i < count; i++) {
                     Uri uri = COMMENTS_URI.buildUpon()
                             .appendQueryParameter(PARAM_DELETE, Boolean.toString(true))
@@ -238,12 +271,18 @@ public class CommentProvider extends SessionProvider {
                         ops.add(ContentProviderOperation.newDelete(uri)
                                 .withSelection(ID_SELECTION, Array.of(ids[i]))
                                 .build());
+                        numDeletes++;
                     }
                 }
 
-                ContentResolver cr = appContext.getContentResolver();
+                // Update the header comment by how comments were truly deleted.
+                ops.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
+                        .withSelection(ID_SELECTION, Array.of(headerId))
+                        .withValue(Comments.COLUMN_NUM_COMMENTS, headerNumComments - numDeletes)
+                        .build());
+
                 try {
-                    cr.applyBatch(AUTHORITY, ops);
+                    appContext.getContentResolver().applyBatch(AUTHORITY, ops);
                 } catch (RemoteException e) {
                     Log.e(TAG, e.getMessage(), e);
                 } catch (OperationApplicationException e) {
