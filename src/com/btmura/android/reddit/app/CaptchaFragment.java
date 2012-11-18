@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -55,6 +56,9 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     private OnCaptchaGuessListener listener;
     private Bundle submitExtras;
     private String captchaId;
+
+    private View progress;
+    private ViewStub errorStub;
     private ImageView captcha;
     private EditText guess;
     private Button cancel;
@@ -88,6 +92,9 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
             Bundle savedInstanceState) {
         getDialog().setTitle(R.string.captcha_title);
         View v = inflater.inflate(R.layout.captcha, container, false);
+
+        progress = v.findViewById(R.id.progress);
+        errorStub = (ViewStub) v.findViewById(R.id.error_stub);
         captcha = (ImageView) v.findViewById(R.id.captcha);
 
         guess = (EditText) v.findViewById(R.id.guess);
@@ -113,12 +120,21 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     }
 
     public void onLoadFinished(Loader<CaptchaResult> loader, CaptchaResult result) {
+        progress.setVisibility(View.GONE);
+        if (result == null) {
+            if (errorStub != null) {
+                errorStub.inflate();
+                errorStub = null;
+            }
+            return;
+        }
         captchaId = result.iden;
         captcha.setImageBitmap(result.captchaBitmap);
         ok.setEnabled(true);
     }
 
     public void onLoaderReset(Loader<CaptchaResult> loader) {
+        progress.setVisibility(View.GONE);
         captchaId = null;
         captcha.setImageBitmap(null);
     }
