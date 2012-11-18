@@ -49,7 +49,7 @@
         android:layout_marginTop="@dimen/element_padding"
         android:hint="@string/hint_title"
         android:imeOptions="flagNoFullscreen"
-        android:inputType="textCapSentences"
+        android:inputType="textCapSentences|textAutoCorrect"
         android:singleLine="true" />
 
     <EditText
@@ -63,7 +63,7 @@
         android:layout_weight="1"
         android:gravity="top"
         android:hint="@string/hint_text_or_link"
-        android:inputType="textCapSentences" />
+        android:inputType="textCapSentences|textAutoCorrect" />
 
     <ViewStub
         android:id="@+id/button_bar_stub"

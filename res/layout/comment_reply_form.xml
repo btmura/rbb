@@ -39,7 +39,7 @@
         android:layout_weight="1"
         android:gravity="top"
         android:hint="@string/hint_comment"
-        android:inputType="textCapSentences" />
+        android:inputType="textCapSentences|textAutoCorrect" />
 
     <ViewStub
         android:id="@+id/button_bar_stub"
