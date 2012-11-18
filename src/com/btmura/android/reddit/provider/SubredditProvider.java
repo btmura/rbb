@@ -133,13 +133,13 @@ public class SubredditProvider extends SessionProvider {
         }
     }
 
-    public static void
-            insertInBackground(Context context, String accountName, String... subreddits) {
+    public static void insertInBackground(Context context, String accountName,
+            String... subreddits) {
         modifyInBackground(context, accountName, subreddits, true);
     }
 
-    public static void
-            deleteInBackground(Context context, String accountName, String... subreddits) {
+    public static void deleteInBackground(Context context, String accountName,
+            String... subreddits) {
         modifyInBackground(context, accountName, subreddits, false);
     }
 
@@ -154,8 +154,8 @@ public class SubredditProvider extends SessionProvider {
                         .build();
 
                 int count = subreddits.length;
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(
-                        count * 2);
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(count * 2);
                 int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
                 for (int i = 0; i < count; i++) {
                     ops.add(ContentProviderOperation.newDelete(syncUri)
