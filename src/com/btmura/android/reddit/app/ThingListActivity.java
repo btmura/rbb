@@ -96,7 +96,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         prefs = result.prefs;
         accountName = result.getLastAccount();
-        adapter.addFilters(this);
+        adapter.addSubredditFilters(this);
         bar.setSelectedNavigationItem(result.getLastFilter());
     }
 

@@ -62,16 +62,16 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         this.inflater = LayoutInflater.from(context);
         if (showFilters) {
             filters = new ArrayList<Item>(4);
-            addFilter(R.string.filter_hot, FilterAdapter.FILTER_HOT);
-            addFilter(R.string.filter_top, FilterAdapter.FILTER_TOP);
-            addFilter(R.string.filter_controversial, FilterAdapter.FILTER_CONTROVERSIAL);
-            addFilter(R.string.filter_new, FilterAdapter.FILTER_NEW);
+            add(R.string.filter_subreddit_hot, FilterAdapter.SUBREDDIT_HOT);
+            add(R.string.filter_subreddit_top, FilterAdapter.SUBREDDIT_TOP);
+            add(R.string.filter_subreddit_controversial, FilterAdapter.SUBREDDIT_CONTROVERSIAL);
+            add(R.string.filter_subreddit_new, FilterAdapter.SUBREDDIT_NEW);
         } else {
             filters = null;
         }
     }
 
-    private void addFilter(int textId, int value) {
+    private void add(int textId, int value) {
         filters.add(new Item(Item.TYPE_FILTER, context.getString(textId), value));
     }
 

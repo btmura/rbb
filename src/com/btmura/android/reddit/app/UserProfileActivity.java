@@ -91,7 +91,7 @@ public class UserProfileActivity extends AbstractBrowserActivity {
 
     @Override
     protected int getFilter() {
-        return FilterAdapter.FILTER_HOT;
+        return FilterAdapter.SUBREDDIT_HOT;
     }
 
     @Override

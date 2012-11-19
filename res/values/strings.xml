@@ -35,10 +35,13 @@
     <string name="error">Something went wrong…</string>
     <string name="error_blank_field">This field cannot be blank.</string>
     <string name="filter_category">Filters</string>
-    <string name="filter_hot">what\'s hot</string>
-    <string name="filter_new">new</string>
-    <string name="filter_controversial">controversial</string>
-    <string name="filter_top">top</string>
+    <string name="filter_profile_overview">Overview</string>
+    <string name="filter_profile_comments">Comments</string>
+    <string name="filter_profile_submitted">Submitted</string>
+    <string name="filter_subreddit_hot">what\'s hot</string>
+    <string name="filter_subreddit_new">new</string>
+    <string name="filter_subreddit_controversial">controversial</string>
+    <string name="filter_subreddit_top">top</string>
     <string name="front_page">front page</string>
     <string name="hint_captcha">Captcha</string>
     <string name="hint_comment">Comment</string>

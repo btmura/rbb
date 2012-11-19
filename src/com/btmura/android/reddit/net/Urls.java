@@ -167,18 +167,18 @@ public class Urls {
         }
 
         switch (filter) {
-            case FilterAdapter.FILTER_HOT:
+            case FilterAdapter.SUBREDDIT_HOT:
                 break;
 
-            case FilterAdapter.FILTER_NEW:
+            case FilterAdapter.SUBREDDIT_NEW:
                 b.append("/new");
                 break;
 
-            case FilterAdapter.FILTER_CONTROVERSIAL:
+            case FilterAdapter.SUBREDDIT_CONTROVERSIAL:
                 b.append("/controversial");
                 break;
 
-            case FilterAdapter.FILTER_TOP:
+            case FilterAdapter.SUBREDDIT_TOP:
                 b.append("/top");
                 break;
 
@@ -188,7 +188,7 @@ public class Urls {
 
         b.append("/.json");
 
-        boolean hasSort = filter == FilterAdapter.FILTER_NEW;
+        boolean hasSort = filter == FilterAdapter.SUBREDDIT_NEW;
         if (hasSort) {
             b.append("?sort=new");
         }

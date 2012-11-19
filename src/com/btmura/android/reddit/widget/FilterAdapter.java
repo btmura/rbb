@@ -29,10 +29,14 @@ import android.widget.TextView;
 
 public class FilterAdapter extends BaseAdapter {
 
-    public static final int FILTER_HOT = 0;
-    public static final int FILTER_TOP = 1;
-    public static final int FILTER_CONTROVERSIAL = 2;
-    public static final int FILTER_NEW = 3;
+    public static final int PROFILE_OVERVIEW = 0;
+    public static final int PROFILE_COMMENTS = 1;
+    public static final int PROFILE_SUBMITTED = 2;
+
+    public static final int SUBREDDIT_HOT = 0;
+    public static final int SUBREDDIT_TOP = 1;
+    public static final int SUBREDDIT_CONTROVERSIAL = 2;
+    public static final int SUBREDDIT_NEW = 3;
 
     private final LayoutInflater inflater;
     private final ArrayList<String> names = new ArrayList<String>(4);
@@ -42,12 +46,23 @@ public class FilterAdapter extends BaseAdapter {
         inflater = LayoutInflater.from(context);
     }
 
-    public void addFilters(Context context) {
-        names.add(context.getString(R.string.filter_hot));
-        names.add(context.getString(R.string.filter_top));
-        names.add(context.getString(R.string.filter_controversial));
-        names.add(context.getString(R.string.filter_new));
+    public void addProfileFilters(Context context) {
+        add(context, R.string.filter_profile_overview);
+        add(context, R.string.filter_profile_comments);
+        add(context, R.string.filter_profile_submitted);
         notifyDataSetChanged();
+    }
+
+    public void addSubredditFilters(Context context) {
+        add(context, R.string.filter_subreddit_hot);
+        add(context, R.string.filter_subreddit_top);
+        add(context, R.string.filter_subreddit_controversial);
+        add(context, R.string.filter_subreddit_new);
+        notifyDataSetChanged();
+    }
+
+    private void add(Context context, int resId) {
+        names.add(context.getString(resId));
     }
 
     public int getFilter(int position) {
