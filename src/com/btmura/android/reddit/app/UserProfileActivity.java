@@ -16,10 +16,12 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
@@ -36,20 +38,44 @@ public class UserProfileActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_profile);
+        setupActionBar();
         setupFragments(savedInstanceState);
+    }
+
+    private void setupActionBar() {
+        ActionBar bar = getActionBar();
+        bar.setTitle(getUserName());
+        bar.setDisplayHomeAsUpEnabled(true);
     }
 
     private void setupFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            String user = getIntent().getStringExtra(EXTRA_USER);
-            if (user == null) {
-                user = "rbbtest1";
-            }
             Fragment frag = ThingListFragment.newInstance(Subreddits.ACCOUNT_NONE, null, 0, null,
-                    user, 0);
+                    getUserName(), 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
             ft.commit();
+        }
+    }
+
+    private String getUserName() {
+        String user = getIntent().getStringExtra(EXTRA_USER);
+        // TODO: Remove this fallback once things become more stable.
+        if (user == null) {
+            user = "rbbtest1";
+        }
+        return user;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
