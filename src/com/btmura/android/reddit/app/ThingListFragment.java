@@ -56,10 +56,21 @@ public class ThingListFragment extends ListFragment implements
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
+    /** Required string argument specifying the account being used. */
     private static final String ARG_ACCOUNT_NAME = "accountName";
+
+    /** Optional string argument specifying the subreddit to load. */
     private static final String ARG_SUBREDDIT = "subreddit";
+
+    /** Optional integer argument used with the subreddit argument. */
     private static final String ARG_FILTER = "filter";
+
+    /** Optional string argument specifying the search query to use. */
     private static final String ARG_QUERY = "query";
+
+    /** Optional string argument specifying the user profile to load. */
+    private static final String ARG_USER = "user";
+
     private static final String ARG_FLAGS = "flags";
 
     private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
@@ -88,12 +99,13 @@ public class ThingListFragment extends ListFragment implements
     private boolean scrollLoading;
 
     public static ThingListFragment newInstance(String accountName, String subreddit,
-            int filter, String query, int flags) {
+            int filter, String query, String user, int flags) {
         Bundle args = new Bundle(5);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putInt(ARG_FILTER, filter);
         args.putString(ARG_QUERY, query);
+        args.putString(ARG_USER, user);
         args.putInt(ARG_FLAGS, flags);
 
         ThingListFragment f = new ThingListFragment();

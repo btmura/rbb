@@ -17,12 +17,19 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
 
+/**
+ * {@link Activity} for viewing a user's profile.
+ */
 public class UserProfileActivity extends Activity {
+
+    /** Required string extra that is the user's name. */
+    public static final String EXTRA_USER = "user";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +40,13 @@ public class UserProfileActivity extends Activity {
 
     private void setupFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            ThingListFragment tlf = ThingListFragment.newInstance(null, null, 0, null, 0);
+            String user = getIntent().getStringExtra(EXTRA_USER);
+            if (user == null) {
+                user = "rbbtest1";
+            }
+            Fragment frag = ThingListFragment.newInstance(null, null, 0, null, user, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+            ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
             ft.commit();
         }
     }
