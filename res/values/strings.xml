@@ -67,6 +67,7 @@
     <string name="menu_share">Share</string>
     <string name="menu_submit">Submit</string>
     <string name="menu_submit_link">Submit a link</string>
+    <string name="menu_view_profile">View profile</string>
     <string name="menu_view_sidebar">View sidebar</string>
     <string name="nsfw">"NSFW"</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>

@@ -249,6 +249,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         return getListView().getCheckedItemCount() == 1;
     }
 
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        mode.invalidate();
+    }
+
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_reply:
@@ -339,10 +343,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         String text = Urls.permaUrl(permaLink, thingId).toExternalForm();
         ClipHelper.setClipToast(getActivity(), title, text);
         return true;
-    }
-
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        mode.invalidate();
     }
 
     public void onDestroyActionMode(ActionMode mode) {

@@ -25,6 +25,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
@@ -47,7 +49,8 @@ import com.btmura.android.reddit.widget.ThingAdapter;
 public class ThingListFragment extends ListFragment implements
         LoaderCallbacks<Cursor>,
         OnScrollListener,
-        OnVoteListener {
+        OnVoteListener,
+        MultiChoiceModeListener {
 
     public static final String TAG = "ThingListFragment";
 
@@ -131,12 +134,14 @@ public class ThingListFragment extends ListFragment implements
     }
 
     @Override
-    public View
-            onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         ListView l = (ListView) v.findViewById(android.R.id.list);
         l.setVerticalScrollBarEnabled(false);
         l.setOnScrollListener(this);
+        l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        l.setMultiChoiceModeListener(this);
         return v;
     }
 
@@ -221,6 +226,30 @@ public class ThingListFragment extends ListFragment implements
         if (!TextUtils.isEmpty(accountName)) {
             VoteProvider.voteInBackground(getActivity(), accountName, thingId, likes);
         }
+    }
+
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.thing_action_menu, menu);
+        return true;
+    }
+
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        int count = getListView().getCheckedItemCount();
+        mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
+
+        return true;
+    }
+
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        mode.invalidate();
+    }
+
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        return false;
+    }
+
+    public void onDestroyActionMode(ActionMode mode) {
     }
 
     @Override
