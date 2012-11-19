@@ -20,19 +20,24 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 
 /**
  * {@link Activity} for viewing a user's profile.
  */
-public class UserProfileActivity extends Activity {
+public class UserProfileActivity extends Activity implements LoaderCallbacks<AccountResult> {
 
     /** Required string extra that is the user's name. */
     public static final String EXTRA_USER = "user";
+
+    private String accountName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +45,7 @@ public class UserProfileActivity extends Activity {
         setContentView(R.layout.user_profile);
         setupActionBar();
         setupFragments(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     private void setupActionBar() {
@@ -50,7 +56,7 @@ public class UserProfileActivity extends Activity {
 
     private void setupFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            Fragment frag = ThingListFragment.newInstance(Subreddits.ACCOUNT_NONE, null, 0, null,
+            Fragment frag = ThingListFragment.newInstance(accountName, null, 0, null,
                     getUserName(), 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
@@ -67,6 +73,22 @@ public class UserProfileActivity extends Activity {
         return user;
     }
 
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(this, true);
+    }
+
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        accountName = result.getLastAccount();
+        ThingListFragment tlf = getThingListFragment();
+        if (tlf != null && tlf.getAccountName() == null) {
+            tlf.setAccountName(accountName);
+            tlf.loadIfPossible();
+        }
+    }
+
+    public void onLoaderReset(Loader<AccountResult> loader) {
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -77,5 +99,9 @@ public class UserProfileActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private ThingListFragment getThingListFragment() {
+        return (ThingListFragment) getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
     }
 }
