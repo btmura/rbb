@@ -46,6 +46,7 @@ public class Urls {
     private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
+    private static final String BASE_USER_URL = BASE_URL + "/user/";
 
     private static final StringBuilder S = new StringBuilder(BASE_URL.length() * 3);
 
@@ -207,6 +208,10 @@ public class Urls {
 
     public static URL subscribeUrl() {
         return newUrl(API_SUBSCRIBE_URL);
+    }
+
+    public static URL userUrl(String user) {
+        return newUrl(resetBuilder().append(BASE_USER_URL).append(user).append("/.json"));
     }
 
     public static URL voteUrl() {

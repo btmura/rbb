@@ -115,7 +115,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         ThingListFragment f = getThingListFragment();
         if (f == null || !f.getAccountName().equals(accountName)
                 || f.getFilter() != filter) {
-            f = ThingListFragment.newInstance(accountName, subreddit, filter, null, 0);
+            f = ThingListFragment.newInstance(accountName, subreddit, filter, null, null, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
             ft.commit();

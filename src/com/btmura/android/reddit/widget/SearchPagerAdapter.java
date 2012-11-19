@@ -43,7 +43,7 @@ public class SearchPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return ThingListFragment.newInstance(accountName, null, 0, query, 0);
+                return ThingListFragment.newInstance(accountName, null, 0, query, null, 0);
 
             case 1:
                 return SubredditListFragment.newInstance(accountName, null, query, 0);

@@ -22,6 +22,7 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.database.Subreddits;
 
 /**
  * {@link Activity} for viewing a user's profile.
@@ -44,7 +45,8 @@ public class UserProfileActivity extends Activity {
             if (user == null) {
                 user = "rbbtest1";
             }
-            Fragment frag = ThingListFragment.newInstance(null, null, 0, null, user, 0);
+            Fragment frag = ThingListFragment.newInstance(Subreddits.ACCOUNT_NONE, null, 0, null,
+                    user, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
             ft.commit();

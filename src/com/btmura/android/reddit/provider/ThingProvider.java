@@ -49,6 +49,7 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_FILTER = "filter";
     public static final String PARAM_MORE = "more";
     public static final String PARAM_QUERY = "query";
+    public static final String PARAM_USER = "user";
 
     private static final String TABLE_NAME_WITH_VOTES = Things.TABLE_NAME
             + " LEFT OUTER JOIN (SELECT "
@@ -85,11 +86,12 @@ public class ThingProvider extends SessionProvider {
             int filter = Integer.parseInt(uri.getQueryParameter(PARAM_FILTER));
             String more = uri.getQueryParameter(PARAM_MORE);
             String query = uri.getQueryParameter(PARAM_QUERY);
+            String user = uri.getQueryParameter(PARAM_USER);
 
             Context context = getContext();
             String cookie = AccountUtils.getCookie(context, accountName);
             ThingListing listing = ThingListing.get(context, accountName, sessionId,
-                    sessionTimestamp, subredditName, filter, more, query, cookie);
+                    sessionTimestamp, subredditName, filter, more, query, user, cookie);
 
             long cleaned;
             long t1 = System.currentTimeMillis();

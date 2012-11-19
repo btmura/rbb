@@ -151,12 +151,17 @@ public class ThingView extends CustomView implements OnGestureListener {
         Resources r = getResources();
 
         longDetailsText.clear();
-        longDetailsText.append(r.getQuantityString(R.plurals.votes_up, ups, ups)).append("  ");
+        longDetailsText.append(r.getQuantityString(R.plurals.votes_up, ups, ups))
+                .append("  ");
         longDetailsText.append(r.getQuantityString(R.plurals.votes_down, downs, downs))
                 .append("  ");
-        longDetailsText.append(domain);
 
-        shortDetailsText = domain;
+        if (!TextUtils.isEmpty(domain)) {
+            longDetailsText.append(domain);
+            shortDetailsText = domain;
+        } else {
+            shortDetailsText = "";
+        }
     }
 
     @Override
@@ -230,7 +235,13 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         int leftHeight = Math.max(VotingArrows.getHeight(drawVotingArrows, true),
                 Thumbnail.getHeight());
-        rightHeight = titleLayout.getHeight() + ELEMENT_PADDING + statusLayout.getHeight();
+
+        rightHeight = 0;
+        if (titleLayout != null) {
+            rightHeight += titleLayout.getHeight() + ELEMENT_PADDING;
+        }
+        rightHeight += statusLayout.getHeight();
+
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -250,8 +261,11 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     private Layout makeTitleLayout(int width) {
-        return new StaticLayout(title, TEXT_PAINTS[THING_TITLE], width, Alignment.ALIGN_NORMAL, 1f,
-                0f, true);
+        if (title != null) {
+            return new StaticLayout(title, TEXT_PAINTS[THING_TITLE], width, Alignment.ALIGN_NORMAL,
+                    1f, 0f, true);
+        }
+        return null;
     }
 
     private static Layout makeLayout(int paint, CharSequence text, int width, Alignment alignment) {
@@ -283,12 +297,12 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         int tdy = (minHeight - rightHeight) / 2;
         c.translate(0, -PADDING + tdy);
-        titleLayout.draw(c);
+        if (titleLayout != null) {
+            titleLayout.draw(c);
+            c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
+        }
 
-        int sdy = titleLayout.getHeight() + ELEMENT_PADDING;
-        c.translate(0, sdy);
         statusLayout.draw(c);
-        c.translate(0, -sdy - tdy);
     }
 
     @Override

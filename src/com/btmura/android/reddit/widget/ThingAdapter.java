@@ -92,18 +92,18 @@ public class ThingAdapter extends BaseCursorAdapter {
     private boolean singleChoice;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
-            String subreddit, int filter, String more, String query, boolean sync) {
-        Uri uri = getUri(accountName, sessionId, subreddit, filter, more, query, sync);
+            String subreddit, int filter, String more, String query, String user, boolean sync) {
+        Uri uri = getUri(accountName, sessionId, subreddit, filter, more, query, user, sync);
         return new CursorLoader(context, uri, PROJECTION, Things.SELECT_BY_SESSION_ID,
                 Array.of(sessionId), null);
     }
 
     public static void updateLoader(Context context, String accountName, String sessionId,
-            String subreddit, int filter, String more, String query, boolean sync,
+            String subreddit, int filter, String more, String query, String user, boolean sync,
             Loader<Cursor> loader) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, subreddit, filter, more, query, sync));
+            cl.setUri(getUri(accountName, sessionId, subreddit, filter, more, query, user, sync));
         }
     }
 
@@ -122,7 +122,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     }
 
     private static Uri getUri(String accountName, String sessionId, String subreddit,
-            int filter, String more, String query, boolean fetch) {
+            int filter, String more, String query, String user, boolean fetch) {
         Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
@@ -131,6 +131,9 @@ public class ThingAdapter extends BaseCursorAdapter {
                 .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
         if (!TextUtils.isEmpty(query)) {
             b.appendQueryParameter(ThingProvider.PARAM_QUERY, query);
+        }
+        if (!TextUtils.isEmpty(user)) {
+            b.appendQueryParameter(ThingProvider.PARAM_USER, user);
         }
         if (!TextUtils.isEmpty(more)) {
             b.appendQueryParameter(ThingProvider.PARAM_MORE, more);

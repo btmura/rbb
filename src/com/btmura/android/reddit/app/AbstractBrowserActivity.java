@@ -223,7 +223,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         SubredditListFragment slf = SubredditListFragment.newInstance(accountName, subreddit,
                 query, slfFlags);
         ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, filter,
-                null, tlfFlags);
+                null, null, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -254,7 +254,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment cf = ControlFragment.newInstance(accountName, null, null, -1, filter);
         SubredditListFragment slf = getSubredditListFragment();
         ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, filter,
-                query, tlfFlags);
+                query, null, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -321,7 +321,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, -1, filter);
         ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, filter,
-                null, tlfFlags);
+                null, null, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();

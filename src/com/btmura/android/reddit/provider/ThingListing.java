@@ -54,10 +54,12 @@ class ThingListing extends JsonParser {
 
     public static ThingListing get(Context context, String accountName, String sessionId,
             long sessionTimestamp, String subredditName, int filter, String more, String query,
-            String cookie) throws IOException {
+            String user, String cookie) throws IOException {
         long t1 = System.currentTimeMillis();
         URL url;
-        if (!TextUtils.isEmpty(query)) {
+        if (!TextUtils.isEmpty(user)) {
+            url = Urls.userUrl(user);
+        } else if (!TextUtils.isEmpty(query)) {
             url = Urls.searchUrl(query, more);
         } else {
             url = Urls.subredditUrl(subredditName, filter, more);
