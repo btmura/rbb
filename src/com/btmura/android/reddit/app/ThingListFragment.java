@@ -184,7 +184,7 @@ public class ThingListFragment extends ListFragment implements
         }
         String more = args != null ? args.getString(LOADER_ARG_MORE) : null;
         return ThingAdapter.getLoader(getActivity(), accountName, sessionId, subreddit, filter,
-                more, query, user, sync);
+                query, user, more, sync);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
@@ -193,8 +193,8 @@ public class ThingListFragment extends ListFragment implements
         }
         sync = false;
         scrollLoading = false;
-        ThingAdapter.updateLoader(getActivity(), accountName, sessionId, subreddit, filter, null,
-                query, user, sync, loader);
+        ThingAdapter.updateLoader(getActivity(), accountName, sessionId, subreddit, filter, query,
+                user, null, sync, loader);
 
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));

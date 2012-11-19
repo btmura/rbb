@@ -84,14 +84,14 @@ public class ThingProvider extends SessionProvider {
             String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
             String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
             int filter = Integer.parseInt(uri.getQueryParameter(PARAM_FILTER));
-            String more = uri.getQueryParameter(PARAM_MORE);
             String query = uri.getQueryParameter(PARAM_QUERY);
             String user = uri.getQueryParameter(PARAM_USER);
+            String more = uri.getQueryParameter(PARAM_MORE);
 
             Context context = getContext();
             String cookie = AccountUtils.getCookie(context, accountName);
             ThingListing listing = ThingListing.get(context, accountName, sessionId,
-                    sessionTimestamp, subredditName, filter, more, query, user, cookie);
+                    sessionTimestamp, subredditName, filter, query, user, more, cookie);
 
             long cleaned;
             long t1 = System.currentTimeMillis();

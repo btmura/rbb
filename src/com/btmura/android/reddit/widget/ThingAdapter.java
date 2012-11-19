@@ -94,14 +94,14 @@ public class ThingAdapter extends BaseCursorAdapter {
     private boolean singleChoice;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
-            String subreddit, int filter, String more, String query, String user, boolean sync) {
+            String subreddit, int filter, String query, String user, String more, boolean sync) {
         Uri uri = getUri(accountName, sessionId, subreddit, filter, more, query, user, sync);
         return new CursorLoader(context, uri, PROJECTION, Things.SELECT_BY_SESSION_ID,
                 Array.of(sessionId), null);
     }
 
     public static void updateLoader(Context context, String accountName, String sessionId,
-            String subreddit, int filter, String more, String query, String user, boolean sync,
+            String subreddit, int filter, String query, String user, String more, boolean sync,
             Loader<Cursor> loader) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
