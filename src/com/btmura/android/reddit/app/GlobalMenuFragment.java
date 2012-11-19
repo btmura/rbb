@@ -107,50 +107,60 @@ public class GlobalMenuFragment extends Fragment implements
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.menu_submit_link).setVisible(hasAccounts);
+        menu.findItem(R.id.menu_view_profile).setVisible(hasAccounts);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_search:
-                handleSearch();
-                return true;
-
-            case R.id.menu_settings:
-                handleSettings();
-                return true;
+            case R.id.menu_add_subreddit:
+                return handleAddSubreddit();
 
             case R.id.menu_submit_link:
-                handleSubmitLink();
-                return true;
+                return handleSubmitLink();
 
-            case R.id.menu_add_subreddit:
-                handleAddSubreddit();
-                return true;
+            case R.id.menu_search:
+                return handleSearch();
+
+            case R.id.menu_view_profile:
+                return handleViewProfile();
+
+            case R.id.menu_settings:
+                return handleSettings();
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void handleSearch() {
-        searchItem.expandActionView();
+    private boolean handleAddSubreddit() {
+        AddSubredditFragment.newInstance().show(getFragmentManager(), AddSubredditFragment.TAG);
+        return true;
     }
 
-    private void handleSettings() {
-        startActivity(new Intent(getActivity(), SettingsActivity.class));
-    }
-
-    private void handleSubmitLink() {
+    private boolean handleSubmitLink() {
         Intent intent = new Intent(getActivity(), SubmitLinkActivity.class);
         if (subredditNameHolder != null) {
             intent.putExtra(SubmitLinkActivity.EXTRA_SUBREDDIT, subredditNameHolder.getSubredditName());
         }
         startActivity(intent);
+        return true;
     }
 
-    private void handleAddSubreddit() {
-        AddSubredditFragment.newInstance().show(getFragmentManager(), AddSubredditFragment.TAG);
+    public boolean handleSearch() {
+        searchItem.expandActionView();
+        return true;
+    }
+
+    private boolean handleViewProfile() {
+        Intent intent = new Intent(getActivity(), UserProfileActivity.class);
+        startActivity(intent);
+        return true;
+    }
+
+    private boolean handleSettings() {
+        startActivity(new Intent(getActivity(), SettingsActivity.class));
+        return true;
     }
 
     public void onFocusChange(View v, boolean hasFocus) {
