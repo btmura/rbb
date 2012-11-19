@@ -17,7 +17,26 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
+import android.os.Bundle;
+
+import com.btmura.android.reddit.R;
 
 public class UserProfileActivity extends Activity {
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.user_profile);
+        setupFragments(savedInstanceState);
+    }
+
+    private void setupFragments(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            ThingListFragment tlf = ThingListFragment.newInstance(null, null, 0, null, 0);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+            ft.commit();
+        }
+    }
 }

@@ -104,7 +104,9 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        listener = (OnThingSelectedListener) activity;
+        if (activity instanceof OnThingSelectedListener) {
+            listener = (OnThingSelectedListener) activity;
+        }
     }
 
     @Override
@@ -303,7 +305,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private int getThingBodyWidth() {
-        return listener.onMeasureThingBody();
+        return listener != null ? listener.onMeasureThingBody() : 0;
     }
 
     public void setAccountName(String accountName) {
