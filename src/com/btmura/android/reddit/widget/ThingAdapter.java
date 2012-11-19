@@ -168,21 +168,25 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return getInt(position, INDEX_KIND);
+        int kind = getInt(position, INDEX_KIND);
+        switch (kind) {
+            case Things.KIND_MORE:
+                return 0;
+
+            default:
+                return 1;
+        }
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         int kind = cursor.getInt(INDEX_KIND);
         switch (kind) {
-            case Things.KIND_THING:
-                return new ThingView(context);
-
             case Things.KIND_MORE:
                 return inflater.inflate(R.layout.thing_more_row, parent, false);
 
             default:
-                throw new IllegalArgumentException();
+                return new ThingView(context);
         }
     }
 

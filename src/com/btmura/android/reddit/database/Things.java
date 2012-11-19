@@ -49,8 +49,12 @@ public class Things implements BaseColumns {
     public static final String COLUMN_URL = "url";
     public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
-    public static final int KIND_THING = 0;
-    public static final int KIND_MORE = 1;
+    public static final int KIND_MORE = 0;
+    public static final int KIND_COMMENT = 1;
+    public static final int KIND_ACCOUNT = 2;
+    public static final int KIND_LINK = 3;
+    public static final int KIND_MESSAGE = 4;
+    public static final int KIND_SUBREDDIT = 5;
 
     public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
 
