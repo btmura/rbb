@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
 
@@ -33,6 +34,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private final GestureDetector detector;
     private OnVoteListener listener;
 
+    private int kind;
     private int likes;
     private int thingBodyWidth;
     private String thumbnailUrl;
@@ -91,6 +93,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             long createdUtc,
             String domain,
             int downs,
+            int kind,
             int likes,
             long nowTimeMs,
             int numComments,
@@ -103,6 +106,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             String thumbnailUrl,
             String title,
             int ups) {
+        this.kind = kind;
         this.likes = likes;
         this.thingBodyWidth = thingBodyWidth;
         this.thingId = thingId;
@@ -319,8 +323,14 @@ public class ThingView extends CustomView implements OnGestureListener {
             c.translate(Thumbnail.getWidth() + PADDING, 0);
         }
 
-        int tdy = (minHeight - rightHeight) / 2;
-        c.translate(0, -PADDING + tdy);
+        c.translate(0, -PADDING + (minHeight - rightHeight) / 2);
+
+        // Render the status at the top for comments.
+        if (kind == Things.KIND_COMMENT && statusLayout != null) {
+            statusLayout.draw(c);
+            c.translate(0, statusLayout.getHeight() + ELEMENT_PADDING);
+        }
+
         if (titleLayout != null) {
             titleLayout.draw(c);
             c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
@@ -331,7 +341,8 @@ public class ThingView extends CustomView implements OnGestureListener {
             c.translate(0, bodyLayout.getHeight() + ELEMENT_PADDING);
         }
 
-        if (statusLayout != null) {
+        // Render the status at the bottom for non-comments.
+        if (kind != Things.KIND_COMMENT && statusLayout != null) {
             statusLayout.draw(c);
         }
     }

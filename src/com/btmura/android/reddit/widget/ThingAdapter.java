@@ -198,6 +198,7 @@ public class ThingAdapter extends BaseCursorAdapter {
             long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
             String domain = cursor.getString(INDEX_DOMAIN);
             int downs = cursor.getInt(INDEX_DOWNS);
+            int kind = cursor.getInt(INDEX_KIND);
             int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
             boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
             int score = cursor.getInt(INDEX_SCORE);
@@ -219,9 +220,9 @@ public class ThingAdapter extends BaseCursorAdapter {
             }
 
             ThingView tv = (ThingView) view;
-            tv.setData(accountName, author, body, createdUtc, domain, downs, likes, nowTimeMs,
-                    numComments, over18, parentSubreddit, score, subreddit, thingBodyWidth,
-                    thingId, thumbnailUrl, title, ups);
+            tv.setData(accountName, author, body, createdUtc, domain, downs, kind, likes,
+                    nowTimeMs, numComments, over18, parentSubreddit, score, subreddit,
+                    thingBodyWidth, thingId, thumbnailUrl, title, ups);
             tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
             tv.setOnVoteListener(listener);
             thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
