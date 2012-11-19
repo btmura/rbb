@@ -6,19 +6,24 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.Layout.Alignment;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Things;
@@ -57,6 +62,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private Layout detailsLayout;
 
     private Rect scoreBounds;
+    private RectF bodyBounds;
     private int rightHeight;
     private int minHeight;
 
@@ -129,6 +135,9 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         if (!TextUtils.isEmpty(body)) {
             bodyText = FORMATTER.formatSpans(getContext(), body);
+            if (bodyBounds == null) {
+                bodyBounds = new RectF();
+            }
         } else {
             bodyText = null;
         }
@@ -279,6 +288,30 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
+        // Move from left to right one more time.
+        int x = PADDING;
+        if (drawVotingArrows) {
+            x += VotingArrows.getWidth(drawVotingArrows);
+        }
+        if (bodyLayout != null) {
+            bodyBounds.left = x;
+            x += bodyLayout.getWidth();
+            bodyBounds.right = x;
+        }
+
+        // Move from top to bottom one more time.
+        int y = (minHeight - rightHeight) / 2;
+
+        if (isTopStatus() && statusLayout != null) {
+            y += statusLayout.getHeight() + ELEMENT_PADDING;
+        }
+
+        if (bodyLayout != null) {
+            bodyBounds.top = y;
+            y += bodyLayout.getHeight();
+            bodyBounds.bottom = y;
+        }
+
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         switch (heightMode) {
@@ -293,6 +326,10 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         setMeasuredDimension(measuredWidth, measuredHeight);
+    }
+
+    private boolean isTopStatus() {
+        return kind == Things.KIND_COMMENT;
     }
 
     private Layout createTitleLayout(int width) {
@@ -335,7 +372,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         c.translate(0, -PADDING + (minHeight - rightHeight) / 2);
 
         // Render the status at the top for comments.
-        if (kind == Things.KIND_COMMENT && statusLayout != null) {
+        if (isTopStatus() && statusLayout != null) {
             statusLayout.draw(c);
             c.translate(0, statusLayout.getHeight() + ELEMENT_PADDING);
         }
@@ -351,17 +388,51 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         // Render the status at the bottom for non-comments.
-        if (kind != Things.KIND_COMMENT && statusLayout != null) {
+        if (!isTopStatus() && statusLayout != null) {
             statusLayout.draw(c);
         }
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (detector.onTouchEvent(event)) {
-            return true;
+    public boolean onTouchEvent(MotionEvent e) {
+        return detector.onTouchEvent(e) || onBodyTouchEvent(e) || super.onTouchEvent(e);
+    }
+
+    private boolean onBodyTouchEvent(MotionEvent e) {
+        int action = e.getAction();
+        if ((action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
+                && bodyText instanceof Spannable
+                && bodyBounds != null
+                && bodyBounds.contains(e.getX(), e.getY())) {
+            float localX = e.getX() - bodyBounds.left;
+            float localY = e.getY() - bodyBounds.top;
+
+            int line = bodyLayout.getLineForVertical(Math.round(localY));
+            int offset = bodyLayout.getOffsetForHorizontal(line, localX);
+            float right = bodyBounds.left + bodyLayout.getLineRight(line);
+
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "b: " + bodyBounds + " x: " + e.getX() + " y: " + e.getY());
+            }
+
+            if (localX > right) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "lx: " + localX + " r: " + right);
+                }
+                return false;
+            }
+
+            Spannable bodySpan = (Spannable) bodyText;
+            ClickableSpan[] spans = bodySpan.getSpans(offset, offset,
+                    ClickableSpan.class);
+            if (spans != null && spans.length > 0) {
+                if (action == MotionEvent.ACTION_UP) {
+                    spans[0].onClick(this);
+                }
+                return true;
+            }
         }
-        return super.onTouchEvent(event);
+        return false;
     }
 
     public boolean onDown(MotionEvent e) {
