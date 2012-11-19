@@ -25,6 +25,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -254,7 +255,6 @@ public class ThingListFragment extends ListFragment implements
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         int count = getListView().getCheckedItemCount();
         mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
-
         return true;
     }
 
@@ -263,7 +263,23 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        return false;
+        switch (item.getItemId()) {
+            case R.id.menu_view_profile:
+                return handleViewProfile(mode);
+
+            default:
+                return false;
+        }
+    }
+
+    private boolean handleViewProfile(ActionMode mode) {
+        int position = getFirstCheckedPosition();
+        String user = adapter.getString(position, ThingAdapter.INDEX_AUTHOR);
+        Intent intent = new Intent(getActivity(), UserProfileActivity.class);
+        intent.putExtra(UserProfileActivity.EXTRA_USER, user);
+        startActivity(intent);
+        mode.finish();
+        return true;
     }
 
     public void onDestroyActionMode(ActionMode mode) {
@@ -361,5 +377,16 @@ public class ThingListFragment extends ListFragment implements
             return subreddit + "-" + System.currentTimeMillis();
         }
         return null;
+    }
+
+    private int getFirstCheckedPosition() {
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int size = adapter.getCount();
+        for (int i = 0; i < size; i++) {
+            if (checked.get(i)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

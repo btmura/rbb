@@ -261,6 +261,9 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             case R.id.menu_delete:
                 return handleDelete(mode);
 
+            case R.id.menu_view_profile:
+                return handleViewProfile(mode);
+
             case R.id.menu_copy_url:
                 return handleCopyUrl(mode);
 
@@ -329,6 +332,16 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
                 j++;
             }
         }
+    }
+
+    private boolean handleViewProfile(ActionMode mode) {
+        int position = getFirstCheckedPosition();
+        String user = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
+        Intent intent = new Intent(getActivity(), UserProfileActivity.class);
+        intent.putExtra(UserProfileActivity.EXTRA_USER, user);
+        startActivity(intent);
+        mode.finish();
+        return true;
     }
 
     private boolean handleCopyUrl(ActionMode mode) {
