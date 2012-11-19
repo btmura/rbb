@@ -59,7 +59,7 @@ class ThingListing extends JsonParser {
         long t1 = System.currentTimeMillis();
         URL url;
         if (!TextUtils.isEmpty(user)) {
-            url = Urls.userUrl(user);
+            url = Urls.userUrl(user, more);
         } else if (!TextUtils.isEmpty(query)) {
             url = Urls.searchUrl(query, more);
         } else {

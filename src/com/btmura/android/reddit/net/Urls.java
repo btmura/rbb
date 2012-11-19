@@ -210,8 +210,12 @@ public class Urls {
         return newUrl(API_SUBSCRIBE_URL);
     }
 
-    public static URL userUrl(String user) {
-        return newUrl(resetBuilder().append(BASE_USER_URL).append(user).append("/.json"));
+    public static URL userUrl(String user, String more) {
+        StringBuilder b = resetBuilder().append(BASE_USER_URL).append(user).append("/.json");
+        if (more != null) {
+            b.append("?count=25&after=").append(encode(more));
+        }
+        return newUrl(b);
     }
 
     public static URL voteUrl() {

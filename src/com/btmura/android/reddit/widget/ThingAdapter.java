@@ -128,9 +128,11 @@ public class ThingAdapter extends BaseCursorAdapter {
         Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
-                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
-                .appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subreddit)
-                .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
+                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId);
+        if (!TextUtils.isEmpty(subreddit)) {
+            b.appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subreddit);
+            b.appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
+        }
         if (!TextUtils.isEmpty(query)) {
             b.appendQueryParameter(ThingProvider.PARAM_QUERY, query);
         }

@@ -83,7 +83,8 @@ public class ThingProvider extends SessionProvider {
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
             String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
-            int filter = Integer.parseInt(uri.getQueryParameter(PARAM_FILTER));
+            String filterParameter = uri.getQueryParameter(PARAM_FILTER);
+            int filter = filterParameter != null ? Integer.parseInt(filterParameter) : 0;
             String query = uri.getQueryParameter(PARAM_QUERY);
             String user = uri.getQueryParameter(PARAM_USER);
             String more = uri.getQueryParameter(PARAM_MORE);
