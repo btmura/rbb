@@ -54,6 +54,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
+    protected void setupFragments(Bundle savedInstanceState) {
+    }
+
+    @Override
     protected void setupViews() {
     }
 

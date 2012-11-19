@@ -58,6 +58,10 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     @Override
+    protected void setupFragments(Bundle savedInstanceState) {
+    }
+
+    @Override
     protected void setupViews() {
         if (!hasQuery()) {
             setQuery("android");
@@ -166,7 +170,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
         } else {
             ThingListFragment f = getThingListFragment();
             if (f == null || !query.equals(f.getQuery())) {
-                setThingListNavigation(query);
+                setThingListNavigation(query, null);
             } else {
                 refreshSubredditListVisibility();
             }

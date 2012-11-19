@@ -106,6 +106,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (!skipSetup()) {
             setupCommonFragments(savedInstanceState);
             setupCommonViews();
+            setupFragments(savedInstanceState);
             setupViews();
             setupActionBar(savedInstanceState);
             getLoaderManager().initLoader(0, null, this);
@@ -131,7 +132,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void setupCommonViews() {
-
         if (!isSinglePane) {
             getFragmentManager().addOnBackStackChangedListener(this);
 
@@ -173,6 +173,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             refreshSubredditListVisibility();
         }
     }
+
+    protected abstract void setupFragments(Bundle savedInstanceState);
 
     protected abstract void setupViews();
 
@@ -242,7 +244,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshViews(null);
     }
 
-    protected void setThingListNavigation(String query) {
+    protected void setThingListNavigation(String query, String user) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setThingListNavigation q:" + query);
         }
@@ -254,7 +256,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment cf = ControlFragment.newInstance(accountName, null, null, -1, filter);
         SubredditListFragment slf = getSubredditListFragment();
         ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, filter,
-                query, null, tlfFlags);
+                query, user, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -483,7 +485,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected void refreshSubredditListVisibility() {
         boolean showSubreddits = hasSubredditList();
-        subredditListContainer.setVisibility(showSubreddits ? View.VISIBLE : View.GONE);
+        if (subredditListContainer != null) {
+            subredditListContainer.setVisibility(showSubreddits ? View.VISIBLE : View.GONE);
+        }
         refreshThingBodyWidthMeasurement();
     }
 
@@ -746,7 +750,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 throw new IllegalStateException();
         }
 
-        subredditListContainer.setVisibility(subredditListVisibility);
+        if (subredditListContainer != null) {
+            subredditListContainer.setVisibility(subredditListVisibility);
+        }
         thingClickAbsorber.setVisibility(clickAbsorberVisibility);
     }
 }

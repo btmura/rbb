@@ -16,23 +16,18 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
  * {@link Activity} for viewing a user's profile.
  */
-public class UserProfileActivity extends Activity implements LoaderCallbacks<AccountResult> {
+public class UserProfileActivity extends AbstractBrowserActivity {
 
     /** Required string extra that is the user's name. */
     public static final String EXTRA_USER = "user";
@@ -40,28 +35,30 @@ public class UserProfileActivity extends Activity implements LoaderCallbacks<Acc
     private String accountName;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void setContentView() {
         setContentView(R.layout.user_profile);
-        setupActionBar();
-        setupFragments(savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
     }
 
-    private void setupActionBar() {
-        ActionBar bar = getActionBar();
+    @Override
+    protected boolean skipSetup() {
+        return false;
+    }
+
+    @Override
+    protected void setupFragments(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            setThingListNavigation(null, getUserName());
+        }
+    }
+
+    @Override
+    protected void setupViews() {
+    }
+
+    @Override
+    protected void setupActionBar(Bundle savedInstanceState) {
         bar.setTitle(getUserName());
         bar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    private void setupFragments(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            Fragment frag = ThingListFragment.newInstance(accountName, null, 0, null,
-                    getUserName(), 0);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
-            ft.commit();
-        }
     }
 
     private String getUserName() {
@@ -73,10 +70,7 @@ public class UserProfileActivity extends Activity implements LoaderCallbacks<Acc
         return user;
     }
 
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true);
-    }
-
+    @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = result.getLastAccount();
         ThingListFragment tlf = getThingListFragment();
@@ -87,21 +81,25 @@ public class UserProfileActivity extends Activity implements LoaderCallbacks<Acc
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
+        accountName = null;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+    protected String getAccountName() {
+        return accountName;
     }
 
-    private ThingListFragment getThingListFragment() {
-        return (ThingListFragment) getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
+    @Override
+    protected int getFilter() {
+        return FilterAdapter.FILTER_HOT;
+    }
+
+    @Override
+    protected boolean hasSubredditList() {
+        return false;
+    }
+
+    @Override
+    protected void refreshActionBar(String subreddit, Bundle thingBundle) {
     }
 }
