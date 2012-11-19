@@ -109,6 +109,16 @@
         </activity>
         <activity android:name=".app.ThingActivity" />
         <activity android:name=".app.ThingListActivity" />
+        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
+        <activity
+            android:name=".app.UserProfileActivity"
+            tools:ignore="ExportedActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <activity-alias
             android:name=".MainActivity"
