@@ -21,11 +21,14 @@ import android.view.MotionEvent;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
 
 public class ThingView extends CustomView implements OnGestureListener {
 
     public static final String TAG = "ThingView";
+
+    private static final Formatter FORMATTER = new Formatter();
 
     private final GestureDetector detector;
     private OnVoteListener listener;
@@ -39,12 +42,14 @@ public class ThingView extends CustomView implements OnGestureListener {
     private Bitmap bitmap;
     private boolean drawVotingArrows;
 
+    private CharSequence bodyText;
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
     private final SpannableStringBuilder longDetailsText = new SpannableStringBuilder();
     private String shortDetailsText;
 
     private Layout titleLayout;
+    private Layout bodyLayout;
     private Layout statusLayout;
     private Layout detailsLayout;
 
@@ -82,6 +87,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     public void setData(String accountName,
             String author,
+            String body,
             long createdUtc,
             String domain,
             int downs,
@@ -108,6 +114,12 @@ public class ThingView extends CustomView implements OnGestureListener {
         setStatusText(author, createdUtc, nowTimeMs, numComments, over18, parentSubreddit, score,
                 subreddit, drawVotingArrows);
         setDetailsText(domain, downs, ups);
+
+        if (!TextUtils.isEmpty(body)) {
+            bodyText = FORMATTER.formatSpans(getContext(), body);
+        } else {
+            bodyText = null;
+        }
 
         requestLayout();
     }
@@ -225,8 +237,25 @@ public class ThingView extends CustomView implements OnGestureListener {
         statusWidth = Math.max(0, statusWidth);
         detailsWidth = Math.max(0, detailsWidth);
 
-        titleLayout = makeTitleLayout(titleWidth);
-        statusLayout = makeLayout(THING_STATUS, statusText, statusWidth, Alignment.ALIGN_NORMAL);
+        titleLayout = null;
+        bodyLayout = null;
+        rightHeight = 0;
+
+        if (!TextUtils.isEmpty(title)) {
+            titleLayout = createTitleLayout(titleWidth);
+            rightHeight += titleLayout.getHeight() + ELEMENT_PADDING;
+        }
+
+        if (!TextUtils.isEmpty(bodyText)) {
+            bodyLayout = createBodyLayout(titleWidth);
+            rightHeight += bodyLayout.getHeight() + ELEMENT_PADDING;
+        }
+
+        if (!TextUtils.isEmpty(statusText)) {
+            statusLayout = makeLayout(THING_STATUS, statusText, statusWidth, Alignment.ALIGN_NORMAL);
+            rightHeight += statusLayout.getHeight();
+        }
+
         detailsLayout = null;
         if (detailsWidth > 0) {
             detailsLayout = makeLayout(THING_STATUS, detailsText, detailsWidth,
@@ -235,13 +264,6 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         int leftHeight = Math.max(VotingArrows.getHeight(drawVotingArrows, true),
                 Thumbnail.getHeight());
-
-        rightHeight = 0;
-        if (titleLayout != null) {
-            rightHeight += titleLayout.getHeight() + ELEMENT_PADDING;
-        }
-        rightHeight += statusLayout.getHeight();
-
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -260,12 +282,14 @@ public class ThingView extends CustomView implements OnGestureListener {
         setMeasuredDimension(measuredWidth, measuredHeight);
     }
 
-    private Layout makeTitleLayout(int width) {
-        if (title != null) {
-            return new StaticLayout(title, TEXT_PAINTS[THING_TITLE], width, Alignment.ALIGN_NORMAL,
-                    1f, 0f, true);
-        }
-        return null;
+    private Layout createTitleLayout(int width) {
+        return new StaticLayout(title, TEXT_PAINTS[THING_TITLE], width,
+                Alignment.ALIGN_NORMAL, 1f, 0f, true);
+    }
+
+    private StaticLayout createBodyLayout(int width) {
+        return new StaticLayout(bodyText, TEXT_PAINTS[THING_TITLE], width,
+                Alignment.ALIGN_NORMAL, 1, 0, true);
     }
 
     private static Layout makeLayout(int paint, CharSequence text, int width, Alignment alignment) {
@@ -302,7 +326,14 @@ public class ThingView extends CustomView implements OnGestureListener {
             c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
         }
 
-        statusLayout.draw(c);
+        if (bodyLayout != null) {
+            bodyLayout.draw(c);
+            c.translate(0, bodyLayout.getHeight() + ELEMENT_PADDING);
+        }
+
+        if (statusLayout != null) {
+            statusLayout.draw(c);
+        }
     }
 
     @Override

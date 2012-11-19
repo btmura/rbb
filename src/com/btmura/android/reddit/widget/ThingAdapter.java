@@ -42,6 +42,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     private static final String[] PROJECTION = {
             Things._ID,
             Things.COLUMN_AUTHOR,
+            Things.COLUMN_BODY,
             Things.COLUMN_CREATED_UTC,
             Things.COLUMN_DOMAIN,
             Things.COLUMN_DOWNS,
@@ -63,23 +64,24 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     public static int INDEX_ID = 0;
     public static int INDEX_AUTHOR = 1;
-    public static int INDEX_CREATED_UTC = 2;
-    public static int INDEX_DOMAIN = 3;
-    public static int INDEX_DOWNS = 4;
-    public static int INDEX_KIND = 5;
-    public static int INDEX_LIKES = 6;
-    public static int INDEX_NUM_COMMENTS = 7;
-    public static int INDEX_OVER_18 = 8;
-    public static int INDEX_PERMA_LINK = 9;
-    public static int INDEX_SCORE = 10;
-    public static int INDEX_SELF = 11;
-    public static int INDEX_SUBREDDIT = 12;
-    public static int INDEX_TITLE = 13;
-    public static int INDEX_THING_ID = 14;
-    public static int INDEX_THUMBNAIL_URL = 15;
-    public static int INDEX_UPS = 16;
-    public static int INDEX_URL = 17;
-    public static int INDEX_VOTE = 18;
+    public static int INDEX_BODY = 2;
+    public static int INDEX_CREATED_UTC = 3;
+    public static int INDEX_DOMAIN = 4;
+    public static int INDEX_DOWNS = 5;
+    public static int INDEX_KIND = 6;
+    public static int INDEX_LIKES = 7;
+    public static int INDEX_NUM_COMMENTS = 8;
+    public static int INDEX_OVER_18 = 9;
+    public static int INDEX_PERMA_LINK = 10;
+    public static int INDEX_SCORE = 11;
+    public static int INDEX_SELF = 12;
+    public static int INDEX_SUBREDDIT = 13;
+    public static int INDEX_TITLE = 14;
+    public static int INDEX_THING_ID = 15;
+    public static int INDEX_THUMBNAIL_URL = 16;
+    public static int INDEX_UPS = 17;
+    public static int INDEX_URL = 18;
+    public static int INDEX_VOTE = 19;
 
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final long nowTimeMs = System.currentTimeMillis();
@@ -188,6 +190,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         if (view instanceof ThingView) {
             String author = cursor.getString(INDEX_AUTHOR);
+            String body = cursor.getString(INDEX_BODY);
             long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
             String domain = cursor.getString(INDEX_DOMAIN);
             int downs = cursor.getInt(INDEX_DOWNS);
@@ -212,7 +215,7 @@ public class ThingAdapter extends BaseCursorAdapter {
             }
 
             ThingView tv = (ThingView) view;
-            tv.setData(accountName, author, createdUtc, domain, downs, likes, nowTimeMs,
+            tv.setData(accountName, author, body, createdUtc, domain, downs, likes, nowTimeMs,
                     numComments, over18, parentSubreddit, score, subreddit, thingBodyWidth,
                     thingId, thumbnailUrl, title, ups);
             tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));

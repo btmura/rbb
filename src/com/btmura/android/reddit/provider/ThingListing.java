@@ -31,6 +31,7 @@ import android.util.JsonReader;
 import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
@@ -95,12 +96,18 @@ class ThingListing extends JsonParser {
     @Override
     public void onEntityStart(int index) {
         // Pass null for thing ID since we know the thing ID later.
-        values.add(newContentValues(Things.KIND_THING, null, 17));
+        values.add(newContentValues(Things.KIND_THING, null, 18));
     }
 
     @Override
     public void onAuthor(JsonReader reader, int index) throws IOException {
         values.get(index).put(Things.COLUMN_AUTHOR, readTrimmedString(reader, ""));
+    }
+
+    @Override
+    public void onBody(JsonReader reader, int index) throws IOException {
+        CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        values.get(index).put(Comments.COLUMN_BODY, body.toString());
     }
 
     @Override
