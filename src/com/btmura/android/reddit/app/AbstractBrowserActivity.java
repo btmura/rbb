@@ -117,7 +117,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void setPrereqs() {
         bar = getActionBar();
-        isSinglePane = findViewById(R.id.thing_list_container) == null;
+        isSinglePane = findViewById(R.id.thing_pager) == null;
     }
 
     protected abstract boolean skipSetup();
@@ -245,6 +245,24 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void setThingListNavigation(String query, String user) {
+        if (isSinglePane) {
+            setThingListNavigationSinglePane(query, user);
+        } else {
+            setThingListNavigationMultiPane(query, user);
+        }
+    }
+
+    protected void setThingListNavigationSinglePane(String query, String user) {
+        ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), null, 0, query,
+                user, tlfFlags);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+        ft.commit();
+    }
+
+    protected void setThingListNavigationMultiPane(String query, String user) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setThingListNavigation q:" + query);
         }
