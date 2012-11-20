@@ -48,6 +48,7 @@ public class ThingAdapter extends BaseCursorAdapter {
             Things.COLUMN_DOWNS,
             Things.COLUMN_KIND,
             Things.COLUMN_LIKES,
+            Things.COLUMN_LINK_ID,
             Things.COLUMN_NUM_COMMENTS,
             Things.COLUMN_OVER_18,
             Things.COLUMN_PERMA_LINK,
@@ -70,18 +71,19 @@ public class ThingAdapter extends BaseCursorAdapter {
     public static int INDEX_DOWNS = 5;
     public static int INDEX_KIND = 6;
     public static int INDEX_LIKES = 7;
-    public static int INDEX_NUM_COMMENTS = 8;
-    public static int INDEX_OVER_18 = 9;
-    public static int INDEX_PERMA_LINK = 10;
-    public static int INDEX_SCORE = 11;
-    public static int INDEX_SELF = 12;
-    public static int INDEX_SUBREDDIT = 13;
-    public static int INDEX_TITLE = 14;
-    public static int INDEX_THING_ID = 15;
-    public static int INDEX_THUMBNAIL_URL = 16;
-    public static int INDEX_UPS = 17;
-    public static int INDEX_URL = 18;
-    public static int INDEX_VOTE = 19;
+    public static int INDEX_LINK_ID = 8;
+    public static int INDEX_NUM_COMMENTS = 9;
+    public static int INDEX_OVER_18 = 10;
+    public static int INDEX_PERMA_LINK = 11;
+    public static int INDEX_SCORE = 12;
+    public static int INDEX_SELF = 13;
+    public static int INDEX_SUBREDDIT = 14;
+    public static int INDEX_TITLE = 15;
+    public static int INDEX_THING_ID = 16;
+    public static int INDEX_THUMBNAIL_URL = 17;
+    public static int INDEX_UPS = 18;
+    public static int INDEX_URL = 19;
+    public static int INDEX_VOTE = 20;
 
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final long nowTimeMs = System.currentTimeMillis();
@@ -270,6 +272,8 @@ public class ThingAdapter extends BaseCursorAdapter {
         b.putString(Things.COLUMN_DOMAIN, c.getString(INDEX_DOMAIN));
         b.putInt(Things.COLUMN_DOWNS, c.getInt(INDEX_DOWNS));
         b.putInt(Things.COLUMN_LIKES, c.getInt(INDEX_LIKES));
+        b.putInt(Things.COLUMN_KIND, c.getInt(INDEX_KIND));
+        b.putString(Things.COLUMN_LINK_ID, c.getString(INDEX_LINK_ID));
         b.putInt(Things.COLUMN_NUM_COMMENTS, c.getInt(INDEX_NUM_COMMENTS));
         b.putBoolean(Things.COLUMN_OVER_18, c.getInt(INDEX_OVER_18) == 1);
         b.putString(Things.COLUMN_PERMA_LINK, c.getString(INDEX_PERMA_LINK));

@@ -34,6 +34,7 @@ public class Things implements BaseColumns {
     public static final String COLUMN_DOWNS = "downs";
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_LIKES = "likes";
+    public static final String COLUMN_LINK_ID = "linkId";
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_OVER_18 = "over18";
     public static final String COLUMN_PERMA_LINK = "permaLink";
@@ -76,6 +77,7 @@ public class Things implements BaseColumns {
                 + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
                 + COLUMN_KIND + " INTEGER NOT NULL, "
                 + COLUMN_LIKES + " INTEGER DEFAULT 0, "
+                + COLUMN_LINK_ID + " TEXT, "
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
                 + COLUMN_PERMA_LINK + " TEXT, "
@@ -99,8 +101,16 @@ public class Things implements BaseColumns {
         return getString(thingBundle, COLUMN_DOMAIN);
     }
 
+    public static int getKind(Bundle thingBundle) {
+        return getInt(thingBundle, COLUMN_KIND);
+    }
+
     public static int getLikes(Bundle thingBundle) {
         return getInt(thingBundle, COLUMN_LIKES);
+    }
+
+    public static String getLinkId(Bundle thingBundle) {
+        return getString(thingBundle, COLUMN_LINK_ID);
     }
 
     public static String getPermaLink(Bundle thingBundle) {

@@ -28,7 +28,8 @@ import com.btmura.android.reddit.database.Things;
 public class ThingPagerAdapter extends FragmentStatePagerAdapter {
 
     public static final int TYPE_LINK = 0;
-    public static final int TYPE_COMMENTS = 1;
+    public static final int TYPE_LINK_COMMENTS = 1;
+    public static final int TYPE_COMMENTS = 2;
 
     private final String accountName;
     private final Bundle thingBundle;
@@ -41,7 +42,16 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return Things.isSelf(thingBundle) ? 1 : 2;
+        switch (Things.getKind(thingBundle)) {
+            case Things.KIND_LINK:
+                return Things.isSelf(thingBundle) ? 1 : 2;
+
+            case Things.KIND_COMMENT:
+                return 1;
+
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     @Override
@@ -50,8 +60,11 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
             case TYPE_LINK:
                 return LinkFragment.newInstance(Things.getUrl(thingBundle));
 
-            case TYPE_COMMENTS:
+            case TYPE_LINK_COMMENTS:
                 return CommentListFragment.newInstance(accountName, Things.getThingId(thingBundle));
+
+            case TYPE_COMMENTS:
+                return CommentListFragment.newInstance(accountName, Things.getLinkId(thingBundle));
 
             default:
                 throw new IllegalStateException();
@@ -61,9 +74,22 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
     public static int getType(Bundle thingBundle, int position) {
         switch (position) {
             case 0:
-                return Things.isSelf(thingBundle) ? TYPE_COMMENTS : TYPE_LINK;
+                return getFirstPageType(thingBundle);
 
             case 1:
+                return TYPE_LINK_COMMENTS;
+
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+    private static int getFirstPageType(Bundle thingBundle) {
+        switch (Things.getKind(thingBundle)) {
+            case Things.KIND_LINK:
+                return Things.isSelf(thingBundle) ? TYPE_LINK_COMMENTS : TYPE_LINK;
+
+            case Things.KIND_COMMENT:
                 return TYPE_COMMENTS;
 
             default:
