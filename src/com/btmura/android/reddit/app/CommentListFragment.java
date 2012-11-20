@@ -54,28 +54,21 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public static final String TAG = "CommentListFragment";
 
     private static final String ARG_ACCOUNT_NAME = "accountName";
-    private static final String ARG_TITLE = "title";
     private static final String ARG_THING_ID = "thingId";
-    private static final String ARG_PERMA_LINK = "permaLink";
 
     private static final String STATE_SESSION_ID = "sessionId";
 
     private String accountName;
-    private CharSequence title;
     private String thingId;
-    private String permaLink;
     private String sessionId;
     private boolean sync;
     private CommentAdapter adapter;
 
-    public static CommentListFragment newInstance(String accountName, CharSequence title,
-            String thingId, String permaLink) {
+    public static CommentListFragment newInstance(String accountName, String thingId) {
         CommentListFragment frag = new CommentListFragment();
-        Bundle b = new Bundle(4);
+        Bundle b = new Bundle(2);
         b.putString(ARG_ACCOUNT_NAME, accountName);
-        b.putCharSequence(ARG_TITLE, title);
         b.putString(ARG_THING_ID, thingId);
-        b.putString(ARG_PERMA_LINK, permaLink);
         frag.setArguments(b);
         return frag;
     }
@@ -84,9 +77,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-        title = getArguments().getCharSequence(ARG_TITLE);
         thingId = getArguments().getString(ARG_THING_ID);
-        permaLink = getArguments().getString(ARG_PERMA_LINK);
         sync = savedInstanceState == null;
 
         // Don't create a new session if changing configuration.
@@ -345,16 +336,28 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     private boolean handleCopyUrl(ActionMode mode) {
-        // Append additional id if the selected item is not the header.
-        String thingId = null;
         int position = getFirstCheckedPosition();
+
+        // Determine the label of the text to copy to the clipboard.
+        CharSequence label;
         if (position != 0) {
-            thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
+            label = adapter.getString(position, CommentAdapter.INDEX_BODY);
+        } else {
+            label = adapter.getString(0, CommentAdapter.INDEX_TITLE);
         }
 
-        // Copy to the clipboard and present a toast.
+        // Determine the text to copy to the clipboard.
+        String thingId;
+        if (position != 0) {
+            thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
+        } else {
+            thingId = null; // Don't append anything to the permalink.
+        }
+        String permaLink = adapter.getString(0, CommentAdapter.INDEX_PERMA_LINK);
         String text = Urls.permaUrl(permaLink, thingId).toExternalForm();
-        ClipHelper.setClipToast(getActivity(), title, text);
+
+        // Copy to the clipboard and present a toast.
+        ClipHelper.setClipToast(getActivity(), label, text);
         return true;
     }
 

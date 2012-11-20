@@ -51,10 +51,7 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
                 return LinkFragment.newInstance(Things.getUrl(thingBundle));
 
             case TYPE_COMMENTS:
-                return CommentListFragment.newInstance(accountName,
-                        Things.getTitle(thingBundle),
-                        Things.getThingId(thingBundle),
-                        Things.getPermaLink(thingBundle));
+                return CommentListFragment.newInstance(accountName, Things.getThingId(thingBundle));
 
             default:
                 throw new IllegalStateException();

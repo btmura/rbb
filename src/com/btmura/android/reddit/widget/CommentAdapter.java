@@ -43,6 +43,7 @@ public class CommentAdapter extends BaseCursorAdapter {
             Comments.COLUMN_LIKES,
             Comments.COLUMN_NESTING,
             Comments.COLUMN_NUM_COMMENTS,
+            Comments.COLUMN_PERMA_LINK,
             Comments.COLUMN_SEQUENCE,
             Comments.COLUMN_SESSION_ID,
             Comments.COLUMN_SESSION_TIMESTAMP,
@@ -62,13 +63,14 @@ public class CommentAdapter extends BaseCursorAdapter {
     public static int INDEX_LIKES = 7;
     public static int INDEX_NESTING = 8;
     public static int INDEX_NUM_COMMENTS = 9;
-    public static int INDEX_SEQUENCE = 10;
-    public static int INDEX_SESSION_ID = 11;
-    public static int INDEX_SESSION_CREATION_TIME = 12;
-    public static int INDEX_TITLE = 13;
-    public static int INDEX_THING_ID = 14;
-    public static int INDEX_UPS = 15;
-    public static int INDEX_VOTE = 16;
+    public static int INDEX_PERMA_LINK = 10;
+    public static int INDEX_SEQUENCE = 11;
+    public static int INDEX_SESSION_ID = 12;
+    public static int INDEX_SESSION_CREATION_TIME = 13;
+    public static int INDEX_TITLE = 14;
+    public static int INDEX_THING_ID = 15;
+    public static int INDEX_UPS = 16;
+    public static int INDEX_VOTE = 17;
 
     private final long nowTimeMs = System.currentTimeMillis();
     private final String accountName;

@@ -42,6 +42,7 @@ public class Comments implements BaseColumns {
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_NESTING = "nesting";
     public static final String COLUMN_NUM_COMMENTS = "numComments";
+    public static final String COLUMN_PERMA_LINK = "permaLink";
     public static final String COLUMN_SELF_TEXT = "selfText";
     public static final String COLUMN_SEQUENCE = "sequence";
     public static final String COLUMN_SESSION_ID = "sessionId";
@@ -92,6 +93,7 @@ public class Comments implements BaseColumns {
                 + COLUMN_LIKES + " INTEGER DEFAULT 0, "
                 + COLUMN_NESTING + " INTEGER NOT NULL, "
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
+                + COLUMN_PERMA_LINK + " TEXT, "
                 + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "
                 + COLUMN_SEQUENCE + " INTEGER NOT NULL, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
