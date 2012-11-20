@@ -20,9 +20,11 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
@@ -39,6 +41,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     private FilterAdapter adapter;
     private String accountName;
+    private SharedPreferences prefs;
 
     @Override
     protected void setContentView() {
@@ -58,7 +61,6 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     protected void setupActionBar(Bundle savedInstanceState) {
         adapter = new FilterAdapter(this);
         adapter.setTitle(getUserName());
-        adapter.addProfileFilters(this);
 
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
@@ -80,12 +82,10 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        prefs = result.prefs;
         accountName = result.getLastAccount();
-        ThingListFragment tlf = getThingListFragment();
-        if (tlf != null && tlf.getAccountName() == null) {
-            tlf.setAccountName(accountName);
-            tlf.loadIfPossible();
-        }
+        adapter.addProfileFilters(this);
+        bar.setSelectedNavigationItem(result.getLastProfileFilter());
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
@@ -114,7 +114,10 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         String accountName = getAccountName();
         String user = getUserName();
+
         int filter = getFilter();
+        AccountPreferences.setLastProfileFilter(prefs, filter);
+
         ThingListFragment frag = getThingListFragment();
         if (frag == null
                 || !Objects.equals(frag.getAccountName(), accountName)

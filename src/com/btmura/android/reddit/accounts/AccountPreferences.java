@@ -27,42 +27,53 @@ public class AccountPreferences {
     private static final String PREFS = "accountPreferences";
 
     /** Global preference for the last selected account. */
-    private static final String GLOBAL_PREF_LAST_ACCOUNT = "lastAccount";
+    private static final String GLOBAL_LAST_ACCOUNT = "lastAccount";
+
+    /** Global preference for the last profile filter by any account. */
+    private static final String GLOBAL_LAST_PROFILE_FILTER = "lastProfileFilter";
 
     /** Global preference for the last selected filter by any account. */
-    private static final String GLOBAL_PREF_LAST_FILTER = "lastFilter";
+    private static final String GLOBAL_LAST_SUBREDDIT_FILTER = "lastSubredditFilter";
 
     /** Account preference for the last selected subreddit. */
-    private static final String ACCOUNT_PREF_LAST_SUBREDDIT = "lastSubreddit";
+    private static final String ACCOUNT_LAST_SUBREDDIT = "lastSubreddit";
 
     public static SharedPreferences getPreferences(Context context) {
         return context.getApplicationContext().getSharedPreferences(PREFS, 0);
     }
 
     public static String getLastAccount(SharedPreferences prefs, String defValue) {
-        return prefs.getString(GLOBAL_PREF_LAST_ACCOUNT, defValue);
+        return prefs.getString(GLOBAL_LAST_ACCOUNT, defValue);
     }
 
     public static void setLastAccount(SharedPreferences prefs, String accountName) {
-        prefs.edit().putString(GLOBAL_PREF_LAST_ACCOUNT, accountName).apply();
+        prefs.edit().putString(GLOBAL_LAST_ACCOUNT, accountName).apply();
     }
 
-    public static int getLastFilter(SharedPreferences prefs, int defValue) {
-        return prefs.getInt(GLOBAL_PREF_LAST_FILTER, defValue);
+    public static int getLastProfileFilter(SharedPreferences prefs, int defValue) {
+        return prefs.getInt(GLOBAL_LAST_PROFILE_FILTER, defValue);
     }
 
-    public static void setLastFilter(SharedPreferences prefs, int filter) {
-        prefs.edit().putInt(GLOBAL_PREF_LAST_FILTER, filter).apply();
+    public static void setLastProfileFilter(SharedPreferences prefs, int filter) {
+        prefs.edit().putInt(GLOBAL_LAST_PROFILE_FILTER, filter).apply();
+    }
+
+    public static int getLastSubredditFilter(SharedPreferences prefs, int defValue) {
+        return prefs.getInt(GLOBAL_LAST_SUBREDDIT_FILTER, defValue);
+    }
+
+    public static void setLastSubredditFilter(SharedPreferences prefs, int filter) {
+        prefs.edit().putInt(GLOBAL_LAST_SUBREDDIT_FILTER, filter).apply();
     }
 
     public static String getLastSubreddit(SharedPreferences prefs, String accountName) {
-        return prefs.getString(getAccountPreferenceKey(accountName, ACCOUNT_PREF_LAST_SUBREDDIT),
+        return prefs.getString(getAccountPreferenceKey(accountName, ACCOUNT_LAST_SUBREDDIT),
                 Subreddits.NAME_FRONT_PAGE);
     }
 
     public static void setLastSubreddit(SharedPreferences prefs, String accountName,
             String subreddit) {
-        prefs.edit().putString(getAccountPreferenceKey(accountName, ACCOUNT_PREF_LAST_SUBREDDIT),
+        prefs.edit().putString(getAccountPreferenceKey(accountName, ACCOUNT_LAST_SUBREDDIT),
                 subreddit).apply();
     }
 

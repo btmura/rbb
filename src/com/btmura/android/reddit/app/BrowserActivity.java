@@ -72,7 +72,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         String accountName = result.getLastAccount();
         adapter.setAccountName(accountName);
-        adapter.setFilter(result.getLastFilter());
+        adapter.setFilter(result.getLastSubredditFilter());
 
         int index = adapter.findAccountName(accountName);
         bar.setSelectedNavigationItem(index);
@@ -111,7 +111,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         AccountPreferences.setLastAccount(prefs, accountName);
 
         int filter = adapter.getFilter();
-        AccountPreferences.setLastFilter(prefs, filter);
+        AccountPreferences.setLastSubredditFilter(prefs, filter);
 
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onNavigationItemSelected i:" + itemPosition

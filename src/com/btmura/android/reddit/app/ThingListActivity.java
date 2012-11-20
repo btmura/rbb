@@ -97,7 +97,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         prefs = result.prefs;
         accountName = result.getLastAccount();
         adapter.addSubredditFilters(this);
-        bar.setSelectedNavigationItem(result.getLastFilter());
+        bar.setSelectedNavigationItem(result.getLastSubredditFilter());
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
@@ -110,7 +110,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         }
 
         int filter = adapter.getFilter(itemPosition);
-        AccountPreferences.setLastFilter(prefs, filter);
+        AccountPreferences.setLastSubredditFilter(prefs, filter);
 
         ThingListFragment f = getThingListFragment();
         if (f == null || !f.getAccountName().equals(accountName)
