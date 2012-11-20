@@ -106,7 +106,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (!skipSetup()) {
             setupCommonFragments(savedInstanceState);
             setupCommonViews();
-            setupFragments(savedInstanceState);
             setupViews();
             setupActionBar(savedInstanceState);
             getLoaderManager().initLoader(0, null, this);
@@ -174,8 +173,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    protected abstract void setupFragments(Bundle savedInstanceState);
-
     protected abstract void setupViews();
 
     protected abstract void setupActionBar(Bundle savedInstanceState);
@@ -224,8 +221,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, -1, filter);
         SubredditListFragment slf = SubredditListFragment.newInstance(accountName, subreddit,
                 query, slfFlags);
-        ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, filter,
-                null, null, tlfFlags);
+        ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, null,
+                null, filter, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -253,8 +250,17 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void setThingListNavigationSinglePane(String query, String user) {
-        ThingListFragment tlf = ThingListFragment.newInstance(getAccountName(), null, 0, query,
-                user, tlfFlags);
+        String accountName = getAccountName();
+        int filter = getFilter();
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "setThingListNavigationSinglePane accountName: " + accountName
+                    + " query: " + query
+                    + " user: " + user
+                    + " filter: " + filter);
+        }
+
+        ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, query, user,
+                filter, tlfFlags);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
@@ -263,18 +269,21 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void setThingListNavigationMultiPane(String query, String user) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "setThingListNavigation q:" + query);
-        }
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
         int filter = getFilter();
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "setThingListNavigationMultiPane accountName: " + accountName
+                    + " query: " + query
+                    + " user: " + user
+                    + " filter: " + filter);
+        }
 
         ControlFragment cf = ControlFragment.newInstance(accountName, null, null, -1, filter);
         SubredditListFragment slf = getSubredditListFragment();
-        ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, filter,
-                query, user, tlfFlags);
+        ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, query,
+                user, filter, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -340,8 +349,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         int filter = getFilter();
 
         ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, -1, filter);
-        ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, filter,
-                null, null, tlfFlags);
+        ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, null,
+                null, filter, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();

@@ -35,9 +35,9 @@
     <string name="error">Something went wrong…</string>
     <string name="error_blank_field">This field cannot be blank.</string>
     <string name="filter_category">Filters</string>
-    <string name="filter_profile_overview">Overview</string>
-    <string name="filter_profile_comments">Comments</string>
-    <string name="filter_profile_submitted">Submitted</string>
+    <string name="filter_profile_overview">overview</string>
+    <string name="filter_profile_comments">comments</string>
+    <string name="filter_profile_submitted">submitted</string>
     <string name="filter_subreddit_hot">what\'s hot</string>
     <string name="filter_subreddit_new">new</string>
     <string name="filter_subreddit_controversial">controversial</string>

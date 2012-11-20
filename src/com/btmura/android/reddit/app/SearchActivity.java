@@ -58,10 +58,6 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     }
 
     @Override
-    protected void setupFragments(Bundle savedInstanceState) {
-    }
-
-    @Override
     protected void setupViews() {
         if (!hasQuery()) {
             setQuery("android");

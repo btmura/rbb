@@ -16,22 +16,28 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.content.Loader;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
  * {@link Activity} for viewing a user's profile.
  */
-public class UserProfileActivity extends AbstractBrowserActivity {
+public class UserProfileActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
     /** Required string extra that is the user's name. */
     public static final String EXTRA_USER = "user";
 
+    private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
+
+    private FilterAdapter adapter;
     private String accountName;
 
     @Override
@@ -45,20 +51,22 @@ public class UserProfileActivity extends AbstractBrowserActivity {
     }
 
     @Override
-    protected void setupFragments(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            setThingListNavigation(null, getUserName());
-        }
-    }
-
-    @Override
     protected void setupViews() {
     }
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
-        bar.setTitle(getUserName());
+        adapter = new FilterAdapter(this);
+        adapter.setTitle(getUserName());
+        adapter.addProfileFilters(this);
+
         bar.setDisplayHomeAsUpEnabled(true);
+        bar.setDisplayShowTitleEnabled(false);
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        bar.setListNavigationCallbacks(adapter, this);
+        if (savedInstanceState != null) {
+            bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_NAVIGATION_INDEX));
+        }
     }
 
     private String getUserName() {
@@ -91,7 +99,7 @@ public class UserProfileActivity extends AbstractBrowserActivity {
 
     @Override
     protected int getFilter() {
-        return FilterAdapter.SUBREDDIT_HOT;
+        return adapter.getFilter(bar.getSelectedNavigationIndex());
     }
 
     @Override
@@ -101,5 +109,24 @@ public class UserProfileActivity extends AbstractBrowserActivity {
 
     @Override
     protected void refreshActionBar(String subreddit, Bundle thingBundle) {
+    }
+
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        String accountName = getAccountName();
+        String user = getUserName();
+        int filter = getFilter();
+        ThingListFragment frag = getThingListFragment();
+        if (frag == null
+                || !Objects.equals(frag.getAccountName(), accountName)
+                || frag.getFilter() != filter) {
+            setThingListNavigation(null, user);
+        }
+        return true;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_NAVIGATION_INDEX, bar.getSelectedNavigationIndex());
     }
 }

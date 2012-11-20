@@ -94,18 +94,18 @@ public class ThingAdapter extends BaseCursorAdapter {
     private boolean singleChoice;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
-            String subreddit, int filter, String query, String user, String more, boolean sync) {
-        Uri uri = getUri(accountName, sessionId, subreddit, filter, more, query, user, sync);
+            String subreddit, String query, String user, int filter, String more, boolean sync) {
+        Uri uri = getUri(accountName, sessionId, subreddit, query, user, filter, more, sync);
         return new CursorLoader(context, uri, PROJECTION, Things.SELECT_BY_SESSION_ID,
                 Array.of(sessionId), null);
     }
 
     public static void updateLoader(Context context, String accountName, String sessionId,
-            String subreddit, int filter, String query, String user, String more, boolean sync,
+            String subreddit, String query, String user, int filter, String more, boolean sync,
             Loader<Cursor> loader) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, subreddit, filter, more, query, user, sync));
+            cl.setUri(getUri(accountName, sessionId, subreddit, query, user, filter, more, sync));
         }
     }
 
@@ -124,14 +124,14 @@ public class ThingAdapter extends BaseCursorAdapter {
     }
 
     private static Uri getUri(String accountName, String sessionId, String subreddit,
-            int filter, String more, String query, String user, boolean fetch) {
+            String query, String user, int filter, String more, boolean fetch) {
         Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
-                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId);
+                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
+                .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
         if (!TextUtils.isEmpty(subreddit)) {
             b.appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subreddit);
-            b.appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
         }
         if (!TextUtils.isEmpty(query)) {
             b.appendQueryParameter(ThingProvider.PARAM_QUERY, query);

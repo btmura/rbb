@@ -54,17 +54,19 @@ class ThingListing extends JsonParser {
     private String moreThingId;
 
     public static ThingListing get(Context context, String accountName, String sessionId,
-            long sessionTimestamp, String subredditName, int filter, String query, String user,
+            long sessionTimestamp, String subredditName, String query, String user, int filter,
             String more, String cookie) throws IOException {
         long t1 = System.currentTimeMillis();
+
         URL url;
         if (!TextUtils.isEmpty(user)) {
-            url = Urls.userUrl(user, more);
+            url = Urls.userUrl(user, filter, more);
         } else if (!TextUtils.isEmpty(query)) {
             url = Urls.searchUrl(query, more);
         } else {
             url = Urls.subredditUrl(subredditName, filter, more);
         }
+
         HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();

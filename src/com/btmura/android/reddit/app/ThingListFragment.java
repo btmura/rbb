@@ -90,9 +90,9 @@ public class ThingListFragment extends ListFragment implements
     private String accountName;
     private String sessionId;
     private String subreddit;
-    private int filter;
     private String query;
     private String user;
+    private int filter;
     private boolean sync;
 
     private String selectedThingId;
@@ -100,14 +100,14 @@ public class ThingListFragment extends ListFragment implements
     private OnThingSelectedListener listener;
     private boolean scrollLoading;
 
-    public static ThingListFragment newInstance(String accountName, String subreddit,
-            int filter, String query, String user, int flags) {
+    public static ThingListFragment newInstance(String accountName, String subreddit, String query,
+            String user, int filter, int flags) {
         Bundle args = new Bundle(6);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_SUBREDDIT, subreddit);
-        args.putInt(ARG_FILTER, filter);
         args.putString(ARG_QUERY, query);
         args.putString(ARG_USER, user);
+        args.putInt(ARG_FILTER, filter);
         args.putInt(ARG_FLAGS, flags);
 
         ThingListFragment f = new ThingListFragment();
@@ -126,9 +126,9 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        filter = getArguments().getInt(ARG_FILTER);
         query = getArguments().getString(ARG_QUERY);
         user = getArguments().getString(ARG_USER);
+        filter = getArguments().getInt(ARG_FILTER);
         sync = savedInstanceState == null;
 
         if (savedInstanceState == null) {
@@ -183,8 +183,8 @@ public class ThingListFragment extends ListFragment implements
             Log.d(TAG, "onCreateLoader args: " + args);
         }
         String more = args != null ? args.getString(LOADER_ARG_MORE) : null;
-        return ThingAdapter.getLoader(getActivity(), accountName, sessionId, subreddit, filter,
-                query, user, more, sync);
+        return ThingAdapter.getLoader(getActivity(), accountName, sessionId, subreddit,
+                query, user, filter, more, sync);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
@@ -193,8 +193,8 @@ public class ThingListFragment extends ListFragment implements
         }
         sync = false;
         scrollLoading = false;
-        ThingAdapter.updateLoader(getActivity(), accountName, sessionId, subreddit, filter, query,
-                user, null, sync, loader);
+        ThingAdapter.updateLoader(getActivity(), accountName, sessionId, subreddit,
+                query, user, filter, null, sync, loader);
 
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
@@ -360,12 +360,12 @@ public class ThingListFragment extends ListFragment implements
         }
     }
 
-    public int getFilter() {
-        return filter;
-    }
-
     public String getQuery() {
         return query;
+    }
+
+    public int getFilter() {
+        return filter;
     }
 
     private String createSessionId() {

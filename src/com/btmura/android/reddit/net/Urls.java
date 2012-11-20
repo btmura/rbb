@@ -210,8 +210,24 @@ public class Urls {
         return newUrl(API_SUBSCRIBE_URL);
     }
 
-    public static URL userUrl(String user, String more) {
-        StringBuilder b = resetBuilder().append(BASE_USER_URL).append(user).append("/.json");
+    public static URL userUrl(String user, int filter, String more) {
+        StringBuilder b = resetBuilder().append(BASE_USER_URL).append(user);
+        switch (filter) {
+            case FilterAdapter.PROFILE_OVERVIEW:
+                break;
+
+            case FilterAdapter.PROFILE_COMMENTS:
+                b.append("/comments");
+                break;
+
+            case FilterAdapter.PROFILE_SUBMITTED:
+                b.append("/submitted");
+                break;
+
+            default:
+                throw new IllegalArgumentException(Integer.toString(filter));
+        }
+        b.append("/.json");
         if (more != null) {
             b.append("?count=25&after=").append(encode(more));
         }
