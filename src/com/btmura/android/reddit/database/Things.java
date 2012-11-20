@@ -101,6 +101,10 @@ public class Things implements BaseColumns {
         return getString(thingBundle, COLUMN_DOMAIN);
     }
 
+    public static boolean isKind(Bundle thingBundle, int kind) {
+        return getKind(thingBundle) == kind;
+    }
+
     public static int getKind(Bundle thingBundle) {
         return getInt(thingBundle, COLUMN_KIND);
     }

@@ -77,6 +77,7 @@ public class ThingListFragment extends ListFragment implements
     private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
     private static final String STATE_SESSION_ID = "sessionId";
     private static final String STATE_SELECTED_THING_ID = "selectedThingId";
+    private static final String STATE_SELECTED_LINK_ID = "selectedLinkId";
     private static final String STATE_SUBREDDIT = ARG_SUBREDDIT;
 
     private static final String LOADER_ARG_MORE = "more";
@@ -96,6 +97,7 @@ public class ThingListFragment extends ListFragment implements
     private boolean sync;
 
     private String selectedThingId;
+    private String selectedLinkId;
     private ThingAdapter adapter;
     private OnThingSelectedListener listener;
     private boolean scrollLoading;
@@ -139,6 +141,7 @@ public class ThingListFragment extends ListFragment implements
             accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
             subreddit = savedInstanceState.getString(STATE_SUBREDDIT);
             selectedThingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
+            selectedLinkId = savedInstanceState.getString(STATE_SELECTED_LINK_ID);
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
         }
 
@@ -146,7 +149,7 @@ public class ThingListFragment extends ListFragment implements
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
 
         adapter = new ThingAdapter(getActivity(), accountName, subreddit, singleChoice, this);
-        adapter.setSelectedThing(selectedThingId);
+        adapter.setSelectedThing(selectedThingId, selectedLinkId);
         setHasOptionsMenu(true);
     }
 
@@ -207,7 +210,9 @@ public class ThingListFragment extends ListFragment implements
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        selectedThingId = adapter.setSelectedPosition(position);
+        adapter.setSelectedPosition(position);
+        selectedThingId = adapter.getSelectedThingId();
+        selectedLinkId = adapter.getSelectedLinkId();
         if (listener != null) {
             listener.onThingSelected(adapter.getThingBundle(position), position);
         }
@@ -291,6 +296,7 @@ public class ThingListFragment extends ListFragment implements
         outState.putString(STATE_ACCOUNT_NAME, accountName);
         outState.putString(STATE_SESSION_ID, sessionId);
         outState.putString(STATE_SELECTED_THING_ID, selectedThingId);
+        outState.putString(STATE_SELECTED_THING_ID, selectedLinkId);
         outState.putString(STATE_SUBREDDIT, subreddit);
     }
 
@@ -344,9 +350,10 @@ public class ThingListFragment extends ListFragment implements
         adapter.setAccountName(accountName);
     }
 
-    public void setSelectedThing(String thingId) {
+    public void setSelectedThing(String thingId, String linkId) {
         selectedThingId = thingId;
-        adapter.setSelectedThing(thingId);
+        selectedLinkId = linkId;
+        adapter.setSelectedThing(thingId, linkId);
     }
 
     public String getAccountName() {

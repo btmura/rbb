@@ -64,6 +64,7 @@ public class CommentProvider extends SessionProvider {
     public static final String PARAM_SESSION_ID = "sessionId";
     public static final String PARAM_PARENT_THING_ID = "parentThingId";
     public static final String PARAM_THING_ID = "thingId";
+    public static final String PARAM_LINK_ID = "linkId";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_COMMENTS = 1;
@@ -117,11 +118,12 @@ public class CommentProvider extends SessionProvider {
             String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
+            String linkId = uri.getQueryParameter(PARAM_LINK_ID);
 
             Context context = getContext();
             String cookie = AccountUtils.getCookie(context, accountName);
             CommentListing listing = CommentListing.get(context, helper, accountName, sessionId,
-                    sessionTimestamp, thingId, cookie);
+                    sessionTimestamp, thingId, linkId, cookie);
 
             long cleaned;
             long t1 = System.currentTimeMillis();

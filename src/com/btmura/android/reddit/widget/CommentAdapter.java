@@ -23,6 +23,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -77,17 +78,17 @@ public class CommentAdapter extends BaseCursorAdapter {
     private final OnVoteListener listener;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
-            String thingId, boolean sync) {
-        Uri uri = getUri(accountName, sessionId, thingId, sync);
+            String thingId, String linkId, boolean sync) {
+        Uri uri = getUri(accountName, sessionId, thingId, linkId, sync);
         return new CursorLoader(context, uri, PROJECTION, Comments.SELECT_VISIBLE_BY_SESSION_ID,
                 Array.of(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
     }
 
     public static void updateLoader(Context context, Loader<Cursor> loader, String accountName,
-            String sessionId, String thingId, boolean sync) {
+            String sessionId, String thingId, String linkId, boolean sync) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, thingId, sync));
+            cl.setUri(getUri(accountName, sessionId, thingId, linkId, sync));
         }
     }
 
@@ -102,13 +103,17 @@ public class CommentAdapter extends BaseCursorAdapter {
         });
     }
 
-    private static Uri getUri(String accountName, String sessionId, String thingId, boolean fetch) {
-        return CommentProvider.COMMENTS_URI.buildUpon()
+    private static Uri getUri(String accountName, String sessionId, String thingId, String linkId,
+            boolean fetch) {
+        Uri.Builder b = CommentProvider.COMMENTS_URI.buildUpon()
                 .appendQueryParameter(CommentProvider.PARAM_FETCH, Boolean.toString(fetch))
                 .appendQueryParameter(CommentProvider.PARAM_ACCOUNT, accountName)
                 .appendQueryParameter(CommentProvider.PARAM_SESSION_ID, sessionId)
-                .appendQueryParameter(CommentProvider.PARAM_THING_ID, thingId)
-                .build();
+                .appendQueryParameter(CommentProvider.PARAM_THING_ID, thingId);
+        if (!TextUtils.isEmpty(linkId)) {
+            b.appendQueryParameter(CommentProvider.PARAM_LINK_ID, linkId);
+        }
+        return b.build();
     }
 
     public CommentAdapter(Context context, String accountName, OnVoteListener listener) {

@@ -43,7 +43,6 @@ import android.view.View.OnClickListener;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
-import com.btmura.android.reddit.app.ThingBundleFragment.OnThingBundleLoadedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
@@ -55,7 +54,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
-        OnThingBundleLoadedListener,
         OnBackStackChangedListener,
         OnPageChangeListener,
         SubredditNameHolder,
@@ -220,7 +218,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String accountName = getAccountName();
         int filter = getFilter();
 
-        ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, -1, filter);
+        ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, filter);
         SubredditListFragment slf = SubredditListFragment.newInstance(accountName, subreddit,
                 query, slfFlags);
         ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, null,
@@ -282,7 +280,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                     + " filter: " + filter);
         }
 
-        ControlFragment cf = ControlFragment.newInstance(accountName, null, null, -1, filter);
+        ControlFragment cf = ControlFragment.newInstance(accountName, null, null, filter);
         SubredditListFragment slf = getSubredditListFragment();
         ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, query,
                 user, filter, tlfFlags);
@@ -350,7 +348,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String accountName = getAccountName();
         int filter = getFilter();
 
-        ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, -1, filter);
+        ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, filter);
         ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, null,
                 null, filter, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
@@ -395,23 +393,16 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         int filter = getFilter();
 
         ControlFragment cf = getControlFragment();
-        cf = ControlFragment.newInstance(accountName, cf.getSubreddit(), thingBundle,
-                thingPosition, filter);
+        cf = ControlFragment.newInstance(accountName, cf.getSubreddit(), thingBundle, filter);
+        ThingMenuFragment tf = ThingMenuFragment.newInstance(thingBundle);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        if (Things.getKind(thingBundle) == Things.KIND_LINK) {
-            ThingMenuFragment tf = ThingMenuFragment.newInstance(thingBundle);
-            ft.add(tf, ThingMenuFragment.TAG);
-        }
+        ft.add(tf, ThingMenuFragment.TAG);
         ft.addToBackStack(null);
         ft.commit();
 
         refreshThingPager(thingBundle);
-    }
-
-    public void onThingBundleLoaded(Bundle thingBundle) {
-        onThingSelected(thingBundle, 0);
     }
 
     private void safePopBackStackImmediate() {
@@ -503,7 +494,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         ThingListFragment tlf = getThingListFragment();
         if (tlf != null) {
-            tlf.setSelectedThing(Things.getThingId(cf.getThingBundle()));
+            tlf.setSelectedThing(Things.getThingId(cf.getThingBundle()),
+                    Things.getLinkId(cf.getThingBundle()));
         }
     }
 

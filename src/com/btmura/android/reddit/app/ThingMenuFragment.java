@@ -70,7 +70,8 @@ public class ThingMenuFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        boolean isSelf = Things.isSelf(thingBundle);
+        boolean isSelf = Things.isSelf(thingBundle)
+                || Things.isKind(thingBundle, Things.KIND_COMMENT);
         boolean showingLink = isShowingLink();
         boolean showLink = !isSelf && !showingLink;
         boolean showComments = !isSelf && showingLink;

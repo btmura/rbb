@@ -92,6 +92,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     private final OnVoteListener listener;
     private String accountName;
     private String selectedThingId;
+    private String selectedLinkId;
     private int thingBodyWidth;
     private boolean singleChoice;
 
@@ -203,6 +204,7 @@ public class ThingAdapter extends BaseCursorAdapter {
             String domain = cursor.getString(INDEX_DOMAIN);
             int downs = cursor.getInt(INDEX_DOWNS);
             int kind = cursor.getInt(INDEX_KIND);
+            String linkId = cursor.getString(INDEX_LINK_ID);
             int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
             boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
             int score = cursor.getInt(INDEX_SCORE);
@@ -227,23 +229,35 @@ public class ThingAdapter extends BaseCursorAdapter {
             tv.setData(accountName, author, body, createdUtc, domain, downs, kind, likes,
                     nowTimeMs, numComments, over18, parentSubreddit, score, subreddit,
                     thingBodyWidth, thingId, thumbnailUrl, title, ups);
-            tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
+            tv.setChosen(singleChoice
+                    && Objects.equals(selectedThingId, thingId)
+                    && Objects.equals(selectedLinkId, linkId));
             tv.setOnVoteListener(listener);
             thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
         }
     }
 
-    public void setSelectedThing(String thingId) {
-        if (!Objects.equals(selectedThingId, thingId)) {
+    public String getSelectedThingId() {
+        return selectedThingId;
+    }
+
+    public String getSelectedLinkId() {
+        return selectedLinkId;
+    }
+
+    public void setSelectedThing(String thingId, String linkId) {
+        if (!Objects.equals(selectedThingId, thingId)
+                || !Objects.equals(selectedLinkId, linkId)) {
             selectedThingId = thingId;
+            selectedLinkId = linkId;
             notifyDataSetChanged();
         }
     }
 
-    public String setSelectedPosition(int position) {
+    public void setSelectedPosition(int position) {
         String thingId = getString(position, INDEX_THING_ID);
-        setSelectedThing(thingId);
-        return thingId;
+        String linkId = getString(position, INDEX_LINK_ID);
+        setSelectedThing(thingId, linkId);
     }
 
     public String getMoreThingId() {

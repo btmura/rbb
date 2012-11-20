@@ -75,9 +75,9 @@ class CommentListing extends JsonParser implements CommentList {
 
     public static CommentListing get(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String sessionId, long sessionTimestamp, String thingId,
-            String cookie) throws IOException {
+            String linkId, String cookie) throws IOException {
         long t1 = System.currentTimeMillis();
-        URL url = Urls.commentsUrl(thingId, -1);
+        URL url = Urls.commentsUrl(thingId, linkId);
         HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();

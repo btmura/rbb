@@ -32,7 +32,6 @@ import javax.net.ssl.HttpsURLConnection;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.Log;
@@ -217,26 +216,6 @@ public class RedditApi {
             SubredditParser parser = new SubredditParser();
             parser.parseListingObject(reader);
             return parser.results;
-        } finally {
-            close(in, conn);
-        }
-    }
-
-    /**
-     * {{@link #getThingBundle(String)} returns a {@link Bundle} containing
-     * information about the thing specified by thingId.
-     */
-    public static Bundle getThingBundle(String thingId, String cookie) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            // Get only one comment, since it will have the info we need.
-            conn = connect(Urls.commentsUrl(thingId, 1), cookie, false);
-            in = conn.getInputStream();
-            JsonReader reader = new JsonReader(new InputStreamReader(in));
-            ThingBundleParser parser = new ThingBundleParser();
-            parser.parseListingArray(reader);
-            return parser.bundle;
         } finally {
             close(in, conn);
         }

@@ -26,22 +26,19 @@ public class ControlFragment extends Fragment {
     private static final String ARG_ACCOUNT_NAME = "an";
     private static final String ARG_SUBREDDIT = "s";
     private static final String ARG_THING_BUNDLE = "tb";
-    private static final String ARG_THING_POSITION = "tp";
     private static final String ARG_FILTER = "f";
 
     private String accountName;
     private String subreddit;
     private Bundle thingBundle;
-    private int thingPosition;
     private int filter;
 
     public static ControlFragment newInstance(String accountName, String sr, Bundle thingBundle,
-            int thingPosition, int filter) {
-        Bundle b = new Bundle(5);
+            int filter) {
+        Bundle b = new Bundle(4);
         b.putString(ARG_ACCOUNT_NAME, accountName);
         b.putString(ARG_SUBREDDIT, sr);
         b.putBundle(ARG_THING_BUNDLE, thingBundle);
-        b.putInt(ARG_THING_POSITION, thingPosition);
         b.putInt(ARG_FILTER, filter);
 
         ControlFragment frag = new ControlFragment();
@@ -65,10 +62,6 @@ public class ControlFragment extends Fragment {
         return thingBundle;
     }
 
-    public int getThingPosition() {
-        return thingPosition;
-    }
-
     public int getFilter() {
         return filter;
     }
@@ -81,7 +74,6 @@ public class ControlFragment extends Fragment {
         accountName = b.getString(ARG_ACCOUNT_NAME);
         subreddit = b.getString(ARG_SUBREDDIT);
         thingBundle = b.getBundle(ARG_THING_BUNDLE);
-        thingPosition = b.getInt(ARG_THING_POSITION);
         filter = b.getInt(ARG_FILTER);
     }
 
@@ -91,7 +83,6 @@ public class ControlFragment extends Fragment {
         outState.putString(ARG_ACCOUNT_NAME, accountName);
         outState.putString(ARG_SUBREDDIT, subreddit);
         outState.putBundle(ARG_THING_BUNDLE, thingBundle);
-        outState.putInt(ARG_THING_POSITION, thingPosition);
         outState.putInt(ARG_FILTER, filter);
     }
 }

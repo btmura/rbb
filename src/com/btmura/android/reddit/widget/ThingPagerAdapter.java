@@ -23,14 +23,12 @@ import android.support.v13.app.FragmentStatePagerAdapter;
 
 import com.btmura.android.reddit.app.CommentListFragment;
 import com.btmura.android.reddit.app.LinkFragment;
-import com.btmura.android.reddit.app.ThingBundleFragment;
 import com.btmura.android.reddit.database.Things;
 
 public class ThingPagerAdapter extends FragmentStatePagerAdapter {
 
     public static final int TYPE_LINK = 0;
     public static final int TYPE_COMMENTS = 1;
-    public static final int TYPE_LOADER = 2;
 
     private final String accountName;
     private final Bundle thingBundle;
@@ -62,10 +60,8 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
                 return LinkFragment.newInstance(Things.getUrl(thingBundle));
 
             case TYPE_COMMENTS:
-                return CommentListFragment.newInstance(accountName, Things.getThingId(thingBundle));
-
-            case TYPE_LOADER:
-                return ThingBundleFragment.newInstance(Things.getLinkId(thingBundle));
+                return CommentListFragment.newInstance(accountName, Things.getThingId(thingBundle),
+                        Things.getLinkId(thingBundle));
 
             default:
                 throw new IllegalStateException();
@@ -91,7 +87,7 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
                 return Things.isSelf(thingBundle) ? TYPE_COMMENTS : TYPE_LINK;
 
             case Things.KIND_COMMENT:
-                return TYPE_LOADER;
+                return TYPE_COMMENTS;
 
             default:
                 throw new IllegalStateException();

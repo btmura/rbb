@@ -55,20 +55,24 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_ID = "thingId";
+    private static final String ARG_LINK_ID = "linkId";
 
     private static final String STATE_SESSION_ID = "sessionId";
 
     private String accountName;
     private String thingId;
+    private String linkId;
     private String sessionId;
     private boolean sync;
     private CommentAdapter adapter;
 
-    public static CommentListFragment newInstance(String accountName, String thingId) {
+    public static CommentListFragment
+            newInstance(String accountName, String thingId, String linkId) {
         CommentListFragment frag = new CommentListFragment();
-        Bundle b = new Bundle(2);
+        Bundle b = new Bundle(3);
         b.putString(ARG_ACCOUNT_NAME, accountName);
         b.putString(ARG_THING_ID, thingId);
+        b.putString(ARG_LINK_ID, linkId);
         frag.setArguments(b);
         return frag;
     }
@@ -78,6 +82,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         super.onCreate(savedInstanceState);
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
         thingId = getArguments().getString(ARG_THING_ID);
+        linkId = getArguments().getString(ARG_LINK_ID);
         sync = savedInstanceState == null;
 
         // Don't create a new session if changing configuration.
@@ -112,7 +117,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-        return CommentAdapter.getLoader(getActivity(), accountName, sessionId, thingId, sync);
+        return CommentAdapter.getLoader(getActivity(), accountName, sessionId,
+                thingId, linkId, sync);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
@@ -120,7 +126,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
         sync = false;
-        CommentAdapter.updateLoader(getActivity(), loader, accountName, sessionId, thingId, sync);
+        CommentAdapter.updateLoader(getActivity(), loader, accountName, sessionId,
+                thingId, linkId, sync);
 
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
