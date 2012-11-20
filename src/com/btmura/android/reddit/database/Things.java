@@ -160,4 +160,20 @@ public class Things implements BaseColumns {
     static String getString(Bundle bundle, String columnName) {
         return bundle != null ? bundle.getString(columnName) : null;
     }
+
+    public static int parseKind(String kind) {
+        if ("t1".equals(kind)) {
+            return Things.KIND_COMMENT;
+        } else if ("t2".equals(kind)) {
+            return Things.KIND_ACCOUNT;
+        } else if ("t3".equals(kind)) {
+            return Things.KIND_LINK;
+        } else if ("t4".equals(kind)) {
+            return Things.KIND_MESSAGE;
+        } else if ("t5".equals(kind)) {
+            return Things.KIND_SUBREDDIT;
+        } else {
+            throw new IllegalArgumentException("kind: " + kind);
+        }
+    }
 }

@@ -67,9 +67,13 @@ public class Urls {
         return newUrl(resetBuilder().append(BASE_CAPTCHA_URL).append(id).append(".png"));
     }
 
-    public static URL commentsUrl(String id) {
+    public static URL commentsUrl(String id, int limit) {
         id = removeTag(id);
-        return newUrl(resetBuilder().append(BASE_COMMENTS_URL).append(id).append(".json"));
+        StringBuilder b = resetBuilder().append(BASE_COMMENTS_URL).append(id).append(".json");
+        if (limit != -1) {
+            b.append("?limit=").append(limit);
+        }
+        return newUrl(b);
     }
 
     public static URL deleteApiUrl() {

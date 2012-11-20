@@ -43,6 +43,7 @@ import android.view.View.OnClickListener;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
+import com.btmura.android.reddit.app.ThingBundleFragment.OnThingBundleLoadedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
@@ -54,6 +55,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
+        OnThingBundleLoadedListener,
         OnBackStackChangedListener,
         OnPageChangeListener,
         SubredditNameHolder,
@@ -395,15 +397,21 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment cf = getControlFragment();
         cf = ControlFragment.newInstance(accountName, cf.getSubreddit(), thingBundle,
                 thingPosition, filter);
-        ThingMenuFragment tf = ThingMenuFragment.newInstance(thingBundle);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        ft.add(tf, ThingMenuFragment.TAG);
+        if (Things.getKind(thingBundle) == Things.KIND_LINK) {
+            ThingMenuFragment tf = ThingMenuFragment.newInstance(thingBundle);
+            ft.add(tf, ThingMenuFragment.TAG);
+        }
         ft.addToBackStack(null);
         ft.commit();
 
         refreshThingPager(thingBundle);
+    }
+
+    public void onThingBundleLoaded(Bundle thingBundle) {
+        onThingSelected(thingBundle, 0);
     }
 
     private void safePopBackStackImmediate() {

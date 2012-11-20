@@ -120,6 +120,15 @@ public class SubmitLinkFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        if (submitTask != null) {
+            submitTask.cancel(true);
+            submitTask = null;
+        }
+        super.onDestroy();
+    }
+
     class SubmitTask extends AsyncTask<Void, Void, Result> {
 
         private Context context;

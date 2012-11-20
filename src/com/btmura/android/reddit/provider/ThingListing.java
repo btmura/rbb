@@ -129,21 +129,7 @@ class ThingListing extends JsonParser {
 
     @Override
     public void onKind(JsonReader reader, int index) throws IOException {
-        String kind = reader.nextString();
-        int kindValue;
-        if ("t1".equals(kind)) {
-            kindValue = Things.KIND_COMMENT;
-        } else if ("t2".equals(kind)) {
-            kindValue = Things.KIND_ACCOUNT;
-        } else if ("t3".equals(kind)) {
-            kindValue = Things.KIND_LINK;
-        } else if ("t4".equals(kind)) {
-            kindValue = Things.KIND_MESSAGE;
-        } else if ("t5".equals(kind)) {
-            kindValue = Things.KIND_SUBREDDIT;
-        } else {
-            throw new IllegalArgumentException("kind: " + kind);
-        }
+        int kindValue = Things.parseKind(reader.nextString());
         values.get(index).put(Things.COLUMN_KIND, kindValue);
     }
 
