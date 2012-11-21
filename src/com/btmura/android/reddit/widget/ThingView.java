@@ -129,8 +129,8 @@ public class ThingView extends CustomView implements OnGestureListener {
             scoreText = VotingArrows.getScoreText(score);
         }
 
-        setStatusText(author, createdUtc, nowTimeMs, numComments, over18, parentSubreddit, score,
-                subreddit, drawVotingArrows);
+        setStatusText(author, createdUtc, kind, nowTimeMs, numComments, over18, parentSubreddit,
+                score, subreddit, drawVotingArrows);
         setDetailsText(domain, downs, ups);
 
         if (!TextUtils.isEmpty(body)) {
@@ -145,8 +145,9 @@ public class ThingView extends CustomView implements OnGestureListener {
         requestLayout();
     }
 
-    private void setStatusText(String author, long createdUtc, long nowTimeMs, int numComments,
-            boolean over18, String parentSubreddit, int score, String subreddit, boolean votable) {
+    private void setStatusText(String author, long createdUtc, int kind, long nowTimeMs,
+            int numComments, boolean over18, String parentSubreddit, int score, String subreddit,
+            boolean votable) {
         Context c = getContext();
         Resources r = getResources();
 
@@ -170,7 +171,10 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         statusText.append(RelativeTime.format(c, nowTimeMs, createdUtc)).append("  ");
-        statusText.append(r.getQuantityString(R.plurals.comments, numComments, numComments));
+
+        if (kind == Things.KIND_LINK) {
+            statusText.append(r.getQuantityString(R.plurals.comments, numComments, numComments));
+        }
     }
 
     private void setDetailsText(String domain, int downs, int ups) {
