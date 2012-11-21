@@ -259,8 +259,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             case R.id.menu_delete:
                 return handleDelete(mode);
 
-            case R.id.menu_view_profile:
-                return handleViewProfile(mode);
+            case R.id.menu_profile:
+                return handleProfile(mode);
 
             case R.id.menu_copy_url:
                 return handleCopyUrl(mode);
@@ -332,7 +332,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         }
     }
 
-    private boolean handleViewProfile(ActionMode mode) {
+    private boolean handleProfile(ActionMode mode) {
         int position = getFirstCheckedPosition();
         String user = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
         Intent intent = new Intent(getActivity(), UserProfileActivity.class);

@@ -17,13 +17,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_view_profile"
+        android:id="@+id/menu_profile"
         android:icon="@drawable/ic_action_profile"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_view_profile"/>
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/menu_profile"/>
     <item
         android:id="@+id/menu_copy_url"
-        android:showAsAction="never"
         android:title="@string/menu_copy_url"/>
 
 </menu>
