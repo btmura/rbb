@@ -297,7 +297,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         detailsLayout = null;
         if (detailsWidth > 0) {
-            detailsLayout = makeLayout(THING_STATUS, detailsText, detailsWidth,
+            detailsLayout = makeBoringLayout(THING_STATUS, detailsText, detailsWidth,
                     Alignment.ALIGN_OPPOSITE);
         }
 
@@ -352,7 +352,10 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     private Layout createLinkTitleLayout(int width) {
-        return makeLayout(THING_LINK_TITLE, linkTitle, width, Alignment.ALIGN_NORMAL);
+        CharSequence truncated = TextUtils.ellipsize(linkTitle,
+                TEXT_PAINTS[THING_LINK_TITLE], width, TruncateAt.END);
+        return new StaticLayout(truncated, TEXT_PAINTS[THING_LINK_TITLE], width,
+                Alignment.ALIGN_NORMAL, 1f, 0f, true);
     }
 
     private Layout createTitleLayout(int width) {
@@ -366,10 +369,11 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     private Layout createStatusLayout(int width) {
-        return makeLayout(THING_STATUS, statusText, width, Alignment.ALIGN_NORMAL);
+        return makeBoringLayout(THING_STATUS, statusText, width, Alignment.ALIGN_NORMAL);
     }
 
-    private static Layout makeLayout(int paint, CharSequence text, int width, Alignment alignment) {
+    private static Layout makeBoringLayout(int paint, CharSequence text, int width,
+            Alignment alignment) {
         BoringLayout.Metrics m = BoringLayout.isBoring(text, TEXT_PAINTS[paint]);
         return BoringLayout.make(text, TEXT_PAINTS[paint], width, alignment, 1f, 0f, m, true,
                 TruncateAt.END, width);
