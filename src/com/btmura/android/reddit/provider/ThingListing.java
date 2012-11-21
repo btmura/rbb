@@ -151,7 +151,8 @@ class ThingListing extends JsonParser {
 
     @Override
     public void onLinkTitle(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_LINK_TITLE, reader.nextString());
+        CharSequence title = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        values.get(index).put(Things.COLUMN_LINK_TITLE, title.toString());
     }
 
     @Override
