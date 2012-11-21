@@ -16,10 +16,102 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.Activity;
+import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
+import android.content.Loader;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 
-public class MailActivity extends Activity {
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.widget.FilterAdapter;
+
+public class MailActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
     /** Required string extra that is the user's name. */
     public static final String EXTRA_USER = "user";
+
+    private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
+
+    private FilterAdapter adapter;
+    private String accountName;
+    private SharedPreferences prefs;
+
+    @Override
+    protected void setContentView() {
+        setContentView(R.layout.mail);
+    }
+
+    @Override
+    protected boolean skipSetup() {
+        return false;
+    }
+
+    @Override
+    protected void setupViews() {
+    }
+
+    @Override
+    protected void setupActionBar(Bundle savedInstanceState) {
+        adapter = new FilterAdapter(this);
+        adapter.setTitle(getUserName());
+
+        bar.setDisplayHomeAsUpEnabled(true);
+        bar.setDisplayShowTitleEnabled(false);
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        bar.setListNavigationCallbacks(adapter, this);
+        if (savedInstanceState != null) {
+            bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_NAVIGATION_INDEX));
+        }
+    }
+
+    private String getUserName() {
+        String user = getIntent().getStringExtra(EXTRA_USER);
+        // TODO: Remove this fallback once things become more stable.
+        if (user == null) {
+            user = "rbbtest1";
+        }
+        return user;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        prefs = result.prefs;
+        accountName = result.getLastAccount();
+        adapter.addMailFilters(this);
+        bar.setSelectedNavigationItem(0);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<AccountResult> loader) {
+    }
+
+    @Override
+    protected String getAccountName() {
+        return accountName;
+    }
+
+    @Override
+    protected int getFilter() {
+        return adapter.getFilter(bar.getSelectedNavigationIndex());
+    }
+
+    @Override
+    protected boolean hasSubredditList() {
+        return false;
+    }
+
+    @Override
+    protected void refreshActionBar(String subreddit, Bundle thingBundle) {
+    }
+
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        return false;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_NAVIGATION_INDEX, bar.getSelectedNavigationIndex());
+    }
 }
