@@ -18,25 +18,21 @@ package com.btmura.android.reddit.app;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
-import android.content.Loader;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.AccountLoader;
-import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.util.Array;
+import com.btmura.android.reddit.accounts.AccountUtils;
 
-public class GlobalMenuFragment extends Fragment implements
-        SearchView.OnFocusChangeListener,
-        SearchView.OnQueryTextListener,
-        LoaderCallbacks<AccountResult> {
+public class GlobalMenuFragment extends Fragment implements OnFocusChangeListener,
+        OnQueryTextListener {
 
     public static final String TAG = "GlobalMenuFragment";
 
@@ -47,10 +43,10 @@ public class GlobalMenuFragment extends Fragment implements
     }
 
     private SubredditNameHolder subredditNameHolder;
+    private AccountNameHolder accountNameHolder;
     private OnSearchQuerySubmittedListener listener;
     private MenuItem searchItem;
     private SearchView searchView;
-    private boolean hasAccounts;
 
     public static GlobalMenuFragment newInstance() {
         return new GlobalMenuFragment();
@@ -62,6 +58,9 @@ public class GlobalMenuFragment extends Fragment implements
         if (activity instanceof SubredditNameHolder) {
             subredditNameHolder = (SubredditNameHolder) activity;
         }
+        if (activity instanceof AccountNameHolder) {
+            accountNameHolder = (AccountNameHolder) activity;
+        }
         if (activity instanceof OnSearchQuerySubmittedListener) {
             listener = (OnSearchQuerySubmittedListener) activity;
         }
@@ -71,26 +70,6 @@ public class GlobalMenuFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(getActivity(), false);
-    }
-
-    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        hasAccounts = !Array.isEmpty(result.accountNames);
-        getActivity().invalidateOptionsMenu();
-    }
-
-    public void onLoaderReset(Loader<AccountResult> loader) {
-        hasAccounts = false;
-        getActivity().invalidateOptionsMenu();
     }
 
     @Override
@@ -106,8 +85,10 @@ public class GlobalMenuFragment extends Fragment implements
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_submit_link).setVisible(hasAccounts);
-        menu.findItem(R.id.menu_profile).setVisible(hasAccounts);
+        boolean isAccount = accountNameHolder != null
+                && AccountUtils.isAccount(accountNameHolder.getAccountName());
+        menu.findItem(R.id.menu_submit_link).setVisible(isAccount);
+        menu.findItem(R.id.menu_profile).setVisible(isAccount);
     }
 
     @Override
@@ -141,7 +122,8 @@ public class GlobalMenuFragment extends Fragment implements
     private boolean handleSubmitLink() {
         Intent intent = new Intent(getActivity(), SubmitLinkActivity.class);
         if (subredditNameHolder != null) {
-            intent.putExtra(SubmitLinkActivity.EXTRA_SUBREDDIT, subredditNameHolder.getSubredditName());
+            intent.putExtra(SubmitLinkActivity.EXTRA_SUBREDDIT,
+                    subredditNameHolder.getSubredditName());
         }
         startActivity(intent);
         return true;
@@ -154,6 +136,7 @@ public class GlobalMenuFragment extends Fragment implements
 
     private boolean handleProfile() {
         Intent intent = new Intent(getActivity(), UserProfileActivity.class);
+        intent.putExtra(UserProfileActivity.EXTRA_USER, accountNameHolder.getAccountName());
         startActivity(intent);
         return true;
     }

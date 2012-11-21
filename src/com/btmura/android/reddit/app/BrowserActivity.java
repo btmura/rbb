@@ -30,7 +30,8 @@ import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
-public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
+public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener,
+        AccountNameHolder {
 
     public static final String EXTRA_SUBREDDIT_NAME = "sn";
 
@@ -84,7 +85,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
-    protected String getAccountName() {
+    public String getAccountName() {
         return adapter.getAccountName();
     }
 
