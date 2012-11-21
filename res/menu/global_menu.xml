@@ -33,9 +33,9 @@
         android:showAsAction="ifRoom|collapseActionView"
         android:title="@string/menu_search"/>
     <item
-        android:id="@+id/menu_profile"
+        android:id="@+id/menu_view_profile"
         android:orderInCategory="1337"
-        android:title="@string/menu_profile"/>
+        android:title="@string/menu_view_profile"/>
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="1337"

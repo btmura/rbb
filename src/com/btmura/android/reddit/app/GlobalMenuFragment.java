@@ -107,7 +107,7 @@ public class GlobalMenuFragment extends Fragment implements
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.menu_submit_link).setVisible(hasAccounts);
-        menu.findItem(R.id.menu_profile).setVisible(hasAccounts);
+        menu.findItem(R.id.menu_view_profile).setVisible(hasAccounts);
     }
 
     @Override
@@ -122,8 +122,8 @@ public class GlobalMenuFragment extends Fragment implements
             case R.id.menu_search:
                 return handleSearch();
 
-            case R.id.menu_profile:
-                return handleProfile();
+            case R.id.menu_view_profile:
+                return handleViewProfile();
 
             case R.id.menu_settings:
                 return handleSettings();
@@ -152,7 +152,7 @@ public class GlobalMenuFragment extends Fragment implements
         return true;
     }
 
-    private boolean handleProfile() {
+    private boolean handleViewProfile() {
         Intent intent = new Intent(getActivity(), UserProfileActivity.class);
         startActivity(intent);
         return true;
