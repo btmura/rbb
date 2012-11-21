@@ -216,12 +216,14 @@ public class ThingView extends CustomView implements OnGestureListener {
                 break;
         }
 
+
+        int linkTitleWidth;
         int titleWidth;
         int detailsWidth;
         CharSequence detailsText;
 
         if (thingBodyWidth > 0) {
-            titleWidth = Math.min(measuredWidth, thingBodyWidth) - PADDING * 2;
+            linkTitleWidth = titleWidth = Math.min(measuredWidth, thingBodyWidth) - PADDING * 2;
             int remainingWidth = measuredWidth - thingBodyWidth - PADDING * 2;
             if (remainingWidth > MAX_DETAILS_WIDTH) {
                 detailsWidth = MAX_DETAILS_WIDTH;
@@ -234,7 +236,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                 detailsText = "";
             }
         } else {
-            titleWidth = measuredWidth - PADDING * 2;
+            linkTitleWidth = titleWidth = measuredWidth - PADDING * 2;
             detailsWidth = 0;
             detailsText = "";
         }
@@ -251,7 +253,6 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
         titleWidth -= leftGadgetWidth;
 
-        int linkTitleWidth = measuredWidth - PADDING * 2;
         int statusWidth = measuredWidth - PADDING * 2 - leftGadgetWidth;
         if (detailsWidth > 0) {
             statusWidth -= detailsWidth + PADDING;
