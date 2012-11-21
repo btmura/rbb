@@ -41,6 +41,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     private int kind;
     private int likes;
+    private String linkTitle;
     private int thingBodyWidth;
     private String thumbnailUrl;
     private String thingId;
@@ -56,6 +57,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private final SpannableStringBuilder longDetailsText = new SpannableStringBuilder();
     private String shortDetailsText;
 
+    private Layout linkTitleLayout;
     private Layout titleLayout;
     private Layout bodyLayout;
     private Layout statusLayout;
@@ -102,6 +104,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             int downs,
             int kind,
             int likes,
+            String linkTitle,
             long nowTimeMs,
             int numComments,
             boolean over18,
@@ -115,6 +118,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             int ups) {
         this.kind = kind;
         this.likes = likes;
+        this.linkTitle = linkTitle;
         this.thingBodyWidth = thingBodyWidth;
         this.thingId = thingId;
         this.thumbnailUrl = thumbnailUrl;
@@ -129,8 +133,8 @@ public class ThingView extends CustomView implements OnGestureListener {
             scoreText = VotingArrows.getScoreText(score);
         }
 
-        setStatusText(author, createdUtc, kind, nowTimeMs, numComments, over18, parentSubreddit,
-                score, subreddit, drawVotingArrows);
+        setStatusText(author, createdUtc, kind, nowTimeMs, numComments, over18,
+                parentSubreddit, score, subreddit, drawVotingArrows);
         setDetailsText(domain, downs, ups);
 
         if (!TextUtils.isEmpty(body)) {
@@ -235,24 +239,25 @@ public class ThingView extends CustomView implements OnGestureListener {
             detailsText = "";
         }
 
-        int width = 0;
+        int leftGadgetWidth = 0;
         if (drawVotingArrows) {
-            width += VotingArrows.getWidth(drawVotingArrows) + PADDING;
+            leftGadgetWidth += VotingArrows.getWidth(drawVotingArrows) + PADDING;
             if (drawScore) {
                 VotingArrows.measureScoreText(scoreText, scoreBounds);
             }
         }
         if (!TextUtils.isEmpty(thumbnailUrl)) {
-            width += Thumbnail.getWidth() + PADDING;
+            leftGadgetWidth += Thumbnail.getWidth() + PADDING;
         }
-        titleWidth -= width;
+        titleWidth -= leftGadgetWidth;
 
-        int statusWidth = measuredWidth - PADDING * 2;
-        statusWidth -= width;
+        int linkTitleWidth = measuredWidth - PADDING * 2;
+        int statusWidth = measuredWidth - PADDING * 2 - leftGadgetWidth;
         if (detailsWidth > 0) {
             statusWidth -= detailsWidth + PADDING;
         }
 
+        linkTitleWidth = Math.max(0, linkTitleWidth);
         titleWidth = Math.max(0, titleWidth);
         statusWidth = Math.max(0, statusWidth);
         detailsWidth = Math.max(0, detailsWidth);
@@ -265,9 +270,15 @@ public class ThingView extends CustomView implements OnGestureListener {
             leftHeight = Math.max(leftHeight, Thumbnail.getHeight());
         }
 
+        linkTitleLayout = null;
         titleLayout = null;
         bodyLayout = null;
         rightHeight = 0;
+
+        if (!TextUtils.isEmpty(linkTitle)) {
+            linkTitleLayout = createLinkTitleLayout(linkTitleWidth);
+            rightHeight += linkTitleLayout.getHeight() + ELEMENT_PADDING;
+        }
 
         if (!TextUtils.isEmpty(title)) {
             titleLayout = createTitleLayout(titleWidth);
@@ -280,7 +291,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         if (!TextUtils.isEmpty(statusText)) {
-            statusLayout = makeLayout(THING_STATUS, statusText, statusWidth, Alignment.ALIGN_NORMAL);
+            statusLayout = createStatusLayout(statusWidth);
             rightHeight += statusLayout.getHeight();
         }
 
@@ -305,6 +316,10 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         // Move from top to bottom one more time.
         int y = (minHeight - rightHeight) / 2;
+
+        if (linkTitleLayout != null) {
+            y += linkTitleLayout.getHeight() + ELEMENT_PADDING;
+        }
 
         if (isTopStatus() && statusLayout != null) {
             y += statusLayout.getHeight() + ELEMENT_PADDING;
@@ -336,14 +351,22 @@ public class ThingView extends CustomView implements OnGestureListener {
         return kind == Things.KIND_COMMENT;
     }
 
+    private Layout createLinkTitleLayout(int width) {
+        return makeLayout(THING_LINK_TITLE, linkTitle, width, Alignment.ALIGN_NORMAL);
+    }
+
     private Layout createTitleLayout(int width) {
         return new StaticLayout(title, TEXT_PAINTS[THING_TITLE], width,
                 Alignment.ALIGN_NORMAL, 1f, 0f, true);
     }
 
-    private StaticLayout createBodyLayout(int width) {
-        return new StaticLayout(bodyText, TEXT_PAINTS[THING_TITLE], width,
-                Alignment.ALIGN_NORMAL, 1, 0, true);
+    private Layout createBodyLayout(int width) {
+        return new StaticLayout(bodyText, TEXT_PAINTS[THING_BODY], width,
+                Alignment.ALIGN_NORMAL, 1f, 0f, true);
+    }
+
+    private Layout createStatusLayout(int width) {
+        return makeLayout(THING_STATUS, statusText, width, Alignment.ALIGN_NORMAL);
     }
 
     private static Layout makeLayout(int paint, CharSequence text, int width, Alignment alignment) {
@@ -363,6 +386,12 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         c.translate(PADDING, PADDING);
+
+        if (linkTitleLayout != null) {
+            linkTitleLayout.draw(c);
+            c.translate(0, linkTitleLayout.getHeight() + ELEMENT_PADDING);
+        }
+
         if (drawVotingArrows) {
             VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes, drawScore, true);
             c.translate(VotingArrows.getWidth(drawVotingArrows) + PADDING, 0);
@@ -440,12 +469,16 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, 0, drawVotingArrows, drawScore, true);
+        return VotingArrows.onDown(e, getTopOffset(), 0, drawVotingArrows, drawScore, true);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, 0, drawVotingArrows, drawScore, true,
+        return VotingArrows.onSingleTapUp(e, getTopOffset(), 0, drawVotingArrows, drawScore, true,
                 listener, thingId);
+    }
+
+    private float getTopOffset() {
+        return linkTitleLayout != null ? linkTitleLayout.getHeight() + ELEMENT_PADDING : 0;
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

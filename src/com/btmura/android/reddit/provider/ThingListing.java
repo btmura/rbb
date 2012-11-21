@@ -150,6 +150,11 @@ class ThingListing extends JsonParser {
     }
 
     @Override
+    public void onLinkTitle(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_LINK_TITLE, reader.nextString());
+    }
+
+    @Override
     public void onName(JsonReader reader, int index) throws IOException {
         String name = readTrimmedString(reader, "");
         values.get(index).put(Things.COLUMN_THING_ID, name);

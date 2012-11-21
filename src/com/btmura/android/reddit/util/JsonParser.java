@@ -153,8 +153,6 @@ public class JsonParser {
                 onDowns(r, i);
             } else if ("likes".equals(name)) {
                 onLikes(r, i);
-            } else if ("link_id".equals(name)) {
-                onLinkId(r, i);
             } else if ("num_comments".equals(name)) {
                 onNumComments(r, i);
             } else if ("subreddit_id".equals(name)) {
@@ -173,6 +171,10 @@ public class JsonParser {
                 onSelfText(r, i);
             } else if ("body".equals(name)) {
                 onBody(r, i);
+            } else if ("link_id".equals(name)) {
+                onLinkId(r, i);
+            } else if ("link_title".equals(name)) {
+                onLinkTitle(r, i);
             } else if ("display_name".equals(name)) {
                 onDisplayName(r, i);
             } else if ("description".equals(name)) {
@@ -303,6 +305,10 @@ public class JsonParser {
     }
 
     public void onLinkId(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onLinkTitle(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 

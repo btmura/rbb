@@ -52,7 +52,13 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="ThingLinkTitleText" parent="@style/SubredditStatusText">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
     <style name="ThingTitleText" parent="@style/SubredditTitleText" />
+
+    <style name="ThingBodyText" parent="@style/SubredditTitleText" />
 
     <style name="ThingStatusText" parent="@style/SubredditStatusText" />
 

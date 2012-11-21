@@ -361,11 +361,11 @@ public class CommentView extends CustomView implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, getCommentLeft(), drawVotingArrows, drawScore, isVotable);
+        return VotingArrows.onDown(e, 0, getCommentLeft(), drawVotingArrows, drawScore, isVotable);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, getCommentLeft(), drawVotingArrows, drawScore,
+        return VotingArrows.onSingleTapUp(e, 0, getCommentLeft(), drawVotingArrows, drawScore,
                 isVotable, listener, thingId);
     }
 
