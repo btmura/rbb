@@ -214,6 +214,11 @@ public class ThingAdapter extends BaseCursorAdapter {
             String title = cursor.getString(INDEX_TITLE);
             int ups = cursor.getInt(INDEX_UPS);
 
+            // Comments don't have a score so calculate our own.
+            if (kind == Things.KIND_COMMENT) {
+                score = ups - downs;
+            }
+
             // Reconcile local and remote votes.
             int likes = cursor.getInt(INDEX_LIKES);
             if (!cursor.isNull(INDEX_VOTE)) {
