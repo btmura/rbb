@@ -37,6 +37,10 @@
         android:orderInCategory="1337"
         android:title="@string/menu_profile"/>
     <item
+        android:id="@+id/menu_mail"
+        android:orderInCategory="1337"
+        android:title="@string/menu_mail"/>
+    <item
         android:id="@+id/menu_settings"
         android:orderInCategory="1337"
         android:title="@string/menu_settings"/>

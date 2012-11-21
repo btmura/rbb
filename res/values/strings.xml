@@ -62,6 +62,7 @@
     <string name="menu_copy_url">Copy URL</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_link">View link</string>
+    <string name="menu_mail">Mail</string>
     <string name="menu_open">Open in another app</string>
     <string name="menu_profile">Profile</string>
     <string name="menu_remove_account">Remove account</string>

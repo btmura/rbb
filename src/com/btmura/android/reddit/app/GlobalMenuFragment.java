@@ -89,6 +89,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 && AccountUtils.isAccount(accountNameHolder.getAccountName());
         menu.findItem(R.id.menu_submit_link).setVisible(isAccount);
         menu.findItem(R.id.menu_profile).setVisible(isAccount);
+        menu.findItem(R.id.menu_mail).setVisible(isAccount);
     }
 
     @Override
