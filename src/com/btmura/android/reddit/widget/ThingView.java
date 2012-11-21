@@ -354,22 +354,24 @@ public class ThingView extends CustomView implements OnGestureListener {
     private Layout createLinkTitleLayout(int width) {
         CharSequence truncated = TextUtils.ellipsize(linkTitle,
                 TEXT_PAINTS[THING_LINK_TITLE], width, TruncateAt.END);
-        return new StaticLayout(truncated, TEXT_PAINTS[THING_LINK_TITLE], width,
-                Alignment.ALIGN_NORMAL, 1f, 0f, true);
+        return makeStaticLayout(THING_LINK_TITLE, truncated, width);
     }
 
     private Layout createTitleLayout(int width) {
-        return new StaticLayout(title, TEXT_PAINTS[THING_TITLE], width,
-                Alignment.ALIGN_NORMAL, 1f, 0f, true);
+        return makeStaticLayout(THING_TITLE, title, width);
     }
 
     private Layout createBodyLayout(int width) {
-        return new StaticLayout(bodyText, TEXT_PAINTS[THING_BODY], width,
-                Alignment.ALIGN_NORMAL, 1f, 0f, true);
+        return makeStaticLayout(THING_BODY, bodyText, width);
     }
 
     private Layout createStatusLayout(int width) {
         return makeBoringLayout(THING_STATUS, statusText, width, Alignment.ALIGN_NORMAL);
+    }
+
+    private static Layout makeStaticLayout(int paint, CharSequence text, int width) {
+        return new StaticLayout(text, TEXT_PAINTS[paint], width,
+                Alignment.ALIGN_NORMAL, 1f, 0f, true);
     }
 
     private static Layout makeBoringLayout(int paint, CharSequence text, int width,
