@@ -33,16 +33,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.util.Flag;
+import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
 public class SubredditListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
-        MultiChoiceModeListener {
+        MultiChoiceModeListener, OnItemSelectedListener {
 
     public static final String TAG = "SubredditListFragment";
 
@@ -56,6 +62,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
     private static final String STATE_SELECTED_SUBREDDIT = ARG_SELECTED_SUBREDDIT;
     private static final String STATE_SESSION_ID = "sessionId";
+    private static final String STATE_SELECTED_ACTION_ACCOUNT = "selectedActionAccount";
 
     public interface OnSubredditSelectedListener {
         void onInitialSubredditSelected(String subreddit);
@@ -71,6 +78,13 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private boolean singleChoice;
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
+
+    private ActionMode actionMode;
+    private AccountNameAdapter accountNameAdapter;
+    private AccountResultHolder accountResultHolder;
+    private TextView subredditCountText;
+    private Spinner accountSpinner;
+    private String selectedActionAccount;
 
     public static SubredditListFragment newInstance(String accountName, String selectedSubreddit,
             String query, int flags) {
@@ -91,6 +105,9 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         if (activity instanceof OnSubredditSelectedListener) {
             listener = (OnSubredditSelectedListener) activity;
         }
+        if (activity instanceof AccountResultHolder) {
+            accountResultHolder = (AccountResultHolder) activity;
+        }
     }
 
     @Override
@@ -109,6 +126,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
             accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
             selectedSubreddit = savedInstanceState.getString(STATE_SELECTED_SUBREDDIT);
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
+            selectedActionAccount = savedInstanceState.getString(STATE_SELECTED_ACTION_ACCOUNT);
         }
 
         int flags = getArguments().getInt(ARG_FLAGS);
@@ -119,7 +137,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         ListView list = (ListView) view.findViewById(android.R.id.list);
         list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -160,6 +179,9 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_subreddits : R.string.error));
         setListShown(true);
+        if (actionMode != null) {
+            actionMode.invalidate();
+        }
         if (cursor != null && cursor.getCount() > 0) {
             listener.onInitialSubredditSelected(adapter.getName(0));
         }
@@ -177,19 +199,71 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         }
     }
 
+    static class ViewHolder {
+        TextView subredditCountText;
+        Spinner accountSpinner;
+    }
+
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.sr_action_menu, menu);
+        View v = LayoutInflater.from(getActivity()).inflate(R.layout.subreddit_cab, null, false);
+        mode.setCustomView(v);
+
+        actionMode = mode;
+        subredditCountText = (TextView) v.findViewById(R.id.subreddit_count);
+        accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
+
+        MenuInflater menuInflater = mode.getMenuInflater();
+        menuInflater.inflate(R.menu.sr_action_menu, menu);
         return true;
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        int count = getListView().getCheckedItemCount();
-        mode.setTitle(getResources().getQuantityString(R.plurals.subreddits, count, count));
+        // We can set the subreddit count if the adapter is ready.
+        boolean isAdapterReady = adapter.getCursor() != null;
+        if (isAdapterReady) {
+            int count = getListView().getCheckedItemCount();
+            String text = getResources().getQuantityString(R.plurals.subreddits, count, count);
+            subredditCountText.setText(text);
+            subredditCountText.setVisibility(View.VISIBLE);
+        } else {
+            subredditCountText.setVisibility(View.GONE);
+        }
 
+        // Show spinner in subreddit search and accounts have been loaded.
         boolean isQuery = query != null;
-        menu.findItem(R.id.menu_add).setVisible(isQuery);
-        menu.findItem(R.id.menu_delete).setVisible(!isQuery);
+        if (isQuery && accountResultHolder != null
+                && accountResultHolder.getAccountResult() != null) {
+            if (accountNameAdapter == null) {
+                accountNameAdapter = new AccountNameAdapter(getActivity());
+            } else {
+                accountNameAdapter.clear();
+            }
+
+            AccountResult result = accountResultHolder.getAccountResult();
+            accountNameAdapter.addAll(result.accountNames);
+            accountSpinner.setAdapter(accountNameAdapter);
+            accountSpinner.setOnItemSelectedListener(this);
+
+            // Don't show the spinner if only the app storage account is
+            // available, since there is only one choice.
+            if (result.accountNames.length > 0) {
+                if (selectedActionAccount == null) {
+                    selectedActionAccount = result.getLastAccount();
+                }
+                int position = accountNameAdapter.findAccountName(selectedActionAccount);
+                accountSpinner.setSelection(position);
+                accountSpinner.setVisibility(View.VISIBLE);
+            } else {
+                accountSpinner.setSelection(0);
+                accountSpinner.setVisibility(View.GONE);
+            }
+        } else {
+            accountSpinner.setAdapter(null);
+            accountSpinner.setVisibility(View.GONE);
+        }
+
+        menu.findItem(R.id.menu_add).setVisible(isQuery && isAdapterReady);
+        menu.findItem(R.id.menu_delete).setVisible(!isQuery && isAdapterReady);
         return true;
     }
 
@@ -211,20 +285,43 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     }
 
     public void onDestroyActionMode(ActionMode mode) {
+        actionMode = null;
+        subredditCountText = null;
+        accountSpinner = null;
+
+        // Don't persist the selected account across action modes.
+        selectedActionAccount = null;
+    }
+
+    public void onItemSelected(AdapterView<?> av, View v, int position, long id) {
+        selectedActionAccount = accountNameAdapter.getItem(position);
+    }
+
+    public void onNothingSelected(AdapterView<?> av) {
+        selectedActionAccount = null;
     }
 
     private boolean handleAdd(ActionMode mode) {
+        String accountName = getSelectedAccountName();
         String[] subreddits = getCheckedSubreddits();
-        SubredditProvider.insertInBackground(getActivity(), getAccountName(), subreddits);
+        SubredditProvider.insertInBackground(getActivity(), accountName, subreddits);
         mode.finish();
         return true;
     }
 
     private boolean handleDelete(ActionMode mode) {
+        String accountName = getSelectedAccountName();
         String[] subreddits = getCheckedSubreddits();
-        SubredditProvider.deleteInBackground(getActivity(), getAccountName(), subreddits);
+        SubredditProvider.deleteInBackground(getActivity(), accountName, subreddits);
         mode.finish();
         return true;
+    }
+
+    private String getSelectedAccountName() {
+        if (getQuery() != null) {
+            return accountNameAdapter.getItem(accountSpinner.getSelectedItemPosition());
+        }
+        return getAccountName();
     }
 
     private String[] getCheckedSubreddits() {
@@ -246,6 +343,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         outState.putString(STATE_ACCOUNT_NAME, accountName);
         outState.putString(STATE_SELECTED_SUBREDDIT, selectedSubreddit);
         outState.putString(STATE_SESSION_ID, sessionId);
+        outState.putString(STATE_SELECTED_ACTION_ACCOUNT, selectedActionAccount);
     }
 
     @Override

@@ -33,7 +33,7 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.SearchPagerAdapter;
 
 public class SearchActivity extends AbstractBrowserActivity implements TabListener,
-        OnSearchQuerySubmittedListener {
+        OnSearchQuerySubmittedListener, AccountResultHolder {
 
     public static final String TAG = "SearchActivity";
 
@@ -42,6 +42,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     private static final String STATE_SELECTED_TAB = "st";
 
     private String accountName;
+    private AccountResult accountResult;
     private Tab tabPosts;
     private Tab tabSubreddits;
     private ViewPager searchPager;
@@ -90,6 +91,7 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        accountResult = result;
         accountName = result.getLastAccount();
         if (isSinglePane) {
             submitSearchQuerySinglePane(getQuery());
@@ -111,6 +113,10 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
         accountName = null;
+    }
+
+    public AccountResult getAccountResult() {
+        return accountResult;
     }
 
     @Override
