@@ -67,14 +67,19 @@ public class Urls {
         return newUrl(resetBuilder().append(BASE_CAPTCHA_URL).append(id).append(".png"));
     }
 
-    public static URL commentsUrl(String id, String linkId) {
+    public static URL commentsUrl(String id, String linkId, boolean json) {
         id = removeTag(id);
         StringBuilder b = resetBuilder().append(BASE_COMMENTS_URL);
         if (!TextUtils.isEmpty(linkId)) {
-            linkId = removeTag(linkId);
-            b.append(linkId).append(".json?comment=").append(id).append("&context=3");
+            b.append(removeTag(linkId));
         } else {
-            b.append(id).append(".json");
+            b.append(id);
+        }
+        if (json) {
+            b.append(".json");
+        }
+        if (!TextUtils.isEmpty(linkId)) {
+            b.append("?comment=").append(id).append("&context=3");
         }
         return newUrl(b);
     }

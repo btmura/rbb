@@ -93,8 +93,8 @@ public class Things implements BaseColumns {
                 + COLUMN_URL + " TEXT)");
     }
 
-    public static String getSubreddit(Bundle thingBundle) {
-        return getString(thingBundle, COLUMN_SUBREDDIT);
+    public static String getBody(Bundle thingBundle) {
+        return getString(thingBundle, COLUMN_BODY);
     }
 
     public static String getDomain(Bundle thingBundle) {
@@ -127,6 +127,10 @@ public class Things implements BaseColumns {
 
     public static boolean isSelf(Bundle thingBundle) {
         return getBoolean(thingBundle, COLUMN_SELF);
+    }
+
+    public static String getSubreddit(Bundle thingBundle) {
+        return getString(thingBundle, COLUMN_SUBREDDIT);
     }
 
     public static String getUrl(Bundle thingBundle) {

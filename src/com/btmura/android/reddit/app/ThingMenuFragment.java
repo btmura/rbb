@@ -36,7 +36,7 @@ public class ThingMenuFragment extends Fragment {
 
     public static final String TAG = "ThingMenuFragment";
 
-    private static final String ARG_THING_BUNDLE = "tb";
+    private static final String ARG_THING_BUNDLE = "thingBundle";
 
     public interface ThingPagerHolder {
         ViewPager getPager();
@@ -70,11 +70,11 @@ public class ThingMenuFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        boolean isSelf = Things.isSelf(thingBundle)
+        boolean onePage = Things.isSelf(thingBundle)
                 || Things.isKind(thingBundle, Things.KIND_COMMENT);
-        boolean showingLink = isShowingLink();
-        boolean showLink = !isSelf && !showingLink;
-        boolean showComments = !isSelf && showingLink;
+        boolean isLinkShown = isLinkShown();
+        boolean showLink = !onePage && !isLinkShown;
+        boolean showComments = !onePage && isLinkShown;
 
         menu.findItem(R.id.menu_link).setVisible(showLink);
         menu.findItem(R.id.menu_comments).setVisible(showComments);
@@ -97,12 +97,12 @@ public class ThingMenuFragment extends Fragment {
                 handleComments();
                 return true;
 
-            case R.id.menu_copy_url:
-                handleCopyUrl();
-                return true;
-
             case R.id.menu_open:
                 handleOpen();
+                return true;
+
+            case R.id.menu_copy_url:
+                handleCopyUrl();
                 return true;
 
             default:
@@ -135,27 +135,54 @@ public class ThingMenuFragment extends Fragment {
         getHolder().getPager().setCurrentItem(1);
     }
 
-    private void handleCopyUrl() {
-        ClipHelper.setClipToast(getActivity(), Things.getTitle(thingBundle), getLink());
-    }
-
     private void handleOpen() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(getLink().toString()));
         startActivity(Intent.createChooser(intent, getString(R.string.menu_open)));
     }
 
-    private boolean isShowingLink() {
-        int position = getHolder().getPager().getCurrentItem();
-        return ThingPagerAdapter.getType(thingBundle, position) == ThingPagerAdapter.TYPE_LINK;
+    private void handleCopyUrl() {
+        ClipHelper.setClipToast(getActivity(), getLabel(), getLink());
+    }
+
+    private boolean isLinkShown() {
+        return getTypeShown() == ThingPagerAdapter.TYPE_LINK_URL;
+    }
+
+    private CharSequence getLabel() {
+        switch (getTypeShown()) {
+            case ThingPagerAdapter.TYPE_LINK_URL:
+            case ThingPagerAdapter.TYPE_LINK_COMMENTS:
+                return Things.getTitle(thingBundle);
+
+            case ThingPagerAdapter.TYPE_COMMENT_CONTEXT:
+                return Things.getBody(thingBundle);
+
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     private CharSequence getLink() {
-        if (isShowingLink()) {
-            return Things.getUrl(thingBundle);
-        } else {
-            return Urls.permaUrl(Things.getPermaLink(thingBundle), null).toExternalForm();
+        switch (getTypeShown()) {
+            case ThingPagerAdapter.TYPE_LINK_URL:
+                return Things.getUrl(thingBundle);
+
+            case ThingPagerAdapter.TYPE_LINK_COMMENTS:
+                return Urls.permaUrl(Things.getPermaLink(thingBundle), null).toExternalForm();
+
+            case ThingPagerAdapter.TYPE_COMMENT_CONTEXT:
+                return Urls.commentsUrl(Things.getThingId(thingBundle),
+                        Things.getLinkId(thingBundle), false).toExternalForm();
+
+            default:
+                throw new IllegalArgumentException();
         }
+    }
+
+    private int getTypeShown() {
+        int position = getHolder().getPager().getCurrentItem();
+        return ThingPagerAdapter.getType(thingBundle, position);
     }
 
     private ThingPagerHolder getHolder() {

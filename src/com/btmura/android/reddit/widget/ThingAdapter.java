@@ -287,6 +287,7 @@ public class ThingAdapter extends BaseCursorAdapter {
         Bundle b = new Bundle(PROJECTION.length);
         b.putLong(Things._ID, c.getLong(INDEX_THING_ID));
         b.putString(Things.COLUMN_AUTHOR, c.getString(INDEX_AUTHOR));
+        b.putString(Things.COLUMN_BODY, c.getString(INDEX_BODY));
         b.putLong(Things.COLUMN_CREATED_UTC, c.getLong(INDEX_CREATED_UTC));
         b.putString(Things.COLUMN_DOMAIN, c.getString(INDEX_DOMAIN));
         b.putInt(Things.COLUMN_DOWNS, c.getInt(INDEX_DOWNS));

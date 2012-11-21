@@ -27,8 +27,9 @@ import com.btmura.android.reddit.database.Things;
 
 public class ThingPagerAdapter extends FragmentStatePagerAdapter {
 
-    public static final int TYPE_LINK = 0;
-    public static final int TYPE_COMMENTS = 1;
+    public static final int TYPE_LINK_URL = 0;
+    public static final int TYPE_LINK_COMMENTS = 1;
+    public static final int TYPE_COMMENT_CONTEXT = 2;
 
     private final String accountName;
     private final Bundle thingBundle;
@@ -56,10 +57,11 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch (getType(thingBundle, position)) {
-            case TYPE_LINK:
+            case TYPE_LINK_URL:
                 return LinkFragment.newInstance(Things.getUrl(thingBundle));
 
-            case TYPE_COMMENTS:
+            case TYPE_LINK_COMMENTS:
+            case TYPE_COMMENT_CONTEXT:
                 return CommentListFragment.newInstance(accountName, Things.getThingId(thingBundle),
                         Things.getLinkId(thingBundle));
 
@@ -74,7 +76,7 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
                 return getFirstPageType(thingBundle);
 
             case 1:
-                return TYPE_COMMENTS;
+                return TYPE_LINK_COMMENTS;
 
             default:
                 throw new IllegalStateException();
@@ -84,10 +86,10 @@ public class ThingPagerAdapter extends FragmentStatePagerAdapter {
     private static int getFirstPageType(Bundle thingBundle) {
         switch (Things.getKind(thingBundle)) {
             case Things.KIND_LINK:
-                return Things.isSelf(thingBundle) ? TYPE_COMMENTS : TYPE_LINK;
+                return Things.isSelf(thingBundle) ? TYPE_LINK_COMMENTS : TYPE_LINK_URL;
 
             case Things.KIND_COMMENT:
-                return TYPE_COMMENTS;
+                return TYPE_COMMENT_CONTEXT;
 
             default:
                 throw new IllegalStateException();
