@@ -57,6 +57,12 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
             return accountNames[0];
         }
 
+        // TODO: Get rid of these methods since they are just wrappers.
+
+        public int getLastMailFilter() {
+            return AccountPreferences.getLastMailFilter(prefs, 0);
+        }
+
         public int getLastProfileFilter() {
             return AccountPreferences.getLastProfileFilter(prefs, 0);
         }

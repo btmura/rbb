@@ -29,6 +29,9 @@ public class AccountPreferences {
     /** Global preference for the last selected account. */
     private static final String GLOBAL_LAST_ACCOUNT = "lastAccount";
 
+    /** Global preference for the last mail filter by any account. */
+    private static final String GLOBAL_LAST_MAIL_FILTER = "lastMailFilter";
+
     /** Global preference for the last profile filter by any account. */
     private static final String GLOBAL_LAST_PROFILE_FILTER = "lastProfileFilter";
 
@@ -48,6 +51,16 @@ public class AccountPreferences {
 
     public static void setLastAccount(SharedPreferences prefs, String accountName) {
         prefs.edit().putString(GLOBAL_LAST_ACCOUNT, accountName).apply();
+    }
+
+    // TODO: Remove default value from these, since the defaul is always 0.
+
+    public static int getLastMailFilter(SharedPreferences prefs, int defValue) {
+        return prefs.getInt(GLOBAL_LAST_MAIL_FILTER, defValue);
+    }
+
+    public static void setLastMailFilter(SharedPreferences prefs, int filter) {
+        prefs.edit().putInt(GLOBAL_LAST_MAIL_FILTER, filter).apply();
     }
 
     public static int getLastProfileFilter(SharedPreferences prefs, int defValue) {

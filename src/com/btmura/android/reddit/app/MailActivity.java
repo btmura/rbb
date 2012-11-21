@@ -23,6 +23,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
@@ -79,7 +80,7 @@ public class MailActivity extends AbstractBrowserActivity implements OnNavigatio
         prefs = result.prefs;
         accountName = result.getLastAccount();
         adapter.addMailFilters(this);
-        bar.setSelectedNavigationItem(0);
+        bar.setSelectedNavigationItem(result.getLastMailFilter());
     }
 
     @Override
@@ -106,7 +107,10 @@ public class MailActivity extends AbstractBrowserActivity implements OnNavigatio
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        return false;
+        int filter = getFilter();
+        AccountPreferences.setLastMailFilter(prefs, filter);
+
+        return true;
     }
 
     @Override
