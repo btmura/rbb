@@ -296,7 +296,7 @@ public class ThingListFragment extends ListFragment implements
         outState.putString(STATE_ACCOUNT_NAME, accountName);
         outState.putString(STATE_SESSION_ID, sessionId);
         outState.putString(STATE_SELECTED_THING_ID, selectedThingId);
-        outState.putString(STATE_SELECTED_THING_ID, selectedLinkId);
+        outState.putString(STATE_SELECTED_LINK_ID, selectedLinkId);
         outState.putString(STATE_SUBREDDIT, subreddit);
     }
 
