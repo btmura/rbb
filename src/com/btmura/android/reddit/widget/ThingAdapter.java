@@ -250,7 +250,7 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        int kind = getInt(position, INDEX_KIND);
+        int kind = mode == MODE_THINGS ? getInt(position, INDEX_KIND) : getInt(position, MESSAGE_KIND);
         switch (kind) {
             case Things.KIND_MORE:
                 return 0;
@@ -262,13 +262,26 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        int kind = cursor.getInt(INDEX_KIND);
+        int kind = getKind(cursor);
         switch (kind) {
             case Things.KIND_MORE:
                 return inflater.inflate(R.layout.thing_more_row, parent, false);
 
             default:
                 return new ThingView(context);
+        }
+    }
+
+    private int getKind(Cursor cursor) {
+        switch (mode) {
+            case MODE_THINGS:
+                return cursor.getInt(INDEX_KIND);
+
+            case MODE_MESSAGES:
+                return cursor.getInt(MESSAGE_KIND);
+
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -377,14 +390,26 @@ public class ThingAdapter extends BaseCursorAdapter {
     }
 
     public String getAuthor(int position) {
-         return getString(position, ThingAdapter.INDEX_AUTHOR);
+        switch (mode) {
+            case MODE_THINGS:
+                return getString(position, INDEX_AUTHOR);
+
+            case MODE_MESSAGES:
+                return getString(position, MESSAGE_AUTHOR);
+
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public String getMoreThingId() {
-        Cursor c = getCursor();
-        if (c != null && c.moveToLast()) {
-            if (c.getInt(INDEX_KIND) == Things.KIND_MORE) {
-                return c.getString(INDEX_THING_ID);
+        // Messages doesn't support pagination yet.
+        if (mode == MODE_THINGS) {
+            Cursor c = getCursor();
+            if (c != null && c.moveToLast()) {
+                if (c.getInt(INDEX_KIND) == Things.KIND_MORE) {
+                    return c.getString(INDEX_THING_ID);
+                }
             }
         }
         return null;

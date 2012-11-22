@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.net;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,6 +30,7 @@ import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -182,6 +184,22 @@ public class RedditApi {
             writeFormData(conn, Urls.newCaptchaQuery());
             in = conn.getInputStream();
             return ResponseParser.parseResponse(in);
+        } finally {
+            close(in, conn);
+        }
+    }
+
+    public static ArrayList<ContentValues> getMessages(Context context, String accountName,
+            int filter, String cookie) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            conn = connect(Urls.messageUrl(filter, null), cookie, false);
+            in = new BufferedInputStream(conn.getInputStream());
+            JsonReader reader = new JsonReader(new InputStreamReader(in));
+            MessageParser parser = new MessageParser(accountName);
+            parser.parseListingObject(reader);
+            return parser.values;
         } finally {
             close(in, conn);
         }

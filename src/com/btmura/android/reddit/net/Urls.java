@@ -119,15 +119,15 @@ public class Urls {
         StringBuilder b = resetBuilder().append(BASE_MESSAGE_URL);
         switch (filter) {
             case FilterAdapter.MESSAGE_INBOX:
-                b.append("/inbox");
+                b.append("inbox");
                 break;
 
             case FilterAdapter.MESSAGE_UNREAD:
-                b.append("/unread");
+                b.append("unread");
                 break;
 
             case FilterAdapter.MESSAGE_SENT:
-                b.append("/sent");
+                b.append("sent");
                 break;
 
             default:

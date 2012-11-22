@@ -175,6 +175,8 @@ public class JsonParser {
                 onLinkId(r, i);
             } else if ("link_title".equals(name)) {
                 onLinkTitle(r, i);
+            } else if ("context".equals(name)) {
+                onContext(r, i);
             } else if ("display_name".equals(name)) {
                 onDisplayName(r, i);
             } else if ("description".equals(name)) {
@@ -309,6 +311,10 @@ public class JsonParser {
     }
 
     public void onLinkTitle(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onContext(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
