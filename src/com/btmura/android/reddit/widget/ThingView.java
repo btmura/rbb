@@ -124,7 +124,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
 
-        drawVotingArrows = AccountUtils.isAccount(accountName);
+        drawVotingArrows = AccountUtils.isAccount(accountName) && kind != Things.KIND_MESSAGE;
         drawScore = drawVotingArrows && kind == Things.KIND_LINK;
         if (drawScore) {
             if (scoreBounds == null) {
@@ -133,9 +133,13 @@ public class ThingView extends CustomView implements OnGestureListener {
             scoreText = VotingArrows.getScoreText(score);
         }
 
-        setStatusText(author, createdUtc, kind, nowTimeMs, numComments, over18,
-                parentSubreddit, score, subreddit, drawVotingArrows);
-        setDetailsText(domain, downs, ups);
+        boolean showSubreddit = !TextUtils.isEmpty(subreddit)
+                && !subreddit.equalsIgnoreCase(parentSubreddit);
+        boolean showPoints = !drawVotingArrows && kind != Things.KIND_MESSAGE;
+        boolean showNumComments = kind == Things.KIND_LINK;
+        setStatusText(over18, showSubreddit, showPoints, showNumComments,
+                author, createdUtc, nowTimeMs, numComments, score, subreddit);
+        setDetailsText(showPoints, domain, downs, ups);
 
         if (!TextUtils.isEmpty(body)) {
             bodyText = FORMATTER.formatSpans(getContext(), body);
@@ -149,46 +153,48 @@ public class ThingView extends CustomView implements OnGestureListener {
         requestLayout();
     }
 
-    private void setStatusText(String author, long createdUtc, int kind, long nowTimeMs,
-            int numComments, boolean over18, String parentSubreddit, int score, String subreddit,
-            boolean votable) {
+    private void setStatusText(boolean showNsfw, boolean showSubreddit, boolean showPoints,
+            boolean showNumComments, String author, long createdUtc, long nowTimeMs,
+            int numComments, int score, String subreddit) {
         Context c = getContext();
         Resources r = getResources();
 
         statusText.clear();
         statusText.clearSpans();
 
-        if (over18) {
+        if (showNsfw) {
             String nsfw = c.getString(R.string.nsfw);
             statusText.append(nsfw).append("  ");
             statusText.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);
         }
 
-        if (!subreddit.equalsIgnoreCase(parentSubreddit)) {
+        if (showSubreddit) {
             statusText.append(subreddit).append("  ");
         }
 
         statusText.append(author).append("  ");
 
-        if (!votable) {
+        if (showPoints) {
             statusText.append(r.getQuantityString(R.plurals.points, score, score)).append("  ");
         }
 
         statusText.append(RelativeTime.format(c, nowTimeMs, createdUtc)).append("  ");
 
-        if (kind == Things.KIND_LINK) {
+        if (showNumComments) {
             statusText.append(r.getQuantityString(R.plurals.comments, numComments, numComments));
         }
     }
 
-    private void setDetailsText(String domain, int downs, int ups) {
+    private void setDetailsText(boolean showPoints, String domain, int downs, int ups) {
         Resources r = getResources();
 
-        longDetailsText.clear();
-        longDetailsText.append(r.getQuantityString(R.plurals.votes_up, ups, ups))
-                .append("  ");
-        longDetailsText.append(r.getQuantityString(R.plurals.votes_down, downs, downs))
-                .append("  ");
+        if (showPoints) {
+            longDetailsText.clear();
+            longDetailsText.append(r.getQuantityString(R.plurals.votes_up, ups, ups))
+                    .append("  ");
+            longDetailsText.append(r.getQuantityString(R.plurals.votes_down, downs, downs))
+                    .append("  ");
+        }
 
         if (!TextUtils.isEmpty(domain)) {
             longDetailsText.append(domain);
@@ -215,7 +221,6 @@ public class ThingView extends CustomView implements OnGestureListener {
                 measuredWidth = getSuggestedMinimumWidth();
                 break;
         }
-
 
         int linkTitleWidth;
         int titleWidth;
