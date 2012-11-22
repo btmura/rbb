@@ -42,6 +42,7 @@ public class Urls {
 
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
     private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
+    private static final String BASE_MESSAGE_URL = BASE_URL + "/message/";
     private static final String BASE_SEARCH_URL = BASE_URL + "/search.json?q=";
     private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
@@ -112,6 +113,31 @@ public class Urls {
         b.append("&passwd=").append(encode(password));
         b.append("&api_type=json");
         return b.toString();
+    }
+
+    public static URL messageUrl(int filter, String more) {
+        StringBuilder b = resetBuilder().append(BASE_MESSAGE_URL);
+        switch (filter) {
+            case FilterAdapter.MESSAGE_INBOX:
+                b.append("/inbox");
+                break;
+
+            case FilterAdapter.MESSAGE_UNREAD:
+                b.append("/unread");
+                break;
+
+            case FilterAdapter.MESSAGE_SENT:
+                b.append("/sent");
+                break;
+
+            default:
+                throw new IllegalArgumentException(Integer.toString(filter));
+        }
+        b.append("/.json");
+        if (more != null) {
+            b.append("?count=25&after=").append(encode(more));
+        }
+        return newUrl(b);
     }
 
     public static URL newCaptchaUrl() {

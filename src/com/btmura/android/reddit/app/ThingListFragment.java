@@ -404,11 +404,11 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private String createSessionId() {
-        if (messageUser != null) {
+        if (!TextUtils.isEmpty(messageUser)) {
             return messageUser + "-" + System.currentTimeMillis();
-        } else if (profileUser != null) {
+        } else if (!TextUtils.isEmpty(profileUser)) {
             return profileUser + "-" + System.currentTimeMillis();
-        } else if (query != null) {
+        } else if (!TextUtils.isEmpty(query)) {
             return query + "-" + System.currentTimeMillis();
         } else if (subreddit != null) {
             return subreddit + "-" + System.currentTimeMillis();

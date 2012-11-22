@@ -132,21 +132,28 @@ public class ThingAdapter extends BaseCursorAdapter {
     }
 
     private static Uri getUri(String accountName, String sessionId, String subreddit,
-            String query, String profileUser, String mailUser, int filter, String more,
+            String query, String profileUser, String messageUser, int filter, String more,
             boolean fetch) {
         Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
                 .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
                 .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
-        if (!TextUtils.isEmpty(subreddit)) {
+
+        // Empty but non-null subreddit means front page.
+        if (subreddit != null) {
             b.appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subreddit);
         }
+
+        // All other parameters must be non-null and not empty.
         if (!TextUtils.isEmpty(query)) {
             b.appendQueryParameter(ThingProvider.PARAM_QUERY, query);
         }
         if (!TextUtils.isEmpty(profileUser)) {
-            b.appendQueryParameter(ThingProvider.PARAM_USER, profileUser);
+            b.appendQueryParameter(ThingProvider.PARAM_PROFILE_USER, profileUser);
+        }
+        if (!TextUtils.isEmpty(messageUser)) {
+            b.appendQueryParameter(ThingProvider.PARAM_MESSAGE_USER, messageUser);
         }
         if (!TextUtils.isEmpty(more)) {
             b.appendQueryParameter(ThingProvider.PARAM_MORE, more);

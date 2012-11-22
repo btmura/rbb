@@ -54,13 +54,15 @@ class ThingListing extends JsonParser {
     private String moreThingId;
 
     public static ThingListing get(Context context, String accountName, String sessionId,
-            long sessionTimestamp, String subredditName, String query, String user, int filter,
-            String more, String cookie) throws IOException {
+            long sessionTimestamp, String subredditName, String query, String profileUser,
+            String messageUser, int filter, String more, String cookie) throws IOException {
         long t1 = System.currentTimeMillis();
 
         URL url;
-        if (!TextUtils.isEmpty(user)) {
-            url = Urls.userUrl(user, filter, more);
+        if (!TextUtils.isEmpty(messageUser)) {
+            url = Urls.messageUrl(filter, more);
+        } else if (!TextUtils.isEmpty(profileUser)) {
+            url = Urls.userUrl(profileUser, filter, more);
         } else if (!TextUtils.isEmpty(query)) {
             url = Urls.searchUrl(query, more);
         } else {

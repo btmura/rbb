@@ -46,10 +46,11 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_ACCOUNT = "account";
     public static final String PARAM_SESSION_ID = "sessionId";
     public static final String PARAM_SUBREDDIT = "subreddit";
+    public static final String PARAM_QUERY = "query";
+    public static final String PARAM_PROFILE_USER = "profileUser";
+    public static final String PARAM_MESSAGE_USER = "messageUser";
     public static final String PARAM_FILTER = "filter";
     public static final String PARAM_MORE = "more";
-    public static final String PARAM_QUERY = "query";
-    public static final String PARAM_USER = "user";
 
     private static final String TABLE_NAME_WITH_VOTES = Things.TABLE_NAME
             + " LEFT OUTER JOIN (SELECT "
@@ -84,7 +85,8 @@ public class ThingProvider extends SessionProvider {
             String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
             String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
             String query = uri.getQueryParameter(PARAM_QUERY);
-            String user = uri.getQueryParameter(PARAM_USER);
+            String profileUser = uri.getQueryParameter(PARAM_PROFILE_USER);
+            String messageUser = uri.getQueryParameter(PARAM_MESSAGE_USER);
             String filterParameter = uri.getQueryParameter(PARAM_FILTER);
             int filter = filterParameter != null ? Integer.parseInt(filterParameter) : 0;
             String more = uri.getQueryParameter(PARAM_MORE);
@@ -92,7 +94,8 @@ public class ThingProvider extends SessionProvider {
             Context context = getContext();
             String cookie = AccountUtils.getCookie(context, accountName);
             ThingListing listing = ThingListing.get(context, accountName, sessionId,
-                    sessionTimestamp, subredditName, query, user, filter, more, cookie);
+                    sessionTimestamp, subredditName, query, profileUser, messageUser, filter, more,
+                    cookie);
 
             long cleaned;
             long t1 = System.currentTimeMillis();
