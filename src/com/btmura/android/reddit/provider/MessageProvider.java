@@ -26,6 +26,11 @@ public class MessageProvider extends SessionProvider {
 
     public static final String TAG = "MessageProvider";
 
+    public static final String AUTHORITY = "com.btmura.android.reddit.provider.messages";
+    static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
+    static final String PATH_MESSAGES = "messages";
+    public static final Uri MESSAGES_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_MESSAGES);
+
     public MessageProvider() {
         super(TAG);
     }

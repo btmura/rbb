@@ -34,6 +34,8 @@ public class Messages implements BaseColumns, KindColumns {
     public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
     public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
+    public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "= ?";
+
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "

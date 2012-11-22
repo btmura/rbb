@@ -30,7 +30,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.provider.MessageProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
@@ -38,6 +40,9 @@ import com.btmura.android.reddit.util.Objects;
 public class ThingAdapter extends BaseCursorAdapter {
 
     public static final String TAG = "ThingAdapter";
+
+    public static final int MODE_THINGS = 0;
+    public static final int MODE_MESSAGES = 1;
 
     private static final String[] PROJECTION = {
             Things._ID,
@@ -64,60 +69,82 @@ public class ThingAdapter extends BaseCursorAdapter {
             Things.COLUMN_VOTE,
     };
 
-    public static int INDEX_ID = 0;
-    public static int INDEX_AUTHOR = 1;
-    public static int INDEX_BODY = 2;
-    public static int INDEX_CREATED_UTC = 3;
-    public static int INDEX_DOMAIN = 4;
-    public static int INDEX_DOWNS = 5;
-    public static int INDEX_KIND = 6;
-    public static int INDEX_LIKES = 7;
-    public static int INDEX_LINK_ID = 8;
-    public static int INDEX_LINK_TITLE = 9;
-    public static int INDEX_NUM_COMMENTS = 10;
-    public static int INDEX_OVER_18 = 11;
-    public static int INDEX_PERMA_LINK = 12;
-    public static int INDEX_SCORE = 13;
-    public static int INDEX_SELF = 14;
-    public static int INDEX_SUBREDDIT = 15;
-    public static int INDEX_TITLE = 16;
-    public static int INDEX_THING_ID = 17;
-    public static int INDEX_THUMBNAIL_URL = 18;
-    public static int INDEX_UPS = 19;
-    public static int INDEX_URL = 20;
-    public static int INDEX_VOTE = 21;
+    private static int INDEX_AUTHOR = 1;
+    private static int INDEX_BODY = 2;
+    private static int INDEX_CREATED_UTC = 3;
+    private static int INDEX_DOMAIN = 4;
+    private static int INDEX_DOWNS = 5;
+    private static int INDEX_KIND = 6;
+    private static int INDEX_LIKES = 7;
+    private static int INDEX_LINK_ID = 8;
+    private static int INDEX_LINK_TITLE = 9;
+    private static int INDEX_NUM_COMMENTS = 10;
+    private static int INDEX_OVER_18 = 11;
+    private static int INDEX_PERMA_LINK = 12;
+    private static int INDEX_SCORE = 13;
+    private static int INDEX_SELF = 14;
+    private static int INDEX_SUBREDDIT = 15;
+    private static int INDEX_TITLE = 16;
+    private static int INDEX_THING_ID = 17;
+    private static int INDEX_THUMBNAIL_URL = 18;
+    private static int INDEX_UPS = 19;
+    private static int INDEX_URL = 20;
+    private static int INDEX_VOTE = 21;
 
-    private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
-    private final long nowTimeMs = System.currentTimeMillis();
-    private final LayoutInflater inflater;
-    private final String parentSubreddit;
-    private final OnVoteListener listener;
-    private String accountName;
-    private String selectedThingId;
-    private String selectedLinkId;
-    private int thingBodyWidth;
-    private boolean singleChoice;
+    private static final String[] MESSAGE_PROJECTION = {
+            Messages._ID,
+            Messages.COLUMN_AUTHOR,
+            Messages.COLUMN_BODY,
+            Messages.COLUMN_CONTEXT,
+            Messages.COLUMN_CREATED_UTC,
+            Messages.COLUMN_KIND,
+            Messages.COLUMN_SUBREDDIT,
+            Messages.COLUMN_THING_ID,
+    };
+
+    private static final int MESSAGE_AUTHOR = 1;
+    private static final int MESSAGE_BODY = 2;
+    private static final int MESSAGE_CREATED_UTC = 4;
+    private static final int MESSAGE_KIND = 5;
+    private static final int MESSAGE_SUBREDDIT = 6;
+    private static final int MESSAGE_THING_ID = 7;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
-            String subreddit, String query, String profileUser, String mailUser, int filter,
+            String subreddit, String query, String profileUser, String messageUser, int filter,
             String more, boolean sync) {
-        Uri uri = getUri(accountName, sessionId, subreddit, query, profileUser, mailUser, filter,
-                more, sync);
+        Uri uri = getUri(accountName, sessionId, subreddit, query, profileUser, messageUser,
+                filter, more, sync);
+
+        // Messages uses a different table so use a different projection.
+        if (!TextUtils.isEmpty(messageUser)) {
+            return new CursorLoader(context, uri, MESSAGE_PROJECTION, Messages.SELECT_BY_ACCOUNT,
+                    Array.of(accountName), null);
+        }
+
+        // Subreddit things and user profiles use the same projection.
         return new CursorLoader(context, uri, PROJECTION, Things.SELECT_BY_SESSION_ID,
                 Array.of(sessionId), null);
     }
 
     public static void updateLoader(Context context, String accountName, String sessionId,
-            String subreddit, String query, String profileUser, String mailUser, int filter,
+            String subreddit, String query, String profileUser, String messageUser, int filter,
             String more, boolean sync, Loader<Cursor> loader) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, subreddit, query, profileUser, mailUser,
+            cl.setUri(getUri(accountName, sessionId, subreddit, query, profileUser, messageUser,
                     filter, more, sync));
         }
     }
 
-    public static void deleteSessionData(final Context context, final String sessionId) {
+    public static void deleteSessionData(final Context context, final String sessionId,
+            String messageUser) {
+
+        // Messages provider doesn't use sessions, so there is nothing to do
+        // here.
+        if (!TextUtils.isEmpty(messageUser)) {
+            return;
+        }
+
         // Use application context to allow activity to be collected and
         // schedule the session deletion in the background thread pool rather
         // than serial pool.
@@ -134,6 +161,13 @@ public class ThingAdapter extends BaseCursorAdapter {
     private static Uri getUri(String accountName, String sessionId, String subreddit,
             String query, String profileUser, String messageUser, int filter, String more,
             boolean fetch) {
+
+        // Use MessageProvider for viewing an account's messages.
+        if (!TextUtils.isEmpty(messageUser)) {
+            return MessageProvider.MESSAGES_URI;
+        }
+
+        // Use ThingProvider for viewing subreddits and user profiles.
         Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
@@ -161,18 +195,48 @@ public class ThingAdapter extends BaseCursorAdapter {
         return b.build();
     }
 
-    public ThingAdapter(Context context, String accountName, String parentSubreddit,
-            boolean singleChoice, OnVoteListener listener) {
+    private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
+    private final long nowTimeMs = System.currentTimeMillis();
+    private final LayoutInflater inflater;
+    private final int mode;
+
+    private String accountName;
+    private String parentSubreddit;
+    private boolean singleChoice;
+    private OnVoteListener listener;
+    private int thingBodyWidth;
+
+    private String selectedThingId;
+    private String selectedLinkId;
+
+    public static ThingAdapter newThingInstance(Context context) {
+        return new ThingAdapter(context, MODE_THINGS);
+    }
+
+    public static ThingAdapter newMessagesInstance(Context context) {
+        return new ThingAdapter(context, MODE_MESSAGES);
+    }
+
+    public ThingAdapter(Context context, int mode) {
         super(context, null, 0);
         this.inflater = LayoutInflater.from(context);
-        this.accountName = accountName;
-        this.parentSubreddit = parentSubreddit;
-        this.singleChoice = singleChoice;
-        this.listener = listener;
+        this.mode = mode;
     }
 
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+    }
+
+    public void setParentSubreddit(String parentSubreddit) {
+        this.parentSubreddit = parentSubreddit;
+    }
+
+    public void setSingleChoice(boolean singleChoice) {
+        this.singleChoice = singleChoice;
+    }
+
+    public void setOnVoteListener(OnVoteListener listener) {
+        this.listener = listener;
     }
 
     public void setThingBodyWidth(int thingBodyWidth) {
@@ -210,6 +274,21 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        switch (mode) {
+            case MODE_THINGS:
+                bindThingModeView(view, context, cursor);
+                break;
+
+            case MODE_MESSAGES:
+                bindMessageModeView(view, context, cursor);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private void bindThingModeView(View view, Context context, Cursor cursor) {
         if (view instanceof ThingView) {
             String author = cursor.getString(INDEX_AUTHOR);
             String body = cursor.getString(INDEX_BODY);
@@ -256,6 +335,24 @@ public class ThingAdapter extends BaseCursorAdapter {
         }
     }
 
+    private void bindMessageModeView(View view, Context c, Cursor cursor) {
+        if (view instanceof ThingView) {
+            String author = cursor.getString(MESSAGE_AUTHOR);
+            String body = cursor.getString(MESSAGE_BODY);
+            long createdUtc = cursor.getLong(MESSAGE_CREATED_UTC);
+            int kind = cursor.getInt(MESSAGE_KIND);
+            String subreddit = cursor.getString(MESSAGE_SUBREDDIT);
+            String thingId = cursor.getString(MESSAGE_THING_ID);
+
+            ThingView tv = (ThingView) view;
+            tv.setData(accountName, author, body, createdUtc, null, -1, kind, -1,
+                    null, nowTimeMs, -1, false, parentSubreddit, -1, subreddit,
+                    thingBodyWidth, thingId, null, null, -1);
+            tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
+            tv.setOnVoteListener(listener);
+        }
+    }
+
     public String getSelectedThingId() {
         return selectedThingId;
     }
@@ -277,6 +374,10 @@ public class ThingAdapter extends BaseCursorAdapter {
         String thingId = getString(position, INDEX_THING_ID);
         String linkId = getString(position, INDEX_LINK_ID);
         setSelectedThing(thingId, linkId);
+    }
+
+    public String getAuthor(int position) {
+         return getString(position, ThingAdapter.INDEX_AUTHOR);
     }
 
     public String getMoreThingId() {

@@ -175,7 +175,17 @@ public class ThingListFragment extends ListFragment implements
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
 
-        adapter = new ThingAdapter(getActivity(), accountName, subreddit, singleChoice, this);
+        int mode;
+        if (!TextUtils.isEmpty(messageUser)) {
+            mode = ThingAdapter.MODE_MESSAGES;
+        } else {
+            mode = ThingAdapter.MODE_THINGS;
+        }
+        adapter = new ThingAdapter(getActivity(), mode);
+        adapter.setAccountName(accountName);
+        adapter.setParentSubreddit(subreddit);
+        adapter.setSingleChoice(singleChoice);
+        adapter.setOnVoteListener(this);
         adapter.setSelectedThing(selectedThingId, selectedLinkId);
         setHasOptionsMenu(true);
     }
@@ -307,7 +317,7 @@ public class ThingListFragment extends ListFragment implements
 
     private boolean handleViewProfile(ActionMode mode) {
         int position = getFirstCheckedPosition();
-        String user = adapter.getString(position, ThingAdapter.INDEX_AUTHOR);
+        String user = adapter.getAuthor(position);
         Intent intent = new Intent(getActivity(), UserProfileActivity.class);
         intent.putExtra(UserProfileActivity.EXTRA_USER, user);
         startActivity(intent);
@@ -364,7 +374,7 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onDestroy() {
         if (!getActivity().isChangingConfigurations()) {
-            ThingAdapter.deleteSessionData(getActivity(), sessionId);
+            ThingAdapter.deleteSessionData(getActivity(), sessionId, messageUser);
         }
         super.onDestroy();
     }
