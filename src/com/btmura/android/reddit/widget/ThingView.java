@@ -139,7 +139,9 @@ public class ThingView extends CustomView implements OnGestureListener {
         boolean showNumComments = kind == Things.KIND_LINK;
         setStatusText(over18, showSubreddit, showPoints, showNumComments,
                 author, createdUtc, nowTimeMs, numComments, score, subreddit);
-        setDetailsText(showPoints, domain, downs, ups);
+
+        boolean showUpsDowns = kind == Things.KIND_LINK;
+        setDetailsText(showUpsDowns, domain, downs, ups);
 
         if (!TextUtils.isEmpty(body)) {
             bodyText = FORMATTER.formatSpans(getContext(), body);
@@ -185,11 +187,11 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
     }
 
-    private void setDetailsText(boolean showPoints, String domain, int downs, int ups) {
+    private void setDetailsText(boolean showUpsDowns, String domain, int downs, int ups) {
         Resources r = getResources();
 
-        if (showPoints) {
-            longDetailsText.clear();
+        longDetailsText.clear();
+        if (showUpsDowns) {
             longDetailsText.append(r.getQuantityString(R.plurals.votes_up, ups, ups))
                     .append("  ");
             longDetailsText.append(r.getQuantityString(R.plurals.votes_down, downs, downs))
