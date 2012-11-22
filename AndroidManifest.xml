@@ -146,6 +146,11 @@
             android:exported="false"
             android:label="@string/provider_comments" />
         <provider
+            android:name=".provider.MessageProvider"
+            android:authorities="@string/authority_messages"
+            android:exported="false"
+            android:label="@string/provider_messages" />
+        <provider
             android:name=".provider.SubredditProvider"
             android:authorities="@string/authority_subreddits"
             android:exported="false"

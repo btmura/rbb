@@ -23,6 +23,7 @@
     <string name="add_subreddit">Add subreddit</string>
     <string name="app_name">reddit by brian</string>
     <string name="authority_comments">com.btmura.android.reddit.provider.comments</string>
+    <string name="authority_messages">com.btmura.android.reddit.provider.messages</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
     <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
@@ -80,6 +81,7 @@
     <string name="nsfw">"NSFW"</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
     <string name="provider_comments">Comments</string>
+    <string name="provider_messages">Messages</string>
     <string name="provider_subreddits">Subreddits</string>
     <string name="provider_things">Things</string>
     <string name="provider_votes">Votes</string>
