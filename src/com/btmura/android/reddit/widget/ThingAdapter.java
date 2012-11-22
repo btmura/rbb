@@ -99,18 +99,21 @@ public class ThingAdapter extends BaseCursorAdapter {
     private boolean singleChoice;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
-            String subreddit, String query, String user, int filter, String more, boolean sync) {
-        Uri uri = getUri(accountName, sessionId, subreddit, query, user, filter, more, sync);
+            String subreddit, String query, String profileUser, String mailUser, int filter,
+            String more, boolean sync) {
+        Uri uri = getUri(accountName, sessionId, subreddit, query, profileUser, mailUser, filter,
+                more, sync);
         return new CursorLoader(context, uri, PROJECTION, Things.SELECT_BY_SESSION_ID,
                 Array.of(sessionId), null);
     }
 
     public static void updateLoader(Context context, String accountName, String sessionId,
-            String subreddit, String query, String user, int filter, String more, boolean sync,
-            Loader<Cursor> loader) {
+            String subreddit, String query, String profileUser, String mailUser, int filter,
+            String more, boolean sync, Loader<Cursor> loader) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, subreddit, query, user, filter, more, sync));
+            cl.setUri(getUri(accountName, sessionId, subreddit, query, profileUser, mailUser,
+                    filter, more, sync));
         }
     }
 
@@ -129,7 +132,8 @@ public class ThingAdapter extends BaseCursorAdapter {
     }
 
     private static Uri getUri(String accountName, String sessionId, String subreddit,
-            String query, String user, int filter, String more, boolean fetch) {
+            String query, String profileUser, String mailUser, int filter, String more,
+            boolean fetch) {
         Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
@@ -141,8 +145,8 @@ public class ThingAdapter extends BaseCursorAdapter {
         if (!TextUtils.isEmpty(query)) {
             b.appendQueryParameter(ThingProvider.PARAM_QUERY, query);
         }
-        if (!TextUtils.isEmpty(user)) {
-            b.appendQueryParameter(ThingProvider.PARAM_USER, user);
+        if (!TextUtils.isEmpty(profileUser)) {
+            b.appendQueryParameter(ThingProvider.PARAM_USER, profileUser);
         }
         if (!TextUtils.isEmpty(more)) {
             b.appendQueryParameter(ThingProvider.PARAM_MORE, more);

@@ -73,7 +73,7 @@
         </activity>
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
-            android:name=".app.MailActivity"
+            android:name=".app.MessageActivity"
             tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -35,9 +35,9 @@
     <string name="error">Something went wrong…</string>
     <string name="error_blank_field">This field cannot be blank.</string>
     <string name="filter_category">Filters</string>
-    <string name="filter_mail_inbox">inbox</string>
-    <string name="filter_mail_unread">unread</string>
-    <string name="filter_mail_sent">sent</string>   
+    <string name="filter_message_inbox">inbox</string>
+    <string name="filter_message_unread">unread</string>
+    <string name="filter_message_sent">sent</string>   
     <string name="filter_profile_overview">overview</string>
     <string name="filter_profile_comments">comments</string>
     <string name="filter_profile_submitted">submitted</string>
@@ -65,7 +65,7 @@
     <string name="menu_copy_url">Copy URL</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_link">View link</string>
-    <string name="menu_mail">Mail</string>
+    <string name="menu_messages">Messages</string>
     <string name="menu_open">Open in another app</string>
     <string name="menu_profile">Profile</string>
     <string name="menu_remove_account">Remove account</string>

@@ -55,24 +55,28 @@ public class ThingListFragment extends ListFragment implements
 
     public static final String TAG = "ThingListFragment";
 
-    public static final int FLAG_SINGLE_CHOICE = 0x1;
-
     /** Required string argument specifying the account being used. */
     private static final String ARG_ACCOUNT_NAME = "accountName";
 
     /** Optional string argument specifying the subreddit to load. */
     private static final String ARG_SUBREDDIT = "subreddit";
 
-    /** Optional integer argument used with the subreddit argument. */
-    private static final String ARG_FILTER = "filter";
-
     /** Optional string argument specifying the search query to use. */
     private static final String ARG_QUERY = "query";
 
-    /** Optional string argument specifying the user profile to load. */
-    private static final String ARG_USER = "user";
+    /** Optional string argument specifying the profileUser profile to load. */
+    private static final String ARG_PROFILE_USER = "profileUser";
 
+    /** Optional string argument specifying whose messages to load. */
+    private static final String ARG_MESSAGE_USER = "messageUser";
+
+    /** Optional integer argument to filter things, profile, or mail. */
+    private static final String ARG_FILTER = "filter";
+
+    /** Opitonal bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
+
+    public static final int FLAG_SINGLE_CHOICE = 0x1;
 
     private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
     private static final String STATE_SESSION_ID = "sessionId";
@@ -92,7 +96,8 @@ public class ThingListFragment extends ListFragment implements
     private String sessionId;
     private String subreddit;
     private String query;
-    private String user;
+    private String profileUser;
+    private String messageUser;
     private int filter;
     private boolean sync;
 
@@ -102,19 +107,40 @@ public class ThingListFragment extends ListFragment implements
     private OnThingSelectedListener listener;
     private boolean scrollLoading;
 
-    public static ThingListFragment newInstance(String accountName, String subreddit, String query,
-            String user, int filter, int flags) {
-        Bundle args = new Bundle(6);
+    public static ThingListFragment newSubredditInstance(String accountName, String subreddit,
+            int filter, int flags) {
+        Bundle args = new Bundle(4);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_SUBREDDIT, subreddit);
-        args.putString(ARG_QUERY, query);
-        args.putString(ARG_USER, user);
         args.putInt(ARG_FILTER, filter);
         args.putInt(ARG_FLAGS, flags);
+        return newFragment(args);
+    }
 
-        ThingListFragment f = new ThingListFragment();
-        f.setArguments(args);
-        return f;
+    public static ThingListFragment newQueryInstance(String accountName, String query, int flags) {
+        Bundle args = new Bundle(3);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_QUERY, query);
+        args.putInt(ARG_FLAGS, flags);
+        return newFragment(args);
+    }
+
+    public static ThingListFragment newInstance(String accountName, String query,
+            String profileUser, String mailUser, int filter, int flags) {
+        Bundle args = new Bundle(6);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_QUERY, query);
+        args.putString(ARG_PROFILE_USER, profileUser);
+        args.putString(ARG_MESSAGE_USER, mailUser);
+        args.putInt(ARG_FILTER, filter);
+        args.putInt(ARG_FLAGS, flags);
+        return newFragment(args);
+    }
+
+    private static ThingListFragment newFragment(Bundle args) {
+        ThingListFragment frag = new ThingListFragment();
+        frag.setArguments(args);
+        return frag;
     }
 
     @Override
@@ -129,7 +155,8 @@ public class ThingListFragment extends ListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         query = getArguments().getString(ARG_QUERY);
-        user = getArguments().getString(ARG_USER);
+        profileUser = getArguments().getString(ARG_PROFILE_USER);
+        messageUser = getArguments().getString(ARG_MESSAGE_USER);
         filter = getArguments().getInt(ARG_FILTER);
         sync = savedInstanceState == null;
 
@@ -176,7 +203,8 @@ public class ThingListFragment extends ListFragment implements
 
     public void loadIfPossible() {
         if (accountName != null && sessionId != null
-                && (subreddit != null || query != null || user != null)) {
+                && (subreddit != null || query != null
+                        || profileUser != null || messageUser != null)) {
             getLoaderManager().initLoader(0, null, this);
         }
     }
@@ -187,7 +215,7 @@ public class ThingListFragment extends ListFragment implements
         }
         String more = args != null ? args.getString(LOADER_ARG_MORE) : null;
         return ThingAdapter.getLoader(getActivity(), accountName, sessionId, subreddit,
-                query, user, filter, more, sync);
+                query, profileUser, messageUser, filter, more, sync);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
@@ -197,7 +225,7 @@ public class ThingListFragment extends ListFragment implements
         sync = false;
         scrollLoading = false;
         ThingAdapter.updateLoader(getActivity(), accountName, sessionId, subreddit,
-                query, user, filter, null, sync, loader);
+                query, profileUser, messageUser, filter, null, sync, loader);
 
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
@@ -376,9 +404,11 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private String createSessionId() {
-        if (!TextUtils.isEmpty(user)) {
-            return user + "-" + System.currentTimeMillis();
-        } else if (!TextUtils.isEmpty(query)) {
+        if (messageUser != null) {
+            return messageUser + "-" + System.currentTimeMillis();
+        } else if (profileUser != null) {
+            return profileUser + "-" + System.currentTimeMillis();
+        } else if (query != null) {
             return query + "-" + System.currentTimeMillis();
         } else if (subreddit != null) {
             return subreddit + "-" + System.currentTimeMillis();

@@ -29,9 +29,9 @@ import android.widget.TextView;
 
 public class FilterAdapter extends BaseAdapter {
 
-    public static final int MAIL_INBOX = 0;
-    public static final int MAIL_UNREAD = 1;
-    public static final int MAIL_SENT = 2;
+    public static final int MESSAGE_INBOX = 0;
+    public static final int MESSAGE_UNREAD = 1;
+    public static final int MESSAGE_SENT = 2;
 
     public static final int PROFILE_OVERVIEW = 0;
     public static final int PROFILE_COMMENTS = 1;
@@ -50,10 +50,10 @@ public class FilterAdapter extends BaseAdapter {
         inflater = LayoutInflater.from(context);
     }
 
-    public void addMailFilters(Context context) {
-        add(context, R.string.filter_mail_inbox);
-        add(context, R.string.filter_mail_unread);
-        add(context, R.string.filter_mail_sent);
+    public void addMessageFilters(Context context) {
+        add(context, R.string.filter_message_inbox);
+        add(context, R.string.filter_message_unread);
+        add(context, R.string.filter_message_sent);
         notifyDataSetChanged();
     }
 

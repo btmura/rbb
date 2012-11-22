@@ -221,8 +221,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, filter);
         SubredditListFragment slf = SubredditListFragment.newInstance(accountName, subreddit,
                 query, slfFlags);
-        ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, null,
-                null, filter, tlfFlags);
+        ThingListFragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit,
+                filter, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -241,26 +241,40 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshViews(null);
     }
 
-    protected void setThingListNavigation(String query, String user) {
+    protected void setQueryThingListNavigation(String query) {
+        setThingListNavigation(query, null, null);
+    }
+
+    protected void setProfileThingListNavigation(String profileUser) {
+        setThingListNavigation(null, profileUser, null);
+    }
+
+    protected void setMessageThingListNavigation(String messageUser) {
+        setThingListNavigation(null, null, messageUser);
+    }
+
+    private void setThingListNavigation(String query, String profileUser, String messageUser) {
         if (isSinglePane) {
-            setThingListNavigationSinglePane(query, user);
+            setThingListNavigationSinglePane(query, profileUser, messageUser);
         } else {
-            setThingListNavigationMultiPane(query, user);
+            setThingListNavigationMultiPane(query, profileUser, messageUser);
         }
     }
 
-    protected void setThingListNavigationSinglePane(String query, String user) {
+    private void setThingListNavigationSinglePane(String query, String profileUser,
+            String messageUser) {
         String accountName = getAccountName();
         int filter = getFilter();
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setThingListNavigationSinglePane accountName: " + accountName
                     + " query: " + query
-                    + " user: " + user
+                    + " profileUser: " + profileUser
+                    + " messageUser: " + messageUser
                     + " filter: " + filter);
         }
 
-        ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, query, user,
-                filter, tlfFlags);
+        ThingListFragment tlf = ThingListFragment.newInstance(accountName, query, profileUser,
+                messageUser, filter, tlfFlags);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
@@ -268,7 +282,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commit();
     }
 
-    protected void setThingListNavigationMultiPane(String query, String user) {
+    private void setThingListNavigationMultiPane(String query, String profileUser,
+            String messageUser) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
@@ -276,14 +291,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setThingListNavigationMultiPane accountName: " + accountName
                     + " query: " + query
-                    + " user: " + user
+                    + " profileUser: " + profileUser
+                    + " messageUser: " + messageUser
                     + " filter: " + filter);
         }
 
         ControlFragment cf = ControlFragment.newInstance(accountName, null, null, filter);
         SubredditListFragment slf = getSubredditListFragment();
-        ThingListFragment tlf = ThingListFragment.newInstance(accountName, null, query,
-                user, filter, tlfFlags);
+        ThingListFragment tlf = ThingListFragment.newInstance(accountName, query, profileUser,
+                messageUser, filter, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -349,8 +365,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         int filter = getFilter();
 
         ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, filter);
-        ThingListFragment tlf = ThingListFragment.newInstance(accountName, subreddit, null,
-                null, filter, tlfFlags);
+        ThingListFragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit,
+                filter, tlfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();

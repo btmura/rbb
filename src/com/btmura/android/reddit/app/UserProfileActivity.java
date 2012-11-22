@@ -112,17 +112,13 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        String accountName = getAccountName();
-        String user = getUserName();
-
         int filter = getFilter();
         AccountPreferences.setLastProfileFilter(prefs, filter);
 
         ThingListFragment frag = getThingListFragment();
-        if (frag == null
-                || !Objects.equals(frag.getAccountName(), accountName)
+        if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != filter) {
-            setThingListNavigation(null, user);
+            setProfileThingListNavigation(getUserName());
         }
         return true;
     }

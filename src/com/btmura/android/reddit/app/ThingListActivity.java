@@ -34,6 +34,7 @@ import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class ThingListActivity extends GlobalMenuActivity implements
@@ -112,12 +113,12 @@ public class ThingListActivity extends GlobalMenuActivity implements
         int filter = adapter.getFilter(itemPosition);
         AccountPreferences.setLastSubredditFilter(prefs, filter);
 
-        ThingListFragment f = getThingListFragment();
-        if (f == null || !f.getAccountName().equals(accountName)
-                || f.getFilter() != filter) {
-            f = ThingListFragment.newInstance(accountName, subreddit, null, null, filter, 0);
+        ThingListFragment frag = getThingListFragment();
+        if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
+                || frag.getFilter() != filter) {
+            frag = ThingListFragment.newSubredditInstance(accountName, subreddit, filter, 0);
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.thing_list_container, f, ThingListFragment.TAG);
+            ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
             ft.commit();
         }
         return true;

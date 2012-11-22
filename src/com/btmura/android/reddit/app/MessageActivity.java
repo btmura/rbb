@@ -25,9 +25,10 @@ import android.os.Bundle;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
-public class MailActivity extends AbstractBrowserActivity implements OnNavigationListener {
+public class MessageActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
     /** Required string extra that is the user's name. */
     public static final String EXTRA_USER = "user";
@@ -79,8 +80,8 @@ public class MailActivity extends AbstractBrowserActivity implements OnNavigatio
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         prefs = result.prefs;
         accountName = result.getLastAccount();
-        adapter.addMailFilters(this);
-        bar.setSelectedNavigationItem(result.getLastMailFilter());
+        adapter.addMessageFilters(this);
+        bar.setSelectedNavigationItem(result.getLastMessageFilter());
     }
 
     @Override
@@ -108,8 +109,13 @@ public class MailActivity extends AbstractBrowserActivity implements OnNavigatio
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         int filter = getFilter();
-        AccountPreferences.setLastMailFilter(prefs, filter);
+        AccountPreferences.setLastMessageFilter(prefs, filter);
 
+        ThingListFragment frag = getThingListFragment();
+        if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
+                || frag.getFilter() != filter) {
+            setMessageThingListNavigation(getUserName());
+        }
         return true;
     }
 

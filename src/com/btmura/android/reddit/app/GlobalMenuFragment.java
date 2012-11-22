@@ -89,7 +89,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 && AccountUtils.isAccount(accountNameHolder.getAccountName());
         menu.findItem(R.id.menu_submit_link).setVisible(isAccount);
         menu.findItem(R.id.menu_profile).setVisible(isAccount);
-        menu.findItem(R.id.menu_mail).setVisible(isAccount);
+        menu.findItem(R.id.menu_messages).setVisible(isAccount);
     }
 
     @Override
@@ -107,8 +107,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
             case R.id.menu_profile:
                 return handleProfile();
 
-            case R.id.menu_mail:
-                return handleMail();
+            case R.id.menu_messages:
+                return handleMessages();
 
             case R.id.menu_settings:
                 return handleSettings();
@@ -145,9 +145,9 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         return true;
     }
 
-    private boolean handleMail() {
-        Intent intent = new Intent(getActivity(), MailActivity.class);
-        intent.putExtra(MailActivity.EXTRA_USER, accountNameHolder.getAccountName());
+    private boolean handleMessages() {
+        Intent intent = new Intent(getActivity(), MessageActivity.class);
+        intent.putExtra(MessageActivity.EXTRA_USER, accountNameHolder.getAccountName());
         startActivity(intent);
         return true;
     }
