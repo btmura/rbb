@@ -61,6 +61,7 @@ public class DbHelper extends SQLiteOpenHelper {
             CommentActions.createTable(db);
             Votes.createTable(db);
             SubredditSearches.createTable(db);
+            Messages.createTable(db);
         } else {
             Subreddits.createSubredditsV1(db);
         }
