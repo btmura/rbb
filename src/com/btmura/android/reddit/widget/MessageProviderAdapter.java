@@ -59,7 +59,18 @@ class MessageProviderAdapter extends ProviderAdapter {
 
     @Override
     Loader<Cursor> getLoader(Context context, Uri uri, Bundle args) {
-        return new CursorLoader(context, uri, PROJECTION, Messages.SELECT_BY_ACCOUNT,
+        String selection;
+        switch (getFilter(args)) {
+            case FilterAdapter.MESSAGE_UNREAD:
+                selection = Messages.SELECT_NEW_BY_ACCOUNT;
+                break;
+
+            default:
+                selection = Messages.SELECT_BY_ACCOUNT;
+                break;
+
+        }
+        return new CursorLoader(context, uri, PROJECTION, selection,
                 Array.of(getAccountName(args)), null);
     }
 

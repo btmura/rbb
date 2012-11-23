@@ -78,7 +78,17 @@ class MessageParser extends JsonParser {
     }
 
     @Override
+    public void onNew(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Messages.COLUMN_NEW, reader.nextBoolean());
+    }
+
+    @Override
     public void onSubreddit(JsonReader reader, int index) throws IOException {
         values.get(index).put(Messages.COLUMN_SUBREDDIT, readTrimmedString(reader, null));
+    }
+
+    @Override
+    public void onWasComment(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Messages.COLUMN_WAS_COMMENT, reader.nextBoolean());
     }
 }

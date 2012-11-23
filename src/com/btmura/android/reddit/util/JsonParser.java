@@ -177,6 +177,10 @@ public class JsonParser {
                 onLinkTitle(r, i);
             } else if ("context".equals(name)) {
                 onContext(r, i);
+            } else if ("new".equals(name)) {
+                onNew(r, i);
+            } else if ("was_comment".equals(name)) {
+                onWasComment(r, i);
             } else if ("display_name".equals(name)) {
                 onDisplayName(r, i);
             } else if ("description".equals(name)) {
@@ -315,6 +319,14 @@ public class JsonParser {
     }
 
     public void onContext(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onNew(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onWasComment(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
