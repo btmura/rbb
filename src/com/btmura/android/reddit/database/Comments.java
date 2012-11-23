@@ -105,18 +105,26 @@ public class Comments implements BaseColumns {
     }
 
     public static String getAuthor(Bundle bundle) {
-        return Things.getString(bundle, COLUMN_AUTHOR);
+        return getString(bundle, COLUMN_AUTHOR);
     }
 
     public static int getNesting(Bundle bundle) {
-        return Things.getInt(bundle, COLUMN_NESTING);
+        return getInt(bundle, COLUMN_NESTING);
     }
 
     public static int getSequence(Bundle bundle) {
-        return Things.getInt(bundle, COLUMN_SEQUENCE);
+        return getInt(bundle, COLUMN_SEQUENCE);
     }
 
     public static String getSessionId(Bundle bundle) {
-        return Things.getString(bundle, COLUMN_SESSION_ID);
+        return getString(bundle, COLUMN_SESSION_ID);
+    }
+
+    private static int getInt(Bundle bundle, String columnName) {
+        return bundle != null ? bundle.getInt(columnName) : null;
+    }
+
+    private static String getString(Bundle bundle, String columnName) {
+        return bundle != null ? bundle.getString(columnName) : null;
     }
 }

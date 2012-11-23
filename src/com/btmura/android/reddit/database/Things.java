@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.database;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
 import android.provider.BaseColumns;
 
 public class Things implements BaseColumns, KindColumns {
@@ -85,14 +84,6 @@ public class Things implements BaseColumns, KindColumns {
                 + COLUMN_THUMBNAIL_URL + " TEXT, "
                 + COLUMN_UPS + " INTEGER DEFAULT 0, "
                 + COLUMN_URL + " TEXT)");
-    }
-
-    static int getInt(Bundle bundle, String columnName) {
-        return bundle != null ? bundle.getInt(columnName) : null;
-    }
-
-    static String getString(Bundle bundle, String columnName) {
-        return bundle != null ? bundle.getString(columnName) : null;
     }
 
     public static int parseKind(String kind) {
