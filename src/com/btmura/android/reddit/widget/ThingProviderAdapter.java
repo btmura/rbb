@@ -60,27 +60,27 @@ class ThingProviderAdapter extends ProviderAdapter {
             Things.COLUMN_VOTE,
     };
 
-    private static int INDEX_AUTHOR = 1;
-    private static int INDEX_BODY = 2;
-    private static int INDEX_CREATED_UTC = 3;
-    private static int INDEX_DOMAIN = 4;
-    private static int INDEX_DOWNS = 5;
-    private static int INDEX_KIND = 6;
-    private static int INDEX_LIKES = 7;
-    private static int INDEX_LINK_ID = 8;
-    private static int INDEX_LINK_TITLE = 9;
-    private static int INDEX_NUM_COMMENTS = 10;
-    private static int INDEX_OVER_18 = 11;
-    private static int INDEX_PERMA_LINK = 12;
-    private static int INDEX_SCORE = 13;
-    private static int INDEX_SELF = 14;
-    private static int INDEX_SUBREDDIT = 15;
-    private static int INDEX_TITLE = 16;
-    private static int INDEX_THING_ID = 17;
-    private static int INDEX_THUMBNAIL_URL = 18;
-    private static int INDEX_UPS = 19;
-    private static int INDEX_URL = 20;
-    private static int INDEX_VOTE = 21;
+    private static final int INDEX_AUTHOR = 1;
+    private static final int INDEX_BODY = 2;
+    private static final int INDEX_CREATED_UTC = 3;
+    private static final int INDEX_DOMAIN = 4;
+    private static final int INDEX_DOWNS = 5;
+    private static final int INDEX_KIND = 6;
+    private static final int INDEX_LIKES = 7;
+    private static final int INDEX_LINK_ID = 8;
+    private static final int INDEX_LINK_TITLE = 9;
+    private static final int INDEX_NUM_COMMENTS = 10;
+    private static final int INDEX_OVER_18 = 11;
+    private static final int INDEX_PERMA_LINK = 12;
+    private static final int INDEX_SCORE = 13;
+    private static final int INDEX_SELF = 14;
+    private static final int INDEX_SUBREDDIT = 15;
+    private static final int INDEX_TITLE = 16;
+    private static final int INDEX_THING_ID = 17;
+    private static final int INDEX_THUMBNAIL_URL = 18;
+    private static final int INDEX_UPS = 19;
+    private static final int INDEX_URL = 20;
+    private static final int INDEX_VOTE = 21;
 
     @Override
     Uri getLoaderUri(Bundle args) {
