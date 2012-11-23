@@ -19,7 +19,6 @@ package com.btmura.android.reddit.database;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.text.TextUtils;
 
 public class Things implements BaseColumns, KindColumns {
     public static final String TABLE_NAME = "things";
@@ -86,74 +85,6 @@ public class Things implements BaseColumns, KindColumns {
                 + COLUMN_THUMBNAIL_URL + " TEXT, "
                 + COLUMN_UPS + " INTEGER DEFAULT 0, "
                 + COLUMN_URL + " TEXT)");
-    }
-
-    public static String getBody(Bundle thingBundle) {
-        return getString(thingBundle, COLUMN_BODY);
-    }
-
-    public static String getDomain(Bundle thingBundle) {
-        return getString(thingBundle, COLUMN_DOMAIN);
-    }
-
-    public static boolean isKind(Bundle thingBundle, int kind) {
-        return getKind(thingBundle) == kind;
-    }
-
-    public static int getKind(Bundle thingBundle) {
-        return getInt(thingBundle, COLUMN_KIND);
-    }
-
-    public static int getLikes(Bundle thingBundle) {
-        return getInt(thingBundle, COLUMN_LIKES);
-    }
-
-    public static String getLinkId(Bundle thingBundle) {
-        return getString(thingBundle, COLUMN_LINK_ID);
-    }
-
-    public static String getPermaLink(Bundle thingBundle) {
-        return getString(thingBundle, COLUMN_PERMA_LINK);
-    }
-
-    public static int getScore(Bundle thingBundle) {
-        return getInt(thingBundle, COLUMN_SCORE);
-    }
-
-    public static boolean isSelf(Bundle thingBundle) {
-        return getBoolean(thingBundle, COLUMN_SELF);
-    }
-
-    public static String getSubreddit(Bundle thingBundle) {
-        return getString(thingBundle, COLUMN_SUBREDDIT);
-    }
-
-    public static String getUrl(Bundle thingBundle) {
-        return getString(thingBundle, COLUMN_URL);
-    }
-
-    public static CharSequence getTitle(Bundle thingBundle) {
-        return getCharSequence(thingBundle, COLUMN_TITLE);
-    }
-
-    public static String getThingId(Bundle thingBundle) {
-        return getString(thingBundle, COLUMN_THING_ID);
-    }
-
-    public static String getThumbnail(Bundle thingBundle) {
-        return getString(thingBundle, COLUMN_THUMBNAIL_URL);
-    }
-
-    public static boolean hasThumbnail(Bundle thingBundle) {
-        return !TextUtils.isEmpty(getThumbnail(thingBundle));
-    }
-
-    static boolean getBoolean(Bundle bundle, String columnName) {
-        return bundle != null ? bundle.getBoolean(columnName) : null;
-    }
-
-    static CharSequence getCharSequence(Bundle bundle, String columnName) {
-        return bundle != null ? bundle.getCharSequence(columnName) : null;
     }
 
     static int getInt(Bundle bundle, String columnName) {
