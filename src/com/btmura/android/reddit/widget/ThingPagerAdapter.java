@@ -19,13 +19,13 @@ package com.btmura.android.reddit.widget;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.v13.app.FragmentStatePagerAdapter;
 
 import com.btmura.android.reddit.app.CommentListFragment;
 import com.btmura.android.reddit.app.LinkFragment;
+import com.btmura.android.reddit.app.FragmentStateItemPagerAdapter;
 import com.btmura.android.reddit.content.ThingBundle;
 
-public class ThingPagerAdapter extends FragmentStatePagerAdapter {
+public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
     public static final int TYPE_LINK = 0;
     public static final int TYPE_COMMENTS = 1;
