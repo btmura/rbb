@@ -51,7 +51,7 @@ public class ThingBundle {
     private static final String KEY_COMMENTS_URL = "commentsUrl";
 
     public static String getSubreddit(Bundle bundle) {
-        return bundle.getString(KEY_SUBREDDIT);
+        return getString(bundle, KEY_SUBREDDIT);
     }
 
     public static void putSubreddit(Bundle bundle, String subreddit) {
@@ -59,7 +59,7 @@ public class ThingBundle {
     }
 
     public static int getKind(Bundle bundle) {
-        return bundle.getInt(KEY_KIND);
+        return getInt(bundle, KEY_KIND);
     }
 
     public static void putKind(Bundle bundle, int kind) {
@@ -67,7 +67,7 @@ public class ThingBundle {
     }
 
     public static String getTitle(Bundle bundle) {
-        return bundle.getString(KEY_TITLE);
+        return getString(bundle, KEY_TITLE);
     }
 
     public static void putTitle(Bundle bundle, String title) {
@@ -75,7 +75,7 @@ public class ThingBundle {
     }
 
     public static String getBody(Bundle bundle) {
-        return bundle.getString(KEY_BODY);
+        return getString(bundle, KEY_BODY);
     }
 
     public static void putBody(Bundle bundle, String body) {
@@ -83,7 +83,7 @@ public class ThingBundle {
     }
 
     public static String getThingId(Bundle bundle) {
-        return bundle.getString(KEY_THING_ID);
+        return getString(bundle, KEY_THING_ID);
     }
 
     public static void putThingId(Bundle bundle, String thingId) {
@@ -91,7 +91,7 @@ public class ThingBundle {
     }
 
     public static String getLinkId(Bundle bundle) {
-        return bundle.getString(KEY_LINK_ID);
+        return getString(bundle, KEY_LINK_ID);
     }
 
     public static void putLinkId(Bundle bundle, String linkId) {
@@ -103,7 +103,7 @@ public class ThingBundle {
     }
 
     public static String getLinkUrl(Bundle bundle) {
-        return bundle.getString(KEY_LINK_URL);
+        return getString(bundle, KEY_LINK_URL);
     }
 
     public static void putLinkUrl(Bundle bundle, String url) {
@@ -111,11 +111,19 @@ public class ThingBundle {
     }
 
     public static String getCommentsUrl(Bundle bundle) {
-        return bundle.getString(KEY_COMMENTS_URL);
+        return getString(bundle, KEY_COMMENTS_URL);
     }
 
     public static void putCommentsUrl(Bundle bundle, String url) {
         bundle.putString(KEY_COMMENTS_URL, url);
+    }
+
+    private static int getInt(Bundle bundle, String key) {
+        return bundle != null ? bundle.getInt(key) : null;
+    }
+
+    private static String getString(Bundle bundle, String key) {
+        return bundle != null ? bundle.getString(key) : null;
     }
 
     private ThingBundle() {
