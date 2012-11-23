@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,8 +29,7 @@ import android.widget.ShareActionProvider;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ClipHelper;
-import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class ThingMenuFragment extends Fragment {
@@ -70,8 +70,7 @@ public class ThingMenuFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        boolean onePage = Things.isSelf(thingBundle)
-                || Things.isKind(thingBundle, Things.KIND_COMMENT);
+        boolean onePage = TextUtils.isEmpty(ThingBundle.getLinkUrl(thingBundle));
         boolean isLinkShown = isLinkShown();
         boolean showLink = !onePage && !isLinkShown;
         boolean showComments = !onePage && isLinkShown;
@@ -113,7 +112,7 @@ public class ThingMenuFragment extends Fragment {
     private void updateShareProvider(Menu menu) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, Things.getTitle(thingBundle));
+        intent.putExtra(Intent.EXTRA_SUBJECT, ThingBundle.getTitle(thingBundle));
         intent.putExtra(Intent.EXTRA_TEXT, getLink());
 
         ShareActionProvider shareActionProvider =
@@ -123,7 +122,7 @@ public class ThingMenuFragment extends Fragment {
 
     private void handleViewSidebar() {
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, Things.getSubreddit(thingBundle));
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, ThingBundle.getSubreddit(thingBundle));
         startActivity(intent);
     }
 
@@ -146,34 +145,20 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private boolean isLinkShown() {
-        return getTypeShown() == ThingPagerAdapter.TYPE_LINK_URL;
+        return getTypeShown() == ThingPagerAdapter.TYPE_LINK;
     }
 
     private CharSequence getLabel() {
-        switch (getTypeShown()) {
-            case ThingPagerAdapter.TYPE_LINK_URL:
-            case ThingPagerAdapter.TYPE_LINK_COMMENTS:
-                return Things.getTitle(thingBundle);
-
-            case ThingPagerAdapter.TYPE_COMMENT_CONTEXT:
-                return Things.getBody(thingBundle);
-
-            default:
-                throw new IllegalArgumentException();
-        }
+        return ThingBundle.getTitle(thingBundle);
     }
 
     private CharSequence getLink() {
         switch (getTypeShown()) {
-            case ThingPagerAdapter.TYPE_LINK_URL:
-                return Things.getUrl(thingBundle);
+            case ThingPagerAdapter.TYPE_LINK:
+                return ThingBundle.getLinkUrl(thingBundle);
 
-            case ThingPagerAdapter.TYPE_LINK_COMMENTS:
-                return Urls.permaUrl(Things.getPermaLink(thingBundle), null).toExternalForm();
-
-            case ThingPagerAdapter.TYPE_COMMENT_CONTEXT:
-                return Urls.commentsUrl(Things.getThingId(thingBundle),
-                        Things.getLinkId(thingBundle), false).toExternalForm();
+            case ThingPagerAdapter.TYPE_COMMENTS:
+                return ThingBundle.getCommentsUrl(thingBundle);
 
             default:
                 throw new IllegalArgumentException();

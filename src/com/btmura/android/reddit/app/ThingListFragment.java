@@ -220,7 +220,7 @@ public class ThingListFragment extends ListFragment implements
         selectedThingId = adapter.getSelectedThingId();
         selectedLinkId = adapter.getSelectedLinkId();
         if (listener != null) {
-            listener.onThingSelected(adapter.getThingBundle(position), position);
+            listener.onThingSelected(adapter.getThingBundle(getActivity(), position), position);
         }
     }
 

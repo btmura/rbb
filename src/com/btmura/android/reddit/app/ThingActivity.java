@@ -29,7 +29,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class ThingActivity extends GlobalMenuActivity implements
@@ -40,7 +40,7 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     public static final String TAG = "ThingActivity";
 
-    public static final String EXTRA_THING_BUNDLE = "tb";
+    public static final String EXTRA_THING_BUNDLE = "thingBundle";
 
     private Bundle thingBundle;
     private ViewPager pager;
@@ -72,7 +72,7 @@ public class ThingActivity extends GlobalMenuActivity implements
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_HOME_AS_UP
                 | ActionBar.DISPLAY_SHOW_TITLE);
-        bar.setTitle(Things.getTitle(thingBundle));
+        bar.setTitle(ThingBundle.getTitle(thingBundle));
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
@@ -104,7 +104,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     public String getSubredditName() {
-        return Things.getSubreddit(thingBundle);
+        return ThingBundle.getSubreddit(thingBundle);
     }
 
     public void onPageSelected(int position) {

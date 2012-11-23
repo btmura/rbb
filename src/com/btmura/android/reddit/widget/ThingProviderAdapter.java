@@ -27,7 +27,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
@@ -233,29 +235,40 @@ class ThingProviderAdapter extends ProviderAdapter {
     }
 
     @Override
-    Bundle makeThingBundle(Cursor c) {
-        Bundle b = new Bundle(PROJECTION.length);
-        b.putLong(Things._ID, c.getLong(INDEX_THING_ID));
-        b.putString(Things.COLUMN_AUTHOR, c.getString(INDEX_AUTHOR));
-        b.putString(Things.COLUMN_BODY, c.getString(INDEX_BODY));
-        b.putLong(Things.COLUMN_CREATED_UTC, c.getLong(INDEX_CREATED_UTC));
-        b.putString(Things.COLUMN_DOMAIN, c.getString(INDEX_DOMAIN));
-        b.putInt(Things.COLUMN_DOWNS, c.getInt(INDEX_DOWNS));
-        b.putInt(Things.COLUMN_LIKES, c.getInt(INDEX_LIKES));
-        b.putInt(Things.COLUMN_KIND, c.getInt(INDEX_KIND));
-        b.putString(Things.COLUMN_LINK_ID, c.getString(INDEX_LINK_ID));
-        b.putString(Things.COLUMN_LINK_TITLE, c.getString(INDEX_LINK_TITLE));
-        b.putInt(Things.COLUMN_NUM_COMMENTS, c.getInt(INDEX_NUM_COMMENTS));
-        b.putBoolean(Things.COLUMN_OVER_18, c.getInt(INDEX_OVER_18) == 1);
-        b.putString(Things.COLUMN_PERMA_LINK, c.getString(INDEX_PERMA_LINK));
-        b.putInt(Things.COLUMN_SCORE, c.getInt(INDEX_SCORE));
-        b.putBoolean(Things.COLUMN_SELF, c.getInt(INDEX_SELF) == 1);
-        b.putString(Things.COLUMN_SUBREDDIT, c.getString(INDEX_SUBREDDIT));
-        b.putString(Things.COLUMN_TITLE, c.getString(INDEX_TITLE));
-        b.putString(Things.COLUMN_THING_ID, c.getString(INDEX_THING_ID));
-        b.putString(Things.COLUMN_THUMBNAIL_URL, c.getString(INDEX_THUMBNAIL_URL));
-        b.putInt(Things.COLUMN_UPS, c.getInt(INDEX_UPS));
-        b.putString(Things.COLUMN_URL, c.getString(INDEX_URL));
+    Bundle makeThingBundle(Context context, Cursor c) {
+        Bundle b = new Bundle(8);
+        ThingBundle.putSubreddit(b, c.getString(INDEX_SUBREDDIT));
+        ThingBundle.putKind(b, c.getInt(INDEX_KIND));
+
+        String title = c.getString(INDEX_TITLE);
+        String body = c.getString(INDEX_BODY);
+        ThingBundle.putTitle(b, !TextUtils.isEmpty(title) ? title : body);
+        ThingBundle.putBody(b, body);
+
+        String thingId = c.getString(INDEX_THING_ID);
+        ThingBundle.putThingId(b, thingId);
+
+        String linkId = c.getString(INDEX_LINK_ID);
+        ThingBundle.putLinkId(b, linkId);
+
+        boolean isSelf = c.getInt(INDEX_SELF) == 1;
+        if (!isSelf) {
+            ThingBundle.putLinkUrl(b, c.getString(INDEX_URL));
+        }
+
+        String permaLink = c.getString(INDEX_PERMA_LINK);
+        if (!TextUtils.isEmpty(permaLink)) {
+            String url = Urls.permaUrl(permaLink, null).toExternalForm();
+            ThingBundle.putCommentsUrl(b, url);
+        } else {
+            // We don't know whether this thing has a link so display the
+            // comments url as the link url, so that the user can use the web
+            // browser to navigate to the link.
+            String url = Urls.commentsUrl(thingId, linkId, false).toExternalForm();
+            ThingBundle.putLinkUrl(b, url);
+            ThingBundle.putCommentsUrl(b, url);
+        }
+
         return b;
     }
 }

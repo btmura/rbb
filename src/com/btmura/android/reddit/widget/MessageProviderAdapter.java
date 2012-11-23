@@ -22,9 +22,12 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 
+import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.database.Messages;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.MessageProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
@@ -46,6 +49,7 @@ class MessageProviderAdapter extends ProviderAdapter {
 
     private static final int INDEX_AUTHOR = 1;
     private static final int INDEX_BODY = 2;
+    private static final int INDEX_CONTEXT = 3;
     private static final int INDEX_CREATED_UTC = 4;
     private static final int INDEX_KIND = 5;
     private static final int INDEX_SUBREDDIT = 6;
@@ -136,7 +140,37 @@ class MessageProviderAdapter extends ProviderAdapter {
     }
 
     @Override
-    Bundle makeThingBundle(Cursor cursor) {
-        return null;
+    Bundle makeThingBundle(Context context, Cursor cursor) {
+        Bundle b = new Bundle(7);
+        ThingBundle.putSubreddit(b, cursor.getString(INDEX_SUBREDDIT));
+        ThingBundle.putKind(b, cursor.getInt(INDEX_KIND));
+
+        // Messages don't have titles so use the body for both.
+        String body = cursor.getString(INDEX_BODY);
+        ThingBundle.putTitle(b, body);
+        ThingBundle.putBody(b, body);
+
+        ThingBundle.putThingId(b, cursor.getString(INDEX_THING_ID));
+
+        String contextUrl = cursor.getString(INDEX_CONTEXT);
+        if (!TextUtils.isEmpty(contextUrl)) {
+            // If there is a context url, then we have to parse that url to grab
+            // the link id embedded inside of it like:
+            //
+            // /r/rbb/comments/13ejyf/testing_from_laptop/c738opg?context=3
+            String[] parts = contextUrl.split("/");
+            if (parts != null && parts.length >= 5) {
+                ThingBundle.putLinkId(b, parts[4]);
+            }
+
+            // We don't know whether this thing has a link so display the
+            // comments url as the link url, so that the user can use the web
+            // browser to navigate to the link.
+            String url = Urls.permaUrl(contextUrl, null).toExternalForm();
+            ThingBundle.putLinkUrl(b, url);
+            ThingBundle.putCommentsUrl(b, url);
+        }
+
+        return b;
     }
 }

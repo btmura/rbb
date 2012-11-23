@@ -90,7 +90,7 @@ public class ThingAdapter extends BaseCursorAdapter {
 
         abstract void bindThingView(ThingAdapter adapter, View view, Context context, Cursor c);
 
-        abstract Bundle makeThingBundle(Cursor cursor);
+        abstract Bundle makeThingBundle(Context context, Cursor cursor);
 
         static String getAccountName(Bundle args) {
             return args.getString(ARG_ACCOUNT_NAME);
@@ -270,10 +270,10 @@ public class ThingAdapter extends BaseCursorAdapter {
         return providerAdapter.getMoreThingId(this);
     }
 
-    public Bundle getThingBundle(int position) {
+    public Bundle getThingBundle(Context context, int position) {
         Cursor c = getCursor();
         if (c != null && c.moveToPosition(position)) {
-            return providerAdapter.makeThingBundle(c);
+            return providerAdapter.makeThingBundle(context, c);
         }
         return null;
     }

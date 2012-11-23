@@ -47,6 +47,7 @@ import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
@@ -510,8 +511,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         ThingListFragment tlf = getThingListFragment();
         if (tlf != null) {
-            tlf.setSelectedThing(Things.getThingId(cf.getThingBundle()),
-                    Things.getLinkId(cf.getThingBundle()));
+            tlf.setSelectedThing(ThingBundle.getThingId(cf.getThingBundle()),
+                    ThingBundle.getLinkId(cf.getThingBundle()));
         }
     }
 
@@ -563,7 +564,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             if (subreddit != null) {
                 return subreddit;
             }
-            return Things.getSubreddit(cf.getThingBundle());
+            return ThingBundle.getSubreddit(cf.getThingBundle());
         }
         return null;
     }
