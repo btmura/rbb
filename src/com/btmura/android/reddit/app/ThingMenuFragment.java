@@ -30,7 +30,6 @@ import android.widget.ShareActionProvider;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ClipHelper;
 import com.btmura.android.reddit.content.ThingBundle;
-import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 public class ThingMenuFragment extends Fragment {
 

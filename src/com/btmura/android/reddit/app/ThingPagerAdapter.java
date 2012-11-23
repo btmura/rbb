@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.widget;
+package com.btmura.android.reddit.app;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 
-import com.btmura.android.reddit.app.CommentListFragment;
-import com.btmura.android.reddit.app.LinkFragment;
-import com.btmura.android.reddit.app.FragmentStateItemPagerAdapter;
 import com.btmura.android.reddit.content.ThingBundle;
 
 public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {

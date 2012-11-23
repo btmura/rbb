@@ -48,7 +48,6 @@ import com.btmura.android.reddit.app.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThingBundle;
-import com.btmura.android.reddit.widget.ThingPagerAdapter;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
