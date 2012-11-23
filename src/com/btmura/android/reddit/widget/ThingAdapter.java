@@ -16,211 +16,147 @@
 
 package com.btmura.android.reddit.widget;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.provider.MessageProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
 public class ThingAdapter extends BaseCursorAdapter {
 
     public static final String TAG = "ThingAdapter";
 
-    public static final int MODE_THINGS = 0;
-    public static final int MODE_MESSAGES = 1;
+    /** String argument specifying the account being used. */
+    public static final String ARG_ACCOUNT_NAME = "accountName";
 
-    private static final String[] PROJECTION = {
-            Things._ID,
-            Things.COLUMN_AUTHOR,
-            Things.COLUMN_BODY,
-            Things.COLUMN_CREATED_UTC,
-            Things.COLUMN_DOMAIN,
-            Things.COLUMN_DOWNS,
-            Things.COLUMN_KIND,
-            Things.COLUMN_LIKES,
-            Things.COLUMN_LINK_ID,
-            Things.COLUMN_LINK_TITLE,
-            Things.COLUMN_NUM_COMMENTS,
-            Things.COLUMN_OVER_18,
-            Things.COLUMN_PERMA_LINK,
-            Things.COLUMN_SCORE,
-            Things.COLUMN_SELF,
-            Things.COLUMN_SUBREDDIT,
-            Things.COLUMN_TITLE,
-            Things.COLUMN_THING_ID,
-            Things.COLUMN_THUMBNAIL_URL,
-            Things.COLUMN_UPS,
-            Things.COLUMN_URL,
-            Things.COLUMN_VOTE,
-    };
+    /** String argument specifying session ID of the data. */
+    public static final String ARG_SESSION_ID = "sessionId";
 
-    private static int INDEX_AUTHOR = 1;
-    private static int INDEX_BODY = 2;
-    private static int INDEX_CREATED_UTC = 3;
-    private static int INDEX_DOMAIN = 4;
-    private static int INDEX_DOWNS = 5;
-    private static int INDEX_KIND = 6;
-    private static int INDEX_LIKES = 7;
-    private static int INDEX_LINK_ID = 8;
-    private static int INDEX_LINK_TITLE = 9;
-    private static int INDEX_NUM_COMMENTS = 10;
-    private static int INDEX_OVER_18 = 11;
-    private static int INDEX_PERMA_LINK = 12;
-    private static int INDEX_SCORE = 13;
-    private static int INDEX_SELF = 14;
-    private static int INDEX_SUBREDDIT = 15;
-    private static int INDEX_TITLE = 16;
-    private static int INDEX_THING_ID = 17;
-    private static int INDEX_THUMBNAIL_URL = 18;
-    private static int INDEX_UPS = 19;
-    private static int INDEX_URL = 20;
-    private static int INDEX_VOTE = 21;
+    /** String argument specifying the subreddit to load. */
+    public static final String ARG_SUBREDDIT = "subreddit";
 
-    private static final String[] MESSAGE_PROJECTION = {
-            Messages._ID,
-            Messages.COLUMN_AUTHOR,
-            Messages.COLUMN_BODY,
-            Messages.COLUMN_CONTEXT,
-            Messages.COLUMN_CREATED_UTC,
-            Messages.COLUMN_KIND,
-            Messages.COLUMN_SUBREDDIT,
-            Messages.COLUMN_THING_ID,
-    };
+    /** String argument specifying the search query to use. */
+    public static final String ARG_QUERY = "query";
 
-    private static final int MESSAGE_AUTHOR = 1;
-    private static final int MESSAGE_BODY = 2;
-    private static final int MESSAGE_CREATED_UTC = 4;
-    private static final int MESSAGE_KIND = 5;
-    private static final int MESSAGE_SUBREDDIT = 6;
-    private static final int MESSAGE_THING_ID = 7;
+    /** String argument specifying the profileUser profile to load. */
+    public static final String ARG_PROFILE_USER = "profileUser";
 
-    public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
-            String subreddit, String query, String profileUser, String messageUser, int filter,
-            String more, boolean sync) {
-        Uri uri = getUri(accountName, sessionId, subreddit, query, profileUser, messageUser,
-                filter, more, sync);
+    /** String argument specifying whose messages to load. */
+    public static final String ARG_MESSAGE_USER = "messageUser";
 
-        // Messages uses a different table so use a different projection.
-        if (!TextUtils.isEmpty(messageUser)) {
-            return new CursorLoader(context, uri, MESSAGE_PROJECTION, Messages.SELECT_BY_ACCOUNT,
-                    Array.of(accountName), null);
+    /** Integer argument to filter things, profile, or messages. */
+    public static final String ARG_FILTER = "filter";
+
+    /** String argument that is used to paginate things. */
+    public static final String ARG_MORE = "more";
+
+    /** Boolean argument to tell some loaders to fetch stuff. */
+    public static final String ARG_FETCH = "fetch";
+
+    /**
+     * {@link ProviderAdapter} allows different providers to be used by
+     * {@link ThingProvider} to create {@link ThingView}s.
+     */
+    static abstract class ProviderAdapter {
+
+        abstract Uri getLoaderUri(Bundle args);
+
+        abstract Loader<Cursor> getLoader(Context context, Uri uri, Bundle args);
+
+        abstract boolean isLoadable(Bundle args);
+
+        abstract String createSessionId(Bundle args);
+
+        abstract void deleteSessionData(Context context, Bundle args);
+
+        abstract String getThingId(ThingAdapter adapter, int position);
+
+        abstract String getLinkId(ThingAdapter adapter, int position);
+
+        abstract String getAuthor(ThingAdapter adapter, int position);
+
+        abstract int getKind(ThingAdapter adapter, int position);
+
+        abstract String getMoreThingId(ThingAdapter adapter);
+
+        abstract void bindThingView(ThingAdapter adapter, View view, Context context, Cursor c);
+
+        abstract Bundle makeThingBundle(Cursor cursor);
+
+        static String getAccountName(Bundle args) {
+            return args.getString(ARG_ACCOUNT_NAME);
         }
 
-        // Subreddit things and user profiles use the same projection.
-        return new CursorLoader(context, uri, PROJECTION, Things.SELECT_BY_SESSION_ID,
-                Array.of(sessionId), null);
+        static String getSessionId(Bundle args) {
+            return args.getString(ARG_SESSION_ID);
+        }
+
+        static String getSubreddit(Bundle args) {
+            return args.getString(ARG_SUBREDDIT);
+        }
+
+        static String getQuery(Bundle args) {
+            return args.getString(ARG_QUERY);
+        }
+
+        static String getProfileUser(Bundle args) {
+            return args.getString(ARG_PROFILE_USER);
+        }
+
+        static String getMessageUser(Bundle args) {
+            return args.getString(ARG_MESSAGE_USER);
+        }
+
+        static int getFilter(Bundle args) {
+            return args.getInt(ARG_FILTER);
+        }
+
+        static String getMore(Bundle args) {
+            return args.getString(ARG_MORE);
+        }
+
+        static boolean getFetch(Bundle args) {
+            return args.getBoolean(ARG_FETCH);
+        }
     }
 
-    public static void updateLoader(Context context, String accountName, String sessionId,
-            String subreddit, String query, String profileUser, String messageUser, int filter,
-            String more, boolean sync, Loader<Cursor> loader) {
-        if (loader instanceof CursorLoader) {
-            CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, subreddit, query, profileUser, messageUser,
-                    filter, more, sync));
-        }
-    }
-
-    public static void deleteSessionData(final Context context, final String sessionId,
-            String messageUser) {
-
-        // Messages provider doesn't use sessions, so there is nothing to do
-        // here.
-        if (!TextUtils.isEmpty(messageUser)) {
-            return;
-        }
-
-        // Use application context to allow activity to be collected and
-        // schedule the session deletion in the background thread pool rather
-        // than serial pool.
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            public void run() {
-                ContentResolver cr = appContext.getContentResolver();
-                cr.delete(ThingProvider.THINGS_URI, Things.SELECT_BY_SESSION_ID,
-                        Array.of(sessionId));
-            }
-        });
-    }
-
-    private static Uri getUri(String accountName, String sessionId, String subreddit,
-            String query, String profileUser, String messageUser, int filter, String more,
-            boolean fetch) {
-
-        // Use MessageProvider for viewing an account's messages.
-        if (!TextUtils.isEmpty(messageUser)) {
-            return MessageProvider.MESSAGES_URI;
-        }
-
-        // Use ThingProvider for viewing subreddits and user profiles.
-        Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
-                .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
-                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
-                .appendQueryParameter(ThingProvider.PARAM_FILTER, Integer.toString(filter));
-
-        // Empty but non-null subreddit means front page.
-        if (subreddit != null) {
-            b.appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, subreddit);
-        }
-
-        // All other parameters must be non-null and not empty.
-        if (!TextUtils.isEmpty(query)) {
-            b.appendQueryParameter(ThingProvider.PARAM_QUERY, query);
-        }
-        if (!TextUtils.isEmpty(profileUser)) {
-            b.appendQueryParameter(ThingProvider.PARAM_PROFILE_USER, profileUser);
-        }
-        if (!TextUtils.isEmpty(messageUser)) {
-            b.appendQueryParameter(ThingProvider.PARAM_MESSAGE_USER, messageUser);
-        }
-        if (!TextUtils.isEmpty(more)) {
-            b.appendQueryParameter(ThingProvider.PARAM_MORE, more);
-        }
-        return b.build();
-    }
-
-    private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
-    private final long nowTimeMs = System.currentTimeMillis();
     private final LayoutInflater inflater;
-    private final int mode;
+    private final ProviderAdapter providerAdapter;
 
-    private String accountName;
-    private String parentSubreddit;
-    private boolean singleChoice;
-    private OnVoteListener listener;
-    private int thingBodyWidth;
+    // Package private variables for ProviderAdapters to access.
 
-    private String selectedThingId;
-    private String selectedLinkId;
+    final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
+    final long nowTimeMs = System.currentTimeMillis();
+    String accountName;
+    String parentSubreddit;
+    boolean singleChoice;
+    OnVoteListener listener;
+    int thingBodyWidth;
+
+    String selectedThingId;
+    String selectedLinkId;
 
     public static ThingAdapter newThingInstance(Context context) {
-        return new ThingAdapter(context, MODE_THINGS);
+        return new ThingAdapter(context, new ThingProviderAdapter());
     }
 
     public static ThingAdapter newMessagesInstance(Context context) {
-        return new ThingAdapter(context, MODE_MESSAGES);
+        return new ThingAdapter(context, new MessageProviderAdapter());
     }
 
-    public ThingAdapter(Context context, int mode) {
+    private ThingAdapter(Context context, ProviderAdapter providerAdapter) {
         super(context, null, 0);
         this.inflater = LayoutInflater.from(context);
-        this.mode = mode;
+        this.providerAdapter = providerAdapter;
     }
 
     public void setAccountName(String accountName) {
@@ -243,6 +179,30 @@ public class ThingAdapter extends BaseCursorAdapter {
         this.thingBodyWidth = thingBodyWidth;
     }
 
+    public Loader<Cursor> createLoader(Context context, Bundle args) {
+        Uri uri = providerAdapter.getLoaderUri(args);
+        return providerAdapter.getLoader(context, uri, args);
+    }
+
+    public void updateLoader(Context context, Loader<Cursor> loader, Bundle args) {
+        if (loader instanceof CursorLoader) {
+            Uri newUri = providerAdapter.getLoaderUri(args);
+            ((CursorLoader) loader).setUri(newUri);
+        }
+    }
+
+    public boolean isLoadable(Bundle args) {
+        return providerAdapter.isLoadable(args);
+    }
+
+    public String createSessionId(Bundle args) {
+        return providerAdapter.createSessionId(args);
+    }
+
+    public void deleteSessionData(Context context, Bundle args) {
+        providerAdapter.deleteSessionData(context, args);
+    }
+
     @Override
     public int getViewTypeCount() {
         return 2;
@@ -250,7 +210,7 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        int kind = mode == MODE_THINGS ? getInt(position, INDEX_KIND) : getInt(position, MESSAGE_KIND);
+        int kind = providerAdapter.getKind(this, position);
         switch (kind) {
             case Things.KIND_MORE:
                 return 0;
@@ -262,7 +222,7 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        int kind = getKind(cursor);
+        int kind = providerAdapter.getKind(this, cursor.getPosition());
         switch (kind) {
             case Things.KIND_MORE:
                 return inflater.inflate(R.layout.thing_more_row, parent, false);
@@ -272,97 +232,10 @@ public class ThingAdapter extends BaseCursorAdapter {
         }
     }
 
-    private int getKind(Cursor cursor) {
-        switch (mode) {
-            case MODE_THINGS:
-                return cursor.getInt(INDEX_KIND);
-
-            case MODE_MESSAGES:
-                return cursor.getInt(MESSAGE_KIND);
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        switch (mode) {
-            case MODE_THINGS:
-                bindThingModeView(view, context, cursor);
-                break;
-
-            case MODE_MESSAGES:
-                bindMessageModeView(view, context, cursor);
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-    private void bindThingModeView(View view, Context context, Cursor cursor) {
         if (view instanceof ThingView) {
-            String author = cursor.getString(INDEX_AUTHOR);
-            String body = cursor.getString(INDEX_BODY);
-            long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
-            String domain = cursor.getString(INDEX_DOMAIN);
-            int downs = cursor.getInt(INDEX_DOWNS);
-            int kind = cursor.getInt(INDEX_KIND);
-            String linkId = cursor.getString(INDEX_LINK_ID);
-            String linkTitle = cursor.getString(INDEX_LINK_TITLE);
-            int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
-            boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
-            int score = cursor.getInt(INDEX_SCORE);
-            String subreddit = cursor.getString(INDEX_SUBREDDIT);
-            String thingId = cursor.getString(INDEX_THING_ID);
-            String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
-            String title = cursor.getString(INDEX_TITLE);
-            int ups = cursor.getInt(INDEX_UPS);
-
-            // Comments don't have a score so calculate our own.
-            if (kind == Things.KIND_COMMENT) {
-                score = ups - downs;
-            }
-
-            // Reconcile local and remote votes.
-            int likes = cursor.getInt(INDEX_LIKES);
-            if (!cursor.isNull(INDEX_VOTE)) {
-                // Local votes take precedence over those from reddit.
-                likes = cursor.getInt(INDEX_VOTE);
-
-                // Modify the score since the vote is still pending and don't go
-                // below 0 since reddit doesn't seem to do that.
-                score = Math.max(0, score + likes);
-            }
-
-            ThingView tv = (ThingView) view;
-            tv.setData(accountName, author, body, createdUtc, domain, downs, kind, likes,
-                    linkTitle, nowTimeMs, numComments, over18, parentSubreddit, score, subreddit,
-                    thingBodyWidth, thingId, thumbnailUrl, title, ups);
-            tv.setChosen(singleChoice
-                    && Objects.equals(selectedThingId, thingId)
-                    && Objects.equals(selectedLinkId, linkId));
-            tv.setOnVoteListener(listener);
-            thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
-        }
-    }
-
-    private void bindMessageModeView(View view, Context c, Cursor cursor) {
-        if (view instanceof ThingView) {
-            String author = cursor.getString(MESSAGE_AUTHOR);
-            String body = cursor.getString(MESSAGE_BODY);
-            long createdUtc = cursor.getLong(MESSAGE_CREATED_UTC);
-            int kind = cursor.getInt(MESSAGE_KIND);
-            String subreddit = cursor.getString(MESSAGE_SUBREDDIT);
-            String thingId = cursor.getString(MESSAGE_THING_ID);
-
-            ThingView tv = (ThingView) view;
-            tv.setData(accountName, author, body, createdUtc, null, -1, kind, -1,
-                    null, nowTimeMs, -1, false, parentSubreddit, -1, subreddit,
-                    thingBodyWidth, thingId, null, null, -1);
-            tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
-            tv.setOnVoteListener(listener);
+            providerAdapter.bindThingView(this, view, context, cursor);
         }
     }
 
@@ -384,68 +257,60 @@ public class ThingAdapter extends BaseCursorAdapter {
     }
 
     public void setSelectedPosition(int position) {
-        String thingId = getString(position, INDEX_THING_ID);
-        String linkId = getString(position, INDEX_LINK_ID);
+        String thingId = providerAdapter.getThingId(this, position);
+        String linkId = providerAdapter.getLinkId(this, position);
         setSelectedThing(thingId, linkId);
     }
 
     public String getAuthor(int position) {
-        switch (mode) {
-            case MODE_THINGS:
-                return getString(position, INDEX_AUTHOR);
-
-            case MODE_MESSAGES:
-                return getString(position, MESSAGE_AUTHOR);
-
-            default:
-                throw new IllegalArgumentException();
-        }
+        return providerAdapter.getAuthor(this, position);
     }
 
     public String getMoreThingId() {
-        // Messages doesn't support pagination yet.
-        if (mode == MODE_THINGS) {
-            Cursor c = getCursor();
-            if (c != null && c.moveToLast()) {
-                if (c.getInt(INDEX_KIND) == Things.KIND_MORE) {
-                    return c.getString(INDEX_THING_ID);
-                }
-            }
-        }
-        return null;
+        return providerAdapter.getMoreThingId(this);
     }
 
     public Bundle getThingBundle(int position) {
         Cursor c = getCursor();
         if (c != null && c.moveToPosition(position)) {
-            return makeBundle(c);
+            return providerAdapter.makeThingBundle(c);
         }
         return null;
     }
 
-    private static Bundle makeBundle(Cursor c) {
-        Bundle b = new Bundle(PROJECTION.length);
-        b.putLong(Things._ID, c.getLong(INDEX_THING_ID));
-        b.putString(Things.COLUMN_AUTHOR, c.getString(INDEX_AUTHOR));
-        b.putString(Things.COLUMN_BODY, c.getString(INDEX_BODY));
-        b.putLong(Things.COLUMN_CREATED_UTC, c.getLong(INDEX_CREATED_UTC));
-        b.putString(Things.COLUMN_DOMAIN, c.getString(INDEX_DOMAIN));
-        b.putInt(Things.COLUMN_DOWNS, c.getInt(INDEX_DOWNS));
-        b.putInt(Things.COLUMN_LIKES, c.getInt(INDEX_LIKES));
-        b.putInt(Things.COLUMN_KIND, c.getInt(INDEX_KIND));
-        b.putString(Things.COLUMN_LINK_ID, c.getString(INDEX_LINK_ID));
-        b.putString(Things.COLUMN_LINK_TITLE, c.getString(INDEX_LINK_TITLE));
-        b.putInt(Things.COLUMN_NUM_COMMENTS, c.getInt(INDEX_NUM_COMMENTS));
-        b.putBoolean(Things.COLUMN_OVER_18, c.getInt(INDEX_OVER_18) == 1);
-        b.putString(Things.COLUMN_PERMA_LINK, c.getString(INDEX_PERMA_LINK));
-        b.putInt(Things.COLUMN_SCORE, c.getInt(INDEX_SCORE));
-        b.putBoolean(Things.COLUMN_SELF, c.getInt(INDEX_SELF) == 1);
-        b.putString(Things.COLUMN_SUBREDDIT, c.getString(INDEX_SUBREDDIT));
-        b.putString(Things.COLUMN_TITLE, c.getString(INDEX_TITLE));
-        b.putString(Things.COLUMN_THING_ID, c.getString(INDEX_THING_ID));
-        b.putString(Things.COLUMN_THUMBNAIL_URL, c.getString(INDEX_THUMBNAIL_URL));
-        b.putInt(Things.COLUMN_UPS, c.getInt(INDEX_UPS));
-        b.putString(Things.COLUMN_URL, c.getString(INDEX_URL));
-        return b;
+    public static String getAccountName(Bundle args) {
+        return ProviderAdapter.getAccountName(args);
+    }
+
+    public static String getSessionId(Bundle args) {
+        return ProviderAdapter.getSessionId(args);
+    }
+
+    public static String getSubreddit(Bundle args) {
+        return ProviderAdapter.getSubreddit(args);
+    }
+
+    public static String getQuery(Bundle args) {
+        return ProviderAdapter.getQuery(args);
+    }
+
+    public static String getProfileUser(Bundle args) {
+        return ProviderAdapter.getProfileUser(args);
+    }
+
+    public static String getMessageUser(Bundle args) {
+        return ProviderAdapter.getMessageUser(args);
+    }
+
+    public static int getFilter(Bundle args) {
+        return ProviderAdapter.getFilter(args);
+    }
+
+    public static String getMore(Bundle args) {
+        return ProviderAdapter.getMore(args);
+    }
+
+    public static boolean getFetch(Bundle args) {
+        return ProviderAdapter.getFetch(args);
     }
 }

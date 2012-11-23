@@ -55,36 +55,14 @@ public class ThingListFragment extends ListFragment implements
 
     public static final String TAG = "ThingListFragment";
 
-    /** Required string argument specifying the account being used. */
-    private static final String ARG_ACCOUNT_NAME = "accountName";
-
-    /** Optional string argument specifying the subreddit to load. */
-    private static final String ARG_SUBREDDIT = "subreddit";
-
-    /** Optional string argument specifying the search query to use. */
-    private static final String ARG_QUERY = "query";
-
-    /** Optional string argument specifying the profileUser profile to load. */
-    private static final String ARG_PROFILE_USER = "profileUser";
-
-    /** Optional string argument specifying whose messages to load. */
-    private static final String ARG_MESSAGE_USER = "messageUser";
-
-    /** Optional integer argument to filter things, profile, or mail. */
-    private static final String ARG_FILTER = "filter";
-
     /** Opitonal bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
-    private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
-    private static final String STATE_SESSION_ID = "sessionId";
+    private static final String STATE_ADAPTER_ARGS = "adapterArgs";
     private static final String STATE_SELECTED_THING_ID = "selectedThingId";
     private static final String STATE_SELECTED_LINK_ID = "selectedLinkId";
-    private static final String STATE_SUBREDDIT = ARG_SUBREDDIT;
-
-    private static final String LOADER_ARG_MORE = "more";
 
     public interface OnThingSelectedListener {
         void onThingSelected(Bundle thingBundle, int position);
@@ -92,47 +70,42 @@ public class ThingListFragment extends ListFragment implements
         int onMeasureThingBody();
     }
 
-    private String accountName;
-    private String sessionId;
-    private String subreddit;
-    private String query;
-    private String profileUser;
-    private String messageUser;
-    private int filter;
-    private boolean sync;
-
     private String selectedThingId;
     private String selectedLinkId;
     private ThingAdapter adapter;
-    private OnThingSelectedListener listener;
+    Bundle adapterArgs;
+
+    private boolean sync;
     private boolean scrollLoading;
+
+    private OnThingSelectedListener listener;
 
     public static ThingListFragment newSubredditInstance(String accountName, String subreddit,
             int filter, int flags) {
         Bundle args = new Bundle(4);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_SUBREDDIT, subreddit);
-        args.putInt(ARG_FILTER, filter);
+        args.putString(ThingAdapter.ARG_ACCOUNT_NAME, accountName);
+        args.putString(ThingAdapter.ARG_SUBREDDIT, subreddit);
+        args.putInt(ThingAdapter.ARG_FILTER, filter);
         args.putInt(ARG_FLAGS, flags);
         return newFragment(args);
     }
 
     public static ThingListFragment newQueryInstance(String accountName, String query, int flags) {
         Bundle args = new Bundle(3);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_QUERY, query);
+        args.putString(ThingAdapter.ARG_ACCOUNT_NAME, accountName);
+        args.putString(ThingAdapter.ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
         return newFragment(args);
     }
 
     public static ThingListFragment newInstance(String accountName, String query,
-            String profileUser, String mailUser, int filter, int flags) {
+            String profileUser, String messageUser, int filter, int flags) {
         Bundle args = new Bundle(6);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_QUERY, query);
-        args.putString(ARG_PROFILE_USER, profileUser);
-        args.putString(ARG_MESSAGE_USER, mailUser);
-        args.putInt(ARG_FILTER, filter);
+        args.putString(ThingAdapter.ARG_ACCOUNT_NAME, accountName);
+        args.putString(ThingAdapter.ARG_QUERY, query);
+        args.putString(ThingAdapter.ARG_PROFILE_USER, profileUser);
+        args.putString(ThingAdapter.ARG_MESSAGE_USER, messageUser);
+        args.putInt(ThingAdapter.ARG_FILTER, filter);
         args.putInt(ARG_FLAGS, flags);
         return newFragment(args);
     }
@@ -154,37 +127,31 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        query = getArguments().getString(ARG_QUERY);
-        profileUser = getArguments().getString(ARG_PROFILE_USER);
-        messageUser = getArguments().getString(ARG_MESSAGE_USER);
-        filter = getArguments().getInt(ARG_FILTER);
         sync = savedInstanceState == null;
 
-        if (savedInstanceState == null) {
-            accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-            subreddit = getArguments().getString(ARG_SUBREDDIT);
-            sessionId = createSessionId();
+        if (!TextUtils.isEmpty(ThingAdapter.getMessageUser(getArguments()))) {
+            adapter = ThingAdapter.newMessagesInstance(getActivity());
         } else {
-            accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
-            subreddit = savedInstanceState.getString(STATE_SUBREDDIT);
-            selectedThingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
-            selectedLinkId = savedInstanceState.getString(STATE_SELECTED_LINK_ID);
-            sessionId = savedInstanceState.getString(STATE_SESSION_ID);
+            adapter = ThingAdapter.newThingInstance(getActivity());
         }
 
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
-
-        int mode;
-        if (!TextUtils.isEmpty(messageUser)) {
-            mode = ThingAdapter.MODE_MESSAGES;
-        } else {
-            mode = ThingAdapter.MODE_THINGS;
-        }
-        adapter = new ThingAdapter(getActivity(), mode);
-        adapter.setAccountName(accountName);
-        adapter.setParentSubreddit(subreddit);
         adapter.setSingleChoice(singleChoice);
+
+        if (savedInstanceState == null) {
+            adapterArgs = new Bundle(7);
+            adapterArgs.putAll(getArguments());
+            adapterArgs.putString(ThingAdapter.ARG_SESSION_ID,
+                    adapter.createSessionId(adapterArgs));
+        } else {
+            adapterArgs = savedInstanceState.getBundle(STATE_ADAPTER_ARGS);
+            selectedThingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
+            selectedLinkId = savedInstanceState.getString(STATE_SELECTED_LINK_ID);
+        }
+
+        adapter.setAccountName(ThingAdapter.getAccountName(adapterArgs));
+        adapter.setParentSubreddit(ThingAdapter.getSubreddit(adapterArgs));
         adapter.setOnVoteListener(this);
         adapter.setSelectedThing(selectedThingId, selectedLinkId);
         setHasOptionsMenu(true);
@@ -212,9 +179,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public void loadIfPossible() {
-        if (accountName != null && sessionId != null
-                && (subreddit != null || query != null
-                        || profileUser != null || messageUser != null)) {
+        if (adapter.isLoadable(adapterArgs)) {
             getLoaderManager().initLoader(0, null, this);
         }
     }
@@ -223,9 +188,11 @@ public class ThingListFragment extends ListFragment implements
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-        String more = args != null ? args.getString(LOADER_ARG_MORE) : null;
-        return ThingAdapter.getLoader(getActivity(), accountName, sessionId, subreddit,
-                query, profileUser, messageUser, filter, more, sync);
+        if (args != null) {
+            adapterArgs.putAll(args);
+        }
+        adapterArgs.putBoolean(ThingAdapter.ARG_FETCH, sync);
+        return adapter.createLoader(getActivity(), adapterArgs);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
@@ -234,8 +201,9 @@ public class ThingListFragment extends ListFragment implements
         }
         sync = false;
         scrollLoading = false;
-        ThingAdapter.updateLoader(getActivity(), accountName, sessionId, subreddit,
-                query, profileUser, messageUser, filter, null, sync, loader);
+        adapterArgs.putBoolean(ThingAdapter.ARG_FETCH, sync);
+        adapterArgs.remove(ThingAdapter.ARG_MORE);
+        adapter.updateLoader(getActivity(), loader, adapterArgs);
 
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
@@ -272,7 +240,7 @@ public class ThingListFragment extends ListFragment implements
                         sync = true;
                         scrollLoading = true;
                         Bundle b = new Bundle(1);
-                        b.putString(LOADER_ARG_MORE, more);
+                        b.putString(ThingAdapter.ARG_MORE, more);
                         getLoaderManager().restartLoader(0, b, this);
                     }
                 }
@@ -284,6 +252,7 @@ public class ThingListFragment extends ListFragment implements
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLike id: " + thingId + " likes: " + likes);
         }
+        String accountName = ThingAdapter.getAccountName(adapterArgs);
         if (!TextUtils.isEmpty(accountName)) {
             VoteProvider.voteInBackground(getActivity(), accountName, thingId, likes);
         }
@@ -331,19 +300,17 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_ACCOUNT_NAME, accountName);
-        outState.putString(STATE_SESSION_ID, sessionId);
-        outState.putString(STATE_SELECTED_THING_ID, selectedThingId);
-        outState.putString(STATE_SELECTED_LINK_ID, selectedLinkId);
-        outState.putString(STATE_SUBREDDIT, subreddit);
+        outState.putBundle(STATE_ADAPTER_ARGS, adapterArgs);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_list_menu, menu);
-        menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(
-                subreddit != null && !Subreddits.isFrontPage(subreddit));
+
+        String subreddit = ThingAdapter.getSubreddit(adapterArgs);
+        menu.findItem(R.id.menu_view_subreddit_sidebar)
+                .setVisible(subreddit != null && !Subreddits.isFrontPage(subreddit));
     }
 
     @Override
@@ -367,14 +334,14 @@ public class ThingListFragment extends ListFragment implements
 
     private void handleViewSidebar() {
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, subreddit);
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, ThingAdapter.getSubreddit(adapterArgs));
         startActivity(intent);
     }
 
     @Override
     public void onDestroy() {
         if (!getActivity().isChangingConfigurations()) {
-            ThingAdapter.deleteSessionData(getActivity(), sessionId, messageUser);
+            adapter.deleteSessionData(getActivity(), adapterArgs);
         }
         super.onDestroy();
     }
@@ -384,7 +351,7 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public void setAccountName(String accountName) {
-        this.accountName = accountName;
+        adapterArgs.putString(ThingAdapter.ARG_ACCOUNT_NAME, accountName);
         adapter.setAccountName(accountName);
     }
 
@@ -395,35 +362,23 @@ public class ThingListFragment extends ListFragment implements
     }
 
     public String getAccountName() {
-        return accountName;
+        return adapterArgs.getString(ThingAdapter.ARG_ACCOUNT_NAME);
     }
 
     public void setSubreddit(String subreddit) {
-        if (!Objects.equalsIgnoreCase(this.subreddit, subreddit)) {
-            this.subreddit = subreddit;
-            this.sessionId = createSessionId();
+        if (!Objects.equalsIgnoreCase(subreddit, ThingAdapter.getSubreddit(adapterArgs))) {
+            adapterArgs.putString(ThingAdapter.ARG_SUBREDDIT, subreddit);
+            adapterArgs.putString(ThingAdapter.ARG_SESSION_ID,
+                    adapter.createSessionId(adapterArgs));
         }
     }
 
     public String getQuery() {
-        return query;
+        return ThingAdapter.getQuery(adapterArgs);
     }
 
     public int getFilter() {
-        return filter;
-    }
-
-    private String createSessionId() {
-        if (!TextUtils.isEmpty(messageUser)) {
-            return messageUser + "-" + System.currentTimeMillis();
-        } else if (!TextUtils.isEmpty(profileUser)) {
-            return profileUser + "-" + System.currentTimeMillis();
-        } else if (!TextUtils.isEmpty(query)) {
-            return query + "-" + System.currentTimeMillis();
-        } else if (subreddit != null) {
-            return subreddit + "-" + System.currentTimeMillis();
-        }
-        return null;
+        return ThingAdapter.getFilter(adapterArgs);
     }
 
     private int getFirstCheckedPosition() {
