@@ -31,15 +31,35 @@ public class Messages implements BaseColumns, KindColumns {
     public static final String COLUMN_CREATED_UTC = "createdUtc";
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_NEW = "new";
+
+    /**
+     * Integer column indicating where this message came from. This is not from
+     * reddit's JSON response. It is an column used internally to implement
+     * displaying of sent messages.
+     */
+    public static final String COLUMN_SOURCE = "source";
+
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
     public static final String COLUMN_WAS_COMMENT = "wasComment";
     public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
+    /** Message came from the inbox data from the server. */
+    public static final int SOURCE_INBOX = 0;
+
+    /** Message came from the sent data the server. */
+    public static final int SOURCE_SENT = 1;
+
     public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "= ?";
 
-    public static final String SELECT_NEW_BY_ACCOUNT = COLUMN_NEW + "= 1 AND "
-            + SELECT_BY_ACCOUNT;
+    public static final String SELECT_BY_ACCOUNT_FROM_INBOX =
+            COLUMN_SOURCE + "=" + SOURCE_INBOX + " AND " + SELECT_BY_ACCOUNT;
+
+    public static final String SELECT_BY_ACCOUNT_FROM_SENT =
+            COLUMN_SOURCE + "=" + SOURCE_SENT + " AND " + SELECT_BY_ACCOUNT;
+
+    public static final String SELECT_NEW_BY_ACCOUNT_FROM_INBOX =
+            COLUMN_NEW + "= 1 AND " + SELECT_BY_ACCOUNT_FROM_INBOX;
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
@@ -51,6 +71,7 @@ public class Messages implements BaseColumns, KindColumns {
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
                 + COLUMN_KIND + " INTEGER NOT NULL, "
                 + COLUMN_NEW + " INTEGER DEFAULT 0, "
+                + COLUMN_SOURCE + " INTEGER DEFAULT 0, "
                 + COLUMN_SUBREDDIT + " TEXT, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
                 + COLUMN_WAS_COMMENT + " INTEGER DEFAULT 0)");

@@ -62,13 +62,16 @@ class MessageProviderAdapter extends ProviderAdapter {
         String selection;
         switch (getFilter(args)) {
             case FilterAdapter.MESSAGE_UNREAD:
-                selection = Messages.SELECT_NEW_BY_ACCOUNT;
+                selection = Messages.SELECT_NEW_BY_ACCOUNT_FROM_INBOX;
+                break;
+
+            case FilterAdapter.MESSAGE_SENT:
+                selection = Messages.SELECT_BY_ACCOUNT_FROM_SENT;
                 break;
 
             default:
-                selection = Messages.SELECT_BY_ACCOUNT;
+                selection = Messages.SELECT_BY_ACCOUNT_FROM_INBOX;
                 break;
-
         }
         return new CursorLoader(context, uri, PROJECTION, selection,
                 Array.of(getAccountName(args)), null);

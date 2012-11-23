@@ -190,14 +190,14 @@ public class RedditApi {
     }
 
     public static ArrayList<ContentValues> getMessages(Context context, String accountName,
-            int filter, String cookie) throws IOException {
+            int filter, int source, String cookie) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
             conn = connect(Urls.messageUrl(filter, null), cookie, false);
             in = new BufferedInputStream(conn.getInputStream());
             JsonReader reader = new JsonReader(new InputStreamReader(in));
-            MessageParser parser = new MessageParser(accountName);
+            MessageParser parser = new MessageParser(accountName, source);
             parser.parseListingObject(reader);
             return parser.values;
         } finally {

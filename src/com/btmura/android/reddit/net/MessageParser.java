@@ -28,12 +28,14 @@ import com.btmura.android.reddit.util.JsonParser;
 
 class MessageParser extends JsonParser {
 
-    ArrayList<ContentValues> values = new ArrayList<ContentValues>();
+    ArrayList<ContentValues> values = new ArrayList<ContentValues>(50);
 
     private final String accountName;
+    private final int source;
 
-    MessageParser(String accountName) {
+    MessageParser(String accountName, int source) {
         this.accountName = accountName;
+        this.source = source;
     }
 
     @Override
@@ -42,8 +44,9 @@ class MessageParser extends JsonParser {
     }
 
     private ContentValues newContentValues(int capacity) {
-        ContentValues values = new ContentValues(capacity + 1);
+        ContentValues values = new ContentValues(capacity + 2);
         values.put(Messages.COLUMN_ACCOUNT, accountName);
+        values.put(Messages.COLUMN_SOURCE, source);
         return values;
     }
 
