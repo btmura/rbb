@@ -208,7 +208,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void setSubredditListNavigationMultiPane(String subreddit, String query) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "setSubredditListNavigation q:" + query);
+            Log.d(TAG, "setSubredditListNavigation subreddit:" + subreddit + " query: " + query);
         }
         safePopBackStackImmediate();
 

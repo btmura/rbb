@@ -208,6 +208,7 @@ public class ThingListFragment extends ListFragment implements
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
+        getActivity().invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -316,7 +317,10 @@ public class ThingListFragment extends ListFragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_list_menu, menu);
+    }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
         String subreddit = ThingAdapter.getSubreddit(adapterArgs);
         menu.findItem(R.id.menu_view_subreddit_sidebar)
                 .setVisible(subreddit != null && !Subreddits.isFrontPage(subreddit));
