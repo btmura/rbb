@@ -40,10 +40,12 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.util.Array;
@@ -69,6 +71,12 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
             .appendQueryParameter(ThingProvider.PARAM_NOTIFY, Boolean.toString(false))
             .build();
 
+    // Avoid notifying the CommentProvider that we are making changes,
+    // because the UI already reflects the pending changes.
+    private static Uri COMMENTS_URI = CommentProvider.COMMENTS_URI.buildUpon()
+            .appendQueryParameter(CommentProvider.PARAM_NOTIFY, Boolean.toString(false))
+            .build();
+
     private static final String[] PROJECTION = {
             Votes._ID,
             Votes.COLUMN_THING_ID,
@@ -86,25 +94,52 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
             ContentProviderClient provider, SyncResult syncResult) {
+        // Extra method just allows us to always print out sync stats after.
+        doSync(account, extras, authority, provider, syncResult);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onPerformSync syncResult: " + syncResult);
+        }
+    }
+
+    private void doSync(Account account, Bundle extras, String authority,
+            ContentProviderClient provider, SyncResult syncResult) {
         try {
+            // Check that we have a non-null cookie and modhash.
             AccountManager manager = AccountManager.get(getContext());
-            String cookie = manager.blockingGetAuthToken(account,
-                    AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
-            String modhash = manager.blockingGetAuthToken(account,
-                    AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
+            String cookie = AccountUtils.getCookie(manager, account);
+            if (cookie == null) {
+                syncResult.stats.numAuthExceptions++;
+                return;
+            }
+            String modhash = AccountUtils.getModhash(manager, account);
+            if (modhash == null) {
+                syncResult.stats.numAuthExceptions++;
+                return;
+            }
 
             // Get all pending votes for this account that haven't been synced.
             Cursor c = provider.query(VoteProvider.ACTIONS_URI, PROJECTION,
                     Votes.SELECT_BY_ACCOUNT, Array.of(account.name), null);
 
+            // TODO: Drop duplicate votes to minimize number of RPCs.
+
+            // Bail out early if there are no votes to process.
+            if (c.getCount() == 0) {
+                c.close();
+                return;
+            }
+
             ArrayList<ContentProviderOperation> ops =
                     new ArrayList<ContentProviderOperation>(c.getCount());
 
-            // Things need to be updated manually after deleting a votes row.
-            // This is because pagination ends up doing a join with the votes
-            // table again. Other tables like comments don't need to do this,
-            // since they don't have pagination.
+            // Things and comments need to be updated manually after deleting a
+            // votes row. This is because pagination ends up doing a join with
+            // the votes table again and requerying could cause another join to
+            // be executed.
             ArrayList<ContentProviderOperation> thingOps =
+                    new ArrayList<ContentProviderOperation>(c.getCount());
+
+            ArrayList<ContentProviderOperation> commentOps =
                     new ArrayList<ContentProviderOperation>(c.getCount());
 
             while (c.moveToNext()) {
@@ -119,11 +154,19 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
                     ops.add(ContentProviderOperation.newDelete(VoteProvider.ACTIONS_URI)
                             .withSelection(VoteProvider.ID_SELECTION, Array.of(id))
                             .build());
+
+                    // Update the tables that join with the votes table since we
+                    // will delete the pending vote rows afterwards.
+                    String[] selectionArgs = Array.of(account.name, thingId);
                     thingOps.add(ContentProviderOperation.newUpdate(THINGS_URI)
-                            .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
-                                    Array.of(account.name, thingId))
+                            .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
                             .withValue(Things.COLUMN_LIKES, vote)
                             .build());
+                    commentOps.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
+                            .withSelection(Comments.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
+                            .withValue(Comments.COLUMN_LIKES, vote)
+                            .build());
+
                 } catch (IOException e) {
                     Log.e(TAG, e.getMessage(), e);
                     syncResult.stats.numIoExceptions++;
@@ -131,21 +174,25 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             c.close();
 
-            // Now delete the rows from the database. The server shows the
-            // updates immediately.
-            ContentProviderResult[] results = provider.applyBatch(ops);
+            // Update the things since pending votes will be deleted.
+            ContentResolver cr = getContext().getContentResolver();
+            ContentProviderResult[] results = cr.applyBatch(ThingProvider.AUTHORITY, thingOps);
             int count = results.length;
             for (int i = 0; i < count; i++) {
-                syncResult.stats.numDeletes += results[i].count;
+                syncResult.stats.numUpdates += results[i].count;
             }
 
-            // We can't update both tables in a transaction, so we'll have to
-            // take the non-fatal but annoying risk of the votes disappearing
-            // when this fails.
-            ContentResolver cr = getContext().getContentResolver();
-            results = cr.applyBatch(ThingProvider.AUTHORITY, thingOps);
+            // Update the comments since pending votes will be deleted.
+            results = cr.applyBatch(CommentProvider.AUTHORITY, commentOps);
             for (int i = 0; i < count; i++) {
                 syncResult.stats.numUpdates += results[i].count;
+            }
+
+            // Now delete the rows from the database. The server shows the
+            // updates immediately.
+            results = provider.applyBatch(ops);
+            for (int i = 0; i < count; i++) {
+                syncResult.stats.numDeletes += results[i].count;
             }
 
         } catch (RemoteException e) {
@@ -163,10 +210,6 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
             syncResult.stats.numAuthExceptions++;
-        }
-
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onPerformSync syncResult: " + syncResult);
         }
     }
 }

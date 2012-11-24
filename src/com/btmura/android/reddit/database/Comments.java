@@ -71,6 +71,9 @@ public class Comments implements BaseColumns {
     public static final int KIND_COMMENT = 1;
     public static final int KIND_MORE = 2;
 
+    public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
+            COLUMN_ACCOUNT + " = ? AND " + COLUMN_THING_ID + " = ?";
+
     public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
 
     public static final String SELECT_VISIBLE_BY_SESSION_ID = SELECT_BY_SESSION_ID
