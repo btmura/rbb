@@ -23,6 +23,7 @@ import android.app.FragmentTransaction;
 import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -32,8 +33,11 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.SearchPagerAdapter;
 
-public class SearchActivity extends AbstractBrowserActivity implements TabListener,
-        OnSearchQuerySubmittedListener, AccountResultHolder {
+public class SearchActivity extends AbstractBrowserActivity implements
+        TabListener,
+        OnSearchQuerySubmittedListener,
+        OnPageChangeListener,
+        AccountResultHolder {
 
     public static final String TAG = "SearchActivity";
 
@@ -207,12 +211,16 @@ public class SearchActivity extends AbstractBrowserActivity implements TabListen
         setNavigationFragments(bar.getSelectedTab());
     }
 
-    @Override
     public void onPageSelected(int position) {
-        super.onPageSelected(position);
         if (isSinglePane) {
             bar.setSelectedNavigationItem(position);
         }
+    }
+
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    public void onPageScrollStateChanged(int state) {
     }
 
     @Override

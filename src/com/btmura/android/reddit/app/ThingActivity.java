@@ -102,6 +102,10 @@ public class ThingActivity extends GlobalMenuActivity implements
         return pager;
     }
 
+    public ThingPagerAdapter getPagerAdapter() {
+        return (ThingPagerAdapter) pager.getAdapter();
+    }
+
     public String getSubredditName() {
         return ThingBundle.getSubreddit(thingBundle);
     }

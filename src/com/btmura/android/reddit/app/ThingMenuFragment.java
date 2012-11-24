@@ -18,17 +18,13 @@ package com.btmura.android.reddit.app;
 
 import android.app.Fragment;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ShareActionProvider;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.ClipHelper;
 import com.btmura.android.reddit.content.ThingBundle;
 
 public class ThingMenuFragment extends Fragment {
@@ -62,22 +58,6 @@ public class ThingMenuFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_menu, menu);
-
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-
-        boolean onePage = TextUtils.isEmpty(ThingBundle.getLinkUrl(thingBundle));
-        boolean isLinkShown = isLinkShown();
-        boolean showLink = !onePage && !isLinkShown;
-        boolean showComments = !onePage && isLinkShown;
-
-        menu.findItem(R.id.menu_link).setVisible(showLink);
-        menu.findItem(R.id.menu_comments).setVisible(showComments);
-
-        updateShareProvider(menu);
     }
 
     @Override
@@ -87,89 +67,14 @@ public class ThingMenuFragment extends Fragment {
                 handleViewSidebar();
                 return true;
 
-            case R.id.menu_link:
-                handleLink();
-                return true;
-
-            case R.id.menu_comments:
-                handleComments();
-                return true;
-
-            case R.id.menu_open:
-                handleOpen();
-                return true;
-
-            case R.id.menu_copy_url:
-                handleCopyUrl();
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void updateShareProvider(Menu menu) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, ThingBundle.getTitle(thingBundle));
-        intent.putExtra(Intent.EXTRA_TEXT, getLink());
-
-        ShareActionProvider shareActionProvider =
-                (ShareActionProvider) menu.findItem(R.id.menu_share).getActionProvider();
-        shareActionProvider.setShareIntent(intent);
     }
 
     private void handleViewSidebar() {
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
         intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, ThingBundle.getSubreddit(thingBundle));
         startActivity(intent);
-    }
-
-    private void handleLink() {
-        getHolder().getPager().setCurrentItem(0);
-    }
-
-    private void handleComments() {
-        getHolder().getPager().setCurrentItem(1);
-    }
-
-    private void handleOpen() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(getLink().toString()));
-        startActivity(Intent.createChooser(intent, getString(R.string.menu_open)));
-    }
-
-    private void handleCopyUrl() {
-        ClipHelper.setClipToast(getActivity(), getLabel(), getLink());
-    }
-
-    private boolean isLinkShown() {
-        return getTypeShown() == ThingPagerAdapter.TYPE_LINK;
-    }
-
-    private CharSequence getLabel() {
-        return ThingBundle.getTitle(thingBundle);
-    }
-
-    private CharSequence getLink() {
-        switch (getTypeShown()) {
-            case ThingPagerAdapter.TYPE_LINK:
-                return ThingBundle.getLinkUrl(thingBundle);
-
-            case ThingPagerAdapter.TYPE_COMMENTS:
-                return ThingBundle.getCommentsUrl(thingBundle);
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-    private int getTypeShown() {
-        int position = getHolder().getPager().getCurrentItem();
-        return ThingPagerAdapter.getType(thingBundle, position);
-    }
-
-    private ThingPagerHolder getHolder() {
-        return (ThingPagerHolder) getActivity();
     }
 }

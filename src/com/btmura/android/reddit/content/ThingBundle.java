@@ -35,9 +35,6 @@ public class ThingBundle {
     /** String for the title of this thing. */
     private static final String KEY_TITLE = "title";
 
-    /** String for the body of this thing. */
-    private static final String KEY_BODY = "body";
-
     /** String for the thing id of this thing. */
     private static final String KEY_THING_ID = "thingId";
 
@@ -46,9 +43,6 @@ public class ThingBundle {
 
     /** String for the link url of this thing. Null when just comments. */
     private static final String KEY_LINK_URL = "linkUrl";
-
-    /** String for the comments url of this thing. */
-    private static final String KEY_COMMENTS_URL = "commentsUrl";
 
     public static String getSubreddit(Bundle bundle) {
         return getString(bundle, KEY_SUBREDDIT);
@@ -72,14 +66,6 @@ public class ThingBundle {
 
     public static void putTitle(Bundle bundle, String title) {
         bundle.putString(KEY_TITLE, title);
-    }
-
-    public static String getBody(Bundle bundle) {
-        return getString(bundle, KEY_BODY);
-    }
-
-    public static void putBody(Bundle bundle, String body) {
-        bundle.putString(KEY_BODY, body);
     }
 
     public static String getThingId(Bundle bundle) {
@@ -108,14 +94,6 @@ public class ThingBundle {
 
     public static void putLinkUrl(Bundle bundle, String url) {
         bundle.putString(KEY_LINK_URL, url);
-    }
-
-    public static String getCommentsUrl(Bundle bundle) {
-        return getString(bundle, KEY_COMMENTS_URL);
-    }
-
-    public static void putCommentsUrl(Bundle bundle, String url) {
-        bundle.putString(KEY_COMMENTS_URL, url);
     }
 
     private static int getInt(Bundle bundle, String key) {

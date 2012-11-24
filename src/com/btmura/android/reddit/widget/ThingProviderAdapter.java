@@ -29,7 +29,6 @@ import android.view.View;
 
 import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
@@ -50,7 +49,6 @@ class ThingProviderAdapter extends ProviderAdapter {
             Things.COLUMN_LINK_TITLE,
             Things.COLUMN_NUM_COMMENTS,
             Things.COLUMN_OVER_18,
-            Things.COLUMN_PERMA_LINK,
             Things.COLUMN_SCORE,
             Things.COLUMN_SELF,
             Things.COLUMN_SUBREDDIT,
@@ -73,16 +71,15 @@ class ThingProviderAdapter extends ProviderAdapter {
     private static final int INDEX_LINK_TITLE = 9;
     private static final int INDEX_NUM_COMMENTS = 10;
     private static final int INDEX_OVER_18 = 11;
-    private static final int INDEX_PERMA_LINK = 12;
-    private static final int INDEX_SCORE = 13;
-    private static final int INDEX_SELF = 14;
-    private static final int INDEX_SUBREDDIT = 15;
-    private static final int INDEX_TITLE = 16;
-    private static final int INDEX_THING_ID = 17;
-    private static final int INDEX_THUMBNAIL_URL = 18;
-    private static final int INDEX_UPS = 19;
-    private static final int INDEX_URL = 20;
-    private static final int INDEX_VOTE = 21;
+    private static final int INDEX_SCORE = 12;
+    private static final int INDEX_SELF = 13;
+    private static final int INDEX_SUBREDDIT = 14;
+    private static final int INDEX_TITLE = 15;
+    private static final int INDEX_THING_ID = 16;
+    private static final int INDEX_THUMBNAIL_URL = 17;
+    private static final int INDEX_UPS = 18;
+    private static final int INDEX_URL = 19;
+    private static final int INDEX_VOTE = 20;
 
     @Override
     Uri getLoaderUri(Bundle args) {
@@ -236,14 +233,13 @@ class ThingProviderAdapter extends ProviderAdapter {
 
     @Override
     Bundle makeThingBundle(Context context, Cursor c) {
-        Bundle b = new Bundle(8);
+        Bundle b = new Bundle(6);
         ThingBundle.putSubreddit(b, c.getString(INDEX_SUBREDDIT));
         ThingBundle.putKind(b, c.getInt(INDEX_KIND));
 
         String title = c.getString(INDEX_TITLE);
         String body = c.getString(INDEX_BODY);
         ThingBundle.putTitle(b, !TextUtils.isEmpty(title) ? title : body);
-        ThingBundle.putBody(b, body);
 
         String thingId = c.getString(INDEX_THING_ID);
         ThingBundle.putThingId(b, thingId);
@@ -254,19 +250,6 @@ class ThingProviderAdapter extends ProviderAdapter {
         boolean isSelf = c.getInt(INDEX_SELF) == 1;
         if (!isSelf) {
             ThingBundle.putLinkUrl(b, c.getString(INDEX_URL));
-        }
-
-        String permaLink = c.getString(INDEX_PERMA_LINK);
-        if (!TextUtils.isEmpty(permaLink)) {
-            String url = Urls.permaUrl(permaLink, null).toExternalForm();
-            ThingBundle.putCommentsUrl(b, url);
-        } else {
-            // We don't know whether this thing has a link so display the
-            // comments url as the link url, so that the user can use the web
-            // browser to navigate to the link.
-            String url = Urls.commentsUrl(thingId, linkId, false).toExternalForm();
-            ThingBundle.putLinkUrl(b, url);
-            ThingBundle.putCommentsUrl(b, url);
         }
 
         return b;

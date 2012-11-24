@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
@@ -38,7 +39,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.content.ClipHelper;
+import com.btmura.android.reddit.content.MenuHelper;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.Comments;
@@ -59,6 +60,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     private static final String STATE_SESSION_ID = "sessionId";
 
+    private OnThingEventListener listener;
     private String accountName;
     private String thingId;
     private String linkId;
@@ -66,8 +68,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private boolean sync;
     private CommentAdapter adapter;
 
-    public static CommentListFragment
-            newInstance(String accountName, String thingId, String linkId) {
+    public static CommentListFragment newInstance(String accountName, String thingId,
+            String linkId) {
         CommentListFragment frag = new CommentListFragment();
         Bundle b = new Bundle(3);
         b.putString(ARG_ACCOUNT_NAME, accountName);
@@ -78,8 +80,18 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnThingEventListener) {
+            listener = (OnThingEventListener) activity;
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
         thingId = getArguments().getString(ARG_THING_ID);
         linkId = getArguments().getString(ARG_LINK_ID);
@@ -132,6 +144,12 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
+
+        getActivity().invalidateOptionsMenu();
+
+        if (listener != null && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF)) {
+            listener.onLinkDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_URL));
+        }
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -163,6 +181,72 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (AccountUtils.isAccount(accountName)) {
             VoteProvider.voteInBackground(getActivity(), accountName, thingId, likes);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.comment_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        boolean isLoaded = adapter.getCursor() != null;
+        menu.findItem(R.id.menu_comment_open).setVisible(isLoaded);
+        menu.findItem(R.id.menu_comment_copy_url).setVisible(isLoaded);
+
+        MenuItem shareItem = menu.findItem(R.id.menu_comment_share);
+        shareItem.setVisible(isLoaded);
+        if (isLoaded) {
+            MenuHelper.setShareProvider(shareItem, getTitle(), getUrl());
+        }
+
+        boolean showLink = isLoaded && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF);
+        menu.findItem(R.id.menu_link).setVisible(showLink);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_link:
+                return handleLink();
+
+            case R.id.menu_comment_open:
+                return handleOpen();
+
+            case R.id.menu_comment_copy_url:
+                return handleCopyUrl();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private boolean handleLink() {
+        if (listener != null) {
+            listener.onLinkMenuItemClick();
+        }
+        return true;
+    }
+
+    private boolean handleOpen() {
+        MenuHelper.startIntentChooser(getActivity(), getUrl());
+        return true;
+    }
+
+    private boolean handleCopyUrl() {
+        MenuHelper.setClipAndToast(getActivity(), getTitle(), getUrl());
+        return true;
+    }
+
+    private String getTitle() {
+        return adapter.getString(0, CommentAdapter.INDEX_TITLE);
+    }
+
+    private String getUrl() {
+        String permaLink = adapter.getString(0, CommentAdapter.INDEX_PERMA_LINK);
+        return Urls.permaUrl(permaLink, null).toExternalForm();
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -364,7 +448,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         String text = Urls.permaUrl(permaLink, thingId).toExternalForm();
 
         // Copy to the clipboard and present a toast.
-        ClipHelper.setClipToast(getActivity(), label, text);
+        MenuHelper.setClipAndToast(getActivity(), label, text);
         return true;
     }
 

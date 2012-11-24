@@ -19,10 +19,14 @@ package com.btmura.android.reddit.app;
 import java.util.regex.Pattern;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
@@ -33,11 +37,13 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.MenuHelper;
 
 public class LinkFragment extends Fragment {
 
     public static final String TAG = "LinkFragment";
 
+    private static final String ARG_TITLE = "title";
     private static final String ARG_URL = "url";
 
     private static final String STATE_URL = "url";
@@ -45,19 +51,36 @@ public class LinkFragment extends Fragment {
     private static final Pattern PATTERN_IMAGE = Pattern.compile(".*\\.(jpg|png|gif)$",
             Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
+    private OnThingEventListener listener;
     private WebView webView;
     private ProgressBar progress;
 
-    public static LinkFragment newInstance(String url) {
-        LinkFragment frag = new LinkFragment();
-        Bundle b = new Bundle(1);
+    public static LinkFragment newInstance(String title, String url) {
+        Bundle b = new Bundle(2);
+        b.putString(ARG_TITLE, title);
         b.putString(ARG_URL, url);
+        LinkFragment frag = new LinkFragment();
         frag.setArguments(b);
         return frag;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnThingEventListener) {
+            listener = (OnThingEventListener) activity;
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.link, container, false);
         webView = (WebView) view.findViewById(R.id.link);
         progress = (ProgressBar) view.findViewById(R.id.progress);
@@ -126,6 +149,50 @@ public class LinkFragment extends Fragment {
     public void onPause() {
         webView.onPause();
         super.onPause();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.link_menu, menu);
+        MenuHelper.setShareProvider(menu.findItem(R.id.menu_link_share),
+                getArguments().getString(ARG_TITLE),
+                getArguments().getString(ARG_URL));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_comments:
+                return handleComments();
+
+            case R.id.menu_link_open:
+                return handleOpen();
+
+            case R.id.menu_link_copy_url:
+                return handleCopyUrl();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private boolean handleComments() {
+        if (listener != null) {
+            listener.onCommentMenuItemClick();
+        }
+        return true;
+    }
+
+    private boolean handleOpen() {
+        MenuHelper.startIntentChooser(getActivity(), getArguments().getString(ARG_URL));
+        return true;
+    }
+
+    private boolean handleCopyUrl() {
+        MenuHelper.setClipAndToast(getActivity(), getArguments().getString(ARG_TITLE),
+                getArguments().getString(ARG_URL));
+        return true;
     }
 
     @Override

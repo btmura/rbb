@@ -32,7 +32,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -48,13 +47,14 @@ import com.btmura.android.reddit.app.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThingBundle;
+import com.btmura.android.reddit.util.Objects;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
+        OnThingEventListener,
         OnBackStackChangedListener,
-        OnPageChangeListener,
         SubredditNameHolder,
         ThingPagerHolder {
 
@@ -134,7 +134,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             getFragmentManager().addOnBackStackChangedListener(this);
 
             thingPager = (ViewPager) findViewById(R.id.thing_pager);
-            thingPager.setOnPageChangeListener(this);
 
             slfFlags |= SubredditListFragment.FLAG_SINGLE_CHOICE;
             tlfFlags |= ThingListFragment.FLAG_SINGLE_CHOICE;
@@ -420,6 +419,28 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshThingPager(thingBundle);
     }
 
+    public void onLinkDiscovery(String thingId, String url) {
+        ControlFragment cf = getControlFragment();
+        Bundle thingBundle = cf.getThingBundle();
+        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle)) 
+                && !ThingBundle.hasLinkUrl(thingBundle)) {
+            ThingBundle.putLinkUrl(thingBundle, url);
+            cf.setThingBundle(thingBundle);
+
+            ThingPagerAdapter adapter = (ThingPagerAdapter) thingPager.getAdapter();
+            adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
+            thingPager.setCurrentItem(1);
+        }
+    }
+
+    public void onLinkMenuItemClick() {
+        thingPager.setCurrentItem(0);
+    }
+
+    public void onCommentMenuItemClick() {
+        thingPager.setCurrentItem(1);
+    }
+
     private void safePopBackStackImmediate() {
         FragmentManager fm = getFragmentManager();
         if (fm.getBackStackEntryCount() > 0) {
@@ -519,7 +540,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(),
                     getAccountName(), thingBundle);
             thingPager.setAdapter(adapter);
-            invalidateOptionsMenu();
+            // invalidateOptionsMenu();
         } else {
             thingPager.setAdapter(null);
         }
@@ -543,16 +564,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         } else {
             thingBodyWidth = dm.widthPixels / 2 - padding * 3 - newWidth;
         }
-    }
-
-    public void onPageSelected(int position) {
-        invalidateOptionsMenu();
-    }
-
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    }
-
-    public void onPageScrollStateChanged(int state) {
     }
 
     public CharSequence getSubredditName() {

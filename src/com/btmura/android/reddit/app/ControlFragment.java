@@ -62,6 +62,10 @@ public class ControlFragment extends Fragment {
         return thingBundle;
     }
 
+    public void setThingBundle(Bundle thingBundle) {
+        this.thingBundle = thingBundle;
+    }
+
     public int getFilter() {
         return filter;
     }

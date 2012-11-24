@@ -115,7 +115,7 @@ class CommentListing extends JsonParser implements CommentList {
 
     @Override
     public void onEntityStart(int index) {
-        ContentValues v = new ContentValues(16);
+        ContentValues v = new ContentValues(19);
         v.put(Comments.COLUMN_ACCOUNT, accountName);
         v.put(Comments.COLUMN_SEQUENCE, index);
         v.put(Comments.COLUMN_SESSION_ID, sessionId);
@@ -142,6 +142,11 @@ class CommentListing extends JsonParser implements CommentList {
     @Override
     public void onDowns(JsonReader reader, int index) throws IOException {
         values.get(index).put(Comments.COLUMN_DOWNS, reader.nextInt());
+    }
+
+    @Override
+    public void onIsSelf(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Comments.COLUMN_SELF, reader.nextBoolean());
     }
 
     @Override
@@ -201,6 +206,11 @@ class CommentListing extends JsonParser implements CommentList {
     @Override
     public void onUps(JsonReader reader, int index) throws IOException {
         values.get(index).put(Comments.COLUMN_UPS, reader.nextInt());
+    }
+
+    @Override
+    public void onUrl(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Comments.COLUMN_URL, reader.nextString());
     }
 
     @Override

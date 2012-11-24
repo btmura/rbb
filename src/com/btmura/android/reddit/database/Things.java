@@ -38,9 +38,9 @@ public class Things implements BaseColumns, KindColumns {
     public static final String COLUMN_OVER_18 = "over18";
     public static final String COLUMN_PERMA_LINK = "permaLink";
     public static final String COLUMN_SCORE = "score";
+    public static final String COLUMN_SELF = "self";
     public static final String COLUMN_SESSION_ID = "sessionId";
     public static final String COLUMN_SESSION_TIMESTAMP = "sessionTimestamp";
-    public static final String COLUMN_SELF = "self";
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;

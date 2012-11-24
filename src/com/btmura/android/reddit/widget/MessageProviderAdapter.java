@@ -27,7 +27,6 @@ import android.view.View;
 
 import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.MessageProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
@@ -141,14 +140,13 @@ class MessageProviderAdapter extends ProviderAdapter {
 
     @Override
     Bundle makeThingBundle(Context context, Cursor cursor) {
-        Bundle b = new Bundle(7);
+        Bundle b = new Bundle(5);
         ThingBundle.putSubreddit(b, cursor.getString(INDEX_SUBREDDIT));
         ThingBundle.putKind(b, cursor.getInt(INDEX_KIND));
 
         // Messages don't have titles so use the body for both.
         String body = cursor.getString(INDEX_BODY);
         ThingBundle.putTitle(b, body);
-        ThingBundle.putBody(b, body);
 
         ThingBundle.putThingId(b, cursor.getString(INDEX_THING_ID));
 
@@ -162,13 +160,6 @@ class MessageProviderAdapter extends ProviderAdapter {
             if (parts != null && parts.length >= 5) {
                 ThingBundle.putLinkId(b, parts[4]);
             }
-
-            // We don't know whether this thing has a link so display the
-            // comments url as the link url, so that the user can use the web
-            // browser to navigate to the link.
-            String url = Urls.permaUrl(contextUrl, null).toExternalForm();
-            ThingBundle.putLinkUrl(b, url);
-            ThingBundle.putCommentsUrl(b, url);
         }
 
         return b;
