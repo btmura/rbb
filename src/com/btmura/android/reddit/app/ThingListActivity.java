@@ -41,6 +41,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnNavigationListener,
         OnThingSelectedListener,
+        AccountNameHolder,
         SubredditNameHolder {
 
     public static final String TAG = "ThingListActivity";
@@ -133,6 +134,10 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public int onMeasureThingBody() {
         return 0;
+    }
+
+    public String getAccountName() {
+        return accountName;
     }
 
     public String getSubredditName() {

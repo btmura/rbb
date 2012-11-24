@@ -33,6 +33,7 @@ import com.btmura.android.reddit.util.Objects;
 public class ThingActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnThingEventListener,
+        AccountNameHolder,
         SubredditNameHolder {
 
     public static final String TAG = "ThingActivity";
@@ -41,8 +42,9 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     private static final String STATE_THING_BUNDLE = EXTRA_THING_BUNDLE;
 
-    private Bundle thingBundle;
     private ViewPager pager;
+    private Bundle thingBundle;
+    private String accountName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,23 +87,11 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        String accountName = result.getLastAccount();
+        accountName = result.getLastAccount();
         pager.setAdapter(new ThingPagerAdapter(getFragmentManager(), accountName, thingBundle));
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     public void onLinkDiscovery(String thingId, String url) {
@@ -123,8 +113,24 @@ public class ThingActivity extends GlobalMenuActivity implements
         pager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
     }
 
+    public String getAccountName() {
+        return accountName;
+    }
+
     public String getSubredditName() {
         return ThingBundle.getSubreddit(thingBundle);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
