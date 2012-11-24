@@ -139,9 +139,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     }
 
     private boolean handleProfile() {
-        Intent intent = new Intent(getActivity(), UserProfileActivity.class);
-        intent.putExtra(UserProfileActivity.EXTRA_USER, accountNameHolder.getAccountName());
-        startActivity(intent);
+        MenuHelper.startProfileActivity(getActivity(), accountNameHolder.getAccountName());
         return true;
     }
 

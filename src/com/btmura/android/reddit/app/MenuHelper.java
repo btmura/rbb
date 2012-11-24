@@ -44,6 +44,12 @@ public class MenuHelper {
         provider.setShareIntent(intent);
     }
 
+    public static void startProfileActivity(Context context, String user) {
+        Intent intent = new Intent(context, UserProfileActivity.class);
+        intent.putExtra(UserProfileActivity.EXTRA_USER, user);
+        context.startActivity(intent);
+    }
+
     /**
      * Sets a plain text {@link ClipData} with the provided label and text to
      * the clipboard and shows a toast with the text.

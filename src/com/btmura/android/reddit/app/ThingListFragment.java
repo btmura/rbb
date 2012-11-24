@@ -285,11 +285,8 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private boolean handleViewProfile(ActionMode mode) {
-        int position = getFirstCheckedPosition();
-        String user = adapter.getAuthor(position);
-        Intent intent = new Intent(getActivity(), UserProfileActivity.class);
-        intent.putExtra(UserProfileActivity.EXTRA_USER, user);
-        startActivity(intent);
+        String user = adapter.getAuthor(getFirstCheckedPosition());
+        MenuHelper.startProfileActivity(getActivity(), user);
         mode.finish();
         return true;
     }
