@@ -55,7 +55,7 @@ public class ThingListFragment extends ListFragment implements
 
     public static final String TAG = "ThingListFragment";
 
-    /** Opitonal bit mask for controlling fragment appearance. */
+    /** Optional bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;

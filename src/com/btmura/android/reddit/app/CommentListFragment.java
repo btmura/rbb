@@ -46,6 +46,7 @@ import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
+import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
@@ -58,6 +59,12 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private static final String ARG_THING_ID = "thingId";
     private static final String ARG_LINK_ID = "linkId";
 
+    /** Optional bit mask for controlling fragment appearance. */
+    private static final String ARG_FLAGS = "flags";
+
+    /** Flag to immediately show link button if thing definitely has a link. */
+    public static final int FLAG_SHOW_LINK_MENU_ITEM = 0x1;
+
     private static final String STATE_SESSION_ID = "sessionId";
 
     private OnThingEventListener listener;
@@ -69,13 +76,15 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private CommentAdapter adapter;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
-            String linkId) {
+            String linkId, int flags) {
+        Bundle args = new Bundle(4);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_THING_ID, thingId);
+        args.putString(ARG_LINK_ID, linkId);
+        args.putInt(ARG_FLAGS, flags);
+
         CommentListFragment frag = new CommentListFragment();
-        Bundle b = new Bundle(3);
-        b.putString(ARG_ACCOUNT_NAME, accountName);
-        b.putString(ARG_THING_ID, thingId);
-        b.putString(ARG_LINK_ID, linkId);
-        frag.setArguments(b);
+        frag.setArguments(args);
         return frag;
     }
 
@@ -202,7 +211,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             MenuHelper.setShareProvider(shareItem, getTitle(), getUrl());
         }
 
-        boolean showLink = isLoaded && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF);
+        boolean linkConfirmed = Flag.isEnabled(getArguments().getInt(ARG_FLAGS),
+                FLAG_SHOW_LINK_MENU_ITEM);
+        boolean showLink = linkConfirmed
+                || (isLoaded && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF));
         menu.findItem(R.id.menu_link).setVisible(showLink);
     }
 

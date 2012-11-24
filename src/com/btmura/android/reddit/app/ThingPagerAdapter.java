@@ -38,15 +38,25 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
     private final String accountName;
     private final Bundle thingBundle;
+    private final int clfFlags;
 
     public ThingPagerAdapter(FragmentManager fm, String accountName, Bundle thingBundle) {
         super(fm);
         this.accountName = accountName;
         this.thingBundle = thingBundle;
+
+        int flags = 0;
         if (ThingBundle.hasLinkUrl(thingBundle)) {
+            flags |= CommentListFragment.FLAG_SHOW_LINK_MENU_ITEM;
+        }
+        this.clfFlags = flags;
+
+        if (ThingBundle.hasLinkUrl(thingBundle)) {
+
             addPage(TYPE_LINK);
         }
         addPage(TYPE_COMMENTS);
+
     }
 
     public void addPage(int type) {
@@ -121,9 +131,11 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
                         ThingBundle.getLinkUrl(thingBundle));
 
             case TYPE_COMMENTS:
+
                 return CommentListFragment.newInstance(accountName,
                         ThingBundle.getThingId(thingBundle),
-                        ThingBundle.getLinkId(thingBundle));
+                        ThingBundle.getLinkId(thingBundle),
+                        clfFlags);
 
             default:
                 throw new IllegalStateException();
