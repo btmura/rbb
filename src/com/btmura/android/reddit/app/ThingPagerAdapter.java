@@ -32,9 +32,11 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
     public static final int TYPE_LINK = 0;
     public static final int TYPE_COMMENTS = 1;
+    public static final int TYPE_MESSAGE = 2;
 
     public static final int PAGE_LINK = TYPE_LINK;
     public static final int PAGE_COMMENTS = TYPE_COMMENTS;
+    public static final int PAGE_MESSAGE = 0;
 
     private final ArrayList<Integer> pages = new ArrayList<Integer>(2);
     private final ArrayList<Integer> oldPages = new ArrayList<Integer>(2);
@@ -47,19 +49,27 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
         super(fm);
         this.accountName = accountName;
         this.thingBundle = thingBundle;
+        this.clfFlags = getFlags(thingBundle);
+        setupPages(thingBundle);
+    }
 
+    private static int getFlags(Bundle thingBundle) {
         int flags = 0;
         if (ThingBundle.hasLinkUrl(thingBundle)) {
             flags |= CommentListFragment.FLAG_SHOW_LINK_MENU_ITEM;
         }
-        this.clfFlags = flags;
+        return flags;
+    }
 
-        if (ThingBundle.hasLinkUrl(thingBundle)) {
-
-            addPage(TYPE_LINK);
+    private void setupPages(Bundle thingBundle) {
+        if (ThingBundle.hasNoComments(thingBundle)) {
+            addPage(TYPE_MESSAGE);
+        } else {
+            if (ThingBundle.hasLinkUrl(thingBundle)) {
+                addPage(TYPE_LINK);
+            }
+            addPage(TYPE_COMMENTS);
         }
-        addPage(TYPE_COMMENTS);
-
     }
 
     public void addPage(int type) {
@@ -134,11 +144,14 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
                         ThingBundle.getLinkUrl(thingBundle));
 
             case TYPE_COMMENTS:
-
                 return CommentListFragment.newInstance(accountName,
                         ThingBundle.getThingId(thingBundle),
                         ThingBundle.getLinkId(thingBundle),
                         clfFlags);
+
+            case TYPE_MESSAGE:
+                return MessageFragment.newInstance(accountName,
+                        ThingBundle.getThingId(thingBundle));
 
             default:
                 throw new IllegalStateException();

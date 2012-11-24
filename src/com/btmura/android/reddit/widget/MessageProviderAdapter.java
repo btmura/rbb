@@ -43,6 +43,7 @@ class MessageProviderAdapter extends ProviderAdapter {
             Messages.COLUMN_KIND,
             Messages.COLUMN_SUBREDDIT,
             Messages.COLUMN_THING_ID,
+            Messages.COLUMN_WAS_COMMENT,
             Messages.COLUMN_VOTE,
     };
 
@@ -53,7 +54,8 @@ class MessageProviderAdapter extends ProviderAdapter {
     private static final int INDEX_KIND = 5;
     private static final int INDEX_SUBREDDIT = 6;
     private static final int INDEX_THING_ID = 7;
-    private static final int INDEX_VOTE = 8;
+    private static final int INDEX_WAS_COMMENT = 8;
+    private static final int INDEX_VOTE = 9;
 
     @Override
     Uri getLoaderUri(Bundle args) {
@@ -161,6 +163,10 @@ class MessageProviderAdapter extends ProviderAdapter {
                 ThingBundle.putLinkId(b, parts[4]);
             }
         }
+
+        // If this message isn't a comment, then it's simply a message with no
+        // comments or links.
+        ThingBundle.putNoComments(b, cursor.getInt(INDEX_WAS_COMMENT) == 0);
 
         return b;
     }

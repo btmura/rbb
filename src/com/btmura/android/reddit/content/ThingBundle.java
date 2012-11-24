@@ -44,6 +44,9 @@ public class ThingBundle {
     /** String for the link url of this thing. Null when just comments. */
     private static final String KEY_LINK_URL = "linkUrl";
 
+    /** Boolean indicating whether this thing has comments at all. */
+    private static final String KEY_NO_COMMENTS = "hasComments";
+
     public static String getSubreddit(Bundle bundle) {
         return getString(bundle, KEY_SUBREDDIT);
     }
@@ -94,6 +97,18 @@ public class ThingBundle {
 
     public static void putLinkUrl(Bundle bundle, String url) {
         bundle.putString(KEY_LINK_URL, url);
+    }
+
+    public static boolean hasNoComments(Bundle bundle) {
+        return getBoolean(bundle, KEY_NO_COMMENTS);
+    }
+
+    public static void putNoComments(Bundle bundle, boolean hasComments) {
+        bundle.putBoolean(KEY_NO_COMMENTS, hasComments);
+    }
+
+    private static boolean getBoolean(Bundle bundle, String key) {
+        return bundle != null ? bundle.getBoolean(key) : null;
     }
 
     private static int getInt(Bundle bundle, String key) {
