@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.view;
+package com.btmura.android.reddit.app;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;

@@ -46,7 +46,6 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.util.Flag;
-import com.btmura.android.reddit.view.MenuHelper;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
