@@ -49,7 +49,10 @@ public class Things implements BaseColumns, KindColumns {
     public static final String COLUMN_URL = "url";
     public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
 
-    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + " = ?";
+    public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
+            COLUMN_ACCOUNT + " = ? AND " + COLUMN_THING_ID + " = ?";
+
+    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
 
     // TODO: Do we need an index for sessionId and more?
     public static final String SELECT_BY_SESSION_ID_AND_MORE =

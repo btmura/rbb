@@ -39,9 +39,15 @@ abstract class BaseProvider extends ContentProvider {
 
     /**
      * Sync changes back to the network. Don't set this in sync adapters or else
-     * we'll get stuck in a syncing loop.
+     * we'll get stuck in a syncing loop. This is by default false.
      */
     public static final String PARAM_SYNC = "sync";
+
+    /**
+     * Parameter to control whether to notify registered listeners of changes.
+     * This is by default true.
+     */
+    public static final String PARAM_NOTIFY = "notify";
 
     protected String logTag;
     protected DbHelper helper;
@@ -162,8 +168,10 @@ abstract class BaseProvider extends ContentProvider {
     protected abstract void processUri(Uri uri, SQLiteDatabase db, ContentValues values);
 
     protected void notifyChange(Uri uri) {
-        boolean sync = uri.getBooleanQueryParameter(PARAM_SYNC, false);
-        getContext().getContentResolver().notifyChange(uri, null, sync);
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY, true)) {
+            boolean sync = uri.getBooleanQueryParameter(PARAM_SYNC, false);
+            getContext().getContentResolver().notifyChange(uri, null, sync);
+        }
     }
 
     @Override

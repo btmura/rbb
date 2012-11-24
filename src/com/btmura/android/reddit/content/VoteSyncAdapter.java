@@ -27,11 +27,13 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -39,8 +41,10 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.util.Array;
 
@@ -58,6 +62,12 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
             return new VoteSyncAdapter(this).getSyncAdapterBinder();
         }
     }
+
+    // Avoid notifying the ThingProvider that we are making changes,
+    // because the UI already reflects the pending changes.
+    private static Uri THINGS_URI = ThingProvider.THINGS_URI.buildUpon()
+            .appendQueryParameter(ThingProvider.PARAM_NOTIFY, Boolean.toString(false))
+            .build();
 
     private static final String[] PROJECTION = {
             Votes._ID,
@@ -89,6 +99,14 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
 
             ArrayList<ContentProviderOperation> ops =
                     new ArrayList<ContentProviderOperation>(c.getCount());
+
+            // Things need to be updated manually after deleting a votes row.
+            // This is because pagination ends up doing a join with the votes
+            // table again. Other tables like comments don't need to do this,
+            // since they don't have pagination.
+            ArrayList<ContentProviderOperation> thingOps =
+                    new ArrayList<ContentProviderOperation>(c.getCount());
+
             while (c.moveToNext()) {
                 long id = c.getLong(INDEX_ID);
                 String thingId = c.getString(INDEX_THING_ID);
@@ -100,6 +118,11 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
                     RedditApi.vote(getContext(), thingId, vote, cookie, modhash);
                     ops.add(ContentProviderOperation.newDelete(VoteProvider.ACTIONS_URI)
                             .withSelection(VoteProvider.ID_SELECTION, Array.of(id))
+                            .build());
+                    thingOps.add(ContentProviderOperation.newUpdate(THINGS_URI)
+                            .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
+                                    Array.of(account.name, thingId))
+                            .withValue(Things.COLUMN_LIKES, vote)
                             .build());
                 } catch (IOException e) {
                     Log.e(TAG, e.getMessage(), e);
@@ -115,6 +138,16 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
             for (int i = 0; i < count; i++) {
                 syncResult.stats.numDeletes += results[i].count;
             }
+
+            // We can't update both tables in a transaction, so we'll have to
+            // take the non-fatal but annoying risk of the votes disappearing
+            // when this fails.
+            ContentResolver cr = getContext().getContentResolver();
+            results = cr.applyBatch(ThingProvider.AUTHORITY, thingOps);
+            for (int i = 0; i < count; i++) {
+                syncResult.stats.numUpdates += results[i].count;
+            }
+
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
             syncResult.databaseError = true;
