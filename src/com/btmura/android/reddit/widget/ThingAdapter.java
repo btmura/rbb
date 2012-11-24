@@ -53,6 +53,9 @@ public class ThingAdapter extends BaseCursorAdapter {
     /** String argument specifying whose messages to load. */
     public static final String ARG_MESSAGE_USER = "messageUser";
 
+    /** String argument specifying what specific message to load. */
+    public static final String ARG_MESSAGE_THREAD_ID = "messageThreadId";
+
     /** Integer argument to filter things, profile, or messages. */
     public static final String ARG_FILTER = "filter";
 
@@ -120,6 +123,10 @@ public class ThingAdapter extends BaseCursorAdapter {
             return args.getString(ARG_MESSAGE_USER);
         }
 
+        static String getMessageThreadId(Bundle args) {
+            return args.getString(ARG_MESSAGE_THREAD_ID);
+        }
+
         static int getFilter(Bundle args) {
             return args.getInt(ARG_FILTER);
         }
@@ -153,8 +160,12 @@ public class ThingAdapter extends BaseCursorAdapter {
         return new ThingAdapter(context, new ThingProviderAdapter());
     }
 
-    public static ThingAdapter newMessagesInstance(Context context) {
+    public static ThingAdapter newMessageInstance(Context context) {
         return new ThingAdapter(context, new MessageProviderAdapter());
+    }
+
+    public static ThingAdapter newMessageThreadInstance(Context context) {
+        return new ThingAdapter(context, new MessageThreadProviderAdapter());
     }
 
     private ThingAdapter(Context context, ProviderAdapter providerAdapter) {
@@ -312,6 +323,10 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     public static String getMessageUser(Bundle args) {
         return ProviderAdapter.getMessageUser(args);
+    }
+
+    public static String getMessageThreadId(Bundle args) {
+        return ProviderAdapter.getMessageThreadId(args);
     }
 
     public static int getFilter(Bundle args) {

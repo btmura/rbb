@@ -98,6 +98,15 @@ public class ThingListFragment extends ListFragment implements
         return newFragment(args);
     }
 
+    public static ThingListFragment newMessageMessagesInstance(String accountName, String thingId,
+            int flags) {
+        Bundle args = new Bundle(2);
+        args.putString(ThingAdapter.ARG_ACCOUNT_NAME, accountName);
+        args.putString(ThingAdapter.ARG_MESSAGE_THREAD_ID, thingId);
+        args.putInt(ARG_FLAGS, flags);
+        return newFragment(args);
+    }
+
     public static ThingListFragment newInstance(String accountName, String query,
             String profileUser, String messageUser, int filter, int flags) {
         Bundle args = new Bundle(6);
@@ -130,7 +139,9 @@ public class ThingListFragment extends ListFragment implements
         sync = savedInstanceState == null;
 
         if (!TextUtils.isEmpty(ThingAdapter.getMessageUser(getArguments()))) {
-            adapter = ThingAdapter.newMessagesInstance(getActivity());
+            adapter = ThingAdapter.newMessageInstance(getActivity());
+        } else if (!TextUtils.isEmpty(ThingAdapter.getMessageThreadId(getArguments()))) {
+            adapter = ThingAdapter.newMessageThreadInstance(getActivity());
         } else {
             adapter = ThingAdapter.newThingInstance(getActivity());
         }
