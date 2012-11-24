@@ -39,6 +39,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
+            android:layout_alignWithParentIfMissing="true"
             android:layout_toRightOf="@+id/subreddit_list_container"
             android:paddingLeft="@dimen/element_padding"
             android:paddingRight="@dimen/element_padding" />
