@@ -18,6 +18,7 @@
 
     <item
         android:id="@+id/menu_view_subreddit_sidebar"
+        android:orderInCategory="1336"
         android:title="@string/menu_view_sidebar"/>
 
 </menu>

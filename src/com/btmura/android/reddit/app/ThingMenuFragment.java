@@ -56,6 +56,20 @@ public class ThingMenuFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        hideExtraViewSidebarItems(menu);
+    }
+
+    private void hideExtraViewSidebarItems(Menu menu) {
+        MenuItem thingSidebarItem = menu.findItem(R.id.menu_view_thing_sidebar);
+        MenuItem subredditSidebarItem = menu.findItem(R.id.menu_view_subreddit_sidebar);
+        if (thingSidebarItem != null && subredditSidebarItem != null) {
+            thingSidebarItem.setVisible(false);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_view_thing_sidebar:

@@ -34,7 +34,6 @@ import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -575,23 +574,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             return ThingBundle.getSubreddit(cf.getThingBundle());
         }
         return null;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        hideExtraViewSidebarItems(menu);
-        return true;
-    }
-
-    private void hideExtraViewSidebarItems(Menu menu) {
-        MenuItem thingSidebarItem = menu.findItem(R.id.menu_view_thing_sidebar);
-        if (thingSidebarItem != null) {
-            MenuItem subredditSidebarItem = menu.findItem(R.id.menu_view_subreddit_sidebar);
-            if (subredditSidebarItem != null) {
-                subredditSidebarItem.setVisible(false);
-            }
-        }
     }
 
     @Override

@@ -321,6 +321,7 @@ public class ThingListFragment extends ListFragment implements
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
         String subreddit = ThingAdapter.getSubreddit(adapterArgs);
         menu.findItem(R.id.menu_view_subreddit_sidebar)
                 .setVisible(subreddit != null && !Subreddits.isFrontPage(subreddit));
