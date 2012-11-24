@@ -45,9 +45,9 @@ public abstract class FragmentStateItemPagerAdapter extends PagerAdapter {
     private final FragmentManager mFragmentManager;
     private FragmentTransaction mCurTransaction = null;
 
-    private long[] mItemIds = new long[0];
     private ArrayList<Fragment.SavedState> mSavedState = new ArrayList<Fragment.SavedState>();
     private ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
+    private long[] mItemIds;
     private Fragment mCurrentPrimaryItem = null;
 
     public FragmentStateItemPagerAdapter(FragmentManager fm) {
@@ -76,8 +76,8 @@ public abstract class FragmentStateItemPagerAdapter extends PagerAdapter {
         if (!Arrays.equals(mItemIds, newItemIds)) {
             ArrayList<Fragment.SavedState> newSavedState = new ArrayList<Fragment.SavedState>();
             ArrayList<Fragment> newFragments = new ArrayList<Fragment>();
-
-            for (int oldPosition = 0; oldPosition < mItemIds.length; oldPosition++) {
+            int numItemIds = mItemIds != null ? mItemIds.length : 0;
+            for (int oldPosition = 0; oldPosition < numItemIds; oldPosition++) {
                 int newPosition = POSITION_NONE;
                 for (int i = 0; i < newItemIds.length; i++) {
                     if (mItemIds[oldPosition] == newItemIds[i]) {
@@ -213,7 +213,7 @@ public abstract class FragmentStateItemPagerAdapter extends PagerAdapter {
     @Override
     public Parcelable saveState() {
         Bundle state = null;
-        if (mItemIds.length > 0) {
+        if (mItemIds != null && mItemIds.length > 0) {
             state = new Bundle();
             state.putLongArray("itemIds", mItemIds);
         }
@@ -244,9 +244,6 @@ public abstract class FragmentStateItemPagerAdapter extends PagerAdapter {
             Bundle bundle = (Bundle) state;
             bundle.setClassLoader(loader);
             mItemIds = bundle.getLongArray("itemIds");
-            if (mItemIds == null) {
-                mItemIds = new long[0];
-            }
             Parcelable[] fss = bundle.getParcelableArray("states");
             mSavedState.clear();
             mFragments.clear();
