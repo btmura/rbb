@@ -36,7 +36,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
@@ -59,8 +58,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private static final int ANIMATION_OPEN_NAV = 0;
     private static final int ANIMATION_CLOSE_NAV = 1;
-    private static final int ANIMATION_OPEN_SIDE_NAV = 2;
-    private static final int ANIMATION_CLOSE_SIDE_NAV = 3;
     private static final int ANIMATION_EXPAND_SUBREDDIT_NAV = 4;
     private static final int ANIMATION_EXPAND_THING_NAV = 5;
 
@@ -86,8 +83,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private AnimatorSet openNavAnimator;
     private AnimatorSet closeNavAnimator;
-    private AnimatorSet openSideNavAnimator;
-    private AnimatorSet closeSideNavAnimator;
     private AnimatorSet expandSubredditNavAnimator;
     private AnimatorSet expandThingNavAnimator;
 
@@ -144,13 +139,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
             if (navContainer != null) {
                 thingClickAbsorber = findViewById(R.id.thing_click_absorber);
-                if (thingClickAbsorber != null) {
-                    thingClickAbsorber.setOnClickListener(new OnClickListener() {
-                        public void onClick(View v) {
-                            runNavContainerAnimation(ANIMATION_CLOSE_SIDE_NAV, null);
-                        }
-                    });
-                }
 
                 fullNavWidth = dm.widthPixels;
                 sideNavWidth = fullNavWidth / 2;
@@ -158,8 +146,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
                 openNavAnimator = createOpenNavAnimator();
                 closeNavAnimator = createCloseNavAnimator();
-                openSideNavAnimator = createSideNavAnimator(true);
-                closeSideNavAnimator = createSideNavAnimator(false);
                 expandSubredditNavAnimator = createExpandNavAnimator(true);
                 expandThingNavAnimator = createExpandNavAnimator(false);
             }
@@ -490,12 +476,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 } else {
                     runNavContainerAnimation(ANIMATION_CLOSE_NAV, null);
                 }
-            } else if (isSideNavShowing()) {
-                if (hasSubredditList()) {
-                    runNavContainerAnimation(ANIMATION_EXPAND_SUBREDDIT_NAV, null);
-                } else {
-                    runNavContainerAnimation(ANIMATION_EXPAND_THING_NAV, null);
-                }
             }
         } else {
             thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
@@ -591,13 +571,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private void handleHome() {
         FragmentManager fm = getFragmentManager();
         if (fm.getBackStackEntryCount() > 0) {
-            if (navContainer != null && !isSideNavShowing()) {
-                runNavContainerAnimation(ANIMATION_OPEN_SIDE_NAV, null);
-            } else {
-                fm.popBackStack();
-            }
-        } else if ((bar.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP)
-                == ActionBar.DISPLAY_HOME_AS_UP) {
+            fm.popBackStack();
+        } else if ((bar.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP) != 0) {
             finish();
         }
     }
@@ -637,10 +612,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 return openNavAnimator;
             case ANIMATION_CLOSE_NAV:
                 return closeNavAnimator;
-            case ANIMATION_OPEN_SIDE_NAV:
-                return openSideNavAnimator;
-            case ANIMATION_CLOSE_SIDE_NAV:
-                return closeSideNavAnimator;
             case ANIMATION_EXPAND_SUBREDDIT_NAV:
                 return expandSubredditNavAnimator;
             case ANIMATION_EXPAND_THING_NAV:
@@ -699,37 +670,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         return as;
     }
 
-    private AnimatorSet createSideNavAnimator(final boolean open) {
-        ObjectAnimator ncTransX;
-        ObjectAnimator tpTransX;
-        if (open) {
-            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", -sideNavWidth, 0);
-            tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", 0, sideNavWidth);
-        } else {
-            ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0, -sideNavWidth);
-            tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", sideNavWidth, 0);
-        }
-
-        AnimatorSet as = new AnimatorSet();
-        as.setDuration(duration).play(ncTransX).with(tpTransX);
-        as.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                changeNavContainerLayout(NAV_LAYOUT_SIDENAV);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
-                if (!open) {
-                    navContainer.setVisibility(View.GONE);
-                }
-            }
-        });
-        return as;
-    }
-
     private AnimatorSet createExpandNavAnimator(boolean showSubreddits) {
         ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0,
                 subredditListWidth);
@@ -756,10 +696,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             }
         });
         return as;
-    }
-
-    private boolean isSideNavShowing() {
-        return thingClickAbsorber != null && thingClickAbsorber.isShown();
     }
 
     private void changeNavContainerLayout(int layout) {
