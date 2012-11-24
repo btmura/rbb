@@ -58,8 +58,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private static final int ANIMATION_OPEN_NAV = 0;
     private static final int ANIMATION_CLOSE_NAV = 1;
-    private static final int ANIMATION_EXPAND_SUBREDDIT_NAV = 4;
-    private static final int ANIMATION_EXPAND_THING_NAV = 5;
 
     private static final int NAV_LAYOUT_ORIGINAL = 0;
     private static final int NAV_LAYOUT_SIDENAV = 1;
@@ -78,13 +76,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private View thingClickAbsorber;
     private int fullNavWidth;
-    private int sideNavWidth;
     private int duration;
 
     private AnimatorSet openNavAnimator;
     private AnimatorSet closeNavAnimator;
-    private AnimatorSet expandSubredditNavAnimator;
-    private AnimatorSet expandThingNavAnimator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,13 +136,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 thingClickAbsorber = findViewById(R.id.thing_click_absorber);
 
                 fullNavWidth = dm.widthPixels;
-                sideNavWidth = fullNavWidth / 2;
                 duration = r.getInteger(android.R.integer.config_shortAnimTime);
 
                 openNavAnimator = createOpenNavAnimator();
                 closeNavAnimator = createCloseNavAnimator();
-                expandSubredditNavAnimator = createExpandNavAnimator(true);
-                expandThingNavAnimator = createExpandNavAnimator(false);
             }
 
             refreshSubredditListVisibility();
@@ -612,10 +604,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 return openNavAnimator;
             case ANIMATION_CLOSE_NAV:
                 return closeNavAnimator;
-            case ANIMATION_EXPAND_SUBREDDIT_NAV:
-                return expandSubredditNavAnimator;
-            case ANIMATION_EXPAND_THING_NAV:
-                return expandThingNavAnimator;
             default:
                 throw new IllegalArgumentException();
         }
@@ -665,34 +653,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 navContainer.setVisibility(View.GONE);
                 thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingPager.setVisibility(View.VISIBLE);
-            }
-        });
-        return as;
-    }
-
-    private AnimatorSet createExpandNavAnimator(boolean showSubreddits) {
-        ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX", 0,
-                subredditListWidth);
-        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX", sideNavWidth,
-                fullNavWidth);
-
-        AnimatorSet as = new AnimatorSet();
-        if (showSubreddits) {
-            as.play(ncTransX).with(tpTransX);
-        } else {
-            as.play(tpTransX);
-        }
-        as.setDuration(duration);
-        as.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-                changeNavContainerLayout(NAV_LAYOUT_ORIGINAL);
-                navContainer.setTranslationX(0);
-
-                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
-                thingPager.setVisibility(View.GONE);
-                refreshThingPager(null);
             }
         });
         return as;
