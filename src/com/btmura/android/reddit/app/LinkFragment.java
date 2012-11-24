@@ -37,7 +37,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.MenuHelper;
+import com.btmura.android.reddit.view.MenuHelper;
 
 public class LinkFragment extends Fragment {
 
