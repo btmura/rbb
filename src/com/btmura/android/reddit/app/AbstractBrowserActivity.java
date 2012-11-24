@@ -43,7 +43,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThingBundle;
@@ -55,8 +54,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         OnThingSelectedListener,
         OnThingEventListener,
         OnBackStackChangedListener,
-        SubredditNameHolder,
-        ThingPagerHolder {
+        SubredditNameHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
 
@@ -101,7 +99,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
         super.onCreate(savedInstanceState);
         setContentView();
-        setPrereqs();
+        setupPrereqs();
         if (!skipSetup()) {
             setupCommonFragments(savedInstanceState);
             setupCommonViews();
@@ -113,7 +111,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract void setContentView();
 
-    private void setPrereqs() {
+    private void setupPrereqs() {
         bar = getActionBar();
         isSinglePane = findViewById(R.id.thing_pager) == null;
     }
@@ -171,6 +169,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
+    // TODO: Do we need this method or can it be rolled into setupPrereqs?
     protected abstract void setupViews();
 
     protected abstract void setupActionBar(Bundle savedInstanceState);
@@ -422,23 +421,23 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public void onLinkDiscovery(String thingId, String url) {
         ControlFragment cf = getControlFragment();
         Bundle thingBundle = cf.getThingBundle();
-        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle)) 
+        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))
                 && !ThingBundle.hasLinkUrl(thingBundle)) {
             ThingBundle.putLinkUrl(thingBundle, url);
             cf.setThingBundle(thingBundle);
 
             ThingPagerAdapter adapter = (ThingPagerAdapter) thingPager.getAdapter();
             adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
-            thingPager.setCurrentItem(1);
+            thingPager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
         }
     }
 
     public void onLinkMenuItemClick() {
-        thingPager.setCurrentItem(0);
+        thingPager.setCurrentItem(ThingPagerAdapter.PAGE_LINK);
     }
 
     public void onCommentMenuItemClick() {
-        thingPager.setCurrentItem(1);
+        thingPager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
     }
 
     private void safePopBackStackImmediate() {
@@ -576,10 +575,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             return ThingBundle.getSubreddit(cf.getThingBundle());
         }
         return null;
-    }
-
-    public ViewPager getPager() {
-        return thingPager;
     }
 
     @Override

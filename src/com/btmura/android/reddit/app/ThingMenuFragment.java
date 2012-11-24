@@ -19,7 +19,6 @@ package com.btmura.android.reddit.app;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,10 +31,6 @@ public class ThingMenuFragment extends Fragment {
     public static final String TAG = "ThingMenuFragment";
 
     private static final String ARG_THING_BUNDLE = "thingBundle";
-
-    public interface ThingPagerHolder {
-        ViewPager getPager();
-    }
 
     private Bundle thingBundle;
 

@@ -22,24 +22,24 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingPagerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThingBundle;
+import com.btmura.android.reddit.util.Objects;
 
 public class ThingActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
-        ThingPagerHolder,
-        SubredditNameHolder,
-        OnPageChangeListener {
+        OnThingEventListener,
+        SubredditNameHolder {
 
     public static final String TAG = "ThingActivity";
 
     public static final String EXTRA_THING_BUNDLE = "thingBundle";
+
+    private static final String STATE_THING_BUNDLE = EXTRA_THING_BUNDLE;
 
     private Bundle thingBundle;
     private ViewPager pager;
@@ -48,16 +48,22 @@ public class ThingActivity extends GlobalMenuActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.thing);
-        pager = (ViewPager) findViewById(R.id.pager);
-        pager.setOnPageChangeListener(this);
-
-        thingBundle = getIntent().getBundleExtra(EXTRA_THING_BUNDLE);
-        setInitialFragments(savedInstanceState);
-        setActionBar(savedInstanceState);
+        setupPrereqs(savedInstanceState);
+        setupFragments(savedInstanceState);
+        setupActionBar(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
     }
 
-    private void setInitialFragments(Bundle savedInstanceState) {
+    private void setupPrereqs(Bundle savedInstanceState) {
+        pager = (ViewPager) findViewById(R.id.pager);
+        if (savedInstanceState == null) {
+            thingBundle = getIntent().getBundleExtra(EXTRA_THING_BUNDLE);
+        } else {
+            thingBundle = savedInstanceState.getBundle(STATE_THING_BUNDLE);
+        }
+    }
+
+    private void setupFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
@@ -66,7 +72,7 @@ public class ThingActivity extends GlobalMenuActivity implements
         }
     }
 
-    private void setActionBar(Bundle savedInstanceState) {
+    private void setupActionBar(Bundle savedInstanceState) {
         ActionBar bar = getActionBar();
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_HOME_AS_UP
@@ -98,25 +104,32 @@ public class ThingActivity extends GlobalMenuActivity implements
         }
     }
 
-    public ViewPager getPager() {
-        return pager;
+    public void onLinkDiscovery(String thingId, String url) {
+        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))
+                && !ThingBundle.hasLinkUrl(thingBundle)) {
+            ThingBundle.putLinkUrl(thingBundle, url);
+
+            ThingPagerAdapter adapter = (ThingPagerAdapter) pager.getAdapter();
+            adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
+            pager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
+        }
     }
 
-    public ThingPagerAdapter getPagerAdapter() {
-        return (ThingPagerAdapter) pager.getAdapter();
+    public void onLinkMenuItemClick() {
+        pager.setCurrentItem(ThingPagerAdapter.PAGE_LINK);
+    }
+
+    public void onCommentMenuItemClick() {
+        pager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
     }
 
     public String getSubredditName() {
         return ThingBundle.getSubreddit(thingBundle);
     }
 
-    public void onPageSelected(int position) {
-        invalidateOptionsMenu();
-    }
-
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    }
-
-    public void onPageScrollStateChanged(int state) {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBundle(STATE_THING_BUNDLE, thingBundle);
     }
 }

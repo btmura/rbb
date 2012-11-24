@@ -33,6 +33,9 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
     public static final int TYPE_LINK = 0;
     public static final int TYPE_COMMENTS = 1;
 
+    public static final int PAGE_LINK = TYPE_LINK;
+    public static final int PAGE_COMMENTS = TYPE_COMMENTS;
+
     private final ArrayList<Integer> pages = new ArrayList<Integer>(2);
     private final ArrayList<Integer> oldPages = new ArrayList<Integer>(2);
 
