@@ -29,6 +29,7 @@ import android.view.View;
 
 import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
@@ -167,6 +168,32 @@ class ThingProviderAdapter extends ProviderAdapter {
     @Override
     String getAuthor(ThingAdapter adapter, int position) {
         return adapter.getString(position, INDEX_AUTHOR);
+    }
+
+    @Override
+    String getTitle(ThingAdapter adapter, int position) {
+        // Link and comment posts have a title.
+        String title = adapter.getString(position, INDEX_TITLE);
+        if (!TextUtils.isEmpty(title)) {
+            return title;
+        }
+
+        // Comments don't have titles so use the body.
+        return adapter.getString(position, INDEX_BODY);
+    }
+
+    @Override
+    String getUrl(ThingAdapter adapter, int position) {
+        // Most things and comments have the url attribute set.
+        String url = adapter.getString(position, INDEX_URL);
+        if (!TextUtils.isEmpty(url)) {
+            return url;
+        }
+
+        // Comment references just provide a thing and link id.
+        String thingId = adapter.getString(position, INDEX_THING_ID);
+        String linkId = adapter.getString(position, INDEX_LINK_ID);
+        return Urls.commentsUrl(thingId, linkId, false).toExternalForm();
     }
 
     @Override

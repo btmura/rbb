@@ -27,6 +27,7 @@ import android.view.View;
 
 import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.database.Messages;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.MessageProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
@@ -110,6 +111,23 @@ class MessageProviderAdapter extends ProviderAdapter {
     @Override
     String getAuthor(ThingAdapter adapter, int position) {
         return adapter.getString(position, INDEX_AUTHOR);
+    }
+
+    @Override
+    String getTitle(ThingAdapter adapter, int position) {
+        return adapter.getString(position, INDEX_BODY);
+    }
+
+    @Override
+    String getUrl(ThingAdapter adapter, int position) {
+        // Comment reply messages have a context url we can use.
+        String context = adapter.getString(position, INDEX_CONTEXT);
+        if (!TextUtils.isEmpty(context)) {
+            return Urls.permaUrl(context, null).toExternalForm();
+        }
+
+        // Assume this is a raw message.
+        return Urls.messageMessagesUrl(getThingId(adapter, position)).toExternalForm();
     }
 
     @Override

@@ -279,6 +279,9 @@ public class ThingListFragment extends ListFragment implements
             case R.id.menu_view_profile:
                 return handleViewProfile(mode);
 
+            case R.id.menu_copy_url:
+                return handleCopyUrl(mode);
+
             default:
                 return false;
         }
@@ -287,6 +290,15 @@ public class ThingListFragment extends ListFragment implements
     private boolean handleViewProfile(ActionMode mode) {
         String user = adapter.getAuthor(getFirstCheckedPosition());
         MenuHelper.startProfileActivity(getActivity(), user);
+        mode.finish();
+        return true;
+    }
+
+    private boolean handleCopyUrl(ActionMode mode) {
+        int position = getFirstCheckedPosition();
+        String title = adapter.getTitle(position);
+        String url = adapter.getUrl(position);
+        MenuHelper.setClipAndToast(getActivity(), title, url);
         mode.finish();
         return true;
     }

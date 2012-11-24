@@ -84,6 +84,10 @@ public class ThingAdapter extends BaseCursorAdapter {
 
         abstract String getAuthor(ThingAdapter adapter, int position);
 
+        abstract String getTitle(ThingAdapter adapter, int position);
+
+        abstract String getUrl(ThingAdapter adapter, int position);
+
         abstract int getKind(ThingAdapter adapter, int position);
 
         abstract String getMoreThingId(ThingAdapter adapter);
@@ -264,6 +268,14 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     public String getAuthor(int position) {
         return providerAdapter.getAuthor(this, position);
+    }
+
+    public String getTitle(int position) {
+        return providerAdapter.getTitle(this, position);
+    }
+
+    public String getUrl(int position) {
+        return providerAdapter.getUrl(this, position);
     }
 
     public String getMoreThingId() {
