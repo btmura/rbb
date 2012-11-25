@@ -65,7 +65,13 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private static final String STATE_SELECTED_ACTION_ACCOUNT = "selectedActionAccount";
 
     public interface OnSubredditSelectedListener {
-        void onInitialSubredditSelected(String subreddit);
+        /**
+         * Notifies the listener of the first subreddit in the loaded list. If
+         * there are no subreddits, then subreddit is null. If there was an
+         * error, then subreddit is null but error is true. Otherwise, subreddit
+         * is non-null with error set to false.
+         */
+        void onInitialSubredditSelected(String subreddit, boolean error);
 
         void onSubredditSelected(String subreddit);
     }
@@ -177,15 +183,28 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         SubredditAdapter.updateLoader(getActivity(), loader, accountName, sessionId, query, sync);
 
         adapter.swapCursor(cursor);
-        setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
+        setEmptyText(getEmptyText(cursor == null));
 
         setListShown(true);
         if (actionMode != null) {
             actionMode.invalidate();
         }
-        if (cursor != null && cursor.getCount() > 0) {
-            listener.onInitialSubredditSelected(adapter.getName(0));
+        if (listener != null) {
+            if (cursor == null) {
+                listener.onInitialSubredditSelected(null, true);
+            } else if (cursor.getCount() == 0) {
+                listener.onInitialSubredditSelected(null, false);
+            } else {
+                listener.onInitialSubredditSelected(adapter.getName(0), false);
+            }
         }
+    }
+
+    private String getEmptyText(boolean error) {
+        if (singleChoice) {
+            return ""; // Don't show duplicate message in multipane layout.
+        }
+        return getString(error ? R.string.error : R.string.empty_list);
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {

@@ -63,6 +63,7 @@ public class ThingListFragment extends ListFragment implements
     private static final String STATE_ADAPTER_ARGS = "adapterArgs";
     private static final String STATE_SELECTED_THING_ID = "selectedThingId";
     private static final String STATE_SELECTED_LINK_ID = "selectedLinkId";
+    private static final String STATE_EMPTY_TEXT = "emptyText";
 
     public interface OnThingSelectedListener {
         void onThingSelected(Bundle thingBundle, int position);
@@ -70,11 +71,12 @@ public class ThingListFragment extends ListFragment implements
         int onMeasureThingBody();
     }
 
+    private ThingAdapter adapter;
+    private Bundle adapterArgs;
     private String selectedThingId;
     private String selectedLinkId;
-    private ThingAdapter adapter;
-    Bundle adapterArgs;
 
+    private int emptyText;
     private boolean sync;
     private boolean scrollLoading;
 
@@ -159,6 +161,7 @@ public class ThingListFragment extends ListFragment implements
             adapterArgs = savedInstanceState.getBundle(STATE_ADAPTER_ARGS);
             selectedThingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
             selectedLinkId = savedInstanceState.getString(STATE_SELECTED_LINK_ID);
+            emptyText = savedInstanceState.getInt(STATE_EMPTY_TEXT);
         }
 
         adapter.setAccountName(ThingAdapter.getAccountName(adapterArgs));
@@ -186,13 +189,27 @@ public class ThingListFragment extends ListFragment implements
         adapter.setThingBodyWidth(getThingBodyWidth());
         setListAdapter(adapter);
         setListShown(false);
-        loadIfPossible();
+        if (emptyText == 0) {
+            loadIfPossible();
+        } else {
+            showEmpty();
+        }
     }
 
     public void loadIfPossible() {
         if (adapter.isLoadable(adapterArgs)) {
             getLoaderManager().initLoader(0, null, this);
         }
+    }
+
+    public void setEmpty(boolean error) {
+        this.emptyText = error ? R.string.error : R.string.empty_list;
+        showEmpty();
+    }
+
+    private void showEmpty() {
+        setEmptyText(getString(emptyText));
+        setListShown(true);
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -321,12 +338,6 @@ public class ThingListFragment extends ListFragment implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBundle(STATE_ADAPTER_ARGS, adapterArgs);
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_list_menu, menu);
@@ -363,6 +374,15 @@ public class ThingListFragment extends ListFragment implements
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
         intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, ThingAdapter.getSubreddit(adapterArgs));
         startActivity(intent);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBundle(STATE_ADAPTER_ARGS, adapterArgs);
+        outState.putString(STATE_SELECTED_THING_ID, selectedThingId);
+        outState.putString(STATE_SELECTED_LINK_ID, selectedLinkId);
+        outState.putInt(STATE_EMPTY_TEXT, emptyText);
     }
 
     @Override

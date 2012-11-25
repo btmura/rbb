@@ -285,13 +285,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshViews(null);
     }
 
-    public void onInitialSubredditSelected(String subreddit) {
+    public void onInitialSubredditSelected(String subreddit, boolean error) {
         if (!isSinglePane) {
-            selectInitialSubredditMultiPane(subreddit);
+            selectInitialSubredditMultiPane(subreddit, error);
         }
     }
 
-    protected void selectInitialSubredditMultiPane(String subreddit) {
+    protected void selectInitialSubredditMultiPane(String subreddit, boolean error) {
         ControlFragment cf = getControlFragment();
         if (cf != null && cf.getSubreddit() == null) {
             cf.setSubreddit(subreddit);
@@ -300,8 +300,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             slf.setSelectedSubreddit(subreddit);
 
             ThingListFragment tlf = getThingListFragment();
-            tlf.setSubreddit(subreddit);
-            tlf.loadIfPossible();
+            if (subreddit != null) {
+                tlf.setSubreddit(subreddit);
+                tlf.loadIfPossible();
+            } else {
+                tlf.setEmpty(error);
+            }
 
             refreshActionBar(subreddit, null);
         }
