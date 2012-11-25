@@ -463,13 +463,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         } else {
             if (hasSubredditList() && subredditListContainer != null) {
                 int currVisibility = subredditListContainer.getVisibility();
-                int nextVisibility = !hasThing ? View.VISIBLE : View.GONE;
+                int nextVisibility = hasThing ? View.GONE : View.VISIBLE;
                 if (currVisibility != nextVisibility) {
                     if (nextVisibility == View.VISIBLE) {
                         runAnimation(ANIMATION_OPEN_SUBREDDIT_LIST);
                     } else {
                         runAnimation(ANIMATION_CLOSE_SUBREDDIT_LIST);
                     }
+                } else {
+                    thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
                 }
             } else {
                 thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
