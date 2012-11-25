@@ -44,6 +44,9 @@ public class ThingBundle {
     /** String for the link url of this thing. Null when just comments. */
     private static final String KEY_LINK_URL = "linkUrl";
 
+    /** String for the comment url of this thing. */
+    private static final String KEY_COMMENT_URL = "commentUrl";
+
     /** Boolean indicating whether this thing has comments at all. */
     private static final String KEY_NO_COMMENTS = "hasComments";
 
@@ -97,6 +100,18 @@ public class ThingBundle {
 
     public static void putLinkUrl(Bundle bundle, String url) {
         bundle.putString(KEY_LINK_URL, url);
+    }
+
+    public static boolean hasCommentUrl(Bundle bundle) {
+        return !TextUtils.isEmpty(getCommentUrl(bundle));
+    }
+
+    public static String getCommentUrl(Bundle bundle) {
+        return getString(bundle, KEY_COMMENT_URL);
+    }
+
+    public static void putCommentUrl(Bundle bundle, String url) {
+        bundle.putString(KEY_COMMENT_URL, url);
     }
 
     public static boolean hasNoComments(Bundle bundle) {
