@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.animation.Animator;
-import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -132,9 +131,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             Resources r = getResources();
             subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
             duration = r.getInteger(android.R.integer.config_shortAnimTime);
-            if (navContainer != null) {
-                fullNavWidth = r.getDisplayMetrics().widthPixels;
-            }
+            fullNavWidth = r.getDisplayMetrics().widthPixels;
 
             refreshSubredditListVisibility();
         }
@@ -458,9 +455,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             int nextVisibility = !hasThing ? View.VISIBLE : View.GONE;
             if (currVisibility != nextVisibility) {
                 if (nextVisibility == View.VISIBLE) {
-                    runNavContainerAnimation(ANIMATION_OPEN_NAV, null);
+                    runAnimation(ANIMATION_OPEN_NAV);
                 } else {
-                    runNavContainerAnimation(ANIMATION_CLOSE_NAV, null);
+                    runAnimation(ANIMATION_CLOSE_NAV);
                 }
             }
         } else {
@@ -469,13 +466,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 int nextVisibility = !hasThing ? View.VISIBLE : View.GONE;
                 if (currVisibility != nextVisibility) {
                     if (nextVisibility == View.VISIBLE) {
-                        runSubredditListAnimation(ANIMATION_OPEN_SUBREDDIT_LIST, null);
+                        runAnimation(ANIMATION_OPEN_SUBREDDIT_LIST);
                     } else {
-                        runSubredditListAnimation(ANIMATION_CLOSE_SUBREDDIT_LIST, null);
+                        runAnimation(ANIMATION_CLOSE_SUBREDDIT_LIST);
                     }
                 }
+            } else {
+                thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
             }
-            thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
             if (!hasThing) {
                 // Avoid nested executePendingTransactions that would occur by
                 // doing popBackStack. This is a hack to get around stale
@@ -537,7 +535,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (navContainer != null) {
             thingBodyWidth = dm.widthPixels - newWidth - padding * 2;
         } else {
-            thingBodyWidth = dm.widthPixels / 2 - padding * 3 - newWidth;
+            thingBodyWidth = dm.widthPixels / 2 - padding * 3;
         }
     }
 
@@ -575,32 +573,27 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected ControlFragment getControlFragment() {
-        return (ControlFragment) getFragmentManager().findFragmentByTag(ControlFragment.TAG);
+        return (ControlFragment) getFragmentManager()
+                .findFragmentByTag(ControlFragment.TAG);
     }
 
     protected SubredditListFragment getSubredditListFragment() {
-        return (SubredditListFragment) getFragmentManager().findFragmentByTag(
-                SubredditListFragment.TAG);
+        return (SubredditListFragment) getFragmentManager()
+                .findFragmentByTag(SubredditListFragment.TAG);
     }
 
     protected ThingListFragment getThingListFragment() {
-        return (ThingListFragment) getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
+        return (ThingListFragment) getFragmentManager()
+                .findFragmentByTag(ThingListFragment.TAG);
     }
 
     protected ThingMenuFragment getThingMenuFragment() {
-        return (ThingMenuFragment) getFragmentManager().findFragmentByTag(ThingMenuFragment.TAG);
+        return (ThingMenuFragment) getFragmentManager()
+                .findFragmentByTag(ThingMenuFragment.TAG);
     }
 
-    private void runNavContainerAnimation(int type, AnimatorListener listener) {
-        navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        navContainer.setVisibility(View.VISIBLE);
-        thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        thingPager.setVisibility(View.VISIBLE);
-        AnimatorSet as = getAnimator(type);
-        if (listener != null) {
-            as.addListener(listener);
-        }
-        as.start();
+    private void runAnimation(int type) {
+        getAnimator(type).start();
     }
 
     private AnimatorSet getAnimator(int type) {
@@ -644,6 +637,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         as.setDuration(duration).play(ncTransX).with(tpTransX);
         as.addListener(new AnimatorListenerAdapter() {
             @Override
+            public void onAnimationStart(Animator animation) {
+                navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                navContainer.setVisibility(View.VISIBLE);
+                thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                thingPager.setVisibility(View.VISIBLE);
+            }
+            @Override
             public void onAnimationEnd(Animator animation) {
                 navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
@@ -663,6 +663,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         as.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
+                navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                navContainer.setVisibility(View.VISIBLE);
+                thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 thingPager.setVisibility(View.GONE);
                 thingPager.setTranslationX(0);
             }
@@ -678,18 +681,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         return as;
     }
 
-    private void runSubredditListAnimation(int type, AnimatorListener listener) {
-        subredditListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        subredditListContainer.setVisibility(View.VISIBLE);
-        thingListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        thingListContainer.setVisibility(View.VISIBLE);
-        AnimatorSet as = getAnimator(type);
-        if (listener != null) {
-            as.addListener(listener);
-        }
-        as.start();
-    }
-
     private AnimatorSet createOpenSubredditListAnimator() {
         ObjectAnimator slTransX = ObjectAnimator.ofFloat(subredditListContainer, "translationX",
                 -subredditListWidth, 0).setDuration(duration);
@@ -700,11 +691,18 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         as.setDuration(duration).play(slTransX).with(tlTransX);
         as.addListener(new AnimatorListenerAdapter() {
             @Override
+            public void onAnimationStart(Animator animation) {
+                subredditListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                subredditListContainer.setVisibility(View.VISIBLE);
+                thingListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                thingListContainer.setVisibility(View.VISIBLE);
+                thingPager.setVisibility(View.GONE);
+            }
+
+            @Override
             public void onAnimationEnd(Animator animation) {
                 subredditListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-                subredditListContainer.setVisibility(View.VISIBLE);
                 thingListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-                thingListContainer.setVisibility(View.VISIBLE);
             }
         });
         return as;
@@ -715,16 +713,29 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 0, -subredditListWidth).setDuration(duration);
         ObjectAnimator tlTransX = ObjectAnimator.ofFloat(thingListContainer, "translationX",
                 0, -subredditListWidth).setDuration(duration);
+        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX",
+                subredditListWidth, 0).setDuration(duration);
 
         AnimatorSet as = new AnimatorSet();
-        as.setDuration(duration).play(slTransX).with(tlTransX);
+        as.setDuration(duration).play(slTransX).with(tlTransX).with(tpTransX);
         as.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                subredditListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                subredditListContainer.setVisibility(View.VISIBLE);
+                thingListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                thingListContainer.setVisibility(View.VISIBLE);
+                thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            }
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 subredditListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
                 subredditListContainer.setVisibility(View.GONE);
                 thingListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingListContainer.setTranslationX(0);
+                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
+                thingPager.setVisibility(View.VISIBLE);
             }
         });
         return as;
