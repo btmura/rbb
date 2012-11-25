@@ -61,9 +61,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private static final int ANIMATION_OPEN_SUBREDDIT_LIST = 2;
     private static final int ANIMATION_CLOSE_SUBREDDIT_LIST = 3;
 
-    private static final int NAV_LAYOUT_ORIGINAL = 0;
-    private static final int NAV_LAYOUT_SIDENAV = 1;
-
     protected ActionBar bar;
 
     protected boolean isSinglePane;
@@ -77,7 +74,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private int subredditListWidth;
     private int thingBodyWidth;
 
-    private View thingClickAbsorber;
     private int fullNavWidth;
     private int duration;
 
@@ -140,7 +136,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             duration = r.getInteger(android.R.integer.config_shortAnimTime);
 
             if (navContainer != null) {
-                thingClickAbsorber = findViewById(R.id.thing_click_absorber);
                 fullNavWidth = dm.widthPixels;
                 openNavAnimator = createOpenNavAnimator();
                 closeNavAnimator = createCloseNavAnimator();
@@ -645,11 +640,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         as.setDuration(duration).play(ncTransX).with(tpTransX);
         as.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationStart(Animator animation) {
-                changeNavContainerLayout(NAV_LAYOUT_ORIGINAL);
-            }
-
-            @Override
             public void onAnimationEnd(Animator animation) {
                 navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
@@ -682,30 +672,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             }
         });
         return as;
-    }
-
-    private void changeNavContainerLayout(int layout) {
-        int subredditListVisibility;
-        int clickAbsorberVisibility;
-        switch (layout) {
-            case NAV_LAYOUT_ORIGINAL:
-                subredditListVisibility = hasSubredditList() ? View.VISIBLE : View.GONE;
-                clickAbsorberVisibility = View.GONE;
-                break;
-
-            case NAV_LAYOUT_SIDENAV:
-                subredditListVisibility = View.GONE;
-                clickAbsorberVisibility = View.VISIBLE;
-                break;
-
-            default:
-                throw new IllegalStateException();
-        }
-
-        if (subredditListContainer != null) {
-            subredditListContainer.setVisibility(subredditListVisibility);
-        }
-        thingClickAbsorber.setVisibility(clickAbsorberVisibility);
     }
 
     private void runSubredditListAnimation(int type, AnimatorListener listener) {
