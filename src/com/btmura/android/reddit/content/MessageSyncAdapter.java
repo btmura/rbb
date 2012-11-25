@@ -54,7 +54,7 @@ public class MessageSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int OP_UPDATES = 1;
     private static final int OP_DELETES = 2;
 
-    private static final int POLL_FREQUENCY_SECONDS = 3 * 60 * 60; // 3 hours
+    private static final int POLL_FREQUENCY_SECONDS = 24 * 60 * 60; // 1 day
 
     public static class Service extends android.app.Service {
         @Override
