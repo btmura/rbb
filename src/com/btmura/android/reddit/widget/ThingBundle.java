@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.content;
+package com.btmura.android.reddit.widget;
 
 import android.os.Bundle;
 import android.text.TextUtils;

@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.content.ThingBundle;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 

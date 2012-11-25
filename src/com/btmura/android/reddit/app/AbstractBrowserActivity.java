@@ -42,8 +42,8 @@ import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedLi
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.util.Objects;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,

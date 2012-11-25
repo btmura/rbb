@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.MessageProvider;

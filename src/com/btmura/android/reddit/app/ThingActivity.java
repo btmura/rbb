@@ -27,8 +27,8 @@ import android.view.MenuItem;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.content.ThingBundle;
 import com.btmura.android.reddit.util.Objects;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
