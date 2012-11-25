@@ -57,7 +57,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_SELECTED_SUBREDDIT = "selectedSubreddit";
     private static final String ARG_QUERY = "query";
-    private static final String ARG_FLAGS = "fags";
+    private static final String ARG_FLAGS = "flags";
 
     private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
     private static final String STATE_SELECTED_SUBREDDIT = ARG_SELECTED_SUBREDDIT;
@@ -177,7 +177,8 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         SubredditAdapter.updateLoader(getActivity(), loader, accountName, sessionId, query, sync);
 
         adapter.swapCursor(cursor);
-        setEmptyText(getString(cursor != null ? R.string.empty_subreddits : R.string.error));
+        setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
+
         setListShown(true);
         if (actionMode != null) {
             actionMode.invalidate();
