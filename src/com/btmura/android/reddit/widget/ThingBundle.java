@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.widget;
 
+import com.btmura.android.reddit.util.BundleSupport;
+
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -24,7 +26,7 @@ import android.text.TextUtils;
  * keys for all thing types that should be used throughout the app for setting
  * the title and copying urls.
  */
-public class ThingBundle {
+public class ThingBundle extends BundleSupport {
 
     /** String subreddit that this thing belongs to. */
     private static final String KEY_SUBREDDIT = "subreddit";
@@ -120,18 +122,6 @@ public class ThingBundle {
 
     public static void putNoComments(Bundle bundle, boolean hasComments) {
         bundle.putBoolean(KEY_NO_COMMENTS, hasComments);
-    }
-
-    private static boolean getBoolean(Bundle bundle, String key) {
-        return bundle != null ? bundle.getBoolean(key) : null;
-    }
-
-    private static int getInt(Bundle bundle, String key) {
-        return bundle != null ? bundle.getInt(key) : null;
-    }
-
-    private static String getString(Bundle bundle, String key) {
-        return bundle != null ? bundle.getString(key) : null;
     }
 
     private ThingBundle() {

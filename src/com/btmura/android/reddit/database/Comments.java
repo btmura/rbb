@@ -16,11 +16,13 @@
 
 package com.btmura.android.reddit.database;
 
+import com.btmura.android.reddit.util.BundleSupport;
+
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 
-public class Comments implements BaseColumns {
+public class Comments extends BundleSupport implements BaseColumns {
 
     public static final String TABLE_NAME = "comments";
 
@@ -125,13 +127,5 @@ public class Comments implements BaseColumns {
 
     public static String getSessionId(Bundle bundle) {
         return getString(bundle, COLUMN_SESSION_ID);
-    }
-
-    private static int getInt(Bundle bundle, String columnName) {
-        return bundle != null ? bundle.getInt(columnName) : null;
-    }
-
-    private static String getString(Bundle bundle, String columnName) {
-        return bundle != null ? bundle.getString(columnName) : null;
     }
 }
