@@ -182,7 +182,9 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_SEARCH:
-                searchItem.collapseActionView();
+                if (searchItem != null) {
+                    searchItem.collapseActionView();
+                }
                 break;
 
             default:
