@@ -121,27 +121,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (!isSinglePane) {
             getFragmentManager().addOnBackStackChangedListener(this);
 
-            thingPager = (ViewPager) findViewById(R.id.thing_pager);
-
             slfFlags |= SubredditListFragment.FLAG_SINGLE_CHOICE;
             tlfFlags |= ThingListFragment.FLAG_SINGLE_CHOICE;
 
             navContainer = findViewById(R.id.nav_container);
             subredditListContainer = findViewById(R.id.subreddit_list_container);
             thingListContainer = findViewById(R.id.thing_list_container);
+            thingPager = (ViewPager) findViewById(R.id.thing_pager);
 
             Resources r = getResources();
-            DisplayMetrics dm = r.getDisplayMetrics();
             subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
             duration = r.getInteger(android.R.integer.config_shortAnimTime);
-
             if (navContainer != null) {
-                fullNavWidth = dm.widthPixels;
-                openNavAnimator = createOpenNavAnimator();
-                closeNavAnimator = createCloseNavAnimator();
-            } else {
-                openSubredditListAnimator = createOpenSubredditListAnimator();
-                closeSubredditListAnimator = createCloseSubredditListAnimator();
+                fullNavWidth = r.getDisplayMetrics().widthPixels;
             }
 
             refreshSubredditListVisibility();
@@ -614,15 +606,27 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private AnimatorSet getAnimator(int type) {
         switch (type) {
             case ANIMATION_OPEN_NAV:
+                if (openNavAnimator == null) {
+                    openNavAnimator = createOpenNavAnimator();
+                }
                 return openNavAnimator;
 
             case ANIMATION_CLOSE_NAV:
+                if (closeNavAnimator == null) {
+                    closeNavAnimator = createCloseNavAnimator();
+                }
                 return closeNavAnimator;
 
             case ANIMATION_OPEN_SUBREDDIT_LIST:
+                if (openSubredditListAnimator == null) {
+                    openSubredditListAnimator = createOpenSubredditListAnimator();
+                }
                 return openSubredditListAnimator;
 
             case ANIMATION_CLOSE_SUBREDDIT_LIST:
+                if (closeSubredditListAnimator == null) {
+                    closeSubredditListAnimator = createCloseSubredditListAnimator();
+                }
                 return closeSubredditListAnimator;
 
             default:
