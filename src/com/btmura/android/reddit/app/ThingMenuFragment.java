@@ -64,7 +64,8 @@ public class ThingMenuFragment extends Fragment {
     private void hideExtraViewSidebarItems(Menu menu) {
         MenuItem thingSidebarItem = menu.findItem(R.id.menu_view_thing_sidebar);
         MenuItem subredditSidebarItem = menu.findItem(R.id.menu_view_subreddit_sidebar);
-        if (thingSidebarItem != null && subredditSidebarItem != null) {
+        if (thingSidebarItem != null && thingSidebarItem.isVisible()
+                && subredditSidebarItem != null && subredditSidebarItem.isVisible()) {
             thingSidebarItem.setVisible(false);
         }
     }
