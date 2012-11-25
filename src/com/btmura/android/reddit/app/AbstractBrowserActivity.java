@@ -471,6 +471,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                         runAnimation(ANIMATION_CLOSE_SUBREDDIT_LIST);
                     }
                 } else {
+                    // There may be no change in visibility if we are just
+                    // starting, but we should set the correct visibility, since
+                    // some activities change modes.
                     thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
                 }
             } else {
@@ -515,7 +518,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(),
                     getAccountName(), thingBundle);
             thingPager.setAdapter(adapter);
-            // invalidateOptionsMenu();
         } else {
             thingPager.setAdapter(null);
         }
@@ -645,6 +647,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 thingPager.setVisibility(View.VISIBLE);
             }
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
