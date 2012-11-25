@@ -58,6 +58,12 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private static final String ARG_THING_ID = "thingId";
     private static final String ARG_LINK_ID = "linkId";
 
+    /** Optional string that has a title for the thing. */
+    private static final String ARG_TITLE = "title";
+
+    /** Optional string that is a complete url to the comments. */
+    private static final String ARG_URL = "permaLink";
+
     /** Optional bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
 
@@ -65,21 +71,27 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public static final int FLAG_SHOW_LINK_MENU_ITEM = 0x1;
 
     private static final String STATE_SESSION_ID = "sessionId";
+    private static final String STATE_TITLE = ARG_TITLE;
+    private static final String STATE_URL = ARG_URL;
 
     private OnThingEventListener listener;
     private String accountName;
     private String thingId;
     private String linkId;
+    private String title;
+    private String url;
     private String sessionId;
     private boolean sync;
     private CommentAdapter adapter;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
-            String linkId, int flags) {
+            String linkId, String title, String url, int flags) {
         Bundle args = new Bundle(4);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_THING_ID, thingId);
         args.putString(ARG_LINK_ID, linkId);
+        args.putString(ARG_TITLE, title);
+        args.putString(ARG_URL, url);
         args.putInt(ARG_FLAGS, flags);
 
         CommentListFragment frag = new CommentListFragment();
@@ -108,8 +120,12 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         // Don't create a new session if changing configuration.
         if (savedInstanceState != null) {
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
+            title = savedInstanceState.getString(STATE_TITLE);
+            url = savedInstanceState.getString(STATE_URL);
         } else {
             sessionId = thingId + "-" + System.currentTimeMillis();
+            title = getArguments().getString(ARG_TITLE);
+            url = getArguments().getString(ARG_URL);
         }
 
         adapter = new CommentAdapter(getActivity(), accountName, this);
@@ -153,7 +169,19 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
 
-        getActivity().invalidateOptionsMenu();
+        // Update the title and url if they weren't provided already.
+        if (adapter.getCount() > 0) {
+            if (TextUtils.isEmpty(title)) {
+                title = adapter.getString(0, CommentAdapter.INDEX_TITLE);
+            }
+            if (TextUtils.isEmpty(url)) {
+                String permaLink = adapter.getString(0, CommentAdapter.INDEX_PERMA_LINK);
+                if (!TextUtils.isEmpty(permaLink)) {
+                    url = Urls.permaUrl(permaLink, null).toExternalForm();
+                }
+            }
+            getActivity().invalidateOptionsMenu();
+        }
 
         if (listener != null && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF)) {
             listener.onLinkDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_URL));
@@ -200,20 +228,20 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        boolean isLoaded = adapter.getCursor() != null;
-        menu.findItem(R.id.menu_comment_open).setVisible(isLoaded);
-        menu.findItem(R.id.menu_comment_copy_url).setVisible(isLoaded);
+        boolean isReady = !TextUtils.isEmpty(title) && !TextUtils.isEmpty(url);
+        menu.findItem(R.id.menu_comment_open).setVisible(isReady);
+        menu.findItem(R.id.menu_comment_copy_url).setVisible(isReady);
 
         MenuItem shareItem = menu.findItem(R.id.menu_comment_share);
-        shareItem.setVisible(isLoaded);
-        if (isLoaded) {
-            MenuHelper.setShareProvider(shareItem, getTitle(), getUrl());
+        shareItem.setVisible(isReady);
+        if (isReady) {
+            MenuHelper.setShareProvider(shareItem, title, url);
         }
 
         boolean linkConfirmed = Flag.isEnabled(getArguments().getInt(ARG_FLAGS),
                 FLAG_SHOW_LINK_MENU_ITEM);
         boolean showLink = linkConfirmed
-                || (isLoaded && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF));
+                || (isReady && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF));
         menu.findItem(R.id.menu_link).setVisible(showLink);
     }
 
@@ -242,22 +270,13 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     private boolean handleOpen() {
-        MenuHelper.startIntentChooser(getActivity(), getUrl());
+        MenuHelper.startIntentChooser(getActivity(), url);
         return true;
     }
 
     private boolean handleCopyUrl() {
-        MenuHelper.setClipAndToast(getActivity(), getTitle(), getUrl());
+        MenuHelper.setClipAndToast(getActivity(), title, url);
         return true;
-    }
-
-    private String getTitle() {
-        return adapter.getString(0, CommentAdapter.INDEX_TITLE);
-    }
-
-    private String getUrl() {
-        String permaLink = adapter.getString(0, CommentAdapter.INDEX_PERMA_LINK);
-        return Urls.permaUrl(permaLink, null).toExternalForm();
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -468,7 +487,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putString(STATE_SESSION_ID, sessionId);
+        outState.putString(STATE_TITLE, title);
+        outState.putString(STATE_URL, url);
     }
 
     @Override
