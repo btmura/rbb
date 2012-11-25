@@ -27,9 +27,7 @@ import java.util.ArrayList;
 import android.content.ContentValues;
 import android.content.Context;
 import android.util.JsonReader;
-import android.util.Log;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.SubredditSearches;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
@@ -55,9 +53,6 @@ class SubredditSearchListing extends JsonParser {
             SubredditSearchListing listing = new SubredditSearchListing(accountName, sessionId,
                     sessionTimestamp);
             listing.parseListingObject(reader);
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "url: " + url + " values: " + listing.values.size());
-            }
             return listing;
         } finally {
             input.close();
@@ -93,11 +88,5 @@ class SubredditSearchListing extends JsonParser {
     @Override
     public void onSubscribers(JsonReader reader, int index) throws IOException {
         values.get(index).put(SubredditSearches.COLUMN_SUBSCRIBERS, reader.nextInt());
-    }
-
-    @Override
-    public void onEntityEnd(int index) {
-        super.onEntityEnd(index);
-        Log.d(TAG, "v: " + values.get(index));
     }
 }
