@@ -80,8 +80,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private String linkId;
     private String title;
     private String url;
-    private String sessionId;
+    private int flags;
+
     private boolean sync;
+    private String sessionId;
     private CommentAdapter adapter;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
@@ -115,6 +117,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         accountName = getArguments().getString(ARG_ACCOUNT_NAME);
         thingId = getArguments().getString(ARG_THING_ID);
         linkId = getArguments().getString(ARG_LINK_ID);
+        flags = getArguments().getInt(ARG_FLAGS);
         sync = savedInstanceState == null;
 
         // Don't create a new session if changing configuration.
@@ -222,26 +225,32 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onCreateOptionsMenu");
+        }
         inflater.inflate(R.menu.comment_menu, menu);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        boolean isReady = !TextUtils.isEmpty(title) && !TextUtils.isEmpty(url);
-        menu.findItem(R.id.menu_comment_open).setVisible(isReady);
-        menu.findItem(R.id.menu_comment_copy_url).setVisible(isReady);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onPrepareOptionsMenu");
+        }
+
+        boolean linkReady = !TextUtils.isEmpty(title) && !TextUtils.isEmpty(url);
+        menu.findItem(R.id.menu_comment_open).setVisible(linkReady);
+        menu.findItem(R.id.menu_comment_copy_url).setVisible(linkReady);
 
         MenuItem shareItem = menu.findItem(R.id.menu_comment_share);
-        shareItem.setVisible(isReady);
-        if (isReady) {
+        shareItem.setVisible(linkReady);
+        if (linkReady) {
             MenuHelper.setShareProvider(shareItem, title, url);
         }
 
-        boolean linkConfirmed = Flag.isEnabled(getArguments().getInt(ARG_FLAGS),
-                FLAG_SHOW_LINK_MENU_ITEM);
-        boolean showLink = linkConfirmed
-                || (isReady && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF));
+        boolean linkConfirmed = Flag.isEnabled(flags, FLAG_SHOW_LINK_MENU_ITEM);
+        boolean showLink = linkConfirmed || (adapter.getCursor() != null
+                && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF));
         menu.findItem(R.id.menu_link).setVisible(showLink);
     }
 
