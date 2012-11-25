@@ -155,9 +155,7 @@ public class CommentAdapter extends BaseCursorAdapter {
             // Local votes take precedence over those from reddit.
             likes = cursor.getInt(INDEX_VOTE);
 
-            // Modify the score since the vote is still pending and don't go
-            // below 0 since reddit doesn't seem to do that.
-            score = Math.max(0, score + likes);
+            score += likes;
         }
 
         CommentView cv = (CommentView) view;
