@@ -28,7 +28,7 @@
     <dimen name="max_details_width">300dp</dimen>
     <dimen name="min_details_width">100dp</dimen>
     <dimen name="padding">16dp</dimen>
-    <dimen name="subreddit_list_width">150dp</dimen>
+    <dimen name="subreddit_list_width">175dp</dimen>
     <dimen name="thumb_width">70dp</dimen>
     <dimen name="radius">6dp</dimen>
 
