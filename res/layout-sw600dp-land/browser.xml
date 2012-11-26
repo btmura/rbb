@@ -49,7 +49,7 @@
         android:id="@+id/thing_pager"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:layout_weight="1.5"
         android:paddingLeft="@dimen/element_padding"
         android:paddingRight="@dimen/element_padding"
         android:visibility="gone" />

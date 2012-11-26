@@ -543,7 +543,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (navContainer != null) {
             thingBodyWidth = dm.widthPixels - newWidth - padding * 2;
         } else {
-            thingBodyWidth = dm.widthPixels / 2 - padding * 3;
+            thingBodyWidth = dm.widthPixels / 5 * 2 - padding * 3;
         }
     }
 
