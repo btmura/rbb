@@ -16,11 +16,10 @@
 
 package com.btmura.android.reddit.app;
 
-import com.btmura.android.reddit.R;
-
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import android.view.Menu;
+
+import com.btmura.android.reddit.R;
 
 public class DebugFragment extends PreferenceFragment {
 
@@ -29,12 +28,5 @@ public class DebugFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         addPreferencesFromResource(R.xml.debug_preferences);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        // TODO: Figure out how to move this somehow to SettingsActivity.
-        menu.findItem(R.id.menu_add_account).setVisible(false);
     }
 }
