@@ -636,10 +636,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private AnimatorSet createOpenNavAnimator() {
-        ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX",
-                -fullNavWidth, 0).setDuration(duration);
-        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX",
-                0, fullNavWidth).setDuration(duration);
+        ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer,
+                "translationX", -fullNavWidth, 0);
+        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager,
+                "translationX", 0, fullNavWidth);
 
         AnimatorSet as = new AnimatorSet();
         as.setDuration(duration).play(ncTransX).with(tpTransX);
@@ -664,8 +664,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private AnimatorSet createCloseNavAnimator() {
-        ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer, "translationX",
-                0, -subredditListWidth).setDuration(duration);
+        ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer,
+                "translationX", 0, -subredditListWidth);
 
         AnimatorSet as = new AnimatorSet();
         as.setDuration(duration).play(ncTransX);
@@ -691,10 +691,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private AnimatorSet createOpenSubredditListAnimator() {
-        ObjectAnimator slTransX = ObjectAnimator.ofFloat(subredditListContainer, "translationX",
-                -subredditListWidth, 0).setDuration(duration);
-        ObjectAnimator tlTransX = ObjectAnimator.ofFloat(thingListContainer, "translationX",
-                -subredditListWidth, 0).setDuration(duration);
+        ObjectAnimator slTransX = ObjectAnimator.ofFloat(subredditListContainer,
+                "translationX", -subredditListWidth, 0);
+        ObjectAnimator tlTransX = ObjectAnimator.ofFloat(thingListContainer,
+                "translationX", -subredditListWidth, 0);
 
         AnimatorSet as = new AnimatorSet();
         as.setDuration(duration).play(slTransX).with(tlTransX);
@@ -718,12 +718,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private AnimatorSet createCloseSubredditListAnimator() {
-        ObjectAnimator slTransX = ObjectAnimator.ofFloat(subredditListContainer, "translationX",
-                0, -subredditListWidth).setDuration(duration);
-        ObjectAnimator tlTransX = ObjectAnimator.ofFloat(thingListContainer, "translationX",
-                0, -subredditListWidth).setDuration(duration);
-        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager, "translationX",
-                subredditListWidth, 0).setDuration(duration);
+        ObjectAnimator slTransX = ObjectAnimator.ofFloat(subredditListContainer,
+                "translationX", 0, -subredditListWidth);
+        ObjectAnimator tlTransX = ObjectAnimator.ofFloat(thingListContainer,
+                "translationX", 0, -subredditListWidth);
+        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager,
+                "translationX", subredditListWidth, 0);
 
         AnimatorSet as = new AnimatorSet();
         as.setDuration(duration).play(slTransX).with(tlTransX).with(tpTransX);
