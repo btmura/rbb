@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.Layout.Alignment;
@@ -17,6 +18,7 @@ import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -39,6 +41,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private final GestureDetector detector;
     private OnVoteListener listener;
 
+    private boolean expanded;
     private int kind;
     private int likes;
     private int nesting;
@@ -55,6 +58,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private CharSequence bodyText;
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
+    private StyleSpan italicSpan;
     private final SpannableStringBuilder longDetailsText = new SpannableStringBuilder();
     private String shortDetailsText;
 
@@ -119,6 +123,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             String thumbnailUrl,
             String title,
             int ups) {
+        this.expanded = expanded;
         this.kind = kind;
         this.nesting = nesting;
         this.likes = likes;
@@ -128,7 +133,9 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
 
-        drawVotingArrows = AccountUtils.isAccount(accountName) && kind != Things.KIND_MESSAGE;
+        drawVotingArrows = AccountUtils.isAccount(accountName)
+                && kind != Things.KIND_MESSAGE
+                && expanded;
         drawScore = drawVotingArrows && kind == Things.KIND_LINK;
         if (drawScore) {
             if (scoreBounds == null) {
@@ -188,6 +195,13 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         if (showNumComments) {
             statusText.append(r.getQuantityString(R.plurals.comments, numComments, numComments));
+        }
+
+        if (!expanded) {
+            if (italicSpan == null) {
+                italicSpan = new StyleSpan(Typeface.ITALIC);
+            }
+            statusText.setSpan(italicSpan, 0, statusText.length(), 0);
         }
     }
 
@@ -290,17 +304,17 @@ public class ThingView extends CustomView implements OnGestureListener {
         bodyLayout = null;
         rightHeight = 0;
 
-        if (!TextUtils.isEmpty(linkTitle)) {
+        if (expanded && !TextUtils.isEmpty(linkTitle)) {
             linkTitleLayout = createLinkTitleLayout(linkTitleWidth);
             rightHeight += linkTitleLayout.getHeight() + ELEMENT_PADDING;
         }
 
-        if (!TextUtils.isEmpty(title)) {
+        if (expanded && !TextUtils.isEmpty(title)) {
             titleLayout = createTitleLayout(titleWidth);
             rightHeight += titleLayout.getHeight() + ELEMENT_PADDING;
         }
 
-        if (!TextUtils.isEmpty(bodyText)) {
+        if (expanded && !TextUtils.isEmpty(bodyText)) {
             bodyLayout = createBodyLayout(titleWidth);
             rightHeight += bodyLayout.getHeight() + ELEMENT_PADDING;
         }

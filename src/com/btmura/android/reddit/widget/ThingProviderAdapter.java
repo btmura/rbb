@@ -249,7 +249,7 @@ class ThingProviderAdapter extends ProviderAdapter {
         }
 
         ThingView tv = (ThingView) view;
-        tv.setData(adapter.accountName, author, body, createdUtc, domain, downs, false, kind,
+        tv.setData(adapter.accountName, author, body, createdUtc, domain, downs, true, kind,
                 likes, linkTitle, 0, adapter.nowTimeMs, numComments, over18,
                 adapter.parentSubreddit, score, subreddit, adapter.thingBodyWidth, thingId,
                 thumbnailUrl, title, ups);
