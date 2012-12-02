@@ -128,7 +128,7 @@ public class CommentAdapter extends BaseCursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return new CommentView(context);
+        return new ThingView(context);
     }
 
     @Override
@@ -158,9 +158,10 @@ public class CommentAdapter extends BaseCursorAdapter {
             score += likes;
         }
 
-        CommentView cv = (CommentView) view;
-        cv.setOnVoteListener(listener);
-        cv.setData(accountName, author, body, createdUtc, expanded, kind, likes, nesting,
-                nowTimeMs, numComments, score, title, thingId);
+        ThingView tv = (ThingView) view;
+        tv.setData(accountName, author, body, createdUtc, null, downs, expanded, kind, likes, null,
+                nesting, nowTimeMs, numComments, false, null, score, null, 0, thingId, null, title,
+                ups);
+        tv.setOnVoteListener(listener);
     }
 }

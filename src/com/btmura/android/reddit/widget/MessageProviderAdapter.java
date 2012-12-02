@@ -150,8 +150,8 @@ class MessageProviderAdapter extends ProviderAdapter {
         String thingId = cursor.getString(INDEX_THING_ID);
 
         ThingView tv = (ThingView) view;
-        tv.setData(adapter.accountName, author, body, createdUtc, null, 0, kind, likes, null,
-                adapter.nowTimeMs, 0, false, adapter.parentSubreddit, 0, subreddit,
+        tv.setData(adapter.accountName, author, body, createdUtc, null, 0, false, kind, likes,
+                null, 0, adapter.nowTimeMs, 0, false, adapter.parentSubreddit, 0, subreddit,
                 adapter.thingBodyWidth, thingId, null, null, 0);
         tv.setChosen(adapter.singleChoice && Objects.equals(adapter.selectedThingId, thingId));
         tv.setOnVoteListener(adapter.listener);

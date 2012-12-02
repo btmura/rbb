@@ -249,9 +249,10 @@ class ThingProviderAdapter extends ProviderAdapter {
         }
 
         ThingView tv = (ThingView) view;
-        tv.setData(adapter.accountName, author, body, createdUtc, domain, downs, kind, likes,
-                linkTitle, adapter.nowTimeMs, numComments, over18, adapter.parentSubreddit, score,
-                subreddit, adapter.thingBodyWidth, thingId, thumbnailUrl, title, ups);
+        tv.setData(adapter.accountName, author, body, createdUtc, domain, downs, false, kind,
+                likes, linkTitle, 0, adapter.nowTimeMs, numComments, over18,
+                adapter.parentSubreddit, score, subreddit, adapter.thingBodyWidth, thingId,
+                thumbnailUrl, title, ups);
         tv.setChosen(adapter.singleChoice
                 && Objects.equals(adapter.selectedThingId, thingId)
                 && Objects.equals(adapter.selectedLinkId, linkId));
