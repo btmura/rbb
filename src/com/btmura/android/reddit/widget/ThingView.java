@@ -41,6 +41,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     private int kind;
     private int likes;
+    private int nesting;
     private String linkTitle;
     private int thingBodyWidth;
     private String thumbnailUrl;
@@ -119,6 +120,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             String title,
             int ups) {
         this.kind = kind;
+        this.nesting = nesting;
         this.likes = likes;
         this.linkTitle = linkTitle;
         this.thingBodyWidth = thingBodyWidth;
@@ -231,9 +233,12 @@ public class ThingView extends CustomView implements OnGestureListener {
         int detailsWidth;
         CharSequence detailsText;
 
+        int totalPadding = PADDING * (2 + nesting);
+        int contentWidth = measuredWidth - totalPadding;
+
         if (thingBodyWidth > 0) {
-            linkTitleWidth = titleWidth = Math.min(measuredWidth, thingBodyWidth) - PADDING * 2;
-            int remainingWidth = measuredWidth - thingBodyWidth - PADDING * 2;
+            linkTitleWidth = titleWidth = Math.min(measuredWidth, thingBodyWidth) - totalPadding;
+            int remainingWidth = measuredWidth - thingBodyWidth - totalPadding;
             if (remainingWidth > MAX_DETAILS_WIDTH) {
                 detailsWidth = MAX_DETAILS_WIDTH;
                 detailsText = longDetailsText;
@@ -245,7 +250,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                 detailsText = "";
             }
         } else {
-            linkTitleWidth = titleWidth = measuredWidth - PADDING * 2;
+            linkTitleWidth = titleWidth = contentWidth;
             detailsWidth = 0;
             detailsText = "";
         }
@@ -262,7 +267,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
         titleWidth -= leftGadgetWidth;
 
-        int statusWidth = measuredWidth - PADDING * 2 - leftGadgetWidth;
+        int statusWidth = contentWidth - leftGadgetWidth;
         if (detailsWidth > 0) {
             statusWidth -= detailsWidth + PADDING;
         }
@@ -401,7 +406,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             c.translate(-dx, -dy);
         }
 
-        c.translate(PADDING, PADDING);
+        c.translate(PADDING * (1 + nesting), PADDING);
 
         if (linkTitleLayout != null) {
             linkTitleLayout.draw(c);
@@ -485,16 +490,21 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, getTopOffset(), 0, drawVotingArrows, drawScore, true);
+        return VotingArrows.onDown(e, getTopOffset(), getLeftOffset(),
+                drawVotingArrows, drawScore, true);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, getTopOffset(), 0, drawVotingArrows, drawScore, true,
-                listener, thingId);
+        return VotingArrows.onSingleTapUp(e, getTopOffset(), getLeftOffset(),
+                drawVotingArrows, drawScore, true, listener, thingId);
     }
 
     private float getTopOffset() {
         return linkTitleLayout != null ? linkTitleLayout.getHeight() + ELEMENT_PADDING : 0;
+    }
+
+    private float getLeftOffset() {
+        return nesting * PADDING;
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
