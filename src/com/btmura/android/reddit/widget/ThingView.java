@@ -36,6 +36,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     public static final String TAG = "ThingView";
 
+    // TODO: Fix thread safety issue here.
     private static final Formatter FORMATTER = new Formatter();
 
     private final GestureDetector detector;
