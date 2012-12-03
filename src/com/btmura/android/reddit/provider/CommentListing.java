@@ -161,13 +161,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     public void onKind(JsonReader reader, int index) throws IOException {
         ContentValues v = values.get(index);
         v.put(Things.COLUMN_NESTING, replyNesting);
-
-        String kind = reader.nextString();
-        if ("more".equalsIgnoreCase(kind)) {
-            v.put(Things.COLUMN_KIND, Things.KIND_MORE);
-        } else {
-            v.put(Things.COLUMN_KIND, Things.KIND_COMMENT);
-        }
+        v.put(Things.COLUMN_KIND, Things.parseKind(reader.nextString()));
     }
 
     @Override

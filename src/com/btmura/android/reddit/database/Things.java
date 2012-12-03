@@ -128,6 +128,8 @@ public class Things implements BaseColumns, KindColumns {
             return Things.KIND_MESSAGE;
         } else if ("t5".equals(kind)) {
             return Things.KIND_SUBREDDIT;
+        } else if ("more".equals(kind)) {
+            return Things.KIND_MORE;
         } else {
             throw new IllegalArgumentException("kind: " + kind);
         }
