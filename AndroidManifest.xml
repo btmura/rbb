@@ -175,18 +175,6 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
-            android:name=".content.CommentSyncAdapter$Service"
-            android:exported="true"
-            android:permission="@string/permission_sync_accounts" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/comment_sync_adapter" />
-        </service>
-        <service
             android:name=".content.MessageSyncAdapter$Service"
             android:exported="true"
             android:permission="@string/permission_sync_accounts" >
@@ -209,6 +197,18 @@
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/subreddit_sync_adapter" />
+        </service>
+        <service
+            android:name=".content.ThingSyncAdapter$Service"
+            android:exported="true"
+            android:permission="@string/permission_sync_accounts" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/thing_sync_adapter" />
         </service>
         <service
             android:name=".content.VoteSyncAdapter$Service"

@@ -110,7 +110,7 @@ public class CommentAdapter extends BaseCursorAdapter {
     private static Uri getUri(String accountName, String sessionId, String thingId, String linkId,
             boolean fetch) {
         Uri.Builder b = ThingProvider.COMMENTS_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.FETCH_COMMENTS, Boolean.toString(fetch))
+                .appendQueryParameter(ThingProvider.PARAM_FETCH_COMMENTS, Boolean.toString(fetch))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
                 .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
                 .appendQueryParameter(ThingProvider.PARAM_THING_ID, thingId);

@@ -48,14 +48,14 @@ import com.btmura.android.reddit.util.Array;
  * schedules a periodic sync when it needs to sync the remaining pending
  * replies.
  */
-public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
+public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
-    public static final String TAG = "CommentSyncAdapter";
+    public static final String TAG = "ThingSyncAdapter";
 
     public static class Service extends android.app.Service {
         @Override
         public IBinder onBind(Intent intent) {
-            return new CommentSyncAdapter(this).getSyncAdapterBinder();
+            return new ThingSyncAdapter(this).getSyncAdapterBinder();
         }
     }
 
@@ -74,7 +74,7 @@ public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INDEX_THING_ID = 2;
     private static final int INDEX_TEXT = 3;
 
-    public CommentSyncAdapter(Context context) {
+    public ThingSyncAdapter(Context context) {
         super(context, true);
     }
 
@@ -133,7 +133,8 @@ public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
                         count--;
                     }
 
-                    // Record the number of entries left for stats purposes only.
+                    // Record the number of entries left for stats purposes
+                    // only.
                     syncResult.stats.numSkippedEntries += count;
 
                     // Respect suggested rate limit or assign our own.

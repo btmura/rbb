@@ -22,7 +22,6 @@
     <string name="add_front_page">Add front page</string>
     <string name="add_subreddit">Add subreddit</string>
     <string name="app_name">reddit by brian</string>
-    <string name="authority_comments">com.btmura.android.reddit.provider.comments</string>
     <string name="authority_messages">com.btmura.android.reddit.provider.messages</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
@@ -37,7 +36,7 @@
     <string name="filter_category">Filters</string>
     <string name="filter_message_inbox">inbox</string>
     <string name="filter_message_unread">unread</string>
-    <string name="filter_message_sent">sent</string>   
+    <string name="filter_message_sent">sent</string>
     <string name="filter_profile_overview">overview</string>
     <string name="filter_profile_comments">comments</string>
     <string name="filter_profile_submitted">submitted</string>
@@ -79,7 +78,6 @@
     <string name="menu_view_sidebar">View sidebar</string>
     <string name="nsfw">"NSFW"</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
-    <string name="provider_comments">Comments</string>
     <string name="provider_messages">Messages</string>
     <string name="provider_subreddits">Subreddits</string>
     <string name="provider_things">Things</string>

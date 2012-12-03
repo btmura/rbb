@@ -65,7 +65,7 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
 
     // Avoid notifying the ThingProvider that we are making changes,
     // because the UI already reflects the pending changes.
-    private static Uri THINGS_URI = ThingProvider.BASE_URI.buildUpon()
+    private static Uri THINGS_URI = ThingProvider.THINGS_URI.buildUpon()
             .appendQueryParameter(ThingProvider.PARAM_NOTIFY, Boolean.toString(false))
             .build();
 

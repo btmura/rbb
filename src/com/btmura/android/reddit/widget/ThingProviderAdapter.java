@@ -86,7 +86,7 @@ class ThingProviderAdapter extends ProviderAdapter {
     @Override
     Uri getLoaderUri(Bundle args) {
         Uri.Builder b = ThingProvider.LINKS_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.FETCH_LINKS, Boolean.toString(getFetch(args)))
+                .appendQueryParameter(ThingProvider.PARAM_FETCH_LINKS, Boolean.toString(getFetch(args)))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, getAccountName(args))
                 .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, getSessionId(args))
                 .appendQueryParameter(ThingProvider.PARAM_FILTER,

@@ -47,13 +47,13 @@ public class ThingProvider extends SessionProvider {
     private static final String PATH_COMMENTS = "comments";
     private static final String PATH_COMMENT_ACTIONS = "comments/actions";
 
-    public static final Uri BASE_URI = Uri.parse(AUTHORITY_URI);
+    public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI);
     public static final Uri LINKS_URI = Uri.parse(AUTHORITY_URI + PATH_LINKS);
     public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
     public static final Uri COMMENT_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENT_ACTIONS);
 
-    public static final String FETCH_LINKS = "fetchLinks";
-    public static final String FETCH_COMMENTS = "fetchComments";
+    public static final String PARAM_FETCH_LINKS = "fetchLinks";
+    public static final String PARAM_FETCH_COMMENTS = "fetchComments";
     public static final String PARAM_REPLY = "reply";
     public static final String PARAM_DELETE = "delete";
 
@@ -111,9 +111,9 @@ public class ThingProvider extends SessionProvider {
 
     @Override
     protected void processUri(Uri uri, SQLiteDatabase db, ContentValues values) {
-        if (uri.getBooleanQueryParameter(FETCH_LINKS, false)) {
+        if (uri.getBooleanQueryParameter(PARAM_FETCH_LINKS, false)) {
             handleFetchLinks(uri, db);
-        } else if (uri.getBooleanQueryParameter(FETCH_COMMENTS, false)) {
+        } else if (uri.getBooleanQueryParameter(PARAM_FETCH_COMMENTS, false)) {
             handleFetchComments(uri, db);
         } else if (uri.getBooleanQueryParameter(PARAM_REPLY, false)) {
             handleReply(uri, db, values);
