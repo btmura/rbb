@@ -272,8 +272,10 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         }
 
         // Update the header comment count with our fake inserts and deletes.
-        Integer numComments = (Integer) values.get(0).get(Things.COLUMN_NUM_COMMENTS);
-        values.get(0).put(Things.COLUMN_NUM_COMMENTS, numComments.intValue() + delta);
+        if (!values.isEmpty()) {
+            Integer numComments = (Integer) values.get(0).get(Things.COLUMN_NUM_COMMENTS);
+            values.get(0).put(Things.COLUMN_NUM_COMMENTS, numComments.intValue() + delta);
+        }
     }
 
     private boolean insertThing(String actionAccountName, String replyId, String body) {
