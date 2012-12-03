@@ -18,13 +18,10 @@ package com.btmura.android.reddit.provider;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import com.btmura.android.reddit.database.Votes;
-import com.btmura.android.reddit.util.Array;
 
 public class VoteProvider extends BaseProvider {
 
@@ -59,28 +56,5 @@ public class VoteProvider extends BaseProvider {
             ContentResolver cr = getContext().getContentResolver();
             cr.notifyChange(ThingProvider.THINGS_URI, null);
         }
-    }
-
-    public static void voteInBackground(final Context context, final String accountName,
-            final String thingId, final int likes) {
-        AsyncTask.execute(new Runnable() {
-            public void run() {
-                ContentResolver cr = context.getContentResolver();
-                Uri uri = ACTIONS_URI.buildUpon()
-                        .appendQueryParameter(PARAM_NOTIFY_OTHERS, Boolean.toString(true))
-                        .appendQueryParameter(PARAM_SYNC, Boolean.toString(true))
-                        .build();
-
-                ContentValues values = new ContentValues(3);
-                values.put(Votes.COLUMN_ACCOUNT, accountName);
-                values.put(Votes.COLUMN_THING_ID, thingId);
-                values.put(Votes.COLUMN_VOTE, likes);
-
-                String[] selectionArgs = Array.of(accountName, thingId);
-                if (cr.update(uri, values, Votes.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs) == 0) {
-                    cr.insert(uri, values);
-                }
-            }
-        });
     }
 }

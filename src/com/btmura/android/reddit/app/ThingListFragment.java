@@ -41,7 +41,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.provider.VoteProvider;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -283,7 +283,7 @@ public class ThingListFragment extends ListFragment implements
         }
         String accountName = ThingAdapter.getAccountName(adapterArgs);
         if (!TextUtils.isEmpty(accountName)) {
-            VoteProvider.voteInBackground(getActivity(), accountName, thingId, likes);
+            Provider.voteAsync(getActivity(), accountName, thingId, likes);
         }
     }
 

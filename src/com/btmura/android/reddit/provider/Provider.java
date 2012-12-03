@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
@@ -29,6 +30,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.btmura.android.reddit.database.CommentLogic;
+import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.util.Array;
@@ -229,6 +231,31 @@ public class Provider {
                     Log.e(TAG, e.getMessage(), e);
                 } catch (OperationApplicationException e) {
                     Log.e(TAG, e.getMessage(), e);
+                }
+            }
+        });
+    }
+
+    public static void voteAsync(final Context context, final String accountName,
+            final String thingId, final int likes) {
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        AsyncTask.execute(new Runnable() {
+            public void run() {
+                Uri uri = VoteProvider.ACTIONS_URI.buildUpon()
+                        .appendQueryParameter(VoteProvider.PARAM_NOTIFY_OTHERS,
+                                Boolean.toString(true))
+                        .appendQueryParameter(VoteProvider.PARAM_SYNC,
+                                Boolean.toString(true))
+                        .build();
+
+                ContentValues values = new ContentValues(3);
+                values.put(Votes.COLUMN_ACCOUNT, accountName);
+                values.put(Votes.COLUMN_THING_ID, thingId);
+                values.put(Votes.COLUMN_VOTE, likes);
+
+                String[] selectionArgs = Array.of(accountName, thingId);
+                if (cr.update(uri, values, Votes.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs) == 0) {
+                    cr.insert(uri, values);
                 }
             }
         });
