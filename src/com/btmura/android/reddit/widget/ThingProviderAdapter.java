@@ -85,8 +85,9 @@ class ThingProviderAdapter extends ProviderAdapter {
 
     @Override
     Uri getLoaderUri(Bundle args) {
-        Uri.Builder b = ThingProvider.LINKS_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.PARAM_FETCH_LINKS, Boolean.toString(getFetch(args)))
+        Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
+                .appendQueryParameter(ThingProvider.PARAM_FETCH_LINKS,
+                        Boolean.toString(getFetch(args)))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, getAccountName(args))
                 .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, getSessionId(args))
                 .appendQueryParameter(ThingProvider.PARAM_FILTER,
@@ -150,8 +151,8 @@ class ThingProviderAdapter extends ProviderAdapter {
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
-                cr.delete(ThingProvider.LINKS_URI, Things.SELECT_BY_SESSION_ID,
-                        Array.of(getSessionId(args)));
+                cr.delete(ThingProvider.THINGS_URI,
+                        Things.SELECT_BY_SESSION_ID, Array.of(getSessionId(args)));
             }
         });
     }

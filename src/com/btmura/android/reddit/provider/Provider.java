@@ -65,14 +65,14 @@ public class Provider {
                         new ArrayList<ContentProviderOperation>(2);
 
                 // Increment the header's number of comments.
-                ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                         .withSelection(BaseProvider.ID_SELECTION, Array.of(parentId))
                         .withValue(Things.COLUMN_NUM_COMMENTS, parentNumComments + 1)
                         .build());
 
                 // Insert the placeholder comment.
-                Uri uri = ThingProvider.COMMENTS_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_REPLY, Boolean.toString(true))
+                Uri uri = ThingProvider.THINGS_URI.buildUpon()
+                        .appendQueryParameter(ThingProvider.PARAM_COMMENT_REPLY, Boolean.toString(true))
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(true))
                         .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID, parentThingId)
                         .appendQueryParameter(ThingProvider.PARAM_THING_ID, replyThingId)
@@ -118,8 +118,8 @@ public class Provider {
 
                 int numDeletes = 0;
                 for (int i = 0; i < count; i++) {
-                    Uri uri = ThingProvider.COMMENTS_URI.buildUpon()
-                            .appendQueryParameter(ThingProvider.PARAM_DELETE,
+                    Uri uri = ThingProvider.THINGS_URI.buildUpon()
+                            .appendQueryParameter(ThingProvider.PARAM_COMMENT_DELETE,
                                     Boolean.toString(true))
                             .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(true))
                             .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
@@ -142,7 +142,7 @@ public class Provider {
                 }
 
                 // Update the header comment by how comments were truly deleted.
-                ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                         .withSelection(BaseProvider.ID_SELECTION, Array.of(headerId))
                         .withValue(Things.COLUMN_NUM_COMMENTS, headerNumComments - numDeletes)
                         .build());
@@ -162,7 +162,7 @@ public class Provider {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                Cursor c = cr.query(ThingProvider.COMMENTS_URI, EXPAND_PROJECTION,
+                Cursor c = cr.query(ThingProvider.THINGS_URI, EXPAND_PROJECTION,
                         Things.SELECT_BY_SESSION_ID, Array.of(sessionId),
                         Things.SORT_BY_SEQUENCE_AND_ID);
                 try {
@@ -179,12 +179,12 @@ public class Provider {
                     int childCount = childIds != null ? childIds.length : 0;
                     ArrayList<ContentProviderOperation> ops =
                             new ArrayList<ContentProviderOperation>(childCount + 1);
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                             .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                             .withValue(Things.COLUMN_EXPANDED, true)
                             .build());
                     for (int i = 0; i < childCount; i++) {
-                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                                 .withSelection(ThingProvider.ID_SELECTION, Array.of(childIds[i]))
                                 .withValue(Things.COLUMN_EXPANDED, true)
                                 .withValue(Things.COLUMN_VISIBLE, true)
@@ -213,12 +213,12 @@ public class Provider {
                 int childCount = childIds != null ? childIds.length : 0;
                 ArrayList<ContentProviderOperation> ops =
                         new ArrayList<ContentProviderOperation>(childCount + 1);
-                ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                         .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                         .withValue(Things.COLUMN_EXPANDED, false)
                         .build());
                 for (int i = 0; i < childCount; i++) {
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                             .withSelection(ThingProvider.ID_SELECTION, Array.of(childIds[i]))
                             .withValue(Things.COLUMN_EXPANDED, true)
                             .withValue(Things.COLUMN_VISIBLE, false)

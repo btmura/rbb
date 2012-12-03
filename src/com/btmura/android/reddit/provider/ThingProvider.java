@@ -43,19 +43,16 @@ public class ThingProvider extends SessionProvider {
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
     static final String AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
-    private static final String PATH_LINKS = "links";
+    private static final String PATH_THINGS = "things";
     private static final String PATH_COMMENTS = "comments";
-    private static final String PATH_COMMENT_ACTIONS = "comments/actions";
 
-    public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI);
-    public static final Uri LINKS_URI = Uri.parse(AUTHORITY_URI + PATH_LINKS);
+    public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
     public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
-    public static final Uri COMMENT_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENT_ACTIONS);
 
     public static final String PARAM_FETCH_LINKS = "fetchLinks";
     public static final String PARAM_FETCH_COMMENTS = "fetchComments";
-    public static final String PARAM_REPLY = "reply";
-    public static final String PARAM_DELETE = "delete";
+    public static final String PARAM_COMMENT_REPLY = "commentReply";
+    public static final String PARAM_COMMENT_DELETE = "commentDelete";
 
     public static final String PARAM_ACCOUNT = "account";
     public static final String PARAM_SESSION_ID = "sessionId";
@@ -71,13 +68,11 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_LINK_ID = "linkId";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_LINKS = 1;
-    private static final int MATCH_COMMENTS = 2;
-    private static final int MATCH_COMMENT_ACTIONS = 3;
+    private static final int MATCH_THINGS = 1;
+    private static final int MATCH_COMMENT_ACTIONS = 2;
     static {
-        MATCHER.addURI(AUTHORITY, PATH_LINKS, MATCH_LINKS);
-        MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENTS);
-        MATCHER.addURI(AUTHORITY, PATH_COMMENT_ACTIONS, MATCH_COMMENT_ACTIONS);
+        MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
+        MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENT_ACTIONS);
     }
 
     private static final String TABLE_NAME_WITH_VOTES = Things.TABLE_NAME
@@ -97,8 +92,7 @@ public class ThingProvider extends SessionProvider {
     protected String getTable(Uri uri, boolean isQuery) {
         int match = MATCHER.match(uri);
         switch (match) {
-            case MATCH_LINKS:
-            case MATCH_COMMENTS:
+            case MATCH_THINGS:
                 return isQuery ? TABLE_NAME_WITH_VOTES : Things.TABLE_NAME;
 
             case MATCH_COMMENT_ACTIONS:
@@ -115,9 +109,9 @@ public class ThingProvider extends SessionProvider {
             handleFetchLinks(uri, db);
         } else if (uri.getBooleanQueryParameter(PARAM_FETCH_COMMENTS, false)) {
             handleFetchComments(uri, db);
-        } else if (uri.getBooleanQueryParameter(PARAM_REPLY, false)) {
+        } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_REPLY, false)) {
             handleReply(uri, db, values);
-        } else if (uri.getBooleanQueryParameter(PARAM_DELETE, false)) {
+        } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
             handleDelete(uri, db);
         }
     }
