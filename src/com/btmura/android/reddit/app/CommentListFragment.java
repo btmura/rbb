@@ -41,9 +41,9 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
-import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.provider.CommentProvider;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.CommentAdapter;
@@ -200,16 +200,16 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         super.onListItemClick(l, v, position, id);
 
         // Only comments can be expanded and collapsed.
-        if (adapter.getInt(position, CommentAdapter.INDEX_KIND) != Comments.KIND_COMMENT) {
+        if (adapter.getInt(position, CommentAdapter.INDEX_KIND) != Things.KIND_COMMENT) {
             return;
         }
 
         // Collapse if expanded. Expand if collapsed.
         if (adapter.getBoolean(position, CommentAdapter.INDEX_EXPANDED)) {
             long[] childIds = CommentLogic.getChildren(this, position);
-            CommentProvider.collapseInBackground(getActivity(), id, childIds);
+            Provider.collapseCommentAsync(getActivity(), id, childIds);
         } else {
-            CommentProvider.expandInBackground(getActivity(), sessionId, id);
+            Provider.expandCommentAsync(getActivity(), sessionId, id);
         }
     }
 
@@ -327,7 +327,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         }
 
         String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
-        if (Comments.DELETED.equals(author)) {
+        if (Things.DELETED.equals(author)) {
             return false;
         }
 
@@ -436,7 +436,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         String[] thingIds = new String[ids.length];
         boolean[] hasChildren = new boolean[ids.length];
         fillCheckedInfo(thingIds, hasChildren);
-        CommentProvider.deleteInBackground(getActivity(), accountName, headerId, headerNumComments,
+        Provider.deleteCommentAsync(getActivity(), accountName, headerId, headerNumComments,
                 thingId, ids, thingIds, hasChildren);
         mode.finish();
         return true;

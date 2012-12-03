@@ -24,7 +24,7 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.CommentReplyFormFragment.OnCommentReplyFormListener;
-import com.btmura.android.reddit.provider.CommentProvider;
+import com.btmura.android.reddit.provider.Provider;
 
 public class CommentReplyActivity extends Activity implements OnCommentReplyFormListener {
 
@@ -102,8 +102,8 @@ public class CommentReplyActivity extends Activity implements OnCommentReplyForm
         int sequence = replyArgs.getInt(ARG_SEQUENCE);
         String sessionId = replyArgs.getString(ARG_SESSION_ID);
         long sessionTimestamp = replyArgs.getLong(ARG_SESSION_TIMESTAMP);
-        CommentProvider.insertInBackground(this, parentId, parentNumComments, parentThingId,
-                replyThingId, accountName, comment, nesting, sequence, sessionId, sessionTimestamp);
+        Provider.insertCommentAsync(this, parentId, parentNumComments, parentThingId, replyThingId,
+                accountName, comment, nesting, sequence, sessionId, sessionTimestamp);
         finish();
     }
 

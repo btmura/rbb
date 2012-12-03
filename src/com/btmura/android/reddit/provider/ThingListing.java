@@ -31,31 +31,51 @@ import android.util.JsonReader;
 import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.JsonParser;
 
-class ThingListing extends JsonParser {
+class ThingListing extends JsonParser implements Listing {
 
     public static final String TAG = "ThingListing";
-
-    public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
-    public long networkTimeMs;
-    public long parseTimeMs;
 
     private final Formatter formatter = new Formatter();
     private final Context context;
     private final String accountName;
     private final String sessionId;
     private final long sessionTimestamp;
+    private final String subreddit;
+    private final String query;
+    private final String profileUser;
+    private final String messageUser;
+    private final int filter;
+    private final String more;
+    private final String cookie;
+
+    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
+    private long networkTimeMs;
+    private long parseTimeMs;
     private String moreThingId;
 
-    public static ThingListing get(Context context, String accountName, String sessionId,
-            long sessionTimestamp, String subredditName, String query, String profileUser,
-            String messageUser, int filter, String more, String cookie) throws IOException {
+    ThingListing(Context context, String accountName, String sessionId,
+            long sessionTimestamp, String subreddit, String query, String profileUser,
+            String messageUser, int filter, String more, String cookie) {
+        this.context = context;
+        this.accountName = accountName;
+        this.sessionId = sessionId;
+        this.sessionTimestamp = sessionTimestamp;
+        this.subreddit = subreddit;
+        this.query = query;
+        this.profileUser = profileUser;
+        this.messageUser = messageUser;
+        this.filter = filter;
+        this.more = more;
+        this.cookie = cookie;
+    }
+
+    public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
 
         URL url;
@@ -66,7 +86,7 @@ class ThingListing extends JsonParser {
         } else if (!TextUtils.isEmpty(query)) {
             url = Urls.searchUrl(query, more);
         } else {
-            url = Urls.subredditUrl(subredditName, filter, more);
+            url = Urls.subredditUrl(subreddit, filter, more);
         }
 
         HttpURLConnection conn = RedditApi.connect(url, cookie, false);
@@ -74,27 +94,25 @@ class ThingListing extends JsonParser {
         long t2 = System.currentTimeMillis();
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
-            ThingListing listing = new ThingListing(context, accountName, sessionId,
-                    sessionTimestamp);
-            listing.parseListingObject(reader);
+            parseListingObject(reader);
             if (BuildConfig.DEBUG) {
                 long t3 = System.currentTimeMillis();
-                listing.networkTimeMs = t2 - t1;
-                listing.parseTimeMs = t3 - t2;
+                networkTimeMs = t2 - t1;
+                parseTimeMs = t3 - t2;
             }
-            return listing;
+            return values;
         } finally {
             input.close();
             conn.disconnect();
         }
     }
 
-    private ThingListing(Context context, String accountName, String sessionId,
-            long sessionTimestamp) {
-        this.context = context;
-        this.accountName = accountName;
-        this.sessionId = sessionId;
-        this.sessionTimestamp = sessionTimestamp;
+    public long getNetworkTimeMs() {
+        return networkTimeMs;
+    }
+
+    public long getParseTimeMs() {
+        return parseTimeMs;
     }
 
     @Override
@@ -111,7 +129,7 @@ class ThingListing extends JsonParser {
     @Override
     public void onBody(JsonReader reader, int index) throws IOException {
         CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
-        values.get(index).put(Comments.COLUMN_BODY, body.toString());
+        values.get(index).put(Things.COLUMN_BODY, body.toString());
     }
 
     @Override

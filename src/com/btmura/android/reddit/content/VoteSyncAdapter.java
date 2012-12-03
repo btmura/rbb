@@ -41,11 +41,9 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.provider.CommentProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.provider.VoteProvider;
 import com.btmura.android.reddit.util.Array;
@@ -67,14 +65,8 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
 
     // Avoid notifying the ThingProvider that we are making changes,
     // because the UI already reflects the pending changes.
-    private static Uri THINGS_URI = ThingProvider.THINGS_URI.buildUpon()
+    private static Uri THINGS_URI = ThingProvider.BASE_URI.buildUpon()
             .appendQueryParameter(ThingProvider.PARAM_NOTIFY, Boolean.toString(false))
-            .build();
-
-    // Avoid notifying the CommentProvider that we are making changes,
-    // because the UI already reflects the pending changes.
-    private static Uri COMMENTS_URI = CommentProvider.COMMENTS_URI.buildUpon()
-            .appendQueryParameter(CommentProvider.PARAM_NOTIFY, Boolean.toString(false))
             .build();
 
     private static final String[] PROJECTION = {
@@ -132,14 +124,11 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
             ArrayList<ContentProviderOperation> ops =
                     new ArrayList<ContentProviderOperation>(c.getCount());
 
-            // Things and comments need to be updated manually after deleting a
-            // votes row. This is because pagination ends up doing a join with
-            // the votes table again and requerying could cause another join to
-            // be executed.
+            // Things need to be updated manually after deleting a votes row.
+            // This is because pagination ends up doing a join with the votes
+            // table again and requerying could cause another join to be
+            // executed.
             ArrayList<ContentProviderOperation> thingOps =
-                    new ArrayList<ContentProviderOperation>(c.getCount());
-
-            ArrayList<ContentProviderOperation> commentOps =
                     new ArrayList<ContentProviderOperation>(c.getCount());
 
             while (c.moveToNext()) {
@@ -162,11 +151,6 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
                             .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
                             .withValue(Things.COLUMN_LIKES, vote)
                             .build());
-                    commentOps.add(ContentProviderOperation.newUpdate(COMMENTS_URI)
-                            .withSelection(Comments.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
-                            .withValue(Comments.COLUMN_LIKES, vote)
-                            .build());
-
                 } catch (IOException e) {
                     Log.e(TAG, e.getMessage(), e);
                     syncResult.stats.numIoExceptions++;
@@ -178,12 +162,6 @@ public class VoteSyncAdapter extends AbstractThreadedSyncAdapter {
             ContentResolver cr = getContext().getContentResolver();
             ContentProviderResult[] results = cr.applyBatch(ThingProvider.AUTHORITY, thingOps);
             int count = results.length;
-            for (int i = 0; i < count; i++) {
-                syncResult.stats.numUpdates += results[i].count;
-            }
-
-            // Update the comments since pending votes will be deleted.
-            results = cr.applyBatch(CommentProvider.AUTHORITY, commentOps);
             for (int i = 0; i < count; i++) {
                 syncResult.stats.numUpdates += results[i].count;
             }

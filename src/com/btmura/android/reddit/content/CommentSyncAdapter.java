@@ -39,7 +39,7 @@ import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
-import com.btmura.android.reddit.provider.CommentProvider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 
 /**
@@ -89,7 +89,7 @@ public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
                     AccountAuthenticator.AUTH_TOKEN_MODHASH, true);
 
             // Get all pending replies that have not been synced.
-            Cursor c = provider.query(CommentProvider.ACTIONS_URI, PROJECTION,
+            Cursor c = provider.query(ThingProvider.COMMENT_ACTIONS_URI, PROJECTION,
                     CommentActions.SELECT_BY_ACCOUNT, Array.of(account.name),
                     CommentActions.SORT_BY_ID);
 
@@ -128,8 +128,8 @@ public class CommentSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     if (!result.shouldRetry()) {
                         syncResult.stats.numDeletes += provider.delete(
-                                CommentProvider.ACTIONS_URI,
-                                CommentProvider.ID_SELECTION, Array.of(id));
+                                ThingProvider.COMMENT_ACTIONS_URI,
+                                ThingProvider.ID_SELECTION, Array.of(id));
                         count--;
                     }
 

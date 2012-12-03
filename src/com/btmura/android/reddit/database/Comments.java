@@ -22,7 +22,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 
-public class Comments extends BundleSupport implements BaseColumns {
+class Comments extends BundleSupport implements BaseColumns {
 
     public static final String TABLE_NAME = "comments";
 

@@ -57,8 +57,7 @@ public class VoteProvider extends BaseProvider {
         super.notifyChange(uri);
         if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
             ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(ThingProvider.THINGS_URI, null);
-            cr.notifyChange(CommentProvider.COMMENTS_URI, null);
+            cr.notifyChange(ThingProvider.BASE_URI, null);
         }
     }
 

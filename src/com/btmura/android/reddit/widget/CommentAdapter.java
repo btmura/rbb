@@ -27,33 +27,33 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.provider.CommentProvider;
+import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 
 public class CommentAdapter extends BaseCursorAdapter {
 
     private static final String[] PROJECTION = {
-            Comments._ID,
-            Comments.COLUMN_AUTHOR,
-            Comments.COLUMN_BODY,
-            Comments.COLUMN_CREATED_UTC,
-            Comments.COLUMN_DOWNS,
-            Comments.COLUMN_EXPANDED,
-            Comments.COLUMN_KIND,
-            Comments.COLUMN_LIKES,
-            Comments.COLUMN_NESTING,
-            Comments.COLUMN_NUM_COMMENTS,
-            Comments.COLUMN_PERMA_LINK,
-            Comments.COLUMN_SELF,
-            Comments.COLUMN_SEQUENCE,
-            Comments.COLUMN_SESSION_ID,
-            Comments.COLUMN_SESSION_TIMESTAMP,
-            Comments.COLUMN_TITLE,
-            Comments.COLUMN_THING_ID,
-            Comments.COLUMN_UPS,
-            Comments.COLUMN_URL,
-            Comments.COLUMN_VOTE,
+            Things._ID,
+            Things.COLUMN_AUTHOR,
+            Things.COLUMN_BODY,
+            Things.COLUMN_CREATED_UTC,
+            Things.COLUMN_DOWNS,
+            Things.COLUMN_EXPANDED,
+            Things.COLUMN_KIND,
+            Things.COLUMN_LIKES,
+            Things.COLUMN_NESTING,
+            Things.COLUMN_NUM_COMMENTS,
+            Things.COLUMN_PERMA_LINK,
+            Things.COLUMN_SELF,
+            Things.COLUMN_SEQUENCE,
+            Things.COLUMN_SESSION_ID,
+            Things.COLUMN_SESSION_TIMESTAMP,
+            Things.COLUMN_TITLE,
+            Things.COLUMN_THING_ID,
+            Things.COLUMN_UPS,
+            Things.COLUMN_URL,
+            Things.COLUMN_VOTE,
     };
 
     public static int INDEX_ID = 0;
@@ -84,8 +84,8 @@ public class CommentAdapter extends BaseCursorAdapter {
     public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
             String thingId, String linkId, boolean sync) {
         Uri uri = getUri(accountName, sessionId, thingId, linkId, sync);
-        return new CursorLoader(context, uri, PROJECTION, Comments.SELECT_VISIBLE_BY_SESSION_ID,
-                Array.of(sessionId), Comments.SORT_BY_SEQUENCE_AND_ID);
+        return new CursorLoader(context, uri, PROJECTION, Things.SELECT_VISIBLE_BY_SESSION_ID,
+                Array.of(sessionId), Things.SORT_BY_SEQUENCE_AND_ID);
     }
 
     public static void updateLoader(Context context, Loader<Cursor> loader, String accountName,
@@ -101,7 +101,7 @@ public class CommentAdapter extends BaseCursorAdapter {
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
-                cr.delete(CommentProvider.COMMENTS_URI, Comments.SELECT_BY_SESSION_ID,
+                cr.delete(ThingProvider.COMMENTS_URI, Things.SELECT_BY_SESSION_ID,
                         Array.of(sessionId));
             }
         });
@@ -109,13 +109,13 @@ public class CommentAdapter extends BaseCursorAdapter {
 
     private static Uri getUri(String accountName, String sessionId, String thingId, String linkId,
             boolean fetch) {
-        Uri.Builder b = CommentProvider.COMMENTS_URI.buildUpon()
-                .appendQueryParameter(CommentProvider.PARAM_FETCH, Boolean.toString(fetch))
-                .appendQueryParameter(CommentProvider.PARAM_ACCOUNT, accountName)
-                .appendQueryParameter(CommentProvider.PARAM_SESSION_ID, sessionId)
-                .appendQueryParameter(CommentProvider.PARAM_THING_ID, thingId);
+        Uri.Builder b = ThingProvider.COMMENTS_URI.buildUpon()
+                .appendQueryParameter(ThingProvider.FETCH_COMMENTS, Boolean.toString(fetch))
+                .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
+                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
+                .appendQueryParameter(ThingProvider.PARAM_THING_ID, thingId);
         if (!TextUtils.isEmpty(linkId)) {
-            b.appendQueryParameter(CommentProvider.PARAM_LINK_ID, linkId);
+            b.appendQueryParameter(ThingProvider.PARAM_LINK_ID, linkId);
         }
         return b.build();
     }
