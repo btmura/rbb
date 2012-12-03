@@ -57,7 +57,7 @@ public class DbHelper extends SQLiteOpenHelper {
         if (version > 1) {
             Subreddits.createSubredditsV2(db);
             Things.createTable(db);
-            CommentActions.createTable(db);
+            Comments.createTable(db);
             Votes.createTable(db);
             SubredditSearches.createTable(db);
             Messages.createTable(db);
@@ -72,7 +72,7 @@ public class DbHelper extends SQLiteOpenHelper {
         if (oldVersion == 1 && newVersion == 2) {
             Subreddits.upgradeSubredditsV2(db);
             Things.createTable(db);
-            CommentActions.createTable(db);
+            Comments.createTable(db);
             Votes.createTable(db);
             SubredditSearches.createTable(db);
         }

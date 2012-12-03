@@ -31,7 +31,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.Array;
@@ -96,7 +96,7 @@ public class ThingProvider extends SessionProvider {
                 return isQuery ? TABLE_NAME_WITH_VOTES : Things.TABLE_NAME;
 
             case MATCH_COMMENT_ACTIONS:
-                return CommentActions.TABLE_NAME;
+                return Comments.TABLE_NAME;
 
             default:
                 throw new IllegalArgumentException("uri: " + uri);
@@ -204,12 +204,12 @@ public class ThingProvider extends SessionProvider {
         String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
         ContentValues v = new ContentValues(5);
-        v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
-        v.put(CommentActions.COLUMN_ACCOUNT, values.getAsString(Things.COLUMN_ACCOUNT));
-        v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
-        v.put(CommentActions.COLUMN_THING_ID, thingId);
-        v.put(CommentActions.COLUMN_TEXT, values.getAsString(Things.COLUMN_BODY));
-        db.insert(CommentActions.TABLE_NAME, null, v);
+        v.put(Comments.COLUMN_ACTION, Comments.ACTION_INSERT);
+        v.put(Comments.COLUMN_ACCOUNT, values.getAsString(Things.COLUMN_ACCOUNT));
+        v.put(Comments.COLUMN_PARENT_THING_ID, parentThingId);
+        v.put(Comments.COLUMN_THING_ID, thingId);
+        v.put(Comments.COLUMN_TEXT, values.getAsString(Things.COLUMN_BODY));
+        db.insert(Comments.TABLE_NAME, null, v);
     }
 
     private void handleDelete(Uri uri, SQLiteDatabase db) {
@@ -218,10 +218,10 @@ public class ThingProvider extends SessionProvider {
         String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
         ContentValues v = new ContentValues(4);
-        v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE);
-        v.put(CommentActions.COLUMN_ACCOUNT, accountName);
-        v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
-        v.put(CommentActions.COLUMN_THING_ID, thingId);
-        db.insert(CommentActions.TABLE_NAME, null, v);
+        v.put(Comments.COLUMN_ACTION, Comments.ACTION_DELETE);
+        v.put(Comments.COLUMN_ACCOUNT, accountName);
+        v.put(Comments.COLUMN_PARENT_THING_ID, parentThingId);
+        v.put(Comments.COLUMN_THING_ID, thingId);
+        db.insert(Comments.TABLE_NAME, null, v);
     }
 }
