@@ -25,7 +25,6 @@
     <string name="authority_messages">com.btmura.android.reddit.provider.messages</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
-    <string name="authority_votes">com.btmura.android.reddit.provider.votes</string>
     <string name="captcha_image">Captcha image</string>
     <string name="captcha_title">Are you a robot?</string>
     <string name="comment_reply_title">Reply to %s</string>
@@ -81,7 +80,6 @@
     <string name="provider_messages">Messages</string>
     <string name="provider_subreddits">Subreddits</string>
     <string name="provider_things">Things</string>
-    <string name="provider_votes">Votes</string>
     <string name="reddit_error">Reddit says: %1$s</string>
     <string name="reddit_error_line">%1$s - %2$s</string>
     <string name="settings_app_info">App info</string>
