@@ -28,7 +28,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.provider.MessageProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.provider.VoteProvider;
 
 public class ContentUriListFragment extends ListFragment {
 
@@ -61,7 +60,7 @@ public class ContentUriListFragment extends ListFragment {
         adapter.add(SubredditProvider.SEARCHES_URI);
         adapter.add(ThingProvider.THINGS_URI);
         adapter.add(ThingProvider.COMMENTS_URI);
-        adapter.add(VoteProvider.ACTIONS_URI);
+        adapter.add(ThingProvider.VOTES_URI);
         adapter.add(MessageProvider.MESSAGES_URI);
         setListAdapter(adapter);
     }

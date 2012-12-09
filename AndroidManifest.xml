@@ -156,11 +156,6 @@
             android:authorities="@string/authority_things"
             android:exported="false"
             android:label="@string/provider_things" />
-        <provider
-            android:name=".provider.VoteProvider"
-            android:authorities="@string/authority_votes"
-            android:exported="false"
-            android:label="@string/provider_votes" />
 
         <service
             android:name=".accounts.AccountAuthenticatorService"
@@ -209,18 +204,6 @@
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/thing_sync_adapter" />
-        </service>
-        <service
-            android:name=".content.VoteSyncAdapter$Service"
-            android:exported="true"
-            android:permission="@string/permission_sync_accounts" >
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/vote_sync_adapter" />
         </service>
 
         <meta-data

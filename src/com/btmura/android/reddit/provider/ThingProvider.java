@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -45,9 +46,11 @@ public class ThingProvider extends SessionProvider {
 
     private static final String PATH_THINGS = "things";
     private static final String PATH_COMMENTS = "comments";
+    private static final String PATH_VOTES = "votes";
 
     public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
     public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
+    public static final Uri VOTES_URI = Uri.parse(AUTHORITY_URI + PATH_VOTES);
 
     public static final String PARAM_FETCH_LINKS = "fetchLinks";
     public static final String PARAM_FETCH_COMMENTS = "fetchComments";
@@ -67,12 +70,16 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_THING_ID = "thingId";
     public static final String PARAM_LINK_ID = "linkId";
 
+    public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
+
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;
-    private static final int MATCH_COMMENT_ACTIONS = 2;
+    private static final int MATCH_COMMENTS = 2;
+    private static final int MATCH_VOTES = 3;
     static {
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
-        MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENT_ACTIONS);
+        MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENTS);
+        MATCHER.addURI(AUTHORITY, PATH_VOTES, MATCH_VOTES);
     }
 
     private static final String TABLE_NAME_WITH_VOTES = Things.TABLE_NAME
@@ -95,8 +102,11 @@ public class ThingProvider extends SessionProvider {
             case MATCH_THINGS:
                 return isQuery ? TABLE_NAME_WITH_VOTES : Things.TABLE_NAME;
 
-            case MATCH_COMMENT_ACTIONS:
+            case MATCH_COMMENTS:
                 return Comments.TABLE_NAME;
+
+            case MATCH_VOTES:
+                return Votes.TABLE_NAME;
 
             default:
                 throw new IllegalArgumentException("uri: " + uri);
@@ -223,5 +233,15 @@ public class ThingProvider extends SessionProvider {
         v.put(Comments.COLUMN_PARENT_THING_ID, parentThingId);
         v.put(Comments.COLUMN_THING_ID, thingId);
         db.insert(Comments.TABLE_NAME, null, v);
+    }
+
+    @Override
+    protected void notifyChange(Uri uri) {
+        super.notifyChange(uri);
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
+            ContentResolver cr = getContext().getContentResolver();
+            cr.notifyChange(ThingProvider.THINGS_URI, null);
+            cr.notifyChange(ThingProvider.COMMENTS_URI, null);
+        }
     }
 }

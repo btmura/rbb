@@ -72,7 +72,8 @@ public class Provider {
 
                 // Insert the placeholder comment.
                 Uri uri = ThingProvider.THINGS_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_COMMENT_REPLY, Boolean.toString(true))
+                        .appendQueryParameter(ThingProvider.PARAM_COMMENT_REPLY,
+                                Boolean.toString(true))
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(true))
                         .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID, parentThingId)
                         .appendQueryParameter(ThingProvider.PARAM_THING_ID, replyThingId)
@@ -241,10 +242,10 @@ public class Provider {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.execute(new Runnable() {
             public void run() {
-                Uri uri = VoteProvider.ACTIONS_URI.buildUpon()
-                        .appendQueryParameter(VoteProvider.PARAM_NOTIFY_OTHERS,
+                Uri uri = ThingProvider.VOTES_URI.buildUpon()
+                        .appendQueryParameter(ThingProvider.PARAM_SYNC,
                                 Boolean.toString(true))
-                        .appendQueryParameter(VoteProvider.PARAM_SYNC,
+                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS,
                                 Boolean.toString(true))
                         .build();
 
