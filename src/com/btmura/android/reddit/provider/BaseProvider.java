@@ -66,7 +66,7 @@ abstract class BaseProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        String table = getTable(uri, true);
+        String table = getTable(uri);
         Cursor c = null;
 
         db.beginTransaction();
@@ -87,7 +87,7 @@ abstract class BaseProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        String table = getTable(uri, false);
+        String table = getTable(uri);
         SQLiteDatabase db = helper.getWritableDatabase();
         long id = -1;
 
@@ -112,7 +112,7 @@ abstract class BaseProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        String table = getTable(uri, false);
+        String table = getTable(uri);
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = 0;
 
@@ -136,7 +136,7 @@ abstract class BaseProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        String table = getTable(uri, false);
+        String table = getTable(uri);
         SQLiteDatabase db = helper.getWritableDatabase();
         int count = 0;
 
@@ -163,7 +163,7 @@ abstract class BaseProvider extends ContentProvider {
         return null;
     }
 
-    protected abstract String getTable(Uri uri, boolean isQuery);
+    protected abstract String getTable(Uri uri);
 
     protected abstract void processUri(Uri uri, SQLiteDatabase db, ContentValues values);
 

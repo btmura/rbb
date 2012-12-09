@@ -25,68 +25,88 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.database.SubredditSearches;
+import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.JsonParser;
 
-class SubredditSearchListing extends JsonParser {
+class SubredditSearchListing extends JsonParser implements Listing {
 
     public static final String TAG = "SubredditSearchListing";
-
-    public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(25);
 
     private final String accountName;
     private final String sessionId;
     private final long sessionTimestamp;
+    private final String query;
+    private final String cookie;
 
-    public static SubredditSearchListing get(Context context, String accountName, String sessionId,
-            long sessionTimestamp, String query, String cookie) throws IOException {
+    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(25);
+    private long networkTimeMs;
+    private long parseTimeMs;
+
+    SubredditSearchListing(String accountName, String sessionId, long sessionTimestamp,
+            String query, String cookie) {
+        this.accountName = accountName;
+        this.sessionId = sessionId;
+        this.sessionTimestamp = sessionTimestamp;
+        this.query = query;
+        this.cookie = cookie;
+    }
+
+    public ArrayList<ContentValues> getValues() throws IOException {
+        long t1 = System.currentTimeMillis();
+
         URL url = Urls.subredditSearchUrl(query, null);
         HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
+        long t2 = System.currentTimeMillis();
         try {
             JsonReader reader = new JsonReader(new InputStreamReader(input));
-            SubredditSearchListing listing = new SubredditSearchListing(accountName, sessionId,
-                    sessionTimestamp);
-            listing.parseListingObject(reader);
-            return listing;
+            parseListingObject(reader);
+            if (BuildConfig.DEBUG) {
+                long t3 = System.currentTimeMillis();
+                networkTimeMs = t2 - t1;
+                parseTimeMs = t3 - t2;
+            }
+            return values;
         } finally {
             input.close();
             conn.disconnect();
         }
     }
 
-    private SubredditSearchListing(String accountName, String sessionId, long sessionTimestamp) {
-        this.accountName = accountName;
-        this.sessionId = sessionId;
-        this.sessionTimestamp = sessionTimestamp;
+    public long getNetworkTimeMs() {
+        return networkTimeMs;
+    }
+
+    public long getParseTimeMs() {
+        return parseTimeMs;
     }
 
     @Override
     public void onEntityStart(int index) {
         ContentValues v = new ContentValues(6);
-        v.put(SubredditSearches.COLUMN_ACCOUNT, accountName);
-        v.put(SubredditSearches.COLUMN_SESSION_ID, sessionId);
-        v.put(SubredditSearches.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
+        v.put(Things.COLUMN_ACCOUNT, accountName);
+        v.put(Things.COLUMN_SESSION_ID, sessionId);
+        v.put(Things.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
         values.add(v);
     }
 
     @Override
     public void onDisplayName(JsonReader reader, int index) throws IOException {
-        values.get(index).put(SubredditSearches.COLUMN_NAME, readTrimmedString(reader, ""));
+        values.get(index).put(Things.COLUMN_NAME, readTrimmedString(reader, ""));
     }
 
     @Override
     public void onOver18(JsonReader reader, int index) throws IOException {
-        values.get(index).put(SubredditSearches.COLUMN_OVER_18, reader.nextBoolean());
+        values.get(index).put(Things.COLUMN_OVER_18, reader.nextBoolean());
     }
 
     @Override
     public void onSubscribers(JsonReader reader, int index) throws IOException {
-        values.get(index).put(SubredditSearches.COLUMN_SUBSCRIBERS, reader.nextInt());
+        values.get(index).put(Things.COLUMN_SUBSCRIBERS, reader.nextInt());
     }
 }

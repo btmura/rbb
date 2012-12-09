@@ -38,6 +38,7 @@ public class Things implements BaseColumns, KindColumns {
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_LINK_ID = "linkId";
     public static final String COLUMN_LINK_TITLE = "linkTitle";
+    public static final String COLUMN_NAME = "name";
     public static final String COLUMN_NESTING = "nesting";
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_OVER_18 = "over18";
@@ -48,6 +49,10 @@ public class Things implements BaseColumns, KindColumns {
     public static final String COLUMN_SEQUENCE = "sequence";
     public static final String COLUMN_SESSION_ID = "sessionId";
     public static final String COLUMN_SESSION_TIMESTAMP = "sessionTimestamp";
+
+    /** Number of subscribers to this subreddit. */
+    public static final String COLUMN_SUBSCRIBERS = "subscribers";
+
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
@@ -81,6 +86,8 @@ public class Things implements BaseColumns, KindColumns {
     public static final String SELECT_VISIBLE_BY_SESSION_ID = SELECT_BY_SESSION_ID
             + " AND " + COLUMN_VISIBLE + " = 1";
 
+    public static final String SORT_BY_NAME = COLUMN_NAME + " COLLATE NOCASE ASC";
+
     // TODO: Do we need an index for sequence and id?
     public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
 
@@ -94,10 +101,11 @@ public class Things implements BaseColumns, KindColumns {
                 + COLUMN_DOMAIN + " TEXT, "
                 + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
                 + COLUMN_EXPANDED + " INTEGER DEFAULT 1, "
-                + COLUMN_KIND + " INTEGER NOT NULL, "
+                + COLUMN_KIND + " INTEGER, "
                 + COLUMN_LIKES + " INTEGER DEFAULT 0, "
                 + COLUMN_LINK_ID + " TEXT, "
                 + COLUMN_LINK_TITLE + " TEXT, "
+                + COLUMN_NAME + " TEXT, "
                 + COLUMN_NESTING + " INTEGER, "
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
@@ -108,8 +116,9 @@ public class Things implements BaseColumns, KindColumns {
                 + COLUMN_SEQUENCE + " INTEGER, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
                 + COLUMN_SESSION_TIMESTAMP + " INTEGER NOT NULL, "
+                + COLUMN_SUBSCRIBERS + " INTEGER, "
                 + COLUMN_SUBREDDIT + " TEXT, "
-                + COLUMN_THING_ID + " TEXT NOT NULL, "
+                + COLUMN_THING_ID + " TEXT, "
                 + COLUMN_TITLE + " TEXT, "
                 + COLUMN_THUMBNAIL_URL + " TEXT, "
                 + COLUMN_UPS + " INTEGER DEFAULT 0, "

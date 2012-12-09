@@ -54,6 +54,7 @@ public class ThingProvider extends SessionProvider {
 
     public static final String PARAM_FETCH_LINKS = "fetchLinks";
     public static final String PARAM_FETCH_COMMENTS = "fetchComments";
+    public static final String PARAM_FETCH_SUBREDDITS = "fetchSubreddits";
     public static final String PARAM_COMMENT_REPLY = "commentReply";
     public static final String PARAM_COMMENT_DELETE = "commentDelete";
 
@@ -70,6 +71,7 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_THING_ID = "thingId";
     public static final String PARAM_LINK_ID = "linkId";
 
+    public static final String PARAM_JOIN_VOTES = "joinVotes";
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
@@ -96,11 +98,15 @@ public class ThingProvider extends SessionProvider {
     }
 
     @Override
-    protected String getTable(Uri uri, boolean isQuery) {
+    protected String getTable(Uri uri) {
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_THINGS:
-                return isQuery ? TABLE_NAME_WITH_VOTES : Things.TABLE_NAME;
+                if (uri.getBooleanQueryParameter(PARAM_JOIN_VOTES, false)) {
+                    return TABLE_NAME_WITH_VOTES;
+                } else {
+                    return Things.TABLE_NAME;
+                }
 
             case MATCH_COMMENTS:
                 return Comments.TABLE_NAME;
@@ -119,6 +125,8 @@ public class ThingProvider extends SessionProvider {
             handleFetchLinks(uri, db);
         } else if (uri.getBooleanQueryParameter(PARAM_FETCH_COMMENTS, false)) {
             handleFetchComments(uri, db);
+        } else if (uri.getBooleanQueryParameter(PARAM_FETCH_SUBREDDITS, false)) {
+            handleFetchSubreddits(uri, db);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_REPLY, false)) {
             handleReply(uri, db, values);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
@@ -166,6 +174,27 @@ public class ThingProvider extends SessionProvider {
 
             CommentListing listing = new CommentListing(context, helper, accountName, sessionId,
                     sessionTimestamp, thingId, linkId, cookie);
+            insertListing(db, listing, sessionId, sessionTimestamp);
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    private void handleFetchSubreddits(Uri uri, SQLiteDatabase db) {
+        try {
+            Context context = getContext();
+            String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
+            String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
+            long sessionTimestamp = getSessionTimestamp();
+            String query = uri.getQueryParameter(PARAM_QUERY);
+            String cookie = AccountUtils.getCookie(context, accountName);
+
+            SubredditSearchListing listing = new SubredditSearchListing(accountName, sessionId,
+                    sessionTimestamp, query, cookie);
             insertListing(db, listing, sessionId, sessionTimestamp);
         } catch (OperationCanceledException e) {
             Log.e(TAG, e.getMessage(), e);

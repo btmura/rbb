@@ -27,9 +27,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.btmura.android.reddit.database.SubredditSearches;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
@@ -43,10 +44,10 @@ public class SubredditAdapter extends BaseCursorAdapter {
     };
 
     private static final String[] PROJECTION_SEARCH = {
-            SubredditSearches._ID,
-            SubredditSearches.COLUMN_NAME,
-            SubredditSearches.COLUMN_SUBSCRIBERS,
-            SubredditSearches.COLUMN_OVER_18,
+            Things._ID,
+            Things.COLUMN_NAME,
+            Things.COLUMN_SUBSCRIBERS,
+            Things.COLUMN_OVER_18,
     };
 
     private static final int INDEX_NAME = 1;
@@ -69,15 +70,15 @@ public class SubredditAdapter extends BaseCursorAdapter {
         }
     }
 
-    public static void
-            deleteSessionData(final Context context, final String sessionId, String query) {
+    public static void deleteSessionData(final Context context, final String sessionId,
+            String query) {
         if (!TextUtils.isEmpty(query)) {
             final Context appContext = context.getApplicationContext();
             AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
                 public void run() {
                     ContentResolver cr = appContext.getContentResolver();
-                    cr.delete(SubredditProvider.SEARCHES_URI,
-                            SubredditSearches.SELECT_BY_SESSION_ID, Array.of(sessionId));
+                    cr.delete(ThingProvider.THINGS_URI,
+                            Things.SELECT_BY_SESSION_ID, Array.of(sessionId));
                 }
             });
         }
@@ -85,11 +86,12 @@ public class SubredditAdapter extends BaseCursorAdapter {
 
     private static Uri getUri(String accountName, String sessionId, String query, boolean sync) {
         if (!TextUtils.isEmpty(query)) {
-            return SubredditProvider.SEARCHES_URI.buildUpon()
-                    .appendQueryParameter(SubredditProvider.PARAM_FETCH, Boolean.toString(sync))
-                    .appendQueryParameter(SubredditProvider.PARAM_ACCOUNT, accountName)
-                    .appendQueryParameter(SubredditProvider.PARAM_SESSION_ID, sessionId)
-                    .appendQueryParameter(SubredditProvider.PARAM_QUERY, query)
+            return ThingProvider.THINGS_URI.buildUpon()
+                    .appendQueryParameter(ThingProvider.PARAM_FETCH_SUBREDDITS,
+                            Boolean.toString(sync))
+                    .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
+                    .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
+                    .appendQueryParameter(ThingProvider.PARAM_QUERY, query)
                     .build();
         }
         return SubredditProvider.SUBREDDITS_URI;
@@ -99,9 +101,7 @@ public class SubredditAdapter extends BaseCursorAdapter {
             String sessionId, String query) {
         if (!TextUtils.isEmpty(query)) {
             return new CursorLoader(context, uri, PROJECTION_SEARCH,
-                    SubredditSearches.SELECT_BY_SESSION_ID,
-                    Array.of(sessionId),
-                    SubredditSearches.SORT_BY_NAME);
+                    Things.SELECT_BY_SESSION_ID, Array.of(sessionId), Things.SORT_BY_NAME);
         }
         return new CursorLoader(context, uri, PROJECTION_SUBREDDITS,
                 Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED,

@@ -88,10 +88,14 @@ class ThingProviderAdapter extends ProviderAdapter {
         Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_FETCH_LINKS,
                         Boolean.toString(getFetch(args)))
-                .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, getAccountName(args))
-                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, getSessionId(args))
+                .appendQueryParameter(ThingProvider.PARAM_ACCOUNT,
+                        getAccountName(args))
+                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID,
+                        getSessionId(args))
                 .appendQueryParameter(ThingProvider.PARAM_FILTER,
-                        Integer.toString(getFilter(args)));
+                        Integer.toString(getFilter(args)))
+                .appendQueryParameter(ThingProvider.PARAM_JOIN_VOTES,
+                        Boolean.toString(true));
 
         // Empty but non-null subreddit means front page.
         if (getSubreddit(args) != null) {

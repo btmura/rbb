@@ -21,7 +21,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
 import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.database.Votes;
 
 public class MessageProvider extends SessionProvider {
 
@@ -32,22 +31,13 @@ public class MessageProvider extends SessionProvider {
     static final String PATH_MESSAGES = "messages";
     public static final Uri MESSAGES_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_MESSAGES);
 
-    private static final String TABLE_NAME_WITH_VOTES = Messages.TABLE_NAME
-            + " LEFT OUTER JOIN (SELECT "
-            + Votes.COLUMN_ACCOUNT + ", "
-            + Votes.COLUMN_THING_ID + ", "
-            + Votes.COLUMN_VOTE
-            + " FROM " + Votes.TABLE_NAME + ") USING ("
-            + Votes.COLUMN_ACCOUNT + ", "
-            + Messages.COLUMN_THING_ID + ")";
-
     public MessageProvider() {
         super(TAG);
     }
 
     @Override
-    protected String getTable(Uri uri, boolean isQuery) {
-        return isQuery ? TABLE_NAME_WITH_VOTES : Messages.TABLE_NAME;
+    protected String getTable(Uri uri) {
+        return Messages.TABLE_NAME;
     }
 
     @Override
