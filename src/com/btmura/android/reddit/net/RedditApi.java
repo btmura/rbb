@@ -227,7 +227,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.subredditListUrl(), cookie, false);
+            conn = connect(Urls.subredditListUrl(1000), cookie, false);
 
             in = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(in));

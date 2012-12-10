@@ -241,8 +241,12 @@ public class Urls {
         return newUrl(b);
     }
 
-    public static URL subredditListUrl() {
-        return newUrl(BASE_SUBREDDIT_LIST_URL);
+    public static URL subredditListUrl(int limit) {
+        StringBuilder b = resetBuilder().append(BASE_SUBREDDIT_LIST_URL);
+        if (limit != -1) {
+            b.append("?limit=").append(limit);
+        }
+        return newUrl(b);
     }
 
     public static URL subredditSearchUrl(String query, String more) {
