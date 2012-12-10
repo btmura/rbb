@@ -43,7 +43,7 @@ public class Urls {
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
     private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
     private static final String BASE_MESSAGE_URL = BASE_URL + "/message/";
-    private static final String BASE_MESSAGE_MESSAGES_URL = BASE_URL + "/message/messages/";
+    private static final String BASE_MESSAGE_THREAD_URL = BASE_URL + "/message/messages/";
     private static final String BASE_SEARCH_URL = BASE_URL + "/search.json?q=";
     private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
@@ -116,8 +116,10 @@ public class Urls {
         return b.toString();
     }
 
-    public static URL messageMessagesUrl(String thingId) {
-        return newUrl(resetBuilder().append(BASE_MESSAGE_MESSAGES_URL).append(removeTag(thingId)));
+    public static URL messageThreadUrl(String thingId) {
+        return newUrl(resetBuilder().append(BASE_MESSAGE_THREAD_URL)
+                .append(removeTag(thingId))
+                .append(".json"));
     }
 
     public static URL messageUrl(int filter, String more) {

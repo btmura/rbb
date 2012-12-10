@@ -32,6 +32,8 @@ public class Messages implements BaseColumns, KindColumns {
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_NEW = "new";
 
+    public static final String COLUMN_SESSION_ID = "sessionId";
+
     /**
      * Integer column indicating where this message came from. This is not from
      * reddit's JSON response. It is an column used internally to implement
@@ -49,6 +51,8 @@ public class Messages implements BaseColumns, KindColumns {
 
     /** Message came from the sent data the server. */
     public static final int SOURCE_SENT = 1;
+
+    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
 
     public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "= ?";
 
@@ -71,6 +75,7 @@ public class Messages implements BaseColumns, KindColumns {
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
                 + COLUMN_KIND + " INTEGER NOT NULL, "
                 + COLUMN_NEW + " INTEGER DEFAULT 0, "
+                + COLUMN_SESSION_ID + " TEXT, "
                 + COLUMN_SOURCE + " INTEGER DEFAULT 0, "
                 + COLUMN_SUBREDDIT + " TEXT, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "

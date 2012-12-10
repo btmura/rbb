@@ -57,7 +57,7 @@ class MessageProviderAdapter extends ProviderAdapter {
 
     @Override
     Uri getLoaderUri(Bundle args) {
-        return MessageProvider.MESSAGES_URI;
+        return MessageProvider.INBOX_URI;
     }
 
     @Override
@@ -124,7 +124,7 @@ class MessageProviderAdapter extends ProviderAdapter {
         }
 
         // Assume this is a raw message.
-        return Urls.messageMessagesUrl(getThingId(adapter, position)).toExternalForm();
+        return Urls.messageThreadUrl(getThingId(adapter, position)).toExternalForm();
     }
 
     @Override

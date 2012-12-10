@@ -60,7 +60,7 @@ public class ContentUriListFragment extends ListFragment {
         adapter.add(ThingProvider.THINGS_URI);
         adapter.add(ThingProvider.COMMENTS_URI);
         adapter.add(ThingProvider.VOTES_URI);
-        adapter.add(MessageProvider.MESSAGES_URI);
+        adapter.add(MessageProvider.INBOX_URI);
         setListAdapter(adapter);
     }
 

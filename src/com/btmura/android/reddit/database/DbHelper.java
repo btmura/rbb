@@ -60,6 +60,7 @@ public class DbHelper extends SQLiteOpenHelper {
             Comments.createTable(db);
             Votes.createTable(db);
             Messages.createTable(db);
+            Sessions.createTable(db);
         } else {
             Subreddits.createSubredditsV1(db);
         }

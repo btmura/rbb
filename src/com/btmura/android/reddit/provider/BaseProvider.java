@@ -71,7 +71,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            processUri(uri, db, null);
+            processUri(uri, db, null, selectionArgs);
             c = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
             c.setNotificationUri(getContext().getContentResolver(), uri);
             db.setTransactionSuccessful();
@@ -93,7 +93,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            processUri(uri, db, values);
+            processUri(uri, db, values, null);
             id = db.insert(table, null, values);
             db.setTransactionSuccessful();
         } finally {
@@ -118,7 +118,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            processUri(uri, db, values);
+            processUri(uri, db, values, selectionArgs);
             count = db.update(table, values, selection, selectionArgs);
             db.setTransactionSuccessful();
         } finally {
@@ -142,7 +142,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            processUri(uri, db, null);
+            processUri(uri, db, null, selectionArgs);
             count = db.delete(table, selection, selectionArgs);
             db.setTransactionSuccessful();
         } finally {
@@ -165,7 +165,8 @@ abstract class BaseProvider extends ContentProvider {
 
     protected abstract String getTable(Uri uri);
 
-    protected abstract void processUri(Uri uri, SQLiteDatabase db, ContentValues values);
+    protected abstract void processUri(Uri uri, SQLiteDatabase db, ContentValues values,
+            String[] selectionArgs);
 
     protected void notifyChange(Uri uri) {
         if (uri.getBooleanQueryParameter(PARAM_NOTIFY, true)) {

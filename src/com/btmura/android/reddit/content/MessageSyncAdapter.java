@@ -105,14 +105,14 @@ public class MessageSyncAdapter extends AbstractThreadedSyncAdapter {
             int[] opCounts = new int[NUM_OPS];
 
             // Delete all the current messages.
-            ops.add(ContentProviderOperation.newDelete(MessageProvider.MESSAGES_URI)
+            ops.add(ContentProviderOperation.newDelete(MessageProvider.INBOX_URI)
                     .withSelection(Messages.SELECT_BY_ACCOUNT, Array.of(account.name))
                     .build());
             opCounts[OP_DELETES]++;
 
             // Add the inbox messages. This covers all messages and unread.
             for (int i = 0; i < inboxCount; i++) {
-                ops.add(ContentProviderOperation.newInsert(MessageProvider.MESSAGES_URI)
+                ops.add(ContentProviderOperation.newInsert(MessageProvider.INBOX_URI)
                         .withValues(inboxValues.get(i))
                         .build());
                 opCounts[OP_INSERTS]++;
@@ -120,7 +120,7 @@ public class MessageSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Add the sent messages. This covers the sent view of the inbox.
             for (int i = 0; i < sentCount; i++) {
-                ops.add(ContentProviderOperation.newInsert(MessageProvider.MESSAGES_URI)
+                ops.add(ContentProviderOperation.newInsert(MessageProvider.INBOX_URI)
                         .withValues(sentValues.get(i))
                         .build());
                 opCounts[OP_INSERTS]++;
