@@ -44,7 +44,6 @@ class MessageProviderAdapter extends ProviderAdapter {
             Messages.COLUMN_SUBREDDIT,
             Messages.COLUMN_THING_ID,
             Messages.COLUMN_WAS_COMMENT,
-            Messages.COLUMN_VOTE,
     };
 
     private static final int INDEX_AUTHOR = 1;
@@ -55,7 +54,6 @@ class MessageProviderAdapter extends ProviderAdapter {
     private static final int INDEX_SUBREDDIT = 6;
     private static final int INDEX_THING_ID = 7;
     private static final int INDEX_WAS_COMMENT = 8;
-    private static final int INDEX_VOTE = 9;
 
     @Override
     Uri getLoaderUri(Bundle args) {
@@ -144,13 +142,12 @@ class MessageProviderAdapter extends ProviderAdapter {
         String author = cursor.getString(INDEX_AUTHOR);
         String body = cursor.getString(INDEX_BODY);
         long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
-        int likes = !cursor.isNull(INDEX_VOTE) ? cursor.getInt(INDEX_VOTE) : 0;
         int kind = cursor.getInt(INDEX_KIND);
         String subreddit = cursor.getString(INDEX_SUBREDDIT);
         String thingId = cursor.getString(INDEX_THING_ID);
 
         ThingView tv = (ThingView) view;
-        tv.setData(adapter.accountName, author, body, createdUtc, null, 0, true, kind, likes,
+        tv.setData(adapter.accountName, author, body, createdUtc, null, 0, true, kind, 0,
                 null, 0, adapter.nowTimeMs, 0, false, adapter.parentSubreddit, 0, subreddit,
                 adapter.thingBodyWidth, thingId, null, null, 0);
         tv.setChosen(adapter.singleChoice && Objects.equals(adapter.selectedThingId, thingId));
