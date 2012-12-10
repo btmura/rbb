@@ -256,9 +256,8 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            int opCount = c.getCount() * 2;
             ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(opCount);
+                    new ArrayList<ContentProviderOperation>(c.getCount() * 2);
 
             while (c.moveToNext()) {
                 long id = c.getLong(VOTE_ID);
@@ -287,14 +286,17 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             c.close();
 
-            // Now delete the rows from the database.
+            // Now delete the successful ops from the database.
             // The server shows the updates immediately.
-            ContentProviderResult[] results = provider.applyBatch(ops);
-            for (int i = 0; i < opCount;) {
-                syncResult.stats.numDeletes += results[i++].count;
-                syncResult.stats.numUpdates += results[i++].count;
+            if (!ops.isEmpty()) {
+                ContentProviderResult[] results = provider.applyBatch(ops);
+                int count = results.length;
+                for (int i = 0; i < count; ) {
+                    // Number of results should be in multiples of two.
+                    syncResult.stats.numDeletes += results[i++].count;
+                    syncResult.stats.numUpdates += results[i++].count;
+                }
             }
-
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
             syncResult.databaseError = true;
