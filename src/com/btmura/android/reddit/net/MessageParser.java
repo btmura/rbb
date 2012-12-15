@@ -23,7 +23,7 @@ import android.content.ContentValues;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.util.JsonParser;
 
 class MessageParser extends JsonParser {
@@ -72,7 +72,7 @@ class MessageParser extends JsonParser {
 
     @Override
     public void onKind(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Messages.COLUMN_KIND, Things.parseKind(reader.nextString()));
+        values.get(index).put(Messages.COLUMN_KIND, Kinds.parseKind(reader.nextString()));
     }
 
     @Override

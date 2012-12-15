@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -211,7 +212,7 @@ class ThingProviderAdapter extends ProviderAdapter {
     String getMoreThingId(ThingAdapter adapter) {
         Cursor c = adapter.getCursor();
         if (c != null && c.moveToLast()) {
-            if (c.getInt(INDEX_KIND) == Things.KIND_MORE) {
+            if (c.getInt(INDEX_KIND) == Kinds.KIND_MORE) {
                 return c.getString(INDEX_THING_ID);
             }
         }
@@ -238,7 +239,7 @@ class ThingProviderAdapter extends ProviderAdapter {
         int ups = cursor.getInt(INDEX_UPS);
 
         // Comments don't have a score so calculate our own.
-        if (kind == Things.KIND_COMMENT) {
+        if (kind == Kinds.KIND_COMMENT) {
             score = ups - downs;
         }
 

@@ -34,9 +34,10 @@ import android.util.JsonReader;
 import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
+import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
@@ -161,7 +162,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     public void onKind(JsonReader reader, int index) throws IOException {
         ContentValues v = values.get(index);
         v.put(Things.COLUMN_NESTING, replyNesting);
-        v.put(Things.COLUMN_KIND, Things.parseKind(reader.nextString()));
+        v.put(Things.COLUMN_KIND, Kinds.parseKind(reader.nextString()));
     }
 
     @Override
@@ -227,7 +228,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         for (int i = 0; i < size;) {
             ContentValues v = values.get(i);
             Integer type = (Integer) v.get(Things.COLUMN_KIND);
-            if (type.intValue() == Things.KIND_MORE) {
+            if (type.intValue() == Kinds.KIND_MORE) {
                 values.remove(i);
                 size--;
             } else {
@@ -294,7 +295,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 p.put(Things.COLUMN_ACCOUNT, actionAccountName);
                 p.put(Things.COLUMN_AUTHOR, actionAccountName);
                 p.put(Things.COLUMN_BODY, body);
-                p.put(Things.COLUMN_KIND, Things.KIND_COMMENT);
+                p.put(Things.COLUMN_KIND, Kinds.KIND_COMMENT);
                 p.put(Things.COLUMN_NESTING, CommentLogic.getInsertNesting(this, i));
                 p.put(Things.COLUMN_SEQUENCE, CommentLogic.getInsertSequence(this, i));
                 p.put(Things.COLUMN_SESSION_ID, sessionId);

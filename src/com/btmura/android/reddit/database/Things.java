@@ -19,7 +19,7 @@ package com.btmura.android.reddit.database;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
-public class Things implements BaseColumns, KindColumns {
+public class Things implements BaseColumns {
     public static final String TABLE_NAME = "things";
 
     /** Account for joining with the votes table. */
@@ -34,7 +34,7 @@ public class Things implements BaseColumns, KindColumns {
     /** Column to indicate whether this comment is expanded. */
     public static final String COLUMN_EXPANDED = "expanded";
 
-    public static final String COLUMN_KIND = "kind";
+    public static final String COLUMN_KIND = Kinds.COLUMN_KIND;
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_LINK_ID = "linkId";
     public static final String COLUMN_LINK_TITLE = "linkTitle";
@@ -78,7 +78,7 @@ public class Things implements BaseColumns, KindColumns {
 
     // TODO: Do we need an index for sessionId and more?
     public static final String SELECT_BY_SESSION_ID_AND_MORE =
-            SELECT_BY_SESSION_ID + " AND " + COLUMN_KIND + " = " + KIND_MORE;
+            SELECT_BY_SESSION_ID + " AND " + COLUMN_KIND + " = " + Kinds.KIND_MORE;
 
     public static final String SELECT_BEFORE_TIMESTAMP =
             COLUMN_SESSION_TIMESTAMP + " < ?";
@@ -124,23 +124,5 @@ public class Things implements BaseColumns, KindColumns {
                 + COLUMN_UPS + " INTEGER DEFAULT 0, "
                 + COLUMN_URL + " TEXT,"
                 + COLUMN_VISIBLE + " INTEGER DEFAULT 1)");
-    }
-
-    public static int parseKind(String kind) {
-        if ("t1".equals(kind)) {
-            return Things.KIND_COMMENT;
-        } else if ("t2".equals(kind)) {
-            return Things.KIND_ACCOUNT;
-        } else if ("t3".equals(kind)) {
-            return Things.KIND_LINK;
-        } else if ("t4".equals(kind)) {
-            return Things.KIND_MESSAGE;
-        } else if ("t5".equals(kind)) {
-            return Things.KIND_SUBREDDIT;
-        } else if ("more".equals(kind)) {
-            return Things.KIND_MORE;
-        } else {
-            throw new IllegalArgumentException("kind: " + kind);
-        }
     }
 }

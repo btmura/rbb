@@ -16,14 +16,12 @@
 
 package com.btmura.android.reddit.database;
 
-interface KindColumns {
+/**
+ * {@link SessionIds} contains definitions of column names and values for tables
+ * that have a sessionId column.
+ */
+public class SessionIds {
 
-    public static final int KIND_MORE = 0;
-    public static final int KIND_COMMENT = 1;
-    public static final int KIND_ACCOUNT = 2;
-    public static final int KIND_LINK = 3;
-    public static final int KIND_MESSAGE = 4;
-    public static final int KIND_SUBREDDIT = 5;
-
-
+    /** Name of the session id column. Use this in table classes for clarity. */
+    public static final String COLUMN_SESSION_ID = "sessionId";
 }

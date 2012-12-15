@@ -27,7 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Objects;
 
@@ -227,7 +227,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     public int getItemViewType(int position) {
         int kind = providerAdapter.getKind(this, position);
         switch (kind) {
-            case Things.KIND_MORE:
+            case Kinds.KIND_MORE:
                 return 0;
 
             default:
@@ -239,7 +239,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         int kind = providerAdapter.getKind(this, cursor.getPosition());
         switch (kind) {
-            case Things.KIND_MORE:
+            case Kinds.KIND_MORE:
                 return inflater.inflate(R.layout.thing_more_row, parent, false);
 
             default:

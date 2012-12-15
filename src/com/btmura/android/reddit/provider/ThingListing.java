@@ -31,6 +31,7 @@ import android.util.JsonReader;
 import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
@@ -149,7 +150,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onKind(JsonReader reader, int index) throws IOException {
-        int kindValue = Things.parseKind(reader.nextString());
+        int kindValue = Kinds.parseKind(reader.nextString());
         values.get(index).put(Things.COLUMN_KIND, kindValue);
     }
 
@@ -243,7 +244,7 @@ class ThingListing extends JsonParser implements Listing {
     @Override
     public void onParseEnd() {
         if (!TextUtils.isEmpty(moreThingId)) {
-            values.add(newContentValues(Things.KIND_MORE, moreThingId, 0));
+            values.add(newContentValues(Kinds.KIND_MORE, moreThingId, 0));
         }
     }
 

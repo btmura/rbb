@@ -41,6 +41,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
@@ -199,7 +200,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         super.onListItemClick(l, v, position, id);
 
         // Only comments can be expanded and collapsed.
-        if (adapter.getInt(position, CommentAdapter.INDEX_KIND) != Things.KIND_COMMENT) {
+        if (adapter.getInt(position, CommentAdapter.INDEX_KIND) != Kinds.KIND_COMMENT) {
             return;
         }
 

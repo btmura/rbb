@@ -30,9 +30,10 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.btmura.android.reddit.database.CommentLogic;
-import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.Array;
 
 public class Provider {
@@ -82,7 +83,7 @@ public class Provider {
                         .withValue(Things.COLUMN_ACCOUNT, accountName)
                         .withValue(Things.COLUMN_AUTHOR, accountName)
                         .withValue(Things.COLUMN_BODY, body)
-                        .withValue(Things.COLUMN_KIND, Things.KIND_COMMENT)
+                        .withValue(Things.COLUMN_KIND, Kinds.KIND_COMMENT)
                         .withValue(Things.COLUMN_NESTING, nesting)
                         .withValue(Things.COLUMN_SEQUENCE, sequence)
                         .withValue(Things.COLUMN_SESSION_ID, sessionId)

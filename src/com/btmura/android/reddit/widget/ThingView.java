@@ -28,7 +28,7 @@ import android.view.MotionEvent;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
 
@@ -135,9 +135,9 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.title = title;
 
         drawVotingArrows = AccountUtils.isAccount(accountName)
-                && kind != Things.KIND_MESSAGE
+                && kind != Kinds.KIND_MESSAGE
                 && expanded;
-        drawScore = drawVotingArrows && kind == Things.KIND_LINK;
+        drawScore = drawVotingArrows && kind == Kinds.KIND_LINK;
         if (drawScore) {
             if (scoreBounds == null) {
                 scoreBounds = new Rect();
@@ -147,12 +147,12 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         boolean showSubreddit = !TextUtils.isEmpty(subreddit)
                 && !subreddit.equalsIgnoreCase(parentSubreddit);
-        boolean showPoints = !drawVotingArrows && kind != Things.KIND_MESSAGE;
-        boolean showNumComments = kind == Things.KIND_LINK;
+        boolean showPoints = !drawVotingArrows && kind != Kinds.KIND_MESSAGE;
+        boolean showNumComments = kind == Kinds.KIND_LINK;
         setStatusText(over18, showSubreddit, showPoints, showNumComments,
                 author, createdUtc, nowTimeMs, numComments, score, subreddit);
 
-        boolean showUpsDowns = kind == Things.KIND_LINK;
+        boolean showUpsDowns = kind == Kinds.KIND_LINK;
         setDetailsText(showUpsDowns, domain, downs, ups);
 
         if (!TextUtils.isEmpty(body)) {
@@ -296,7 +296,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         if (drawVotingArrows) {
             leftHeight = Math.max(leftHeight, VotingArrows.getHeight(drawVotingArrows, drawScore));
         }
-        if (kind == Things.KIND_LINK) {
+        if (kind == Kinds.KIND_LINK) {
             leftHeight = Math.max(leftHeight, Thumbnail.getHeight());
         }
 
@@ -378,7 +378,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     private boolean isTopStatus() {
-        return kind == Things.KIND_COMMENT;
+        return kind == Kinds.KIND_COMMENT;
     }
 
     private Layout createLinkTitleLayout(int width) {

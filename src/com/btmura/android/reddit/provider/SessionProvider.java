@@ -18,6 +18,7 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -26,6 +27,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.SessionIds;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.util.Array;
 
@@ -56,74 +58,128 @@ abstract class SessionProvider extends BaseProvider {
         return SESSION_TIMESTAMP;
     }
 
-    private static final String[] SESSION_PROJECTION = {Sessions._ID};
-    private static final String SESSION_SELECTION = Sessions.COLUMN_TYPE + "=? AND "
-            + Sessions.COLUMN_THING_ID + "=?";
+    /** Projection with timestamps to see if the sessions are fresh enough. */
+    private static final String[] SESSION_PROJECTION = {
+            Sessions._ID,
+            Sessions.COLUMN_TIMESTAMP,
+    };
 
+    /** Column index for the session ID in {@link #SESSION_PROJECTION} */
+    private static final int INDEX_ID = 0;
+
+    /** Column index for the timestamp in {@link #SESSION_PROJECTION} */
+    private static final int INDEX_TIMESTAMP = 1;
+
+    /** Selection for finding a session directly by id. */
+    private static final String SELECT_BY_SESSION_ID = SessionIds.COLUMN_SESSION_ID + "=?";
+
+    /** Selection for finding existing sessions for a thing. */
+    private static final String SELECT_BY_TYPE_AND_THING_ID =
+            Sessions.COLUMN_TYPE + "=? AND " + Sessions.COLUMN_THING_ID + "=?";
+
+    /** Interval for how long a session's data is considered still fresh. */
+    private static final long SESSION_INTERVAL = TimeUnit.SECONDS.toMillis(30);
+
+    /**
+     * Returns a session id that contains the data matching the type and thing
+     * ID given. If there is no such session, it will attempt to use the network
+     * to create a session with the data.
+     */
     long getListingSession(int type, String thingId, Listing listing,
-            SQLiteDatabase db, String tableName, String sessionIdKey) throws IOException {
-        long sessionId = findListingSession(type, thingId, db);
-        if (sessionId != -1) {
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "findListingSession sessionId: " + sessionId);
-            }
-            return sessionId;
-        }
-        return createListingSession(type, thingId, listing, db, tableName, sessionIdKey);
-    }
+            SQLiteDatabase db, String tableName, String sessionIdKey) {
 
-    private long findListingSession(int type, String thingId, SQLiteDatabase db) {
+        // Current time for measuring age of sessions and inserting new ones.
+        long now = System.currentTimeMillis();
+
+        // Fetch is whether or not we want to use the network to get new data.
+        boolean fetch = true;
+
+        // candidateSession is the best session of data to return in case the
+        // network is down. It may have old data. -1 means no candidate.
+        long candidateId = -1;
+
+        // Get list of matching sessions expired or not.
         Cursor c = db.query(Sessions.TABLE_NAME, SESSION_PROJECTION,
-                SESSION_SELECTION, Array.of(Integer.toString(type), thingId),
+                SELECT_BY_TYPE_AND_THING_ID, Array.of(Integer.toString(type), thingId),
                 null, null, null);
-        try {
-            if (c.moveToNext()) {
-                return c.getLong(0);
+
+        // Return the first session with content that we still consider fresh.
+        while (c.moveToNext()) {
+            long id = c.getLong(INDEX_ID);
+            long timestamp = c.getLong(INDEX_TIMESTAMP);
+
+            // Any matching data serves as some sort of candidate.
+            if (candidateId == -1) {
+                candidateId = id;
             }
-            return -1;
-        } finally {
-            c.close();
+
+            // Use fresh data and avoid going to the network.
+            if (timestamp + SESSION_INTERVAL >= now) {
+                candidateId = id;
+                fetch = false;
+                break;
+            }
         }
-    }
+        c.close();
 
-    private long createListingSession(int type, String thingId, Listing listing,
-            SQLiteDatabase db, String tableName, String sessionIdKey) throws IOException {
-        ArrayList<ContentValues> values = listing.getValues();
-        db.beginTransaction();
-        try {
-            // Create a new row for this session.
-            ContentValues sv = newSessionValues(type, thingId);
-            long sessionId = db.insert(Sessions.TABLE_NAME, null, sv);
-
-            // Add the session id to the rows.
-            int count = values.size();
-            for (int i = 0; i < count; i++) {
-                values.get(i).put(sessionIdKey, sessionId);
-            }
-
-            // Insert the rows into the database.
-            InsertHelper helper = new InsertHelper(db, tableName);
-            for (int i = 0; i < count; i++) {
-                helper.insert(values.get(i));
-            }
-
-            db.setTransactionSuccessful();
-
+        // Return fresh session if it was found.
+        if (!fetch) {
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "createListingSession sessionId: " + sessionId + " values: " + count);
+                Log.d(TAG, "reusing session: " + candidateId);
             }
-            return sessionId;
-
-        } finally {
-            db.endTransaction();
+            return candidateId;
         }
-    }
 
-    private ContentValues newSessionValues(int type, String thingId) {
-        ContentValues values = new ContentValues(3);
-        values.put(Sessions.COLUMN_TYPE, type);
-        values.put(Sessions.COLUMN_THING_ID, thingId);
-        values.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
-        return values;
+        // Fetch data from the network. Return the candidate if it fails.
+        try {
+            ArrayList<ContentValues> values = listing.getValues();
+
+            // Insert new db values. Delete prior candidate session.
+            db.beginTransaction();
+            try {
+                // Delete prior candidate session since we have new data.
+                if (candidateId != -1) {
+                    String[] selectionArgs = Array.of(candidateId);
+                    int deleted1 = db.delete(Sessions.TABLE_NAME, ID_SELECTION, selectionArgs);
+                    int deleted2 = db.delete(tableName, SELECT_BY_SESSION_ID, selectionArgs);
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "deleted session: " + deleted1 + " " + deleted2);
+                    }
+                }
+
+                // Insert a session row for the new data.
+                ContentValues sv = new ContentValues(3);
+                sv.put(Sessions.COLUMN_TYPE, type);
+                sv.put(Sessions.COLUMN_THING_ID, thingId);
+                sv.put(Sessions.COLUMN_TIMESTAMP, now);
+                long sessionId = db.insert(Sessions.TABLE_NAME, null, sv);
+
+                // Add the session id to the data rows.
+                int count = values.size();
+                for (int i = 0; i < count; i++) {
+                    values.get(i).put(sessionIdKey, sessionId);
+                }
+
+                // Insert the rows into the database.
+                InsertHelper helper = new InsertHelper(db, tableName);
+                for (int i = 0; i < count; i++) {
+                    helper.insert(values.get(i));
+                }
+
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "created session: " + sessionId + " " + count);
+                }
+
+                db.setTransactionSuccessful();
+                return sessionId;
+
+            } finally {
+                db.endTransaction();
+            }
+
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+            return candidateId;
+        }
     }
 }

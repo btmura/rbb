@@ -19,7 +19,7 @@ package com.btmura.android.reddit.database;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
-public class Messages implements BaseColumns, KindColumns {
+public class Messages implements BaseColumns {
     public static final String TABLE_NAME = "messages";
 
     /** Account for joining with the votes table. */
@@ -32,7 +32,7 @@ public class Messages implements BaseColumns, KindColumns {
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_NEW = "new";
 
-    public static final String COLUMN_SESSION_ID = "sessionId";
+    public static final String COLUMN_SESSION_ID = SessionIds.COLUMN_SESSION_ID;
 
     /**
      * Integer column indicating where this message came from. This is not from

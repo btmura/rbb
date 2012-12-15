@@ -30,7 +30,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.JsonParser;
@@ -112,7 +112,7 @@ public class MessageThreadListing extends JsonParser implements Listing {
 
     @Override
     public void onKind(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Messages.COLUMN_KIND, Things.parseKind(reader.nextString()));
+        values.get(index).put(Messages.COLUMN_KIND, Kinds.parseKind(reader.nextString()));
     }
 
     @Override
