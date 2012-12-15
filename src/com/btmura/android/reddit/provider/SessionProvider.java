@@ -36,8 +36,6 @@ abstract class SessionProvider extends BaseProvider {
 
     private static final String TAG = "SessionProvider";
 
-    private static final boolean DEBUG = BuildConfig.DEBUG && !true;
-
     /** Timestamp to apply to all data so we can clean it up later if necessary. */
     private static long SESSION_TIMESTAMP = -1;
 
@@ -66,7 +64,7 @@ abstract class SessionProvider extends BaseProvider {
             SQLiteDatabase db, String tableName, String sessionIdKey) throws IOException {
         long sessionId = findListingSession(type, thingId, db);
         if (sessionId != -1) {
-            if (DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.d(TAG, "findListingSession sessionId: " + sessionId);
             }
             return sessionId;
@@ -111,7 +109,7 @@ abstract class SessionProvider extends BaseProvider {
 
             db.setTransactionSuccessful();
 
-            if (DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.d(TAG, "createListingSession sessionId: " + sessionId + " values: " + count);
             }
             return sessionId;

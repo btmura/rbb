@@ -65,10 +65,13 @@ abstract class BaseProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
+        if (BuildConfig.DEBUG) {
+            Log.d(logTag, "query uri: " + uri);
+        }
+
         SQLiteDatabase db = helper.getWritableDatabase();
         String table = getTable(uri);
         Cursor c = null;
-
         db.beginTransaction();
         try {
             processUri(uri, db, null, selectionArgs);
@@ -77,10 +80,6 @@ abstract class BaseProvider extends ContentProvider {
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
-        }
-
-        if (BuildConfig.DEBUG) {
-            Log.d(logTag, "query table: " + table);
         }
         return c;
     }

@@ -39,7 +39,7 @@ public class MessageThreadListing extends JsonParser implements Listing {
 
     private static final String TAG = "MessageThreadListing";
 
-    private static final boolean DEBUG = BuildConfig.DEBUG && !true;
+    private static final boolean DEBUG = BuildConfig.DEBUG && true;
 
     private final String accountName;
     private final String thingId;
@@ -125,5 +125,10 @@ public class MessageThreadListing extends JsonParser implements Listing {
         if (DEBUG) {
             Log.d(TAG, "values: " + values.get(index));
         }
+    }
+
+    @Override
+    public boolean shouldParseReplies() {
+        return true;
     }
 }
