@@ -36,8 +36,6 @@ import com.btmura.android.reddit.util.Array;
  */
 abstract class SessionProvider extends BaseProvider {
 
-    private static final String TAG = "SessionProvider";
-
     /** Timestamp to apply to all data so we can clean it up later if necessary. */
     private static long SESSION_TIMESTAMP = -1;
 
@@ -125,7 +123,7 @@ abstract class SessionProvider extends BaseProvider {
         // Return fresh session if it was found.
         if (!fetch) {
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "reusing session: " + candidateId);
+                Log.d(logTag, "reusing session: " + candidateId);
             }
             return candidateId;
         }
@@ -143,7 +141,7 @@ abstract class SessionProvider extends BaseProvider {
                     int deleted1 = db.delete(Sessions.TABLE_NAME, ID_SELECTION, selectionArgs);
                     int deleted2 = db.delete(tableName, SELECT_BY_SESSION_ID, selectionArgs);
                     if (BuildConfig.DEBUG) {
-                        Log.d(TAG, "deleted session: " + deleted1 + " " + deleted2);
+                        Log.d(logTag, "deleted session: " + deleted1 + " " + deleted2);
                     }
                 }
 
@@ -167,7 +165,7 @@ abstract class SessionProvider extends BaseProvider {
                 }
 
                 if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "created session: " + sessionId + " " + count);
+                    Log.d(logTag, "created session: " + sessionId + " " + count);
                 }
 
                 db.setTransactionSuccessful();
@@ -178,7 +176,7 @@ abstract class SessionProvider extends BaseProvider {
             }
 
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Log.e(logTag, e.getMessage(), e);
             return candidateId;
         }
     }
