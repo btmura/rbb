@@ -30,9 +30,13 @@ import com.btmura.android.reddit.R;
  */
 public class ComposeActivity extends Activity {
 
+    /** Charsequence extra for the activity's title */
+    public static final String EXTRA_TITLE = "title";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle(getIntent().getCharSequenceExtra(EXTRA_TITLE));
         setContentView(R.layout.compose);
         setupActionBar();
         setupFragments(savedInstanceState);

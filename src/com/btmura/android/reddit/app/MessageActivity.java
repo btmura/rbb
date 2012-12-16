@@ -141,7 +141,9 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     private boolean handleCompose() {
-        startActivity(new Intent(this, ComposeActivity.class));
+        Intent intent = new Intent(this, ComposeActivity.class);
+        intent.putExtra(ComposeActivity.EXTRA_TITLE, getString(R.string.compose_message_title));
+        startActivity(intent);
         return true;
     }
 

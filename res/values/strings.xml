@@ -28,6 +28,7 @@
     <string name="captcha_image">Captcha image</string>
     <string name="captcha_title">Are you a robot?</string>
     <string name="comment_reply_title">Reply to %s</string>
+    <string name="compose_message_title">Compose message</string>
     <string name="content_browser">Content providers</string>
     <string name="empty_list">Nothing to see here…</string>
     <string name="error">Something went wrong…</string>
