@@ -28,10 +28,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.DbHelper;
+import com.btmura.android.reddit.util.Array;
 
 abstract class BaseProvider extends ContentProvider {
 
@@ -48,6 +50,12 @@ abstract class BaseProvider extends ContentProvider {
      * This is by default true.
      */
     public static final String PARAM_NOTIFY = "notify";
+
+    /** Selection is a bundle of a selection and its arguments. */
+    static class Selection {
+        String selection;
+        String[] selectionArgs;
+    }
 
     protected String logTag;
     protected DbHelper helper;
@@ -74,7 +82,12 @@ abstract class BaseProvider extends ContentProvider {
         Cursor c = null;
         db.beginTransaction();
         try {
-            processUri(uri, db, null, selectionArgs);
+            Selection newSelection = processUri(uri, db, null, selection, selectionArgs);
+            if (newSelection != null) {
+                selection = newSelection.selection;
+                selectionArgs = newSelection.selectionArgs;
+            }
+
             c = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
             c.setNotificationUri(getContext().getContentResolver(), uri);
             db.setTransactionSuccessful();
@@ -92,7 +105,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            processUri(uri, db, values, null);
+            processUri(uri, db, values, null, null);
             id = db.insert(table, null, values);
             db.setTransactionSuccessful();
         } finally {
@@ -117,7 +130,12 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            processUri(uri, db, values, selectionArgs);
+            Selection newSelection = processUri(uri, db, values, selection, selectionArgs);
+            if (newSelection != null) {
+                selection = newSelection.selection;
+                selectionArgs = newSelection.selectionArgs;
+            }
+
             count = db.update(table, values, selection, selectionArgs);
             db.setTransactionSuccessful();
         } finally {
@@ -141,7 +159,12 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            processUri(uri, db, null, selectionArgs);
+            Selection newSelection = processUri(uri, db, null, selection, selectionArgs);
+            if (newSelection != null) {
+                selection = newSelection.selection;
+                selectionArgs = newSelection.selectionArgs;
+            }
+
             count = db.delete(table, selection, selectionArgs);
             db.setTransactionSuccessful();
         } finally {
@@ -164,8 +187,13 @@ abstract class BaseProvider extends ContentProvider {
 
     protected abstract String getTable(Uri uri);
 
-    protected abstract void processUri(Uri uri, SQLiteDatabase db, ContentValues values,
-            String[] selectionArgs);
+    /**
+     * Processes the database inputs and returns a new selection to use for
+     * querying or null to indicate that no changes to the selection need to be
+     * made to the selection.
+     */
+    protected abstract Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
+            String selection, String[] selectionArgs);
 
     protected void notifyChange(Uri uri) {
         if (uri.getBooleanQueryParameter(PARAM_NOTIFY, true)) {
@@ -186,5 +214,16 @@ abstract class BaseProvider extends ContentProvider {
         } finally {
             db.endTransaction();
         }
+    }
+
+    static String appendSelection(String selection, String clause) {
+        if (TextUtils.isEmpty(selection)) {
+            return clause;
+        }
+        return selection + " AND " + clause;
+    }
+
+    static String[] appendSelectionArg(String[] selectionArgs, String arg) {
+        return Array.append(selectionArgs, arg);
     }
 }

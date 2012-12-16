@@ -54,8 +54,7 @@ public class MessageThreadProviderAdapter extends ProviderAdapter {
 
     @Override
     Loader<Cursor> getLoader(Context context, Uri uri, Bundle args) {
-        return new CursorLoader(context, uri, PROJECTION,
-                Messages.SELECT_BY_SESSION_ID, new String[] {"0"}, null);
+        return new CursorLoader(context, uri, PROJECTION, null, null, null);
     }
 
     @Override

@@ -60,8 +60,9 @@ public class SubredditProvider extends SessionProvider {
         return Subreddits.TABLE_NAME;
     }
 
-    protected void processUri(Uri uri, SQLiteDatabase db, ContentValues values,
-            String[] selectionArgs) {
+    protected Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
+            String selection, String[] selectionArgs) {
+        return null;
     }
 
     public static void insertInBackground(Context context, String accountName,

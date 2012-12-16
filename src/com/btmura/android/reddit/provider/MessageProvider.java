@@ -70,14 +70,17 @@ public class MessageProvider extends SessionProvider {
     }
 
     @Override
-    protected void processUri(Uri uri, SQLiteDatabase db, ContentValues values,
-            String[] selectionArgs) {
+    protected Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
+            String selection, String[] selectionArgs) {
         if (uri.getBooleanQueryParameter(PARAM_FETCH, false)) {
-            handleFetch(uri, db, selectionArgs);
+            return handleFetch(uri, db, selection, selectionArgs);
         }
+        return null;
     }
 
-    private void handleFetch(Uri uri, SQLiteDatabase db, String[] selectionArgs) {
+    /** Fetches a session containing data for a message thread. */
+    private Selection handleFetch(Uri uri, SQLiteDatabase db, String selection,
+            String[] selectionArgs) {
         try {
             // Collect the ingredients we need to get the listing.
             Context context = getContext();
@@ -85,14 +88,19 @@ public class MessageProvider extends SessionProvider {
             String thingId = uri.getLastPathSegment();
             String cookie = AccountUtils.getCookie(context, accountName);
             if (cookie == null) {
-                return;
+                return null;
             }
 
-            // Create the session and modify the selection args to use it.
+            // Get the session containing the data for this listing.
             MessageThreadListing listing = new MessageThreadListing(accountName, thingId, cookie);
             long sessionId = getListingSession(Sessions.TYPE_MESSAGE_THREAD_LISTING, thingId,
                     listing, db, Messages.TABLE_NAME, Messages.COLUMN_SESSION_ID);
-            selectionArgs[selectionArgs.length - 1] = Long.toString(sessionId);
+
+            // Answer this query by modifying the selection arguments.
+            Selection newSelection = new Selection();
+            newSelection.selection = appendSelection(selection, Messages.SELECT_BY_SESSION_ID);
+            newSelection.selectionArgs = appendSelectionArg(selectionArgs, Long.toString(sessionId));
+            return newSelection;
 
         } catch (OperationCanceledException e) {
             Log.e(TAG, e.getMessage(), e);
@@ -101,5 +109,6 @@ public class MessageProvider extends SessionProvider {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
         }
+        return null;
     }
 }

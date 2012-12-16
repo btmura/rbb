@@ -120,8 +120,8 @@ public class ThingProvider extends SessionProvider {
     }
 
     @Override
-    protected void processUri(Uri uri, SQLiteDatabase db, ContentValues values,
-            String[] selectionArgs) {
+    protected Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
+            String selection, String[] selectionArgs) {
         if (uri.getBooleanQueryParameter(PARAM_FETCH_LINKS, false)) {
             handleFetchLinks(uri, db);
         } else if (uri.getBooleanQueryParameter(PARAM_FETCH_COMMENTS, false)) {
@@ -133,6 +133,7 @@ public class ThingProvider extends SessionProvider {
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
             handleDelete(uri, db);
         }
+        return null;
     }
 
     private void handleFetchLinks(Uri uri, SQLiteDatabase db) {
