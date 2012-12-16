@@ -60,6 +60,7 @@
     <string name="menu_add_account">Add account</string>
     <string name="menu_add_subreddit">Add subreddit</string>
     <string name="menu_comments">View comments</string>
+    <string name="menu_compose">Compose</string>
     <string name="menu_copy_url">Copy URL</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_link">View link</string>

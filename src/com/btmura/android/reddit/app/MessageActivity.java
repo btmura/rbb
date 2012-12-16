@@ -21,6 +21,7 @@ import android.app.ActionBar.OnNavigationListener;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
@@ -116,6 +117,13 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
                 || frag.getFilter() != filter) {
             setMessageThingListNavigation(getUserName());
         }
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.message_menu, menu);
         return true;
     }
 
