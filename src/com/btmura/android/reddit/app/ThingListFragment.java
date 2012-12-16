@@ -296,6 +296,7 @@ public class ThingListFragment extends ListFragment implements
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         int count = getListView().getCheckedItemCount();
         mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
+        menu.findItem(R.id.menu_compose_message).setVisible(count == 1);
         menu.findItem(R.id.menu_view_profile).setVisible(count == 1);
         menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
         return true;
