@@ -308,6 +308,9 @@ public class ThingListFragment extends ListFragment implements
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_compose_message:
+                return handleComposeMessage(mode);
+
             case R.id.menu_view_profile:
                 return handleViewProfile(mode);
 
@@ -317,6 +320,13 @@ public class ThingListFragment extends ListFragment implements
             default:
                 return false;
         }
+    }
+
+    private boolean handleComposeMessage(ActionMode mode) {
+        String user = adapter.getAuthor(getFirstCheckedPosition());
+        MenuHelper.startComposeActivity(getActivity(), user);
+        mode.finish();
+        return true;
     }
 
     private boolean handleViewProfile(ActionMode mode) {

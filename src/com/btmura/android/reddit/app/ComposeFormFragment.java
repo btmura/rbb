@@ -51,6 +51,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** Integer argument indicating the type of composition. */
     public static final String ARG_COMPOSITION = "composition";
 
+    /** String extra to pre-fill the destination field if possible. */
+    public static final String ARG_DESTINATION = "destination";
+
     /** Type of composition when submitting a link or text. */
     public static final int COMPOSITION_SUBMISSION = 0;
 
@@ -103,9 +106,10 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** Cancel button visible when this form is a dialog. */
     private View cancel;
 
-    public static ComposeFormFragment newInstance(int composition) {
-        Bundle args = new Bundle(1);
+    public static ComposeFormFragment newInstance(int composition, String destination) {
+        Bundle args = new Bundle(2);
         args.putInt(ARG_COMPOSITION, composition);
+        args.putString(ARG_DESTINATION, destination);
         ComposeFormFragment frag = new ComposeFormFragment();
         frag.setArguments(args);
         return frag;
@@ -140,7 +144,13 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         accountSpinner.setAdapter(adapter);
 
         destinationText = (EditText) v.findViewById(R.id.destination_text);
+        destinationText.setText(getArguments().getString(ARG_DESTINATION));
+
         titleText = (EditText) v.findViewById(R.id.title_text);
+        if (!TextUtils.isEmpty(destinationText.getText())) {
+            titleText.requestFocus();
+        }
+
         textText = (EditText) v.findViewById(R.id.text_text);
 
         switch (getArguments().getInt(ARG_COMPOSITION)) {

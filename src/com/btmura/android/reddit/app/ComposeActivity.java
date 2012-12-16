@@ -35,7 +35,7 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
         OnCaptchaGuessListener, OnComposeListener {
 
     /** Charsequence extra for the activity's title */
-    public static final String EXTRA_TITLE = "title";
+    public static final String EXTRA_DESTINATION = "destination";
 
     /** Integer extra indicating the type of composition. */
     public static final String EXTRA_COMPOSITION = "composition";
@@ -64,13 +64,14 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle(getIntent().getCharSequenceExtra(EXTRA_TITLE));
         setContentView(R.layout.compose);
         setupActionBar();
         setupFragments(savedInstanceState);
     }
 
     private void setupActionBar() {
+        setTitle(getString(R.string.compose_message_title));
+
         // No action bar will be available on large devices.
         ActionBar bar = getActionBar();
         if (bar != null) {
@@ -85,8 +86,11 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
         }
 
         int composition = getIntent().getIntExtra(EXTRA_COMPOSITION, -1);
+        String destination = getIntent().getStringExtra(EXTRA_COMPOSE_DESTINATION);
+        ComposeFormFragment frag = ComposeFormFragment.newInstance(composition, destination);
+
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.compose_form_container, ComposeFormFragment.newInstance(composition));
+        ft.replace(R.id.compose_form_container, frag);
         ft.commit();
     }
 
