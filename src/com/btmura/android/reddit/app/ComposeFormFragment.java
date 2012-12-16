@@ -36,6 +36,7 @@ import android.widget.Spinner;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
 /**
@@ -145,6 +146,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         switch (getArguments().getInt(ARG_COMPOSITION)) {
             case COMPOSITION_SUBMISSION:
                 destinationText.setHint(R.string.hint_subreddit);
+                destinationText.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
                 titleText.setHint(R.string.hint_title);
                 textText.setHint(R.string.hint_text_or_link);
                 break;
