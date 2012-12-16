@@ -68,7 +68,7 @@ public class SubmitLinkActivity extends Activity implements OnSubmitFormListener
     }
 
     public void onCaptchaGuess(String id, String guess, Bundle submitExtras) {
-        SubmitLinkFragment f = SubmitLinkFragment.newInstance(submitExtras, id, guess);
+        SubmitLinkFragment f = SubmitLinkFragment.newInstance(id, guess, submitExtras);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(f, SubmitLinkFragment.TAG);
         ft.commit();

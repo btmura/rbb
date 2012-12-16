@@ -44,7 +44,7 @@ public class SubmitLinkFragment extends Fragment {
     private static final String ARG_TEXT = "text";
     private static final String ARG_IS_LINK = "isLink";
 
-    private static final String ARG_SUBMIT_EXTRAS = "submitExtras";
+    private static final String ARG_EXTRAS = "submitExtras";
     private static final String ARG_CAPTCHA_ID = "captchaId";
     private static final String ARG_CAPTCHA_GUESS = "captchaGuess";
 
@@ -75,12 +75,12 @@ public class SubmitLinkFragment extends Fragment {
         return args;
     }
 
-    public static SubmitLinkFragment newInstance(Bundle submitExtras, String captchaId,
-            String captchaGuess) {
+    public static SubmitLinkFragment newInstance(String captchaId, String captchaGuess,
+            Bundle extras) {
         Bundle args = new Bundle(3);
-        args.putBundle(ARG_SUBMIT_EXTRAS, submitExtras);
         args.putString(ARG_CAPTCHA_ID, captchaId);
         args.putString(ARG_CAPTCHA_GUESS, captchaGuess);
+        args.putBundle(ARG_EXTRAS, extras);
 
         SubmitLinkFragment frag = new SubmitLinkFragment();
         frag.setArguments(args);
@@ -100,7 +100,7 @@ public class SubmitLinkFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        Bundle submitExtras = getArguments().getBundle(ARG_SUBMIT_EXTRAS);
+        Bundle submitExtras = getArguments().getBundle(ARG_EXTRAS);
         accountName = submitExtras.getString(ARG_ACCOUNT_NAME);
         subreddit = submitExtras.getString(ARG_SUBREDDIT);
         title = submitExtras.getString(ARG_TITLE);

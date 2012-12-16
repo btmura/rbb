@@ -36,6 +36,18 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     /** Charsequence extra for the activity's title */
     public static final String EXTRA_TITLE = "title";
 
+    /** Integer extra indicating the type of composition. */
+    public static final String EXTRA_COMPOSITION = "composition";
+
+    /** Type of composition when submitting a link or text. */
+    public static final int COMPOSITION_SUBMISSION = ComposeFormFragment.COMPOSITION_SUBMISSION;
+
+    /** Type of composition when replying to some comment. */
+    public static final int COMPOSITION_COMMENT = ComposeFormFragment.COMPOSITION_COMMENT;
+
+    /** Type of composition when crafting a message. */
+    public static final int COMPOSITION_MESSAGE = ComposeFormFragment.COMPOSITION_MESSAGE;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,9 +71,9 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
             return;
         }
 
+        int composition = getIntent().getIntExtra(EXTRA_COMPOSITION, -1);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.compose_form_container,
-                ComposeFormFragment.newInstance(ComposeFormFragment.COMPOSITION_MESSAGE));
+        ft.replace(R.id.compose_form_container, ComposeFormFragment.newInstance(composition));
         ft.commit();
     }
 
@@ -75,6 +87,23 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     }
 
     public void onCaptchaGuess(String id, String guess, Bundle extras) {
+        switch (getIntent().getIntExtra(EXTRA_COMPOSITION, -1)) {
+            case COMPOSITION_SUBMISSION:
+                SubmitLinkFragment f = SubmitLinkFragment.newInstance(id, guess, extras);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.add(f, SubmitLinkFragment.TAG);
+                ft.commit();
+                break;
+
+            case COMPOSITION_COMMENT:
+                break;
+
+            case COMPOSITION_MESSAGE:
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public void onCaptchaCancelled() {
