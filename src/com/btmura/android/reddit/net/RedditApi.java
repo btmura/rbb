@@ -276,6 +276,21 @@ public class RedditApi {
         }
     }
 
+    public static Result compose(String to, String subject, String text, String captchaId,
+            String captchaGuess, String cookie, String modhash) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            conn = connect(Urls.composeUrl(), cookie, true);
+            writeFormData(conn, Urls.composeQuery(to, subject, text,
+                    captchaId, captchaGuess, modhash));
+            in = conn.getInputStream();
+            return ResponseParser.parseResponse(logResponse(in));
+        } finally {
+            close(in, conn);
+        }
+    }
+
     public static Result submit(String subreddit, String title, String text, boolean link,
             String captchaId, String captchaGuess, String cookie, String modhash)
             throws IOException {

@@ -33,6 +33,7 @@ public class Urls {
     public static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
     private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
+    private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
     private static final String API_DELETE_URL = BASE_URL + "/api/del";
     private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
     private static final String API_NEW_CAPTCHA_URL = BASE_URL + "/api/new_captcha";
@@ -84,6 +85,27 @@ public class Urls {
             b.append("?comment=").append(id).append("&context=3");
         }
         return newUrl(b);
+    }
+
+    public static URL composeUrl() {
+        return newUrl(API_COMPOSE_URL);
+    }
+
+    public static String composeQuery(String to, String subject, String text, String captchaId,
+            String captchaGuess, String modhash) {
+        StringBuilder b = resetBuilder();
+        b.append("to=").append(encode(to));
+        b.append("&subject=").append(encode(subject));
+        b.append("&text=").append(encode(text));
+        if (!TextUtils.isEmpty(captchaId)) {
+            b.append("&iden=").append(encode(captchaId));
+        }
+        if (!TextUtils.isEmpty(captchaGuess)) {
+            b.append("&captcha=").append(encode(captchaGuess));
+        }
+        b.append("&uh=").append(encode(modhash));
+        b.append("&api_type=json");
+        return b.toString();
     }
 
     public static URL deleteApiUrl() {

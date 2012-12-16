@@ -25,13 +25,14 @@ import android.view.MenuItem;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.app.ComposeFormFragment.OnComposeFormListener;
+import com.btmura.android.reddit.app.ComposeFragment.OnComposeListener;
 
 /**
  * {@link Activity} that displays a form for composing submissions and messages
  * and subsequently processing them.
  */
 public class ComposeActivity extends Activity implements OnComposeFormListener,
-        OnCaptchaGuessListener {
+        OnCaptchaGuessListener, OnComposeListener {
 
     /** Charsequence extra for the activity's title */
     public static final String EXTRA_TITLE = "title";
@@ -47,6 +48,18 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
 
     /** Type of composition when crafting a message. */
     public static final int COMPOSITION_MESSAGE = ComposeFormFragment.COMPOSITION_MESSAGE;
+
+    /** String extra with account name from compose dialog. */
+    private static final String EXTRA_COMPOSE_ACCOUNT_NAME = "accountName";
+
+    /** String extra with destination from compose dialog. */
+    private static final String EXTRA_COMPOSE_DESTINATION = "destination";
+
+    /** String extra with title from compose dialog. */
+    private static final String EXTRA_COMPOSE_TITLE = "title";
+
+    /** String extra with text from compose dialog. */
+    private static final String EXTRA_COMPOSE_TEXT = "text";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +91,13 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     }
 
     public void onComposeForm(String accountName, String destination, String title, String text) {
-        Bundle extras = new Bundle();
+        // Bundle up extras from the form to pass through the captcha fragment
+        // and then back to callbacks in this activity.
+        Bundle extras = new Bundle(4);
+        extras.putString(EXTRA_COMPOSE_ACCOUNT_NAME, accountName);
+        extras.putString(EXTRA_COMPOSE_DESTINATION, destination);
+        extras.putString(EXTRA_COMPOSE_TITLE, title);
+        extras.putString(EXTRA_COMPOSE_TEXT, text);
         CaptchaFragment.newInstance(extras).show(getFragmentManager(), CaptchaFragment.TAG);
     }
 
@@ -99,6 +118,15 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
                 break;
 
             case COMPOSITION_MESSAGE:
+                String accountName = extras.getString(EXTRA_COMPOSE_ACCOUNT_NAME);
+                String destination = extras.getString(EXTRA_COMPOSE_DESTINATION);
+                String title = extras.getString(EXTRA_COMPOSE_TITLE);
+                String text = extras.getString(EXTRA_COMPOSE_TEXT);
+                ComposeFragment frag = ComposeFragment.newInstance(accountName, destination, title,
+                        text, id, guess);
+                ft = getFragmentManager().beginTransaction();
+                ft.add(frag, ComposeFragment.TAG);
+                ft.commit();
                 break;
 
             default:
@@ -107,6 +135,13 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     }
 
     public void onCaptchaCancelled() {
+    }
+
+    public void onCompose() {
+        finish();
+    }
+
+    public void onComposeCancelled() {
     }
 
     @Override
