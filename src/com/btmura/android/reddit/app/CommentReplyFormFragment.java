@@ -51,7 +51,6 @@ public class CommentReplyFormFragment extends Fragment implements
 
     public static final String TAG = "CommentReplyFormFragment";
 
-    /** String extra with the parent thing ID. */
     public static final String ARG_REPLY_ARGS = "replyArgs";
 
     /**
@@ -77,11 +76,6 @@ public class CommentReplyFormFragment extends Fragment implements
     private View ok;
     private View cancel;
 
-    /**
-     * @param parentThingId is the ID of the thing containing the comments
-     * @param replyThingId of the thing the user is replying to
-     * @param author of the thing the user is replying to
-     */
     public static CommentReplyFormFragment newInstance(Bundle replyArgs) {
         Bundle args = new Bundle(1);
         args.putBundle(ARG_REPLY_ARGS, replyArgs);
