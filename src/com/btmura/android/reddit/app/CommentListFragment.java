@@ -304,6 +304,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
         menu.findItem(R.id.menu_reply).setVisible(isReplyItemVisible());
         menu.findItem(R.id.menu_delete).setVisible(isDeleteItemVisible());
+        menu.findItem(R.id.menu_compose_message).setVisible(isComposeMessageItemVisible());
         menu.findItem(R.id.menu_copy_url).setVisible(isCopyUrlItemVisible());
         return true;
     }
@@ -366,6 +367,15 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         return true;
     }
 
+    private boolean isComposeMessageItemVisible() {
+        // You need an account to compose a message.
+        if (!AccountUtils.isAccount(accountName)) {
+            return false;
+        }
+        return getListView().getCheckedItemCount() == 1;
+    }
+
+
     private boolean isCopyUrlItemVisible() {
         return getListView().getCheckedItemCount() == 1;
     }
@@ -384,6 +394,9 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
             case R.id.menu_view_profile:
                 return handleViewProfile(mode);
+
+            case R.id.menu_compose_message:
+                return handleComposeMessage(mode);
 
             case R.id.menu_copy_url:
                 return handleCopyUrl(mode);
@@ -456,11 +469,15 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     }
 
     private boolean handleViewProfile(ActionMode mode) {
-        int position = getFirstCheckedPosition();
-        String user = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
-        Intent intent = new Intent(getActivity(), UserProfileActivity.class);
-        intent.putExtra(UserProfileActivity.EXTRA_USER, user);
-        startActivity(intent);
+        String user = adapter.getString(getFirstCheckedPosition(), CommentAdapter.INDEX_AUTHOR);
+        MenuHelper.startProfileActivity(getActivity(), user);
+        mode.finish();
+        return true;
+    }
+
+    private boolean handleComposeMessage(ActionMode mode) {
+        String user = adapter.getString(getFirstCheckedPosition(), CommentAdapter.INDEX_AUTHOR);
+        MenuHelper.startComposeActivity(getActivity(), user);
         mode.finish();
         return true;
     }
