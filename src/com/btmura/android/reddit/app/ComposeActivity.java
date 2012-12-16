@@ -23,12 +23,15 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
+import com.btmura.android.reddit.app.ComposeFormFragment.OnComposeFormListener;
 
 /**
  * {@link Activity} that displays a form for composing submissions and messages
  * and subsequently processing them.
  */
-public class ComposeActivity extends Activity {
+public class ComposeActivity extends Activity implements OnComposeFormListener,
+        OnCaptchaGuessListener {
 
     /** Charsequence extra for the activity's title */
     public static final String EXTRA_TITLE = "title";
@@ -60,6 +63,21 @@ public class ComposeActivity extends Activity {
         ft.replace(R.id.compose_form_container,
                 ComposeFormFragment.newInstance(ComposeFormFragment.COMPOSITION_MESSAGE));
         ft.commit();
+    }
+
+    public void onComposeForm(String accountName, String destination, String title, String text) {
+        Bundle extras = new Bundle();
+        CaptchaFragment.newInstance(extras).show(getFragmentManager(), CaptchaFragment.TAG);
+    }
+
+    public void onComposeFormCancelled() {
+        finish();
+    }
+
+    public void onCaptchaGuess(String id, String guess, Bundle extras) {
+    }
+
+    public void onCaptchaCancelled() {
     }
 
     @Override

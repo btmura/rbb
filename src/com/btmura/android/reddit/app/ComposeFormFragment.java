@@ -21,6 +21,7 @@ import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -59,6 +60,18 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     public static final int COMPOSITION_MESSAGE = 2;
 
     public interface OnComposeFormListener {
+
+        /**
+         * Method fired when OK is pressed and basic validations has passed.
+         *
+         * @param accountName of the account composing the message
+         * @param destination whether subreddit or user name
+         * @param title or subject of the composition
+         * @param text of the composition
+         */
+        void onComposeForm(String accountName, String destination, String title, String text);
+
+        /** Method fired when cancel is pressed. */
         void onComposeFormCancelled();
     }
 
@@ -231,6 +244,30 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     }
 
     private boolean handleSubmit() {
+        // Comments don't have a choice of destination or title.
+        if (getArguments().getInt(ARG_COMPOSITION) != COMPOSITION_COMMENT) {
+            if (TextUtils.isEmpty(destinationText.getText())) {
+                destinationText.setError(getString(R.string.error_blank_field));
+                return true;
+            }
+            if (TextUtils.isEmpty(titleText.getText())) {
+                titleText.setError(getString(R.string.error_blank_field));
+                return true;
+            }
+        }
+
+        if (TextUtils.isEmpty(textText.getText())) {
+            textText.setError(getString(R.string.error_blank_field));
+            return true;
+        }
+
+        if (listener != null) {
+            listener.onComposeForm(adapter.getItem(accountSpinner.getSelectedItemPosition()),
+                    destinationText.getText().toString(),
+                    titleText.getText().toString(),
+                    textText.getText().toString());
+        }
+
         return true;
     }
 }
