@@ -16,13 +16,19 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -34,7 +40,8 @@ import com.btmura.android.reddit.widget.AccountNameAdapter;
 /**
  * {@link Fragment} that displays a form for composing submissions and messages.
  */
-public class ComposeFormFragment extends Fragment implements LoaderCallbacks<AccountResult> {
+public class ComposeFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
+        OnClickListener {
 
     // This fragment only reports back the user's input and doesn't handle
     // modifying the database. The caller of this fragment should handle that.
@@ -51,6 +58,13 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** Type of composition when crafting a message. */
     public static final int COMPOSITION_MESSAGE = 2;
 
+    public interface OnComposeFormListener {
+        void onComposeFormCancelled();
+    }
+
+    /** Listener to notify on compose events. */
+    private OnComposeFormListener listener;
+
     /** Flag for initially setting account spinner once. */
     private boolean restoringState;
 
@@ -66,12 +80,29 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** {@link EditText} for either title or subject. */
     private EditText titleText;
 
+    /** {@link EditText} for either submission text or message. */
+    private EditText textText;
+
+    /** Ok button visible when this form is a dialog. */
+    private View ok;
+
+    /** Cancel button visible when this form is a dialog. */
+    private View cancel;
+
     public static ComposeFormFragment newInstance(int composition) {
         Bundle args = new Bundle(1);
         args.putInt(ARG_COMPOSITION, composition);
         ComposeFormFragment frag = new ComposeFormFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnComposeFormListener) {
+            listener = (OnComposeFormListener) activity;
+        }
     }
 
     @Override
@@ -96,22 +127,41 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
         destinationText = (EditText) v.findViewById(R.id.destination_text);
         titleText = (EditText) v.findViewById(R.id.title_text);
+        textText = (EditText) v.findViewById(R.id.text_text);
 
         switch (getArguments().getInt(ARG_COMPOSITION)) {
             case COMPOSITION_SUBMISSION:
                 destinationText.setHint(R.string.hint_subreddit);
                 titleText.setHint(R.string.hint_title);
+                textText.setHint(R.string.hint_text_or_link);
                 break;
 
             case COMPOSITION_COMMENT:
                 destinationText.setVisibility(View.GONE);
                 titleText.setVisibility(View.GONE);
+                textText.setHint(R.string.hint_comment);
                 break;
 
             case COMPOSITION_MESSAGE:
                 destinationText.setHint(R.string.hint_username);
                 titleText.setHint(R.string.hint_subject);
+                textText.setHint(R.string.hint_message);
                 break;
+
+            default:
+                throw new IllegalStateException();
+        }
+
+        if (getActivity().getActionBar() == null) {
+            ViewStub vs = (ViewStub) v.findViewById(R.id.button_bar_stub);
+            View buttonBar = vs.inflate();
+            ok = buttonBar.findViewById(R.id.ok);
+            ok.setOnClickListener(this);
+            cancel = buttonBar.findViewById(R.id.cancel);
+            cancel.setOnClickListener(this);
+
+            // Don't enable OK until the accounts are loaded.
+            ok.setEnabled(false);
         }
 
         return v;
@@ -129,6 +179,10 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        if (ok != null) {
+            ok.setEnabled(true);
+        }
+
         accountSpinner.setEnabled(true);
         adapter.clear();
         adapter.addAll(result.accountNames);
@@ -143,5 +197,40 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.compose_form_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.menu_submit).setEnabled(accountSpinner.isEnabled());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_submit:
+                return handleSubmit();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void onClick(View v) {
+        if (v == ok) {
+            handleSubmit();
+        } else if (v == cancel && listener != null) {
+            listener.onComposeFormCancelled();
+        }
+    }
+
+    private boolean handleSubmit() {
+        return true;
     }
 }

@@ -51,7 +51,7 @@
         android:singleLine="true" />
 
     <EditText
-        android:id="@+id/text"
+        android:id="@+id/text_text"
         android:layout_width="match_parent"
         android:layout_height="0px"
         android:layout_marginBottom="@dimen/padding"
@@ -60,7 +60,6 @@
         android:layout_marginTop="@dimen/element_padding"
         android:layout_weight="1"
         android:gravity="top"
-        android:hint="@string/hint_text_or_link"
         android:inputType="textCapSentences|textAutoCorrect" />
 
     <ViewStub
