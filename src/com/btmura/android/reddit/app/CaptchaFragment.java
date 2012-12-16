@@ -45,16 +45,16 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
             InputFilters.NO_SPACES_FILTER,
     };
 
-    private static final String ARG_SUBMIT_EXTRAS = "submitExtras";
+    private static final String ARG_EXTRAS = "extras";
 
     public interface OnCaptchaGuessListener {
-        void onCaptchaGuess(String id, String guess, Bundle submitExtras);
+        void onCaptchaGuess(String id, String guess, Bundle extras);
 
         void onCaptchaCancelled();
     }
 
     private OnCaptchaGuessListener listener;
-    private Bundle submitExtras;
+    private Bundle extras;
     private String captchaId;
 
     private View progress;
@@ -64,9 +64,9 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     private Button cancel;
     private Button ok;
 
-    public static CaptchaFragment newInstance(Bundle submitExtras) {
+    public static CaptchaFragment newInstance(Bundle extras) {
         Bundle args = new Bundle(1);
-        args.putBundle(ARG_SUBMIT_EXTRAS, submitExtras);
+        args.putBundle(ARG_EXTRAS, extras);
 
         CaptchaFragment f = new CaptchaFragment();
         f.setArguments(args);
@@ -84,7 +84,7 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        submitExtras = getArguments().getBundle(ARG_SUBMIT_EXTRAS);
+        extras = getArguments().getBundle(ARG_EXTRAS);
     }
 
     @Override
@@ -161,7 +161,7 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
         }
         // TODO: Disable widgets if captcha image wasn't retrieved.
         if (listener != null) {
-            listener.onCaptchaGuess(captchaId, guess.getText().toString(), submitExtras);
+            listener.onCaptchaGuess(captchaId, guess.getText().toString(), extras);
         }
         dismiss();
     }
