@@ -29,13 +29,12 @@
         android:paddingLeft="@dimen/spinner_padding" />
 
     <EditText
-        android:id="@+id/subreddit_text"
+        android:id="@+id/destination_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/element_padding"
-        android:hint="@string/hint_subreddit"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />

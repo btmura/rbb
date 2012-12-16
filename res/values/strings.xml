@@ -52,6 +52,7 @@
     <string name="hint_subreddit">Subreddit</string>
     <string name="hint_text_or_link">Text or link</string>
     <string name="hint_title">Title</string>
+    <string name="hint_username">Username</string>
     <string name="loading">Loading…</string>
     <string name="login_adding_account">Adding account…</string>
     <string name="login_error">There was a problem: %1$s</string>

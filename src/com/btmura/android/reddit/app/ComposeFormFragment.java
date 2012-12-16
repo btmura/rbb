@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.btmura.android.reddit.R;
@@ -38,6 +39,18 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     // This fragment only reports back the user's input and doesn't handle
     // modifying the database. The caller of this fragment should handle that.
 
+    /** Integer argument indicating the type of composition. */
+    public static final String ARG_COMPOSITION = "composition";
+
+    /** Type of composition when submitting a link or text. */
+    public static final int COMPOSITION_SUBMISSION = 0;
+
+    /** Type of composition when replying to some comment. */
+    public static final int COMPOSITION_COMMENT = 1;
+
+    /** Type of composition when crafting a message. */
+    public static final int COMPOSITION_MESSAGE = 2;
+
     /** Flag for initially setting account spinner once. */
     private boolean restoringState;
 
@@ -47,8 +60,12 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** Spinner containing all the acounts who can compose. */
     private Spinner accountSpinner;
 
-    public static ComposeFormFragment newInstance() {
+    /** {@link EditText} for the destination of the message. */
+    private EditText destinationText;
+
+    public static ComposeFormFragment newInstance(int composition) {
         Bundle args = new Bundle(1);
+        args.putInt(ARG_COMPOSITION, composition);
         ComposeFormFragment frag = new ComposeFormFragment();
         frag.setArguments(args);
         return frag;
@@ -73,6 +90,21 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
         accountSpinner.setEnabled(false);
         accountSpinner.setAdapter(adapter);
+
+        destinationText = (EditText) v.findViewById(R.id.destination_text);
+
+        switch (getArguments().getInt(ARG_COMPOSITION)) {
+            case COMPOSITION_SUBMISSION:
+                destinationText.setHint(R.string.hint_subreddit);
+                break;
+
+            case COMPOSITION_COMMENT:
+                break;
+
+            case COMPOSITION_MESSAGE:
+                destinationText.setHint(R.string.hint_username);
+                break;
+        }
 
         return v;
     }

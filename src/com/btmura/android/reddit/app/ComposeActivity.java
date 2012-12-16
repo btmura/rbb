@@ -57,7 +57,8 @@ public class ComposeActivity extends Activity {
         }
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.compose_form_container, ComposeFormFragment.newInstance());
+        ft.replace(R.id.compose_form_container,
+                ComposeFormFragment.newInstance(ComposeFormFragment.COMPOSITION_MESSAGE));
         ft.commit();
     }
 
