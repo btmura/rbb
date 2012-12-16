@@ -49,6 +49,7 @@
     <string name="hint_comment">Comment</string>
     <string name="hint_login">Login</string>
     <string name="hint_password">Password</string>
+    <string name="hint_subject">Subject</string>
     <string name="hint_subreddit">Subreddit</string>
     <string name="hint_text_or_link">Text or link</string>
     <string name="hint_title">Title</string>

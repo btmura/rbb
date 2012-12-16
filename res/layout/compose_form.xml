@@ -40,13 +40,12 @@
         android:singleLine="true" />
 
     <EditText
-        android:id="@+id/title"
+        android:id="@+id/title_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/element_padding"
-        android:hint="@string/hint_title"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textCapSentences|textAutoCorrect"
         android:singleLine="true" />

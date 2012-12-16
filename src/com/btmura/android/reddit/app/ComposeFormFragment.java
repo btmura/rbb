@@ -57,11 +57,14 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** Adapter of account names to select who will be composing. */
     private AccountNameAdapter adapter;
 
-    /** Spinner containing all the acounts who can compose. */
+    /** {@link Spinner} containing all the acounts who can compose. */
     private Spinner accountSpinner;
 
-    /** {@link EditText} for the destination of the message. */
+    /** {@link EditText} for either subreddit or username. */
     private EditText destinationText;
+
+    /** {@link EditText} for either title or subject. */
+    private EditText titleText;
 
     public static ComposeFormFragment newInstance(int composition) {
         Bundle args = new Bundle(1);
@@ -92,17 +95,22 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         accountSpinner.setAdapter(adapter);
 
         destinationText = (EditText) v.findViewById(R.id.destination_text);
+        titleText = (EditText) v.findViewById(R.id.title_text);
 
         switch (getArguments().getInt(ARG_COMPOSITION)) {
             case COMPOSITION_SUBMISSION:
                 destinationText.setHint(R.string.hint_subreddit);
+                titleText.setHint(R.string.hint_title);
                 break;
 
             case COMPOSITION_COMMENT:
+                destinationText.setVisibility(View.GONE);
+                titleText.setVisibility(View.GONE);
                 break;
 
             case COMPOSITION_MESSAGE:
                 destinationText.setHint(R.string.hint_username);
+                titleText.setHint(R.string.hint_subject);
                 break;
         }
 
