@@ -83,12 +83,12 @@ public class MessageThreadProviderAdapter extends ProviderAdapter {
 
     @Override
     String getAuthor(ThingAdapter adapter, int position) {
-        return null;
+        return adapter.getString(position, INDEX_AUTHOR);
     }
 
     @Override
     String getTitle(ThingAdapter adapter, int position) {
-        return null;
+        return adapter.getString(position, INDEX_BODY);
     }
 
     @Override

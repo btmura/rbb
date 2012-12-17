@@ -70,12 +70,29 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     }
 
     private void setupActionBar() {
-        setTitle(getString(R.string.compose_message_title));
+        setTitle(getComposeTitle());
 
         // No action bar will be available on large devices.
         ActionBar bar = getActionBar();
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    private String getComposeTitle() {
+        switch (getIntent().getIntExtra(EXTRA_COMPOSITION, -1)) {
+            case COMPOSITION_SUBMISSION:
+                return getString(R.string.submit_link_label);
+
+            case COMPOSITION_COMMENT:
+                return getString(R.string.comment_reply_title,
+                        getIntent().getStringExtra(EXTRA_COMPOSE_DESTINATION));
+
+            case COMPOSITION_MESSAGE:
+                return getString(R.string.compose_message_title);
+
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
