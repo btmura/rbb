@@ -56,6 +56,10 @@ class SubredditSearchListing extends JsonParser implements Listing {
         this.cookie = cookie;
     }
 
+    public int getType() {
+        return 0;
+    }
+
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
 

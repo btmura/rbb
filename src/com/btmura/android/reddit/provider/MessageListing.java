@@ -31,16 +31,19 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.JsonParser;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
-public class MessageThreadListing extends JsonParser implements Listing {
+class MessageListing extends JsonParser implements Listing {
 
-    private static final String TAG = "MessageThreadListing";
+    private static final String TAG = "MessageListing";
 
     private static final boolean DEBUG = BuildConfig.DEBUG && true;
 
+    private final int listingType;
     private final String accountName;
     private final String thingId;
     private final String cookie;
@@ -49,16 +52,38 @@ public class MessageThreadListing extends JsonParser implements Listing {
     private long networkTimeMs;
     private long parseTimeMs;
 
-    MessageThreadListing(String accountName, String thingId, String cookie) {
+    /** Returns a listing for an inbox. */
+    static MessageListing newInboxInstance(String accountName, String cookie) {
+        return new MessageListing(Sessions.TYPE_MESSAGE_INBOX_LISTING,
+                accountName, null, cookie);
+    }
+
+    /** Returns a listing for sent messages. */
+    static MessageListing newSentInstance(String accountName, String cookie) {
+        return new MessageListing(Sessions.TYPE_MESSAGE_SENT_LISTING,
+                accountName, null, cookie);
+    }
+
+    /** Returns an instance for a message thread. */
+    static MessageListing newThreadInstance(String accountName, String thingId, String cookie) {
+        return new MessageListing(Sessions.TYPE_MESSAGE_THREAD_LISTING,
+                accountName, thingId, cookie);
+    }
+
+    private MessageListing(int listingType, String accountName, String thingId, String cookie) {
+        this.listingType = listingType;
         this.accountName = accountName;
         this.thingId = thingId;
         this.cookie = cookie;
     }
 
+    public int getType() {
+        return listingType;
+    }
+
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
-        URL url = Urls.messageThreadUrl(thingId);
-        HttpURLConnection conn = RedditApi.connect(url, cookie, false);
+        HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
         try {
@@ -73,6 +98,22 @@ public class MessageThreadListing extends JsonParser implements Listing {
         } finally {
             input.close();
             conn.disconnect();
+        }
+    }
+
+    private URL getUrl() {
+        switch (listingType) {
+            case Sessions.TYPE_MESSAGE_INBOX_LISTING:
+                return Urls.messageUrl(FilterAdapter.MESSAGE_INBOX, null);
+
+            case Sessions.TYPE_MESSAGE_SENT_LISTING:
+                return Urls.messageUrl(FilterAdapter.MESSAGE_SENT, null);
+
+            case Sessions.TYPE_MESSAGE_THREAD_LISTING:
+                return Urls.messageThreadUrl(thingId);
+
+            default:
+                throw new IllegalArgumentException();
         }
     }
 

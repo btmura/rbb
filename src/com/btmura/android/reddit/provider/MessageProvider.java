@@ -29,7 +29,6 @@ import android.util.Log;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.database.Sessions;
 
 public class MessageProvider extends SessionProvider {
 
@@ -86,15 +85,34 @@ public class MessageProvider extends SessionProvider {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String thingId = uri.getLastPathSegment();
+
+            // Get the account cookie or bail out.
             String cookie = AccountUtils.getCookie(context, accountName);
             if (cookie == null) {
                 return null;
             }
 
+            Listing listing;
+            switch (MATCHER.match(uri)) {
+                case MATCH_INBOX:
+                    listing = MessageListing.newInboxInstance(accountName, cookie);
+                    break;
+
+                case MATCH_SENT:
+                    listing = MessageListing.newSentInstance(accountName, cookie);
+                    break;
+
+                case MATCH_MESSAGE:
+                    listing = MessageListing.newThreadInstance(accountName, thingId, cookie);
+                    break;
+
+                default:
+                    throw new IllegalArgumentException();
+            }
+
             // Get the session containing the data for this listing.
-            MessageThreadListing listing = new MessageThreadListing(accountName, thingId, cookie);
-            long sessionId = getListingSession(Sessions.TYPE_MESSAGE_THREAD_LISTING, thingId,
-                    listing, db, Messages.TABLE_NAME, Messages.COLUMN_SESSION_ID);
+            long sessionId = getListingSession(listing, thingId, db, Messages.TABLE_NAME,
+                    Messages.COLUMN_SESSION_ID);
 
             // Answer this query by modifying the selection arguments.
             Selection newSelection = new Selection();

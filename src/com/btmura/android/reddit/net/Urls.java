@@ -151,10 +151,6 @@ public class Urls {
                 b.append("inbox");
                 break;
 
-            case FilterAdapter.MESSAGE_UNREAD:
-                b.append("unread");
-                break;
-
             case FilterAdapter.MESSAGE_SENT:
                 b.append("sent");
                 break;

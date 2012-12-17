@@ -23,6 +23,9 @@ import android.content.ContentValues;
 
 interface Listing {
 
+    /** Returns an integer indicating the type of listing. */
+    int getType();
+
     ArrayList<ContentValues> getValues() throws IOException;
 
     long getNetworkTimeMs();

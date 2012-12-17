@@ -83,7 +83,7 @@ abstract class SessionProvider extends BaseProvider {
      * ID given. If there is no such session, it will attempt to use the network
      * to create a session with the data.
      */
-    long getListingSession(int type, String thingId, Listing listing,
+    long getListingSession(Listing listing, String thingId,
             SQLiteDatabase db, String tableName, String sessionIdKey) {
 
         // Current time for measuring age of sessions and inserting new ones.
@@ -95,6 +95,9 @@ abstract class SessionProvider extends BaseProvider {
         // candidateSession is the best session of data to return in case the
         // network is down. It may have old data. -1 means no candidate.
         long candidateId = -1;
+
+        // Get the type of listing to search for.
+        int type = listing.getType();
 
         // Get list of matching sessions expired or not.
         Cursor c = db.query(Sessions.TABLE_NAME, SESSION_PROJECTION,

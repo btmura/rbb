@@ -28,7 +28,6 @@ import android.view.View;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.MessageProvider;
-import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingAdapter.ProviderAdapter;
 
@@ -57,27 +56,28 @@ class MessageProviderAdapter extends ProviderAdapter {
 
     @Override
     Uri getLoaderUri(Bundle args) {
-        return MessageProvider.INBOX_URI;
+        Uri uri;
+        switch (getFilter(args)) {
+            case FilterAdapter.MESSAGE_INBOX:
+                uri = MessageProvider.INBOX_URI;
+                break;
+
+            case FilterAdapter.MESSAGE_SENT:
+                uri = MessageProvider.SENT_URI;
+                break;
+
+            default:
+                throw new IllegalStateException();
+        }
+        return uri.buildUpon()
+                .appendQueryParameter(MessageProvider.PARAM_FETCH, Boolean.toString(true))
+                .appendQueryParameter(MessageProvider.PARAM_ACCOUNT, getAccountName(args))
+                .build();
     }
 
     @Override
     Loader<Cursor> getLoader(Context context, Uri uri, Bundle args) {
-        String selection;
-        switch (getFilter(args)) {
-            case FilterAdapter.MESSAGE_UNREAD:
-                selection = Messages.SELECT_NEW_BY_ACCOUNT_FROM_INBOX;
-                break;
-
-            case FilterAdapter.MESSAGE_SENT:
-                selection = Messages.SELECT_BY_ACCOUNT_FROM_SENT;
-                break;
-
-            default:
-                selection = Messages.SELECT_BY_ACCOUNT_FROM_INBOX;
-                break;
-        }
-        return new CursorLoader(context, uri, PROJECTION, selection,
-                Array.of(getAccountName(args)), null);
+        return new CursorLoader(context, uri, PROJECTION, null, null, null);
     }
 
     @Override
