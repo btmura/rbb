@@ -86,7 +86,7 @@ public class MessageThreadListing extends JsonParser implements Listing {
 
     @Override
     public void onEntityStart(int index) {
-        values.add(newContentValues(5));
+        values.add(newContentValues(9));
     }
 
     private ContentValues newContentValues(int capacity) {
@@ -106,6 +106,11 @@ public class MessageThreadListing extends JsonParser implements Listing {
     }
 
     @Override
+    public void onContext(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Messages.COLUMN_CONTEXT, reader.nextString());
+    }
+
+    @Override
     public void onCreatedUtc(JsonReader reader, int index) throws IOException {
         values.get(index).put(Messages.COLUMN_CREATED_UTC, reader.nextLong());
     }
@@ -118,6 +123,21 @@ public class MessageThreadListing extends JsonParser implements Listing {
     @Override
     public void onName(JsonReader reader, int index) throws IOException {
         values.get(index).put(Messages.COLUMN_THING_ID, reader.nextString());
+    }
+
+    @Override
+    public void onNew(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Messages.COLUMN_NEW, reader.nextBoolean());
+    }
+
+    @Override
+    public void onSubreddit(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Messages.COLUMN_SUBREDDIT, readTrimmedString(reader, null));
+    }
+
+    @Override
+    public void onWasComment(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Messages.COLUMN_WAS_COMMENT, reader.nextBoolean());
     }
 
     @Override

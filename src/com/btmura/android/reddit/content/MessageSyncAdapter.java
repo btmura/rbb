@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.content;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -25,34 +24,20 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.provider.MessageProvider;
-import com.btmura.android.reddit.util.Array;
-import com.btmura.android.reddit.widget.FilterAdapter;
+import com.btmura.android.reddit.accounts.AccountUtils;
 
 public class MessageSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "MessageSyncAdapter";
-
-    private static final int NUM_OPS = 3;
-    private static final int OP_INSERTS = 0;
-    private static final int OP_UPDATES = 1;
-    private static final int OP_DELETES = 2;
 
     private static final int POLL_FREQUENCY_SECONDS = 24 * 60 * 60; // 1 day
 
@@ -84,52 +69,11 @@ public class MessageSyncAdapter extends AbstractThreadedSyncAdapter {
             ContentProviderClient provider, SyncResult syncResult) {
         try {
             AccountManager manager = AccountManager.get(getContext());
-            String cookie = manager.blockingGetAuthToken(account,
-                    AccountAuthenticator.AUTH_TOKEN_COOKIE, true);
-
+            String cookie = AccountUtils.getCookie(manager, account);
             if (cookie == null) {
                 syncResult.stats.numAuthExceptions++;
                 return;
             }
-
-            ArrayList<ContentValues> inboxValues = RedditApi.getMessages(getContext(),
-                    account.name, FilterAdapter.MESSAGE_INBOX, Messages.SOURCE_INBOX, cookie);
-            ArrayList<ContentValues> sentValues = RedditApi.getMessages(getContext(),
-                    account.name, FilterAdapter.MESSAGE_SENT, Messages.SOURCE_SENT, cookie);
-
-            int inboxCount = inboxValues.size();
-            int sentCount = sentValues.size();
-
-            ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(inboxCount + sentCount + 1);
-            int[] opCounts = new int[NUM_OPS];
-
-            // Delete all the current messages.
-            ops.add(ContentProviderOperation.newDelete(MessageProvider.INBOX_URI)
-                    .withSelection(Messages.SELECT_BY_ACCOUNT, Array.of(account.name))
-                    .build());
-            opCounts[OP_DELETES]++;
-
-            // Add the inbox messages. This covers all messages and unread.
-            for (int i = 0; i < inboxCount; i++) {
-                ops.add(ContentProviderOperation.newInsert(MessageProvider.INBOX_URI)
-                        .withValues(inboxValues.get(i))
-                        .build());
-                opCounts[OP_INSERTS]++;
-            }
-
-            // Add the sent messages. This covers the sent view of the inbox.
-            for (int i = 0; i < sentCount; i++) {
-                ops.add(ContentProviderOperation.newInsert(MessageProvider.INBOX_URI)
-                        .withValues(sentValues.get(i))
-                        .build());
-                opCounts[OP_INSERTS]++;
-            }
-
-            getContext().getContentResolver().applyBatch(authority, ops);
-            syncResult.stats.numInserts += opCounts[OP_INSERTS];
-            syncResult.stats.numUpdates += opCounts[OP_UPDATES];
-            syncResult.stats.numDeletes += opCounts[OP_DELETES];
 
         } catch (OperationCanceledException e) {
             Log.e(TAG, e.getMessage(), e);
@@ -140,12 +84,6 @@ public class MessageSyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
             syncResult.stats.numIoExceptions++;
-        } catch (RemoteException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
-        } catch (OperationApplicationException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
         }
     }
 }
