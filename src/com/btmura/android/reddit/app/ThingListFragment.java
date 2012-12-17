@@ -328,15 +328,19 @@ public class ThingListFragment extends ListFragment implements
     }
 
     private boolean handleReply(ActionMode mode) {
-        String user = adapter.getAuthor(getFirstCheckedPosition());
-        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_COMMENT, user);
+        int position = getFirstCheckedPosition();
+        String user = adapter.getAuthor(position);
+        Bundle extras = adapter.getReplyExtras(adapterArgs, position);
+        MenuHelper.startComposeActivity(getActivity(),
+                ComposeActivity.COMPOSITION_MESSAGE_REPLY, user, extras);
         mode.finish();
         return true;
     }
 
     private boolean handleComposeMessage(ActionMode mode) {
         String user = adapter.getAuthor(getFirstCheckedPosition());
-        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_MESSAGE, user);
+        MenuHelper.startComposeActivity(getActivity(),
+                ComposeActivity.COMPOSITION_MESSAGE, user, null);
         mode.finish();
         return true;
     }

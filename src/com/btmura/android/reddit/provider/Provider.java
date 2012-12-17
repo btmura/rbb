@@ -32,6 +32,7 @@ import android.util.Log;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.Array;
@@ -40,12 +41,15 @@ public class Provider {
 
     public static final String TAG = "Provider";
 
+    private static final String TRUE = Boolean.toString(true);
+
     /** Projection used by {@link #expandInBackground(Context, long)}. */
     private static final String[] EXPAND_PROJECTION = {
             Things._ID,
             Things.COLUMN_EXPANDED,
             Things.COLUMN_NESTING,
     };
+
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
     public static void insertCommentAsync(Context context,
@@ -73,9 +77,8 @@ public class Provider {
 
                 // Insert the placeholder comment.
                 Uri uri = ThingProvider.THINGS_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_COMMENT_REPLY,
-                                Boolean.toString(true))
-                        .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(true))
+                        .appendQueryParameter(ThingProvider.PARAM_COMMENT_REPLY, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID, parentThingId)
                         .appendQueryParameter(ThingProvider.PARAM_THING_ID, replyThingId)
                         .build();
@@ -90,15 +93,7 @@ public class Provider {
                         .withValue(Things.COLUMN_SESSION_TIMESTAMP, sessionTimestamp)
                         .build());
 
-                try {
-                    appContext.getContentResolver().applyBatch(ThingProvider.AUTHORITY, ops);
-                } catch (RemoteException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                } catch (Exception e) {
-                    Log.e(TAG, e.getMessage(), e);
-                }
+                applyOps(appContext, ThingProvider.AUTHORITY, ops);
             }
         });
     }
@@ -121,9 +116,8 @@ public class Provider {
                 int numDeletes = 0;
                 for (int i = 0; i < count; i++) {
                     Uri uri = ThingProvider.THINGS_URI.buildUpon()
-                            .appendQueryParameter(ThingProvider.PARAM_COMMENT_DELETE,
-                                    Boolean.toString(true))
-                            .appendQueryParameter(ThingProvider.PARAM_SYNC, Boolean.toString(true))
+                            .appendQueryParameter(ThingProvider.PARAM_COMMENT_DELETE, TRUE)
+                            .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                             .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
                             .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID,
                                     parentThingId)
@@ -149,21 +143,16 @@ public class Provider {
                         .withValue(Things.COLUMN_NUM_COMMENTS, headerNumComments - numDeletes)
                         .build());
 
-                try {
-                    appContext.getContentResolver().applyBatch(ThingProvider.AUTHORITY, ops);
-                } catch (RemoteException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                }
+                applyOps(appContext, ThingProvider.AUTHORITY, ops);
             }
         });
     }
 
     public static void expandCommentAsync(Context context, final String sessionId, final long id) {
-        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
+                ContentResolver cr = appContext.getContentResolver();
                 Cursor c = cr.query(ThingProvider.THINGS_URI, EXPAND_PROJECTION,
                         Things.SELECT_BY_SESSION_ID, Array.of(sessionId),
                         Things.SORT_BY_SEQUENCE_AND_ID);
@@ -193,13 +182,8 @@ public class Provider {
                                 .build());
                     }
 
-                    try {
-                        cr.applyBatch(ThingProvider.AUTHORITY, ops);
-                    } catch (RemoteException e) {
-                        Log.e(TAG, e.getMessage(), e);
-                    } catch (OperationApplicationException e) {
-                        Log.e(TAG, e.getMessage(), e);
-                    }
+                    applyOps(appContext, ThingProvider.AUTHORITY, ops);
+
                 } finally {
                     c.close();
                 }
@@ -209,7 +193,7 @@ public class Provider {
 
     public static void collapseCommentAsync(Context context, final long id,
             final long[] childIds) {
-        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 int childCount = childIds != null ? childIds.length : 0;
@@ -227,13 +211,39 @@ public class Provider {
                             .build());
                 }
 
-                try {
-                    cr.applyBatch(ThingProvider.AUTHORITY, ops);
-                } catch (RemoteException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                }
+                applyOps(appContext, ThingProvider.AUTHORITY, ops);
+            }
+        });
+    }
+
+    public static void insertMessageReplyAsync(Context context,
+            final String accountName,
+            final String body,
+            final String parentThingId,
+            final long sessionId,
+            final String thingId) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            public void run() {
+                Uri uri = MessageProvider.MESSAGES_URI.buildUpon()
+                        .appendPath(parentThingId)
+                        .appendQueryParameter(MessageProvider.PARAM_THING_ID, thingId)
+                        .appendQueryParameter(MessageProvider.PARAM_REPLY, TRUE)
+                        .appendQueryParameter(MessageProvider.PARAM_SYNC, TRUE)
+                        .build();
+
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(1);
+                ops.add(ContentProviderOperation.newInsert(uri)
+                        .withValue(Messages.COLUMN_ACCOUNT, accountName)
+                        .withValue(Messages.COLUMN_AUTHOR, accountName)
+                        .withValue(Messages.COLUMN_BODY, body)
+                        .withValue(Messages.COLUMN_KIND, Kinds.KIND_MESSAGE)
+                        .withValue(Messages.COLUMN_SESSION_ID, sessionId)
+                        .withValue(Messages.COLUMN_WAS_COMMENT, false)
+                        .build());
+
+                applyOps(appContext, MessageProvider.AUTHORITY, ops);
             }
         });
     }
@@ -241,13 +251,11 @@ public class Provider {
     public static void voteAsync(final Context context, final String accountName,
             final String thingId, final int likes) {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
-        AsyncTask.execute(new Runnable() {
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 Uri uri = ThingProvider.VOTES_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_SYNC,
-                                Boolean.toString(true))
-                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS,
-                                Boolean.toString(true))
+                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS, TRUE)
                         .build();
 
                 ContentValues values = new ContentValues(3);
@@ -261,5 +269,17 @@ public class Provider {
                 }
             }
         });
+    }
+
+    static void applyOps(Context context, String authority, ArrayList<ContentProviderOperation> ops) {
+        try {
+            context.getContentResolver().applyBatch(authority, ops);
+        } catch (RemoteException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (OperationApplicationException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
     }
 }

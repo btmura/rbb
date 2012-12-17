@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 
 public class MessageProvider extends SessionProvider {
@@ -55,9 +56,12 @@ public class MessageProvider extends SessionProvider {
         MATCHER.addURI(AUTHORITY, PATH_MESSAGES + "/*", MATCH_MESSAGE);
     }
 
-    public static final String PARAM_ACCOUNT = "account";
-
+    // TODO: Remove this parameter because it can be enabled all the time.
     public static final String PARAM_FETCH = "fetch";
+    public static final String PARAM_REPLY = "reply";
+
+    public static final String PARAM_ACCOUNT = "account";
+    public static final String PARAM_THING_ID = "thingId";
 
     public MessageProvider() {
         super(TAG);
@@ -73,6 +77,8 @@ public class MessageProvider extends SessionProvider {
             String selection, String[] selectionArgs) {
         if (uri.getBooleanQueryParameter(PARAM_FETCH, false)) {
             return handleFetch(uri, db, selection, selectionArgs);
+        } else if (uri.getBooleanQueryParameter(PARAM_REPLY, false)) {
+            return handleReply(uri, db, values);
         }
         return null;
     }
@@ -127,6 +133,23 @@ public class MessageProvider extends SessionProvider {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
         }
+        return null;
+    }
+
+    private Selection handleReply(Uri uri, SQLiteDatabase db, ContentValues values) {
+        // Get the thing ID of the thing we are replying to.
+        String thingId = uri.getQueryParameter(PARAM_THING_ID);
+
+        // Insert an action to sync the reply back to the network eventually.
+        ContentValues v = new ContentValues(5);
+        v.put(MessageActions.COLUMN_ACCOUNT, values.getAsString(Messages.COLUMN_ACCOUNT));
+        v.put(MessageActions.COLUMN_ACTION, MessageActions.ACTION_INSERT);
+        v.put(MessageActions.COLUMN_PARENT_THING_ID, uri.getLastPathSegment());
+        v.put(MessageActions.COLUMN_THING_ID, thingId);
+        v.put(MessageActions.COLUMN_TEXT, values.getAsString(Messages.COLUMN_BODY));
+        db.insert(MessageActions.TABLE_NAME, null, v);
+
+        // This doesn't affect any selection so return null.
         return null;
     }
 }

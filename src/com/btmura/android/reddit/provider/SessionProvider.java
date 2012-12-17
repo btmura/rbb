@@ -144,7 +144,8 @@ abstract class SessionProvider extends BaseProvider {
                     int deleted1 = db.delete(Sessions.TABLE_NAME, ID_SELECTION, selectionArgs);
                     int deleted2 = db.delete(tableName, SELECT_BY_SESSION_ID, selectionArgs);
                     if (BuildConfig.DEBUG) {
-                        Log.d(logTag, "deleted session: " + deleted1 + " " + deleted2);
+                        Log.d(logTag, "deleted session: " + candidateId
+                                + " count: " + deleted1 + " " + deleted2);
                     }
                 }
 
@@ -168,7 +169,7 @@ abstract class SessionProvider extends BaseProvider {
                 }
 
                 if (BuildConfig.DEBUG) {
-                    Log.d(logTag, "created session: " + sessionId + " " + count);
+                    Log.d(logTag, "created session: " + sessionId + " count: " + count);
                 }
 
                 db.setTransactionSuccessful();

@@ -26,6 +26,8 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.app.ComposeFormFragment.OnComposeFormListener;
 import com.btmura.android.reddit.app.ComposeFragment.OnComposeListener;
+import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.widget.MessageThreadProviderAdapter;
 
 /**
  * {@link Activity} that displays a form for composing submissions and messages
@@ -40,14 +42,20 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     /** Integer extra indicating the type of composition. */
     static final String EXTRA_COMPOSITION = "composition";
 
+    /** Bundle of extras to pass through. */
+    static final String EXTRA_EXTRAS = "extras";
+
     /** Type of composition when submitting a link or text. */
     static final int COMPOSITION_SUBMISSION = ComposeFormFragment.COMPOSITION_SUBMISSION;
 
-    /** Type of composition when replying to some comment. */
-    static final int COMPOSITION_COMMENT = ComposeFormFragment.COMPOSITION_COMMENT;
-
-    /** Type of composition when crafting a message. */
+    /** Type of composition when crafting a new message. */
     static final int COMPOSITION_MESSAGE = ComposeFormFragment.COMPOSITION_MESSAGE;
+
+    /** Type of composition when replying to some comment. */
+    static final int COMPOSITION_COMMENT_REPLY = ComposeFormFragment.COMPOSITION_COMMENT_REPLY;
+
+    /** Type of composition when replying to some message. */
+    static final int COMPOSITION_MESSAGE_REPLY = ComposeFormFragment.COMPOSITION_MESSAGE_REPLY;
 
     /** String extra with account name from compose dialog. */
     private static final String EXTRA_COMPOSE_ACCOUNT_NAME = "accountName";
@@ -84,12 +92,13 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
             case COMPOSITION_SUBMISSION:
                 return getString(R.string.submit_link_label);
 
-            case COMPOSITION_COMMENT:
-                return getString(R.string.comment_reply_title,
-                        getIntent().getStringExtra(EXTRA_COMPOSE_DESTINATION));
-
             case COMPOSITION_MESSAGE:
                 return getString(R.string.compose_message_title);
+
+            case COMPOSITION_COMMENT_REPLY:
+            case COMPOSITION_MESSAGE_REPLY:
+                return getString(R.string.comment_reply_title,
+                        getIntent().getStringExtra(EXTRA_COMPOSE_DESTINATION));
 
             default:
                 throw new IllegalArgumentException();
@@ -112,30 +121,43 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     }
 
     public void onComposeForm(String accountName, String destination, String title, String text) {
-        // Bundle up extras from the form to pass through the captcha fragment
-        // and then back to callbacks in this activity.
-        Bundle extras = new Bundle(4);
-        extras.putString(EXTRA_COMPOSE_ACCOUNT_NAME, accountName);
-        extras.putString(EXTRA_COMPOSE_DESTINATION, destination);
-        extras.putString(EXTRA_COMPOSE_TITLE, title);
-        extras.putString(EXTRA_COMPOSE_TEXT, text);
-        CaptchaFragment.newInstance(extras).show(getFragmentManager(), CaptchaFragment.TAG);
+        switch (getComposition()) {
+            case COMPOSITION_MESSAGE_REPLY:
+                handleMessageReply(accountName, text);
+                return;
+
+            default:
+                // Bundle up extras from the form to pass through the captcha
+                // fragment and then back to callbacks in this activity.
+                Bundle extras = new Bundle(4);
+                extras.putString(EXTRA_COMPOSE_ACCOUNT_NAME, accountName);
+                extras.putString(EXTRA_COMPOSE_DESTINATION, destination);
+                extras.putString(EXTRA_COMPOSE_TITLE, title);
+                extras.putString(EXTRA_COMPOSE_TEXT, text);
+                CaptchaFragment.newInstance(extras).show(getFragmentManager(), CaptchaFragment.TAG);
+        }
     }
 
     public void onComposeFormCancelled() {
         finish();
     }
 
+    private void handleMessageReply(String accountName, String body) {
+        Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
+        String parentThingId = extras.getString(MessageThreadProviderAdapter.EXTRA_PARENT_THING_ID);
+        long sessionId = extras.getLong(MessageThreadProviderAdapter.EXTRA_SESSION_ID);
+        String thingId = extras.getString(MessageThreadProviderAdapter.EXTRA_THING_ID);
+        Provider.insertMessageReplyAsync(this, accountName, body, parentThingId, sessionId, thingId);
+        finish();
+    }
+
     public void onCaptchaGuess(String id, String guess, Bundle extras) {
-        switch (getIntent().getIntExtra(EXTRA_COMPOSITION, -1)) {
+        switch (getComposition()) {
             case COMPOSITION_SUBMISSION:
                 SubmitLinkFragment f = SubmitLinkFragment.newInstance(id, guess, extras);
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.add(f, SubmitLinkFragment.TAG);
                 ft.commit();
-                break;
-
-            case COMPOSITION_COMMENT:
                 break;
 
             case COMPOSITION_MESSAGE:
@@ -175,5 +197,9 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private int getComposition() {
+        return getIntent().getIntExtra(EXTRA_COMPOSITION, -1);
     }
 }

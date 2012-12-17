@@ -56,11 +56,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         if (version > 1) {
             Subreddits.createSubredditsV2(db);
-            Things.createTable(db);
-            Comments.createTable(db);
-            Votes.createTable(db);
-            Messages.createTable(db);
-            Sessions.createTable(db);
+            createNewTablesV2(db);
         } else {
             Subreddits.createSubredditsV1(db);
         }
@@ -71,9 +67,16 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion == 1 && newVersion == 2) {
             Subreddits.upgradeSubredditsV2(db);
-            Things.createTable(db);
-            Comments.createTable(db);
-            Votes.createTable(db);
+            createNewTablesV2(db);
         }
+    }
+
+    private static void createNewTablesV2(SQLiteDatabase db) {
+        Things.createTable(db);
+        Comments.createTable(db);
+        Votes.createTable(db);
+        Messages.createTable(db);
+        MessageActions.createTable(db);
+        Sessions.createTable(db);
     }
 }

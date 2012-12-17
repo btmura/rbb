@@ -78,7 +78,7 @@ public class Messages implements BaseColumns {
                 + COLUMN_SESSION_ID + " TEXT, "
                 + COLUMN_SOURCE + " INTEGER DEFAULT 0, "
                 + COLUMN_SUBREDDIT + " TEXT, "
-                + COLUMN_THING_ID + " TEXT NOT NULL, "
+                + COLUMN_THING_ID + " TEXT, "
                 + COLUMN_WAS_COMMENT + " INTEGER DEFAULT 0)");
     }
 }

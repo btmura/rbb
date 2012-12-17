@@ -375,7 +375,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         return getListView().getCheckedItemCount() == 1;
     }
 
-
     private boolean isCopyUrlItemVisible() {
         return getListView().getCheckedItemCount() == 1;
     }
@@ -477,7 +476,8 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
 
     private boolean handleComposeMessage(ActionMode mode) {
         String user = adapter.getString(getFirstCheckedPosition(), CommentAdapter.INDEX_AUTHOR);
-        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_MESSAGE, user);
+        MenuHelper.startComposeActivity(getActivity(),
+                ComposeActivity.COMPOSITION_MESSAGE, user, null);
         mode.finish();
         return true;
     }

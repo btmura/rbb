@@ -133,6 +133,11 @@ class MessageProviderAdapter extends ProviderAdapter {
     }
 
     @Override
+    Bundle getReplyExtras(ThingAdapter adapter, Bundle args, int position) {
+        return null;
+    }
+
+    @Override
     String getMoreThingId(ThingAdapter adapter) {
         return null; // Pagination not supported in messages.
     }

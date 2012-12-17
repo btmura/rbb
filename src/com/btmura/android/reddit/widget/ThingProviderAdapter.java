@@ -209,6 +209,11 @@ class ThingProviderAdapter extends ProviderAdapter {
     }
 
     @Override
+    Bundle getReplyExtras(ThingAdapter adapter, Bundle args, int position) {
+        return null;
+    }
+
+    @Override
     String getMoreThingId(ThingAdapter adapter) {
         Cursor c = adapter.getCursor();
         if (c != null && c.moveToLast()) {

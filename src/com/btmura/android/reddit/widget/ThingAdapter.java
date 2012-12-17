@@ -93,6 +93,8 @@ public class ThingAdapter extends BaseCursorAdapter {
 
         abstract int getKind(ThingAdapter adapter, int position);
 
+        abstract Bundle getReplyExtras(ThingAdapter adapter, Bundle args, int position);
+
         abstract String getMoreThingId(ThingAdapter adapter);
 
         abstract void bindThingView(ThingAdapter adapter, View view, Context context, Cursor c);
@@ -279,6 +281,10 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     public String getAuthor(int position) {
         return providerAdapter.getAuthor(this, position);
+    }
+
+    public Bundle getReplyExtras(Bundle args, int position) {
+        return providerAdapter.getReplyExtras(this, args, position);
     }
 
     public String getTitle(int position) {

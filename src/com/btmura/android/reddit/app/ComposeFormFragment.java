@@ -57,11 +57,14 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** Type of composition when submitting a link or text. */
     public static final int COMPOSITION_SUBMISSION = 0;
 
-    /** Type of composition when replying to some comment. */
-    public static final int COMPOSITION_COMMENT = 1;
+    /** Type of composition when crafting a new message. */
+    public static final int COMPOSITION_MESSAGE = 1;
 
-    /** Type of composition when crafting a message. */
-    public static final int COMPOSITION_MESSAGE = 2;
+    /** Type of composition when replying to some comment. */
+    public static final int COMPOSITION_COMMENT_REPLY = 2;
+
+    /** Type of composition when replying to some message. */
+    public static final int COMPOSITION_MESSAGE_REPLY = 3;
 
     public interface OnComposeFormListener {
 
@@ -161,16 +164,17 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 textText.setHint(R.string.hint_text_or_link);
                 break;
 
-            case COMPOSITION_COMMENT:
-                destinationText.setVisibility(View.GONE);
-                titleText.setVisibility(View.GONE);
-                textText.setHint(R.string.hint_comment);
-                break;
-
             case COMPOSITION_MESSAGE:
                 destinationText.setHint(R.string.hint_username);
                 titleText.setHint(R.string.hint_subject);
                 textText.setHint(R.string.hint_message);
+                break;
+
+            case COMPOSITION_COMMENT_REPLY:
+            case COMPOSITION_MESSAGE_REPLY:
+                destinationText.setVisibility(View.GONE);
+                titleText.setVisibility(View.GONE);
+                textText.setHint(R.string.hint_comment);
                 break;
 
             default:
@@ -257,7 +261,8 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
     private boolean handleSubmit() {
         // Comments don't have a choice of destination or title.
-        if (getArguments().getInt(ARG_COMPOSITION) != COMPOSITION_COMMENT) {
+        int composition = getArguments().getInt(ARG_COMPOSITION);
+        if (composition == COMPOSITION_SUBMISSION || composition == COMPOSITION_MESSAGE) {
             if (TextUtils.isEmpty(destinationText.getText())) {
                 destinationText.setError(getString(R.string.error_blank_field));
                 return true;

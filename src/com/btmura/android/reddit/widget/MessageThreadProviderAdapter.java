@@ -36,18 +36,26 @@ public class MessageThreadProviderAdapter extends ProviderAdapter {
             Messages.COLUMN_BODY,
             Messages.COLUMN_CREATED_UTC,
             Messages.COLUMN_KIND,
+            Messages.COLUMN_SESSION_ID,
+            Messages.COLUMN_THING_ID,
     };
 
     private static final int INDEX_AUTHOR = 1;
     private static final int INDEX_BODY = 2;
     private static final int INDEX_CREATED_UTC = 3;
     private static final int INDEX_KIND = 4;
+    private static final int INDEX_SESSION_ID = 5;
+    private static final int INDEX_THING_ID = 6;
+
+    public static final String EXTRA_PARENT_THING_ID = "parentThingId";
+    public static final String EXTRA_SESSION_ID = "sessionId";
+    public static final String EXTRA_THING_ID = "thingId";
 
     @Override
     Uri getLoaderUri(Bundle args) {
         return MessageProvider.MESSAGES_URI.buildUpon()
                 .appendPath(getMessageThreadId(args))
-                .appendQueryParameter(MessageProvider.PARAM_FETCH, Boolean.toString(getFetch(args)))
+                .appendQueryParameter(MessageProvider.PARAM_FETCH, Boolean.toString(true))
                 .appendQueryParameter(MessageProvider.PARAM_ACCOUNT, getAccountName(args))
                 .build();
     }
@@ -99,6 +107,15 @@ public class MessageThreadProviderAdapter extends ProviderAdapter {
     @Override
     int getKind(ThingAdapter adapter, int position) {
         return adapter.getInt(position, INDEX_KIND);
+    }
+
+    @Override
+    Bundle getReplyExtras(ThingAdapter adapter, Bundle args, int position) {
+        Bundle extras = new Bundle(3);
+        extras.putString(EXTRA_PARENT_THING_ID, getMessageThreadId(args));
+        extras.putLong(EXTRA_SESSION_ID, adapter.getLong(position, INDEX_SESSION_ID));
+        extras.putString(EXTRA_THING_ID, adapter.getString(position, INDEX_THING_ID));
+        return extras;
     }
 
     @Override

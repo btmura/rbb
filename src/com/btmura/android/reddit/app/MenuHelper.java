@@ -21,6 +21,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ShareActionProvider;
 import android.widget.Toast;
@@ -44,10 +45,12 @@ public class MenuHelper {
         provider.setShareIntent(intent);
     }
 
-    public static void startComposeActivity(Context context, int composition, String destination) {
+    public static void startComposeActivity(Context context, int composition, String destination,
+            Bundle extras) {
         Intent intent = new Intent(context, ComposeActivity.class);
         intent.putExtra(ComposeActivity.EXTRA_COMPOSITION, composition);
         intent.putExtra(ComposeActivity.EXTRA_DESTINATION, destination);
+        intent.putExtra(ComposeActivity.EXTRA_EXTRAS, extras);
         context.startActivity(intent);
     }
 
