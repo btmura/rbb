@@ -44,9 +44,9 @@ public class MenuHelper {
         provider.setShareIntent(intent);
     }
 
-    public static void startComposeActivity(Context context, String destination) {
+    public static void startComposeActivity(Context context, int composition, String destination) {
         Intent intent = new Intent(context, ComposeActivity.class);
-        intent.putExtra(ComposeActivity.EXTRA_COMPOSITION, ComposeActivity.COMPOSITION_MESSAGE);
+        intent.putExtra(ComposeActivity.EXTRA_COMPOSITION, composition);
         intent.putExtra(ComposeActivity.EXTRA_DESTINATION, destination);
         context.startActivity(intent);
     }

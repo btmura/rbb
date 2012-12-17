@@ -329,14 +329,14 @@ public class ThingListFragment extends ListFragment implements
 
     private boolean handleReply(ActionMode mode) {
         String user = adapter.getAuthor(getFirstCheckedPosition());
-        MenuHelper.startComposeActivity(getActivity(), user);
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_COMMENT, user);
         mode.finish();
         return true;
     }
 
     private boolean handleComposeMessage(ActionMode mode) {
         String user = adapter.getAuthor(getFirstCheckedPosition());
-        MenuHelper.startComposeActivity(getActivity(), user);
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_MESSAGE, user);
         mode.finish();
         return true;
     }

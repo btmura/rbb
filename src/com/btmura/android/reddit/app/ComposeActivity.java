@@ -35,19 +35,19 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
         OnCaptchaGuessListener, OnComposeListener {
 
     /** Charsequence extra for the activity's title */
-    public static final String EXTRA_DESTINATION = "destination";
+    static final String EXTRA_DESTINATION = "destination";
 
     /** Integer extra indicating the type of composition. */
-    public static final String EXTRA_COMPOSITION = "composition";
+    static final String EXTRA_COMPOSITION = "composition";
 
     /** Type of composition when submitting a link or text. */
-    public static final int COMPOSITION_SUBMISSION = ComposeFormFragment.COMPOSITION_SUBMISSION;
+    static final int COMPOSITION_SUBMISSION = ComposeFormFragment.COMPOSITION_SUBMISSION;
 
     /** Type of composition when replying to some comment. */
-    public static final int COMPOSITION_COMMENT = ComposeFormFragment.COMPOSITION_COMMENT;
+    static final int COMPOSITION_COMMENT = ComposeFormFragment.COMPOSITION_COMMENT;
 
     /** Type of composition when crafting a message. */
-    public static final int COMPOSITION_MESSAGE = ComposeFormFragment.COMPOSITION_MESSAGE;
+    static final int COMPOSITION_MESSAGE = ComposeFormFragment.COMPOSITION_MESSAGE;
 
     /** String extra with account name from compose dialog. */
     private static final String EXTRA_COMPOSE_ACCOUNT_NAME = "accountName";
