@@ -61,6 +61,7 @@ public class ContentUriListFragment extends ListFragment {
         adapter.add(ThingProvider.COMMENTS_URI);
         adapter.add(ThingProvider.VOTES_URI);
         adapter.add(MessageProvider.INBOX_URI);
+        adapter.add(MessageProvider.ACTIONS_URI);
         setListAdapter(adapter);
     }
 
