@@ -66,7 +66,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     /** Rate limit in seconds if the server doesn't suggest one. */
-    private static final int RATE_LIMIT_SECONDS = 60;
+    static final int RATE_LIMIT_SECONDS = 60;
 
     private static final String[] COMMENT_PROJECTION = {
             Comments._ID,
