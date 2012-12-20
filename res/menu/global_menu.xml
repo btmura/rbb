@@ -34,11 +34,13 @@
         android:title="@string/menu_search"/>
     <item
         android:id="@+id/menu_profile"
-        android:orderInCategory="1337"
+        android:icon="@drawable/ic_action_profile"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_profile"/>
     <item
         android:id="@+id/menu_messages"
-        android:orderInCategory="1337"
+        android:icon="@drawable/ic_action_messages"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_messages"/>
     <item
         android:id="@+id/menu_settings"
