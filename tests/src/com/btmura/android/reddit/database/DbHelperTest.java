@@ -24,6 +24,7 @@ import android.test.AndroidTestCase;
 import com.btmura.android.reddit.database.DbHelper;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.util.Array;
 
 public class DbHelperTest extends AndroidTestCase {
 
@@ -33,6 +34,21 @@ public class DbHelperTest extends AndroidTestCase {
             Subreddits.COLUMN_NAME,
             Subreddits.COLUMN_STATE,
             Subreddits.COLUMN_EXPIRATION,
+    };
+
+    private static final String[] TABLES_V1 = {
+            Subreddits.TABLE_NAME,
+    };
+
+    private static final String[] TABLES_V2 = {
+            Accounts.TABLE_NAME,
+            Sessions.TABLE_NAME,
+            Subreddits.TABLE_NAME,
+            Things.TABLE_NAME,
+            Comments.TABLE_NAME,
+            Votes.TABLE_NAME,
+            Messages.TABLE_NAME,
+            MessageActions.TABLE_NAME,
     };
 
     @Override
@@ -47,6 +63,22 @@ public class DbHelperTest extends AndroidTestCase {
         mContext.deleteDatabase(DbHelper.DATABASE_TEST);
     }
 
+    public void testOnCreate_v2() {
+        DbHelper helper = createHelperVersion(2);
+        assertTablesExist(helper.getReadableDatabase(), TABLES_V2);
+        helper.close();
+    }
+
+    public void testOnUpgrade_v1ToV2() {
+        DbHelper helper = createHelperVersion(1);
+        assertTablesExist(helper.getReadableDatabase(), TABLES_V1);
+        helper.close();
+
+        helper = createHelperVersion(2);
+        assertTablesExist(helper.getReadableDatabase(), TABLES_V2);
+        helper.close();
+    }
+
     public void testSubreddits_defaults() {
         DbHelper helper = createHelperVersion(2);
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -55,8 +87,8 @@ public class DbHelperTest extends AndroidTestCase {
         values.put(Subreddits.COLUMN_NAME, "Android");
         long id = db.insert(Subreddits.TABLE_NAME, null, values);
 
-        Cursor cursor = db.query(Subreddits.TABLE_NAME, PROJECTION, SubredditProvider.ID_SELECTION,
-                new String[] {Long.toString(id)}, null, null, null);
+        Cursor cursor = db.query(Subreddits.TABLE_NAME, PROJECTION,
+                SubredditProvider.ID_SELECTION, Array.of(id), null, null, null);
         try {
             assertTrue(cursor.moveToNext());
             assertEquals(id, cursor.getLong(0));
@@ -125,17 +157,19 @@ public class DbHelperTest extends AndroidTestCase {
         helper.close();
     }
 
-    public void testOnUpgrade_v1ToV2() {
-        DbHelper helper = createHelperVersion(1);
-        helper.getWritableDatabase();
-        helper.close();
-
-        helper = createHelperVersion(2);
-        helper.getWritableDatabase();
-        helper.close();
-    }
-
     private DbHelper createHelperVersion(int version) {
         return new DbHelper(mContext, DbHelper.DATABASE_TEST, version);
+    }
+
+    // TODO: Improve test to fail if there are unexpected tables.
+    private void assertTablesExist(SQLiteDatabase db, String[] tables) {
+        for (String table : tables) {
+            assertTableExists(db, table);
+        }
+    }
+
+    private void assertTableExists(SQLiteDatabase db, String table) {
+        assertNotNull("Missing table: " + table,
+                db.query(table, null, null, null, null, null, null));
     }
 }

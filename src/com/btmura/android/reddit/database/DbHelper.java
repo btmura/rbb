@@ -72,11 +72,12 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     private static void createNewTablesV2(SQLiteDatabase db) {
+        Accounts.createTable(db);
+        Sessions.createTable(db);
         Things.createTable(db);
         Comments.createTable(db);
         Votes.createTable(db);
         Messages.createTable(db);
         MessageActions.createTable(db);
-        Sessions.createTable(db);
     }
 }
