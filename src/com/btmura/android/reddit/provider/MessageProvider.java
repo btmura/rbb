@@ -119,7 +119,8 @@ public class MessageProvider extends SessionProvider {
                     break;
 
                 case MATCH_MESSAGE:
-                    listing = MessageListing.newThreadInstance(accountName, thingId, cookie);
+                    listing = MessageListing.newThreadInstance(accountName, thingId, cookie,
+                            helper);
                     break;
 
                 default:

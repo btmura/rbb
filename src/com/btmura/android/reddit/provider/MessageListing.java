@@ -25,15 +25,21 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.MessageActions;
+import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
@@ -47,34 +53,38 @@ class MessageListing extends JsonParser implements Listing {
     private final String accountName;
     private final String thingId;
     private final String cookie;
-
+    private final SQLiteOpenHelper dbHelper;
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>();
+
     private long networkTimeMs;
     private long parseTimeMs;
 
     /** Returns a listing for an inbox. */
     static MessageListing newInboxInstance(String accountName, String cookie) {
         return new MessageListing(Sessions.TYPE_MESSAGE_INBOX_LISTING,
-                accountName, null, cookie);
+                accountName, null, cookie, null);
     }
 
     /** Returns a listing for sent messages. */
     static MessageListing newSentInstance(String accountName, String cookie) {
         return new MessageListing(Sessions.TYPE_MESSAGE_SENT_LISTING,
-                accountName, null, cookie);
+                accountName, null, cookie, null);
     }
 
     /** Returns an instance for a message thread. */
-    static MessageListing newThreadInstance(String accountName, String thingId, String cookie) {
+    static MessageListing newThreadInstance(String accountName, String thingId, String cookie,
+            SQLiteOpenHelper dbHelper) {
         return new MessageListing(Sessions.TYPE_MESSAGE_THREAD_LISTING,
-                accountName, thingId, cookie);
+                accountName, thingId, cookie, dbHelper);
     }
 
-    private MessageListing(int listingType, String accountName, String thingId, String cookie) {
+    private MessageListing(int listingType, String accountName, String thingId, String cookie,
+            SQLiteOpenHelper dbHelper) {
         this.listingType = listingType;
         this.accountName = accountName;
         this.thingId = thingId;
         this.cookie = cookie;
+        this.dbHelper = dbHelper;
     }
 
     public int getType() {
@@ -191,5 +201,78 @@ class MessageListing extends JsonParser implements Listing {
     @Override
     public boolean shouldParseReplies() {
         return true;
+    }
+
+    @Override
+    public void onParseEnd() {
+        if (listingType == Sessions.TYPE_MESSAGE_THREAD_LISTING) {
+            mergeActions();
+        }
+    }
+
+    static final String[] MERGE_PROJECTION = {
+            MessageActions._ID,
+            MessageActions.COLUMN_ACCOUNT,
+            MessageActions.COLUMN_ACTION,
+            MessageActions.COLUMN_THING_ID,
+            MessageActions.COLUMN_TEXT,
+    };
+
+    static final int MERGE_INDEX_ACCOUNT = 1;
+    static final int MERGE_INDEX_ACTION = 2;
+    static final int MERGE_INDEX_THING_ID = 3;
+    static final int MERGE_INDEX_TEXT = 4;
+
+    static final String MERGE_SELECTION = MessageActions.COLUMN_PARENT_THING_ID + "=?";
+
+    static final String MERGE_SORT = MessageActions._ID + " ASC";
+
+    private void mergeActions() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(MessageActions.TABLE_NAME, MERGE_PROJECTION,
+                MERGE_SELECTION, Array.of(thingId), null, null, MERGE_SORT);
+        try {
+            while (c.moveToNext()) {
+                String actionAccountName = c.getString(MERGE_INDEX_ACCOUNT);
+                int action = c.getInt(MERGE_INDEX_ACTION);
+                String targetId = c.getString(MERGE_INDEX_THING_ID);
+                String text = c.getString(MERGE_INDEX_TEXT);
+                switch (action) {
+                    case MessageActions.ACTION_INSERT:
+                        insertThing(actionAccountName, targetId, text);
+                        break;
+
+                    default:
+                        throw new IllegalStateException();
+                }
+            }
+        } finally {
+            c.close();
+        }
+    }
+
+    private void insertThing(String actionAccountName, String targetId, String body) {
+        int size = values.size();
+        for (int i = 0; i < size; i++) {
+            ContentValues v = values.get(i);
+            String id = v.getAsString(Messages.COLUMN_THING_ID);
+
+            // This thing could be a placeholder we previously inserted.
+            if (TextUtils.isEmpty(id)) {
+                continue;
+            }
+
+            if (id.equals(targetId)) {
+                // Allocate extra space for session ID that provider will insert.
+                ContentValues p = new ContentValues(5);
+                p.put(Messages.COLUMN_ACCOUNT, actionAccountName);
+                p.put(Messages.COLUMN_AUTHOR, actionAccountName);
+                p.put(Messages.COLUMN_BODY, body);
+                p.put(Messages.COLUMN_KIND, Kinds.KIND_MESSAGE);
+
+                values.add(i + 1, p);
+                size++;
+            }
+        }
     }
 }
