@@ -117,7 +117,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         // Only show the messages icon when there is unread mail.
         int showAsAction = MenuItem.SHOW_AS_ACTION_NEVER;
         if (isAccount && adapter.hasMessages(accountNameHolder.getAccountName())) {
-            showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS;
+            showAsAction = MenuItem.SHOW_AS_ACTION_IF_ROOM;
         }
 
         menu.findItem(R.id.menu_submit_link).setVisible(isAccount);
