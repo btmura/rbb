@@ -39,7 +39,7 @@
         android:title="@string/menu_profile"/>
     <item
         android:id="@+id/menu_messages"
-        android:icon="@drawable/ic_action_messages"
+        android:icon="@drawable/ic_action_unread_messages"
         android:showAsAction="ifRoom"
         android:title="@string/menu_messages"/>
     <item
