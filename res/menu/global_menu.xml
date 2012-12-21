@@ -33,15 +33,17 @@
         android:showAsAction="ifRoom|collapseActionView"
         android:title="@string/menu_search"/>
     <item
-        android:id="@+id/menu_profile"
-        android:icon="@drawable/ic_action_profile"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_profile"/>
-    <item
         android:id="@+id/menu_messages"
         android:icon="@drawable/ic_action_messages"
+        android:orderInCategory="1337"
         android:showAsAction="ifRoom"
         android:title="@string/menu_messages"/>
+    <item
+        android:id="@+id/menu_profile"
+        android:icon="@drawable/ic_action_profile"
+        android:orderInCategory="1337"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_profile"/>
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="1337"
