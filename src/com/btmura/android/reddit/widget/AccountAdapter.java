@@ -48,9 +48,11 @@ public class AccountAdapter extends BaseCursorAdapter {
 
     public boolean hasMessages(String accountName) {
         Cursor c = getCursor();
-        for (c.moveToPosition(-1); c.moveToNext();) {
-            if (Objects.equals(accountName, c.getString(INDEX_ACCOUNT))) {
-                return c.getInt(INDEX_HAS_MAIL) == 1;
+        if (c != null) {
+            for (c.moveToPosition(-1); c.moveToNext();) {
+                if (Objects.equals(accountName, c.getString(INDEX_ACCOUNT))) {
+                    return c.getInt(INDEX_HAS_MAIL) == 1;
+                }
             }
         }
         return false;
