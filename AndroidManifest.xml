@@ -145,6 +145,11 @@
         </activity-alias>
 
         <provider
+            android:name=".provider.AccountProvider"
+            android:authorities="@string/authority_accounts"
+            android:exported="false"
+            android:label="@string/provider_accounts" />
+        <provider
             android:name=".provider.MessageProvider"
             android:authorities="@string/authority_messages"
             android:exported="false"

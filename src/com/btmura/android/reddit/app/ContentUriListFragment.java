@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.provider.MessageProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -56,6 +57,7 @@ public class ContentUriListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adapter = new ArrayAdapter<Uri>(getActivity(), R.layout.content_uri_row);
+        adapter.add(AccountProvider.ACCOUNTS_URI);
         adapter.add(SubredditProvider.SUBREDDITS_URI);
         adapter.add(ThingProvider.THINGS_URI);
         adapter.add(ThingProvider.COMMENTS_URI);

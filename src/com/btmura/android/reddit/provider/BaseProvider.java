@@ -192,8 +192,11 @@ abstract class BaseProvider extends ContentProvider {
      * querying or null to indicate that no changes to the selection need to be
      * made to the selection.
      */
-    protected abstract Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
-            String selection, String[] selectionArgs);
+    protected Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
+            String selection, String[] selectionArgs) {
+        // Do nothing by default. Override to do more processing of URIs.
+        return null;
+    }
 
     protected void notifyChange(Uri uri) {
         if (uri.getBooleanQueryParameter(PARAM_NOTIFY, true)) {
