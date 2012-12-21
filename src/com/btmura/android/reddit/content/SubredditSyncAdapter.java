@@ -160,8 +160,8 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         long expiration = c.getLong(INDEX_EXPIRATION);
         int state = c.getInt(INDEX_STATE);
 
-        // Front page is a synthetic subreddit we don't need to sync.
-        if (Subreddits.isFrontPage(name)) {
+        // Don't sync subreddits that can't be like front page, random, and all.
+        if (!Subreddits.isSyncable(name)) {
             return;
         }
 

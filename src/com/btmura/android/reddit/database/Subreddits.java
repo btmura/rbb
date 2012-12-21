@@ -47,6 +47,8 @@ public class Subreddits implements BaseColumns {
     public static final String ACCOUNT_NONE = "";
 
     public static final String NAME_FRONT_PAGE = "";
+    public static final String NAME_ALL = "all";
+    public static final String NAME_RANDOM = "random";
 
     public static final int STATE_NORMAL = 0;
     public static final int STATE_INSERTING = 1;
@@ -54,6 +56,12 @@ public class Subreddits implements BaseColumns {
 
     public static boolean isFrontPage(String subreddit) {
         return TextUtils.isEmpty(subreddit);
+    }
+
+    public static boolean isSyncable(String subreddit) {
+        return !isFrontPage(subreddit)
+                && !NAME_ALL.equalsIgnoreCase(subreddit)
+                && !NAME_RANDOM.equalsIgnoreCase(subreddit);
     }
 
     public static String getTitle(Context c, String subreddit) {
