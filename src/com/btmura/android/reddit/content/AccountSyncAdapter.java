@@ -26,7 +26,6 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
@@ -52,8 +51,6 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "AccountSyncAdapter";
 
-    private static final int POLL_FREQUENCY_SECONDS = 24 * 60 * 60; // 1 day
-
     private static final String ACCOUNT_SELECTION = Accounts.COLUMN_ACCOUNT + "=?";
 
     public static class Service extends android.app.Service {
@@ -75,9 +72,6 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "accountName: " + account.name + " syncResult: " + syncResult.toString());
         }
-
-        // Schedule the next sync to check messages.
-        ContentResolver.addPeriodicSync(account, authority, extras, POLL_FREQUENCY_SECONDS);
     }
 
     private void doSync(Account account, Bundle extras, String authority,
