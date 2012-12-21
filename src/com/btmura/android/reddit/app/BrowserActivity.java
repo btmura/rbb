@@ -143,6 +143,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             replaceThingListFragmentMultiPane();
         }
 
+        // Invalidate menu so that mail icon disappears when switching back to
+        // app storage account.
+        invalidateOptionsMenu();
+
         return true;
     }
 
