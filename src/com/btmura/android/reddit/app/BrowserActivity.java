@@ -18,6 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
+import android.content.ContentResolver;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -27,7 +28,9 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener,
@@ -117,6 +120,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onNavigationItemSelected i:" + itemPosition
                     + " an:" + accountName + " f:" + filter);
+        }
+
+        // Quickly sync to check whether the user has new messages.
+        if (AccountUtils.isAccount(accountName)) {
+            ContentResolver.requestSync(AccountUtils.getAccount(this, accountName),
+                    AccountProvider.AUTHORITY, Bundle.EMPTY);
         }
 
         SubredditListFragment slf = getSubredditListFragment();
