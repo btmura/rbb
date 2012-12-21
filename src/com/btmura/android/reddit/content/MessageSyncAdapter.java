@@ -46,8 +46,6 @@ public class MessageSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "MessageSyncAdapter";
 
-    private static final int POLL_FREQUENCY_SECONDS = 24 * 60 * 60; // 1 day
-
     public static class Service extends android.app.Service {
         @Override
         public IBinder onBind(Intent intent) {
@@ -67,9 +65,6 @@ public class MessageSyncAdapter extends AbstractThreadedSyncAdapter {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "accountName: " + account.name + " syncResult: " + syncResult.toString());
         }
-
-        // Schedule the next sync to check messages.
-        ContentResolver.addPeriodicSync(account, authority, extras, POLL_FREQUENCY_SECONDS);
     }
 
     private void doSync(Account account, Bundle extras, String authority,
