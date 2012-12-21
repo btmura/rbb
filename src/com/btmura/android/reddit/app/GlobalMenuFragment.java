@@ -18,7 +18,10 @@ package com.btmura.android.reddit.app;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,9 +33,10 @@ import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.widget.AccountAdapter;
 
 public class GlobalMenuFragment extends Fragment implements OnFocusChangeListener,
-        OnQueryTextListener {
+        OnQueryTextListener, LoaderCallbacks<Cursor> {
 
     public static final String TAG = "GlobalMenuFragment";
 
@@ -45,6 +49,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     private SubredditNameHolder subredditNameHolder;
     private AccountNameHolder accountNameHolder;
     private OnSearchQuerySubmittedListener listener;
+    private AccountAdapter adapter;
     private MenuItem searchItem;
     private SearchView searchView;
 
@@ -70,6 +75,26 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        adapter = new AccountAdapter(getActivity());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return AccountAdapter.getLoader(getActivity());
+    }
+
+    public void onLoadFinished(Loader<Cursor> loader, Cursor c) {
+        adapter.swapCursor(c);
+        getActivity().invalidateOptionsMenu();
+    }
+
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 
     @Override
@@ -87,9 +112,17 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         super.onPrepareOptionsMenu(menu);
         boolean isAccount = accountNameHolder != null
                 && AccountUtils.isAccount(accountNameHolder.getAccountName());
+
+        int messagesResId;
+        if (isAccount && adapter.hasMessages(accountNameHolder.getAccountName())) {
+            messagesResId = R.drawable.ic_action_unread_messages;
+        } else {
+            messagesResId = R.drawable.ic_action_messages;
+        }
+
         menu.findItem(R.id.menu_submit_link).setVisible(isAccount);
         menu.findItem(R.id.menu_profile).setVisible(isAccount);
-        menu.findItem(R.id.menu_messages).setVisible(isAccount);
+        menu.findItem(R.id.menu_messages).setVisible(isAccount).setIcon(messagesResId);
     }
 
     @Override
