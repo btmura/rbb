@@ -36,6 +36,7 @@ public class Urls {
     private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
     private static final String API_DELETE_URL = BASE_URL + "/api/del";
     private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
+    private static final String API_ME_URL = BASE_URL + "/api/me";
     private static final String API_NEW_CAPTCHA_URL = BASE_URL + "/api/new_captcha";
     private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
     private static final String API_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
@@ -136,6 +137,10 @@ public class Urls {
         b.append("&passwd=").append(encode(password));
         b.append("&api_type=json");
         return b.toString();
+    }
+
+    public static URL meUrl() {
+        return newUrl(resetBuilder().append(API_ME_URL).append(".json"));
     }
 
     public static URL messageThreadUrl(String thingId) {

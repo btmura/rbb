@@ -181,6 +181,8 @@ public class JsonParser {
                 onNew(r, i);
             } else if ("was_comment".equals(name)) {
                 onWasComment(r, i);
+            } else if ("has_mail".equals(name)) {
+                onHasMail(r, i);
             } else if ("display_name".equals(name)) {
                 onDisplayName(r, i);
             } else if ("description".equals(name)) {
@@ -327,6 +329,10 @@ public class JsonParser {
     }
 
     public void onWasComment(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onHasMail(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 

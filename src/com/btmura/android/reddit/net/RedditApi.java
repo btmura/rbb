@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.net;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,6 +40,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.util.Array;
+import com.btmura.android.reddit.util.JsonParser;
 
 public class RedditApi {
 
@@ -133,6 +135,32 @@ public class RedditApi {
         public CharSequence title;
         public int subscribers;
         public CharSequence description;
+    }
+
+    /**
+     * {@link AccountResult} is the result of calling the
+     * {@link RedditApi#me(String)} method.
+     */
+    public static class AccountResult extends JsonParser {
+
+        /** True if the account has mail. False otherwise. */
+        public boolean hasMail;
+
+        /** Return a new {@link AccountResult} from a {@link JsonReader}. */
+        public static AccountResult fromJsonReader(JsonReader reader) throws IOException {
+            AccountResult result = new AccountResult();
+            result.parseEntity(reader);
+            return result;
+        }
+
+        private AccountResult() {
+            // Use the fromJsonReader method.
+        }
+
+        @Override
+        public void onHasMail(JsonReader reader, int index) throws IOException {
+            hasMail = reader.nextBoolean();
+        }
     }
 
     public static Result comment(String thingId, String text, String cookie, String modhash)
@@ -235,6 +263,18 @@ public class RedditApi {
             writeFormData(conn, Urls.loginQuery(login, password));
             in = conn.getInputStream();
             return LoginParser.parseResponse(in);
+        } finally {
+            close(in, conn);
+        }
+    }
+
+    public static AccountResult me(String cookie) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            conn = connect(Urls.meUrl(), cookie, false);
+            in = new BufferedInputStream(conn.getInputStream());
+            return AccountResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
         } finally {
             close(in, conn);
         }
