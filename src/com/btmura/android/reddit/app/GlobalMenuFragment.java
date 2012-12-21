@@ -138,6 +138,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 return handleProfile();
 
             case R.id.menu_messages:
+            case R.id.menu_unread_messages:
                 return handleMessages();
 
             case R.id.menu_settings:
