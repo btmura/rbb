@@ -30,7 +30,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 import android.util.JsonReader;
-import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
@@ -45,9 +44,7 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 
 class MessageListing extends JsonParser implements Listing {
 
-    private static final String TAG = "MessageListing";
-
-    private static final boolean DEBUG = BuildConfig.DEBUG && true;
+    public static final String TAG = "MessageListing";
 
     private final int listingType;
     private final String accountName;
@@ -189,13 +186,6 @@ class MessageListing extends JsonParser implements Listing {
     @Override
     public void onWasComment(JsonReader reader, int index) throws IOException {
         values.get(index).put(Messages.COLUMN_WAS_COMMENT, reader.nextBoolean());
-    }
-
-    @Override
-    public void onEntityEnd(int index) {
-        if (DEBUG) {
-            Log.d(TAG, "values: " + values.get(index));
-        }
     }
 
     @Override
