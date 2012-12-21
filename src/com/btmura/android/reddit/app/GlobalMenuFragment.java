@@ -110,19 +110,19 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+
         boolean isAccount = accountNameHolder != null
                 && AccountUtils.isAccount(accountNameHolder.getAccountName());
 
-        int messagesResId;
+        // Only show the messages icon when there is unread mail.
+        int showAsAction = MenuItem.SHOW_AS_ACTION_NEVER;
         if (isAccount && adapter.hasMessages(accountNameHolder.getAccountName())) {
-            messagesResId = R.drawable.ic_action_unread_messages;
-        } else {
-            messagesResId = R.drawable.ic_action_messages;
+            showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS;
         }
 
         menu.findItem(R.id.menu_submit_link).setVisible(isAccount);
         menu.findItem(R.id.menu_profile).setVisible(isAccount);
-        menu.findItem(R.id.menu_messages).setVisible(isAccount).setIcon(messagesResId);
+        menu.findItem(R.id.menu_messages).setVisible(isAccount).setShowAsAction(showAsAction);
     }
 
     @Override
