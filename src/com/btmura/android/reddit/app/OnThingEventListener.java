@@ -17,7 +17,8 @@
 package com.btmura.android.reddit.app;
 
 interface OnThingEventListener {
-    void onLinkDiscovery(String thingId, String title, String url);
+    void onTitleDiscovery(String thingId, String title);
+    void onLinkDiscovery(String thingId, String url);
     void onLinkMenuItemClick();
     void onCommentMenuItemClick();
 }

@@ -76,6 +76,10 @@ public class ThingBundle extends BundleSupport {
         bundle.putString(KEY_TITLE, title);
     }
 
+    public static boolean hasTitle(Bundle bundle) {
+        return !TextUtils.isEmpty(getTitle(bundle));
+    }
+
     public static String getThingId(Bundle bundle) {
         return getString(bundle, KEY_THING_ID);
     }

@@ -103,14 +103,18 @@ public class ThingActivity extends GlobalMenuActivity implements
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
-    public void onLinkDiscovery(String thingId, String title, String url) {
+    public void onTitleDiscovery(String thingId, String title) {
+        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))
+                && !ThingBundle.hasTitle(thingBundle)) {
+            ThingBundle.putTitle(thingBundle, title);
+            refreshTitle();
+        }
+    }
+
+    public void onLinkDiscovery(String thingId, String url) {
         if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))
                 && !ThingBundle.hasLinkUrl(thingBundle)) {
             ThingBundle.putLinkUrl(thingBundle, url);
-            ThingBundle.putTitle(thingBundle, title);
-
-            refreshTitle();
-
             ThingPagerAdapter adapter = (ThingPagerAdapter) pager.getAdapter();
             adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
             pager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);

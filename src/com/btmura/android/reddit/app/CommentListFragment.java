@@ -186,11 +186,12 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             getActivity().invalidateOptionsMenu();
         }
 
-        // Broadcast the link if there is one in case the parent doesn't know it.
-        if (listener != null && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF)) {
-            listener.onLinkDiscovery(thingId,
-                    adapter.getString(0, CommentAdapter.INDEX_TITLE),
-                    adapter.getString(0, CommentAdapter.INDEX_URL));
+        // Broadcast the link if there is one in case the parent doesn't know.
+        if (listener != null) {
+            listener.onTitleDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_TITLE));
+            if (!adapter.getBoolean(0, CommentAdapter.INDEX_SELF)) {
+                listener.onLinkDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_URL));
+            }
         }
     }
 
