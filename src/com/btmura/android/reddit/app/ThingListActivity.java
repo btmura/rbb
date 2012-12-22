@@ -126,7 +126,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         return true;
     }
 
-    public void onThingSelected(Bundle thingBundle, int position) {
+    public void onThingSelected(Bundle thingBundle) {
         Intent i = new Intent(this, ThingActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         i.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);

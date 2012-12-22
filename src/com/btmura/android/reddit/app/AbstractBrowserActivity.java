@@ -325,14 +325,18 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     public void onSubredditSelected(String subreddit) {
+        selectSubreddit(subreddit, 0);
+    }
+
+    protected void selectSubreddit(String subreddit, int flags) {
         if (isSinglePane) {
-            selectSubredditSinglePane(subreddit, 0);
+            selectSubredditSinglePane(subreddit, flags);
         } else {
             selectSubredditMultiPane(subreddit);
         }
     }
 
-    protected void selectSubredditSinglePane(String subreddit, int flags) {
+    private void selectSubredditSinglePane(String subreddit, int flags) {
         Intent intent = new Intent(this, ThingListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
@@ -369,15 +373,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         selectSubredditMultiPane(getControlFragment().getSubreddit());
     }
 
-    public void onThingSelected(Bundle thingBundle, int position) {
+    public void onThingSelected(Bundle thingBundle) {
+        selectThing(thingBundle, 0);
+    }
+
+    protected void selectThing(Bundle thingBundle, int flags) {
         if (isSinglePane) {
             selectThingSinglePane(thingBundle, 0);
         } else {
-            selectThingMultiPane(thingBundle, position);
+            selectThingMultiPane(thingBundle);
         }
     }
 
-    protected void selectThingSinglePane(Bundle thingBundle, int flags) {
+    private void selectThingSinglePane(Bundle thingBundle, int flags) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
@@ -385,7 +393,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         startActivity(intent);
     }
 
-    private void selectThingMultiPane(Bundle thingBundle, int thingPosition) {
+    private void selectThingMultiPane(Bundle thingBundle) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();

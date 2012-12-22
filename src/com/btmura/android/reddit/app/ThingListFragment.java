@@ -67,7 +67,7 @@ public class ThingListFragment extends ListFragment implements
     private static final String STATE_EMPTY_TEXT = "emptyText";
 
     public interface OnThingSelectedListener {
-        void onThingSelected(Bundle thingBundle, int position);
+        void onThingSelected(Bundle thingBundle);
 
         int onMeasureThingBody();
     }
@@ -250,7 +250,7 @@ public class ThingListFragment extends ListFragment implements
         selectedThingId = adapter.getSelectedThingId();
         selectedLinkId = adapter.getSelectedLinkId();
         if (listener != null) {
-            listener.onThingSelected(adapter.getThingBundle(getActivity(), position), position);
+            listener.onThingSelected(adapter.getThingBundle(getActivity(), position));
         }
     }
 
