@@ -34,6 +34,7 @@ import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
@@ -166,7 +167,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     private boolean insertBackStack() {
         int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
-        return (flags & FLAG_INSERT_HOME) == FLAG_INSERT_HOME;
+        return Flag.isEnabled(flags, FLAG_INSERT_HOME);
     }
 
     @Override
