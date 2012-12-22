@@ -355,7 +355,7 @@ public class ThingListFragment extends ListFragment implements
     private boolean handleCopyUrl(ActionMode mode) {
         int position = getFirstCheckedPosition();
         String title = adapter.getTitle(position);
-        String url = adapter.getUrl(position);
+        CharSequence url = adapter.getUrl(position);
         MenuHelper.setClipAndToast(getActivity(), title, url);
         mode.finish();
         return true;

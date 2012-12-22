@@ -29,6 +29,12 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 // TODO: Fix this class to be thread safe.
 public class Urls {
 
+    /** Type for getting a HTML response. */
+    public static final int TYPE_HTML = 0;
+
+    /** Type for getting a JSON response. */
+    public static final int TYPE_JSON = 1;
+
     public static final String BASE_URL = "http://www.reddit.com";
     public static final String BASE_SSL_URL = "https://ssl.reddit.com";
 
@@ -143,10 +149,13 @@ public class Urls {
         return newUrl(resetBuilder().append(API_ME_URL).append(".json"));
     }
 
-    public static URL messageThreadUrl(String thingId) {
-        return newUrl(resetBuilder().append(BASE_MESSAGE_THREAD_URL)
-                .append(removeTag(thingId))
-                .append(".json"));
+    public static CharSequence messageThread(String thingId, int apiType) {
+        StringBuilder b = new StringBuilder(BASE_MESSAGE_THREAD_URL);
+        b.append(removeTag(thingId));
+        if (apiType == TYPE_JSON) {
+            b.append(".json");
+        }
+        return b;
     }
 
     public static URL messageUrl(int filter, String more) {
@@ -327,7 +336,7 @@ public class Urls {
         return newUrl(b);
     }
 
-    private static URL newUrl(CharSequence url) {
+    public static URL newUrl(CharSequence url) {
         try {
             return new URL(url.toString());
         } catch (MalformedURLException e) {

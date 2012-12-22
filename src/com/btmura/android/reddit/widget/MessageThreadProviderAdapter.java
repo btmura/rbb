@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.btmura.android.reddit.database.Messages;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.MessageProvider;
 import com.btmura.android.reddit.widget.ThingAdapter.ProviderAdapter;
 
@@ -81,7 +82,7 @@ public class MessageThreadProviderAdapter extends ProviderAdapter {
 
     @Override
     String getThingId(ThingAdapter adapter, int position) {
-        return null;
+        return adapter.getString(position, INDEX_THING_ID);
     }
 
     @Override
@@ -100,8 +101,8 @@ public class MessageThreadProviderAdapter extends ProviderAdapter {
     }
 
     @Override
-    String getUrl(ThingAdapter adapter, int position) {
-        return null;
+    CharSequence getUrl(ThingAdapter adapter, int position) {
+        return Urls.messageThread(getThingId(adapter, position), Urls.TYPE_HTML);
     }
 
     @Override

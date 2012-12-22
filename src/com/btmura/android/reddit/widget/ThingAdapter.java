@@ -89,7 +89,7 @@ public class ThingAdapter extends BaseCursorAdapter {
 
         abstract String getTitle(ThingAdapter adapter, int position);
 
-        abstract String getUrl(ThingAdapter adapter, int position);
+        abstract CharSequence getUrl(ThingAdapter adapter, int position);
 
         abstract int getKind(ThingAdapter adapter, int position);
 
@@ -291,7 +291,7 @@ public class ThingAdapter extends BaseCursorAdapter {
         return providerAdapter.getTitle(this, position);
     }
 
-    public String getUrl(int position) {
+    public CharSequence getUrl(int position) {
         return providerAdapter.getUrl(this, position);
     }
 

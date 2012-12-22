@@ -117,7 +117,7 @@ class MessageListing extends JsonParser implements Listing {
                 return Urls.messageUrl(FilterAdapter.MESSAGE_SENT, null);
 
             case Sessions.TYPE_MESSAGE_THREAD_LISTING:
-                return Urls.messageThreadUrl(thingId);
+                return Urls.newUrl(Urls.messageThread(thingId, Urls.TYPE_JSON));
 
             default:
                 throw new IllegalArgumentException();

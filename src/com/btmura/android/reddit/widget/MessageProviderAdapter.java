@@ -116,7 +116,7 @@ class MessageProviderAdapter extends ProviderAdapter {
     }
 
     @Override
-    String getUrl(ThingAdapter adapter, int position) {
+    CharSequence getUrl(ThingAdapter adapter, int position) {
         // Comment reply messages have a context url we can use.
         String context = adapter.getString(position, INDEX_CONTEXT);
         if (!TextUtils.isEmpty(context)) {
@@ -124,7 +124,7 @@ class MessageProviderAdapter extends ProviderAdapter {
         }
 
         // Assume this is a raw message.
-        return Urls.messageThreadUrl(getThingId(adapter, position)).toExternalForm();
+        return Urls.messageThread(getThingId(adapter, position), Urls.TYPE_HTML);
     }
 
     @Override
