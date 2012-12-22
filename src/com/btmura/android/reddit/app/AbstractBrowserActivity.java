@@ -21,6 +21,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
@@ -376,16 +377,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
+        String subreddit = ThingBundle.getSubreddit(thingBundle);
         int filter = getFilter();
 
-        ControlFragment cf = getControlFragment();
-        cf = ControlFragment.newInstance(accountName, cf.getSubreddit(), thingBundle, filter);
-        ThingMenuFragment tf = ThingMenuFragment.newInstance(
-                ThingBundle.getSubreddit(thingBundle));
+        Fragment cf = ControlFragment.newInstance(accountName, subreddit, thingBundle, filter);
+        Fragment mf = ThingMenuFragment.newInstance(subreddit);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        ft.add(tf, ThingMenuFragment.TAG);
+        ft.add(mf, ThingMenuFragment.TAG);
         ft.addToBackStack(null);
         ft.commit();
 
