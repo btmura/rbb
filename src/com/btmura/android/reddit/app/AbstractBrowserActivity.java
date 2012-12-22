@@ -495,9 +495,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             int nextVisibility = !hasThing ? View.VISIBLE : View.GONE;
             if (currVisibility != nextVisibility) {
                 if (nextVisibility == View.VISIBLE) {
-                    runAnimation(ANIMATION_OPEN_NAV);
+                    startAnimation(ANIMATION_OPEN_NAV);
                 } else {
-                    runAnimation(ANIMATION_CLOSE_NAV);
+                    startAnimation(ANIMATION_CLOSE_NAV);
                 }
             }
         } else {
@@ -506,9 +506,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 int nextVisibility = hasThing ? View.GONE : View.VISIBLE;
                 if (currVisibility != nextVisibility) {
                     if (nextVisibility == View.VISIBLE) {
-                        runAnimation(ANIMATION_OPEN_SUBREDDIT_LIST);
+                        startAnimation(ANIMATION_OPEN_SUBREDDIT_LIST);
                     } else {
-                        runAnimation(ANIMATION_CLOSE_SUBREDDIT_LIST);
+                        startAnimation(ANIMATION_CLOSE_SUBREDDIT_LIST);
                     }
                 } else {
                     // There may be no change in visibility if we are just
@@ -619,7 +619,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    protected ControlFragment getControlFragment() {
+    private ControlFragment getControlFragment() {
         return (ControlFragment) getFragmentManager()
                 .findFragmentByTag(ControlFragment.TAG);
     }
@@ -634,12 +634,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 .findFragmentByTag(ThingListFragment.TAG);
     }
 
-    protected ThingMenuFragment getThingMenuFragment() {
+    private ThingMenuFragment getThingMenuFragment() {
         return (ThingMenuFragment) getFragmentManager()
                 .findFragmentByTag(ThingMenuFragment.TAG);
     }
 
-    private void runAnimation(int type) {
+    private void startAnimation(int type) {
         getAnimator(type).start();
     }
 
