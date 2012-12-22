@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.app;
 
+import java.util.List;
+
 import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
@@ -47,11 +49,19 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private static final String AUTHORITY = "www.reddit.com";
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_SUBREDDIT = 1;
+    private static final int MATCH_COMMENTS = 2;
     static {
         MATCHER.addURI(AUTHORITY, "r/*", MATCH_SUBREDDIT);
+        MATCHER.addURI(AUTHORITY, "r/*/comments/*", MATCH_COMMENTS);
+        MATCHER.addURI(AUTHORITY, "r/*/comments/*/*", MATCH_COMMENTS);
     }
 
+    /** Requested subreddit from intent data or extra. */
     private String requestedSubreddit;
+
+    /** Requested thing from intent data. */
+    private String requestedThingId;
+
     private AccountSpinnerAdapter adapter;
     private SharedPreferences prefs;
 
@@ -68,6 +78,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             switch (MATCHER.match(data)) {
                 case MATCH_SUBREDDIT:
                     requestedSubreddit = data.getLastPathSegment();
+                    break;
+
+                case MATCH_COMMENTS:
+                    List<String> segments = data.getPathSegments();
+                    requestedSubreddit = segments.get(1);
+                    requestedThingId = segments.get(2);
                     break;
             }
         }
