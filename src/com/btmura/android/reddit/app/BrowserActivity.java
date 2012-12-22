@@ -16,11 +16,13 @@
 
 package com.btmura.android.reddit.app;
 
+import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.ContentResolver;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -111,7 +113,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         adapter.updateState(itemPosition);
 
-        String accountName = adapter.getAccountName();
+        final String accountName = adapter.getAccountName();
         AccountPreferences.setLastAccount(prefs, accountName);
 
         int filter = adapter.getFilter();
@@ -124,8 +126,13 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         // Quickly sync to check whether the user has new messages.
         if (AccountUtils.isAccount(accountName)) {
-            ContentResolver.requestSync(AccountUtils.getAccount(this, accountName),
-                    AccountProvider.AUTHORITY, Bundle.EMPTY);
+            // requestSync can trigger a strict mode warning by writing to disk.
+            AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+                public void run() {
+                    Account account = AccountUtils.getAccount(getApplicationContext(), accountName);
+                    ContentResolver.requestSync(account, AccountProvider.AUTHORITY, Bundle.EMPTY);
+                }
+            });
         }
 
         SubredditListFragment slf = getSubredditListFragment();
