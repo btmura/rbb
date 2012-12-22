@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
@@ -83,15 +82,15 @@ class ThingListing extends JsonParser implements Listing {
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
 
-        URL url;
+        CharSequence url;
         if (!TextUtils.isEmpty(messageUser)) {
-            url = Urls.messageUrl(filter, more);
+            url = Urls.message(filter, more);
         } else if (!TextUtils.isEmpty(profileUser)) {
-            url = Urls.userUrl(profileUser, filter, more);
+            url = Urls.user(profileUser, filter, more);
         } else if (!TextUtils.isEmpty(query)) {
-            url = Urls.searchUrl(query, more);
+            url = Urls.search(query, more);
         } else {
-            url = Urls.subredditUrl(subreddit, filter, more);
+            url = Urls.subreddit(subreddit, filter, more);
         }
 
         HttpURLConnection conn = RedditApi.connect(url, cookie, false);

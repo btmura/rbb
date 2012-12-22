@@ -190,7 +190,7 @@ class ThingProviderAdapter extends ProviderAdapter {
     }
 
     @Override
-    String getUrl(ThingAdapter adapter, int position) {
+    CharSequence getUrl(ThingAdapter adapter, int position) {
         // Most things and comments have the url attribute set.
         String url = adapter.getString(position, INDEX_URL);
         if (!TextUtils.isEmpty(url)) {
@@ -200,7 +200,7 @@ class ThingProviderAdapter extends ProviderAdapter {
         // Comment references just provide a thing and link id.
         String thingId = adapter.getString(position, INDEX_THING_ID);
         String linkId = adapter.getString(position, INDEX_LINK_ID);
-        return Urls.commentsUrl(thingId, linkId, false).toExternalForm();
+        return Urls.comments(thingId, linkId, Urls.TYPE_HTML);
     }
 
     @Override
@@ -294,7 +294,7 @@ class ThingProviderAdapter extends ProviderAdapter {
 
         String permaLink = c.getString(INDEX_PERMA_LINK);
         if (!TextUtils.isEmpty(permaLink)) {
-            ThingBundle.putCommentUrl(b, Urls.permaUrl(permaLink, null).toExternalForm());
+            ThingBundle.putCommentUrl(b, Urls.perma(permaLink, null));
         }
 
         return b;

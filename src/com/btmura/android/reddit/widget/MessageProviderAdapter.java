@@ -120,7 +120,7 @@ class MessageProviderAdapter extends ProviderAdapter {
         // Comment reply messages have a context url we can use.
         String context = adapter.getString(position, INDEX_CONTEXT);
         if (!TextUtils.isEmpty(context)) {
-            return Urls.permaUrl(context, null).toExternalForm();
+            return Urls.perma(context, null);
         }
 
         // Assume this is a raw message.

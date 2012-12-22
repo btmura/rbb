@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
@@ -62,8 +61,7 @@ class SubredditSearchListing extends JsonParser implements Listing {
 
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
-
-        URL url = Urls.subredditSearchUrl(query, null);
+        CharSequence url = Urls.subredditSearch(query, null);
         HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();

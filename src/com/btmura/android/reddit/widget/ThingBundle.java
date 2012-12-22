@@ -96,24 +96,24 @@ public class ThingBundle extends BundleSupport {
         return !TextUtils.isEmpty(getLinkUrl(bundle));
     }
 
-    public static String getLinkUrl(Bundle bundle) {
-        return getString(bundle, KEY_LINK_URL);
+    public static CharSequence getLinkUrl(Bundle bundle) {
+        return getCharSequence(bundle, KEY_LINK_URL);
     }
 
-    public static void putLinkUrl(Bundle bundle, String url) {
-        bundle.putString(KEY_LINK_URL, url);
+    public static void putLinkUrl(Bundle bundle, CharSequence url) {
+        bundle.putCharSequence(KEY_LINK_URL, url);
     }
 
     public static boolean hasCommentUrl(Bundle bundle) {
         return !TextUtils.isEmpty(getCommentUrl(bundle));
     }
 
-    public static String getCommentUrl(Bundle bundle) {
-        return getString(bundle, KEY_COMMENT_URL);
+    public static CharSequence getCommentUrl(Bundle bundle) {
+        return getCharSequence(bundle, KEY_COMMENT_URL);
     }
 
-    public static void putCommentUrl(Bundle bundle, String url) {
-        bundle.putString(KEY_COMMENT_URL, url);
+    public static void putCommentUrl(Bundle bundle, CharSequence url) {
+        bundle.putCharSequence(KEY_COMMENT_URL, url);
     }
 
     public static boolean hasNoComments(Bundle bundle) {

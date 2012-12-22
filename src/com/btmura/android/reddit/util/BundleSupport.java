@@ -31,4 +31,8 @@ public abstract class BundleSupport {
     protected static String getString(Bundle bundle, String key) {
         return bundle != null ? bundle.getString(key) : null;
     }
+
+    protected static CharSequence getCharSequence(Bundle bundle, String key) {
+        return bundle != null ? bundle.getCharSequence(key) : null;
+    }
 }

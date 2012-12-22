@@ -58,14 +58,20 @@ public class Urls {
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
     private static final String BASE_USER_URL = BASE_URL + "/user/";
 
-    private static final StringBuilder S = new StringBuilder(BASE_URL.length() * 3);
-
-    public static URL commentsApiUrl() {
-        return newUrl(API_COMMENTS_URL);
+    public static URL newUrl(CharSequence url) {
+        try {
+            return new URL(url.toString());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static String commentsApiQuery(String thingId, String text, String modhash) {
-        StringBuilder b = resetBuilder();
+    public static CharSequence commentsUrl() {
+        return API_COMMENTS_URL;
+    }
+
+    public static String commentsQuery(String thingId, String text, String modhash) {
+        StringBuilder b = new StringBuilder();
         b.append("thing_id=").append(encode(thingId));
         b.append("&text=").append(encode(text));
         b.append("&uh=").append(encode(modhash));
@@ -73,34 +79,34 @@ public class Urls {
         return b.toString();
     }
 
-    public static URL captchaUrl(String id) {
-        return newUrl(resetBuilder().append(BASE_CAPTCHA_URL).append(id).append(".png"));
+    public static CharSequence captcha(String id) {
+        return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
     }
 
-    public static URL commentsUrl(String id, String linkId, boolean json) {
+    public static CharSequence comments(String id, String linkId, int apiType) {
         id = removeTag(id);
-        StringBuilder b = resetBuilder().append(BASE_COMMENTS_URL);
+        StringBuilder b = new StringBuilder(BASE_COMMENTS_URL);
         if (!TextUtils.isEmpty(linkId)) {
             b.append(removeTag(linkId));
         } else {
             b.append(id);
         }
-        if (json) {
+        if (apiType == TYPE_JSON) {
             b.append(".json");
         }
         if (!TextUtils.isEmpty(linkId)) {
             b.append("?comment=").append(id).append("&context=3");
         }
-        return newUrl(b);
+        return b;
     }
 
-    public static URL composeUrl() {
-        return newUrl(API_COMPOSE_URL);
+    public static CharSequence compose() {
+        return API_COMPOSE_URL;
     }
 
     public static String composeQuery(String to, String subject, String text, String captchaId,
             String captchaGuess, String modhash) {
-        StringBuilder b = resetBuilder();
+        StringBuilder b = new StringBuilder();
         b.append("to=").append(encode(to));
         b.append("&subject=").append(encode(subject));
         b.append("&text=").append(encode(text));
@@ -115,38 +121,38 @@ public class Urls {
         return b.toString();
     }
 
-    public static URL deleteApiUrl() {
-        return newUrl(API_DELETE_URL);
+    public static CharSequence deleteUrl() {
+        return API_DELETE_URL;
     }
 
-    public static String deleteApiQuery(String thingId, String modhash) {
-        StringBuilder b = resetBuilder();
+    public static CharSequence deleteQuery(String thingId, String modhash) {
+        StringBuilder b = new StringBuilder();
         b.append("id=").append(encode(thingId));
         b.append("&uh=").append(encode(modhash));
         b.append("&api_type=json");
-        return b.toString();
+        return b;
     }
 
-    public static String loginCookie(String cookie) {
-        StringBuilder b = resetBuilder();
+    public static CharSequence loginCookie(String cookie) {
+        StringBuilder b = new StringBuilder();
         b.append("reddit_session=").append(encode(cookie));
-        return b.toString();
+        return b;
     }
 
-    public static URL loginUrl(String userName) {
-        return newUrl(resetBuilder().append(API_LOGIN_URL).append(encode(userName)));
+    public static CharSequence login(String userName) {
+        return new StringBuilder(API_LOGIN_URL).append(encode(userName));
     }
 
-    public static String loginQuery(String userName, String password) {
-        StringBuilder b = resetBuilder();
+    public static CharSequence loginQuery(String userName, String password) {
+        StringBuilder b = new StringBuilder();
         b.append("user=").append(encode(userName));
         b.append("&passwd=").append(encode(password));
         b.append("&api_type=json");
-        return b.toString();
+        return b;
     }
 
-    public static URL meUrl() {
-        return newUrl(resetBuilder().append(API_ME_URL).append(".json"));
+    public static CharSequence me() {
+        return new StringBuilder(API_ME_URL).append(".json");
     }
 
     public static CharSequence messageThread(String thingId, int apiType) {
@@ -158,8 +164,8 @@ public class Urls {
         return b;
     }
 
-    public static URL messageUrl(int filter, String more) {
-        StringBuilder b = resetBuilder().append(BASE_MESSAGE_URL);
+    public static CharSequence message(int filter, String more) {
+        StringBuilder b = new StringBuilder(BASE_MESSAGE_URL);
         switch (filter) {
             case FilterAdapter.MESSAGE_INBOX:
                 b.append("inbox");
@@ -176,51 +182,49 @@ public class Urls {
         if (more != null) {
             b.append("?count=25&after=").append(encode(more));
         }
-        return newUrl(b);
+        return b;
     }
 
-    public static URL newCaptchaUrl() {
-        return newUrl(API_NEW_CAPTCHA_URL);
+    public static CharSequence newCaptcha() {
+        return API_NEW_CAPTCHA_URL;
     }
 
-    public static String newCaptchaQuery() {
-        StringBuilder b = resetBuilder();
-        b.append("api_type=json");
-        return b.toString();
+    public static CharSequence newCaptchaQuery() {
+        return "api_type=json";
     }
 
-    public static String subscribeQuery(String modhash, String subreddit, boolean subscribe) {
-        StringBuilder b = resetBuilder();
+    public static CharSequence subscribeQuery(String modhash, String subreddit, boolean subscribe) {
+        StringBuilder b = new StringBuilder();
         b.append("action=").append(subscribe ? "sub" : "unsub");
         b.append("&uh=").append(encode(modhash));
         b.append("&sr_name=").append(encode(subreddit));
         b.append("&api_type=json");
-        return b.toString();
+        return b;
     }
 
-    public static URL permaUrl(String permaLink, String thingId) {
-        StringBuilder b = resetBuilder().append(BASE_URL).append(permaLink);
+    public static CharSequence perma(String permaLink, String thingId) {
+        StringBuilder b = new StringBuilder(BASE_URL).append(permaLink);
         if (!TextUtils.isEmpty(thingId)) {
             b.append(removeTag(thingId));
         }
-        return newUrl(b);
+        return b;
     }
 
-    public static URL searchUrl(String query, String more) {
+    public static CharSequence search(String query, String more) {
         return newSearchUrl(BASE_SEARCH_URL, query, more);
     }
 
-    public static URL sidebarUrl(String name) {
-        return newUrl(resetBuilder().append(BASE_SUBREDDIT_URL).append(name).append("/about.json"));
+    public static CharSequence sidebar(String name) {
+        return new StringBuilder(BASE_SUBREDDIT_URL).append(name).append("/about.json");
     }
 
-    public static URL submitUrl() {
-        return newUrl(API_SUBMIT_URL);
+    public static CharSequence submit() {
+        return API_SUBMIT_URL;
     }
 
-    public static String submitQuery(String modhash, String subreddit, String title, String text,
-            boolean link, String captchaId, String captchaGuess) {
-        StringBuilder b = resetBuilder();
+    public static CharSequence submitQuery(String modhash, String subreddit, String title,
+            String text, boolean link, String captchaId, String captchaGuess) {
+        StringBuilder b = new StringBuilder();
         b.append(link ? "kind=link" : "kind=self");
         b.append("&uh=").append(encode(modhash));
         b.append("&sr=").append(encode(subreddit));
@@ -233,11 +237,11 @@ public class Urls {
             b.append("&captcha=").append(encode(captchaGuess));
         }
         b.append("&api_type=json");
-        return b.toString();
+        return b;
     }
 
-    public static URL subredditUrl(String subreddit, int filter, String more) {
-        StringBuilder b = resetBuilder().append(BASE_URL);
+    public static CharSequence subreddit(String subreddit, int filter, String more) {
+        StringBuilder b = new StringBuilder(BASE_URL);
 
         if (!Subreddits.isFrontPage(subreddit)) {
             b.append("/r/").append(encode(subreddit));
@@ -272,27 +276,27 @@ public class Urls {
         if (more != null) {
             b.append(hasSort ? "&" : "?").append("count=25&after=").append(encode(more));
         }
-        return newUrl(b);
+        return b;
     }
 
-    public static URL subredditListUrl(int limit) {
-        StringBuilder b = resetBuilder().append(BASE_SUBREDDIT_LIST_URL);
+    public static CharSequence subredditList(int limit) {
+        StringBuilder b = new StringBuilder(BASE_SUBREDDIT_LIST_URL);
         if (limit != -1) {
             b.append("?limit=").append(limit);
         }
-        return newUrl(b);
+        return b;
     }
 
-    public static URL subredditSearchUrl(String query, String more) {
+    public static CharSequence subredditSearch(String query, String more) {
         return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, more);
     }
 
-    public static URL subscribeUrl() {
-        return newUrl(API_SUBSCRIBE_URL);
+    public static CharSequence subscribe() {
+        return API_SUBSCRIBE_URL;
     }
 
-    public static URL userUrl(String user, int filter, String more) {
-        StringBuilder b = resetBuilder().append(BASE_USER_URL).append(user);
+    public static CharSequence user(String user, int filter, String more) {
+        StringBuilder b = new StringBuilder(BASE_USER_URL).append(user);
         switch (filter) {
             case FilterAdapter.PROFILE_OVERVIEW:
                 break;
@@ -312,40 +316,28 @@ public class Urls {
         if (more != null) {
             b.append("?count=25&after=").append(encode(more));
         }
-        return newUrl(b);
+        return b;
     }
 
-    public static URL voteUrl() {
-        return newUrl(API_VOTE_URL);
+    public static CharSequence vote() {
+        return API_VOTE_URL;
     }
 
-    public static String voteQuery(String modhash, String id, int vote) {
-        StringBuilder b = resetBuilder();
+    public static CharSequence voteQuery(String modhash, String id, int vote) {
+        StringBuilder b = new StringBuilder();
         b.append("id=").append(id);
         b.append("&dir=").append(encode(Integer.toString(vote)));
         b.append("&uh=").append(encode(modhash));
         b.append("&api_type=json");
-        return b.toString();
+        return b;
     }
 
-    private static URL newSearchUrl(String base, String query, String more) {
-        StringBuilder b = resetBuilder().append(base).append(encode(query));
+    private static CharSequence newSearchUrl(String base, String query, String more) {
+        StringBuilder b = new StringBuilder(base).append(encode(query));
         if (more != null) {
             b.append("&count=25&after=").append(encode(more));
         }
-        return newUrl(b);
-    }
-
-    public static URL newUrl(CharSequence url) {
-        try {
-            return new URL(url.toString());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static StringBuilder resetBuilder() {
-        return S.delete(0, S.length());
+        return b;
     }
 
     private static String encode(String param) {

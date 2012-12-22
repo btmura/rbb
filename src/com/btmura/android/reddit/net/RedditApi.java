@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -168,8 +167,8 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.commentsApiUrl(), cookie, true);
-            writeFormData(conn, Urls.commentsApiQuery(thingId, text, modhash));
+            conn = connect(Urls.commentsUrl(), cookie, true);
+            writeFormData(conn, Urls.commentsQuery(thingId, text, modhash));
             in = conn.getInputStream();
             return ResponseParser.parseResponse(in);
         } finally {
@@ -181,8 +180,8 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.deleteApiUrl(), cookie, true);
-            writeFormData(conn, Urls.deleteApiQuery(thingId, modhash));
+            conn = connect(Urls.deleteUrl(), cookie, true);
+            writeFormData(conn, Urls.deleteQuery(thingId, modhash));
             in = conn.getInputStream();
             return ResponseParser.parseResponse(in);
         } finally {
@@ -194,7 +193,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.captchaUrl(id), null, false);
+            conn = connect(Urls.captcha(id), null, false);
             in = conn.getInputStream();
             return BitmapFactory.decodeStream(in);
         } finally {
@@ -206,7 +205,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.newCaptchaUrl(), null, true);
+            conn = connect(Urls.newCaptcha(), null, true);
             writeFormData(conn, Urls.newCaptchaQuery());
             in = conn.getInputStream();
             return ResponseParser.parseResponse(in);
@@ -220,9 +219,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            URL url = Urls.sidebarUrl(subreddit);
-            conn = connect(url, cookie, false);
-
+            conn = connect(Urls.sidebar(subreddit), cookie, false);
             in = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(in));
             SidebarParser parser = new SidebarParser(context);
@@ -237,8 +234,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.subredditListUrl(1000), cookie, false);
-
+            conn = connect(Urls.subredditList(1000), cookie, false);
             in = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(in));
             SubredditParser parser = new SubredditParser();
@@ -254,8 +250,8 @@ public class RedditApi {
         HttpsURLConnection conn = null;
         InputStream in = null;
         try {
-            URL url = Urls.loginUrl(login);
-            conn = (HttpsURLConnection) url.openConnection();
+            CharSequence url = Urls.login(login);
+            conn = (HttpsURLConnection) Urls.newUrl(url).openConnection();
             setCommonHeaders(conn, null);
             setFormDataHeaders(conn);
             conn.connect();
@@ -272,7 +268,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.meUrl(), cookie, false);
+            conn = connect(Urls.me(), cookie, false);
             in = new BufferedInputStream(conn.getInputStream());
             return AccountResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
         } finally {
@@ -285,7 +281,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.subscribeUrl(), cookie, true);
+            conn = connect(Urls.subscribe(), cookie, true);
             conn.connect();
 
             writeFormData(conn, Urls.subscribeQuery(modhash, subreddit, subscribe));
@@ -303,7 +299,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.composeUrl(), cookie, true);
+            conn = connect(Urls.compose(), cookie, true);
             writeFormData(conn, Urls.composeQuery(to, subject, text,
                     captchaId, captchaGuess, modhash));
             in = conn.getInputStream();
@@ -319,7 +315,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.submitUrl(), cookie, true);
+            conn = connect(Urls.submit(), cookie, true);
             writeFormData(conn, Urls.submitQuery(modhash, subreddit, title, text, link,
                     captchaId, captchaGuess));
             in = conn.getInputStream();
@@ -334,7 +330,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.voteUrl(), cookie, true);
+            conn = connect(Urls.vote(), cookie, true);
             writeFormData(conn, Urls.voteQuery(modhash, name, vote));
             in = conn.getInputStream();
             return ResponseParser.parseResponse(in);
@@ -343,9 +339,9 @@ public class RedditApi {
         }
     }
 
-    public static HttpURLConnection connect(URL url, String cookie, boolean doOutput)
+    public static HttpURLConnection connect(CharSequence url, String cookie, boolean doOutput)
             throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        HttpURLConnection conn = (HttpURLConnection) Urls.newUrl(url).openConnection();
         setCommonHeaders(conn, cookie);
         if (doOutput) {
             setFormDataHeaders(conn);
@@ -358,7 +354,7 @@ public class RedditApi {
         conn.setRequestProperty("Accept-Charset", CHARSET);
         conn.setRequestProperty("User-Agent", USER_AGENT);
         if (!TextUtils.isEmpty(cookie)) {
-            conn.setRequestProperty("Cookie", Urls.loginCookie(cookie));
+            conn.setRequestProperty("Cookie", Urls.loginCookie(cookie).toString());
         }
     }
 
@@ -367,11 +363,11 @@ public class RedditApi {
         conn.setDoOutput(true);
     }
 
-    private static void writeFormData(HttpURLConnection conn, String data) throws IOException {
+    private static void writeFormData(HttpURLConnection conn, CharSequence data) throws IOException {
         OutputStream output = null;
         try {
             output = conn.getOutputStream();
-            output.write(data.getBytes(CHARSET));
+            output.write(data.toString().getBytes(CHARSET));
             output.close();
         } finally {
             if (output != null) {

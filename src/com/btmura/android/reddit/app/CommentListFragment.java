@@ -79,7 +79,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private String thingId;
     private String linkId;
     private String title;
-    private String url;
+    private CharSequence url;
     private int flags;
 
     private boolean sync;
@@ -87,13 +87,13 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private CommentAdapter adapter;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
-            String linkId, String title, String url, int flags) {
+            String linkId, String title, CharSequence url, int flags) {
         Bundle args = new Bundle(4);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_THING_ID, thingId);
         args.putString(ARG_LINK_ID, linkId);
         args.putString(ARG_TITLE, title);
-        args.putString(ARG_URL, url);
+        args.putCharSequence(ARG_URL, url);
         args.putInt(ARG_FLAGS, flags);
 
         CommentListFragment frag = new CommentListFragment();
@@ -124,11 +124,11 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (savedInstanceState != null) {
             sessionId = savedInstanceState.getString(STATE_SESSION_ID);
             title = savedInstanceState.getString(STATE_TITLE);
-            url = savedInstanceState.getString(STATE_URL);
+            url = savedInstanceState.getCharSequence(STATE_URL);
         } else {
             sessionId = thingId + "-" + System.currentTimeMillis();
             title = getArguments().getString(ARG_TITLE);
-            url = getArguments().getString(ARG_URL);
+            url = getArguments().getCharSequence(ARG_URL);
         }
 
         adapter = new CommentAdapter(getActivity(), accountName, this);
@@ -180,7 +180,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             if (TextUtils.isEmpty(url)) {
                 String permaLink = adapter.getString(0, CommentAdapter.INDEX_PERMA_LINK);
                 if (!TextUtils.isEmpty(permaLink)) {
-                    url = Urls.permaUrl(permaLink, null).toExternalForm();
+                    url = Urls.perma(permaLink, null);
                 }
             }
             getActivity().invalidateOptionsMenu();
@@ -501,7 +501,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             thingId = null; // Don't append anything to the permalink.
         }
         String permaLink = adapter.getString(0, CommentAdapter.INDEX_PERMA_LINK);
-        String text = Urls.permaUrl(permaLink, thingId).toExternalForm();
+        CharSequence text = Urls.perma(permaLink, thingId);
 
         // Copy to the clipboard and present a toast.
         MenuHelper.setClipAndToast(getActivity(), label, text);
@@ -516,7 +516,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         super.onSaveInstanceState(outState);
         outState.putString(STATE_SESSION_ID, sessionId);
         outState.putString(STATE_TITLE, title);
-        outState.putString(STATE_URL, url);
+        outState.putCharSequence(STATE_URL, url);
     }
 
     @Override

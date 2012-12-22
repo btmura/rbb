@@ -54,10 +54,10 @@ public class LinkFragment extends Fragment {
     private WebView webView;
     private ProgressBar progress;
 
-    public static LinkFragment newInstance(String title, String url) {
+    public static LinkFragment newInstance(String title, CharSequence url) {
         Bundle b = new Bundle(2);
         b.putString(ARG_TITLE, title);
-        b.putString(ARG_URL, url);
+        b.putCharSequence(ARG_URL, url);
         LinkFragment frag = new LinkFragment();
         frag.setArguments(b);
         return frag;
@@ -128,7 +128,7 @@ public class LinkFragment extends Fragment {
         if (savedInstanceState != null) {
             url = savedInstanceState.getString(STATE_URL);
         } else {
-            url = getArguments().getString(ARG_URL);
+            url = getArguments().getCharSequence(ARG_URL).toString();
         }
         if (PATTERN_IMAGE.matcher(url).matches()) {
             String img = String.format("<img src=\"%s\" width=\"100%%\" />", url);

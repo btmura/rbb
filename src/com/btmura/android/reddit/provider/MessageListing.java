@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
@@ -108,16 +107,16 @@ class MessageListing extends JsonParser implements Listing {
         }
     }
 
-    private URL getUrl() {
+    private CharSequence getUrl() {
         switch (listingType) {
             case Sessions.TYPE_MESSAGE_INBOX_LISTING:
-                return Urls.messageUrl(FilterAdapter.MESSAGE_INBOX, null);
+                return Urls.message(FilterAdapter.MESSAGE_INBOX, null);
 
             case Sessions.TYPE_MESSAGE_SENT_LISTING:
-                return Urls.messageUrl(FilterAdapter.MESSAGE_SENT, null);
+                return Urls.message(FilterAdapter.MESSAGE_SENT, null);
 
             case Sessions.TYPE_MESSAGE_THREAD_LISTING:
-                return Urls.newUrl(Urls.messageThread(thingId, Urls.TYPE_JSON));
+                return Urls.messageThread(thingId, Urls.TYPE_JSON);
 
             default:
                 throw new IllegalArgumentException();

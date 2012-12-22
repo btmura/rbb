@@ -30,13 +30,13 @@ import com.btmura.android.reddit.R;
 
 public class MenuHelper {
 
-    public static void startIntentChooser(Context context, String url) {
+    public static void startIntentChooser(Context context, CharSequence url) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
+        intent.setData(Uri.parse(url.toString()));
         context.startActivity(Intent.createChooser(intent, context.getString(R.string.menu_open)));
     }
 
-    public static void setShareProvider(MenuItem shareItem, String label, String text) {
+    public static void setShareProvider(MenuItem shareItem, String label, CharSequence text) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_SUBJECT, label);
