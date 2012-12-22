@@ -391,12 +391,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshThingPager(thingBundle);
     }
 
-    public void onLinkDiscovery(String thingId, String url) {
+    public void onLinkDiscovery(String thingId, String title, String url) {
         ControlFragment cf = getControlFragment();
         Bundle thingBundle = cf.getThingBundle();
         if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))
                 && !ThingBundle.hasLinkUrl(thingBundle)) {
             ThingBundle.putLinkUrl(thingBundle, url);
+            ThingBundle.putTitle(thingBundle, title);
             cf.setThingBundle(thingBundle);
 
             ThingPagerAdapter adapter = (ThingPagerAdapter) thingPager.getAdapter();

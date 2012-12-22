@@ -38,6 +38,7 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener,
         AccountNameHolder {
@@ -51,8 +52,13 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private static final int MATCH_SUBREDDIT = 1;
     private static final int MATCH_COMMENTS = 2;
     static {
+        // http://www.reddit.com/r/rbb
         MATCHER.addURI(AUTHORITY, "r/*", MATCH_SUBREDDIT);
+
+        // http://www.reddit.com/r/rbb/comments/12zl0q/
         MATCHER.addURI(AUTHORITY, "r/*/comments/*", MATCH_COMMENTS);
+
+        // http://www.reddit.com/r/rbb/comments/12zl0q/test_1
         MATCHER.addURI(AUTHORITY, "r/*/comments/*/*", MATCH_COMMENTS);
     }
 
@@ -83,22 +89,33 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 case MATCH_COMMENTS:
                     List<String> segments = data.getPathSegments();
                     requestedSubreddit = segments.get(1);
-                    requestedThingId = segments.get(2);
+                    requestedThingId = segments.get(3);
                     break;
             }
         }
+
+        // TODO: Do more sanity checks on the url data.
 
         // Process the intent's extras if available. The data takes precedence.
         if (TextUtils.isEmpty(requestedSubreddit)) {
             requestedSubreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
         }
 
-        // Single pane browser activity only shows subreddits, so start the more
-        // specific activity and bail out.
-        if (isSinglePane && !TextUtils.isEmpty(requestedSubreddit)) {
-            selectSubredditSinglePane(requestedSubreddit, ThingListActivity.FLAG_INSERT_HOME);
-            finish();
-            return true;
+        // Single pane browser only shows subreddits, so start another activity
+        // and finish this one.
+        if (isSinglePane) {
+            if (!TextUtils.isEmpty(requestedThingId)) {
+                Bundle b = new Bundle(2);
+                ThingBundle.putSubreddit(b, requestedSubreddit);
+                ThingBundle.putThingId(b, requestedThingId);
+                selectThingSinglePane(b);
+                finish();
+                return true;
+            } else if (!TextUtils.isEmpty(requestedSubreddit)) {
+                selectSubredditSinglePane(requestedSubreddit, ThingListActivity.FLAG_INSERT_HOME);
+                finish();
+                return true;
+            }
         }
 
         return false;

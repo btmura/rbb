@@ -80,7 +80,11 @@ public class ThingActivity extends GlobalMenuActivity implements
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_HOME_AS_UP
                 | ActionBar.DISPLAY_SHOW_TITLE);
-        bar.setTitle(ThingBundle.getTitle(thingBundle));
+        refreshTitle();
+    }
+
+    private void refreshTitle() {
+        setTitle(ThingBundle.getTitle(thingBundle));
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
@@ -95,10 +99,13 @@ public class ThingActivity extends GlobalMenuActivity implements
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
-    public void onLinkDiscovery(String thingId, String url) {
+    public void onLinkDiscovery(String thingId, String title, String url) {
         if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))
                 && !ThingBundle.hasLinkUrl(thingBundle)) {
             ThingBundle.putLinkUrl(thingBundle, url);
+            ThingBundle.putTitle(thingBundle, title);
+
+            refreshTitle();
 
             ThingPagerAdapter adapter = (ThingPagerAdapter) pager.getAdapter();
             adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
