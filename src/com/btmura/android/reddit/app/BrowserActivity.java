@@ -22,6 +22,8 @@ import android.app.ActionBar.OnNavigationListener;
 import android.content.ContentResolver;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.content.UriMatcher;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -38,8 +40,18 @@ import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener,
         AccountNameHolder {
 
-    public static final String EXTRA_SUBREDDIT_NAME = "sn";
+    /** String extra used to request a specific subreddit to view. */
+    public static final String EXTRA_SUBREDDIT = "subreddit";
 
+    // URI constants and matcher for handling intents with data.
+    private static final String AUTHORITY = "www.reddit.com";
+    private static final UriMatcher MATCHER = new UriMatcher(0);
+    private static final int MATCH_SUBREDDIT = 1;
+    static {
+        MATCHER.addURI(AUTHORITY, "r/*", MATCH_SUBREDDIT);
+    }
+
+    private String requestedSubreddit;
     private AccountSpinnerAdapter adapter;
     private SharedPreferences prefs;
 
@@ -50,12 +62,29 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected boolean skipSetup() {
-        if (isSinglePane && getIntent().hasExtra(EXTRA_SUBREDDIT_NAME)) {
-            String name = getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME);
-            selectSubredditSinglePane(name, ThingListActivity.FLAG_INSERT_HOME);
+        // Process the intent's data if available.
+        Uri data = getIntent().getData();
+        if (data != null) {
+            switch (MATCHER.match(data)) {
+                case MATCH_SUBREDDIT:
+                    requestedSubreddit = data.getLastPathSegment();
+                    break;
+            }
+        }
+
+        // Process the intent's extras if available. The data takes precedence.
+        if (TextUtils.isEmpty(requestedSubreddit)) {
+            requestedSubreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
+        }
+
+        // Single pane browser activity only shows subreddits, so start the more
+        // specific activity and bail out.
+        if (isSinglePane && !TextUtils.isEmpty(requestedSubreddit)) {
+            selectSubredditSinglePane(requestedSubreddit, ThingListActivity.FLAG_INSERT_HOME);
             finish();
             return true;
         }
+
         return false;
     }
 
@@ -138,10 +167,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         SubredditListFragment slf = getSubredditListFragment();
         ThingListFragment tlf = getThingListFragment();
         if (slf == null || !slf.getAccountName().equals(accountName)) {
-            String name = getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME);
             String subreddit;
-            if (!isSinglePane && !TextUtils.isEmpty(name)) {
-                subreddit = name;
+            if (!isSinglePane && !TextUtils.isEmpty(requestedSubreddit)) {
+                subreddit = requestedSubreddit;
             } else {
                 subreddit = AccountPreferences.getLastSubreddit(prefs, accountName);
             }
