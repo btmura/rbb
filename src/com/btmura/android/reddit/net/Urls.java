@@ -26,7 +26,6 @@ import android.text.TextUtils;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
-// TODO: Fix this class to be thread safe.
 public class Urls {
 
     /** Type for getting a HTML response. */
