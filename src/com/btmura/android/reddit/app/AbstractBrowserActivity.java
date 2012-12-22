@@ -251,10 +251,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                     + " filter: " + filter);
         }
 
-        ThingListFragment tlf = ThingListFragment.newInstance(accountName, query, profileUser,
-                messageUser, filter, tfFlags);
+        Fragment tf = ThingListFragment.newInstance(accountName, query, profileUser, messageUser,
+                filter, tfFlags);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+        ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
@@ -274,20 +274,20 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                     + " filter: " + filter);
         }
 
-        ControlFragment cf = ControlFragment.newInstance(accountName, null, null, filter);
-        SubredditListFragment slf = getSubredditListFragment();
-        ThingListFragment tlf = ThingListFragment.newInstance(accountName, query, profileUser,
-                messageUser, filter, tfFlags);
-        ThingMenuFragment tmf = getThingMenuFragment();
+        Fragment cf = ControlFragment.newInstance(accountName, null, null, filter);
+        Fragment sf = getSubredditListFragment();
+        Fragment tf = ThingListFragment.newInstance(accountName, query, profileUser, messageUser,
+                filter, tfFlags);
+        Fragment mf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        if (slf != null) {
-            ft.remove(slf);
+        if (sf != null) {
+            ft.remove(sf);
         }
-        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
-        if (tmf != null) {
-            ft.remove(tmf);
+        ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
+        if (mf != null) {
+            ft.remove(mf);
         }
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
@@ -309,15 +309,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (cf != null && cf.getSubreddit() == null) {
             cf.setSubreddit(subreddit);
 
-            SubredditListFragment slf = getSubredditListFragment();
-            slf.setSelectedSubreddit(subreddit);
+            SubredditListFragment sf = getSubredditListFragment();
+            sf.setSelectedSubreddit(subreddit);
 
-            ThingListFragment tlf = getThingListFragment();
+            ThingListFragment tf = getThingListFragment();
             if (subreddit != null) {
-                tlf.setSubreddit(subreddit);
-                tlf.loadIfPossible();
+                tf.setSubreddit(subreddit);
+                tf.loadIfPossible();
             } else {
-                tlf.setEmpty(error);
+                tf.setEmpty(error);
             }
 
             refreshActionBar(subreddit, null);
@@ -350,16 +350,16 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String accountName = getAccountName();
         int filter = getFilter();
 
-        ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, filter);
-        ThingListFragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit,
-                filter, tfFlags);
-        ThingMenuFragment tmf = getThingMenuFragment();
+        Fragment cf = ControlFragment.newInstance(accountName, subreddit, null, filter);
+        Fragment tf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
+                tfFlags);
+        Fragment mf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
-        if (tmf != null) {
-            ft.remove(tmf);
+        ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
+        if (mf != null) {
+            ft.remove(mf);
         }
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
