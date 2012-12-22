@@ -50,89 +50,30 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.CommentReplyActivity"
-            android:theme="@android:style/Theme.Holo.DialogWhenLarge"
-            tools:ignore="ExportedActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
         <activity
             android:name=".app.ComposeActivity"
             android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.ContentBrowserActivity"
-            android:label="@string/content_browser"
-            tools:ignore="ExportedActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
-        <activity
-            android:name=".app.MessageActivity"
-            tools:ignore="ExportedActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
-        <activity
-            android:name=".app.SearchActivity"
-            tools:ignore="ExportedActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
+            android:label="@string/content_browser" />
+        <activity android:name=".app.MessageActivity" />
+        <activity android:name=".app.SearchActivity" />
         <activity
             android:name=".app.SettingsActivity"
-            android:label="@string/settings_label"
-            tools:ignore="ExportedActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:label="@string/settings_label" />
         <activity
             android:name=".app.SidebarActivity"
             android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.SubmitLinkActivity"
             android:label="@string/submit_link_label"
-            android:theme="@android:style/Theme.Holo.DialogWhenLarge"
-            tools:ignore="ExportedActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
         <activity android:name=".app.ThingActivity" />
         <activity android:name=".app.ThingListActivity" />
-        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
-        <activity
-            android:name=".app.UserProfileActivity"
-            tools:ignore="ExportedActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".app.UserProfileActivity" />
 
         <activity-alias
             android:name=".MainActivity"
