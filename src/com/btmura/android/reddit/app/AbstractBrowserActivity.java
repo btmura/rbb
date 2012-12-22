@@ -65,8 +65,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected boolean isSinglePane;
     private ViewPager thingPager;
-    private int slfFlags;
-    private int tlfFlags;
+    private int sfFlags;
+    private int tfFlags;
 
     private View navContainer;
     private View subredditListContainer;
@@ -121,8 +121,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (!isSinglePane) {
             getFragmentManager().addOnBackStackChangedListener(this);
 
-            slfFlags |= SubredditListFragment.FLAG_SINGLE_CHOICE;
-            tlfFlags |= ThingListFragment.FLAG_SINGLE_CHOICE;
+            sfFlags |= SubredditListFragment.FLAG_SINGLE_CHOICE;
+            tfFlags |= ThingListFragment.FLAG_SINGLE_CHOICE;
 
             navContainer = findViewById(R.id.nav_container);
             subredditListContainer = findViewById(R.id.subreddit_list_container);
@@ -157,54 +157,66 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract boolean hasSubredditList();
 
-    protected void setSubredditListNavigation(String subreddit, String query) {
+    protected void setSubredditListNavigation(String subreddit, String query, Bundle thingBundle) {
         if (isSinglePane) {
             setSubredditListNavigationSinglePane(query);
         } else {
-            setSubredditListNavigationMultiPane(subreddit, query);
+            setSubredditListNavigationMultiPane(subreddit, query, thingBundle);
         }
     }
 
     private void setSubredditListNavigationSinglePane(String query) {
-        SubredditListFragment slf = SubredditListFragment.newInstance(getAccountName(), null,
-                query, slfFlags);
+        Fragment sf = SubredditListFragment.newInstance(getAccountName(), null, query, sfFlags);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.subreddit_list_container, slf, SubredditListFragment.TAG);
+        ft.replace(R.id.subreddit_list_container, sf, SubredditListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
     }
 
-    private void setSubredditListNavigationMultiPane(String subreddit, String query) {
+    private void setSubredditListNavigationMultiPane(String subreddit, String query,
+            Bundle thingBundle) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "setSubredditListNavigation subreddit:" + subreddit + " query: " + query);
+            Log.d(TAG, "setSubredditListNavigation subreddit:" + subreddit
+                    + " query: " + query
+                    + " thingBundle: " + thingBundle);
         }
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
         int filter = getFilter();
 
-        ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, filter);
-        SubredditListFragment slf = SubredditListFragment.newInstance(accountName, subreddit,
-                query, slfFlags);
-        ThingListFragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit,
-                filter, tlfFlags);
-        ThingMenuFragment tmf = getThingMenuFragment();
+        Fragment cf = ControlFragment.newInstance(accountName, subreddit, thingBundle, filter);
+        Fragment sf = SubredditListFragment.newInstance(accountName, subreddit, query, sfFlags);
+        Fragment tf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
+                tfFlags);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        ft.replace(R.id.subreddit_list_container, slf, SubredditListFragment.TAG);
-        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
-        if (tmf != null) {
-            ft.remove(tmf);
+        ft.replace(R.id.subreddit_list_container, sf, SubredditListFragment.TAG);
+        ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
+
+        // If a thing was specified by the thingBundle argument, then add the
+        // ThingMenuFragment. Otherwise, make sure to remove the prior
+        // ThingMenuFragment for some other thing.
+        if (thingBundle != null) {
+            Fragment mf = ThingMenuFragment.newInstance(subreddit);
+            ft.add(mf, ThingMenuFragment.TAG);
+        } else {
+            Fragment mf = getThingMenuFragment();
+            if (mf != null) {
+                ft.remove(mf);
+            }
         }
+
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
 
         refreshSubredditListVisibility();
-        refreshActionBar(subreddit, null);
-        refreshViews(null);
+        refreshActionBar(subreddit, thingBundle);
+        refreshViews(thingBundle);
+        refreshThingPager(thingBundle);
     }
 
     protected void setQueryThingListNavigation(String query) {
@@ -240,7 +252,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
 
         ThingListFragment tlf = ThingListFragment.newInstance(accountName, query, profileUser,
-                messageUser, filter, tlfFlags);
+                messageUser, filter, tfFlags);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
@@ -265,7 +277,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment cf = ControlFragment.newInstance(accountName, null, null, filter);
         SubredditListFragment slf = getSubredditListFragment();
         ThingListFragment tlf = ThingListFragment.newInstance(accountName, query, profileUser,
-                messageUser, filter, tlfFlags);
+                messageUser, filter, tfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -292,7 +304,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    protected void selectInitialSubredditMultiPane(String subreddit, boolean error) {
+    private void selectInitialSubredditMultiPane(String subreddit, boolean error) {
         ControlFragment cf = getControlFragment();
         if (cf != null && cf.getSubreddit() == null) {
             cf.setSubreddit(subreddit);
@@ -328,7 +340,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         startActivity(intent);
     }
 
-    protected void selectSubredditMultiPane(String subreddit) {
+    private void selectSubredditMultiPane(String subreddit) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
@@ -336,7 +348,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         ControlFragment cf = ControlFragment.newInstance(accountName, subreddit, null, filter);
         ThingListFragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit,
-                filter, tlfFlags);
+                filter, tfFlags);
         ThingMenuFragment tmf = getThingMenuFragment();
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -373,7 +385,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         startActivity(intent);
     }
 
-    protected void selectThingMultiPane(Bundle thingBundle, int thingPosition) {
+    private void selectThingMultiPane(Bundle thingBundle, int thingPosition) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
@@ -442,6 +454,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (cf != null) {
             String subreddit = cf.getSubreddit();
             Bundle thingBundle = cf.getThingBundle();
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "onBackStackChanged subreddit: " + subreddit
+                        + " thingBundle: " + thingBundle);
+            }
             refreshActionBar(subreddit, thingBundle);
             refreshViews(thingBundle);
             refreshCheckedItems();
@@ -530,6 +546,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void refreshThingPager(Bundle thingBundle) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "refreshThingPager thingBundle: " + thingBundle);
+        }
         if (thingBundle != null) {
             ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(),
                     getAccountName(), thingBundle);

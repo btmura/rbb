@@ -203,19 +203,19 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             // Set the subreddit to be the account's last visited subreddit.
             String subreddit = AccountPreferences.getLastSubreddit(prefs, accountName);
 
-            // Override the subreddit to the one requested by the intent.
-            // Single pane activites already have launched another activity.
+            // Reference to thingBundle that will often be null.
+            Bundle thingBundle = null;
+
+            // Override the subreddit and thing to the one requested by the
+            // intent. Single pane activities have launched another activity to
+            // handle intent URIs already.
             if (!isSinglePane && !TextUtils.isEmpty(requestedSubreddit)) {
                 subreddit = requestedSubreddit;
+                thingBundle = requestedThingBundle;
                 requestedSubreddit = null;
-            }
-            setSubredditListNavigation(subreddit, null);
-
-            // Navigate to the thing requested by the intent if specified.
-            if (!isSinglePane && requestedThingBundle != null) {
-                selectThingMultiPane(requestedThingBundle, 0);
                 requestedThingBundle = null;
             }
+            setSubredditListNavigation(subreddit, null, thingBundle);
         } else if (tlf != null && tlf.getFilter() != filter) {
             replaceThingListFragmentMultiPane();
         }
