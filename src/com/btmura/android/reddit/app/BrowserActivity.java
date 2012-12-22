@@ -65,8 +65,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     /** Requested subreddit from intent data or extra. */
     private String requestedSubreddit;
 
-    /** Requested thing from intent data. */
-    private String requestedThingId;
+    /** Requested thing bundle from intent data. */
+    private Bundle requestedThingBundle;
 
     private AccountSpinnerAdapter adapter;
     private SharedPreferences prefs;
@@ -89,7 +89,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 case MATCH_COMMENTS:
                     List<String> segments = data.getPathSegments();
                     requestedSubreddit = segments.get(1);
-                    requestedThingId = segments.get(3);
+                    requestedThingBundle = new Bundle(2);
+                    ThingBundle.putSubreddit(requestedThingBundle, requestedSubreddit);
+                    ThingBundle.putThingId(requestedThingBundle, segments.get(3));
                     break;
             }
         }
@@ -104,11 +106,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         // Single pane browser only shows subreddits, so start another activity
         // and finish this one.
         if (isSinglePane) {
-            if (!TextUtils.isEmpty(requestedThingId)) {
-                Bundle b = new Bundle(2);
-                ThingBundle.putSubreddit(b, requestedSubreddit);
-                ThingBundle.putThingId(b, requestedThingId);
-                selectThingSinglePane(b, ThingActivity.FLAG_INSERT_HOME);
+            if (requestedThingBundle != null) {
+                selectThingSinglePane(requestedThingBundle, ThingActivity.FLAG_INSERT_HOME);
                 finish();
                 return true;
             } else if (!TextUtils.isEmpty(requestedSubreddit)) {
