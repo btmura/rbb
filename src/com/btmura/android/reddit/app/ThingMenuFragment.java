@@ -24,19 +24,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingMenuFragment extends Fragment {
 
     public static final String TAG = "ThingMenuFragment";
 
-    private static final String ARG_THING_BUNDLE = "thingBundle";
+    private static final String ARG_SUBREDDIT = "subreddit";
 
-    private Bundle thingBundle;
-
-    public static ThingMenuFragment newInstance(Bundle thingBundle) {
+    public static ThingMenuFragment newInstance(String subreddit) {
         Bundle args = new Bundle(1);
-        args.putBundle(ARG_THING_BUNDLE, thingBundle);
+        args.putString(ARG_SUBREDDIT, subreddit);
         ThingMenuFragment f = new ThingMenuFragment();
         f.setArguments(args);
         return f;
@@ -45,7 +42,6 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        thingBundle = getArguments().getBundle(ARG_THING_BUNDLE);
         setHasOptionsMenu(true);
     }
 
@@ -84,7 +80,7 @@ public class ThingMenuFragment extends Fragment {
 
     private void handleViewSidebar() {
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, ThingBundle.getSubreddit(thingBundle));
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getArguments().getString(ARG_SUBREDDIT));
         startActivity(intent);
     }
 }

@@ -379,7 +379,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         ControlFragment cf = getControlFragment();
         cf = ControlFragment.newInstance(accountName, cf.getSubreddit(), thingBundle, filter);
-        ThingMenuFragment tf = ThingMenuFragment.newInstance(thingBundle);
+        ThingMenuFragment tf = ThingMenuFragment.newInstance(
+                ThingBundle.getSubreddit(thingBundle));
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);

@@ -69,7 +69,8 @@ public class ThingActivity extends GlobalMenuActivity implements
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
-            ft.add(ThingMenuFragment.newInstance(thingBundle), ThingMenuFragment.TAG);
+            ft.add(ThingMenuFragment.newInstance(ThingBundle.getSubreddit(thingBundle)),
+                    ThingMenuFragment.TAG);
             ft.commit();
         }
     }
