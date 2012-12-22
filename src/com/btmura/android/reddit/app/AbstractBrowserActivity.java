@@ -358,16 +358,17 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     public void onThingSelected(Bundle thingBundle, int position) {
         if (isSinglePane) {
-            selectThingSinglePane(thingBundle);
+            selectThingSinglePane(thingBundle, 0);
         } else {
             selectThingMultiPane(thingBundle, position);
         }
     }
 
-    protected void selectThingSinglePane(Bundle thingBundle) {
+    protected void selectThingSinglePane(Bundle thingBundle, int flags) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
+        intent.putExtra(ThingActivity.EXTRA_FLAGS, flags);
         startActivity(intent);
     }
 

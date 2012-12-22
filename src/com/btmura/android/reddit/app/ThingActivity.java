@@ -19,6 +19,7 @@ package com.btmura.android.reddit.app;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -39,6 +40,9 @@ public class ThingActivity extends GlobalMenuActivity implements
     public static final String TAG = "ThingActivity";
 
     public static final String EXTRA_THING_BUNDLE = "thingBundle";
+    public static final String EXTRA_FLAGS = "flags";
+
+    public static final int FLAG_INSERT_HOME = 0x1;
 
     private static final String STATE_THING_BUNDLE = EXTRA_THING_BUNDLE;
 
@@ -133,12 +137,27 @@ public class ThingActivity extends GlobalMenuActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                handleHome();
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void handleHome() {
+        if (insertBackStack()) {
+            Intent intent = new Intent(this, ThingListActivity.class);
+            intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, getSubredditName());
+            intent.putExtra(ThingListActivity.EXTRA_FLAGS, ThingListActivity.FLAG_INSERT_HOME);
+            startActivity(intent);
+        }
+        finish();
+    }
+
+    private boolean insertBackStack() {
+        int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
+        return (flags & FLAG_INSERT_HOME) == FLAG_INSERT_HOME;
     }
 
     @Override

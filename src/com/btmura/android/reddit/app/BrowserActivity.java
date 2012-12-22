@@ -108,7 +108,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 Bundle b = new Bundle(2);
                 ThingBundle.putSubreddit(b, requestedSubreddit);
                 ThingBundle.putThingId(b, requestedThingId);
-                selectThingSinglePane(b);
+                selectThingSinglePane(b, ThingActivity.FLAG_INSERT_HOME);
                 finish();
                 return true;
             } else if (!TextUtils.isEmpty(requestedSubreddit)) {
