@@ -276,8 +276,8 @@ public class RedditApi {
         }
     }
 
-    public static void subscribe(String cookie, String modhash, String subreddit,
-            boolean subscribe) throws IOException {
+    public static void subscribe(String subreddit, boolean subscribe, String cookie,
+            String modhash) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {

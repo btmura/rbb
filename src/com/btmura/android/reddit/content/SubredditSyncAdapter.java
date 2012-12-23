@@ -194,7 +194,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
                 if (expiration == 0) {
                     try {
                         boolean subscribe = state == Subreddits.STATE_INSERTING;
-                        RedditApi.subscribe(cookie, modhash, name, subscribe);
+                        RedditApi.subscribe(name, subscribe, cookie, modhash);
                         long newExpiration = System.currentTimeMillis() + EXPIRATION_PADDING;
                         ops.add(ContentProviderOperation.newUpdate(SubredditProvider.SUBREDDITS_URI)
                                 .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
