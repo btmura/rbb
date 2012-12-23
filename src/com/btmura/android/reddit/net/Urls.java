@@ -43,8 +43,10 @@ public class Urls {
     private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
     private static final String API_ME_URL = BASE_URL + "/api/me";
     private static final String API_NEW_CAPTCHA_URL = BASE_URL + "/api/new_captcha";
+    private static final String API_SAVE_URL = BASE_URL + "/api/save";
     private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
     private static final String API_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
+    private static final String API_UNSAVE_URL = BASE_URL + "/api/unsave";
     private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
 
     private static final String BASE_CAPTCHA_URL = BASE_URL + "/captcha/";
@@ -192,6 +194,14 @@ public class Urls {
         return "api_type=json";
     }
 
+    public static CharSequence saveQuery(String thingId, String modhash) {
+        StringBuilder b = new StringBuilder();
+        b.append("id=").append(encode(thingId));
+        b.append("&uh=").append(encode(modhash));
+        b.append("&api_type=json");
+        return b;
+    }
+
     public static CharSequence subscribeQuery(String modhash, String subreddit, boolean subscribe) {
         StringBuilder b = new StringBuilder();
         b.append("action=").append(subscribe ? "sub" : "unsub");
@@ -207,6 +217,10 @@ public class Urls {
             b.append(removeTag(thingId));
         }
         return b;
+    }
+
+    public static CharSequence save(boolean save) {
+        return save ? API_SAVE_URL : API_UNSAVE_URL;
     }
 
     public static CharSequence search(String query, String more) {

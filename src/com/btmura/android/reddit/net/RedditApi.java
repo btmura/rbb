@@ -276,6 +276,21 @@ public class RedditApi {
         }
     }
 
+    public static Result save(String thingId, boolean save, String cookie, String modhash)
+            throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            conn = connect(Urls.save(save), cookie, true);
+            conn.connect();
+            writeFormData(conn, Urls.saveQuery(thingId, modhash));
+            in = conn.getInputStream();
+            return ResponseParser.parseResponse(in);
+        } finally {
+            close(in, conn);
+        }
+    }
+
     public static void subscribe(String subreddit, boolean subscribe, String cookie,
             String modhash) throws IOException {
         HttpURLConnection conn = null;
