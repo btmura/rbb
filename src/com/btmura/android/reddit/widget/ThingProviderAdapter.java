@@ -28,7 +28,9 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
@@ -60,7 +62,10 @@ class ThingProviderAdapter extends ProviderAdapter {
             Things.COLUMN_THUMBNAIL_URL,
             Things.COLUMN_UPS,
             Things.COLUMN_URL,
-            Things.COLUMN_VOTE,
+
+            // Following 2 columns are from joined tables at the end.
+            Saves.COLUMN_ACTION,
+            Votes.COLUMN_VOTE,
     };
 
     private static final int INDEX_AUTHOR = 1;
@@ -84,7 +89,10 @@ class ThingProviderAdapter extends ProviderAdapter {
     private static final int INDEX_THUMBNAIL_URL = 19;
     private static final int INDEX_UPS = 20;
     private static final int INDEX_URL = 21;
-    private static final int INDEX_VOTE = 22;
+
+    // Following 2 colums are from joined tables at the end.
+    private static final int INDEX_SAVE_ACTION = 22;
+    private static final int INDEX_VOTE = 23;
 
     @Override
     Uri getLoaderUri(Bundle args) {
@@ -97,7 +105,7 @@ class ThingProviderAdapter extends ProviderAdapter {
                         getSessionId(args))
                 .appendQueryParameter(ThingProvider.PARAM_FILTER,
                         Integer.toString(getFilter(args)))
-                .appendQueryParameter(ThingProvider.PARAM_JOIN_VOTES,
+                .appendQueryParameter(ThingProvider.PARAM_JOIN,
                         Boolean.toString(true));
 
         // Empty but non-null subreddit means front page.
@@ -181,7 +189,8 @@ class ThingProviderAdapter extends ProviderAdapter {
 
     @Override
     boolean isSaved(ThingAdapter adapter, int position) {
-        return adapter.getBoolean(position, INDEX_SAVED);
+        return adapter.getBoolean(position, INDEX_SAVED)
+                || adapter.getInt(position, INDEX_SAVE_ACTION) == Saves.ACTION_SAVE;
     }
 
     @Override

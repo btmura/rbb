@@ -302,8 +302,8 @@ public class Provider {
         });
     }
 
-    static void
-            applyOps(Context context, String authority, ArrayList<ContentProviderOperation> ops) {
+    static void applyOps(Context context, String authority,
+            ArrayList<ContentProviderOperation> ops) {
         try {
             context.getContentResolver().applyBatch(authority, ops);
         } catch (RemoteException e) {

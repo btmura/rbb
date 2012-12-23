@@ -41,10 +41,10 @@ public class Saves implements BaseColumns {
     public static final String COLUMN_EXPIRATION = "expiration";
 
     /** Action column value to save something. */
-    public static final int ACTION_SAVE = 0;
+    public static final int ACTION_SAVE = 1;
 
     /** Action column value to unsave something. */
-    public static final int ACTION_UNSAVE = 1;
+    public static final int ACTION_UNSAVE = -1;
 
     /** Creates the savedThings table. */
     static void createTable(SQLiteDatabase db) {

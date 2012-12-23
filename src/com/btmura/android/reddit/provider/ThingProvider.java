@@ -74,7 +74,7 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_THING_ID = "thingId";
     public static final String PARAM_LINK_ID = "linkId";
 
-    public static final String PARAM_JOIN_VOTES = "joinVotes";
+    public static final String PARAM_JOIN = "joinVotes";
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
@@ -89,7 +89,17 @@ public class ThingProvider extends SessionProvider {
         MATCHER.addURI(AUTHORITY, PATH_SAVES, MATCH_SAVES);
     }
 
-    private static final String TABLE_NAME_WITH_VOTES = Things.TABLE_NAME
+    private static final String JOINED_THING_TABLE = Things.TABLE_NAME
+            // Join with pending saves to fake that the save happened.
+            + " LEFT OUTER JOIN (SELECT "
+            + Saves.COLUMN_ACCOUNT + ", "
+            + Saves.COLUMN_THING_ID + ", "
+            + Saves.COLUMN_ACTION
+            + " FROM " + Saves.TABLE_NAME + ") USING ("
+            + Saves.COLUMN_ACCOUNT + ", "
+            + Things.COLUMN_THING_ID + ")"
+
+            // Join with pending votes to fake that the vote happened.
             + " LEFT OUTER JOIN (SELECT "
             + Votes.COLUMN_ACCOUNT + ", "
             + Votes.COLUMN_THING_ID + ", "
@@ -107,8 +117,8 @@ public class ThingProvider extends SessionProvider {
         int match = MATCHER.match(uri);
         switch (match) {
             case MATCH_THINGS:
-                if (uri.getBooleanQueryParameter(PARAM_JOIN_VOTES, false)) {
-                    return TABLE_NAME_WITH_VOTES;
+                if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
+                    return JOINED_THING_TABLE;
                 } else {
                     return Things.TABLE_NAME;
                 }
