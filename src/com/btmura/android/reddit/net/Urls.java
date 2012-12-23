@@ -202,7 +202,8 @@ public class Urls {
         return b;
     }
 
-    public static CharSequence subscribeQuery(String modhash, String subreddit, boolean subscribe) {
+    public static CharSequence subscribeQuery(String subreddit, boolean subscribe,
+            String modhash) {
         StringBuilder b = new StringBuilder();
         b.append("action=").append(subscribe ? "sub" : "unsub");
         b.append("&uh=").append(encode(modhash));

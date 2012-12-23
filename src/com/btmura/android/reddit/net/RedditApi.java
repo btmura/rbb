@@ -299,7 +299,7 @@ public class RedditApi {
             conn = connect(Urls.subscribe(), cookie, true);
             conn.connect();
 
-            writeFormData(conn, Urls.subscribeQuery(modhash, subreddit, subscribe));
+            writeFormData(conn, Urls.subscribeQuery(subreddit, subscribe, modhash));
             in = conn.getInputStream();
             if (BuildConfig.DEBUG) {
                 logResponse(in);
