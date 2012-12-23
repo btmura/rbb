@@ -323,6 +323,10 @@ public class Urls {
                 b.append("/submitted");
                 break;
 
+            case FilterAdapter.PROFILE_SAVED:
+                b.append("/saved");
+                break;
+
             default:
                 throw new IllegalArgumentException(Integer.toString(filter));
         }

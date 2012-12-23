@@ -35,6 +35,7 @@ public class FilterAdapter extends BaseAdapter {
     public static final int PROFILE_OVERVIEW = 0;
     public static final int PROFILE_COMMENTS = 1;
     public static final int PROFILE_SUBMITTED = 2;
+    public static final int PROFILE_SAVED = 3;
 
     public static final int SUBREDDIT_HOT = 0;
     public static final int SUBREDDIT_TOP = 1;
@@ -59,6 +60,7 @@ public class FilterAdapter extends BaseAdapter {
         add(context, R.string.filter_profile_overview);
         add(context, R.string.filter_profile_comments);
         add(context, R.string.filter_profile_submitted);
+        add(context, R.string.filter_profile_saved);
         notifyDataSetChanged();
     }
 

@@ -40,6 +40,7 @@
     <string name="filter_profile_overview">overview</string>
     <string name="filter_profile_comments">comments</string>
     <string name="filter_profile_submitted">submitted</string>
+    <string name="filter_profile_saved">saved</string>
     <string name="filter_subreddit_hot">what\'s hot</string>
     <string name="filter_subreddit_new">new</string>
     <string name="filter_subreddit_controversial">controversial</string>
