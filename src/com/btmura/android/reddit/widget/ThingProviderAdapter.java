@@ -216,7 +216,7 @@ class ThingProviderAdapter extends ProviderAdapter {
         // Comment references just provide a thing and link id.
         String thingId = adapter.getString(position, INDEX_THING_ID);
         String linkId = adapter.getString(position, INDEX_LINK_ID);
-        return Urls.comments(thingId, linkId, Urls.TYPE_HTML);
+        return Urls.commentListing(thingId, linkId, Urls.TYPE_HTML);
     }
 
     @Override

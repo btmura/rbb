@@ -67,7 +67,7 @@ public class Urls {
         }
     }
 
-    public static CharSequence commentsUrl() {
+    public static CharSequence comments() {
         return API_COMMENTS_URL;
     }
 
@@ -84,7 +84,7 @@ public class Urls {
         return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
     }
 
-    public static CharSequence comments(String id, String linkId, int apiType) {
+    public static CharSequence commentListing(String id, String linkId, int apiType) {
         id = removeTag(id);
         StringBuilder b = new StringBuilder(BASE_COMMENTS_URL);
         if (!TextUtils.isEmpty(linkId)) {
@@ -122,7 +122,7 @@ public class Urls {
         return b.toString();
     }
 
-    public static CharSequence deleteUrl() {
+    public static CharSequence delete() {
         return API_DELETE_URL;
     }
 
@@ -236,8 +236,8 @@ public class Urls {
         return API_SUBMIT_URL;
     }
 
-    public static CharSequence submitQuery(String modhash, String subreddit, String title,
-            String text, boolean link, String captchaId, String captchaGuess) {
+    public static CharSequence submitQuery(String subreddit, String title, String text,
+            boolean link, String captchaId, String captchaGuess, String modhash) {
         StringBuilder b = new StringBuilder();
         b.append(link ? "kind=link" : "kind=self");
         b.append("&uh=").append(encode(modhash));
@@ -337,9 +337,9 @@ public class Urls {
         return API_VOTE_URL;
     }
 
-    public static CharSequence voteQuery(String modhash, String id, int vote) {
+    public static CharSequence voteQuery(String thingId, int vote, String modhash) {
         StringBuilder b = new StringBuilder();
-        b.append("id=").append(id);
+        b.append("id=").append(thingId);
         b.append("&dir=").append(encode(Integer.toString(vote)));
         b.append("&uh=").append(encode(modhash));
         b.append("&api_type=json");

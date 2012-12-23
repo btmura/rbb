@@ -50,6 +50,8 @@ public class RedditApi {
             + CHARSET;
     private static final String USER_AGENT = "reddit by brian (rbb) for Android by /u/btmura";
 
+    private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
+
     public static class Result {
         public double rateLimit;
 
@@ -164,29 +166,11 @@ public class RedditApi {
 
     public static Result comment(String thingId, String text, String cookie, String modhash)
             throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.commentsUrl(), cookie, true);
-            writeFormData(conn, Urls.commentsQuery(thingId, text, modhash));
-            in = conn.getInputStream();
-            return ResponseParser.parseResponse(in);
-        } finally {
-            close(in, conn);
-        }
+        return postData(Urls.comments(), Urls.commentsQuery(thingId, text, modhash), cookie);
     }
 
     public static Result delete(String thingId, String cookie, String modhash) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.deleteUrl(), cookie, true);
-            writeFormData(conn, Urls.deleteQuery(thingId, modhash));
-            in = conn.getInputStream();
-            return ResponseParser.parseResponse(in);
-        } finally {
-            close(in, conn);
-        }
+        return postData(Urls.delete(), Urls.deleteQuery(thingId, modhash), cookie);
     }
 
     public static Bitmap getCaptcha(String id) throws IOException {
@@ -202,16 +186,7 @@ public class RedditApi {
     }
 
     public static Result newCaptcha() throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.newCaptcha(), null, true);
-            writeFormData(conn, Urls.newCaptchaQuery());
-            in = conn.getInputStream();
-            return ResponseParser.parseResponse(in);
-        } finally {
-            close(in, conn);
-        }
+        return postData(Urls.newCaptcha(), Urls.newCaptchaQuery(), null);
     }
 
     public static SidebarResult getSidebar(Context context, String subreddit, String cookie)
@@ -278,76 +253,45 @@ public class RedditApi {
 
     public static Result save(String thingId, boolean save, String cookie, String modhash)
             throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.save(save), cookie, true);
-            conn.connect();
-            writeFormData(conn, Urls.saveQuery(thingId, modhash));
-            in = conn.getInputStream();
-            return ResponseParser.parseResponse(in);
-        } finally {
-            close(in, conn);
-        }
+        return postData(Urls.save(save), Urls.saveQuery(thingId, modhash), cookie);
     }
 
-    public static void subscribe(String subreddit, boolean subscribe, String cookie,
+    public static Result subscribe(String subreddit, boolean subscribe, String cookie,
             String modhash) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.subscribe(), cookie, true);
-            conn.connect();
-
-            writeFormData(conn, Urls.subscribeQuery(subreddit, subscribe, modhash));
-            in = conn.getInputStream();
-            if (BuildConfig.DEBUG) {
-                logResponse(in);
-            }
-        } finally {
-            close(in, conn);
-        }
+        return postData(Urls.subscribe(), Urls.subscribeQuery(subreddit, subscribe, modhash),
+                cookie);
     }
 
     public static Result compose(String to, String subject, String text, String captchaId,
             String captchaGuess, String cookie, String modhash) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.compose(), cookie, true);
-            writeFormData(conn, Urls.composeQuery(to, subject, text,
-                    captchaId, captchaGuess, modhash));
-            in = conn.getInputStream();
-            return ResponseParser.parseResponse(logResponse(in));
-        } finally {
-            close(in, conn);
-        }
+        return postData(Urls.compose(), Urls.composeQuery(to, subject, text,
+                captchaId, captchaGuess, modhash), cookie);
     }
 
     public static Result submit(String subreddit, String title, String text, boolean link,
             String captchaId, String captchaGuess, String cookie, String modhash)
             throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.submit(), cookie, true);
-            writeFormData(conn, Urls.submitQuery(modhash, subreddit, title, text, link,
-                    captchaId, captchaGuess));
-            in = conn.getInputStream();
-            return ResponseParser.parseResponse(in);
-        } finally {
-            close(in, conn);
-        }
+        return postData(Urls.submit(), Urls.submitQuery(subreddit, title, text, link, captchaId,
+                captchaGuess, modhash), cookie);
     }
 
-    public static Result vote(Context context, String name, int vote, String cookie,
+    public static Result vote(Context context, String thingId, int vote, String cookie,
             String modhash) throws IOException {
+        return postData(Urls.vote(), Urls.voteQuery(thingId, vote, modhash), cookie);
+    }
+
+    private static Result postData(CharSequence url, CharSequence data, String cookie)
+            throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.vote(), cookie, true);
-            writeFormData(conn, Urls.voteQuery(modhash, name, vote));
+            conn = connect(url, cookie, true);
+            conn.connect();
+            writeFormData(conn, data);
             in = conn.getInputStream();
+            if (LOG_RESPONSES) {
+                in = logResponse(in);
+            }
             return ResponseParser.parseResponse(in);
         } finally {
             close(in, conn);

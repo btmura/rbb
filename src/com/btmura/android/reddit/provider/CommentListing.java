@@ -93,7 +93,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
-        CharSequence url = Urls.comments(thingId, linkId, Urls.TYPE_JSON);
+        CharSequence url = Urls.commentListing(thingId, linkId, Urls.TYPE_JSON);
         HttpURLConnection conn = RedditApi.connect(url, cookie, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
