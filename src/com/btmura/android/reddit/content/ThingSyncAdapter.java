@@ -48,12 +48,6 @@ import com.btmura.android.reddit.net.RedditApi.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 
-/**
- * {@link AbstractThreadedSyncAdapter} that syncs pending replies to the server.
- * It processes one reply at a time to avoid hitting the rate limit. It
- * schedules a periodic sync when it needs to sync the remaining pending
- * replies.
- */
 public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "ThingSyncAdapter";
@@ -144,6 +138,11 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
+    /**
+     * Syncs pending replies to the server by processeing one reply at a time to
+     * avoid hitting the rate limit. It schedules a periodic sync when it needs
+     * to sync the remaining pending replies.
+     */
     private void syncComments(Account account, Bundle extras, String authority,
             ContentProviderClient provider, SyncResult syncResult, String cookie, String modhash) {
         try {
@@ -291,7 +290,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             if (!ops.isEmpty()) {
                 ContentProviderResult[] results = provider.applyBatch(ops);
                 int count = results.length;
-                for (int i = 0; i < count; ) {
+                for (int i = 0; i < count;) {
                     // Number of results should be in multiples of two.
                     syncResult.stats.numDeletes += results[i++].count;
                     syncResult.stats.numUpdates += results[i++].count;
