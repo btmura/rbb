@@ -41,6 +41,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.net.RedditApi;
@@ -74,6 +75,16 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int COMMENT_THING_ID = 2;
     private static final int COMMENT_TEXT = 3;
 
+    private static final String[] SAVE_PROJECTION = {
+            Saves._ID,
+            Saves.COLUMN_THING_ID,
+            Saves.COLUMN_ACTION,
+    };
+
+    private static final int SAVE_ID = 0;
+    private static final int SAVE_THING_ID = 1;
+    private static final int SAVE_ACTION = 2;
+
     private static final String[] VOTE_PROJECTION = {
             Votes._ID,
             Votes.COLUMN_THING_ID,
@@ -83,6 +94,8 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int VOTE_ID = 0;
     private static final int VOTE_THING_ID = 1;
     private static final int VOTE_VOTE = 2;
+
+    public static final String SELECT_BY_ACCOUNT = Votes.COLUMN_ACCOUNT + " = ?";
 
     public ThingSyncAdapter(Context context) {
         super(context, true);
@@ -115,9 +128,9 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             // Sync comments and votes. Exceptions are handled within the
-            // methods to make sure both comments and votes are processed each
-            // time.
+            // methods to make sure both comments and votes are processed.
             syncComments(account, extras, authority, provider, syncResult, cookie, modhash);
+            syncSaves(account, extras, authority, provider, syncResult, cookie, modhash);
             syncVotes(account, extras, authority, provider, syncResult, cookie, modhash);
 
         } catch (OperationCanceledException e) {
@@ -240,14 +253,76 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
+    private void syncSaves(Account account, Bundle extras, String authority,
+            ContentProviderClient provider, SyncResult syncResult, String cookie, String modhash) {
+        try {
+            // Get all pending saves for this account that haven't been synced.
+            Cursor c = provider.query(ThingProvider.SAVES_URI, SAVE_PROJECTION,
+                    SELECT_BY_ACCOUNT, Array.of(account.name), null);
+
+            // Bail out early if there are no saves to process.
+            if (c.getCount() == 0) {
+                c.close();
+                return;
+            }
+
+            // 2 ops per save. 1 for save and 1 to update affected sessions.
+            ArrayList<ContentProviderOperation> ops =
+                    new ArrayList<ContentProviderOperation>(c.getCount() * 2);
+
+            while (c.moveToNext()) {
+                long id = c.getLong(SAVE_ID);
+                String thingId = c.getString(SAVE_THING_ID);
+                int action = c.getInt(SAVE_ACTION);
+
+                try {
+                    boolean saved = action == Saves.ACTION_SAVE;
+                    RedditApi.save(thingId, saved, cookie, modhash);
+                    ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVES_URI)
+                            .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
+                            .build());
+
+                    // Update the tables that join with the votes table since we
+                    // will delete the pending vote rows afterwards.
+                    String[] selectionArgs = Array.of(account.name, thingId);
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
+                            .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
+                            .withValue(Things.COLUMN_SAVED, saved)
+                            .build());
+
+                } catch (IOException e) {
+                    Log.e(TAG, e.getMessage(), e);
+                    syncResult.stats.numIoExceptions++;
+                }
+            }
+            c.close();
+
+            // Now delete the successful ops from the database.
+            // The server shows the updates immediately.
+            if (!ops.isEmpty()) {
+                ContentProviderResult[] results = provider.applyBatch(ops);
+                int count = results.length;
+                for (int i = 0; i < count;) {
+                    // Number of results should be in multiples of two.
+                    syncResult.stats.numDeletes += results[i++].count;
+                    syncResult.stats.numUpdates += results[i++].count;
+                }
+            }
+        } catch (RemoteException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.databaseError = true;
+        } catch (OperationApplicationException e) {
+            Log.e(TAG, e.getMessage(), e);
+            syncResult.databaseError = true;
+        }
+    }
+
     private void syncVotes(Account account, Bundle extras, String authority,
             ContentProviderClient provider, SyncResult syncResult, String cookie, String modhash) {
         try {
             // Get all pending votes for this account that haven't been synced.
             Cursor c = provider.query(ThingProvider.VOTES_URI, VOTE_PROJECTION,
-                    Votes.SELECT_BY_ACCOUNT, Array.of(account.name), null);
-
-            // TODO: Drop duplicate votes to minimize number of RPCs.
+                    SELECT_BY_ACCOUNT, Array.of(account.name), null);
 
             // Bail out early if there are no votes to process.
             if (c.getCount() == 0) {
@@ -255,6 +330,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
+            // 2 ops per vote: 1 for vote and 1 to update affected sessions.
             ArrayList<ContentProviderOperation> ops =
                     new ArrayList<ContentProviderOperation>(c.getCount() * 2);
 
