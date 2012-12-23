@@ -20,35 +20,33 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
- * {@link Votes} is a table that stores pending upvotes and downvotes before
- * they are synced back to the server.
+ * {@link Saves} is a table that stores pending saves and unsaves before they
+ * are synced back the server.
  */
-public class Votes implements BaseColumns {
-    public static final String TABLE_NAME = "votes";
+public class Saves implements BaseColumns {
 
-    /** Account that liked this thing. */
+    /** Name of the table to store save and unsave actions. */
+    public static final String TABLE_NAME = "saveds";
+
+    /** Account that either saved on unsaved this thing. */
     public static final String COLUMN_ACCOUNT = "account";
 
-    /** String ID of the thing that the user wants to vote on. */
+    /** String ID of the thing that the user wants to save or unsave. */
     public static final String COLUMN_THING_ID = "thingId";
 
-    /** Integer column indicating either an upvote or downvote. */
-    public static final String COLUMN_VOTE = "vote";
+    /** Integer column indicating action whether to save or unsave. */
+    public static final String COLUMN_ACTION = "action";
 
     /** Unused long column for expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
-    /** Vote column value indicating an upvote. */
-    public static final int VOTE_UP = 1;
+    /** Action column value to save something. */
+    public static final int ACTION_SAVE = 0;
 
-    /** Vote column value indicating a downvote. */
-    public static final int VOTE_DOWN = -1;
+    /** Action column value to unsave something. */
+    public static final int ACTION_UNSAVE = 1;
 
-    public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + " = ?";
-    public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
-            SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + " = ?";
-
-    /** Creates the votes table. */
+    /** Creates the savedThings table. */
     static void createTable(SQLiteDatabase db) {
         // TODO: Add unique constraint for account + thingId
         // TODO: Add index for account + thingId ?
@@ -56,7 +54,7 @@ public class Votes implements BaseColumns {
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
-                + COLUMN_VOTE + " INTEGER NOT NULL, "
+                + COLUMN_ACTION + " INTEGER NOT NULL, "
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0)");
     }
 }
