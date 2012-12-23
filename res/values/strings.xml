@@ -74,6 +74,7 @@
     <string name="menu_profile">Profile</string>
     <string name="menu_remove_account">Remove account</string>
     <string name="menu_reply">Reply</string>
+    <string name="menu_save">Save</string>
     <string name="menu_search">Search</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_share">Share</string>

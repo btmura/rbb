@@ -27,6 +27,11 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_compose_message"/>
     <item
+        android:id="@+id/menu_save"
+        android:icon="@drawable/ic_action_save"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_save"/>
+    <item
         android:id="@+id/menu_view_profile"
         android:icon="@drawable/ic_action_profile"
         android:showAsAction="ifRoom"
