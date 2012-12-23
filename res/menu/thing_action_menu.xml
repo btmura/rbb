@@ -32,6 +32,11 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_save"/>
     <item
+        android:id="@+id/menu_unsave"
+        android:icon="@drawable/ic_action_unsave"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_unsave"/>
+    <item
         android:id="@+id/menu_view_profile"
         android:icon="@drawable/ic_action_profile"
         android:showAsAction="ifRoom"
