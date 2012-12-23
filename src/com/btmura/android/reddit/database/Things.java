@@ -43,6 +43,7 @@ public class Things implements BaseColumns {
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_OVER_18 = "over18";
     public static final String COLUMN_PERMA_LINK = "permaLink";
+    public static final String COLUMN_SAVED = "saved";
     public static final String COLUMN_SCORE = "score";
     public static final String COLUMN_SELF = "self";
     public static final String COLUMN_SELF_TEXT = "selfText";
@@ -110,6 +111,7 @@ public class Things implements BaseColumns {
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
                 + COLUMN_PERMA_LINK + " TEXT, "
+                + COLUMN_SAVED + " INTEGER DEFAULT 0, "
                 + COLUMN_SCORE + " INTEGER DEFAULT 0, "
                 + COLUMN_SELF + " INTEGER DEFAULT 0, "
                 + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "

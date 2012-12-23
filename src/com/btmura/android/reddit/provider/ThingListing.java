@@ -201,6 +201,11 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     @Override
+    public void onSaved(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_SAVED, reader.nextBoolean());
+    }
+
+    @Override
     public void onScore(JsonReader reader, int index) throws IOException {
         values.get(index).put(Things.COLUMN_SCORE, reader.nextInt());
     }

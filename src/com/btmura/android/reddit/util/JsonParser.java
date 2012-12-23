@@ -171,6 +171,8 @@ public class JsonParser {
                 onSelfText(r, i);
             } else if ("body".equals(name)) {
                 onBody(r, i);
+            } else if ("saved".equals(name)) {
+                onSaved(r, i);
             } else if ("link_id".equals(name)) {
                 onLinkId(r, i);
             } else if ("link_title".equals(name)) {
@@ -289,6 +291,10 @@ public class JsonParser {
     }
 
     public void onBody(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onSaved(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
