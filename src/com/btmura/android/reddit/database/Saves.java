@@ -26,7 +26,7 @@ import android.provider.BaseColumns;
 public class Saves implements BaseColumns {
 
     /** Name of the table to store save and unsave actions. */
-    public static final String TABLE_NAME = "saveds";
+    public static final String TABLE_NAME = "saves";
 
     /** Account that either saved on unsaved this thing. */
     public static final String COLUMN_ACCOUNT = "account";

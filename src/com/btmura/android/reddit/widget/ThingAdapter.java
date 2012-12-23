@@ -297,6 +297,10 @@ public class ThingAdapter extends BaseCursorAdapter {
         return providerAdapter.getTitle(this, position);
     }
 
+    public String getThingId(int position) {
+        return providerAdapter.getThingId(this, position);
+    }
+
     public CharSequence getUrl(int position) {
         return providerAdapter.getUrl(this, position);
     }

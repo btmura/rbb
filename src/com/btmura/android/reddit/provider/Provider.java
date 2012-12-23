@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
@@ -33,6 +32,7 @@ import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Messages;
+import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.Array;
@@ -50,6 +50,8 @@ public class Provider {
             Things.COLUMN_NESTING,
     };
 
+    private static final String SELECT_SAVES_BY_THING_ID = Saves.COLUMN_THING_ID + "=?";
+    private static final String SELECT_VOTES_BY_THING_ID = Votes.COLUMN_THING_ID + "=?";
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
     public static void insertCommentAsync(Context context,
@@ -248,30 +250,60 @@ public class Provider {
         });
     }
 
-    public static void voteAsync(final Context context, final String accountName,
-            final String thingId, final int likes) {
-        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+    public static void saveAsync(final Context context, final String accountName,
+            final String thingId, final int action) {
+        final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                Uri uri = ThingProvider.VOTES_URI.buildUpon()
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(2);
+                ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVES_URI)
+                        .withSelection(SELECT_SAVES_BY_THING_ID, Array.of(thingId))
+                        .build());
+
+                Uri uri = ThingProvider.SAVES_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS, TRUE)
                         .build();
+                ops.add(ContentProviderOperation.newInsert(uri)
+                        .withValue(Saves.COLUMN_ACCOUNT, accountName)
+                        .withValue(Saves.COLUMN_THING_ID, thingId)
+                        .withValue(Saves.COLUMN_ACTION, action)
+                        .build());
 
-                ContentValues values = new ContentValues(3);
-                values.put(Votes.COLUMN_ACCOUNT, accountName);
-                values.put(Votes.COLUMN_THING_ID, thingId);
-                values.put(Votes.COLUMN_VOTE, likes);
-
-                String[] selectionArgs = Array.of(accountName, thingId);
-                if (cr.update(uri, values, Votes.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs) == 0) {
-                    cr.insert(uri, values);
-                }
+                applyOps(appContext, ThingProvider.AUTHORITY, ops);
             }
         });
     }
 
-    static void applyOps(Context context, String authority, ArrayList<ContentProviderOperation> ops) {
+    public static void voteAsync(final Context context, final String accountName,
+            final String thingId, final int likes) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            public void run() {
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(2);
+                ops.add(ContentProviderOperation.newDelete(ThingProvider.VOTES_URI)
+                        .withSelection(SELECT_VOTES_BY_THING_ID, Array.of(thingId))
+                        .build());
+
+                Uri uri = ThingProvider.VOTES_URI.buildUpon()
+                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS, TRUE)
+                        .build();
+                ops.add(ContentProviderOperation.newInsert(uri)
+                        .withValue(Votes.COLUMN_ACCOUNT, accountName)
+                        .withValue(Votes.COLUMN_THING_ID, thingId)
+                        .withValue(Votes.COLUMN_VOTE, likes)
+                        .build());
+
+                applyOps(appContext, ThingProvider.AUTHORITY, ops);
+            }
+        });
+    }
+
+    static void
+            applyOps(Context context, String authority, ArrayList<ContentProviderOperation> ops) {
         try {
             context.getContentResolver().applyBatch(authority, ops);
         } catch (RemoteException e) {

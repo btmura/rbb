@@ -33,6 +33,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.util.Array;
@@ -47,10 +48,12 @@ public class ThingProvider extends SessionProvider {
     private static final String PATH_THINGS = "things";
     private static final String PATH_COMMENTS = "comments";
     private static final String PATH_VOTES = "votes";
+    private static final String PATH_SAVES = "saves";
 
     public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
     public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
     public static final Uri VOTES_URI = Uri.parse(AUTHORITY_URI + PATH_VOTES);
+    public static final Uri SAVES_URI = Uri.parse(AUTHORITY_URI + PATH_SAVES);
 
     public static final String PARAM_FETCH_LINKS = "fetchLinks";
     public static final String PARAM_FETCH_COMMENTS = "fetchComments";
@@ -78,10 +81,12 @@ public class ThingProvider extends SessionProvider {
     private static final int MATCH_THINGS = 1;
     private static final int MATCH_COMMENTS = 2;
     private static final int MATCH_VOTES = 3;
+    private static final int MATCH_SAVES = 4;
     static {
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
         MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENTS);
         MATCHER.addURI(AUTHORITY, PATH_VOTES, MATCH_VOTES);
+        MATCHER.addURI(AUTHORITY, PATH_SAVES, MATCH_SAVES);
     }
 
     private static final String TABLE_NAME_WITH_VOTES = Things.TABLE_NAME
@@ -113,6 +118,9 @@ public class ThingProvider extends SessionProvider {
 
             case MATCH_VOTES:
                 return Votes.TABLE_NAME;
+
+            case MATCH_SAVES:
+                return Saves.TABLE_NAME;
 
             default:
                 throw new IllegalArgumentException("uri: " + uri);

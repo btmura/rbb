@@ -41,6 +41,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
@@ -328,6 +329,12 @@ public class ThingListFragment extends ListFragment implements
             case R.id.menu_compose_message:
                 return handleComposeMessage(mode);
 
+            case R.id.menu_save:
+                return handleSave(mode, Saves.ACTION_SAVE);
+
+            case R.id.menu_unsave:
+                return handleSave(mode, Saves.ACTION_UNSAVE);
+
             case R.id.menu_view_profile:
                 return handleViewProfile(mode);
 
@@ -353,6 +360,14 @@ public class ThingListFragment extends ListFragment implements
         String user = adapter.getAuthor(getFirstCheckedPosition());
         MenuHelper.startComposeActivity(getActivity(),
                 ComposeActivity.COMPOSITION_MESSAGE, user, null);
+        mode.finish();
+        return true;
+    }
+
+    private boolean handleSave(ActionMode mode, int action) {
+        String accountName = ThingAdapter.getAccountName(adapterArgs);
+        String thingId = adapter.getThingId(getFirstCheckedPosition());
+        Provider.saveAsync(getActivity(), accountName, thingId, action);
         mode.finish();
         return true;
     }
