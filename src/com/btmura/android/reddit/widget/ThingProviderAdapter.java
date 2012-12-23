@@ -51,6 +51,7 @@ class ThingProviderAdapter extends ProviderAdapter {
             Things.COLUMN_NUM_COMMENTS,
             Things.COLUMN_OVER_18,
             Things.COLUMN_PERMA_LINK,
+            Things.COLUMN_SAVED,
             Things.COLUMN_SCORE,
             Things.COLUMN_SELF,
             Things.COLUMN_SUBREDDIT,
@@ -74,15 +75,16 @@ class ThingProviderAdapter extends ProviderAdapter {
     private static final int INDEX_NUM_COMMENTS = 10;
     private static final int INDEX_OVER_18 = 11;
     private static final int INDEX_PERMA_LINK = 12;
-    private static final int INDEX_SCORE = 13;
-    private static final int INDEX_SELF = 14;
-    private static final int INDEX_SUBREDDIT = 15;
-    private static final int INDEX_TITLE = 16;
-    private static final int INDEX_THING_ID = 17;
-    private static final int INDEX_THUMBNAIL_URL = 18;
-    private static final int INDEX_UPS = 19;
-    private static final int INDEX_URL = 20;
-    private static final int INDEX_VOTE = 21;
+    private static final int INDEX_SAVED = 13;
+    private static final int INDEX_SCORE = 14;
+    private static final int INDEX_SELF = 15;
+    private static final int INDEX_SUBREDDIT = 16;
+    private static final int INDEX_TITLE = 17;
+    private static final int INDEX_THING_ID = 18;
+    private static final int INDEX_THUMBNAIL_URL = 19;
+    private static final int INDEX_UPS = 20;
+    private static final int INDEX_URL = 21;
+    private static final int INDEX_VOTE = 22;
 
     @Override
     Uri getLoaderUri(Bundle args) {
@@ -175,6 +177,11 @@ class ThingProviderAdapter extends ProviderAdapter {
     @Override
     String getAuthor(ThingAdapter adapter, int position) {
         return adapter.getString(position, INDEX_AUTHOR);
+    }
+
+    @Override
+    boolean isSaved(ThingAdapter adapter, int position) {
+        return adapter.getBoolean(position, INDEX_SAVED);
     }
 
     @Override

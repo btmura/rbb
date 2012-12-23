@@ -298,12 +298,21 @@ public class ThingListFragment extends ListFragment implements
         int count = getListView().getCheckedItemCount();
         boolean hasAccount = AccountUtils.isAccount(ThingAdapter.getAccountName(adapterArgs));
         mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
-        menu.findItem(R.id.menu_reply).setVisible(count == 1 && hasAccount);
-        menu.findItem(R.id.menu_compose_message).setVisible(count == 1 && hasAccount);
-        menu.findItem(R.id.menu_save).setVisible(count == 1 && hasAccount);
-        menu.findItem(R.id.menu_unsave).setVisible(count == 1 && hasAccount);
+
+        menu.findItem(R.id.menu_reply).setVisible(hasAccount && count == 1);
+        menu.findItem(R.id.menu_compose_message).setVisible(hasAccount && count == 1);
         menu.findItem(R.id.menu_view_profile).setVisible(count == 1);
         menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
+
+        boolean showSave = false;
+        boolean showUnsave = false;
+        if (hasAccount && count == 1) {
+            showSave = !adapter.isSaved(getFirstCheckedPosition());
+            showUnsave = !showSave;
+        }
+        menu.findItem(R.id.menu_save).setVisible(showSave);
+        menu.findItem(R.id.menu_unsave).setVisible(showUnsave);
+
         return true;
     }
 

@@ -111,6 +111,11 @@ class MessageProviderAdapter extends ProviderAdapter {
     }
 
     @Override
+    boolean isSaved(ThingAdapter adapter, int position) {
+        return false;
+    }
+
+    @Override
     String getTitle(ThingAdapter adapter, int position) {
         return adapter.getString(position, INDEX_BODY);
     }

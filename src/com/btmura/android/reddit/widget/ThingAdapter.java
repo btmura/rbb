@@ -87,6 +87,8 @@ public class ThingAdapter extends BaseCursorAdapter {
 
         abstract String getAuthor(ThingAdapter adapter, int position);
 
+        abstract boolean isSaved(ThingAdapter adapter, int position);
+
         abstract String getTitle(ThingAdapter adapter, int position);
 
         abstract CharSequence getUrl(ThingAdapter adapter, int position);
@@ -281,6 +283,10 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     public String getAuthor(int position) {
         return providerAdapter.getAuthor(this, position);
+    }
+
+    public boolean isSaved(int position) {
+        return providerAdapter.isSaved(this, position);
     }
 
     public Bundle getReplyExtras(Bundle args, int position) {
