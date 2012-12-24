@@ -19,6 +19,7 @@ package com.btmura.android.reddit.app;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,6 +31,8 @@ public class ThingMenuFragment extends Fragment {
     public static final String TAG = "ThingMenuFragment";
 
     private static final String ARG_SUBREDDIT = "subreddit";
+
+    private String subreddit;
 
     public static ThingMenuFragment newInstance(String subreddit) {
         Bundle args = new Bundle(1);
@@ -43,6 +46,7 @@ public class ThingMenuFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        subreddit = getArguments().getString(ARG_SUBREDDIT);
     }
 
     @Override
@@ -54,6 +58,7 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.menu_view_thing_sidebar).setVisible(!TextUtils.isEmpty(subreddit));
         hideExtraViewSidebarItems(menu);
     }
 
