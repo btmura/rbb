@@ -72,8 +72,8 @@ abstract class SessionProvider extends BaseProvider {
     private static final String SELECT_BY_SESSION_ID = SessionIds.COLUMN_SESSION_ID + "=?";
 
     /** Selection for finding existing sessions for a thing. */
-    private static final String SELECT_BY_TYPE_AND_THING_ID =
-            Sessions.COLUMN_TYPE + "=? AND " + Sessions.COLUMN_THING_ID + "=?";
+    private static final String SELECT_BY_KEY_AND_TYPE =
+            Sessions.COLUMN_KEY + "=? AND " + Sessions.COLUMN_TYPE + "=?";
 
     /** Interval for how long a session's data is considered still fresh. */
     private static final long SESSION_INTERVAL = TimeUnit.SECONDS.toMillis(30);
@@ -83,7 +83,7 @@ abstract class SessionProvider extends BaseProvider {
      * ID given. If there is no such session, it will attempt to use the network
      * to create a session with the data.
      */
-    long getListingSession(Listing listing, String thingId,
+    long getListingSession(Listing listing, String key,
             SQLiteDatabase db, String tableName, String sessionIdKey) {
 
         // Current time for measuring age of sessions and inserting new ones.
@@ -101,7 +101,7 @@ abstract class SessionProvider extends BaseProvider {
 
         // Get list of matching sessions expired or not.
         Cursor c = db.query(Sessions.TABLE_NAME, SESSION_PROJECTION,
-                SELECT_BY_TYPE_AND_THING_ID, Array.of(Integer.toString(type), thingId),
+                SELECT_BY_KEY_AND_TYPE, Array.of(key, Integer.toString(type)),
                 null, null, null);
 
         // Return the first session with content that we still consider fresh.
@@ -152,7 +152,7 @@ abstract class SessionProvider extends BaseProvider {
                 // Insert a session row for the new data.
                 ContentValues sv = new ContentValues(3);
                 sv.put(Sessions.COLUMN_TYPE, type);
-                sv.put(Sessions.COLUMN_THING_ID, thingId);
+                sv.put(Sessions.COLUMN_KEY, key);
                 sv.put(Sessions.COLUMN_TIMESTAMP, now);
                 long sessionId = db.insert(Sessions.TABLE_NAME, null, sv);
 

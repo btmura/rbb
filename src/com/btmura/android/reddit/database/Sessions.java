@@ -20,10 +20,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 public class Sessions implements BaseColumns {
+
     public static final String TABLE_NAME = "sessions";
 
-    public static final String COLUMN_THING_ID = "thingId";
+    /**
+     * String key identifying the session. It means different things for
+     * different listing types.
+     */
+    public static final String COLUMN_KEY = "key";
+
+    /** Long timestamp when the session was created. */
     public static final String COLUMN_TIMESTAMP = "timestamp";
+
+    /** Integer type of the session. */
     public static final String COLUMN_TYPE = "type";
 
     public static final int TYPE_MESSAGE_THREAD_LISTING = 0;
@@ -33,7 +42,7 @@ public class Sessions implements BaseColumns {
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
-                + COLUMN_THING_ID + " TEXT NOT NULL, "
+                + COLUMN_KEY + " TEXT NOT NULL, "
                 + COLUMN_TIMESTAMP + " INTEGER NOT NULL, "
                 + COLUMN_TYPE + " INTEGER DEFAULT 0)");
     }
