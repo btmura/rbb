@@ -46,9 +46,9 @@ public class RedditApi {
     public static final String TAG = "RedditApi";
 
     private static final String CHARSET = "UTF-8";
-    private static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset="
-            + CHARSET;
-    private static final String USER_AGENT = "reddit by brian (rbb) for Android by /u/btmura";
+    private static final String CONTENT_TYPE =
+            "application/x-www-form-urlencoded;charset=" + CHARSET;
+    static final String USER_AGENT = "reddit by brian v2.0 by /u/btmura";
 
     private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
 
