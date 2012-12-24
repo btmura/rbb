@@ -257,6 +257,12 @@ public class Urls {
     public static CharSequence subreddit(String subreddit, int filter, String more) {
         StringBuilder b = new StringBuilder(BASE_URL);
 
+        // Trim off /r/ if it is there. Only when random provides us with the
+        // redirect subreddit location. Otherwise, this prefix is not attached.
+        if (subreddit.startsWith("/r/")) {
+            subreddit = subreddit.substring(3);
+        }
+
         if (!Subreddits.isFrontPage(subreddit)) {
             b.append("/r/").append(encode(subreddit));
         }

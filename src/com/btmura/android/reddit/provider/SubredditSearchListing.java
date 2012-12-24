@@ -62,7 +62,7 @@ class SubredditSearchListing extends JsonParser implements Listing {
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         CharSequence url = Urls.subredditSearch(query, null);
-        HttpURLConnection conn = RedditApi.connect(url, cookie, false);
+        HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
         try {

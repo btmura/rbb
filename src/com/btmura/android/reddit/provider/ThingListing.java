@@ -31,6 +31,7 @@ import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
@@ -82,6 +83,10 @@ class ThingListing extends JsonParser implements Listing {
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
 
+        // Always follow redirects unless we are going to /r/random. We need to
+        // catch this case so we can goto the JSON version.
+        boolean followRedirects = true;
+
         CharSequence url;
         if (!TextUtils.isEmpty(messageUser)) {
             url = Urls.message(filter, more);
@@ -91,9 +96,22 @@ class ThingListing extends JsonParser implements Listing {
             url = Urls.search(query, more);
         } else {
             url = Urls.subreddit(subreddit, filter, more);
+            followRedirects = !Subreddits.NAME_RANDOM.equalsIgnoreCase(subreddit);
+
         }
 
-        HttpURLConnection conn = RedditApi.connect(url, cookie, false);
+        HttpURLConnection conn = RedditApi.connect(url, cookie, followRedirects, false);
+
+        // Handle the redirect if the request was for /r/random to use JSON.
+        if (!followRedirects && conn.getResponseCode() == 302) {
+            String location = conn.getHeaderField("Location");
+            url = Urls.subreddit(location, filter, more);
+
+            // Disconnect and reconnect to the proper URL.
+            conn.disconnect();
+            conn = RedditApi.connect(url, cookie, false, false);
+        }
+
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
         try {

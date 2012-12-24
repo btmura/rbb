@@ -89,7 +89,7 @@ class MessageListing extends JsonParser implements Listing {
 
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
-        HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, false);
+        HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, true, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();
         try {

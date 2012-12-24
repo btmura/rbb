@@ -177,7 +177,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.captcha(id), null, false);
+            conn = connect(Urls.captcha(id), null, true, false);
             in = conn.getInputStream();
             return BitmapFactory.decodeStream(in);
         } finally {
@@ -194,7 +194,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.sidebar(subreddit), cookie, false);
+            conn = connect(Urls.sidebar(subreddit), cookie, true, false);
             in = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(in));
             SidebarParser parser = new SidebarParser(context);
@@ -209,7 +209,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.subredditList(1000), cookie, false);
+            conn = connect(Urls.subredditList(1000), cookie, true, false);
             in = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(in));
             SubredditParser parser = new SubredditParser();
@@ -243,7 +243,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.me(), cookie, false);
+            conn = connect(Urls.me(), cookie, true, false);
             in = new BufferedInputStream(conn.getInputStream());
             return AccountResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
         } finally {
@@ -285,7 +285,7 @@ public class RedditApi {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(url, cookie, true);
+            conn = connect(url, cookie, true, true);
             conn.connect();
             writeFormData(conn, data);
             in = conn.getInputStream();
@@ -298,9 +298,10 @@ public class RedditApi {
         }
     }
 
-    public static HttpURLConnection connect(CharSequence url, String cookie, boolean doOutput)
-            throws IOException {
+    public static HttpURLConnection connect(CharSequence url, String cookie,
+            boolean followRedirects, boolean doOutput) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) Urls.newUrl(url).openConnection();
+        conn.setInstanceFollowRedirects(followRedirects);
         setCommonHeaders(conn, cookie);
         if (doOutput) {
             setFormDataHeaders(conn);
