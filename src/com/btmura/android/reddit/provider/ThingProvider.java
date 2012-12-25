@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -51,6 +52,7 @@ import com.btmura.android.reddit.database.Votes;
  *
  * /comments
  * /comments/12345 - DONE
+ * /comments/12345/67890
  *
  * /users
  * /users/btmura - DONE
@@ -127,13 +129,14 @@ public class ThingProvider extends SessionProvider {
     private static final int MATCH_REDDIT_SEARCH = 3;
     private static final int MATCH_SUBREDDIT = 4;
     private static final int MATCH_COMMENTS = 5;
-    private static final int MATCH_USER = 6;
-    private static final int MATCH_COMMENT_ACTIONS = 7;
-    private static final int MATCH_MESSAGE_ACTIONS = 8;
-    private static final int MATCH_SAVE_ACTIONS = 9;
-    private static final int MATCH_VOTE_ACTIONS = 10;
+    private static final int MATCH_COMMENTS_CONTEXT = 6;
+    private static final int MATCH_USER = 7;
+    private static final int MATCH_COMMENT_ACTIONS = 8;
+    private static final int MATCH_MESSAGE_ACTIONS = 9;
+    private static final int MATCH_SAVE_ACTIONS = 10;
+    private static final int MATCH_VOTE_ACTIONS = 11;
 
-    private static final int MATCH_THINGS = 11;
+    private static final int MATCH_THINGS = 12;
 
     static {
         MATCHER.addURI(AUTHORITY, PATH_FRONT, MATCH_FRONT);
@@ -142,6 +145,7 @@ public class ThingProvider extends SessionProvider {
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*", MATCH_SUBREDDIT);
         MATCHER.addURI(AUTHORITY, PATH_USER + "/*", MATCH_USER);
         MATCHER.addURI(AUTHORITY, PATH_COMMENTS + "/*", MATCH_COMMENTS);
+        MATCHER.addURI(AUTHORITY, PATH_COMMENTS + "/*/*", MATCH_COMMENTS_CONTEXT);
         MATCHER.addURI(AUTHORITY, PATH_COMMENT_ACTIONS, MATCH_COMMENT_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_MESSAGE_ACTIONS, MATCH_MESSAGE_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_SAVE_ACTIONS, MATCH_SAVE_ACTIONS);
@@ -185,6 +189,7 @@ public class ThingProvider extends SessionProvider {
             case MATCH_REDDIT_SEARCH:
             case MATCH_SUBREDDIT:
             case MATCH_COMMENTS:
+            case MATCH_COMMENTS_CONTEXT:
             case MATCH_USER:
             case MATCH_THINGS:
                 if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
@@ -237,7 +242,6 @@ public class ThingProvider extends SessionProvider {
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String query = uri.getQueryParameter(PARAM_QUERY);
             String messageUser = uri.getQueryParameter(PARAM_MESSAGE_USER);
-            String linkId = uri.getQueryParameter(PARAM_LINK_ID);
             String filterParameter = uri.getQueryParameter(PARAM_FILTER);
             int filter = filterParameter != null ? Integer.parseInt(filterParameter) : 0;
             String more = uri.getQueryParameter(PARAM_MORE);
@@ -277,6 +281,15 @@ public class ThingProvider extends SessionProvider {
                     String thingId = uri.getLastPathSegment();
                     listing = CommentListing.newInstance(context, helper, accountName, thingId,
                             cookie);
+                    break;
+
+                case MATCH_COMMENTS_CONTEXT:
+                    List<String> segments = uri.getPathSegments();
+                    int count = segments.size();
+                    thingId = segments.get(count - 2);
+                    String linkId = segments.get(count - 1);
+                    listing = CommentListing.newContextInstance(context, helper, accountName,
+                            thingId, linkId, cookie);
                     break;
 
                 case MATCH_USER:

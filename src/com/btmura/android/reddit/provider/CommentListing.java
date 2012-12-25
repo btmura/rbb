@@ -81,9 +81,14 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 thingId, null, cookie);
     }
 
+    static CommentListing newContextInstance(Context context, SQLiteOpenHelper dbHelper,
+            String accountName, String thingId, String linkId, String cookie) {
+        return new CommentListing(Sessions.TYPE_COMMENT_LISTING, context, dbHelper, accountName,
+                thingId, linkId, cookie);
+    }
+
     private CommentListing(int listingType, Context context, SQLiteOpenHelper dbHelper,
-            String accountName,
-            String thingId, String linkId, String cookie) {
+            String accountName, String thingId, String linkId, String cookie) {
         this.listingType = listingType;
         this.context = context;
         this.dbHelper = dbHelper;
@@ -97,6 +102,9 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         switch (listingType) {
             case Sessions.TYPE_COMMENT_LISTING:
                 return thingId;
+
+            case Sessions.TYPE_COMMENT_CONTEXT_LISTING:
+                return linkId;
 
             default:
                 throw new IllegalArgumentException();

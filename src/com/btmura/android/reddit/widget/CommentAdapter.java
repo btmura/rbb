@@ -100,7 +100,7 @@ public class CommentAdapter extends BaseCursorAdapter {
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
                 .appendQueryParameter(ThingProvider.PARAM_JOIN, Boolean.toString(true));
         if (!TextUtils.isEmpty(linkId)) {
-            b.appendQueryParameter(ThingProvider.PARAM_LINK_ID, linkId);
+            b.appendPath(linkId);
         }
         return b.build();
     }
