@@ -87,7 +87,7 @@ abstract class SessionProvider extends BaseProvider {
         }
         c.close();
 
-        // Return the existing session if a refresh is notr equire.
+        // Return the existing session if a refresh is not required.
         if (!refresh) {
             if (BuildConfig.DEBUG) {
                 Log.d(logTag, "reusing session: " + existingSessionId);

@@ -227,12 +227,8 @@ public class ThingProvider extends SessionProvider {
     @Override
     protected Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
             String selection, String[] selectionArgs) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "processUri uri: " + uri);
-        }
-
         if (uri.getBooleanQueryParameter(PARAM_LISTING_GET, false)) {
-            return handleListingRefresh(uri, db, selection, selectionArgs);
+            return handleListingGet(uri, db, selection, selectionArgs);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_REPLY, false)) {
             handleReply(uri, db, values);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
@@ -241,11 +237,8 @@ public class ThingProvider extends SessionProvider {
         return null;
     }
 
-    private Selection handleListingRefresh(Uri uri, SQLiteDatabase db, String selection,
+    private Selection handleListingGet(Uri uri, SQLiteDatabase db, String selection,
             String[] selectionArgs) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "handleListingType uri: " + uri);
-        }
         try {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
