@@ -41,31 +41,12 @@ import com.btmura.android.reddit.database.Votes;
  * URI MATCHING PATTERNS:
  *
  * <pre>
- * /front - DONE
- * /search - DONE
- *
- * /reddits/search - DONE
- *
- * /r/rbb - DONE
- * /r/rbb/search - NOT USED YET
- *
- * /comments/12345 - DONE
- * /comments/12345/67890 - DONE
- *
- * /users/btmura - DONE
- *
- * /messages
- * /messages/inbox
- * /messages/sent
- * /messages/messages
- * /messages/messages/12345
+ * /things/
  *
  * /actions/comments - DONE
  * /actions/messages
  * /actions/saves - DONE
  * /actions/votes - DONE
- *
- * /tables/things - DONE
  * </pre>
  */
 public class ThingProvider extends SessionProvider {
