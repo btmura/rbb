@@ -36,6 +36,36 @@ import com.btmura.android.reddit.database.SessionIds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 
+/**
+ * URI MATCHING PATTERNS:
+ *
+ * <pre>
+ * /front
+ * /search
+ * /reddits/search
+ *
+ * /r/
+ * /r/rbb/
+ * /r/rbb/search
+ *
+ * /comments/
+ * /comments/12345/
+ *
+ * /users/
+ * /users/btmura
+ *
+ * /messages/
+ * /messages/inbox
+ * /messages/sent
+ * /messages/messages
+ * /messages/messages/12345
+ *
+ * /actions/comments/
+ * /actions/messages/
+ * /actions/saves/
+ * /actions/votes/
+ * </pre>
+ */
 public class ThingProvider extends SessionProvider {
 
     public static final String TAG = "ThingProvider";
@@ -79,7 +109,9 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_JOIN = "joinVotes";
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
+
     private static final UriMatcher MATCHER = new UriMatcher(0);
+
     private static final int MATCH_FRONT_PAGE = 1;
     private static final int MATCH_SUBREDDIT = 2;
     private static final int MATCH_USER = 3;
