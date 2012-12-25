@@ -156,8 +156,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-        return CommentAdapter.getLoader(getActivity(), accountName, sessionId,
-                thingId, linkId, sync);
+        return CommentAdapter.getLoader(getActivity(), accountName, thingId, linkId, sync);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
@@ -165,8 +164,7 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
         sync = false;
-        CommentAdapter.updateLoader(getActivity(), loader, accountName, sessionId,
-                thingId, linkId, sync);
+        CommentAdapter.updateLoader(getActivity(), loader, accountName, thingId, linkId, sync);
 
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));

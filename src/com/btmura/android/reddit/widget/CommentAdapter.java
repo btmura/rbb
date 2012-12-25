@@ -16,20 +16,17 @@
 
 package com.btmura.android.reddit.widget;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.util.Array;
 
 public class CommentAdapter extends BaseCursorAdapter {
 
@@ -79,39 +76,28 @@ public class CommentAdapter extends BaseCursorAdapter {
     private final String accountName;
     private final OnVoteListener listener;
 
-    public static Loader<Cursor> getLoader(Context context, String accountName, String sessionId,
-            String thingId, String linkId, boolean sync) {
-        Uri uri = getUri(accountName, sessionId, thingId, linkId, sync);
-        return new CursorLoader(context, uri, PROJECTION, Things.SELECT_VISIBLE_BY_SESSION_ID,
-                Array.of(sessionId), Things.SORT_BY_SEQUENCE_AND_ID);
+    public static Loader<Cursor> getLoader(Context context, String accountName, String thingId,
+            String linkId, boolean sync) {
+        Uri uri = getUri(accountName, thingId, linkId, sync);
+        return new CursorLoader(context, uri, PROJECTION, Things.SELECT_VISIBLE, null,
+                Things.SORT_BY_SEQUENCE_AND_ID);
     }
 
     public static void updateLoader(Context context, Loader<Cursor> loader, String accountName,
-            String sessionId, String thingId, String linkId, boolean sync) {
+            String thingId, String linkId, boolean sync) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, thingId, linkId, sync));
+            cl.setUri(getUri(accountName, thingId, linkId, sync));
         }
     }
 
     public static void deleteSessionData(final Context context, final String sessionId) {
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            public void run() {
-                ContentResolver cr = appContext.getContentResolver();
-                cr.delete(ThingProvider.THINGS_URI, Things.SELECT_BY_SESSION_ID,
-                        Array.of(sessionId));
-            }
-        });
     }
 
-    private static Uri getUri(String accountName, String sessionId, String thingId, String linkId,
-            boolean fetch) {
-        Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
+    private static Uri getUri(String accountName, String thingId, String linkId, boolean fetch) {
+        Uri.Builder b = ThingProvider.COMMENTS_URI.buildUpon().appendPath(thingId)
                 .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
-                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
-                .appendQueryParameter(ThingProvider.PARAM_THING_ID, thingId)
                 .appendQueryParameter(ThingProvider.PARAM_JOIN, Boolean.toString(true));
         if (!TextUtils.isEmpty(linkId)) {
             b.appendQueryParameter(ThingProvider.PARAM_LINK_ID, linkId);

@@ -44,8 +44,8 @@ class ThingListing extends JsonParser implements Listing {
     public static final String TAG = "ThingListing";
 
     private final Formatter formatter = new Formatter();
-    private final Context context;
     private final int listingType;
+    private final Context context;
     private final String accountName;
     private final String subreddit;
     private final String query;

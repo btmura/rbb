@@ -37,6 +37,7 @@ import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
@@ -66,6 +67,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     public long parseTimeMs;
 
     private final Formatter formatter = new Formatter();
+    private final int listingType;
     private final Context context;
     private final SQLiteOpenHelper dbHelper;
     private final String accountName;
@@ -73,8 +75,16 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private final String linkId;
     private final String cookie;
 
-    CommentListing(Context context, SQLiteOpenHelper dbHelper, String accountName, String thingId,
-            String linkId, String cookie) {
+    static CommentListing newInstance(Context context, SQLiteOpenHelper dbHelper,
+            String accountName, String thingId, String cookie) {
+        return new CommentListing(Sessions.TYPE_COMMENT_LISTING, context, dbHelper, accountName,
+                thingId, null, cookie);
+    }
+
+    private CommentListing(int listingType, Context context, SQLiteOpenHelper dbHelper,
+            String accountName,
+            String thingId, String linkId, String cookie) {
+        this.listingType = listingType;
         this.context = context;
         this.dbHelper = dbHelper;
         this.accountName = accountName;
@@ -84,11 +94,17 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     }
 
     public String getKey() {
-        return null;
+        switch (listingType) {
+            case Sessions.TYPE_COMMENT_LISTING:
+                return thingId;
+
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public int getType() {
-        return 0;
+        return listingType;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

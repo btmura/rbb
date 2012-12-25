@@ -80,8 +80,7 @@ public class Things implements BaseColumns {
     public static final String SELECT_BY_SESSION_ID_AND_MORE =
             SELECT_BY_SESSION_ID + " AND " + COLUMN_KIND + " = " + Kinds.KIND_MORE;
 
-    public static final String SELECT_VISIBLE_BY_SESSION_ID = SELECT_BY_SESSION_ID
-            + " AND " + COLUMN_VISIBLE + " = 1";
+    public static final String SELECT_VISIBLE = COLUMN_VISIBLE + "=1";
 
     public static final String SORT_BY_NAME = COLUMN_NAME + " COLLATE NOCASE ASC";
 

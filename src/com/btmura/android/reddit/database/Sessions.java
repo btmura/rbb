@@ -40,6 +40,7 @@ public class Sessions implements BaseColumns {
     public static final int TYPE_MESSAGE_SENT_LISTING = 2;
     public static final int TYPE_SUBREDDIT_LISTING = 3;
     public static final int TYPE_USER_LISTING = 4;
+    public static final int TYPE_COMMENT_LISTING = 5;
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("

@@ -39,22 +39,23 @@ import com.btmura.android.reddit.database.Votes;
 /**
  * URI MATCHING PATTERNS:
  *
+ * <pre>
  * /front - DONE
  * /search
  *
  * /reddits/search
  *
- * /r/
+ * /r
  * /r/rbb - DONE
  * /r/rbb/search
  *
  * /comments
- * /comments/12345
+ * /comments/12345 - DONE
  *
  * /users
  * /users/btmura - DONE
  *
- * /messages/
+ * /messages
  * /messages/inbox
  * /messages/sent
  * /messages/messages
@@ -64,6 +65,7 @@ import com.btmura.android.reddit.database.Votes;
  * /actions/messages
  * /actions/saves
  * /actions/votes
+ * </pre>
  */
 public class ThingProvider extends SessionProvider {
 
@@ -74,19 +76,20 @@ public class ThingProvider extends SessionProvider {
 
     private static final String PATH_FRONT = "front";
     private static final String PATH_SUBREDDIT = "r";
+    private static final String PATH_COMMENTS = "comments";
     private static final String PATH_USER = "users";
 
     private static final String PATH_THINGS = "things";
-    private static final String PATH_COMMENTS = "comments";
+
     private static final String PATH_VOTES = "votes";
     private static final String PATH_SAVES = "saves";
 
     public static final Uri FRONT_URI = Uri.parse(AUTHORITY_URI + PATH_FRONT);
     public static final Uri SUBREDDIT_URI = Uri.parse(AUTHORITY_URI + PATH_SUBREDDIT);
+    public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
     public static final Uri USER_URI = Uri.parse(AUTHORITY_URI + PATH_USER);
 
     public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
-    public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
     public static final Uri VOTES_URI = Uri.parse(AUTHORITY_URI + PATH_VOTES);
     public static final Uri SAVES_URI = Uri.parse(AUTHORITY_URI + PATH_SAVES);
 
@@ -110,14 +113,12 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_JOIN = "joinVotes";
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
-
     private static final UriMatcher MATCHER = new UriMatcher(0);
-
     private static final int MATCH_FRONT = 1;
     private static final int MATCH_SUBREDDIT = 2;
-    private static final int MATCH_USER = 3;
+    private static final int MATCH_COMMENTS = 3;
+    private static final int MATCH_USER = 4;
 
-    private static final int MATCH_COMMENTS = 4;
     private static final int MATCH_THINGS = 5;
     private static final int MATCH_VOTES = 6;
     private static final int MATCH_SAVES = 7;
@@ -125,7 +126,7 @@ public class ThingProvider extends SessionProvider {
         MATCHER.addURI(AUTHORITY, PATH_FRONT, MATCH_FRONT);
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*", MATCH_SUBREDDIT);
         MATCHER.addURI(AUTHORITY, PATH_USER + "/*", MATCH_USER);
-
+        MATCHER.addURI(AUTHORITY, PATH_COMMENTS + "/*", MATCH_COMMENTS);
 
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
         MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENTS);
@@ -165,16 +166,15 @@ public class ThingProvider extends SessionProvider {
         switch (match) {
             case MATCH_FRONT:
             case MATCH_SUBREDDIT:
+            case MATCH_COMMENTS:
             case MATCH_USER:
+
             case MATCH_THINGS:
                 if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
                     return JOINED_THING_TABLE;
                 } else {
                     return Things.TABLE_NAME;
                 }
-
-            case MATCH_COMMENTS:
-                return Comments.TABLE_NAME;
 
             case MATCH_VOTES:
                 return Votes.TABLE_NAME;
@@ -214,7 +214,6 @@ public class ThingProvider extends SessionProvider {
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String query = uri.getQueryParameter(PARAM_QUERY);
             String messageUser = uri.getQueryParameter(PARAM_MESSAGE_USER);
-            String thingId = uri.getQueryParameter(PARAM_THING_ID);
             String linkId = uri.getQueryParameter(PARAM_LINK_ID);
             String filterParameter = uri.getQueryParameter(PARAM_FILTER);
             int filter = filterParameter != null ? Integer.parseInt(filterParameter) : 0;
@@ -243,15 +242,16 @@ public class ThingProvider extends SessionProvider {
                             filter, more, cookie);
                     break;
 
+                case MATCH_COMMENTS:
+                    String thingId = uri.getLastPathSegment();
+                    listing = CommentListing.newInstance(context, helper, accountName, thingId,
+                            cookie);
+                    break;
+
                 case MATCH_USER:
                     String user = uri.getLastPathSegment();
                     listing = ThingListing.newUserInstance(context, accountName, user,
                             filter, more, cookie);
-                    break;
-
-                case MATCH_COMMENTS:
-                    listing = new CommentListing(context, helper, accountName, thingId, linkId,
-                            cookie);
                     break;
             }
 
