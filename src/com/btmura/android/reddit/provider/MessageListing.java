@@ -84,6 +84,11 @@ class MessageListing extends JsonParser implements Listing {
     }
 
     public String getKey() {
+        switch (listingType) {
+            case Sessions.TYPE_MESSAGE_INBOX_LISTING:
+            case Sessions.TYPE_MESSAGE_SENT_LISTING:
+                return accountName;
+        }
         return thingId;
     }
 
