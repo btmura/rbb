@@ -27,6 +27,7 @@ import android.view.View;
 
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Saves;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.net.Urls;
@@ -97,8 +98,13 @@ class ThingProviderAdapter extends ProviderAdapter {
 
         // Empty but non-null subreddit means front page.
         if (getSubreddit(args) != null) {
-            b = ThingProvider.SUBREDDIT_URI.buildUpon();
-            b.appendPath(getSubreddit(args));
+            String subreddit = getSubreddit(args);
+            if (Subreddits.isFrontPage(subreddit)) {
+                b = ThingProvider.FRONT_URI.buildUpon();
+            } else {
+                b = ThingProvider.SUBREDDIT_URI.buildUpon();
+                b.appendPath(subreddit);
+            }
         } else if (!TextUtils.isEmpty(getProfileUser(args))) {
             b = ThingProvider.USER_URI.buildUpon();
             b.appendPath(getProfileUser(args));

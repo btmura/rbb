@@ -39,20 +39,20 @@ import com.btmura.android.reddit.database.Votes;
 /**
  * URI MATCHING PATTERNS:
  *
- * <pre>
- * /front
+ * /front - DONE
  * /search
+ *
  * /reddits/search
  *
  * /r/
- * /r/rbb/
+ * /r/rbb - DONE
  * /r/rbb/search
  *
- * /comments/
- * /comments/12345/
+ * /comments
+ * /comments/12345
  *
- * /users/
- * /users/btmura
+ * /users
+ * /users/btmura - DONE
  *
  * /messages/
  * /messages/inbox
@@ -60,11 +60,10 @@ import com.btmura.android.reddit.database.Votes;
  * /messages/messages
  * /messages/messages/12345
  *
- * /actions/comments/
- * /actions/messages/
- * /actions/saves/
- * /actions/votes/
- * </pre>
+ * /actions/comments
+ * /actions/messages
+ * /actions/saves
+ * /actions/votes
  */
 public class ThingProvider extends SessionProvider {
 
@@ -73,14 +72,16 @@ public class ThingProvider extends SessionProvider {
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
     static final String AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
+    private static final String PATH_FRONT = "front";
     private static final String PATH_SUBREDDIT = "r";
-    private static final String PATH_USER = "u";
+    private static final String PATH_USER = "users";
 
     private static final String PATH_THINGS = "things";
     private static final String PATH_COMMENTS = "comments";
     private static final String PATH_VOTES = "votes";
     private static final String PATH_SAVES = "saves";
 
+    public static final Uri FRONT_URI = Uri.parse(AUTHORITY_URI + PATH_FRONT);
     public static final Uri SUBREDDIT_URI = Uri.parse(AUTHORITY_URI + PATH_SUBREDDIT);
     public static final Uri USER_URI = Uri.parse(AUTHORITY_URI + PATH_USER);
 
@@ -112,7 +113,7 @@ public class ThingProvider extends SessionProvider {
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
 
-    private static final int MATCH_FRONT_PAGE = 1;
+    private static final int MATCH_FRONT = 1;
     private static final int MATCH_SUBREDDIT = 2;
     private static final int MATCH_USER = 3;
 
@@ -121,11 +122,10 @@ public class ThingProvider extends SessionProvider {
     private static final int MATCH_VOTES = 6;
     private static final int MATCH_SAVES = 7;
     static {
-        MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT, MATCH_FRONT_PAGE);
+        MATCHER.addURI(AUTHORITY, PATH_FRONT, MATCH_FRONT);
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*", MATCH_SUBREDDIT);
         MATCHER.addURI(AUTHORITY, PATH_USER + "/*", MATCH_USER);
 
-        MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*/" + PATH_COMMENTS + "/*", MATCH_COMMENTS);
 
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
         MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENTS);
@@ -163,7 +163,7 @@ public class ThingProvider extends SessionProvider {
             Log.d(TAG, "getTable match: " + match);
         }
         switch (match) {
-            case MATCH_FRONT_PAGE:
+            case MATCH_FRONT:
             case MATCH_SUBREDDIT:
             case MATCH_USER:
             case MATCH_THINGS:
@@ -232,7 +232,7 @@ public class ThingProvider extends SessionProvider {
 
             Listing listing = null;
             switch (match) {
-                case MATCH_FRONT_PAGE:
+                case MATCH_FRONT:
                     listing = ThingListing.newFrontPageInstance(context, accountName,
                             filter, more, cookie);
                     break;
