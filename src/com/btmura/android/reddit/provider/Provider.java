@@ -255,11 +255,11 @@ public class Provider {
             public void run() {
                 ArrayList<ContentProviderOperation> ops =
                         new ArrayList<ContentProviderOperation>(2);
-                ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVES_URI)
+                ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVE_ACTIONS_URI)
                         .withSelection(SELECT_SAVES_BY_THING_ID, Array.of(thingId))
                         .build());
 
-                Uri uri = ThingProvider.SAVES_URI.buildUpon()
+                Uri uri = ThingProvider.SAVE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS, TRUE)
                         .build();
@@ -281,11 +281,11 @@ public class Provider {
             public void run() {
                 ArrayList<ContentProviderOperation> ops =
                         new ArrayList<ContentProviderOperation>(2);
-                ops.add(ContentProviderOperation.newDelete(ThingProvider.VOTES_URI)
+                ops.add(ContentProviderOperation.newDelete(ThingProvider.VOTE_ACTIONS_URI)
                         .withSelection(SELECT_VOTES_BY_THING_ID, Array.of(thingId))
                         .build());
 
-                Uri uri = ThingProvider.VOTES_URI.buildUpon()
+                Uri uri = ThingProvider.VOTE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS, TRUE)
                         .build();

@@ -47,7 +47,7 @@ import com.btmura.android.reddit.database.Votes;
  *
  * /r
  * /r/rbb - DONE
- * /r/rbb/search
+ * /r/rbb/search - NOT USED YET
  *
  * /comments
  * /comments/12345 - DONE
@@ -61,10 +61,10 @@ import com.btmura.android.reddit.database.Votes;
  * /messages/messages
  * /messages/messages/12345
  *
- * /actions/comments
+ * /actions/comments - DONE
  * /actions/messages
- * /actions/saves
- * /actions/votes
+ * /actions/saves - DONE
+ * /actions/votes - DONE
  * </pre>
  */
 public class ThingProvider extends SessionProvider {
@@ -80,10 +80,12 @@ public class ThingProvider extends SessionProvider {
     private static final String PATH_SUBREDDIT = "r";
     private static final String PATH_COMMENTS = "comments";
     private static final String PATH_USER = "users";
+    private static final String PATH_COMMENT_ACTIONS = "actions/comments";
+    private static final String PATH_MESSAGE_ACTIONS = "actions/messages";
+    private static final String PATH_SAVE_ACTIONS = "actions/saves";
+    private static final String PATH_VOTE_ACTIONS = "actions/votes";
 
     private static final String PATH_THINGS = "things";
-    private static final String PATH_VOTES = "votes";
-    private static final String PATH_SAVES = "saves";
 
     public static final Uri FRONT_URI = Uri.parse(AUTHORITY_URI + PATH_FRONT);
     public static final Uri SEARCH_URI = Uri.parse(AUTHORITY_URI + PATH_SEARCH);
@@ -92,9 +94,12 @@ public class ThingProvider extends SessionProvider {
     public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
     public static final Uri USER_URI = Uri.parse(AUTHORITY_URI + PATH_USER);
 
+    public static final Uri COMMENT_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENT_ACTIONS);
+    public static final Uri MESSAGE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_MESSAGE_ACTIONS);
+    public static final Uri SAVE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_SAVE_ACTIONS);
+    public static final Uri VOTE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_VOTE_ACTIONS);
+
     public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
-    public static final Uri VOTES_URI = Uri.parse(AUTHORITY_URI + PATH_VOTES);
-    public static final Uri SAVES_URI = Uri.parse(AUTHORITY_URI + PATH_SAVES);
 
     public static final String PARAM_FETCH = "fetch";
     public static final String PARAM_COMMENT_REPLY = "commentReply";
@@ -113,7 +118,7 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_THING_ID = "thingId";
     public static final String PARAM_LINK_ID = "linkId";
 
-    public static final String PARAM_JOIN = "joinVotes";
+    public static final String PARAM_JOIN = "join";
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
@@ -123,10 +128,13 @@ public class ThingProvider extends SessionProvider {
     private static final int MATCH_SUBREDDIT = 4;
     private static final int MATCH_COMMENTS = 5;
     private static final int MATCH_USER = 6;
+    private static final int MATCH_COMMENT_ACTIONS = 7;
+    private static final int MATCH_MESSAGE_ACTIONS = 8;
+    private static final int MATCH_SAVE_ACTIONS = 9;
+    private static final int MATCH_VOTE_ACTIONS = 10;
 
-    private static final int MATCH_THINGS = 7;
-    private static final int MATCH_VOTES = 8;
-    private static final int MATCH_SAVES = 9;
+    private static final int MATCH_THINGS = 11;
+
     static {
         MATCHER.addURI(AUTHORITY, PATH_FRONT, MATCH_FRONT);
         MATCHER.addURI(AUTHORITY, PATH_SEARCH, MATCH_SEARCH);
@@ -134,11 +142,12 @@ public class ThingProvider extends SessionProvider {
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*", MATCH_SUBREDDIT);
         MATCHER.addURI(AUTHORITY, PATH_USER + "/*", MATCH_USER);
         MATCHER.addURI(AUTHORITY, PATH_COMMENTS + "/*", MATCH_COMMENTS);
+        MATCHER.addURI(AUTHORITY, PATH_COMMENT_ACTIONS, MATCH_COMMENT_ACTIONS);
+        MATCHER.addURI(AUTHORITY, PATH_MESSAGE_ACTIONS, MATCH_MESSAGE_ACTIONS);
+        MATCHER.addURI(AUTHORITY, PATH_SAVE_ACTIONS, MATCH_SAVE_ACTIONS);
+        MATCHER.addURI(AUTHORITY, PATH_VOTE_ACTIONS, MATCH_VOTE_ACTIONS);
 
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
-        MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENTS);
-        MATCHER.addURI(AUTHORITY, PATH_VOTES, MATCH_VOTES);
-        MATCHER.addURI(AUTHORITY, PATH_SAVES, MATCH_SAVES);
     }
 
     private static final String JOINED_THING_TABLE = Things.TABLE_NAME
@@ -184,11 +193,17 @@ public class ThingProvider extends SessionProvider {
                     return Things.TABLE_NAME;
                 }
 
-            case MATCH_VOTES:
-                return Votes.TABLE_NAME;
+            case MATCH_COMMENT_ACTIONS:
+                return Comments.TABLE_NAME;
 
-            case MATCH_SAVES:
+            case MATCH_MESSAGE_ACTIONS:
+                throw new UnsupportedOperationException();
+
+            case MATCH_SAVE_ACTIONS:
                 return Saves.TABLE_NAME;
+
+            case MATCH_VOTE_ACTIONS:
+                return Votes.TABLE_NAME;
 
             default:
                 throw new IllegalArgumentException("uri: " + uri);

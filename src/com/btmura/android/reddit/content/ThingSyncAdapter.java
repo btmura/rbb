@@ -257,7 +257,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             ContentProviderClient provider, SyncResult syncResult, String cookie, String modhash) {
         try {
             // Get all pending saves for this account that haven't been synced.
-            Cursor c = provider.query(ThingProvider.SAVES_URI, SAVE_PROJECTION,
+            Cursor c = provider.query(ThingProvider.SAVE_ACTIONS_URI, SAVE_PROJECTION,
                     SELECT_BY_ACCOUNT, Array.of(account.name), null);
 
             // Bail out early if there are no saves to process.
@@ -278,7 +278,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                 try {
                     boolean saved = action == Saves.ACTION_SAVE;
                     RedditApi.save(thingId, saved, cookie, modhash);
-                    ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVES_URI)
+                    ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVE_ACTIONS_URI)
                             .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                             .build());
 
@@ -321,7 +321,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             ContentProviderClient provider, SyncResult syncResult, String cookie, String modhash) {
         try {
             // Get all pending votes for this account that haven't been synced.
-            Cursor c = provider.query(ThingProvider.VOTES_URI, VOTE_PROJECTION,
+            Cursor c = provider.query(ThingProvider.VOTE_ACTIONS_URI, VOTE_PROJECTION,
                     SELECT_BY_ACCOUNT, Array.of(account.name), null);
 
             // Bail out early if there are no votes to process.
@@ -343,7 +343,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                 // deletion of the database row.
                 try {
                     RedditApi.vote(getContext(), thingId, vote, cookie, modhash);
-                    ops.add(ContentProviderOperation.newDelete(ThingProvider.VOTES_URI)
+                    ops.add(ContentProviderOperation.newDelete(ThingProvider.VOTE_ACTIONS_URI)
                             .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                             .build());
 
