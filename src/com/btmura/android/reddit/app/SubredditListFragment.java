@@ -33,8 +33,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -364,16 +364,6 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         outState.putString(STATE_SELECTED_SUBREDDIT, selectedSubreddit);
         outState.putString(STATE_SESSION_ID, sessionId);
         outState.putString(STATE_SELECTED_ACTION_ACCOUNT, selectedActionAccount);
-    }
-
-    @Override
-    public void onDestroy() {
-        // Only search queries will have sessions but its ok to always do this.
-        // TODO: Remove deleteSessionData method duplication in adapters.
-        if (!getActivity().isChangingConfigurations()) {
-            SubredditAdapter.deleteSessionData(getActivity(), sessionId, query);
-        }
-        super.onDestroy();
     }
 
     public void setAccountName(String accountName) {

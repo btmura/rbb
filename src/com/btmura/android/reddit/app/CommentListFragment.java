@@ -519,14 +519,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         outState.putCharSequence(STATE_URL, url);
     }
 
-    @Override
-    public void onDestroy() {
-        if (!getActivity().isChangingConfigurations()) {
-            CommentAdapter.deleteSessionData(getActivity(), sessionId);
-        }
-        super.onDestroy();
-    }
-
     public int getCommentCount() {
         return adapter.getCount();
     }

@@ -91,9 +91,6 @@ public class CommentAdapter extends BaseCursorAdapter {
         }
     }
 
-    public static void deleteSessionData(final Context context, final String sessionId) {
-    }
-
     private static Uri getUri(String accountName, String thingId, String linkId, boolean fetch) {
         Uri.Builder b = ThingProvider.COMMENTS_URI.buildUpon().appendPath(thingId)
                 .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))

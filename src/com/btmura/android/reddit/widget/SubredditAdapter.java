@@ -68,10 +68,6 @@ public class SubredditAdapter extends BaseCursorAdapter {
         }
     }
 
-    public static void deleteSessionData(final Context context, final String sessionId,
-            String query) {
-    }
-
     private static Uri getUri(String accountName, String query, boolean sync) {
         if (!TextUtils.isEmpty(query)) {
             return ThingProvider.REDDIT_SEARCH_URI.buildUpon()
