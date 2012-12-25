@@ -23,7 +23,6 @@
     <string name="add_subreddit">Add subreddit</string>
     <string name="app_name">reddit by brian</string>
     <string name="authority_accounts">com.btmura.android.reddit.provider.accounts</string>
-    <string name="authority_messages">com.btmura.android.reddit.provider.messages</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
     <string name="captcha_image">Captcha image</string>
@@ -87,8 +86,7 @@
     <string name="menu_view_sidebar">View sidebar</string>
     <string name="nsfw">"NSFW"</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
-    <string name="provider_accounts">Accounts</string>    
-    <string name="provider_messages">Messages</string>
+    <string name="provider_accounts">Accounts</string>
     <string name="provider_subreddits">Subreddits</string>
     <string name="provider_things">Things</string>
     <string name="reddit_error">Reddit says: %1$s</string>

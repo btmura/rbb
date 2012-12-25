@@ -193,6 +193,33 @@ public class ThingProvider extends SessionProvider {
         return b.build();
     }
 
+    public static final Uri messageInboxUri(String accountName, boolean refresh) {
+        Uri.Builder b = THINGS_URI.buildUpon();
+        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_INBOX_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        return b.build();
+    }
+
+    public static final Uri messageSentUri(String accountName, boolean refresh) {
+        Uri.Builder b = THINGS_URI.buildUpon();
+        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_SENT_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        return b.build();
+    }
+
+    public static final Uri messageThreadUri(String accountName, String thingId, boolean refresh) {
+        Uri.Builder b = THINGS_URI.buildUpon();
+        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_THREAD_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        return b.build();
+    }
+
     public ThingProvider() {
         super(TAG);
     }
@@ -266,6 +293,18 @@ public class ThingProvider extends SessionProvider {
             int listingType = Integer.parseInt(uri.getQueryParameter(PARAM_LISTING_TYPE));
             Listing listing = null;
             switch (listingType) {
+                case Sessions.TYPE_MESSAGE_THREAD_LISTING:
+                    listing = MessageListing.newThreadInstance(accountName, thingId, cookie, helper);
+                    break;
+
+                case Sessions.TYPE_MESSAGE_INBOX_LISTING:
+                    listing = MessageListing.newInboxInstance(accountName, cookie);
+                    break;
+
+                case Sessions.TYPE_MESSAGE_SENT_LISTING:
+                    listing = MessageListing.newSentInstance(accountName, cookie);
+                    break;
+
                 case Sessions.TYPE_SUBREDDIT_LISTING:
                     listing = ThingListing.newSubredditInstance(context, accountName, subreddit,
                             filter, more, cookie);

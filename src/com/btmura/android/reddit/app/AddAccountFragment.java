@@ -50,7 +50,6 @@ import com.btmura.android.reddit.content.SubredditSyncAdapter;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.LoginResult;
 import com.btmura.android.reddit.provider.AccountProvider;
-import com.btmura.android.reddit.provider.MessageProvider;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.InputFilters;
@@ -210,7 +209,6 @@ public class AddAccountFragment extends Fragment implements
                 ContentResolver.setSyncAutomatically(account, AccountProvider.AUTHORITY, true);
                 ContentResolver.setSyncAutomatically(account, SubredditProvider.AUTHORITY, true);
                 ContentResolver.setSyncAutomatically(account, ThingProvider.AUTHORITY, true);
-                ContentResolver.setSyncAutomatically(account, MessageProvider.AUTHORITY, true);
 
                 Bundle b = new Bundle(2);
                 b.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);

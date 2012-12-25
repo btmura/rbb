@@ -225,11 +225,11 @@ public class Provider {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                Uri uri = MessageProvider.MESSAGES_URI.buildUpon()
-                        .appendPath(parentThingId)
-                        .appendQueryParameter(MessageProvider.PARAM_THING_ID, thingId)
+                Uri uri = ThingProvider.THINGS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_MESSAGE_REPLY, TRUE)
-                        .appendQueryParameter(MessageProvider.PARAM_SYNC, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID, parentThingId)
+                        .appendQueryParameter(ThingProvider.PARAM_THING_ID, thingId)
+                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .build();
 
                 ArrayList<ContentProviderOperation> ops =
@@ -243,7 +243,7 @@ public class Provider {
                         .withValue(Messages.COLUMN_WAS_COMMENT, false)
                         .build());
 
-                applyOps(appContext, MessageProvider.AUTHORITY, ops);
+                applyOps(appContext, ThingProvider.AUTHORITY, ops);
             }
         });
     }

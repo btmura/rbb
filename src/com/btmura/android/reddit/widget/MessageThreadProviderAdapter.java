@@ -26,7 +26,7 @@ import android.view.View;
 
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.provider.MessageProvider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.widget.ThingAdapter.ProviderAdapter;
 
 public class MessageThreadProviderAdapter extends ProviderAdapter {
@@ -54,11 +54,10 @@ public class MessageThreadProviderAdapter extends ProviderAdapter {
 
     @Override
     Uri getLoaderUri(Bundle args) {
-        return MessageProvider.MESSAGES_URI.buildUpon()
-                .appendPath(getMessageThreadId(args))
-                .appendQueryParameter(MessageProvider.PARAM_FETCH, Boolean.toString(true))
-                .appendQueryParameter(MessageProvider.PARAM_ACCOUNT, getAccountName(args))
-                .build();
+        String accountName = getAccountName(args);
+        String thingId = getMessageThreadId(args);
+        boolean refresh = getRefresh(args);
+        return ThingProvider.messageThreadUri(accountName, thingId, refresh);
     }
 
     @Override

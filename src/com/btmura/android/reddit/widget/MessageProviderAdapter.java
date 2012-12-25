@@ -27,7 +27,7 @@ import android.view.View;
 
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.provider.MessageProvider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingAdapter.ProviderAdapter;
 
@@ -56,23 +56,19 @@ class MessageProviderAdapter extends ProviderAdapter {
 
     @Override
     Uri getLoaderUri(Bundle args) {
-        Uri uri;
+        String accountName = getAccountName(args);
+        boolean refresh = getRefresh(args);
+
         switch (getFilter(args)) {
             case FilterAdapter.MESSAGE_INBOX:
-                uri = MessageProvider.INBOX_URI;
-                break;
+                return ThingProvider.messageInboxUri(accountName, refresh);
 
             case FilterAdapter.MESSAGE_SENT:
-                uri = MessageProvider.SENT_URI;
-                break;
+                return ThingProvider.messageSentUri(accountName, refresh);
 
             default:
                 throw new IllegalStateException();
         }
-        return uri.buildUpon()
-                .appendQueryParameter(MessageProvider.PARAM_FETCH, Boolean.toString(true))
-                .appendQueryParameter(MessageProvider.PARAM_ACCOUNT, getAccountName(args))
-                .build();
     }
 
     @Override
