@@ -87,8 +87,8 @@ public class Things implements BaseColumns {
     // TODO: Do we need an index for sequence and id?
     public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
 
-    static void createTable(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+    static void createTempTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_AUTHOR + " TEXT, "

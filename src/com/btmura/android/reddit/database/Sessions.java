@@ -44,8 +44,8 @@ public class Sessions implements BaseColumns {
     public static final int TYPE_SEARCH_LISTING = 6;
     public static final int TYPE_REDDIT_SEARCH_LISTING = 7;
 
-    static void createTable(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+    static void createTempTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_KEY + " TEXT NOT NULL, "
                 + COLUMN_TIMESTAMP + " INTEGER NOT NULL, "

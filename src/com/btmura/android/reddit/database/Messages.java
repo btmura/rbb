@@ -43,8 +43,8 @@ public class Messages implements BaseColumns {
 
     public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "= ?";
 
-    static void createTable(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+    static void createTempTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_AUTHOR + " TEXT, "

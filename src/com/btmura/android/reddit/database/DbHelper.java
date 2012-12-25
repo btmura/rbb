@@ -53,6 +53,15 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onOpen(SQLiteDatabase db) {
+        if (!db.isReadOnly()) {
+            Sessions.createTempTable(db);
+            Things.createTempTable(db);
+            Messages.createTempTable(db);
+        }
+    }
+
+    @Override
     public void onCreate(SQLiteDatabase db) {
         if (version > 1) {
             Subreddits.createSubredditsV2(db);
@@ -73,12 +82,9 @@ public class DbHelper extends SQLiteOpenHelper {
 
     private static void createNewTablesV2(SQLiteDatabase db) {
         Accounts.createTable(db);
-        Sessions.createTable(db);
-        Things.createTable(db);
         Comments.createTable(db);
-        Votes.createTable(db);
-        Saves.createTable(db);
-        Messages.createTable(db);
         MessageActions.createTable(db);
+        Saves.createTable(db);
+        Votes.createTable(db);
     }
 }
