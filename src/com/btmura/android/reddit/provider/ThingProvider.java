@@ -32,6 +32,8 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.MessageActions;
+import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.SessionIds;
 import com.btmura.android.reddit.database.Sessions;
@@ -45,7 +47,7 @@ import com.btmura.android.reddit.database.Votes;
  * /things/
  *
  * /actions/comments - DONE
- * /actions/messages
+ * /actions/messages - DONE
  * /actions/saves - DONE
  * /actions/votes - DONE
  * </pre>
@@ -89,6 +91,8 @@ public class ThingProvider extends SessionProvider {
 
     public static final String PARAM_COMMENT_REPLY = "commentReply";
     public static final String PARAM_COMMENT_DELETE = "commentDelete";
+
+    public static final String PARAM_MESSAGE_REPLY = "messageReply";
 
     static final String PARAM_ACCOUNT = "account";
     static final String PARAM_SUBREDDIT = "subreddit";
@@ -211,7 +215,7 @@ public class ThingProvider extends SessionProvider {
                 return Comments.TABLE_NAME;
 
             case MATCH_MESSAGE_ACTIONS:
-                throw new UnsupportedOperationException();
+                return MessageActions.TABLE_NAME;
 
             case MATCH_SAVE_ACTIONS:
                 return Saves.TABLE_NAME;
@@ -230,10 +234,13 @@ public class ThingProvider extends SessionProvider {
         if (uri.getBooleanQueryParameter(PARAM_LISTING_GET, false)) {
             return handleListingGet(uri, db, selection, selectionArgs);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_REPLY, false)) {
-            handleReply(uri, db, values);
+            handleCommentReply(uri, db, values);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
-            handleDelete(uri, db);
+            handleCommentDelete(uri, db);
+        } else if (uri.getBooleanQueryParameter(PARAM_MESSAGE_REPLY, false)) {
+            handleMessageReply(uri, db, values);
         }
+
         return null;
     }
 
@@ -304,7 +311,7 @@ public class ThingProvider extends SessionProvider {
         return null;
     }
 
-    private void handleReply(Uri uri, SQLiteDatabase db, ContentValues values) {
+    private void handleCommentReply(Uri uri, SQLiteDatabase db, ContentValues values) {
         String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
         String thingId = uri.getQueryParameter(PARAM_THING_ID);
 
@@ -317,7 +324,7 @@ public class ThingProvider extends SessionProvider {
         db.insert(Comments.TABLE_NAME, null, v);
     }
 
-    private void handleDelete(Uri uri, SQLiteDatabase db) {
+    private void handleCommentDelete(Uri uri, SQLiteDatabase db) {
         String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
         String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
         String thingId = uri.getQueryParameter(PARAM_THING_ID);
@@ -328,6 +335,20 @@ public class ThingProvider extends SessionProvider {
         v.put(Comments.COLUMN_PARENT_THING_ID, parentThingId);
         v.put(Comments.COLUMN_THING_ID, thingId);
         db.insert(Comments.TABLE_NAME, null, v);
+    }
+
+    private void handleMessageReply(Uri uri, SQLiteDatabase db, ContentValues values) {
+        // Get the thing ID of the thing we are replying to.
+        String thingId = uri.getQueryParameter(PARAM_THING_ID);
+
+        // Insert an action to sync the reply back to the network eventually.
+        ContentValues v = new ContentValues(5);
+        v.put(MessageActions.COLUMN_ACCOUNT, values.getAsString(Messages.COLUMN_ACCOUNT));
+        v.put(MessageActions.COLUMN_ACTION, MessageActions.ACTION_INSERT);
+        v.put(MessageActions.COLUMN_PARENT_THING_ID, uri.getLastPathSegment());
+        v.put(MessageActions.COLUMN_THING_ID, thingId);
+        v.put(MessageActions.COLUMN_TEXT, values.getAsString(Messages.COLUMN_BODY));
+        db.insert(MessageActions.TABLE_NAME, null, v);
     }
 
     @Override

@@ -228,7 +228,7 @@ public class Provider {
                 Uri uri = MessageProvider.MESSAGES_URI.buildUpon()
                         .appendPath(parentThingId)
                         .appendQueryParameter(MessageProvider.PARAM_THING_ID, thingId)
-                        .appendQueryParameter(MessageProvider.PARAM_REPLY, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_MESSAGE_REPLY, TRUE)
                         .appendQueryParameter(MessageProvider.PARAM_SYNC, TRUE)
                         .build();
 
