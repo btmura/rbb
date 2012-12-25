@@ -418,11 +418,9 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
             String replyThingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
             int nesting = CommentLogic.getInsertNesting(this, position);
             int sequence = CommentLogic.getInsertSequence(this, position);
-            long sessionTimestamp = adapter.getLong(position,
-                    CommentAdapter.INDEX_SESSION_CREATION_TIME);
 
             Bundle args = CommentReplyActivity.newArgs(parentId, parentNumComments, thingId,
-                    replyAuthor, replyThingId, nesting, sequence, sessionId, sessionTimestamp);
+                    replyAuthor, replyThingId, nesting, sequence, sessionId);
 
             Intent intent = new Intent(getActivity(), CommentReplyActivity.class);
             intent.putExtra(CommentReplyActivity.EXTRA_ARGS, args);

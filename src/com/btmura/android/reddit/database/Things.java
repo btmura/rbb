@@ -48,8 +48,7 @@ public class Things implements BaseColumns {
     public static final String COLUMN_SELF = "self";
     public static final String COLUMN_SELF_TEXT = "selfText";
     public static final String COLUMN_SEQUENCE = "sequence";
-    public static final String COLUMN_SESSION_ID = "sessionId";
-    public static final String COLUMN_SESSION_TIMESTAMP = "sessionTimestamp";
+    public static final String COLUMN_SESSION_ID = SessionIds.COLUMN_SESSION_ID;
 
     /** Number of subscribers to this subreddit. */
     public static final String COLUMN_SUBSCRIBERS = "subscribers";
@@ -80,9 +79,6 @@ public class Things implements BaseColumns {
     // TODO: Do we need an index for sessionId and more?
     public static final String SELECT_BY_SESSION_ID_AND_MORE =
             SELECT_BY_SESSION_ID + " AND " + COLUMN_KIND + " = " + Kinds.KIND_MORE;
-
-    public static final String SELECT_BEFORE_TIMESTAMP =
-            COLUMN_SESSION_TIMESTAMP + " < ?";
 
     public static final String SELECT_VISIBLE_BY_SESSION_ID = SELECT_BY_SESSION_ID
             + " AND " + COLUMN_VISIBLE + " = 1";
@@ -117,7 +113,6 @@ public class Things implements BaseColumns {
                 + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "
                 + COLUMN_SEQUENCE + " INTEGER, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
-                + COLUMN_SESSION_TIMESTAMP + " INTEGER NOT NULL, "
                 + COLUMN_SUBSCRIBERS + " INTEGER, "
                 + COLUMN_SUBREDDIT + " TEXT, "
                 + COLUMN_THING_ID + " TEXT, "

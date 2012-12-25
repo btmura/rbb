@@ -69,19 +69,15 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private final Context context;
     private final SQLiteOpenHelper dbHelper;
     private final String accountName;
-    private final String sessionId;
-    private final long sessionTimestamp;
     private final String thingId;
     private final String linkId;
     private final String cookie;
 
-    CommentListing(Context context, SQLiteOpenHelper dbHelper, String accountName,
-            String sessionId, long sessionTimestamp, String thingId, String linkId, String cookie) {
+    CommentListing(Context context, SQLiteOpenHelper dbHelper, String accountName, String thingId,
+            String linkId, String cookie) {
         this.context = context;
         this.dbHelper = dbHelper;
         this.accountName = accountName;
-        this.sessionId = sessionId;
-        this.sessionTimestamp = sessionTimestamp;
         this.thingId = thingId;
         this.linkId = linkId;
         this.cookie = cookie;
@@ -131,11 +127,9 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void onEntityStart(int index) {
-        ContentValues v = new ContentValues(19);
+        ContentValues v = new ContentValues(18);
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_SEQUENCE, index);
-        v.put(Things.COLUMN_SESSION_ID, sessionId);
-        v.put(Things.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
         values.add(v);
     }
 
@@ -305,8 +299,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 p.put(Things.COLUMN_KIND, Kinds.KIND_COMMENT);
                 p.put(Things.COLUMN_NESTING, CommentLogic.getInsertNesting(this, i));
                 p.put(Things.COLUMN_SEQUENCE, CommentLogic.getInsertSequence(this, i));
-                p.put(Things.COLUMN_SESSION_ID, sessionId);
-                p.put(Things.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
 
                 values.add(CommentLogic.getInsertPosition(this, i), p);
                 size++;

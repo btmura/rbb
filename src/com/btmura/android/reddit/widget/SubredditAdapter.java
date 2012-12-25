@@ -87,8 +87,7 @@ public class SubredditAdapter extends BaseCursorAdapter {
     private static Uri getUri(String accountName, String sessionId, String query, boolean sync) {
         if (!TextUtils.isEmpty(query)) {
             return ThingProvider.THINGS_URI.buildUpon()
-                    .appendQueryParameter(ThingProvider.PARAM_FETCH_SUBREDDITS,
-                            Boolean.toString(sync))
+                    .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(sync))
                     .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
                     .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
                     .appendQueryParameter(ThingProvider.PARAM_QUERY, query)

@@ -63,8 +63,7 @@ public class Provider {
             final String body,
             final int nesting,
             final int sequence,
-            final String sessionId,
-            final long sessionTimestamp) {
+            final String sessionId) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
@@ -92,7 +91,6 @@ public class Provider {
                         .withValue(Things.COLUMN_NESTING, nesting)
                         .withValue(Things.COLUMN_SEQUENCE, sequence)
                         .withValue(Things.COLUMN_SESSION_ID, sessionId)
-                        .withValue(Things.COLUMN_SESSION_TIMESTAMP, sessionTimestamp)
                         .build());
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);

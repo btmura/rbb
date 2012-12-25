@@ -24,4 +24,7 @@ public class SessionIds {
 
     /** Name of the session id column. Use this in table classes for clarity. */
     public static final String COLUMN_SESSION_ID = "sessionId";
+
+    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
+
 }

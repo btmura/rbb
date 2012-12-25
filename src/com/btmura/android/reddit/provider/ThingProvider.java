@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -25,18 +24,16 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
-import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Saves;
+import com.btmura.android.reddit.database.SessionIds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
-import com.btmura.android.reddit.util.Array;
 
 public class ThingProvider extends SessionProvider {
 
@@ -44,6 +41,9 @@ public class ThingProvider extends SessionProvider {
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
     static final String AUTHORITY_URI = "content://" + AUTHORITY + "/";
+
+    private static final String PATH_SUBREDDIT = "r";
+
 
     private static final String PATH_THINGS = "things";
     private static final String PATH_COMMENTS = "comments";
@@ -55,9 +55,7 @@ public class ThingProvider extends SessionProvider {
     public static final Uri VOTES_URI = Uri.parse(AUTHORITY_URI + PATH_VOTES);
     public static final Uri SAVES_URI = Uri.parse(AUTHORITY_URI + PATH_SAVES);
 
-    public static final String PARAM_FETCH_LINKS = "fetchLinks";
-    public static final String PARAM_FETCH_COMMENTS = "fetchComments";
-    public static final String PARAM_FETCH_SUBREDDITS = "fetchSubreddits";
+    public static final String PARAM_FETCH = "fetch";
     public static final String PARAM_COMMENT_REPLY = "commentReply";
     public static final String PARAM_COMMENT_DELETE = "commentDelete";
 
@@ -78,11 +76,17 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_THINGS = 1;
+    private static final int MATCH_SUBREDDIT = 1;
     private static final int MATCH_COMMENTS = 2;
-    private static final int MATCH_VOTES = 3;
-    private static final int MATCH_SAVES = 4;
+
+    private static final int MATCH_THINGS = 3;
+    private static final int MATCH_VOTES = 5;
+    private static final int MATCH_SAVES = 6;
     static {
+        MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*", MATCH_SUBREDDIT);
+        MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*/" + PATH_COMMENTS + "/*", MATCH_COMMENTS);
+
+
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
         MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENTS);
         MATCHER.addURI(AUTHORITY, PATH_VOTES, MATCH_VOTES);
@@ -140,12 +144,8 @@ public class ThingProvider extends SessionProvider {
     @Override
     protected Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
             String selection, String[] selectionArgs) {
-        if (uri.getBooleanQueryParameter(PARAM_FETCH_LINKS, false)) {
-            handleFetchLinks(uri, db);
-        } else if (uri.getBooleanQueryParameter(PARAM_FETCH_COMMENTS, false)) {
-            handleFetchComments(uri, db);
-        } else if (uri.getBooleanQueryParameter(PARAM_FETCH_SUBREDDITS, false)) {
-            handleFetchSubreddits(uri, db);
+        if (uri.getBooleanQueryParameter(PARAM_FETCH, false)) {
+            return handleFetch(uri, db, selection, selectionArgs);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_REPLY, false)) {
             handleReply(uri, db, values);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
@@ -154,108 +154,51 @@ public class ThingProvider extends SessionProvider {
         return null;
     }
 
-    private void handleFetchLinks(Uri uri, SQLiteDatabase db) {
+    private Selection handleFetch(Uri uri, SQLiteDatabase db, String selection, String[] selectionArgs) {
         try {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
-            String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
-            long sessionTimestamp = getSessionTimestamp();
             String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
             String query = uri.getQueryParameter(PARAM_QUERY);
             String profileUser = uri.getQueryParameter(PARAM_PROFILE_USER);
             String messageUser = uri.getQueryParameter(PARAM_MESSAGE_USER);
+            String thingId = uri.getQueryParameter(PARAM_THING_ID);
+            String linkId = uri.getQueryParameter(PARAM_LINK_ID);
             String filterParameter = uri.getQueryParameter(PARAM_FILTER);
             int filter = filterParameter != null ? Integer.parseInt(filterParameter) : 0;
             String more = uri.getQueryParameter(PARAM_MORE);
+
             String cookie = AccountUtils.getCookie(context, accountName);
-
-            ThingListing listing = new ThingListing(context, accountName, sessionId,
-                    sessionTimestamp, subredditName, query, profileUser, messageUser, filter, more,
-                    cookie);
-            insertListing(db, listing, sessionId, sessionTimestamp);
-        } catch (OperationCanceledException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (AuthenticatorException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void handleFetchComments(Uri uri, SQLiteDatabase db) {
-        try {
-            Context context = getContext();
-            String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
-            String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
-            long sessionTimestamp = getSessionTimestamp();
-            String thingId = uri.getQueryParameter(PARAM_THING_ID);
-            String linkId = uri.getQueryParameter(PARAM_LINK_ID);
-            String cookie = AccountUtils.getCookie(context, accountName);
-
-            CommentListing listing = new CommentListing(context, helper, accountName, sessionId,
-                    sessionTimestamp, thingId, linkId, cookie);
-            insertListing(db, listing, sessionId, sessionTimestamp);
-        } catch (OperationCanceledException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (AuthenticatorException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void handleFetchSubreddits(Uri uri, SQLiteDatabase db) {
-        try {
-            Context context = getContext();
-            String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
-            String sessionId = uri.getQueryParameter(PARAM_SESSION_ID);
-            long sessionTimestamp = getSessionTimestamp();
-            String query = uri.getQueryParameter(PARAM_QUERY);
-            String cookie = AccountUtils.getCookie(context, accountName);
-
-            SubredditSearchListing listing = new SubredditSearchListing(accountName, sessionId,
-                    sessionTimestamp, query, cookie);
-            insertListing(db, listing, sessionId, sessionTimestamp);
-        } catch (OperationCanceledException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (AuthenticatorException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void insertListing(SQLiteDatabase db, Listing listing, String sessionId,
-            long sessionTimestamp) throws IOException {
-        ArrayList<ContentValues> values = listing.getValues();
-        long cleaned;
-        long t1 = System.currentTimeMillis();
-        db.beginTransaction();
-        try {
-            // Delete old things that can't possibly be viewed anymore.
-            cleaned = db.delete(Things.TABLE_NAME, Things.SELECT_BEFORE_TIMESTAMP,
-                    Array.of(sessionTimestamp));
-
-            // Delete the loading more element before appending more.
-            db.delete(Things.TABLE_NAME, Things.SELECT_BY_SESSION_ID_AND_MORE,
-                    Array.of(sessionId));
-
-            InsertHelper insertHelper = new InsertHelper(db, Things.TABLE_NAME);
-            int count = values.size();
-            for (int i = 0; i < count; i++) {
-                insertHelper.insert(values.get(i));
+            if (cookie == null) {
+                return null;
             }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
+
+            Listing listing = null;
+            switch (MATCHER.match(uri)) {
+                case MATCH_SUBREDDIT:
+                    listing = new ThingListing(context, accountName, subredditName, query, profileUser, messageUser, filter, more, cookie);
+                    break;
+
+                case MATCH_COMMENTS:
+                    listing = new CommentListing(context, helper, accountName, thingId, linkId, cookie);
+                    break;
+            }
+
+            long sessionId = getListingSession(listing, db, Things.TABLE_NAME);
+
+            Selection newSelection = new Selection();
+            newSelection.selection = appendSelection(selection, SessionIds.SELECT_BY_SESSION_ID);
+            newSelection.selectionArgs = appendSelectionArg(selectionArgs, Long.toString(sessionId));
+            return newSelection;
+
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
         }
-        if (BuildConfig.DEBUG) {
-            long t2 = System.currentTimeMillis();
-            Log.d(TAG, "sync network: " + listing.getNetworkTimeMs()
-                    + " parse: " + listing.getParseTimeMs()
-                    + " db: " + (t2 - t1)
-                    + " cleaned: " + cleaned);
-        }
+        return null;
     }
 
     private void handleReply(Uri uri, SQLiteDatabase db, ContentValues values) {

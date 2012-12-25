@@ -37,8 +37,6 @@ class SubredditSearchListing extends JsonParser implements Listing {
     public static final String TAG = "SubredditSearchListing";
 
     private final String accountName;
-    private final String sessionId;
-    private final long sessionTimestamp;
     private final String query;
     private final String cookie;
 
@@ -46,17 +44,14 @@ class SubredditSearchListing extends JsonParser implements Listing {
     private long networkTimeMs;
     private long parseTimeMs;
 
-    SubredditSearchListing(String accountName, String sessionId, long sessionTimestamp,
-            String query, String cookie) {
+    SubredditSearchListing(String accountName, String query, String cookie) {
         this.accountName = accountName;
-        this.sessionId = sessionId;
-        this.sessionTimestamp = sessionTimestamp;
         this.query = query;
         this.cookie = cookie;
     }
 
     public String getKey() {
-        return null;
+        return query;
     }
 
     public int getType() {
@@ -96,8 +91,6 @@ class SubredditSearchListing extends JsonParser implements Listing {
     public void onEntityStart(int index) {
         ContentValues v = new ContentValues(6);
         v.put(Things.COLUMN_ACCOUNT, accountName);
-        v.put(Things.COLUMN_SESSION_ID, sessionId);
-        v.put(Things.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
         values.add(v);
     }
 

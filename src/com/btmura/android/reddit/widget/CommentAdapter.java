@@ -48,7 +48,6 @@ public class CommentAdapter extends BaseCursorAdapter {
             Things.COLUMN_SELF,
             Things.COLUMN_SEQUENCE,
             Things.COLUMN_SESSION_ID,
-            Things.COLUMN_SESSION_TIMESTAMP,
             Things.COLUMN_TITLE,
             Things.COLUMN_THING_ID,
             Things.COLUMN_UPS,
@@ -70,12 +69,11 @@ public class CommentAdapter extends BaseCursorAdapter {
     public static int INDEX_SELF = 11;
     public static int INDEX_SEQUENCE = 12;
     public static int INDEX_SESSION_ID = 13;
-    public static int INDEX_SESSION_CREATION_TIME = 14;
-    public static int INDEX_TITLE = 15;
-    public static int INDEX_THING_ID = 16;
-    public static int INDEX_UPS = 17;
-    public static int INDEX_URL = 18;
-    public static int INDEX_VOTE = 19;
+    public static int INDEX_TITLE = 14;
+    public static int INDEX_THING_ID = 15;
+    public static int INDEX_UPS = 16;
+    public static int INDEX_URL = 17;
+    public static int INDEX_VOTE = 18;
 
     private final long nowTimeMs = System.currentTimeMillis();
     private final String accountName;
@@ -110,7 +108,7 @@ public class CommentAdapter extends BaseCursorAdapter {
     private static Uri getUri(String accountName, String sessionId, String thingId, String linkId,
             boolean fetch) {
         Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.PARAM_FETCH_COMMENTS, Boolean.toString(fetch))
+                .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
                 .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
                 .appendQueryParameter(ThingProvider.PARAM_THING_ID, thingId)

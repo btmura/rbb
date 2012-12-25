@@ -41,7 +41,6 @@ public class CommentReplyActivity extends Activity implements OnCommentReplyForm
     public static final String ARG_NESTING = "nesting";
     public static final String ARG_SEQUENCE = "sequence";
     public static final String ARG_SESSION_ID = "sessionId";
-    public static final String ARG_SESSION_TIMESTAMP = "sessionTimestamp";
 
     public static Bundle newArgs(long parentId,
             int parentNumComments,
@@ -50,8 +49,7 @@ public class CommentReplyActivity extends Activity implements OnCommentReplyForm
             String replyThingId,
             int nesting,
             int sequence,
-            String sessionId,
-            long sessionTimestamp) {
+            String sessionId) {
         Bundle args = new Bundle(9);
         args.putLong(ARG_PARENT_ID, parentId);
         args.putInt(ARG_PARENT_NUM_COMMENTS, parentNumComments);
@@ -61,7 +59,6 @@ public class CommentReplyActivity extends Activity implements OnCommentReplyForm
         args.putInt(ARG_NESTING, nesting);
         args.putInt(ARG_SEQUENCE, sequence);
         args.putString(ARG_SESSION_ID, sessionId);
-        args.putLong(ARG_SESSION_TIMESTAMP, sessionTimestamp);
         return args;
     }
 
@@ -101,9 +98,8 @@ public class CommentReplyActivity extends Activity implements OnCommentReplyForm
         int nesting = replyArgs.getInt(ARG_NESTING);
         int sequence = replyArgs.getInt(ARG_SEQUENCE);
         String sessionId = replyArgs.getString(ARG_SESSION_ID);
-        long sessionTimestamp = replyArgs.getLong(ARG_SESSION_TIMESTAMP);
         Provider.insertCommentAsync(this, parentId, parentNumComments, parentThingId, replyThingId,
-                accountName, comment, nesting, sequence, sessionId, sessionTimestamp);
+                accountName, comment, nesting, sequence, sessionId);
         finish();
     }
 

@@ -45,8 +45,6 @@ class ThingListing extends JsonParser implements Listing {
     private final Formatter formatter = new Formatter();
     private final Context context;
     private final String accountName;
-    private final String sessionId;
-    private final long sessionTimestamp;
     private final String subreddit;
     private final String query;
     private final String profileUser;
@@ -60,13 +58,10 @@ class ThingListing extends JsonParser implements Listing {
     private long parseTimeMs;
     private String moreThingId;
 
-    ThingListing(Context context, String accountName, String sessionId,
-            long sessionTimestamp, String subreddit, String query, String profileUser,
-            String messageUser, int filter, String more, String cookie) {
+    ThingListing(Context context, String accountName, String subreddit, String query,
+            String profileUser, String messageUser, int filter, String more, String cookie) {
         this.context = context;
         this.accountName = accountName;
-        this.sessionId = sessionId;
-        this.sessionTimestamp = sessionTimestamp;
         this.subreddit = subreddit;
         this.query = query;
         this.profileUser = profileUser;
@@ -279,11 +274,9 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     private ContentValues newContentValues(int kind, String thingId, int extraCapacity) {
-        ContentValues v = new ContentValues(5 + extraCapacity);
+        ContentValues v = new ContentValues(3 + extraCapacity);
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_KIND, kind);
-        v.put(Things.COLUMN_SESSION_ID, sessionId);
-        v.put(Things.COLUMN_SESSION_TIMESTAMP, sessionTimestamp);
         v.put(Things.COLUMN_THING_ID, thingId);
         return v;
     }
