@@ -36,24 +36,8 @@ import com.btmura.android.reddit.util.Array;
  */
 abstract class SessionProvider extends BaseProvider {
 
-    /** Timestamp to apply to all data so we can clean it up later if necessary. */
-    private static long SESSION_TIMESTAMP = -1;
-
     SessionProvider(String logTag) {
         super(logTag);
-    }
-
-    /**
-     * Return the session timestamp to mark the data.
-     */
-    static long getSessionTimestamp() {
-        // Initialize this once to delete all session data that was created
-        // before this time. This allows to clean up any residue in the
-        // database that can no longer be viewed.
-        if (SESSION_TIMESTAMP == -1) {
-            SESSION_TIMESTAMP = System.currentTimeMillis();
-        }
-        return SESSION_TIMESTAMP;
     }
 
     /** Projection with timestamps to see if the sessions are fresh enough. */
