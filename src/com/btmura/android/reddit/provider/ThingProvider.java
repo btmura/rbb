@@ -234,19 +234,20 @@ public class ThingProvider extends SessionProvider {
         switch (match) {
             case MATCH_THINGS:
                 // TODO: Remove duplicate logic of table resolution.
-                int listingType = Integer.parseInt(uri.getQueryParameter(PARAM_LISTING_TYPE));
-                switch (listingType) {
-                    case Sessions.TYPE_MESSAGE_THREAD_LISTING:
-                    case Sessions.TYPE_MESSAGE_INBOX_LISTING:
-                    case Sessions.TYPE_MESSAGE_SENT_LISTING:
-                        return Messages.TABLE_NAME;
+                String listingType = uri.getQueryParameter(PARAM_LISTING_TYPE);
+                if (!TextUtils.isEmpty(listingType)) {
+                    switch (Integer.parseInt(listingType)) {
+                        case Sessions.TYPE_MESSAGE_THREAD_LISTING:
+                        case Sessions.TYPE_MESSAGE_INBOX_LISTING:
+                        case Sessions.TYPE_MESSAGE_SENT_LISTING:
+                            return Messages.TABLE_NAME;
+                    }
+                }
 
-                    default:
-                        if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
-                            return JOINED_THING_TABLE;
-                        } else {
-                            return Things.TABLE_NAME;
-                        }
+                if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
+                    return JOINED_THING_TABLE;
+                } else {
+                    return Things.TABLE_NAME;
                 }
 
             case MATCH_COMMENT_ACTIONS:
