@@ -66,6 +66,12 @@ class ThingListing extends JsonParser implements Listing {
                 Subreddits.NAME_FRONT_PAGE, null, null, null, filter, more, cookie);
     }
 
+    static ThingListing newSubredditInstance(Context context, String accountName, String subreddit,
+            int filter, String more, String cookie) {
+        return new ThingListing(Sessions.TYPE_SUBREDDIT_LISTING, context, accountName,
+                subreddit, null, null, null, filter, more, cookie);
+    }
+
     ThingListing(int listingType, Context context, String accountName, String subreddit,
             String query, String profileUser, String messageUser, int filter, String more,
             String cookie) {

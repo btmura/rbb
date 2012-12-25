@@ -90,7 +90,6 @@ public class ThingProvider extends SessionProvider {
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*", MATCH_SUBREDDIT);
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*/" + PATH_COMMENTS + "/*", MATCH_COMMENTS);
 
-
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
         MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENTS);
         MATCHER.addURI(AUTHORITY, PATH_VOTES, MATCH_VOTES);
@@ -167,14 +166,14 @@ public class ThingProvider extends SessionProvider {
         return null;
     }
 
-    private Selection handleFetch(Uri uri, SQLiteDatabase db, String selection, String[] selectionArgs) {
+    private Selection handleFetch(Uri uri, SQLiteDatabase db, String selection,
+            String[] selectionArgs) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "handleFetch uri: " + uri);
         }
         try {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
-            String subredditName = uri.getQueryParameter(PARAM_SUBREDDIT);
             String query = uri.getQueryParameter(PARAM_QUERY);
             String profileUser = uri.getQueryParameter(PARAM_PROFILE_USER);
             String messageUser = uri.getQueryParameter(PARAM_MESSAGE_USER);
@@ -197,15 +196,19 @@ public class ThingProvider extends SessionProvider {
             Listing listing = null;
             switch (match) {
                 case MATCH_FRONT_PAGE:
-                    listing = ThingListing.newFrontPageInstance(context, accountName, filter, more, cookie);
+                    listing = ThingListing.newFrontPageInstance(context, accountName,
+                            filter, more, cookie);
                     break;
 
                 case MATCH_SUBREDDIT:
-                    listing = new ThingListing(0, context, accountName, subredditName, query, profileUser, messageUser, filter, more, cookie);
+                    String subreddit = uri.getLastPathSegment();
+                    listing = ThingListing.newSubredditInstance(context, accountName, subreddit,
+                            filter, more, cookie);
                     break;
 
                 case MATCH_COMMENTS:
-                    listing = new CommentListing(context, helper, accountName, thingId, linkId, cookie);
+                    listing = new CommentListing(context, helper, accountName, thingId, linkId,
+                            cookie);
                     break;
             }
 
