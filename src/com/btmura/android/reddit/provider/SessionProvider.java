@@ -84,7 +84,7 @@ abstract class SessionProvider extends BaseProvider {
      * to create a session with the data.
      */
     long getListingSession(Listing listing, String key,
-            SQLiteDatabase db, String tableName, String sessionIdKey) {
+            SQLiteDatabase db, String targetTable) {
 
         // Current time for measuring age of sessions and inserting new ones.
         long now = System.currentTimeMillis();
@@ -142,7 +142,7 @@ abstract class SessionProvider extends BaseProvider {
                 if (candidateId != -1) {
                     String[] selectionArgs = Array.of(candidateId);
                     int deleted1 = db.delete(Sessions.TABLE_NAME, ID_SELECTION, selectionArgs);
-                    int deleted2 = db.delete(tableName, SELECT_BY_SESSION_ID, selectionArgs);
+                    int deleted2 = db.delete(targetTable, SELECT_BY_SESSION_ID, selectionArgs);
                     if (BuildConfig.DEBUG) {
                         Log.d(logTag, "deleted session: " + candidateId
                                 + " count: " + deleted1 + " " + deleted2);
@@ -159,11 +159,11 @@ abstract class SessionProvider extends BaseProvider {
                 // Add the session id to the data rows.
                 int count = values.size();
                 for (int i = 0; i < count; i++) {
-                    values.get(i).put(sessionIdKey, sessionId);
+                    values.get(i).put(SessionIds.COLUMN_SESSION_ID, sessionId);
                 }
 
                 // Insert the rows into the database.
-                InsertHelper helper = new InsertHelper(db, tableName);
+                InsertHelper helper = new InsertHelper(db, targetTable);
                 for (int i = 0; i < count; i++) {
                     helper.insert(values.get(i));
                 }
