@@ -63,7 +63,7 @@ public class ThingAdapter extends BaseCursorAdapter {
     public static final String ARG_MORE = "more";
 
     /** Boolean argument to tell some loaders to fetch stuff. */
-    public static final String ARG_FETCH = "fetch";
+    public static final String ARG_REFRESH = "refresh";
 
     /**
      * {@link ProviderAdapter} allows different providers to be used by
@@ -139,8 +139,8 @@ public class ThingAdapter extends BaseCursorAdapter {
             return args.getString(ARG_MORE);
         }
 
-        static boolean getFetch(Bundle args) {
-            return args.getBoolean(ARG_FETCH);
+        static boolean getRefresh(Bundle args) {
+            return args.getBoolean(ARG_REFRESH);
         }
     }
 
@@ -353,7 +353,7 @@ public class ThingAdapter extends BaseCursorAdapter {
         return ProviderAdapter.getMore(args);
     }
 
-    public static boolean getFetch(Bundle args) {
-        return ProviderAdapter.getFetch(args);
+    public static boolean getRefresh(Bundle args) {
+        return ProviderAdapter.getRefresh(args);
     }
 }

@@ -68,13 +68,9 @@ public class SubredditAdapter extends BaseCursorAdapter {
         }
     }
 
-    private static Uri getUri(String accountName, String query, boolean sync) {
+    private static Uri getUri(String accountName, String query, boolean refresh) {
         if (!TextUtils.isEmpty(query)) {
-            return ThingProvider.REDDIT_SEARCH_URI.buildUpon()
-                    .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(sync))
-                    .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
-                    .appendQueryParameter(ThingProvider.PARAM_QUERY, query)
-                    .build();
+            return ThingProvider.subredditSearchUri(accountName, query, refresh);
         }
         return SubredditProvider.SUBREDDITS_URI;
     }

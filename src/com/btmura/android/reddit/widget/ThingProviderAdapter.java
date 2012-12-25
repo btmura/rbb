@@ -27,7 +27,6 @@ import android.view.View;
 
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Saves;
-import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.net.Urls;
@@ -88,47 +87,30 @@ class ThingProviderAdapter extends ProviderAdapter {
     private static final int INDEX_UPS = 20;
     private static final int INDEX_URL = 21;
 
-    // Following 2 colums are from joined tables at the end.
+    // Following 2 columns are from joined tables at the end.
     private static final int INDEX_SAVE_ACTION = 22;
     private static final int INDEX_VOTE = 23;
 
     @Override
     Uri getLoaderUri(Bundle args) {
-        Uri.Builder b = null;
+        String accountName = getAccountName(args);
+        String subreddit = getSubreddit(args);
+        String profileUser = getProfileUser(args);
+        String query = getQuery(args);
+        int filter = getFilter(args);
+        String more = getMore(args);
+        boolean refresh = getRefresh(args);
 
         // Empty but non-null subreddit means front page.
-        if (getSubreddit(args) != null) {
-            String subreddit = getSubreddit(args);
-            if (Subreddits.isFrontPage(subreddit)) {
-                b = ThingProvider.FRONT_URI.buildUpon();
-            } else {
-                b = ThingProvider.SUBREDDIT_URI.buildUpon();
-                b.appendPath(subreddit);
-            }
-        } else if (!TextUtils.isEmpty(getProfileUser(args))) {
-            b = ThingProvider.USER_URI.buildUpon();
-            b.appendPath(getProfileUser(args));
+        if (subreddit != null) {
+            return ThingProvider.subredditUri(accountName, subreddit, filter, more, refresh);
+        } else if (!TextUtils.isEmpty(profileUser)) {
+            return ThingProvider.profileUri(accountName, profileUser, filter, more, refresh);
         } else if (!TextUtils.isEmpty(getQuery(args))) {
-            b = ThingProvider.SEARCH_URI.buildUpon();
-            b.appendQueryParameter(ThingProvider.PARAM_QUERY, getQuery(args));
+            return ThingProvider.searchUri(accountName, query, refresh);
+        } else {
+            throw new IllegalArgumentException();
         }
-
-        b.appendQueryParameter(ThingProvider.PARAM_FETCH,
-                Boolean.toString(getFetch(args)))
-                .appendQueryParameter(ThingProvider.PARAM_ACCOUNT,
-                        getAccountName(args))
-                .appendQueryParameter(ThingProvider.PARAM_FILTER,
-                        Integer.toString(getFilter(args)))
-                .appendQueryParameter(ThingProvider.PARAM_JOIN,
-                        Boolean.toString(true));
-
-        if (!TextUtils.isEmpty(getMessageUser(args))) {
-            b.appendQueryParameter(ThingProvider.PARAM_MESSAGE_USER, getMessageUser(args));
-        }
-        if (!TextUtils.isEmpty(getMore(args))) {
-            b.appendQueryParameter(ThingProvider.PARAM_MORE, getMore(args));
-        }
-        return b.build();
     }
 
     @Override

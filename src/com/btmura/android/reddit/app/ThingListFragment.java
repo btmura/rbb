@@ -221,7 +221,7 @@ public class ThingListFragment extends ListFragment implements
         if (args != null) {
             adapterArgs.putAll(args);
         }
-        adapterArgs.putBoolean(ThingAdapter.ARG_FETCH, sync);
+        adapterArgs.putBoolean(ThingAdapter.ARG_REFRESH, sync);
         return adapter.createLoader(getActivity(), adapterArgs);
     }
 
@@ -231,7 +231,7 @@ public class ThingListFragment extends ListFragment implements
         }
         sync = false;
         scrollLoading = false;
-        adapterArgs.putBoolean(ThingAdapter.ARG_FETCH, sync);
+        adapterArgs.putBoolean(ThingAdapter.ARG_REFRESH, sync);
         adapterArgs.remove(ThingAdapter.ARG_MORE);
         adapter.updateLoader(getActivity(), loader, adapterArgs);
 

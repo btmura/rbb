@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
-import java.util.List;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -27,6 +26,7 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -34,6 +34,7 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.SessionIds;
+import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 
@@ -56,78 +57,50 @@ public class ThingProvider extends SessionProvider {
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
     static final String AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
-    private static final String PATH_FRONT = "front";
-    private static final String PATH_SEARCH = "search";
-    private static final String PATH_REDDIT_SEARCH = "reddits/search";
-    private static final String PATH_SUBREDDIT = "r";
-    private static final String PATH_COMMENTS = "comments";
-    private static final String PATH_USERS = "users";
+    private static final String PATH_THINGS = "things";
     private static final String PATH_COMMENT_ACTIONS = "actions/comments";
     private static final String PATH_MESSAGE_ACTIONS = "actions/messages";
     private static final String PATH_SAVE_ACTIONS = "actions/saves";
     private static final String PATH_VOTE_ACTIONS = "actions/votes";
-    private static final String PATH_TABLES = "tables";
 
-    public static final Uri FRONT_URI = Uri.parse(AUTHORITY_URI + PATH_FRONT);
-    public static final Uri SEARCH_URI = Uri.parse(AUTHORITY_URI + PATH_SEARCH);
-    public static final Uri REDDIT_SEARCH_URI = Uri.parse(AUTHORITY_URI + PATH_REDDIT_SEARCH);
-    public static final Uri SUBREDDIT_URI = Uri.parse(AUTHORITY_URI + PATH_SUBREDDIT);
-    public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
-    public static final Uri USER_URI = Uri.parse(AUTHORITY_URI + PATH_USERS);
+    public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
     public static final Uri COMMENT_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENT_ACTIONS);
     public static final Uri MESSAGE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_MESSAGE_ACTIONS);
     public static final Uri SAVE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_SAVE_ACTIONS);
     public static final Uri VOTE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_VOTE_ACTIONS);
-    public static final Uri THINGS_TABLE_URI = Uri.parse(AUTHORITY_URI + PATH_TABLES
-            + "/" + Things.TABLE_NAME);
-
-    public static final String PARAM_FETCH = "fetch";
-    public static final String PARAM_COMMENT_REPLY = "commentReply";
-    public static final String PARAM_COMMENT_DELETE = "commentDelete";
-
-    public static final String PARAM_ACCOUNT = "account";
-    public static final String PARAM_SESSION_ID = "sessionId";
-    public static final String PARAM_SUBREDDIT = "subreddit";
-    public static final String PARAM_QUERY = "query";
-    public static final String PARAM_PROFILE_USER = "profileUser";
-    public static final String PARAM_MESSAGE_USER = "messageUser";
-    public static final String PARAM_FILTER = "filter";
-    public static final String PARAM_MORE = "more";
-
-    public static final String PARAM_PARENT_THING_ID = "parentThingId";
-    public static final String PARAM_THING_ID = "thingId";
-    public static final String PARAM_LINK_ID = "linkId";
-
-    public static final String PARAM_JOIN = "join";
-    public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_FRONT = 1;
-    private static final int MATCH_SEARCH = 2;
-    private static final int MATCH_REDDIT_SEARCH = 3;
-    private static final int MATCH_SUBREDDIT = 5;
-    private static final int MATCH_COMMENTS = 7;
-    private static final int MATCH_COMMENTS_CONTEXT = 8;
-    private static final int MATCH_USERS = 10;
-    private static final int MATCH_COMMENT_ACTIONS = 11;
-    private static final int MATCH_MESSAGE_ACTIONS = 12;
-    private static final int MATCH_SAVE_ACTIONS = 13;
-    private static final int MATCH_VOTE_ACTIONS = 14;
-    private static final int MATCH_TABLES = 15;
+    private static final int MATCH_THINGS = 1;
+    private static final int MATCH_COMMENT_ACTIONS = 2;
+    private static final int MATCH_MESSAGE_ACTIONS = 3;
+    private static final int MATCH_SAVE_ACTIONS = 4;
+    private static final int MATCH_VOTE_ACTIONS = 5;
     static {
-        MATCHER.addURI(AUTHORITY, PATH_FRONT, MATCH_FRONT);
-        MATCHER.addURI(AUTHORITY, PATH_SEARCH, MATCH_SEARCH);
-        MATCHER.addURI(AUTHORITY, PATH_REDDIT_SEARCH, MATCH_REDDIT_SEARCH);
-        MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*", MATCH_SUBREDDIT);
-        MATCHER.addURI(AUTHORITY, PATH_USERS + "/*", MATCH_USERS);
-        MATCHER.addURI(AUTHORITY, PATH_COMMENTS + "/*", MATCH_COMMENTS);
-        MATCHER.addURI(AUTHORITY, PATH_COMMENTS + "/*/*", MATCH_COMMENTS_CONTEXT);
+        MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
         MATCHER.addURI(AUTHORITY, PATH_COMMENT_ACTIONS, MATCH_COMMENT_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_MESSAGE_ACTIONS, MATCH_MESSAGE_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_SAVE_ACTIONS, MATCH_SAVE_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_VOTE_ACTIONS, MATCH_VOTE_ACTIONS);
-        MATCHER.addURI(AUTHORITY, PATH_TABLES + "/*", MATCH_TABLES);
     }
+
+    static final String PARAM_LISTING_GET = "getListing";
+    static final String PARAM_LISTING_TYPE = "listingType";
+    static final String PARAM_LISTING_REFRESH = "refresh";
+
+    public static final String PARAM_COMMENT_REPLY = "commentReply";
+    public static final String PARAM_COMMENT_DELETE = "commentDelete";
+
+    static final String PARAM_ACCOUNT = "account";
+    static final String PARAM_SUBREDDIT = "subreddit";
+    static final String PARAM_QUERY = "query";
+    static final String PARAM_PROFILE_USER = "profileUser";
+    static final String PARAM_FILTER = "filter";
+    static final String PARAM_MORE = "more";
+    static final String PARAM_PARENT_THING_ID = "parentThingId";
+    static final String PARAM_THING_ID = "thingId";
+    static final String PARAM_LINK_ID = "linkId";
+    static final String PARAM_JOIN = "join";
+    static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
     private static final String JOINED_THING_TABLE = Things.TABLE_NAME
             // Join with pending saves to fake that the save happened.
@@ -148,6 +121,74 @@ public class ThingProvider extends SessionProvider {
             + Votes.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")";
 
+    public static final Uri subredditUri(String accountName, String subreddit, int filter,
+            String more, boolean refresh) {
+        Uri.Builder b = THINGS_URI.buildUpon();
+        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_SUBREDDIT_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        b.appendQueryParameter(PARAM_SUBREDDIT, subreddit);
+        b.appendQueryParameter(PARAM_FILTER, toString(filter));
+        b.appendQueryParameter(PARAM_JOIN, TRUE);
+        if (!TextUtils.isEmpty(more)) {
+            b.appendQueryParameter(PARAM_MORE, more);
+        }
+        return b.build();
+    }
+
+    public static final Uri commentsUri(String accountName, String thingId, String linkId,
+            boolean refresh) {
+        Uri.Builder b = THINGS_URI.buildUpon();
+        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_COMMENT_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        b.appendQueryParameter(PARAM_THING_ID, thingId);
+        if (!TextUtils.isEmpty(linkId)) {
+            b.appendQueryParameter(PARAM_LINK_ID, linkId);
+        }
+        b.appendQueryParameter(PARAM_JOIN, TRUE);
+        return b.build();
+    }
+
+    public static final Uri profileUri(String accountName, String profileUser, int filter,
+            String more, boolean refresh) {
+        Uri.Builder b = THINGS_URI.buildUpon();
+        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_USER_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        b.appendQueryParameter(PARAM_PROFILE_USER, profileUser);
+        b.appendQueryParameter(PARAM_FILTER, toString(filter));
+        b.appendQueryParameter(PARAM_JOIN, TRUE);
+        if (!TextUtils.isEmpty(more)) {
+            b.appendQueryParameter(PARAM_MORE, more);
+        }
+        return b.build();
+    }
+
+    public static final Uri searchUri(String accountName, String query, boolean refresh) {
+        Uri.Builder b = THINGS_URI.buildUpon();
+        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_SEARCH_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        b.appendQueryParameter(PARAM_QUERY, query);
+        b.appendQueryParameter(PARAM_JOIN, TRUE);
+        return b.build();
+    }
+
+    public static final Uri subredditSearchUri(String accountName, String query, boolean refresh) {
+        Uri.Builder b = THINGS_URI.buildUpon();
+        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_REDDIT_SEARCH_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        b.appendQueryParameter(PARAM_QUERY, query);
+        return b.build();
+    }
+
     public ThingProvider() {
         super(TAG);
     }
@@ -159,13 +200,7 @@ public class ThingProvider extends SessionProvider {
             Log.d(TAG, "getTable match: " + match);
         }
         switch (match) {
-            case MATCH_FRONT:
-            case MATCH_SEARCH:
-            case MATCH_REDDIT_SEARCH:
-            case MATCH_SUBREDDIT:
-            case MATCH_COMMENTS:
-            case MATCH_COMMENTS_CONTEXT:
-            case MATCH_USERS:
+            case MATCH_THINGS:
                 if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
                     return JOINED_THING_TABLE;
                 } else {
@@ -184,9 +219,6 @@ public class ThingProvider extends SessionProvider {
             case MATCH_VOTE_ACTIONS:
                 return Votes.TABLE_NAME;
 
-            case MATCH_TABLES:
-                return uri.getLastPathSegment();
-
             default:
                 throw new IllegalArgumentException("uri: " + uri);
         }
@@ -199,8 +231,8 @@ public class ThingProvider extends SessionProvider {
             Log.d(TAG, "processUri uri: " + uri);
         }
 
-        if (uri.getBooleanQueryParameter(PARAM_FETCH, false)) {
-            return handleFetch(uri, db, selection, selectionArgs);
+        if (uri.getBooleanQueryParameter(PARAM_LISTING_GET, false)) {
+            return handleListingRefresh(uri, db, selection, selectionArgs);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_REPLY, false)) {
             handleReply(uri, db, values);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
@@ -209,15 +241,19 @@ public class ThingProvider extends SessionProvider {
         return null;
     }
 
-    private Selection handleFetch(Uri uri, SQLiteDatabase db, String selection,
+    private Selection handleListingRefresh(Uri uri, SQLiteDatabase db, String selection,
             String[] selectionArgs) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "handleFetch uri: " + uri);
+            Log.d(TAG, "handleListingType uri: " + uri);
         }
         try {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
+            String subreddit = uri.getQueryParameter(PARAM_SUBREDDIT);
             String query = uri.getQueryParameter(PARAM_QUERY);
+            String profileUser = uri.getQueryParameter(PARAM_PROFILE_USER);
+            String thingId = uri.getQueryParameter(PARAM_THING_ID);
+            String linkId = uri.getQueryParameter(PARAM_LINK_ID);
             String filterParameter = uri.getQueryParameter(PARAM_FILTER);
             int filter = filterParameter != null ? Integer.parseInt(filterParameter) : 0;
             String more = uri.getQueryParameter(PARAM_MORE);
@@ -227,55 +263,38 @@ public class ThingProvider extends SessionProvider {
                 return null;
             }
 
-            int match = MATCHER.match(uri);
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "handleFetch match: " + match);
-            }
-
+            int listingType = Integer.parseInt(uri.getQueryParameter(PARAM_LISTING_TYPE));
             Listing listing = null;
-            switch (match) {
-                case MATCH_FRONT:
-                    listing = ThingListing.newFrontPageInstance(context, accountName, filter, more,
-                            cookie);
-                    break;
-
-                case MATCH_SEARCH:
-                    listing = ThingListing.newSearchInstance(context, accountName, query, cookie);
-                    break;
-
-                case MATCH_REDDIT_SEARCH:
-                    listing = SubredditSearchListing.newInstance(accountName, query, cookie);
-                    break;
-
-                case MATCH_SUBREDDIT:
-                    String subreddit = uri.getLastPathSegment();
+            switch (listingType) {
+                case Sessions.TYPE_SUBREDDIT_LISTING:
                     listing = ThingListing.newSubredditInstance(context, accountName, subreddit,
                             filter, more, cookie);
                     break;
 
-                case MATCH_COMMENTS:
-                    String thingId = uri.getLastPathSegment();
+                case Sessions.TYPE_USER_LISTING:
+                    listing = ThingListing.newUserInstance(context, accountName, profileUser,
+                            filter, more, cookie);
+                    break;
+
+                case Sessions.TYPE_COMMENT_LISTING:
                     listing = CommentListing.newInstance(context, helper, accountName, thingId,
-                            cookie);
+                            linkId, cookie);
                     break;
 
-                case MATCH_COMMENTS_CONTEXT:
-                    List<String> segments = uri.getPathSegments();
-                    int count = segments.size();
-                    thingId = segments.get(count - 2);
-                    String linkId = segments.get(count - 1);
-                    listing = CommentListing.newContextInstance(context, helper, accountName,
-                            thingId, linkId, cookie);
+                case Sessions.TYPE_SEARCH_LISTING:
+                    listing = ThingListing.newSearchInstance(context, accountName, query, cookie);
                     break;
 
-                case MATCH_USERS:
-                    String user = uri.getLastPathSegment();
-                    listing = ThingListing.newUserInstance(context, accountName, user, filter,
-                            more, cookie);
+                case Sessions.TYPE_REDDIT_SEARCH_LISTING:
+                    listing = SubredditSearchListing.newInstance(accountName, query, cookie);
                     break;
+
+                default:
+                    throw new IllegalArgumentException();
             }
 
-            long sessionId = getListingSession(listing, db, Things.TABLE_NAME);
+            boolean refresh = uri.getBooleanQueryParameter(PARAM_LISTING_REFRESH, false);
+            long sessionId = getListingSession(listing, db, refresh);
 
             Selection newSelection = new Selection();
             newSelection.selection = appendSelection(selection, SessionIds.SELECT_BY_SESSION_ID);
@@ -323,8 +342,7 @@ public class ThingProvider extends SessionProvider {
         super.notifyChange(uri);
         if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
             ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(ThingProvider.SUBREDDIT_URI, null);
-            cr.notifyChange(ThingProvider.COMMENTS_URI, null);
+            cr.notifyChange(ThingProvider.THINGS_URI, null);
         }
     }
 }

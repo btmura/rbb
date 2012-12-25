@@ -128,7 +128,7 @@ public class MessageProvider extends SessionProvider {
             }
 
             // Get the session containing the data for this listing.
-            long sessionId = getListingSession(listing, db, Messages.TABLE_NAME);
+            long sessionId = getListingSession(listing, db, true);
 
             // Answer this query by modifying the selection arguments.
             Selection newSelection = new Selection();

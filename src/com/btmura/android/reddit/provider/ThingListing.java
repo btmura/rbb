@@ -60,12 +60,6 @@ class ThingListing extends JsonParser implements Listing {
     private long parseTimeMs;
     private String moreThingId;
 
-    static ThingListing newFrontPageInstance(Context context, String accountName,
-            int filter, String more, String cookie) {
-        return new ThingListing(Sessions.TYPE_SUBREDDIT_LISTING, context, accountName,
-                Subreddits.NAME_FRONT_PAGE, null, null, null, filter, more, cookie);
-    }
-
     static ThingListing newSearchInstance(Context context, String accountName, String query,
             String cookie) {
         return new ThingListing(Sessions.TYPE_SEARCH_LISTING, context, accountName,
@@ -99,6 +93,10 @@ class ThingListing extends JsonParser implements Listing {
         this.cookie = cookie;
     }
 
+    public int getType() {
+        return listingType;
+    }
+
     public String getKey() {
         switch (listingType) {
             case Sessions.TYPE_SEARCH_LISTING:
@@ -109,12 +107,14 @@ class ThingListing extends JsonParser implements Listing {
 
             case Sessions.TYPE_USER_LISTING:
                 return profileUser;
+
+            default:
+                throw new IllegalArgumentException();
         }
-        return null;
     }
 
-    public int getType() {
-        return listingType;
+    public String getTargetTable() {
+        return Things.TABLE_NAME;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

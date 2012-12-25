@@ -39,6 +39,10 @@ abstract class BaseProvider extends ContentProvider {
 
     public static final String ID_SELECTION = BaseColumns._ID + "= ?";
 
+    public static final String TRUE = Boolean.toString(true);
+
+    public static final String FALSE = Boolean.toString(false);
+
     /**
      * Sync changes back to the network. Don't set this in sync adapters or else
      * we'll get stuck in a syncing loop. This is by default false.
@@ -228,5 +232,13 @@ abstract class BaseProvider extends ContentProvider {
 
     static String[] appendSelectionArg(String[] selectionArgs, String arg) {
         return Array.append(selectionArgs, arg);
+    }
+
+    static String toString(int value) {
+        return Integer.toString(value);
+    }
+
+    static String toString(boolean value) {
+        return Boolean.toString(value);
     }
 }

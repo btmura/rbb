@@ -202,7 +202,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 if (!result.shouldRetry()) {
                     syncResult.stats.numDeletes += provider.delete(
-                            ThingProvider.COMMENTS_URI,
+                            ThingProvider.COMMENT_ACTIONS_URI,
                             ThingProvider.ID_SELECTION, Array.of(id));
                     count--;
                 }
@@ -285,7 +285,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                     // Update the tables that join with the votes table since we
                     // will delete the pending vote rows afterwards.
                     String[] selectionArgs = Array.of(account.name, thingId);
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_TABLE_URI)
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                             .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
                             .withValue(Things.COLUMN_SAVED, saved)
                             .build());
@@ -350,7 +350,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                     // Update the tables that join with the votes table since we
                     // will delete the pending vote rows afterwards.
                     String[] selectionArgs = Array.of(account.name, thingId);
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_TABLE_URI)
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                             .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
                             .withValue(Things.COLUMN_LIKES, vote)
                             .build());

@@ -43,7 +43,6 @@ public class Sessions implements BaseColumns {
     public static final int TYPE_COMMENT_LISTING = 5;
     public static final int TYPE_SEARCH_LISTING = 6;
     public static final int TYPE_REDDIT_SEARCH_LISTING = 7;
-    public static final int TYPE_COMMENT_CONTEXT_LISTING = 8;
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("

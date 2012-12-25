@@ -55,12 +55,16 @@ class SubredditSearchListing extends JsonParser implements Listing {
         this.cookie = cookie;
     }
 
+    public int getType() {
+        return Sessions.TYPE_REDDIT_SEARCH_LISTING;
+    }
+
     public String getKey() {
         return query;
     }
 
-    public int getType() {
-        return Sessions.TYPE_REDDIT_SEARCH_LISTING;
+    public String getTargetTable() {
+        return Things.TABLE_NAME;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

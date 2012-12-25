@@ -23,13 +23,16 @@ import android.content.ContentValues;
 
 interface Listing {
 
-    /** Returns a string key used to identify a unique session. */
-    String getKey();
+    ArrayList<ContentValues> getValues() throws IOException;
 
     /** Returns an integer indicating the type of listing. */
     int getType();
 
-    ArrayList<ContentValues> getValues() throws IOException;
+    /** Returns a string key used to identify a unique session. */
+    String getKey();
+
+    /** Return the name of the table where the values should be inserted. */
+    String getTargetTable();
 
     long getNetworkTimeMs();
 

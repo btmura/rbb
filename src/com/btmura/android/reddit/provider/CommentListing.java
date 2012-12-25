@@ -67,7 +67,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     public long parseTimeMs;
 
     private final Formatter formatter = new Formatter();
-    private final int listingType;
     private final Context context;
     private final SQLiteOpenHelper dbHelper;
     private final String accountName;
@@ -76,20 +75,12 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private final String cookie;
 
     static CommentListing newInstance(Context context, SQLiteOpenHelper dbHelper,
-            String accountName, String thingId, String cookie) {
-        return new CommentListing(Sessions.TYPE_COMMENT_LISTING, context, dbHelper, accountName,
-                thingId, null, cookie);
+            String accountName, String thingId, String linkId, String cookie) {
+        return new CommentListing(context, dbHelper, accountName, thingId, linkId, cookie);
     }
 
-    static CommentListing newContextInstance(Context context, SQLiteOpenHelper dbHelper,
+    private CommentListing(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String thingId, String linkId, String cookie) {
-        return new CommentListing(Sessions.TYPE_COMMENT_LISTING, context, dbHelper, accountName,
-                thingId, linkId, cookie);
-    }
-
-    private CommentListing(int listingType, Context context, SQLiteOpenHelper dbHelper,
-            String accountName, String thingId, String linkId, String cookie) {
-        this.listingType = listingType;
         this.context = context;
         this.dbHelper = dbHelper;
         this.accountName = accountName;
@@ -98,21 +89,16 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         this.cookie = cookie;
     }
 
-    public String getKey() {
-        switch (listingType) {
-            case Sessions.TYPE_COMMENT_LISTING:
-                return thingId;
-
-            case Sessions.TYPE_COMMENT_CONTEXT_LISTING:
-                return linkId;
-
-            default:
-                throw new IllegalArgumentException();
-        }
+    public int getType() {
+        return Sessions.TYPE_COMMENT_LISTING;
     }
 
-    public int getType() {
-        return listingType;
+    public String getKey() {
+        return TextUtils.isEmpty(linkId) ? thingId : thingId + "-" + linkId;
+    }
+
+    public String getTargetTable() {
+        return Things.TABLE_NAME;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

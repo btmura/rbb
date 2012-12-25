@@ -21,7 +21,6 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -77,29 +76,22 @@ public class CommentAdapter extends BaseCursorAdapter {
     private final OnVoteListener listener;
 
     public static Loader<Cursor> getLoader(Context context, String accountName, String thingId,
-            String linkId, boolean sync) {
-        Uri uri = getUri(accountName, thingId, linkId, sync);
+            String linkId, boolean refresh) {
+        Uri uri = getUri(accountName, thingId, linkId, refresh);
         return new CursorLoader(context, uri, PROJECTION, Things.SELECT_VISIBLE, null,
                 Things.SORT_BY_SEQUENCE_AND_ID);
     }
 
     public static void updateLoader(Context context, Loader<Cursor> loader, String accountName,
-            String thingId, String linkId, boolean sync) {
+            String thingId, String linkId, boolean refresh) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, thingId, linkId, sync));
+            cl.setUri(getUri(accountName, thingId, linkId, refresh));
         }
     }
 
-    private static Uri getUri(String accountName, String thingId, String linkId, boolean fetch) {
-        Uri.Builder b = ThingProvider.COMMENTS_URI.buildUpon().appendPath(thingId)
-                .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(fetch))
-                .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
-                .appendQueryParameter(ThingProvider.PARAM_JOIN, Boolean.toString(true));
-        if (!TextUtils.isEmpty(linkId)) {
-            b.appendPath(linkId);
-        }
-        return b.build();
+    private static Uri getUri(String accountName, String thingId, String linkId, boolean refresh) {
+        return ThingProvider.commentsUri(accountName, thingId, linkId, refresh);
     }
 
     public CommentAdapter(Context context, String accountName, OnVoteListener listener) {

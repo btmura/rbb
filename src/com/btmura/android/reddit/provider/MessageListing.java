@@ -83,17 +83,26 @@ class MessageListing extends JsonParser implements Listing {
         this.dbHelper = dbHelper;
     }
 
+    public int getType() {
+        return listingType;
+    }
+
     public String getKey() {
         switch (listingType) {
             case Sessions.TYPE_MESSAGE_INBOX_LISTING:
             case Sessions.TYPE_MESSAGE_SENT_LISTING:
                 return accountName;
+
+            case Sessions.TYPE_MESSAGE_THREAD_LISTING:
+                return thingId;
+
+            default:
+                throw new IllegalArgumentException();
         }
-        return thingId;
     }
 
-    public int getType() {
-        return listingType;
+    public String getTargetTable() {
+        return Messages.TABLE_NAME;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {
@@ -261,7 +270,8 @@ class MessageListing extends JsonParser implements Listing {
             }
 
             if (id.equals(targetId)) {
-                // Allocate extra space for session ID that provider will insert.
+                // Allocate extra space for session ID that provider will
+                // insert.
                 ContentValues p = new ContentValues(5);
                 p.put(Messages.COLUMN_ACCOUNT, actionAccountName);
                 p.put(Messages.COLUMN_AUTHOR, actionAccountName);
