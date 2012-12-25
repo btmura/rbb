@@ -16,13 +16,11 @@
 
 package com.btmura.android.reddit.widget;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,40 +54,29 @@ public class SubredditAdapter extends BaseCursorAdapter {
 
     private String selectedSubreddit;
 
-    public static Loader<Cursor> getLoader(Context context, String accountName,
-            String sessionId, String query, boolean sync) {
-        Uri uri = getUri(accountName, sessionId, query, sync);
-        return getLoader(context, uri, accountName, sessionId, query);
+    public static Loader<Cursor> getLoader(Context context, String accountName, String query,
+            boolean sync) {
+        Uri uri = getUri(accountName, query, sync);
+        return getLoader(context, uri, accountName, query);
     }
 
     public static void updateLoader(Context context, Loader<Cursor> loader, String accountName,
-            String sessionId, String query, boolean sync) {
+            String query, boolean sync) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, sessionId, query, sync));
+            cl.setUri(getUri(accountName, query, sync));
         }
     }
 
     public static void deleteSessionData(final Context context, final String sessionId,
             String query) {
-        if (!TextUtils.isEmpty(query)) {
-            final Context appContext = context.getApplicationContext();
-            AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-                public void run() {
-                    ContentResolver cr = appContext.getContentResolver();
-                    cr.delete(ThingProvider.THINGS_URI,
-                            Things.SELECT_BY_SESSION_ID, Array.of(sessionId));
-                }
-            });
-        }
     }
 
-    private static Uri getUri(String accountName, String sessionId, String query, boolean sync) {
+    private static Uri getUri(String accountName, String query, boolean sync) {
         if (!TextUtils.isEmpty(query)) {
-            return ThingProvider.THINGS_URI.buildUpon()
+            return ThingProvider.REDDIT_SEARCH_URI.buildUpon()
                     .appendQueryParameter(ThingProvider.PARAM_FETCH, Boolean.toString(sync))
                     .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
-                    .appendQueryParameter(ThingProvider.PARAM_SESSION_ID, sessionId)
                     .appendQueryParameter(ThingProvider.PARAM_QUERY, query)
                     .build();
         }
@@ -97,10 +84,10 @@ public class SubredditAdapter extends BaseCursorAdapter {
     }
 
     private static Loader<Cursor> getLoader(Context context, Uri uri, String accountName,
-            String sessionId, String query) {
+            String query) {
         if (!TextUtils.isEmpty(query)) {
-            return new CursorLoader(context, uri, PROJECTION_SEARCH,
-                    Things.SELECT_BY_SESSION_ID, Array.of(sessionId), Things.SORT_BY_NAME);
+            return new CursorLoader(context, uri, PROJECTION_SEARCH, null, null,
+                    Things.SORT_BY_NAME);
         }
         return new CursorLoader(context, uri, PROJECTION_SUBREDDITS,
                 Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED,

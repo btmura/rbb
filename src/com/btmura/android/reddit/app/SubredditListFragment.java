@@ -172,7 +172,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-        return SubredditAdapter.getLoader(getActivity(), accountName, sessionId, query, sync);
+        return SubredditAdapter.getLoader(getActivity(), accountName, query, sync);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
@@ -180,7 +180,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
         sync = false;
-        SubredditAdapter.updateLoader(getActivity(), loader, accountName, sessionId, query, sync);
+        SubredditAdapter.updateLoader(getActivity(), loader, accountName, query, sync);
 
         adapter.swapCursor(cursor);
         setEmptyText(getEmptyText(cursor == null));

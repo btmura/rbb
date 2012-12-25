@@ -43,7 +43,7 @@ import com.btmura.android.reddit.database.Votes;
  * /front - DONE
  * /search - DONE
  *
- * /reddits/search
+ * /reddits/search - DONE
  *
  * /r
  * /r/rbb - DONE
@@ -76,6 +76,7 @@ public class ThingProvider extends SessionProvider {
 
     private static final String PATH_FRONT = "front";
     private static final String PATH_SEARCH = "search";
+    private static final String PATH_REDDIT_SEARCH = "reddits/search";
     private static final String PATH_SUBREDDIT = "r";
     private static final String PATH_COMMENTS = "comments";
     private static final String PATH_USER = "users";
@@ -86,6 +87,7 @@ public class ThingProvider extends SessionProvider {
 
     public static final Uri FRONT_URI = Uri.parse(AUTHORITY_URI + PATH_FRONT);
     public static final Uri SEARCH_URI = Uri.parse(AUTHORITY_URI + PATH_SEARCH);
+    public static final Uri REDDIT_SEARCH_URI = Uri.parse(AUTHORITY_URI + PATH_REDDIT_SEARCH);
     public static final Uri SUBREDDIT_URI = Uri.parse(AUTHORITY_URI + PATH_SUBREDDIT);
     public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
     public static final Uri USER_URI = Uri.parse(AUTHORITY_URI + PATH_USER);
@@ -117,16 +119,18 @@ public class ThingProvider extends SessionProvider {
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_FRONT = 1;
     private static final int MATCH_SEARCH = 2;
-    private static final int MATCH_SUBREDDIT = 3;
-    private static final int MATCH_COMMENTS = 4;
-    private static final int MATCH_USER = 5;
+    private static final int MATCH_REDDIT_SEARCH = 3;
+    private static final int MATCH_SUBREDDIT = 4;
+    private static final int MATCH_COMMENTS = 5;
+    private static final int MATCH_USER = 6;
 
-    private static final int MATCH_THINGS = 6;
-    private static final int MATCH_VOTES = 7;
-    private static final int MATCH_SAVES = 8;
+    private static final int MATCH_THINGS = 7;
+    private static final int MATCH_VOTES = 8;
+    private static final int MATCH_SAVES = 9;
     static {
         MATCHER.addURI(AUTHORITY, PATH_FRONT, MATCH_FRONT);
         MATCHER.addURI(AUTHORITY, PATH_SEARCH, MATCH_SEARCH);
+        MATCHER.addURI(AUTHORITY, PATH_REDDIT_SEARCH, MATCH_REDDIT_SEARCH);
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*", MATCH_SUBREDDIT);
         MATCHER.addURI(AUTHORITY, PATH_USER + "/*", MATCH_USER);
         MATCHER.addURI(AUTHORITY, PATH_COMMENTS + "/*", MATCH_COMMENTS);
@@ -169,6 +173,7 @@ public class ThingProvider extends SessionProvider {
         switch (match) {
             case MATCH_FRONT:
             case MATCH_SEARCH:
+            case MATCH_REDDIT_SEARCH:
             case MATCH_SUBREDDIT:
             case MATCH_COMMENTS:
             case MATCH_USER:
@@ -215,6 +220,7 @@ public class ThingProvider extends SessionProvider {
         try {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
+            String query = uri.getQueryParameter(PARAM_QUERY);
             String messageUser = uri.getQueryParameter(PARAM_MESSAGE_USER);
             String linkId = uri.getQueryParameter(PARAM_LINK_ID);
             String filterParameter = uri.getQueryParameter(PARAM_FILTER);
@@ -234,32 +240,34 @@ public class ThingProvider extends SessionProvider {
             Listing listing = null;
             switch (match) {
                 case MATCH_FRONT:
-                    listing = ThingListing.newFrontPageInstance(context, accountName,
-                            filter, more, cookie);
+                    listing = ThingListing.newFrontPageInstance(context, accountName, filter, more,
+                            cookie);
                     break;
 
                 case MATCH_SEARCH:
-                    String query = uri.getQueryParameter(PARAM_QUERY);
-                    listing = ThingListing.newSearchInstance(context, accountName,
-                            query, cookie);
+                    listing = ThingListing.newSearchInstance(context, accountName, query, cookie);
+                    break;
+
+                case MATCH_REDDIT_SEARCH:
+                    listing = SubredditSearchListing.newInstance(accountName, query, cookie);
                     break;
 
                 case MATCH_SUBREDDIT:
                     String subreddit = uri.getLastPathSegment();
-                    listing = ThingListing.newSubredditInstance(context, accountName,
-                            subreddit, filter, more, cookie);
+                    listing = ThingListing.newSubredditInstance(context, accountName, subreddit,
+                            filter, more, cookie);
                     break;
 
                 case MATCH_COMMENTS:
                     String thingId = uri.getLastPathSegment();
-                    listing = CommentListing.newInstance(context, helper, accountName,
-                            thingId, cookie);
+                    listing = CommentListing.newInstance(context, helper, accountName, thingId,
+                            cookie);
                     break;
 
                 case MATCH_USER:
                     String user = uri.getLastPathSegment();
-                    listing = ThingListing.newUserInstance(context, accountName,
-                            user, filter, more, cookie);
+                    listing = ThingListing.newUserInstance(context, accountName, user, filter,
+                            more, cookie);
                     break;
             }
 
