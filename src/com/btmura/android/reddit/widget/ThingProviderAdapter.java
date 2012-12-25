@@ -16,13 +16,11 @@
 
 package com.btmura.android.reddit.widget;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -33,7 +31,6 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingAdapter.ProviderAdapter;
 
@@ -96,13 +93,11 @@ class ThingProviderAdapter extends ProviderAdapter {
 
     @Override
     Uri getLoaderUri(Bundle args) {
-        Uri.Builder b = ThingProvider.THINGS_URI.buildUpon()
+        Uri.Builder b = ThingProvider.SUBREDDIT_URI.buildUpon()
                 .appendQueryParameter(ThingProvider.PARAM_FETCH,
                         Boolean.toString(getFetch(args)))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT,
                         getAccountName(args))
-                .appendQueryParameter(ThingProvider.PARAM_SESSION_ID,
-                        getSessionId(args))
                 .appendQueryParameter(ThingProvider.PARAM_FILTER,
                         Integer.toString(getFilter(args)))
                 .appendQueryParameter(ThingProvider.PARAM_JOIN,
@@ -110,7 +105,7 @@ class ThingProviderAdapter extends ProviderAdapter {
 
         // Empty but non-null subreddit means front page.
         if (getSubreddit(args) != null) {
-            b.appendQueryParameter(ThingProvider.PARAM_SUBREDDIT, getSubreddit(args));
+            b.appendPath(getSubreddit(args));
         }
 
         // All other parameters must be non-null and not empty.
@@ -131,14 +126,12 @@ class ThingProviderAdapter extends ProviderAdapter {
 
     @Override
     Loader<Cursor> getLoader(Context context, Uri uri, Bundle args) {
-        return new CursorLoader(context, uri, PROJECTION, Things.SELECT_BY_SESSION_ID,
-                Array.of(getSessionId(args)), null);
+        return new CursorLoader(context, uri, PROJECTION, null, null, null);
     }
 
     @Override
     boolean isLoadable(Bundle args) {
         return getAccountName(args) != null
-                && getSessionId(args) != null
                 && (getSubreddit(args) != null
                         || getQuery(args) != null
                         || getProfileUser(args) != null);
@@ -146,30 +139,11 @@ class ThingProviderAdapter extends ProviderAdapter {
 
     @Override
     String createSessionId(Bundle args) {
-        if (!TextUtils.isEmpty(getProfileUser(args))) {
-            return getProfileUser(args) + "-" + System.currentTimeMillis();
-        } else if (!TextUtils.isEmpty(getQuery(args))) {
-            return getQuery(args) + "-" + System.currentTimeMillis();
-        } else if (getSubreddit(args) != null) {
-            return getSubreddit(args) + "-" + System.currentTimeMillis();
-        } else {
-            return null;
-        }
+        return null;
     }
 
     @Override
     void deleteSessionData(Context context, final Bundle args) {
-        // Use application context to allow activity to be collected and
-        // schedule the session deletion in the background thread pool rather
-        // than serial pool.
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            public void run() {
-                ContentResolver cr = appContext.getContentResolver();
-                cr.delete(ThingProvider.THINGS_URI,
-                        Things.SELECT_BY_SESSION_ID, Array.of(getSessionId(args)));
-            }
-        });
     }
 
     @Override

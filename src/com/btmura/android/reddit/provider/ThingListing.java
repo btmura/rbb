@@ -31,6 +31,7 @@ import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
@@ -44,6 +45,7 @@ class ThingListing extends JsonParser implements Listing {
 
     private final Formatter formatter = new Formatter();
     private final Context context;
+    private final int listingType;
     private final String accountName;
     private final String subreddit;
     private final String query;
@@ -58,9 +60,17 @@ class ThingListing extends JsonParser implements Listing {
     private long parseTimeMs;
     private String moreThingId;
 
-    ThingListing(Context context, String accountName, String subreddit, String query,
-            String profileUser, String messageUser, int filter, String more, String cookie) {
+    static ThingListing newFrontPageInstance(Context context, String accountName, int filter,
+            String more, String cookie) {
+        return new ThingListing(Sessions.TYPE_SUBREDDIT_LISTING, context, accountName,
+                Subreddits.NAME_FRONT_PAGE, null, null, null, filter, more, cookie);
+    }
+
+    ThingListing(int listingType, Context context, String accountName, String subreddit,
+            String query, String profileUser, String messageUser, int filter, String more,
+            String cookie) {
         this.context = context;
+        this.listingType = listingType;
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;
@@ -72,11 +82,15 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     public String getKey() {
+        switch (listingType) {
+            case Sessions.TYPE_SUBREDDIT_LISTING:
+                return subreddit;
+        }
         return null;
     }
 
     public int getType() {
-        return 0;
+        return listingType;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

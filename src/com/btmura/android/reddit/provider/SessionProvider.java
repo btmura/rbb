@@ -147,7 +147,7 @@ abstract class SessionProvider extends BaseProvider {
                     int deleted2 = db.delete(targetTable, SELECT_BY_SESSION_ID, selectionArgs);
                     if (BuildConfig.DEBUG) {
                         Log.d(logTag, "deleted session: " + candidateId
-                                + " count: " + deleted1 + " " + deleted2);
+                                + " count: " + deleted1 + "," + deleted2);
                     }
                 }
 

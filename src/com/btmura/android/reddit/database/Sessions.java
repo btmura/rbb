@@ -38,6 +38,7 @@ public class Sessions implements BaseColumns {
     public static final int TYPE_MESSAGE_THREAD_LISTING = 0;
     public static final int TYPE_MESSAGE_INBOX_LISTING = 1;
     public static final int TYPE_MESSAGE_SENT_LISTING = 2;
+    public static final int TYPE_SUBREDDIT_LISTING = 3;
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("

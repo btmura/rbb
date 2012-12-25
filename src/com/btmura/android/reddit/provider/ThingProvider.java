@@ -28,6 +28,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Saves;
@@ -44,11 +45,12 @@ public class ThingProvider extends SessionProvider {
 
     private static final String PATH_SUBREDDIT = "r";
 
-
     private static final String PATH_THINGS = "things";
     private static final String PATH_COMMENTS = "comments";
     private static final String PATH_VOTES = "votes";
     private static final String PATH_SAVES = "saves";
+
+    public static final Uri SUBREDDIT_URI = Uri.parse(AUTHORITY_URI + PATH_SUBREDDIT);
 
     public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
     public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
@@ -76,13 +78,15 @@ public class ThingProvider extends SessionProvider {
     public static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_SUBREDDIT = 1;
-    private static final int MATCH_COMMENTS = 2;
+    private static final int MATCH_FRONT_PAGE = 1;
+    private static final int MATCH_SUBREDDIT = 2;
+    private static final int MATCH_COMMENTS = 3;
 
-    private static final int MATCH_THINGS = 3;
+    private static final int MATCH_THINGS = 4;
     private static final int MATCH_VOTES = 5;
     private static final int MATCH_SAVES = 6;
     static {
+        MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT, MATCH_FRONT_PAGE);
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*", MATCH_SUBREDDIT);
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*/" + PATH_COMMENTS + "/*", MATCH_COMMENTS);
 
@@ -119,7 +123,12 @@ public class ThingProvider extends SessionProvider {
     @Override
     protected String getTable(Uri uri) {
         int match = MATCHER.match(uri);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "getTable match: " + match);
+        }
         switch (match) {
+            case MATCH_FRONT_PAGE:
+            case MATCH_SUBREDDIT:
             case MATCH_THINGS:
                 if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
                     return JOINED_THING_TABLE;
@@ -144,6 +153,10 @@ public class ThingProvider extends SessionProvider {
     @Override
     protected Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
             String selection, String[] selectionArgs) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "processUri uri: " + uri);
+        }
+
         if (uri.getBooleanQueryParameter(PARAM_FETCH, false)) {
             return handleFetch(uri, db, selection, selectionArgs);
         } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_REPLY, false)) {
@@ -155,6 +168,9 @@ public class ThingProvider extends SessionProvider {
     }
 
     private Selection handleFetch(Uri uri, SQLiteDatabase db, String selection, String[] selectionArgs) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "handleFetch uri: " + uri);
+        }
         try {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
@@ -169,14 +185,23 @@ public class ThingProvider extends SessionProvider {
             String more = uri.getQueryParameter(PARAM_MORE);
 
             String cookie = AccountUtils.getCookie(context, accountName);
-            if (cookie == null) {
+            if (cookie == null && AccountUtils.isAccount(accountName)) {
                 return null;
             }
 
+            int match = MATCHER.match(uri);
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "handleFetch match: " + match);
+            }
+
             Listing listing = null;
-            switch (MATCHER.match(uri)) {
+            switch (match) {
+                case MATCH_FRONT_PAGE:
+                    listing = ThingListing.newFrontPageInstance(context, accountName, filter, more, cookie);
+                    break;
+
                 case MATCH_SUBREDDIT:
-                    listing = new ThingListing(context, accountName, subredditName, query, profileUser, messageUser, filter, more, cookie);
+                    listing = new ThingListing(0, context, accountName, subredditName, query, profileUser, messageUser, filter, more, cookie);
                     break;
 
                 case MATCH_COMMENTS:
