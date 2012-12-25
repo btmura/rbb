@@ -55,6 +55,10 @@ class SubredditSearchListing extends JsonParser implements Listing {
         this.cookie = cookie;
     }
 
+    public String getKey() {
+        return null;
+    }
+
     public int getType() {
         return 0;
     }

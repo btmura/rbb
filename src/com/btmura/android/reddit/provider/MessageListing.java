@@ -83,6 +83,10 @@ class MessageListing extends JsonParser implements Listing {
         this.dbHelper = dbHelper;
     }
 
+    public String getKey() {
+        return thingId;
+    }
+
     public int getType() {
         return listingType;
     }

@@ -72,8 +72,8 @@ abstract class SessionProvider extends BaseProvider {
     private static final String SELECT_BY_SESSION_ID = SessionIds.COLUMN_SESSION_ID + "=?";
 
     /** Selection for finding existing sessions for a thing. */
-    private static final String SELECT_BY_KEY_AND_TYPE =
-            Sessions.COLUMN_KEY + "=? AND " + Sessions.COLUMN_TYPE + "=?";
+    private static final String SELECT_BY_TYPE_AND_KEY =
+            Sessions.COLUMN_TYPE + "=? AND " + Sessions.COLUMN_KEY + "=?";
 
     /** Interval for how long a session's data is considered still fresh. */
     private static final long SESSION_INTERVAL = TimeUnit.SECONDS.toMillis(30);
@@ -83,8 +83,7 @@ abstract class SessionProvider extends BaseProvider {
      * ID given. If there is no such session, it will attempt to use the network
      * to create a session with the data.
      */
-    long getListingSession(Listing listing, String key,
-            SQLiteDatabase db, String targetTable) {
+    long getListingSession(Listing listing, SQLiteDatabase db, String targetTable) {
 
         // Current time for measuring age of sessions and inserting new ones.
         long now = System.currentTimeMillis();
@@ -99,9 +98,12 @@ abstract class SessionProvider extends BaseProvider {
         // Get the type of listing to search for.
         int type = listing.getType();
 
+        // Get the key to identify existing listings of the same type.
+        String key = listing.getKey();
+
         // Get list of matching sessions expired or not.
         Cursor c = db.query(Sessions.TABLE_NAME, SESSION_PROJECTION,
-                SELECT_BY_KEY_AND_TYPE, Array.of(key, Integer.toString(type)),
+                SELECT_BY_TYPE_AND_KEY, Array.of(Integer.toString(type), key),
                 null, null, null);
 
         // Return the first session with content that we still consider fresh.

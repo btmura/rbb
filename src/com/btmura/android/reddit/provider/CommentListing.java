@@ -87,6 +87,10 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         this.cookie = cookie;
     }
 
+    public String getKey() {
+        return null;
+    }
+
     public int getType() {
         return 0;
     }

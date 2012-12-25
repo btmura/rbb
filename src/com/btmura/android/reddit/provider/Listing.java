@@ -23,6 +23,9 @@ import android.content.ContentValues;
 
 interface Listing {
 
+    /** Returns a string key used to identify a unique session. */
+    String getKey();
+
     /** Returns an integer indicating the type of listing. */
     int getType();
 
