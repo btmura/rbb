@@ -217,6 +217,7 @@ public class ThingProvider extends SessionProvider {
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_THREAD_LISTING));
         b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        b.appendQueryParameter(PARAM_THING_ID, thingId);
         return b.build();
     }
 
@@ -232,10 +233,20 @@ public class ThingProvider extends SessionProvider {
         }
         switch (match) {
             case MATCH_THINGS:
-                if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
-                    return JOINED_THING_TABLE;
-                } else {
-                    return Things.TABLE_NAME;
+                // TODO: Remove duplicate logic of table resolution.
+                int listingType = Integer.parseInt(uri.getQueryParameter(PARAM_LISTING_TYPE));
+                switch (listingType) {
+                    case Sessions.TYPE_MESSAGE_THREAD_LISTING:
+                    case Sessions.TYPE_MESSAGE_INBOX_LISTING:
+                    case Sessions.TYPE_MESSAGE_SENT_LISTING:
+                        return Messages.TABLE_NAME;
+
+                    default:
+                        if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
+                            return JOINED_THING_TABLE;
+                        } else {
+                            return Things.TABLE_NAME;
+                        }
                 }
 
             case MATCH_COMMENT_ACTIONS:
