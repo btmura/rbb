@@ -225,7 +225,7 @@ public class Provider {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                Uri uri = ThingProvider.THINGS_URI.buildUpon()
+                Uri uri = ThingProvider.MESSAGES_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_MESSAGE_REPLY, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID, parentThingId)
                         .appendQueryParameter(ThingProvider.PARAM_THING_ID, thingId)

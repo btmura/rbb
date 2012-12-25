@@ -44,12 +44,12 @@ import com.btmura.android.reddit.database.Votes;
  * URI MATCHING PATTERNS:
  *
  * <pre>
- * /things/
- *
- * /actions/comments - DONE
- * /actions/messages - DONE
- * /actions/saves - DONE
- * /actions/votes - DONE
+ * /things
+ * /messages
+ * /actions/comments
+ * /actions/messages
+ * /actions/saves
+ * /actions/votes
  * </pre>
  */
 public class ThingProvider extends SessionProvider {
@@ -60,12 +60,14 @@ public class ThingProvider extends SessionProvider {
     static final String AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
     private static final String PATH_THINGS = "things";
+    private static final String PATH_MESSAGES = "messages";
     private static final String PATH_COMMENT_ACTIONS = "actions/comments";
     private static final String PATH_MESSAGE_ACTIONS = "actions/messages";
     private static final String PATH_SAVE_ACTIONS = "actions/saves";
     private static final String PATH_VOTE_ACTIONS = "actions/votes";
 
     public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
+    public static final Uri MESSAGES_URI = Uri.parse(AUTHORITY_URI + PATH_MESSAGES);
     public static final Uri COMMENT_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENT_ACTIONS);
     public static final Uri MESSAGE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_MESSAGE_ACTIONS);
     public static final Uri SAVE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_SAVE_ACTIONS);
@@ -73,12 +75,14 @@ public class ThingProvider extends SessionProvider {
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;
-    private static final int MATCH_COMMENT_ACTIONS = 2;
-    private static final int MATCH_MESSAGE_ACTIONS = 3;
-    private static final int MATCH_SAVE_ACTIONS = 4;
-    private static final int MATCH_VOTE_ACTIONS = 5;
+    private static final int MATCH_MESSAGES = 2;
+    private static final int MATCH_COMMENT_ACTIONS = 3;
+    private static final int MATCH_MESSAGE_ACTIONS = 4;
+    private static final int MATCH_SAVE_ACTIONS = 5;
+    private static final int MATCH_VOTE_ACTIONS = 6;
     static {
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
+        MATCHER.addURI(AUTHORITY, PATH_MESSAGES, MATCH_MESSAGES);
         MATCHER.addURI(AUTHORITY, PATH_COMMENT_ACTIONS, MATCH_COMMENT_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_MESSAGE_ACTIONS, MATCH_MESSAGE_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_SAVE_ACTIONS, MATCH_SAVE_ACTIONS);
@@ -194,7 +198,7 @@ public class ThingProvider extends SessionProvider {
     }
 
     public static final Uri messageInboxUri(String accountName, boolean refresh) {
-        Uri.Builder b = THINGS_URI.buildUpon();
+        Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_INBOX_LISTING));
         b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
@@ -203,7 +207,7 @@ public class ThingProvider extends SessionProvider {
     }
 
     public static final Uri messageSentUri(String accountName, boolean refresh) {
-        Uri.Builder b = THINGS_URI.buildUpon();
+        Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_SENT_LISTING));
         b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
@@ -212,7 +216,7 @@ public class ThingProvider extends SessionProvider {
     }
 
     public static final Uri messageThreadUri(String accountName, String thingId, boolean refresh) {
-        Uri.Builder b = THINGS_URI.buildUpon();
+        Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_THREAD_LISTING));
         b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
@@ -233,22 +237,14 @@ public class ThingProvider extends SessionProvider {
         }
         switch (match) {
             case MATCH_THINGS:
-                // TODO: Remove duplicate logic of table resolution.
-                String listingType = uri.getQueryParameter(PARAM_LISTING_TYPE);
-                if (!TextUtils.isEmpty(listingType)) {
-                    switch (Integer.parseInt(listingType)) {
-                        case Sessions.TYPE_MESSAGE_THREAD_LISTING:
-                        case Sessions.TYPE_MESSAGE_INBOX_LISTING:
-                        case Sessions.TYPE_MESSAGE_SENT_LISTING:
-                            return Messages.TABLE_NAME;
-                    }
-                }
-
                 if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
                     return JOINED_THING_TABLE;
                 } else {
                     return Things.TABLE_NAME;
                 }
+
+            case MATCH_MESSAGES:
+                return Messages.TABLE_NAME;
 
             case MATCH_COMMENT_ACTIONS:
                 return Comments.TABLE_NAME;
