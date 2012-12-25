@@ -66,6 +66,12 @@ class ThingListing extends JsonParser implements Listing {
                 Subreddits.NAME_FRONT_PAGE, null, null, null, filter, more, cookie);
     }
 
+    static ThingListing newSearchInstance(Context context, String accountName, String query,
+            String cookie) {
+        return new ThingListing(Sessions.TYPE_SEARCH_LISTING, context, accountName,
+                null, query, null, null, 0, null, cookie);
+    }
+
     static ThingListing newSubredditInstance(Context context, String accountName, String subreddit,
             int filter, String more, String cookie) {
         return new ThingListing(Sessions.TYPE_SUBREDDIT_LISTING, context, accountName,
@@ -95,6 +101,9 @@ class ThingListing extends JsonParser implements Listing {
 
     public String getKey() {
         switch (listingType) {
+            case Sessions.TYPE_SEARCH_LISTING:
+                return query;
+
             case Sessions.TYPE_SUBREDDIT_LISTING:
                 return subreddit;
 

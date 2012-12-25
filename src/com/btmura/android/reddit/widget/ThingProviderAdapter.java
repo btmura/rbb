@@ -108,6 +108,9 @@ class ThingProviderAdapter extends ProviderAdapter {
         } else if (!TextUtils.isEmpty(getProfileUser(args))) {
             b = ThingProvider.USER_URI.buildUpon();
             b.appendPath(getProfileUser(args));
+        } else if (!TextUtils.isEmpty(getQuery(args))) {
+            b = ThingProvider.SEARCH_URI.buildUpon();
+            b.appendQueryParameter(ThingProvider.PARAM_QUERY, getQuery(args));
         }
 
         b.appendQueryParameter(ThingProvider.PARAM_FETCH,
@@ -119,13 +122,6 @@ class ThingProviderAdapter extends ProviderAdapter {
                 .appendQueryParameter(ThingProvider.PARAM_JOIN,
                         Boolean.toString(true));
 
-        // All other parameters must be non-null and not empty.
-        if (!TextUtils.isEmpty(getQuery(args))) {
-            b.appendQueryParameter(ThingProvider.PARAM_QUERY, getQuery(args));
-        }
-        if (!TextUtils.isEmpty(getProfileUser(args))) {
-            b.appendQueryParameter(ThingProvider.PARAM_PROFILE_USER, getProfileUser(args));
-        }
         if (!TextUtils.isEmpty(getMessageUser(args))) {
             b.appendQueryParameter(ThingProvider.PARAM_MESSAGE_USER, getMessageUser(args));
         }
