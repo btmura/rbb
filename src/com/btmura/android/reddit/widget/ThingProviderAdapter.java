@@ -93,20 +93,25 @@ class ThingProviderAdapter extends ProviderAdapter {
 
     @Override
     Uri getLoaderUri(Bundle args) {
-        Uri.Builder b = ThingProvider.SUBREDDIT_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.PARAM_FETCH,
-                        Boolean.toString(getFetch(args)))
+        Uri.Builder b = null;
+
+        // Empty but non-null subreddit means front page.
+        if (getSubreddit(args) != null) {
+            b = ThingProvider.SUBREDDIT_URI.buildUpon();
+            b.appendPath(getSubreddit(args));
+        } else if (!TextUtils.isEmpty(getProfileUser(args))) {
+            b = ThingProvider.USER_URI.buildUpon();
+            b.appendPath(getProfileUser(args));
+        }
+
+        b.appendQueryParameter(ThingProvider.PARAM_FETCH,
+                Boolean.toString(getFetch(args)))
                 .appendQueryParameter(ThingProvider.PARAM_ACCOUNT,
                         getAccountName(args))
                 .appendQueryParameter(ThingProvider.PARAM_FILTER,
                         Integer.toString(getFilter(args)))
                 .appendQueryParameter(ThingProvider.PARAM_JOIN,
                         Boolean.toString(true));
-
-        // Empty but non-null subreddit means front page.
-        if (getSubreddit(args) != null) {
-            b.appendPath(getSubreddit(args));
-        }
 
         // All other parameters must be non-null and not empty.
         if (!TextUtils.isEmpty(getQuery(args))) {

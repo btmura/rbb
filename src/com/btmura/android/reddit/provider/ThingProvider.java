@@ -44,6 +44,7 @@ public class ThingProvider extends SessionProvider {
     static final String AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
     private static final String PATH_SUBREDDIT = "r";
+    private static final String PATH_USER = "u";
 
     private static final String PATH_THINGS = "things";
     private static final String PATH_COMMENTS = "comments";
@@ -51,6 +52,7 @@ public class ThingProvider extends SessionProvider {
     private static final String PATH_SAVES = "saves";
 
     public static final Uri SUBREDDIT_URI = Uri.parse(AUTHORITY_URI + PATH_SUBREDDIT);
+    public static final Uri USER_URI = Uri.parse(AUTHORITY_URI + PATH_USER);
 
     public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
     public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
@@ -80,14 +82,17 @@ public class ThingProvider extends SessionProvider {
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_FRONT_PAGE = 1;
     private static final int MATCH_SUBREDDIT = 2;
-    private static final int MATCH_COMMENTS = 3;
+    private static final int MATCH_USER = 3;
 
-    private static final int MATCH_THINGS = 4;
-    private static final int MATCH_VOTES = 5;
-    private static final int MATCH_SAVES = 6;
+    private static final int MATCH_COMMENTS = 4;
+    private static final int MATCH_THINGS = 5;
+    private static final int MATCH_VOTES = 6;
+    private static final int MATCH_SAVES = 7;
     static {
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT, MATCH_FRONT_PAGE);
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*", MATCH_SUBREDDIT);
+        MATCHER.addURI(AUTHORITY, PATH_USER + "/*", MATCH_USER);
+
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDIT + "/*/" + PATH_COMMENTS + "/*", MATCH_COMMENTS);
 
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
@@ -128,6 +133,7 @@ public class ThingProvider extends SessionProvider {
         switch (match) {
             case MATCH_FRONT_PAGE:
             case MATCH_SUBREDDIT:
+            case MATCH_USER:
             case MATCH_THINGS:
                 if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
                     return JOINED_THING_TABLE;
@@ -175,7 +181,6 @@ public class ThingProvider extends SessionProvider {
             Context context = getContext();
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String query = uri.getQueryParameter(PARAM_QUERY);
-            String profileUser = uri.getQueryParameter(PARAM_PROFILE_USER);
             String messageUser = uri.getQueryParameter(PARAM_MESSAGE_USER);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
             String linkId = uri.getQueryParameter(PARAM_LINK_ID);
@@ -203,6 +208,12 @@ public class ThingProvider extends SessionProvider {
                 case MATCH_SUBREDDIT:
                     String subreddit = uri.getLastPathSegment();
                     listing = ThingListing.newSubredditInstance(context, accountName, subreddit,
+                            filter, more, cookie);
+                    break;
+
+                case MATCH_USER:
+                    String user = uri.getLastPathSegment();
+                    listing = ThingListing.newUserInstance(context, accountName, user,
                             filter, more, cookie);
                     break;
 
