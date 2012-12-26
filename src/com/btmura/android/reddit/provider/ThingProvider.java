@@ -35,7 +35,7 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.database.Saves;
+import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SessionIds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
@@ -115,11 +115,11 @@ public class ThingProvider extends SessionProvider {
     private static final String JOINED_THING_TABLE = Things.TABLE_NAME
             // Join with pending saves to fake that the save happened.
             + " LEFT OUTER JOIN (SELECT "
-            + Saves.COLUMN_ACCOUNT + ", "
-            + Saves.COLUMN_THING_ID + ", "
-            + Saves.COLUMN_ACTION
-            + " FROM " + Saves.TABLE_NAME + ") USING ("
-            + Saves.COLUMN_ACCOUNT + ", "
+            + SaveActions.COLUMN_ACCOUNT + ", "
+            + SaveActions.COLUMN_THING_ID + ", "
+            + SaveActions.COLUMN_ACTION
+            + " FROM " + SaveActions.TABLE_NAME + ") USING ("
+            + SaveActions.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")"
 
             // Join with pending votes to fake that the vote happened.
@@ -271,7 +271,7 @@ public class ThingProvider extends SessionProvider {
                 return MessageActions.TABLE_NAME;
 
             case MATCH_SAVE_ACTIONS:
-                return Saves.TABLE_NAME;
+                return SaveActions.TABLE_NAME;
 
             case MATCH_VOTE_ACTIONS:
                 return VoteActions.TABLE_NAME;

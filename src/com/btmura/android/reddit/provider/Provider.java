@@ -32,7 +32,7 @@ import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.database.Saves;
+import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
@@ -50,7 +50,7 @@ public class Provider {
             Things.COLUMN_NESTING,
     };
 
-    private static final String SELECT_SAVES_BY_THING_ID = Saves.COLUMN_THING_ID + "=?";
+    private static final String SELECT_SAVES_BY_THING_ID = SaveActions.COLUMN_THING_ID + "=?";
     private static final String SELECT_VOTES_BY_THING_ID = VoteActions.COLUMN_THING_ID + "=?";
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
@@ -264,9 +264,9 @@ public class Provider {
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS, TRUE)
                         .build();
                 ops.add(ContentProviderOperation.newInsert(uri)
-                        .withValue(Saves.COLUMN_ACCOUNT, accountName)
-                        .withValue(Saves.COLUMN_THING_ID, thingId)
-                        .withValue(Saves.COLUMN_ACTION, action)
+                        .withValue(SaveActions.COLUMN_ACCOUNT, accountName)
+                        .withValue(SaveActions.COLUMN_THING_ID, thingId)
+                        .withValue(SaveActions.COLUMN_ACTION, action)
                         .build());
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);

@@ -26,7 +26,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.Saves;
+import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.Urls;
@@ -61,7 +61,7 @@ class ThingProviderAdapter extends ProviderAdapter {
             Things.COLUMN_URL,
 
             // Following 2 columns are from joined tables at the end.
-            Saves.COLUMN_ACTION,
+            SaveActions.COLUMN_ACTION,
             VoteActions.COLUMN_VOTE,
     };
 
@@ -144,7 +144,7 @@ class ThingProviderAdapter extends ProviderAdapter {
     @Override
     boolean isSaved(ThingAdapter adapter, int position) {
         return adapter.getBoolean(position, INDEX_SAVED)
-                || adapter.getInt(position, INDEX_SAVE_ACTION) == Saves.ACTION_SAVE;
+                || adapter.getInt(position, INDEX_SAVE_ACTION) == SaveActions.ACTION_SAVE;
     }
 
     @Override

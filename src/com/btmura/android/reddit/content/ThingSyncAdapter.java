@@ -43,7 +43,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.MessageActions;
-import com.btmura.android.reddit.database.Saves;
+import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.RedditApi;
@@ -90,9 +90,9 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int MESSAGE_TEXT = 3;
 
     private static final String[] SAVE_PROJECTION = {
-            Saves._ID,
-            Saves.COLUMN_THING_ID,
-            Saves.COLUMN_ACTION,
+            SaveActions._ID,
+            SaveActions.COLUMN_THING_ID,
+            SaveActions.COLUMN_ACTION,
     };
 
     private static final int SAVE_ID = 0;
@@ -389,7 +389,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
                 int action = c.getInt(SAVE_ACTION);
 
                 try {
-                    boolean saved = action == Saves.ACTION_SAVE;
+                    boolean saved = action == SaveActions.ACTION_SAVE;
                     RedditApi.save(thingId, saved, cookie, modhash);
                     ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVE_ACTIONS_URI)
                             .withSelection(ThingProvider.ID_SELECTION, Array.of(id))

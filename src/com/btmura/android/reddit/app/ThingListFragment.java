@@ -41,7 +41,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.Saves;
+import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -327,10 +327,10 @@ public class ThingListFragment extends ListFragment implements
                 return handleComposeMessage(mode);
 
             case R.id.menu_save:
-                return handleSave(mode, Saves.ACTION_SAVE);
+                return handleSave(mode, SaveActions.ACTION_SAVE);
 
             case R.id.menu_unsave:
-                return handleSave(mode, Saves.ACTION_UNSAVE);
+                return handleSave(mode, SaveActions.ACTION_UNSAVE);
 
             case R.id.menu_view_profile:
                 return handleViewProfile(mode);

@@ -20,13 +20,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
- * {@link Saves} is a table that stores pending saves and unsaves before they
+ * {@link SaveActions} is a table that stores pending saves and unsaves before they
  * are synced back the server.
  */
-public class Saves implements BaseColumns {
+public class SaveActions implements BaseColumns {
 
     /** Name of the table to store save and unsave actions. */
-    public static final String TABLE_NAME = "saves";
+    public static final String TABLE_NAME = "saveActions";
 
     /** Account that either saved on unsaved this thing. */
     public static final String COLUMN_ACCOUNT = "account";
