@@ -16,6 +16,10 @@
 
 package com.btmura.android.reddit.app;
 
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.widget.LoaderAdapter;
+import com.btmura.android.reddit.widget.MessageLoaderAdapter;
+
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -28,6 +32,8 @@ public class MessageListFragment extends ThingProviderListFragment {
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_ID = "thingId";
 
+    private LoaderAdapter adapter;
+
     public static MessageListFragment newInstance(String accountName, String thingId) {
         Bundle args = new Bundle(2);
         args.putString(ARG_ACCOUNT_NAME, accountName);
@@ -38,23 +44,48 @@ public class MessageListFragment extends ThingProviderListFragment {
         return frag;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        adapter = new MessageLoaderAdapter(getActivity());
+        adapter.setAccountName(getArguments().getString(ARG_ACCOUNT_NAME));
+        adapter.setThingId(getArguments().getString(ARG_THING_ID));
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setListAdapter(adapter);
+        setListShown(false);
+        if (adapter.isLoadable()) {
+            getLoaderManager().initLoader(0, null, this);
+        }
+    }
+
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
+        return adapter.getLoader(getActivity(), args);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        // Process ThingProvide results.
         super.onLoadFinished(loader, cursor);
+        adapter.swapCursor(cursor);
+        setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
+        setListShown(true);
+    }
+
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 
     @Override
     protected void onSessionIdLoaded(long sessionId) {
+        adapter.setSessionId(sessionId);
     }
 
     @Override
     protected void onSubredditLoaded(String subreddit) {
-    }
-
-    public void onLoaderReset(Loader<Cursor> arg0) {
+        throw new IllegalStateException();
     }
 }
