@@ -138,10 +138,6 @@ public class ThingAdapter extends BaseCursorAdapter {
         static String getMore(Bundle args) {
             return args.getString(ARG_MORE);
         }
-
-        static boolean getRefresh(Bundle args) {
-            return args.getBoolean(ARG_REFRESH);
-        }
     }
 
     private final LayoutInflater inflater;
@@ -351,9 +347,5 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     public static String getMore(Bundle args) {
         return ProviderAdapter.getMore(args);
-    }
-
-    public static boolean getRefresh(Bundle args) {
-        return ProviderAdapter.getRefresh(args);
     }
 }
