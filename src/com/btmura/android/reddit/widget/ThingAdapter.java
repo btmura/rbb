@@ -77,10 +77,6 @@ public class ThingAdapter extends BaseCursorAdapter {
 
         abstract boolean isLoadable(Bundle args);
 
-        abstract String createSessionId(Bundle args);
-
-        abstract void deleteSessionData(Context context, Bundle args);
-
         abstract String getThingId(ThingAdapter adapter, int position);
 
         abstract String getLinkId(ThingAdapter adapter, int position);
@@ -208,14 +204,6 @@ public class ThingAdapter extends BaseCursorAdapter {
 
     public boolean isLoadable(Bundle args) {
         return providerAdapter.isLoadable(args);
-    }
-
-    public String createSessionId(Bundle args) {
-        return providerAdapter.createSessionId(args);
-    }
-
-    public void deleteSessionData(Context context, Bundle args) {
-        providerAdapter.deleteSessionData(context, args);
     }
 
     @Override

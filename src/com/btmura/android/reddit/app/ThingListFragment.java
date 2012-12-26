@@ -156,8 +156,6 @@ public class ThingListFragment extends ListFragment implements
         if (savedInstanceState == null) {
             adapterArgs = new Bundle(7);
             adapterArgs.putAll(getArguments());
-            adapterArgs.putString(ThingAdapter.ARG_SESSION_ID,
-                    adapter.createSessionId(adapterArgs));
         } else {
             adapterArgs = savedInstanceState.getBundle(STATE_ADAPTER_ARGS);
             selectedThingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
@@ -438,14 +436,6 @@ public class ThingListFragment extends ListFragment implements
         outState.putInt(STATE_EMPTY_TEXT, emptyText);
     }
 
-    @Override
-    public void onDestroy() {
-        if (!getActivity().isChangingConfigurations()) {
-            adapter.deleteSessionData(getActivity(), adapterArgs);
-        }
-        super.onDestroy();
-    }
-
     private int getThingBodyWidth() {
         return listener != null ? listener.onMeasureThingBody() : 0;
     }
@@ -468,8 +458,6 @@ public class ThingListFragment extends ListFragment implements
     public void setSubreddit(String subreddit) {
         if (!Objects.equalsIgnoreCase(subreddit, ThingAdapter.getSubreddit(adapterArgs))) {
             adapterArgs.putString(ThingAdapter.ARG_SUBREDDIT, subreddit);
-            adapterArgs.putString(ThingAdapter.ARG_SESSION_ID,
-                    adapter.createSessionId(adapterArgs));
         }
     }
 

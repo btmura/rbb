@@ -82,16 +82,6 @@ class MessageProviderAdapter extends ProviderAdapter {
     }
 
     @Override
-    String createSessionId(Bundle args) {
-        return null; // Messages doesn't use the session API.
-    }
-
-    @Override
-    void deleteSessionData(Context context, Bundle args) {
-        // Messages doesn't use the session API.
-    }
-
-    @Override
     String getThingId(ThingAdapter adapter, int position) {
         return adapter.getString(position, INDEX_THING_ID);
     }

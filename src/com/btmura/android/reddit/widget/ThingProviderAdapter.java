@@ -127,15 +127,6 @@ class ThingProviderAdapter extends ProviderAdapter {
     }
 
     @Override
-    String createSessionId(Bundle args) {
-        return null;
-    }
-
-    @Override
-    void deleteSessionData(Context context, final Bundle args) {
-    }
-
-    @Override
     String getThingId(ThingAdapter adapter, int position) {
         return adapter.getString(position, INDEX_THING_ID);
     }
