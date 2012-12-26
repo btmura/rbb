@@ -41,6 +41,7 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 public class ThingListActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnNavigationListener,
+        OnSubredditEventListener,
         OnThingSelectedListener,
         AccountNameHolder,
         SubredditNameHolder {
@@ -53,6 +54,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     public static final int FLAG_INSERT_HOME = 0x1;
 
     private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
+    private static final String STATE_SUBREDDIT = "subreddit";
 
     private ActionBar bar;
     private FilterAdapter adapter;
@@ -83,7 +85,12 @@ public class ThingListActivity extends GlobalMenuActivity implements
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-        subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
+        if (savedInstanceState != null) {
+            subreddit = savedInstanceState.getString(STATE_SUBREDDIT);
+        } else {
+            subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
+        }
+
         adapter = new FilterAdapter(this);
         adapter.setTitle(Subreddits.getTitle(this, subreddit));
         bar.setListNavigationCallbacks(adapter, this);
@@ -124,6 +131,11 @@ public class ThingListActivity extends GlobalMenuActivity implements
             ft.commit();
         }
         return true;
+    }
+
+    public void onSubredditDiscovery(String subreddit) {
+        this.subreddit = subreddit;
+        adapter.setTitle(subreddit);
     }
 
     public void onThingSelected(Bundle thingBundle) {
@@ -174,6 +186,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_NAVIGATION_INDEX, bar.getSelectedNavigationIndex());
+        outState.putString(STATE_SUBREDDIT, subreddit);
     }
 
     private ThingListFragment getThingListFragment() {
