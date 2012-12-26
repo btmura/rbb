@@ -27,8 +27,8 @@ import android.view.View;
 
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
+import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Objects;
@@ -61,8 +61,8 @@ class ThingProviderAdapter extends ProviderAdapter {
             Things.COLUMN_URL,
 
             // Following 2 columns are from joined tables at the end.
-            SaveActions.COLUMN_ACTION,
-            VoteActions.COLUMN_ACTION,
+            SharedColumns.COLUMN_SAVE,
+            SharedColumns.COLUMN_VOTE,
     };
 
     private static final int INDEX_AUTHOR = 1;

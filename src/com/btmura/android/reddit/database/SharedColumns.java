@@ -16,15 +16,14 @@
 
 package com.btmura.android.reddit.database;
 
-/**
- * {@link SessionIds} contains definitions of column names and values for tables
- * that have a sessionId column.
- */
-public class SessionIds {
+public class SharedColumns {
+
+    public static final String COLUMN_SAVE = "save";
 
     /** Name of the session id column. Use this in table classes for clarity. */
     public static final String COLUMN_SESSION_ID = "sessionId";
 
-    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
+    public static final String COLUMN_VOTE = "vote";
 
+    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
 }

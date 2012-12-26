@@ -36,7 +36,7 @@ import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.SaveActions;
-import com.btmura.android.reddit.database.SessionIds;
+import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 
@@ -117,7 +117,7 @@ public class ThingProvider extends SessionProvider {
             + " LEFT OUTER JOIN (SELECT "
             + SaveActions.COLUMN_ACCOUNT + ", "
             + SaveActions.COLUMN_THING_ID + ", "
-            + SaveActions.COLUMN_ACTION
+            + SaveActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_SAVE
             + " FROM " + SaveActions.TABLE_NAME + ") USING ("
             + SaveActions.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")"
@@ -126,7 +126,7 @@ public class ThingProvider extends SessionProvider {
             + " LEFT OUTER JOIN (SELECT "
             + VoteActions.COLUMN_ACCOUNT + ", "
             + VoteActions.COLUMN_THING_ID + ", "
-            + VoteActions.COLUMN_ACTION
+            + VoteActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_VOTE
             + " FROM " + VoteActions.TABLE_NAME + ") USING ("
             + VoteActions.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")";
@@ -361,7 +361,7 @@ public class ThingProvider extends SessionProvider {
             sessionId = getListingSession(listing, db, sessionId);
 
             Selection newSelection = new Selection();
-            newSelection.selection = appendSelection(selection, SessionIds.SELECT_BY_SESSION_ID);
+            newSelection.selection = appendSelection(selection, SharedColumns.SELECT_BY_SESSION_ID);
             newSelection.selectionArgs = appendSelectionArg(selectionArgs, Long.toString(sessionId));
             newSelection.extras = new Bundle(1);
             newSelection.extras.putLong(EXTRA_SESSION_ID, sessionId);

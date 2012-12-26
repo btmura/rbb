@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
 
@@ -48,7 +49,7 @@ public class CommentAdapter extends BaseCursorAdapter {
             Things.COLUMN_THING_ID,
             Things.COLUMN_UPS,
             Things.COLUMN_URL,
-            Things.COLUMN_VOTE,
+            SharedColumns.COLUMN_VOTE,
     };
 
     public static int INDEX_ID = 0;

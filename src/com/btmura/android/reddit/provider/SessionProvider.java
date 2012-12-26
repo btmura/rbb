@@ -26,8 +26,8 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.SessionIds;
 import com.btmura.android.reddit.database.Sessions;
+import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.util.Array;
 
 /**
@@ -37,7 +37,7 @@ abstract class SessionProvider extends BaseProvider {
 
     private static final String SELECT_MORE_WITH_SESSION_ID =
             Kinds.COLUMN_KIND + "=" + Kinds.KIND_MORE
-                    + " AND " + SessionIds.COLUMN_SESSION_ID + "=?";
+                    + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
 
     SessionProvider(String logTag) {
         super(logTag);
@@ -73,7 +73,7 @@ abstract class SessionProvider extends BaseProvider {
             // Add the session id to the data rows.
             int count = values.size();
             for (int i = 0; i < count; i++) {
-                values.get(i).put(SessionIds.COLUMN_SESSION_ID, sessionId);
+                values.get(i).put(SharedColumns.COLUMN_SESSION_ID, sessionId);
             }
 
             // Insert the rows into the database.

@@ -48,7 +48,7 @@ public class Things implements BaseColumns {
     public static final String COLUMN_SELF = "self";
     public static final String COLUMN_SELF_TEXT = "selfText";
     public static final String COLUMN_SEQUENCE = "sequence";
-    public static final String COLUMN_SESSION_ID = SessionIds.COLUMN_SESSION_ID;
+    public static final String COLUMN_SESSION_ID = SharedColumns.COLUMN_SESSION_ID;
 
     /** Number of subscribers to this subreddit. */
     public static final String COLUMN_SUBSCRIBERS = "subscribers";
@@ -65,8 +65,6 @@ public class Things implements BaseColumns {
      * parent is collapsed will have expanded to true but visible to false.
      */
     public static final String COLUMN_VISIBLE = "visible";
-
-    public static final String COLUMN_VOTE = VoteActions.COLUMN_ACTION;
 
     /** Deleted comments have an author and body with this string. */
     public static final String DELETED = "[deleted]";
