@@ -43,12 +43,14 @@ import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedLi
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingBundle;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnSubredditSelectedListener,
+        OnSubredditEventListener,
         OnThingSelectedListener,
         OnThingEventListener,
         OnBackStackChangedListener,
@@ -410,6 +412,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commit();
 
         refreshThingPager(thingBundle);
+    }
+
+    public void onSubredditDiscovery(String subreddit) {
+        ControlFragment cf = getControlFragment();
+        if (Objects.equalsIgnoreCase(Subreddits.NAME_RANDOM, cf.getSubreddit())) {
+            cf.setSubreddit(subreddit);
+            refreshActionBar(subreddit, cf.getThingBundle());
+        }
     }
 
     public void onTitleDiscovery(String thingId, String title) {

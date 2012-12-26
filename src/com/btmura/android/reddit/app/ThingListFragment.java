@@ -74,15 +74,14 @@ public class ThingListFragment extends ListFragment implements
         int onMeasureThingBody();
     }
 
+    private OnThingSelectedListener listener;
+    private OnSubredditEventListener eventListener;
     private ThingAdapter adapter;
     private Bundle adapterArgs;
     private String selectedThingId;
     private String selectedLinkId;
-
     private int emptyText;
     private boolean scrollLoading;
-
-    private OnThingSelectedListener listener;
 
     public static ThingListFragment newSubredditInstance(String accountName, String subreddit,
             int filter, int flags) {
@@ -134,6 +133,9 @@ public class ThingListFragment extends ListFragment implements
         super.onAttach(activity);
         if (activity instanceof OnThingSelectedListener) {
             listener = (OnThingSelectedListener) activity;
+        }
+        if (activity instanceof OnSubredditEventListener) {
+            eventListener = (OnSubredditEventListener) activity;
         }
     }
 
@@ -234,8 +236,11 @@ public class ThingListFragment extends ListFragment implements
                             extras.getLong(ThingProvider.EXTRA_SESSION_ID));
                 }
                 if (extras.containsKey(ThingProvider.EXTRA_RESOLVED_SUBREDDIT)) {
-                    adapterArgs.putString(ThingAdapter.ARG_SUBREDDIT,
-                            extras.getString(ThingProvider.EXTRA_RESOLVED_SUBREDDIT));
+                    String subreddit = extras.getString(ThingProvider.EXTRA_RESOLVED_SUBREDDIT);
+                    adapterArgs.putString(ThingAdapter.ARG_SUBREDDIT, subreddit);
+                    if (eventListener != null) {
+                        eventListener.onSubredditDiscovery(subreddit);
+                    }
                 }
             }
         }

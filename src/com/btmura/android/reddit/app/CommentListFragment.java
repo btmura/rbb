@@ -83,7 +83,6 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     private String title;
     private CharSequence url;
     private int flags;
-
     private CommentAdapter adapter;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
