@@ -238,6 +238,7 @@ public class ThingListFragment extends ListFragment implements
                 if (extras.containsKey(ThingProvider.EXTRA_RESOLVED_SUBREDDIT)) {
                     String subreddit = extras.getString(ThingProvider.EXTRA_RESOLVED_SUBREDDIT);
                     adapterArgs.putString(ThingAdapter.ARG_SUBREDDIT, subreddit);
+                    adapter.setParentSubreddit(subreddit);
                     if (eventListener != null) {
                         eventListener.onSubredditDiscovery(subreddit);
                     }
