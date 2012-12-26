@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
+import android.os.Bundle;
 
 interface Listing {
 
@@ -33,6 +34,8 @@ interface Listing {
     public static final int TYPE_REDDIT_SEARCH_LISTING = 7;
 
     ArrayList<ContentValues> getValues() throws IOException;
+
+    void addCursorExtras(Bundle bundle);
 
     /** Return the name of the table where the values should be inserted. */
     String getTargetTable();

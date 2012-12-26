@@ -24,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
+import android.os.Bundle;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -54,14 +55,6 @@ class SubredditSearchListing extends JsonParser implements Listing {
         this.cookie = cookie;
     }
 
-    public String getTargetTable() {
-        return Things.TABLE_NAME;
-    }
-
-    public boolean isAppend() {
-        return false;
-    }
-
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         CharSequence url = Urls.subredditSearch(query, null);
@@ -83,12 +76,23 @@ class SubredditSearchListing extends JsonParser implements Listing {
         }
     }
 
+    public void addCursorExtras(Bundle bundle) {
+    }
+
     public long getNetworkTimeMs() {
         return networkTimeMs;
     }
 
     public long getParseTimeMs() {
         return parseTimeMs;
+    }
+
+    public String getTargetTable() {
+        return Things.TABLE_NAME;
+    }
+
+    public boolean isAppend() {
+        return false;
     }
 
     @Override

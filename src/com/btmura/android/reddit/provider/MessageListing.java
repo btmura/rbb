@@ -27,6 +27,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.JsonReader;
 
@@ -82,14 +83,6 @@ class MessageListing extends JsonParser implements Listing {
         this.dbHelper = dbHelper;
     }
 
-    public String getTargetTable() {
-        return Messages.TABLE_NAME;
-    }
-
-    public boolean isAppend() {
-        return false;
-    }
-
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, true, false);
@@ -126,12 +119,23 @@ class MessageListing extends JsonParser implements Listing {
         }
     }
 
+    public void addCursorExtras(Bundle bundle) {
+    }
+
     public long getNetworkTimeMs() {
         return networkTimeMs;
     }
 
     public long getParseTimeMs() {
         return parseTimeMs;
+    }
+
+    public String getTargetTable() {
+        return Messages.TABLE_NAME;
+    }
+
+    public boolean isAppend() {
+        return false;
     }
 
     @Override

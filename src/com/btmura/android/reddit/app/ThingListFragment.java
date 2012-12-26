@@ -228,8 +228,15 @@ public class ThingListFragment extends ListFragment implements
         scrollLoading = false;
         if (cursor != null) {
             Bundle extras = cursor.getExtras();
-            if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
-                adapterArgs.putLong(ThingAdapter.ARG_SESSION_ID, extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+            if (extras != null) {
+                if (extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
+                    adapterArgs.putLong(ThingAdapter.ARG_SESSION_ID,
+                            extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+                }
+                if (extras.containsKey(ThingProvider.EXTRA_RESOLVED_SUBREDDIT)) {
+                    adapterArgs.putString(ThingAdapter.ARG_SUBREDDIT,
+                            extras.getString(ThingProvider.EXTRA_RESOLVED_SUBREDDIT));
+                }
             }
         }
         adapterArgs.remove(ThingAdapter.ARG_MORE);

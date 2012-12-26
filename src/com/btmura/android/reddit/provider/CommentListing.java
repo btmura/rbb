@@ -28,6 +28,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -88,14 +89,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         this.cookie = cookie;
     }
 
-    public String getTargetTable() {
-        return Things.TABLE_NAME;
-    }
-
-    public boolean isAppend() {
-        return false;
-    }
-
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         CharSequence url = Urls.commentListing(thingId, linkId, Urls.TYPE_JSON);
@@ -117,12 +110,23 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         }
     }
 
+    public void addCursorExtras(Bundle bundle) {
+    }
+
     public long getNetworkTimeMs() {
         return networkTimeMs;
     }
 
     public long getParseTimeMs() {
         return parseTimeMs;
+    }
+
+    public String getTargetTable() {
+        return Things.TABLE_NAME;
+    }
+
+    public boolean isAppend() {
+        return false;
     }
 
     @Override

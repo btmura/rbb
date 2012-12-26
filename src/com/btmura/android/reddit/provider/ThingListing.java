@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -56,6 +57,8 @@ class ThingListing extends JsonParser implements Listing {
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
     private long networkTimeMs;
     private long parseTimeMs;
+
+    private String resolvedSubreddit;
     private String moreThingId;
 
     static ThingListing newSearchInstance(Context context, String accountName, String query,
@@ -88,14 +91,6 @@ class ThingListing extends JsonParser implements Listing {
         this.cookie = cookie;
     }
 
-    public String getTargetTable() {
-        return Things.TABLE_NAME;
-    }
-
-    public boolean isAppend() {
-        return !TextUtils.isEmpty(more);
-    }
-
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
 
@@ -113,7 +108,6 @@ class ThingListing extends JsonParser implements Listing {
         } else {
             url = Urls.subreddit(subreddit, filter, more);
             followRedirects = !Subreddits.NAME_RANDOM.equalsIgnoreCase(subreddit);
-
         }
 
         HttpURLConnection conn = RedditApi.connect(url, cookie, followRedirects, false);
@@ -121,7 +115,15 @@ class ThingListing extends JsonParser implements Listing {
         // Handle the redirect if the request was for /r/random to use JSON.
         if (!followRedirects && conn.getResponseCode() == 302) {
             String location = conn.getHeaderField("Location");
+            if (location.startsWith("/r/")) {
+                location = location.substring(3);
+            }
+            if (location.length() > 1 && location.endsWith("/")) {
+                location = location.substring(0, location.length() - 1);
+            }
+
             url = Urls.subreddit(location, filter, more);
+            resolvedSubreddit = location;
 
             // Disconnect and reconnect to the proper URL.
             conn.disconnect();
@@ -145,12 +147,26 @@ class ThingListing extends JsonParser implements Listing {
         }
     }
 
+    public void addCursorExtras(Bundle bundle) {
+        if (resolvedSubreddit != null) {
+            bundle.putString(ThingProvider.EXTRA_RESOLVED_SUBREDDIT, resolvedSubreddit);
+        }
+    }
+
     public long getNetworkTimeMs() {
         return networkTimeMs;
     }
 
     public long getParseTimeMs() {
         return parseTimeMs;
+    }
+
+    public String getTargetTable() {
+        return Things.TABLE_NAME;
+    }
+
+    public boolean isAppend() {
+        return !TextUtils.isEmpty(more);
     }
 
     @Override

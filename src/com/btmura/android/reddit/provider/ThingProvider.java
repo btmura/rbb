@@ -60,6 +60,7 @@ public class ThingProvider extends SessionProvider {
     static final String AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
     public static final String EXTRA_SESSION_ID = "sessionId";
+    public static final String EXTRA_RESOLVED_SUBREDDIT = "resolvedSubreddit";
 
     private static final String PATH_THINGS = "things";
     private static final String PATH_MESSAGES = "messages";
@@ -363,8 +364,10 @@ public class ThingProvider extends SessionProvider {
             Selection newSelection = new Selection();
             newSelection.selection = appendSelection(selection, SharedColumns.SELECT_BY_SESSION_ID);
             newSelection.selectionArgs = appendSelectionArg(selectionArgs, Long.toString(sessionId));
-            newSelection.extras = new Bundle(1);
+
+            newSelection.extras = new Bundle(2);
             newSelection.extras.putLong(EXTRA_SESSION_ID, sessionId);
+            listing.addCursorExtras(newSelection.extras);
 
             return newSelection;
 
