@@ -23,9 +23,9 @@ import android.provider.BaseColumns;
  * Table for storing pending actions like adding or deleting comments. The
  * actions will be processed one by one in the background.
  */
-public class Comments implements BaseColumns {
+public class CommentActions implements BaseColumns {
 
-    public static final String TABLE_NAME = "comments";
+    public static final String TABLE_NAME = "commentActions";
 
     /** Account that created or deleted this comment. */
     public static final String COLUMN_ACCOUNT = VoteActions.COLUMN_ACCOUNT;

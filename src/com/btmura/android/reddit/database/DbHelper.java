@@ -82,7 +82,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     private static void createNewTablesV2(SQLiteDatabase db) {
         Accounts.createTable(db);
-        Comments.createTable(db);
+        CommentActions.createTable(db);
         MessageActions.createTable(db);
         Saves.createTable(db);
         VoteActions.createTable(db);

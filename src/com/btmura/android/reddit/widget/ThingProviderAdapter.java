@@ -155,7 +155,7 @@ class ThingProviderAdapter extends ProviderAdapter {
             return title;
         }
 
-        // Comments don't have titles so use the body.
+        // CommentActions don't have titles so use the body.
         return adapter.getString(position, INDEX_BODY);
     }
 
@@ -213,7 +213,7 @@ class ThingProviderAdapter extends ProviderAdapter {
         String title = cursor.getString(INDEX_TITLE);
         int ups = cursor.getInt(INDEX_UPS);
 
-        // Comments don't have a score so calculate our own.
+        // CommentActions don't have a score so calculate our own.
         if (kind == Kinds.KIND_COMMENT) {
             score = ups - downs;
         }

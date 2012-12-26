@@ -260,7 +260,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     }
 
     private boolean handleSubmit() {
-        // Comments don't have a choice of destination or title.
+        // CommentActions don't have a choice of destination or title.
         int composition = getArguments().getInt(ARG_COMPOSITION);
         if (composition == COMPOSITION_SUBMISSION || composition == COMPOSITION_MESSAGE) {
             if (TextUtils.isEmpty(destinationText.getText())) {

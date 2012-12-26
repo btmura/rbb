@@ -119,7 +119,7 @@ public class CommentAdapter extends BaseCursorAdapter {
         String thingId = cursor.getString(INDEX_THING_ID);
         int ups = cursor.getInt(INDEX_UPS);
 
-        // Comments don't have a score so calculate our own.
+        // CommentActions don't have a score so calculate our own.
         int score = ups - downs;
 
         // TODO: Remove code duplication with ThingAdapter.

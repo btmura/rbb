@@ -37,7 +37,7 @@ public class MessageActions implements BaseColumns {
     public static final String COLUMN_PARENT_THING_ID = "parentThingId";
 
     /** ID of the thing that we are commenting on or deleting. */
-    // TODO: Rename to targetID in this table and Comments table.
+    // TODO: Rename to targetID in this table and CommentActions table.
     public static final String COLUMN_THING_ID = "thingId";
 
     /** Text of the reply. */

@@ -41,7 +41,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.Things;
@@ -66,10 +66,10 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
     static final int RATE_LIMIT_SECONDS = 60;
 
     private static final String[] COMMENT_PROJECTION = {
-            Comments._ID,
-            Comments.COLUMN_ACTION,
-            Comments.COLUMN_THING_ID,
-            Comments.COLUMN_TEXT,
+            CommentActions._ID,
+            CommentActions.COLUMN_ACTION,
+            CommentActions.COLUMN_THING_ID,
+            CommentActions.COLUMN_TEXT,
     };
 
     private static final int COMMENT_ID = 0;
@@ -178,7 +178,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             // Get all pending replies that have not been synced.
             Cursor c = provider.query(ThingProvider.COMMENT_ACTIONS_URI, COMMENT_PROJECTION,
-                    Comments.SELECT_BY_ACCOUNT, Array.of(account.name), SORT_BY_ID);
+                    CommentActions.SELECT_BY_ACCOUNT, Array.of(account.name), SORT_BY_ID);
 
             int count = c.getCount();
 
@@ -205,9 +205,9 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             try {
                 // Try to sync the comment with the server.
                 Result result = null;
-                if (action == Comments.ACTION_INSERT) {
+                if (action == CommentActions.ACTION_INSERT) {
                     result = RedditApi.comment(thingId, text, cookie, modhash);
-                } else if (action == Comments.ACTION_DELETE) {
+                } else if (action == CommentActions.ACTION_DELETE) {
                     result = RedditApi.delete(thingId, cookie, modhash);
                 }
 

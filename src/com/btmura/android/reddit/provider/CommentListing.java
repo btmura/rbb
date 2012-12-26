@@ -35,7 +35,7 @@ import android.util.JsonToken;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
-import com.btmura.android.reddit.database.Comments;
+import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
@@ -49,11 +49,11 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     public static final String TAG = "CommentListing";
 
     private static final String[] PROJECTION = {
-            Comments._ID,
-            Comments.COLUMN_ACCOUNT,
-            Comments.COLUMN_ACTION,
-            Comments.COLUMN_THING_ID,
-            Comments.COLUMN_TEXT,
+            CommentActions._ID,
+            CommentActions.COLUMN_ACCOUNT,
+            CommentActions.COLUMN_ACTION,
+            CommentActions.COLUMN_THING_ID,
+            CommentActions.COLUMN_TEXT,
     };
 
     private static final int INDEX_ACCOUNT_NAME = 1;
@@ -248,9 +248,9 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         int delta = 0;
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query(Comments.TABLE_NAME, PROJECTION,
-                Comments.SELECT_BY_PARENT_THING_ID, Array.of(thingId),
-                null, null, Comments.SORT_BY_ID);
+        Cursor c = db.query(CommentActions.TABLE_NAME, PROJECTION,
+                CommentActions.SELECT_BY_PARENT_THING_ID, Array.of(thingId),
+                null, null, CommentActions.SORT_BY_ID);
         try {
             while (c.moveToNext()) {
                 String actionAccountName = c.getString(INDEX_ACCOUNT_NAME);
@@ -258,13 +258,13 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 String id = c.getString(INDEX_THING_ID);
                 String text = c.getString(INDEX_TEXT);
                 switch (action) {
-                    case Comments.ACTION_INSERT:
+                    case CommentActions.ACTION_INSERT:
                         if (insertThing(actionAccountName, id, text)) {
                             delta++;
                         }
                         break;
 
-                    case Comments.ACTION_DELETE:
+                    case CommentActions.ACTION_DELETE:
                         if (deleteThing(id)) {
                             delta--;
                         }
