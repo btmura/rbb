@@ -175,9 +175,11 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
-        Bundle extras = cursor.getExtras();
-        if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
-            sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+        if (cursor != null) {
+            Bundle extras = cursor.getExtras();
+            if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
+                sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+            }
         }
         SubredditAdapter.updateLoader(getActivity(), loader, sessionId, accountName, query);
 

@@ -162,9 +162,11 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
-        Bundle extras = cursor.getExtras();
-        if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
-            sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+        if (cursor != null) {
+            Bundle extras = cursor.getExtras();
+            if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
+                sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+            }
         }
         CommentAdapter.updateLoader(getActivity(), loader, sessionId, accountName, thingId, linkId);
 

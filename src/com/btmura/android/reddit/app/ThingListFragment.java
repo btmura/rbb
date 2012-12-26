@@ -226,9 +226,11 @@ public class ThingListFragment extends ListFragment implements
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
         scrollLoading = false;
-        Bundle extras = cursor.getExtras();
-        if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
-            adapterArgs.putLong(ThingAdapter.ARG_SESSION_ID, extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+        if (cursor != null) {
+            Bundle extras = cursor.getExtras();
+            if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
+                adapterArgs.putLong(ThingAdapter.ARG_SESSION_ID, extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+            }
         }
         adapterArgs.remove(ThingAdapter.ARG_MORE);
         adapter.updateLoader(getActivity(), loader, adapterArgs);
