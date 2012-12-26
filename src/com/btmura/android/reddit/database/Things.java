@@ -66,7 +66,7 @@ public class Things implements BaseColumns {
      */
     public static final String COLUMN_VISIBLE = "visible";
 
-    public static final String COLUMN_VOTE = VoteActions.COLUMN_VOTE;
+    public static final String COLUMN_VOTE = VoteActions.COLUMN_ACTION;
 
     /** Deleted comments have an author and body with this string. */
     public static final String DELETED = "[deleted]";

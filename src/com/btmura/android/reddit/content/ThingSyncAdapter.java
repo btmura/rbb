@@ -102,7 +102,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String[] VOTE_PROJECTION = {
             VoteActions._ID,
             VoteActions.COLUMN_THING_ID,
-            VoteActions.COLUMN_VOTE,
+            VoteActions.COLUMN_ACTION,
     };
 
     private static final int VOTE_ID = 0;

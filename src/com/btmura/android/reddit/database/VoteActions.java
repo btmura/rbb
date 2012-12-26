@@ -34,16 +34,16 @@ public class VoteActions implements BaseColumns {
     public static final String COLUMN_THING_ID = "thingId";
 
     /** Integer column indicating either an upvote or downvote. */
-    public static final String COLUMN_VOTE = "vote";
+    public static final String COLUMN_ACTION = "action";
 
     /** Unused long column for expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
     /** Vote column value indicating an upvote. */
-    public static final int VOTE_UP = 1;
+    public static final int ACTION_VOTE_UP = 1;
 
     /** Vote column value indicating a downvote. */
-    public static final int VOTE_DOWN = -1;
+    public static final int ACTION_VOTE_DOWN = -1;
 
     /** Creates the votes table. */
     static void createTable(SQLiteDatabase db) {
@@ -53,7 +53,7 @@ public class VoteActions implements BaseColumns {
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
-                + COLUMN_VOTE + " INTEGER NOT NULL, "
+                + COLUMN_ACTION + " INTEGER NOT NULL, "
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0)");
     }
 }

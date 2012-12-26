@@ -292,7 +292,7 @@ public class Provider {
                 ops.add(ContentProviderOperation.newInsert(uri)
                         .withValue(VoteActions.COLUMN_ACCOUNT, accountName)
                         .withValue(VoteActions.COLUMN_THING_ID, thingId)
-                        .withValue(VoteActions.COLUMN_VOTE, likes)
+                        .withValue(VoteActions.COLUMN_ACTION, likes)
                         .build());
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);

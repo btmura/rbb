@@ -62,7 +62,7 @@ class ThingProviderAdapter extends ProviderAdapter {
 
             // Following 2 columns are from joined tables at the end.
             SaveActions.COLUMN_ACTION,
-            VoteActions.COLUMN_VOTE,
+            VoteActions.COLUMN_ACTION,
     };
 
     private static final int INDEX_AUTHOR = 1;

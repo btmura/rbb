@@ -146,11 +146,11 @@ class VotingArrows {
         int scorePaintIndex = NEUTRAL;
         int downPaintIndex = NEUTRAL;
         switch (likes) {
-            case VoteActions.VOTE_UP:
+            case VoteActions.ACTION_VOTE_UP:
                 upPaintIndex = scorePaintIndex = UP;
                 break;
 
-            case VoteActions.VOTE_DOWN:
+            case VoteActions.ACTION_VOTE_DOWN:
                 scorePaintIndex = downPaintIndex = DOWN;
                 break;
         }
@@ -210,11 +210,11 @@ class VotingArrows {
             int event = getEvent(e, top, left, drawArrows, drawScore, isVotable);
             switch (event) {
                 case EVENT_UPVOTE:
-                    listener.onVote(thingId, VoteActions.VOTE_UP);
+                    listener.onVote(thingId, VoteActions.ACTION_VOTE_UP);
                     return true;
 
                 case EVENT_DOWNVOTE:
-                    listener.onVote(thingId, VoteActions.VOTE_DOWN);
+                    listener.onVote(thingId, VoteActions.ACTION_VOTE_DOWN);
                     return true;
             }
         }

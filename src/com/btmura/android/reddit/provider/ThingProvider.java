@@ -126,7 +126,7 @@ public class ThingProvider extends SessionProvider {
             + " LEFT OUTER JOIN (SELECT "
             + VoteActions.COLUMN_ACCOUNT + ", "
             + VoteActions.COLUMN_THING_ID + ", "
-            + VoteActions.COLUMN_VOTE
+            + VoteActions.COLUMN_ACTION
             + " FROM " + VoteActions.TABLE_NAME + ") USING ("
             + VoteActions.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")";
