@@ -23,13 +23,19 @@ import android.content.ContentValues;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SessionIds;
 import com.btmura.android.reddit.database.Sessions;
+import com.btmura.android.reddit.util.Array;
 
 /**
  * {@link BaseProvider} that has additional methods for handling sessions.
  */
 abstract class SessionProvider extends BaseProvider {
+
+    private static final String SELECT_MORE_WITH_SESSION_ID =
+            Kinds.COLUMN_KIND + "=" + Kinds.KIND_MORE
+                    + " AND " + SessionIds.COLUMN_SESSION_ID + "=?";
 
     SessionProvider(String logTag) {
         super(logTag);
@@ -37,7 +43,8 @@ abstract class SessionProvider extends BaseProvider {
 
     /** Returns a session id pointing to the data. */
     long getListingSession(Listing listing, SQLiteDatabase db, long sessionId) throws IOException {
-        // Return existing session if it exists and we're not appending more to it.
+        // Return existing session if it exists and we're not appending more to
+        // it.
         if (sessionId != -1 && !listing.isAppend()) {
             return sessionId;
         }
@@ -53,6 +60,12 @@ abstract class SessionProvider extends BaseProvider {
                 ContentValues v = new ContentValues(1);
                 v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
                 sessionId = db.insert(Sessions.TABLE_NAME, null, v);
+            }
+
+            // Delete any existing "Loading..." signs if appending.
+            if (listing.isAppend()) {
+                db.delete(listing.getTargetTable(), SELECT_MORE_WITH_SESSION_ID,
+                        Array.of(sessionId));
             }
 
             // Add the session id to the data rows.
