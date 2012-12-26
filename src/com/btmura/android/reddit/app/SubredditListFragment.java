@@ -17,8 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
-import android.app.ListFragment;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -42,12 +40,11 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
-public class SubredditListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
+public class SubredditListFragment extends ThingProviderListFragment implements
         MultiChoiceModeListener, OnItemSelectedListener {
 
     public static final String TAG = "SubredditListFragment";
@@ -175,14 +172,11 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
-        if (cursor != null) {
-            Bundle extras = cursor.getExtras();
-            if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
-                sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
-            }
-        }
-        SubredditAdapter.updateLoader(getActivity(), loader, sessionId, accountName, query);
 
+        // Process ThingProvider results.
+        super.onLoadFinished(loader, cursor);
+
+        SubredditAdapter.updateLoader(getActivity(), loader, sessionId, accountName, query);
         adapter.swapCursor(cursor);
         setEmptyText(getEmptyText(cursor == null));
 
@@ -206,6 +200,16 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
             return ""; // Don't show duplicate message in multipane layout.
         }
         return getString(error ? R.string.error : R.string.empty_list);
+    }
+
+    @Override
+    protected void onSessionIdLoaded(long sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    @Override
+    protected void onSubredditLoaded(String subreddit) {
+        throw new IllegalStateException();
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {

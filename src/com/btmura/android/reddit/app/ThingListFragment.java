@@ -17,8 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
-import android.app.ListFragment;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -44,14 +42,12 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
 
-public class ThingListFragment extends ListFragment implements
-        LoaderCallbacks<Cursor>,
+public class ThingListFragment extends ThingProviderListFragment implements
         OnScrollListener,
         OnVoteListener,
         MultiChoiceModeListener {
@@ -227,24 +223,11 @@ public class ThingListFragment extends ListFragment implements
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
+
+        // Process ThingProvider results.
+        super.onLoadFinished(loader, cursor);
+
         scrollLoading = false;
-        if (cursor != null) {
-            Bundle extras = cursor.getExtras();
-            if (extras != null) {
-                if (extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
-                    adapterArgs.putLong(ThingAdapter.ARG_SESSION_ID,
-                            extras.getLong(ThingProvider.EXTRA_SESSION_ID));
-                }
-                if (extras.containsKey(ThingProvider.EXTRA_RESOLVED_SUBREDDIT)) {
-                    String subreddit = extras.getString(ThingProvider.EXTRA_RESOLVED_SUBREDDIT);
-                    adapterArgs.putString(ThingAdapter.ARG_SUBREDDIT, subreddit);
-                    adapter.setParentSubreddit(subreddit);
-                    if (eventListener != null) {
-                        eventListener.onSubredditDiscovery(subreddit);
-                    }
-                }
-            }
-        }
         adapterArgs.remove(ThingAdapter.ARG_MORE);
         adapter.updateLoader(getActivity(), loader, adapterArgs);
 
@@ -252,6 +235,20 @@ public class ThingListFragment extends ListFragment implements
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
         getActivity().invalidateOptionsMenu();
+    }
+
+    @Override
+    protected void onSessionIdLoaded(long sessionId) {
+        adapterArgs.putLong(ThingAdapter.ARG_SESSION_ID, sessionId);
+    }
+
+    @Override
+    protected void onSubredditLoaded(String subreddit) {
+        adapterArgs.putString(ThingAdapter.ARG_SUBREDDIT, subreddit);
+        adapter.setParentSubreddit(subreddit);
+        if (eventListener != null) {
+            eventListener.onSubredditDiscovery(subreddit);
+        }
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {

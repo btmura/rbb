@@ -17,8 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
-import android.app.ListFragment;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -45,12 +43,11 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
-public class CommentListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
+public class CommentListFragment extends ThingProviderListFragment implements
         MultiChoiceModeListener, OnVoteListener, CommentList {
 
     public static final String TAG = "CommentListFragment";
@@ -161,12 +158,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
-        if (cursor != null) {
-            Bundle extras = cursor.getExtras();
-            if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
-                sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
-            }
-        }
+
+        // Process ThingProvider results.
+        super.onLoadFinished(loader, cursor);
+
         CommentAdapter.updateLoader(getActivity(), loader, sessionId, accountName, thingId, linkId);
 
         adapter.swapCursor(cursor);
@@ -194,6 +189,16 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
                 listener.onLinkDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_URL));
             }
         }
+    }
+
+    @Override
+    protected void onSessionIdLoaded(long sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    @Override
+    protected void onSubredditLoaded(String subreddit) {
+        throw new IllegalStateException();
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {

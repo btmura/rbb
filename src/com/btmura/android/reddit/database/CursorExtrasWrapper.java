@@ -20,13 +20,19 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.os.Bundle;
 
+/**
+ * {@link CursorWrapper} that allows sending back some extras with its
+ * {@link Cursor}. This is a workaround for the fact that there is no public API
+ * to set the extras, but there is a public API method to get extras.
+ */
 public class CursorExtrasWrapper extends CursorWrapper {
 
+    /** Bundle of extras returned by {@link #getExtras}. */
     private final Bundle extras;
 
     public CursorExtrasWrapper(Cursor cursor, Bundle extras) {
         super(cursor);
-        this.extras = extras;
+        this.extras = extras != null ? extras : Bundle.EMPTY;
     }
 
     @Override
