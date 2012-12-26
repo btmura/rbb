@@ -44,6 +44,7 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -79,7 +80,6 @@ public class ThingListFragment extends ListFragment implements
     private String selectedLinkId;
 
     private int emptyText;
-    private boolean sync;
     private boolean scrollLoading;
 
     private OnThingSelectedListener listener;
@@ -140,7 +140,6 @@ public class ThingListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sync = savedInstanceState == null;
 
         if (!TextUtils.isEmpty(ThingAdapter.getMessageUser(getArguments()))) {
             adapter = ThingAdapter.newMessageInstance(getActivity());
@@ -221,7 +220,6 @@ public class ThingListFragment extends ListFragment implements
         if (args != null) {
             adapterArgs.putAll(args);
         }
-        adapterArgs.putBoolean(ThingAdapter.ARG_REFRESH, sync);
         return adapter.createLoader(getActivity(), adapterArgs);
     }
 
@@ -229,9 +227,11 @@ public class ThingListFragment extends ListFragment implements
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
-        sync = false;
         scrollLoading = false;
-        adapterArgs.putBoolean(ThingAdapter.ARG_REFRESH, sync);
+        Bundle extras = cursor.getExtras();
+        if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
+            adapterArgs.putLong(ThingAdapter.ARG_SESSION_ID, extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+        }
         adapterArgs.remove(ThingAdapter.ARG_MORE);
         adapter.updateLoader(getActivity(), loader, adapterArgs);
 
@@ -268,7 +268,6 @@ public class ThingListFragment extends ListFragment implements
                 if (!adapter.isEmpty()) {
                     String more = adapter.getMoreThingId();
                     if (!TextUtils.isEmpty(more)) {
-                        sync = true;
                         scrollLoading = true;
                         Bundle b = new Bundle(1);
                         b.putString(ThingAdapter.ARG_MORE, more);

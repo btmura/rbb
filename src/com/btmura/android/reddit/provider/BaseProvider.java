@@ -27,11 +27,13 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.CursorExtrasWrapper;
 import com.btmura.android.reddit.database.DbHelper;
 import com.btmura.android.reddit.util.Array;
 
@@ -59,6 +61,7 @@ abstract class BaseProvider extends ContentProvider {
     static class Selection {
         String selection;
         String[] selectionArgs;
+        Bundle extras;
     }
 
     protected String logTag;
@@ -94,6 +97,9 @@ abstract class BaseProvider extends ContentProvider {
 
             c = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
             c.setNotificationUri(getContext().getContentResolver(), uri);
+            if (newSelection != null && newSelection.extras != null) {
+                c = new CursorExtrasWrapper(c, newSelection.extras);
+            }
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

@@ -16,19 +16,21 @@
 
 package com.btmura.android.reddit.database;
 
-import android.database.sqlite.SQLiteDatabase;
-import android.provider.BaseColumns;
+import android.database.Cursor;
+import android.database.CursorWrapper;
+import android.os.Bundle;
 
-public class Sessions implements BaseColumns {
+public class CursorExtrasWrapper extends CursorWrapper {
 
-    public static final String TABLE_NAME = "sessions";
+    private final Bundle extras;
 
-    /** Long timestamp when the session was created. */
-    public static final String COLUMN_TIMESTAMP = "timestamp";
+    public CursorExtrasWrapper(Cursor cursor, Bundle extras) {
+        super(cursor);
+        this.extras = extras;
+    }
 
-    static void createTempTable(SQLiteDatabase db) {
-        db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY, "
-                + COLUMN_TIMESTAMP + " INTEGER NOT NULL)");
+    @Override
+    public Bundle getExtras() {
+        return extras;
     }
 }

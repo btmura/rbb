@@ -50,7 +50,9 @@ abstract class SessionProvider extends BaseProvider {
         try {
             // Create a new session if there is no id.
             if (sessionId == -1) {
-                sessionId = db.insert(Sessions.TABLE_NAME, null, new ContentValues(0));
+                ContentValues v = new ContentValues(1);
+                v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
+                sessionId = db.insert(Sessions.TABLE_NAME, null, v);
             }
 
             // Add the session id to the data rows.

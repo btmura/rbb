@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -57,6 +58,8 @@ public class ThingProvider extends SessionProvider {
 
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
     static final String AUTHORITY_URI = "content://" + AUTHORITY + "/";
+
+    public static final String EXTRA_SESSION_ID = "sessionId";
 
     private static final String PATH_THINGS = "things";
     private static final String PATH_MESSAGES = "messages";
@@ -133,11 +136,13 @@ public class ThingProvider extends SessionProvider {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_SUBREDDIT_LISTING));
-        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_SUBREDDIT, subreddit);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
         b.appendQueryParameter(PARAM_JOIN, TRUE);
+        if (sessionId != -1) {
+            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
+        }
         if (!TextUtils.isEmpty(more)) {
             b.appendQueryParameter(PARAM_MORE, more);
         }
@@ -149,10 +154,12 @@ public class ThingProvider extends SessionProvider {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_COMMENT_LISTING));
-        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_THING_ID, thingId);
         b.appendQueryParameter(PARAM_JOIN, TRUE);
+        if (sessionId != -1) {
+            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
+        }
         if (!TextUtils.isEmpty(linkId)) {
             b.appendQueryParameter(PARAM_LINK_ID, linkId);
         }
@@ -164,11 +171,13 @@ public class ThingProvider extends SessionProvider {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_USER_LISTING));
-        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_PROFILE_USER, profileUser);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
         b.appendQueryParameter(PARAM_JOIN, TRUE);
+        if (sessionId != -1) {
+            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
+        }
         if (!TextUtils.isEmpty(more)) {
             b.appendQueryParameter(PARAM_MORE, more);
         }
@@ -179,10 +188,12 @@ public class ThingProvider extends SessionProvider {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_SEARCH_LISTING));
-        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_QUERY, query);
         b.appendQueryParameter(PARAM_JOIN, TRUE);
+        if (sessionId != -1) {
+            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
+        }
         return b.build();
     }
 
@@ -190,9 +201,11 @@ public class ThingProvider extends SessionProvider {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_REDDIT_SEARCH_LISTING));
-        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_QUERY, query);
+        if (sessionId != -1) {
+            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
+        }
         return b.build();
     }
 
@@ -200,8 +213,10 @@ public class ThingProvider extends SessionProvider {
         Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_INBOX_LISTING));
-        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        if (sessionId != -1) {
+            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
+        }
         return b.build();
     }
 
@@ -209,8 +224,10 @@ public class ThingProvider extends SessionProvider {
         Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_SENT_LISTING));
-        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        if (sessionId != -1) {
+            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
+        }
         return b.build();
     }
 
@@ -218,9 +235,11 @@ public class ThingProvider extends SessionProvider {
         Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_THREAD_LISTING));
-        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_THING_ID, thingId);
+        if (sessionId != -1) {
+            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
+        }
         return b.build();
     }
 
@@ -344,6 +363,9 @@ public class ThingProvider extends SessionProvider {
             Selection newSelection = new Selection();
             newSelection.selection = appendSelection(selection, SessionIds.SELECT_BY_SESSION_ID);
             newSelection.selectionArgs = appendSelectionArg(selectionArgs, Long.toString(sessionId));
+            newSelection.extras = new Bundle(1);
+            newSelection.extras.putLong(EXTRA_SESSION_ID, sessionId);
+
             return newSelection;
 
         } catch (OperationCanceledException e) {
