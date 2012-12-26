@@ -159,11 +159,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract boolean hasSubredditList();
 
-    protected void setSubredditListNavigation(String subreddit, String query, Bundle thingBundle) {
+    protected void setSubredditListNavigation(String subreddit, boolean isRandom, String query,
+            Bundle thingBundle) {
         if (isSinglePane) {
             setSubredditListNavigationSinglePane(query);
         } else {
-            setSubredditListNavigationMultiPane(subreddit, query, thingBundle);
+            setSubredditListNavigationMultiPane(subreddit, isRandom, query, thingBundle);
         }
     }
 
@@ -176,10 +177,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commit();
     }
 
-    private void setSubredditListNavigationMultiPane(String subreddit, String query,
-            Bundle thingBundle) {
+    private void setSubredditListNavigationMultiPane(String subreddit, boolean isRandom,
+            String query, Bundle thingBundle) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setSubredditListNavigation subreddit:" + subreddit
+                    + " isRandom: " + isRandom
                     + " query: " + query
                     + " thingBundle: " + thingBundle);
         }
@@ -188,7 +190,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String accountName = getAccountName();
         int filter = getFilter();
 
-        Fragment cf = ControlFragment.newInstance(accountName, subreddit, thingBundle, filter);
+        Fragment cf = ControlFragment.newInstance(accountName, subreddit, isRandom, thingBundle,
+                filter);
         Fragment sf = SubredditListFragment.newInstance(accountName, subreddit, query, sfFlags);
         Fragment tf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
                 tfFlags);
@@ -276,7 +279,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                     + " filter: " + filter);
         }
 
-        Fragment cf = ControlFragment.newInstance(accountName, null, null, filter);
+        Fragment cf = ControlFragment.newInstance(accountName, null, false, null, filter);
         Fragment sf = getSubredditListFragment();
         Fragment tf = ThingListFragment.newInstance(accountName, query, profileUser, messageUser,
                 filter, tfFlags);
@@ -327,14 +330,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     public void onSubredditSelected(String subreddit) {
-        selectSubreddit(subreddit, 0);
+        selectSubreddit(subreddit, Subreddits.NAME_RANDOM.equalsIgnoreCase(subreddit), 0);
     }
 
-    protected void selectSubreddit(String subreddit, int flags) {
+    protected void selectSubreddit(String subreddit, boolean isRandom, int flags) {
         if (isSinglePane) {
             selectSubredditSinglePane(subreddit, flags);
         } else {
-            selectSubredditMultiPane(subreddit);
+            selectSubredditMultiPane(subreddit, isRandom);
         }
     }
 
@@ -346,13 +349,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         startActivity(intent);
     }
 
-    private void selectSubredditMultiPane(String subreddit) {
+    private void selectSubredditMultiPane(String subreddit, boolean isRandom) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
         int filter = getFilter();
 
-        Fragment cf = ControlFragment.newInstance(accountName, subreddit, null, filter);
+        Fragment cf = ControlFragment.newInstance(accountName, subreddit, isRandom, null, filter);
         Fragment tf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
                 tfFlags);
         Fragment mf = getThingMenuFragment();
@@ -372,7 +375,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void replaceThingListFragmentMultiPane() {
-        selectSubredditMultiPane(getControlFragment().getSubreddit());
+        ControlFragment cf = getControlFragment();
+        selectSubredditMultiPane(cf.getSubreddit(), cf.isRandom());
     }
 
     public void onThingSelected(Bundle thingBundle) {
@@ -402,7 +406,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String subreddit = ThingBundle.getSubreddit(thingBundle);
         int filter = getFilter();
 
-        Fragment cf = ControlFragment.newInstance(accountName, subreddit, thingBundle, filter);
+        Fragment cf = ControlFragment.newInstance(accountName, subreddit, false, thingBundle,
+                filter);
         Fragment mf = ThingMenuFragment.newInstance(subreddit);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -418,6 +423,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment cf = getControlFragment();
         if (Objects.equalsIgnoreCase(Subreddits.NAME_RANDOM, cf.getSubreddit())) {
             cf.setSubreddit(subreddit);
+            cf.setIsRandom(true);
             refreshActionBar(subreddit, cf.getThingBundle());
         }
     }
@@ -553,7 +559,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         SubredditListFragment slf = getSubredditListFragment();
         if (slf != null) {
-            slf.setSelectedSubreddit(cf.getSubreddit());
+            slf.setSelectedSubreddit(cf.isRandom() ? Subreddits.NAME_RANDOM : cf.getSubreddit());
         }
 
         ThingListFragment tlf = getThingListFragment();

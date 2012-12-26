@@ -36,6 +36,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 import com.btmura.android.reddit.widget.ThingBundle;
@@ -111,7 +112,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 finish();
                 return true;
             } else if (!TextUtils.isEmpty(requestedSubreddit)) {
-                selectSubreddit(requestedSubreddit, ThingListActivity.FLAG_INSERT_HOME);
+                selectSubreddit(requestedSubreddit,
+                        Subreddits.NAME_RANDOM.equalsIgnoreCase(requestedSubreddit),
+                        ThingListActivity.FLAG_INSERT_HOME);
                 finish();
                 return true;
             }
@@ -181,8 +184,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         AccountPreferences.setLastSubredditFilter(prefs, filter);
 
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onNavigationItemSelected i:" + itemPosition
-                    + " an:" + accountName + " f:" + filter);
+            Log.d(TAG, "onNavigationItemSelected itemPosition:" + itemPosition
+                    + " accountName:" + accountName
+                    + " filter:" + filter);
         }
 
         // Quickly sync to check whether the user has new messages.
@@ -215,7 +219,14 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 requestedSubreddit = null;
                 requestedThingBundle = null;
             }
-            setSubredditListNavigation(subreddit, null, thingBundle);
+
+            // Check name to see if this is the random subreddit. We avoid the
+            // problem where the last visited subreddit is the resolved random
+            // subreddit, because we don't save the subreddit preference when
+            // changing filters or on resolving the subreddit!
+            boolean isRandom = Subreddits.NAME_RANDOM.equalsIgnoreCase(subreddit);
+
+            setSubredditListNavigation(subreddit, isRandom, null, thingBundle);
         } else if (tlf != null && tlf.getFilter() != filter) {
             replaceThingListFragmentMultiPane();
         }

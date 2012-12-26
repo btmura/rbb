@@ -169,7 +169,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
         if (tab == tabSubreddits) {
             SubredditListFragment f = getSubredditListFragment();
             if (f == null || !query.equals(f.getQuery())) {
-                setSubredditListNavigation(null, query, null);
+                setSubredditListNavigation(null, false, query, null);
             } else {
                 refreshSubredditListVisibility();
             }

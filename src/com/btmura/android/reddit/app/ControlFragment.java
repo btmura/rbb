@@ -19,25 +19,30 @@ package com.btmura.android.reddit.app;
 import android.app.Fragment;
 import android.os.Bundle;
 
+import com.btmura.android.reddit.database.Subreddits;
+
 public class ControlFragment extends Fragment {
 
     public static final String TAG = "ControlFragment";
 
-    private static final String ARG_ACCOUNT_NAME = "an";
-    private static final String ARG_SUBREDDIT = "s";
-    private static final String ARG_THING_BUNDLE = "tb";
-    private static final String ARG_FILTER = "f";
+    private static final String ARG_ACCOUNT_NAME = "accountName";
+    private static final String ARG_SUBREDDIT = "subreddit";
+    private static final String ARG_IS_RANDOM = "isRandom";
+    private static final String ARG_THING_BUNDLE = "thingBundle";
+    private static final String ARG_FILTER = "filter";
 
     private String accountName;
     private String subreddit;
+    private boolean isRandom;
     private Bundle thingBundle;
     private int filter;
 
-    public static ControlFragment newInstance(String accountName, String sr, Bundle thingBundle,
-            int filter) {
-        Bundle b = new Bundle(4);
+    public static ControlFragment newInstance(String accountName, String subreddit,
+            boolean isRandom, Bundle thingBundle, int filter) {
+        Bundle b = new Bundle(5);
         b.putString(ARG_ACCOUNT_NAME, accountName);
-        b.putString(ARG_SUBREDDIT, sr);
+        b.putString(ARG_SUBREDDIT, subreddit);
+        b.putBoolean(ARG_IS_RANDOM, isRandom);
         b.putBundle(ARG_THING_BUNDLE, thingBundle);
         b.putInt(ARG_FILTER, filter);
 
@@ -54,8 +59,17 @@ public class ControlFragment extends Fragment {
         return subreddit;
     }
 
+    public boolean isRandom() {
+        return isRandom;
+    }
+
     public void setSubreddit(String subreddit) {
         this.subreddit = subreddit;
+        this.isRandom = Subreddits.NAME_RANDOM.equalsIgnoreCase(subreddit);
+    }
+
+    public void setIsRandom(boolean isRandom) {
+        this.isRandom = isRandom;
     }
 
     public Bundle getThingBundle() {
@@ -77,6 +91,7 @@ public class ControlFragment extends Fragment {
         Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
         accountName = b.getString(ARG_ACCOUNT_NAME);
         subreddit = b.getString(ARG_SUBREDDIT);
+        isRandom = b.getBoolean(ARG_IS_RANDOM);
         thingBundle = b.getBundle(ARG_THING_BUNDLE);
         filter = b.getInt(ARG_FILTER);
     }
@@ -86,6 +101,7 @@ public class ControlFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putString(ARG_ACCOUNT_NAME, accountName);
         outState.putString(ARG_SUBREDDIT, subreddit);
+        outState.putBoolean(ARG_IS_RANDOM, isRandom);
         outState.putBundle(ARG_THING_BUNDLE, thingBundle);
         outState.putInt(ARG_FILTER, filter);
     }
