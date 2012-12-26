@@ -94,10 +94,10 @@ public class ThingProvider extends SessionProvider {
     static final String PARAM_LISTING_GET = "getListing";
     static final String PARAM_LISTING_TYPE = "listingType";
 
-    public static final String PARAM_COMMENT_REPLY = "commentReply";
-    public static final String PARAM_COMMENT_DELETE = "commentDelete";
+    static final String PARAM_COMMENT_REPLY = "commentReply";
+    static final String PARAM_COMMENT_DELETE = "commentDelete";
 
-    public static final String PARAM_MESSAGE_REPLY = "messageReply";
+    static final String PARAM_MESSAGE_REPLY = "messageReply";
 
     static final String PARAM_SESSION_ID = "sessionId";
     static final String PARAM_ACCOUNT = "account";
