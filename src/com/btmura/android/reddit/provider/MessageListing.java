@@ -34,7 +34,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.Array;
@@ -57,20 +56,20 @@ class MessageListing extends JsonParser implements Listing {
 
     /** Returns a listing for an inbox. */
     static MessageListing newInboxInstance(String accountName, String cookie) {
-        return new MessageListing(Sessions.TYPE_MESSAGE_INBOX_LISTING,
+        return new MessageListing(Listing.TYPE_MESSAGE_INBOX_LISTING,
                 accountName, null, cookie, null);
     }
 
     /** Returns a listing for sent messages. */
     static MessageListing newSentInstance(String accountName, String cookie) {
-        return new MessageListing(Sessions.TYPE_MESSAGE_SENT_LISTING,
+        return new MessageListing(Listing.TYPE_MESSAGE_SENT_LISTING,
                 accountName, null, cookie, null);
     }
 
     /** Returns an instance for a message thread. */
     static MessageListing newThreadInstance(String accountName, String thingId, String cookie,
             SQLiteOpenHelper dbHelper) {
-        return new MessageListing(Sessions.TYPE_MESSAGE_THREAD_LISTING,
+        return new MessageListing(Listing.TYPE_MESSAGE_THREAD_LISTING,
                 accountName, thingId, cookie, dbHelper);
     }
 
@@ -83,26 +82,12 @@ class MessageListing extends JsonParser implements Listing {
         this.dbHelper = dbHelper;
     }
 
-    public int getType() {
-        return listingType;
-    }
-
-    public String getKey() {
-        switch (listingType) {
-            case Sessions.TYPE_MESSAGE_INBOX_LISTING:
-            case Sessions.TYPE_MESSAGE_SENT_LISTING:
-                return accountName;
-
-            case Sessions.TYPE_MESSAGE_THREAD_LISTING:
-                return thingId;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
     public String getTargetTable() {
         return Messages.TABLE_NAME;
+    }
+
+    public boolean isAppend() {
+        return false;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {
@@ -127,13 +112,13 @@ class MessageListing extends JsonParser implements Listing {
 
     private CharSequence getUrl() {
         switch (listingType) {
-            case Sessions.TYPE_MESSAGE_INBOX_LISTING:
+            case Listing.TYPE_MESSAGE_INBOX_LISTING:
                 return Urls.message(FilterAdapter.MESSAGE_INBOX, null);
 
-            case Sessions.TYPE_MESSAGE_SENT_LISTING:
+            case Listing.TYPE_MESSAGE_SENT_LISTING:
                 return Urls.message(FilterAdapter.MESSAGE_SENT, null);
 
-            case Sessions.TYPE_MESSAGE_THREAD_LISTING:
+            case Listing.TYPE_MESSAGE_THREAD_LISTING:
                 return Urls.messageThread(thingId, Urls.TYPE_JSON);
 
             default:
@@ -212,7 +197,7 @@ class MessageListing extends JsonParser implements Listing {
 
     @Override
     public void onParseEnd() {
-        if (listingType == Sessions.TYPE_MESSAGE_THREAD_LISTING) {
+        if (listingType == Listing.TYPE_MESSAGE_THREAD_LISTING) {
             mergeActions();
         }
     }

@@ -56,15 +56,15 @@ class MessageProviderAdapter extends ProviderAdapter {
 
     @Override
     Uri getLoaderUri(Bundle args) {
+        long sessionId = getSessionId(args);
         String accountName = getAccountName(args);
-        boolean refresh = getRefresh(args);
 
         switch (getFilter(args)) {
             case FilterAdapter.MESSAGE_INBOX:
-                return ThingProvider.messageInboxUri(accountName, refresh);
+                return ThingProvider.messageInboxUri(sessionId, accountName);
 
             case FilterAdapter.MESSAGE_SENT:
-                return ThingProvider.messageSentUri(accountName, refresh);
+                return ThingProvider.messageSentUri(sessionId, accountName);
 
             default:
                 throw new IllegalStateException();

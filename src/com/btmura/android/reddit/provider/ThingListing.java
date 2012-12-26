@@ -31,7 +31,6 @@ import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
@@ -44,7 +43,6 @@ class ThingListing extends JsonParser implements Listing {
     public static final String TAG = "ThingListing";
 
     private final Formatter formatter = new Formatter();
-    private final int listingType;
     private final Context context;
     private final String accountName;
     private final String subreddit;
@@ -62,27 +60,24 @@ class ThingListing extends JsonParser implements Listing {
 
     static ThingListing newSearchInstance(Context context, String accountName, String query,
             String cookie) {
-        return new ThingListing(Sessions.TYPE_SEARCH_LISTING, context, accountName,
-                null, query, null, null, 0, null, cookie);
+        return new ThingListing(context, accountName, null, query, null, null, 0, null, cookie);
     }
 
     static ThingListing newSubredditInstance(Context context, String accountName, String subreddit,
             int filter, String more, String cookie) {
-        return new ThingListing(Sessions.TYPE_SUBREDDIT_LISTING, context, accountName,
-                subreddit, null, null, null, filter, more, cookie);
+        return new ThingListing(context, accountName, subreddit, null, null, null, filter, more,
+                cookie);
     }
 
     static ThingListing newUserInstance(Context context, String accountName, String profileUser,
             int filter, String more, String cookie) {
-        return new ThingListing(Sessions.TYPE_USER_LISTING, context, accountName,
-                null, null, profileUser, null, filter, more, cookie);
+        return new ThingListing(context, accountName, null, null, profileUser, null, filter, more,
+                cookie);
     }
 
-    ThingListing(int listingType, Context context, String accountName, String subreddit,
-            String query, String profileUser, String messageUser, int filter, String more,
-            String cookie) {
+    private ThingListing(Context context, String accountName, String subreddit, String query,
+            String profileUser, String messageUser, int filter, String more, String cookie) {
         this.context = context;
-        this.listingType = listingType;
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;
@@ -93,28 +88,12 @@ class ThingListing extends JsonParser implements Listing {
         this.cookie = cookie;
     }
 
-    public int getType() {
-        return listingType;
-    }
-
-    public String getKey() {
-        switch (listingType) {
-            case Sessions.TYPE_SEARCH_LISTING:
-                return query;
-
-            case Sessions.TYPE_SUBREDDIT_LISTING:
-                return subreddit;
-
-            case Sessions.TYPE_USER_LISTING:
-                return profileUser;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
     public String getTargetTable() {
         return Things.TABLE_NAME;
+    }
+
+    public boolean isAppend() {
+        return !TextUtils.isEmpty(more);
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

@@ -22,7 +22,6 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -76,11 +75,10 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         void onSubredditSelected(String subreddit);
     }
 
+    private long sessionId;
     private String accountName;
-    private String sessionId;
     private String selectedSubreddit;
     private String query;
-    private boolean sync;
     private boolean singleChoice;
     private SubredditAdapter adapter;
     private OnSubredditSelectedListener listener;
@@ -120,18 +118,15 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         query = getArguments().getString(ARG_QUERY);
-        sync = savedInstanceState == null;
 
         if (savedInstanceState == null) {
+            sessionId = -1;
             accountName = getArguments().getString(ARG_ACCOUNT_NAME);
             selectedSubreddit = getArguments().getString(ARG_SELECTED_SUBREDDIT);
-            if (!TextUtils.isEmpty(query)) {
-                sessionId = query + "-" + System.currentTimeMillis();
-            }
         } else {
+            sessionId = savedInstanceState.getLong(STATE_SESSION_ID, -1);
             accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
             selectedSubreddit = savedInstanceState.getString(STATE_SELECTED_SUBREDDIT);
-            sessionId = savedInstanceState.getString(STATE_SESSION_ID);
             selectedActionAccount = savedInstanceState.getString(STATE_SELECTED_ACTION_ACCOUNT);
         }
 
@@ -172,15 +167,14 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onCreateLoader args: " + args);
         }
-        return SubredditAdapter.getLoader(getActivity(), accountName, query, sync);
+        return SubredditAdapter.getLoader(getActivity(), sessionId, accountName, query);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
         }
-        sync = false;
-        SubredditAdapter.updateLoader(getActivity(), loader, accountName, query, sync);
+        SubredditAdapter.updateLoader(getActivity(), loader, sessionId, accountName, query);
 
         adapter.swapCursor(cursor);
         setEmptyText(getEmptyText(cursor == null));
@@ -362,7 +356,7 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
         super.onSaveInstanceState(outState);
         outState.putString(STATE_ACCOUNT_NAME, accountName);
         outState.putString(STATE_SELECTED_SUBREDDIT, selectedSubreddit);
-        outState.putString(STATE_SESSION_ID, sessionId);
+        outState.putLong(STATE_SESSION_ID, sessionId);
         outState.putString(STATE_SELECTED_ACTION_ACCOUNT, selectedActionAccount);
     }
 

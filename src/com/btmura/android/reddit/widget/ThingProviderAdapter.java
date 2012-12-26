@@ -93,21 +93,21 @@ class ThingProviderAdapter extends ProviderAdapter {
 
     @Override
     Uri getLoaderUri(Bundle args) {
+        long sessionId = getSessionId(args);
         String accountName = getAccountName(args);
         String subreddit = getSubreddit(args);
         String profileUser = getProfileUser(args);
         String query = getQuery(args);
         int filter = getFilter(args);
         String more = getMore(args);
-        boolean refresh = getRefresh(args);
 
         // Empty but non-null subreddit means front page.
         if (subreddit != null) {
-            return ThingProvider.subredditUri(accountName, subreddit, filter, more, refresh);
+            return ThingProvider.subredditUri(sessionId, accountName, subreddit, filter, more);
         } else if (!TextUtils.isEmpty(profileUser)) {
-            return ThingProvider.profileUri(accountName, profileUser, filter, more, refresh);
+            return ThingProvider.profileUri(sessionId, accountName, profileUser, filter, more);
         } else if (!TextUtils.isEmpty(getQuery(args))) {
-            return ThingProvider.searchUri(accountName, query, refresh);
+            return ThingProvider.searchUri(sessionId, accountName, query);
         } else {
             throw new IllegalArgumentException();
         }

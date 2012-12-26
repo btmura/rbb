@@ -107,8 +107,8 @@ public class ThingAdapter extends BaseCursorAdapter {
             return args.getString(ARG_ACCOUNT_NAME);
         }
 
-        static String getSessionId(Bundle args) {
-            return args.getString(ARG_SESSION_ID);
+        static long getSessionId(Bundle args) {
+            return args.getLong(ARG_SESSION_ID, -1);
         }
 
         static String getSubreddit(Bundle args) {
@@ -321,7 +321,7 @@ public class ThingAdapter extends BaseCursorAdapter {
         return ProviderAdapter.getAccountName(args);
     }
 
-    public static String getSessionId(Bundle args) {
+    public static long getSessionId(Bundle args) {
         return ProviderAdapter.getSessionId(args);
     }
 

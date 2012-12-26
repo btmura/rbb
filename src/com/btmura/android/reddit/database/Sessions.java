@@ -23,32 +23,8 @@ public class Sessions implements BaseColumns {
 
     public static final String TABLE_NAME = "sessions";
 
-    /**
-     * String key identifying the session. It means different things for
-     * different listing types.
-     */
-    public static final String COLUMN_KEY = "key";
-
-    /** Long timestamp when the session was created. */
-    public static final String COLUMN_TIMESTAMP = "timestamp";
-
-    /** Integer type of the session. */
-    public static final String COLUMN_TYPE = "type";
-
-    public static final int TYPE_MESSAGE_THREAD_LISTING = 0;
-    public static final int TYPE_MESSAGE_INBOX_LISTING = 1;
-    public static final int TYPE_MESSAGE_SENT_LISTING = 2;
-    public static final int TYPE_SUBREDDIT_LISTING = 3;
-    public static final int TYPE_USER_LISTING = 4;
-    public static final int TYPE_COMMENT_LISTING = 5;
-    public static final int TYPE_SEARCH_LISTING = 6;
-    public static final int TYPE_REDDIT_SEARCH_LISTING = 7;
-
     static void createTempTable(SQLiteDatabase db) {
         db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY, "
-                + COLUMN_KEY + " TEXT NOT NULL, "
-                + COLUMN_TIMESTAMP + " INTEGER NOT NULL, "
-                + COLUMN_TYPE + " INTEGER DEFAULT 0)");
+                + _ID + " INTEGER PRIMARY KEY)");
     }
 }

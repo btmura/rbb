@@ -37,7 +37,6 @@ import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
@@ -89,16 +88,12 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         this.cookie = cookie;
     }
 
-    public int getType() {
-        return Sessions.TYPE_COMMENT_LISTING;
-    }
-
-    public String getKey() {
-        return TextUtils.isEmpty(linkId) ? thingId : thingId + "-" + linkId;
-    }
-
     public String getTargetTable() {
         return Things.TABLE_NAME;
+    }
+
+    public boolean isAppend() {
+        return false;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

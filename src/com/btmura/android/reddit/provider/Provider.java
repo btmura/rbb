@@ -63,7 +63,7 @@ public class Provider {
             final String body,
             final int nesting,
             final int sequence,
-            final String sessionId) {
+            final long sessionId) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
@@ -148,7 +148,7 @@ public class Provider {
         });
     }
 
-    public static void expandCommentAsync(Context context, final String sessionId, final long id) {
+    public static void expandCommentAsync(Context context, final long sessionId, final long id) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {

@@ -54,10 +54,10 @@ public class MessageThreadProviderAdapter extends ProviderAdapter {
 
     @Override
     Uri getLoaderUri(Bundle args) {
+        long sessionId = getSessionId(args);
         String accountName = getAccountName(args);
         String thingId = getMessageThreadId(args);
-        boolean refresh = getRefresh(args);
-        return ThingProvider.messageThreadUri(accountName, thingId, refresh);
+        return ThingProvider.messageThreadUri(sessionId, accountName, thingId);
     }
 
     @Override

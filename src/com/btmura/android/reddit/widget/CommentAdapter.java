@@ -75,23 +75,23 @@ public class CommentAdapter extends BaseCursorAdapter {
     private final String accountName;
     private final OnVoteListener listener;
 
-    public static Loader<Cursor> getLoader(Context context, String accountName, String thingId,
-            String linkId, boolean refresh) {
-        Uri uri = getUri(accountName, thingId, linkId, refresh);
+    public static Loader<Cursor> getLoader(Context context, long sessionId, String accountName,
+            String thingId, String linkId) {
+        Uri uri = getUri(sessionId, accountName, thingId, linkId);
         return new CursorLoader(context, uri, PROJECTION, Things.SELECT_VISIBLE, null,
                 Things.SORT_BY_SEQUENCE_AND_ID);
     }
 
-    public static void updateLoader(Context context, Loader<Cursor> loader, String accountName,
-            String thingId, String linkId, boolean refresh) {
+    public static void updateLoader(Context context, Loader<Cursor> loader, long sessionId,
+            String accountName, String thingId, String linkId) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, thingId, linkId, refresh));
+            cl.setUri(getUri(sessionId, accountName, thingId, linkId));
         }
     }
 
-    private static Uri getUri(String accountName, String thingId, String linkId, boolean refresh) {
-        return ThingProvider.commentsUri(accountName, thingId, linkId, refresh);
+    private static Uri getUri(long sessionId, String accountName, String thingId, String linkId) {
+        return ThingProvider.commentsUri(sessionId, accountName, thingId, linkId);
     }
 
     public CommentAdapter(Context context, String accountName, OnVoteListener listener) {

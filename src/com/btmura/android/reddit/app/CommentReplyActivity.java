@@ -49,7 +49,7 @@ public class CommentReplyActivity extends Activity implements OnCommentReplyForm
             String replyThingId,
             int nesting,
             int sequence,
-            String sessionId) {
+            long sessionId) {
         Bundle args = new Bundle(9);
         args.putLong(ARG_PARENT_ID, parentId);
         args.putInt(ARG_PARENT_NUM_COMMENTS, parentNumComments);
@@ -58,7 +58,7 @@ public class CommentReplyActivity extends Activity implements OnCommentReplyForm
         args.putString(ARG_REPLY_THING_ID, replyThingId);
         args.putInt(ARG_NESTING, nesting);
         args.putInt(ARG_SEQUENCE, sequence);
-        args.putString(ARG_SESSION_ID, sessionId);
+        args.putLong(ARG_SESSION_ID, sessionId);
         return args;
     }
 
@@ -97,7 +97,7 @@ public class CommentReplyActivity extends Activity implements OnCommentReplyForm
         String replyThingId = replyArgs.getString(ARG_REPLY_THING_ID);
         int nesting = replyArgs.getInt(ARG_NESTING);
         int sequence = replyArgs.getInt(ARG_SEQUENCE);
-        String sessionId = replyArgs.getString(ARG_SESSION_ID);
+        long sessionId = replyArgs.getLong(ARG_SESSION_ID, -1);
         Provider.insertCommentAsync(this, parentId, parentNumComments, parentThingId, replyThingId,
                 accountName, comment, nesting, sequence, sessionId);
         finish();

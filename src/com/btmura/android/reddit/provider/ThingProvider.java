@@ -36,7 +36,6 @@ import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.SessionIds;
-import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.Votes;
 
@@ -91,13 +90,13 @@ public class ThingProvider extends SessionProvider {
 
     static final String PARAM_LISTING_GET = "getListing";
     static final String PARAM_LISTING_TYPE = "listingType";
-    static final String PARAM_LISTING_REFRESH = "refresh";
 
     public static final String PARAM_COMMENT_REPLY = "commentReply";
     public static final String PARAM_COMMENT_DELETE = "commentDelete";
 
     public static final String PARAM_MESSAGE_REPLY = "messageReply";
 
+    static final String PARAM_SESSION_ID = "sessionId";
     static final String PARAM_ACCOUNT = "account";
     static final String PARAM_SUBREDDIT = "subreddit";
     static final String PARAM_QUERY = "query";
@@ -129,12 +128,12 @@ public class ThingProvider extends SessionProvider {
             + Votes.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")";
 
-    public static final Uri subredditUri(String accountName, String subreddit, int filter,
-            String more, boolean refresh) {
+    public static final Uri subredditUri(long sessionId, String accountName, String subreddit,
+            int filter, String more) {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_SUBREDDIT_LISTING));
-        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_SUBREDDIT_LISTING));
+        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_SUBREDDIT, subreddit);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
@@ -145,27 +144,27 @@ public class ThingProvider extends SessionProvider {
         return b.build();
     }
 
-    public static final Uri commentsUri(String accountName, String thingId, String linkId,
-            boolean refresh) {
+    public static final Uri commentsUri(long sessionId, String accountName, String thingId,
+            String linkId) {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_COMMENT_LISTING));
-        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_COMMENT_LISTING));
+        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_THING_ID, thingId);
+        b.appendQueryParameter(PARAM_JOIN, TRUE);
         if (!TextUtils.isEmpty(linkId)) {
             b.appendQueryParameter(PARAM_LINK_ID, linkId);
         }
-        b.appendQueryParameter(PARAM_JOIN, TRUE);
         return b.build();
     }
 
-    public static final Uri profileUri(String accountName, String profileUser, int filter,
-            String more, boolean refresh) {
+    public static final Uri profileUri(long sessionId, String accountName, String profileUser,
+            int filter, String more) {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_USER_LISTING));
-        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_USER_LISTING));
+        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_PROFILE_USER, profileUser);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
@@ -176,50 +175,50 @@ public class ThingProvider extends SessionProvider {
         return b.build();
     }
 
-    public static final Uri searchUri(String accountName, String query, boolean refresh) {
+    public static final Uri searchUri(long sessionId, String accountName, String query) {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_SEARCH_LISTING));
-        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_SEARCH_LISTING));
+        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_QUERY, query);
         b.appendQueryParameter(PARAM_JOIN, TRUE);
         return b.build();
     }
 
-    public static final Uri subredditSearchUri(String accountName, String query, boolean refresh) {
+    public static final Uri subredditSearchUri(long sessionId, String accountName, String query) {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_REDDIT_SEARCH_LISTING));
-        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_REDDIT_SEARCH_LISTING));
+        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_QUERY, query);
         return b.build();
     }
 
-    public static final Uri messageInboxUri(String accountName, boolean refresh) {
+    public static final Uri messageInboxUri(long sessionId, String accountName) {
         Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_INBOX_LISTING));
-        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_INBOX_LISTING));
+        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         return b.build();
     }
 
-    public static final Uri messageSentUri(String accountName, boolean refresh) {
+    public static final Uri messageSentUri(long sessionId, String accountName) {
         Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_SENT_LISTING));
-        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_SENT_LISTING));
+        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         return b.build();
     }
 
-    public static final Uri messageThreadUri(String accountName, String thingId, boolean refresh) {
+    public static final Uri messageThreadUri(long sessionId, String accountName, String thingId) {
         Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_THREAD_LISTING));
-        b.appendQueryParameter(PARAM_LISTING_REFRESH, toString(refresh));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_THREAD_LISTING));
+        b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_THING_ID, thingId);
         return b.build();
@@ -283,14 +282,14 @@ public class ThingProvider extends SessionProvider {
             String[] selectionArgs) {
         try {
             Context context = getContext();
+            long sessionId = getLongParameter(uri, PARAM_SESSION_ID, -1);
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String subreddit = uri.getQueryParameter(PARAM_SUBREDDIT);
             String query = uri.getQueryParameter(PARAM_QUERY);
             String profileUser = uri.getQueryParameter(PARAM_PROFILE_USER);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
             String linkId = uri.getQueryParameter(PARAM_LINK_ID);
-            String filterParameter = uri.getQueryParameter(PARAM_FILTER);
-            int filter = filterParameter != null ? Integer.parseInt(filterParameter) : 0;
+            int filter = getIntParameter(uri, PARAM_FILTER, 0);
             String more = uri.getQueryParameter(PARAM_MORE);
 
             String cookie = AccountUtils.getCookie(context, accountName);
@@ -301,38 +300,38 @@ public class ThingProvider extends SessionProvider {
             int listingType = Integer.parseInt(uri.getQueryParameter(PARAM_LISTING_TYPE));
             Listing listing = null;
             switch (listingType) {
-                case Sessions.TYPE_MESSAGE_THREAD_LISTING:
+                case Listing.TYPE_MESSAGE_THREAD_LISTING:
                     listing = MessageListing.newThreadInstance(accountName, thingId, cookie, helper);
                     break;
 
-                case Sessions.TYPE_MESSAGE_INBOX_LISTING:
+                case Listing.TYPE_MESSAGE_INBOX_LISTING:
                     listing = MessageListing.newInboxInstance(accountName, cookie);
                     break;
 
-                case Sessions.TYPE_MESSAGE_SENT_LISTING:
+                case Listing.TYPE_MESSAGE_SENT_LISTING:
                     listing = MessageListing.newSentInstance(accountName, cookie);
                     break;
 
-                case Sessions.TYPE_SUBREDDIT_LISTING:
+                case Listing.TYPE_SUBREDDIT_LISTING:
                     listing = ThingListing.newSubredditInstance(context, accountName, subreddit,
                             filter, more, cookie);
                     break;
 
-                case Sessions.TYPE_USER_LISTING:
+                case Listing.TYPE_USER_LISTING:
                     listing = ThingListing.newUserInstance(context, accountName, profileUser,
                             filter, more, cookie);
                     break;
 
-                case Sessions.TYPE_COMMENT_LISTING:
+                case Listing.TYPE_COMMENT_LISTING:
                     listing = CommentListing.newInstance(context, helper, accountName, thingId,
                             linkId, cookie);
                     break;
 
-                case Sessions.TYPE_SEARCH_LISTING:
+                case Listing.TYPE_SEARCH_LISTING:
                     listing = ThingListing.newSearchInstance(context, accountName, query, cookie);
                     break;
 
-                case Sessions.TYPE_REDDIT_SEARCH_LISTING:
+                case Listing.TYPE_REDDIT_SEARCH_LISTING:
                     listing = SubredditSearchListing.newInstance(accountName, query, cookie);
                     break;
 
@@ -340,8 +339,7 @@ public class ThingProvider extends SessionProvider {
                     throw new IllegalArgumentException();
             }
 
-            boolean refresh = uri.getBooleanQueryParameter(PARAM_LISTING_REFRESH, false);
-            long sessionId = getListingSession(listing, db, refresh);
+            sessionId = getListingSession(listing, db, sessionId);
 
             Selection newSelection = new Selection();
             newSelection.selection = appendSelection(selection, SessionIds.SELECT_BY_SESSION_ID);

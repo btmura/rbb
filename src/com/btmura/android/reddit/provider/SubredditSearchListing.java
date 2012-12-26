@@ -27,7 +27,6 @@ import android.content.ContentValues;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
@@ -55,16 +54,12 @@ class SubredditSearchListing extends JsonParser implements Listing {
         this.cookie = cookie;
     }
 
-    public int getType() {
-        return Sessions.TYPE_REDDIT_SEARCH_LISTING;
-    }
-
-    public String getKey() {
-        return query;
-    }
-
     public String getTargetTable() {
         return Things.TABLE_NAME;
+    }
+
+    public boolean isAppend() {
+        return false;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

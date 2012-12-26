@@ -54,23 +54,23 @@ public class SubredditAdapter extends BaseCursorAdapter {
 
     private String selectedSubreddit;
 
-    public static Loader<Cursor> getLoader(Context context, String accountName, String query,
-            boolean sync) {
-        Uri uri = getUri(accountName, query, sync);
+    public static Loader<Cursor> getLoader(Context context, long sessionId, String accountName,
+            String query) {
+        Uri uri = getUri(sessionId, accountName, query);
         return getLoader(context, uri, accountName, query);
     }
 
-    public static void updateLoader(Context context, Loader<Cursor> loader, String accountName,
-            String query, boolean sync) {
+    public static void updateLoader(Context context, Loader<Cursor> loader, long sessionId,
+            String accountName, String query) {
         if (loader instanceof CursorLoader) {
             CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(accountName, query, sync));
+            cl.setUri(getUri(sessionId, accountName, query));
         }
     }
 
-    private static Uri getUri(String accountName, String query, boolean refresh) {
+    private static Uri getUri(long sessionId, String accountName, String query) {
         if (!TextUtils.isEmpty(query)) {
-            return ThingProvider.subredditSearchUri(accountName, query, refresh);
+            return ThingProvider.subredditSearchUri(sessionId, accountName, query);
         }
         return SubredditProvider.SUBREDDITS_URI;
     }
