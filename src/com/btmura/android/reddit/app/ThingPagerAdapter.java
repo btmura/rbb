@@ -32,11 +32,11 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
     public static final int TYPE_LINK = 0;
     public static final int TYPE_COMMENTS = 1;
-    public static final int TYPE_MESSAGE = 2;
+    public static final int TYPE_MESSAGE_THREAD = 2;
 
     public static final int PAGE_LINK = TYPE_LINK;
     public static final int PAGE_COMMENTS = TYPE_COMMENTS;
-    public static final int PAGE_MESSAGE = 0;
+    public static final int PAGE_MESSAGE_THREAD = 0;
 
     private final ArrayList<Integer> pages = new ArrayList<Integer>(2);
     private final ArrayList<Integer> oldPages = new ArrayList<Integer>(2);
@@ -63,7 +63,7 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
     private void setupPages(Bundle thingBundle) {
         if (ThingBundle.hasNoComments(thingBundle)) {
-            addPage(TYPE_MESSAGE);
+            addPage(TYPE_MESSAGE_THREAD);
         } else {
             if (ThingBundle.hasLinkUrl(thingBundle)) {
                 addPage(TYPE_LINK);
@@ -151,7 +151,7 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
                         ThingBundle.getCommentUrl(thingBundle),
                         clfFlags);
 
-            case TYPE_MESSAGE:
+            case TYPE_MESSAGE_THREAD:
                 return ThingListFragment.newMessageMessagesInstance(accountName,
                         ThingBundle.getThingId(thingBundle),
                         0);
