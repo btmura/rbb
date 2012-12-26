@@ -27,7 +27,7 @@ public class Accounts implements BaseColumns {
     public static final String TABLE_NAME = "accounts";
 
     /** Account name of the account. */
-    public static final String COLUMN_ACCOUNT = Votes.COLUMN_ACCOUNT;
+    public static final String COLUMN_ACCOUNT = VoteActions.COLUMN_ACCOUNT;
 
     /** Integer either 0 or 1 indicating whether the account has mail. */
     public static final String COLUMN_HAS_MAIL = "hasMail";

@@ -32,7 +32,7 @@ import android.text.TextUtils.TruncateAt;
 import android.view.MotionEvent;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.database.Votes;
+import com.btmura.android.reddit.database.VoteActions;
 
 class VotingArrows {
 
@@ -146,11 +146,11 @@ class VotingArrows {
         int scorePaintIndex = NEUTRAL;
         int downPaintIndex = NEUTRAL;
         switch (likes) {
-            case Votes.VOTE_UP:
+            case VoteActions.VOTE_UP:
                 upPaintIndex = scorePaintIndex = UP;
                 break;
 
-            case Votes.VOTE_DOWN:
+            case VoteActions.VOTE_DOWN:
                 scorePaintIndex = downPaintIndex = DOWN;
                 break;
         }
@@ -210,11 +210,11 @@ class VotingArrows {
             int event = getEvent(e, top, left, drawArrows, drawScore, isVotable);
             switch (event) {
                 case EVENT_UPVOTE:
-                    listener.onVote(thingId, Votes.VOTE_UP);
+                    listener.onVote(thingId, VoteActions.VOTE_UP);
                     return true;
 
                 case EVENT_DOWNVOTE:
-                    listener.onVote(thingId, Votes.VOTE_DOWN);
+                    listener.onVote(thingId, VoteActions.VOTE_DOWN);
                     return true;
             }
         }

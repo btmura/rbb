@@ -20,12 +20,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
- * {@link Votes} is a table that stores pending upvotes and downvotes before
+ * {@link VoteActions} is a table that stores pending upvotes and downvotes before
  * they are synced back to the server.
  */
-public class Votes implements BaseColumns {
+public class VoteActions implements BaseColumns {
 
-    public static final String TABLE_NAME = "votes";
+    public static final String TABLE_NAME = "voteActions";
 
     /** Account that liked this thing. */
     public static final String COLUMN_ACCOUNT = "account";

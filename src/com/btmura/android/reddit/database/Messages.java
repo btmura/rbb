@@ -23,7 +23,7 @@ public class Messages implements BaseColumns {
     public static final String TABLE_NAME = "messages";
 
     /** Account for joining with the votes table. */
-    public static final String COLUMN_ACCOUNT = Votes.COLUMN_ACCOUNT;
+    public static final String COLUMN_ACCOUNT = VoteActions.COLUMN_ACCOUNT;
 
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_BODY = "body";
@@ -35,9 +35,9 @@ public class Messages implements BaseColumns {
     public static final String COLUMN_SESSION_ID = SessionIds.COLUMN_SESSION_ID;
 
     public static final String COLUMN_SUBREDDIT = "subreddit";
-    public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
+    public static final String COLUMN_THING_ID = VoteActions.COLUMN_THING_ID;
     public static final String COLUMN_WAS_COMMENT = "wasComment";
-    public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
+    public static final String COLUMN_VOTE = VoteActions.COLUMN_VOTE;
 
     public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
 

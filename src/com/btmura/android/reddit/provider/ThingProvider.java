@@ -38,7 +38,7 @@ import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.SessionIds;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.database.Votes;
+import com.btmura.android.reddit.database.VoteActions;
 
 /**
  * URI MATCHING PATTERNS:
@@ -124,11 +124,11 @@ public class ThingProvider extends SessionProvider {
 
             // Join with pending votes to fake that the vote happened.
             + " LEFT OUTER JOIN (SELECT "
-            + Votes.COLUMN_ACCOUNT + ", "
-            + Votes.COLUMN_THING_ID + ", "
-            + Votes.COLUMN_VOTE
-            + " FROM " + Votes.TABLE_NAME + ") USING ("
-            + Votes.COLUMN_ACCOUNT + ", "
+            + VoteActions.COLUMN_ACCOUNT + ", "
+            + VoteActions.COLUMN_THING_ID + ", "
+            + VoteActions.COLUMN_VOTE
+            + " FROM " + VoteActions.TABLE_NAME + ") USING ("
+            + VoteActions.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")";
 
     public static final Uri subredditUri(long sessionId, String accountName, String subreddit,
@@ -274,7 +274,7 @@ public class ThingProvider extends SessionProvider {
                 return Saves.TABLE_NAME;
 
             case MATCH_VOTE_ACTIONS:
-                return Votes.TABLE_NAME;
+                return VoteActions.TABLE_NAME;
 
             default:
                 throw new IllegalArgumentException("uri: " + uri);

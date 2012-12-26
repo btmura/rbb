@@ -45,7 +45,7 @@ import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.database.Votes;
+import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -100,16 +100,16 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int SAVE_ACTION = 2;
 
     private static final String[] VOTE_PROJECTION = {
-            Votes._ID,
-            Votes.COLUMN_THING_ID,
-            Votes.COLUMN_VOTE,
+            VoteActions._ID,
+            VoteActions.COLUMN_THING_ID,
+            VoteActions.COLUMN_VOTE,
     };
 
     private static final int VOTE_ID = 0;
     private static final int VOTE_THING_ID = 1;
     private static final int VOTE_VOTE = 2;
 
-    public static final String SELECT_BY_ACCOUNT = Votes.COLUMN_ACCOUNT + " = ?";
+    public static final String SELECT_BY_ACCOUNT = VoteActions.COLUMN_ACCOUNT + " = ?";
 
     public static final String SORT_BY_ID = BaseColumns._ID + " ASC";
 

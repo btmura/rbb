@@ -34,7 +34,7 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Saves;
 import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.database.Votes;
+import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
 
 public class Provider {
@@ -51,7 +51,7 @@ public class Provider {
     };
 
     private static final String SELECT_SAVES_BY_THING_ID = Saves.COLUMN_THING_ID + "=?";
-    private static final String SELECT_VOTES_BY_THING_ID = Votes.COLUMN_THING_ID + "=?";
+    private static final String SELECT_VOTES_BY_THING_ID = VoteActions.COLUMN_THING_ID + "=?";
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
     public static void insertCommentAsync(Context context,
@@ -290,9 +290,9 @@ public class Provider {
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS, TRUE)
                         .build();
                 ops.add(ContentProviderOperation.newInsert(uri)
-                        .withValue(Votes.COLUMN_ACCOUNT, accountName)
-                        .withValue(Votes.COLUMN_THING_ID, thingId)
-                        .withValue(Votes.COLUMN_VOTE, likes)
+                        .withValue(VoteActions.COLUMN_ACCOUNT, accountName)
+                        .withValue(VoteActions.COLUMN_THING_ID, thingId)
+                        .withValue(VoteActions.COLUMN_VOTE, likes)
                         .build());
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);

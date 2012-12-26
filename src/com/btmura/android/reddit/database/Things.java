@@ -23,7 +23,7 @@ public class Things implements BaseColumns {
     public static final String TABLE_NAME = "things";
 
     /** Account for joining with the votes table. */
-    public static final String COLUMN_ACCOUNT = Votes.COLUMN_ACCOUNT;
+    public static final String COLUMN_ACCOUNT = VoteActions.COLUMN_ACCOUNT;
 
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_BODY = "body";
@@ -55,7 +55,7 @@ public class Things implements BaseColumns {
 
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_TITLE = "title";
-    public static final String COLUMN_THING_ID = Votes.COLUMN_THING_ID;
+    public static final String COLUMN_THING_ID = VoteActions.COLUMN_THING_ID;
     public static final String COLUMN_THUMBNAIL_URL = "thumbnailUrl";
     public static final String COLUMN_UPS = "ups";
     public static final String COLUMN_URL = "url";
@@ -66,7 +66,7 @@ public class Things implements BaseColumns {
      */
     public static final String COLUMN_VISIBLE = "visible";
 
-    public static final String COLUMN_VOTE = Votes.COLUMN_VOTE;
+    public static final String COLUMN_VOTE = VoteActions.COLUMN_VOTE;
 
     /** Deleted comments have an author and body with this string. */
     public static final String DELETED = "[deleted]";

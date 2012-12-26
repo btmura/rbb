@@ -24,7 +24,7 @@ public class MessageActions implements BaseColumns {
     public static final String TABLE_NAME = "messageActions";
 
     /** Account that created or deleted this comment. */
-    public static final String COLUMN_ACCOUNT = Votes.COLUMN_ACCOUNT;
+    public static final String COLUMN_ACCOUNT = VoteActions.COLUMN_ACCOUNT;
 
     /** Action this row represents like adding or deleting. */
     public static final String COLUMN_ACTION = "action";
