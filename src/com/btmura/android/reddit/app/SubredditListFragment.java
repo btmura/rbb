@@ -42,6 +42,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
@@ -173,6 +174,10 @@ public class SubredditListFragment extends ListFragment implements LoaderCallbac
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
+        }
+        Bundle extras = cursor.getExtras();
+        if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
+            sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
         }
         SubredditAdapter.updateLoader(getActivity(), loader, sessionId, accountName, query);
 

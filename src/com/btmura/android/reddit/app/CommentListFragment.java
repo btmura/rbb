@@ -45,6 +45,7 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -160,6 +161,10 @@ public class CommentListFragment extends ListFragment implements LoaderCallbacks
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
+        }
+        Bundle extras = cursor.getExtras();
+        if (extras != null && extras.containsKey(ThingProvider.EXTRA_SESSION_ID)) {
+            sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
         }
         CommentAdapter.updateLoader(getActivity(), loader, sessionId, accountName, thingId, linkId);
 

@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import android.content.ContentValues;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SessionIds;
 import com.btmura.android.reddit.database.Sessions;
@@ -80,6 +82,10 @@ abstract class SessionProvider extends BaseProvider {
                 helper.insert(values.get(i));
             }
             db.setTransactionSuccessful();
+
+            if (BuildConfig.DEBUG) {
+                Log.d(logTag, "created new session: " + sessionId);
+            }
 
             return sessionId;
         } finally {
