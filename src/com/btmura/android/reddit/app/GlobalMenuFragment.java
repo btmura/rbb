@@ -158,12 +158,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     }
 
     private boolean handleSubmitLink() {
-        Intent intent = new Intent(getActivity(), SubmitLinkActivity.class);
-        if (subredditNameHolder != null) {
-            intent.putExtra(SubmitLinkActivity.EXTRA_SUBREDDIT,
-                    subredditNameHolder.getSubredditName());
-        }
-        startActivity(intent);
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_SUBMISSION,
+                subredditNameHolder.getSubredditName().toString(), null);
         return true;
     }
 

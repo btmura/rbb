@@ -79,10 +79,6 @@
         <activity
             android:name=".app.SidebarActivity"
             android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
-        <activity
-            android:name=".app.SubmitLinkActivity"
-            android:label="@string/submit_link_label"
-            android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
         <activity android:name=".app.ThingActivity" />
         <activity android:name=".app.ThingListActivity" />
         <activity android:name=".app.UserProfileActivity" />
