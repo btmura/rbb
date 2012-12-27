@@ -34,9 +34,9 @@ import com.btmura.android.reddit.widget.MessageLoaderAdapter;
 /**
  * {@link ThingProviderListFragment} for showing the messages is a thread.
  */
-public class MessageListFragment extends ThingProviderListFragment {
+public class MessageThreadListFragment extends ThingProviderListFragment {
 
-    public static final String TAG = "MessageListFragment";
+    public static final String TAG = "MessageThreadListFragment";
 
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_ID = "thingId";
@@ -49,12 +49,12 @@ public class MessageListFragment extends ThingProviderListFragment {
 
     private MessageLoaderAdapter adapter;
 
-    public static MessageListFragment newInstance(String accountName, String thingId) {
+    public static MessageThreadListFragment newInstance(String accountName, String thingId) {
         Bundle args = new Bundle(2);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_THING_ID, thingId);
 
-        MessageListFragment frag = new MessageListFragment();
+        MessageThreadListFragment frag = new MessageThreadListFragment();
         frag.setArguments(args);
         return frag;
     }

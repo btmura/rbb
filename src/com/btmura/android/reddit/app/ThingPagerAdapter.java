@@ -157,7 +157,7 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
                         clfFlags);
 
             case TYPE_MESSAGES:
-                return MessageListFragment.newInstance(accountName,
+                return MessageThreadListFragment.newInstance(accountName,
                         ThingBundle.getThingId(thingBundle));
 
             default:

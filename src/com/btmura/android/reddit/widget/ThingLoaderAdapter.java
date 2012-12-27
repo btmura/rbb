@@ -17,14 +17,15 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
@@ -32,9 +33,8 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.widget.ThingAdapter.ProviderAdapter;
 
-class ThingProviderAdapter extends ProviderAdapter {
+public class ThingLoaderAdapter extends BaseLoaderAdapter {
 
     private static final String[] PROJECTION = {
             Things._ID,
@@ -91,22 +91,28 @@ class ThingProviderAdapter extends ProviderAdapter {
     private static final int INDEX_SAVE_ACTION = 22;
     private static final int INDEX_VOTE = 23;
 
-    @Override
-    Uri getLoaderUri(Bundle args) {
-        long sessionId = getSessionId(args);
-        String accountName = getAccountName(args);
-        String subreddit = getSubreddit(args);
-        String profileUser = getProfileUser(args);
-        String query = getQuery(args);
-        int filter = getFilter(args);
-        String more = getMore(args);
+    private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
+    private final String profileUser;
 
+    public ThingLoaderAdapter(Context context, String subreddit, String query, String profileUser) {
+        super(context, query);
+        this.subreddit = subreddit;
+        this.profileUser = profileUser;
+    }
+
+    @Override
+    public boolean isLoadable() {
+        return accountName != null && (subreddit != null || query != null || profileUser != null);
+    }
+
+    @Override
+    protected Uri getLoaderUri() {
         // Empty but non-null subreddit means front page.
         if (subreddit != null) {
             return ThingProvider.subredditUri(sessionId, accountName, subreddit, filter, more);
         } else if (!TextUtils.isEmpty(profileUser)) {
             return ThingProvider.profileUri(sessionId, accountName, profileUser, filter, more);
-        } else if (!TextUtils.isEmpty(getQuery(args))) {
+        } else if (!TextUtils.isEmpty(query)) {
             return ThingProvider.searchUri(sessionId, accountName, query);
         } else {
             throw new IllegalArgumentException();
@@ -114,78 +120,65 @@ class ThingProviderAdapter extends ProviderAdapter {
     }
 
     @Override
-    Loader<Cursor> getLoader(Context context, Uri uri, Bundle args) {
-        return new CursorLoader(context, uri, PROJECTION, null, null, null);
+    protected String[] getProjection() {
+        return PROJECTION;
     }
 
     @Override
-    boolean isLoadable(Bundle args) {
-        return getAccountName(args) != null
-                && (getSubreddit(args) != null
-                        || getQuery(args) != null
-                        || getProfileUser(args) != null);
+    public String getAuthor(int position) {
+        return getString(position, INDEX_AUTHOR);
     }
 
     @Override
-    String getThingId(ThingAdapter adapter, int position) {
-        return adapter.getString(position, INDEX_THING_ID);
+    public Bundle getReplyExtras(int position) {
+        return null;
     }
 
     @Override
-    String getLinkId(ThingAdapter adapter, int position) {
-        return adapter.getString(position, INDEX_LINK_ID);
+    public String getThingId(int position) {
+        return getString(position, INDEX_THING_ID);
     }
 
     @Override
-    String getAuthor(ThingAdapter adapter, int position) {
-        return adapter.getString(position, INDEX_AUTHOR);
+    public String getLinkId(int position) {
+        return getString(position, INDEX_LINK_ID);
     }
 
     @Override
-    boolean isSaved(ThingAdapter adapter, int position) {
-        return adapter.getBoolean(position, INDEX_SAVED)
-                || adapter.getInt(position, INDEX_SAVE_ACTION) == SaveActions.ACTION_SAVE;
+    public boolean isSaved(int position) {
+        return getBoolean(position, INDEX_SAVED)
+                || getInt(position, INDEX_SAVE_ACTION) == SaveActions.ACTION_SAVE;
     }
 
     @Override
-    String getTitle(ThingAdapter adapter, int position) {
+    public String getTitle(int position) {
         // Link and comment posts have a title.
-        String title = adapter.getString(position, INDEX_TITLE);
+        String title = getString(position, INDEX_TITLE);
         if (!TextUtils.isEmpty(title)) {
             return title;
         }
 
         // CommentActions don't have titles so use the body.
-        return adapter.getString(position, INDEX_BODY);
+        return getString(position, INDEX_BODY);
     }
 
     @Override
-    CharSequence getUrl(ThingAdapter adapter, int position) {
+    public CharSequence getUrl(int position) {
         // Most things and comments have the url attribute set.
-        String url = adapter.getString(position, INDEX_URL);
+        String url = getString(position, INDEX_URL);
         if (!TextUtils.isEmpty(url)) {
             return url;
         }
 
         // Comment references just provide a thing and link id.
-        String thingId = adapter.getString(position, INDEX_THING_ID);
-        String linkId = adapter.getString(position, INDEX_LINK_ID);
+        String thingId = getThingId(position);
+        String linkId = getLinkId(position);
         return Urls.commentListing(thingId, linkId, Urls.TYPE_HTML);
     }
 
     @Override
-    int getKind(ThingAdapter adapter, int position) {
-        return adapter.getInt(position, INDEX_KIND);
-    }
-
-    @Override
-    Bundle getReplyExtras(ThingAdapter adapter, Bundle args, int position) {
-        return null;
-    }
-
-    @Override
-    String getMoreThingId(ThingAdapter adapter) {
-        Cursor c = adapter.getCursor();
+    public String getMore() {
+        Cursor c = getCursor();
         if (c != null && c.moveToLast()) {
             if (c.getInt(INDEX_KIND) == Kinds.KIND_MORE) {
                 return c.getString(INDEX_THING_ID);
@@ -195,54 +188,84 @@ class ThingProviderAdapter extends ProviderAdapter {
     }
 
     @Override
-    void bindThingView(ThingAdapter adapter, View view, Context context, Cursor cursor) {
-        String author = cursor.getString(INDEX_AUTHOR);
-        String body = cursor.getString(INDEX_BODY);
-        long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
-        String domain = cursor.getString(INDEX_DOMAIN);
-        int downs = cursor.getInt(INDEX_DOWNS);
-        int kind = cursor.getInt(INDEX_KIND);
-        String linkId = cursor.getString(INDEX_LINK_ID);
-        String linkTitle = cursor.getString(INDEX_LINK_TITLE);
-        int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
-        boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
-        int score = cursor.getInt(INDEX_SCORE);
-        String subreddit = cursor.getString(INDEX_SUBREDDIT);
-        String thingId = cursor.getString(INDEX_THING_ID);
-        String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
-        String title = cursor.getString(INDEX_TITLE);
-        int ups = cursor.getInt(INDEX_UPS);
-
-        // CommentActions don't have a score so calculate our own.
-        if (kind == Kinds.KIND_COMMENT) {
-            score = ups - downs;
-        }
-
-        // Reconcile local and remote votes.
-        int likes = cursor.getInt(INDEX_LIKES);
-        if (!cursor.isNull(INDEX_VOTE)) {
-            // Local votes take precedence over those from reddit.
-            likes = cursor.getInt(INDEX_VOTE);
-
-            // Modify the score since the vote is still pending and don't go
-            // below 0 since reddit doesn't seem to do that.
-            score = Math.max(0, score + likes);
-        }
-
-        ThingView tv = (ThingView) view;
-        tv.setData(adapter.accountName, author, body, createdUtc, domain, downs, true, kind,
-                likes, linkTitle, 0, adapter.nowTimeMs, numComments, over18,
-                adapter.parentSubreddit, score, subreddit, adapter.thingBodyWidth, thingId,
-                thumbnailUrl, title, ups);
-        tv.setChosen(adapter.singleChoice
-                && Objects.equals(adapter.selectedThingId, thingId)
-                && Objects.equals(adapter.selectedLinkId, linkId));
-        tv.setOnVoteListener(adapter.listener);
-        adapter.thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
+    public int getViewTypeCount() {
+        return 2;
     }
 
     @Override
-    Bundle makeThingBundle(Context context, Cursor c) {
+    public int getItemViewType(int position) {
+        switch (getInt(position, INDEX_KIND)) {
+            case Kinds.KIND_MORE:
+                return 0;
+
+            default:
+                return 1;
+        }
+    }
+
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        switch (getInt(cursor.getPosition(), INDEX_KIND)) {
+            case Kinds.KIND_MORE:
+                LayoutInflater inflater = LayoutInflater.from(context);
+                return inflater.inflate(R.layout.thing_more_row, parent, false);
+
+            default:
+                return new ThingView(context);
+        }
+    }
+
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+        if (view instanceof ThingView) {
+            String author = cursor.getString(INDEX_AUTHOR);
+            String body = cursor.getString(INDEX_BODY);
+            long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
+            String domain = cursor.getString(INDEX_DOMAIN);
+            int downs = cursor.getInt(INDEX_DOWNS);
+            int kind = cursor.getInt(INDEX_KIND);
+            String linkId = cursor.getString(INDEX_LINK_ID);
+            String linkTitle = cursor.getString(INDEX_LINK_TITLE);
+            int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
+            boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
+            int score = cursor.getInt(INDEX_SCORE);
+            String subreddit = cursor.getString(INDEX_SUBREDDIT);
+            String thingId = cursor.getString(INDEX_THING_ID);
+            String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
+            String title = cursor.getString(INDEX_TITLE);
+            int ups = cursor.getInt(INDEX_UPS);
+
+            // CommentActions don't have a score so calculate our own.
+            if (kind == Kinds.KIND_COMMENT) {
+                score = ups - downs;
+            }
+
+            // Reconcile local and remote votes.
+            int likes = cursor.getInt(INDEX_LIKES);
+            if (!cursor.isNull(INDEX_VOTE)) {
+                // Local votes take precedence over those from reddit.
+                likes = cursor.getInt(INDEX_VOTE);
+
+                // Modify the score since the vote is still pending and don't go
+                // below 0 since reddit doesn't seem to do that.
+                score = Math.max(0, score + likes);
+            }
+
+            ThingView tv = (ThingView) view;
+            tv.setData(accountName, author, body, createdUtc, domain, downs, true, kind,
+                    likes, linkTitle, 0, System.currentTimeMillis(), numComments, over18,
+                    parentSubreddit, score, subreddit, thingBodyWidth, thingId,
+                    thumbnailUrl, title, ups);
+            tv.setChosen(singleChoice
+                    && Objects.equals(selectedThingId, thingId)
+                    && Objects.equals(selectedLinkId, linkId));
+            tv.setOnVoteListener(listener);
+            thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
+        }
+    }
+
+    @Override
+    protected Bundle makeThingBundle(Context context, Cursor c) {
         Bundle b = new Bundle(6);
         ThingBundle.putSubreddit(b, c.getString(INDEX_SUBREDDIT));
         ThingBundle.putKind(b, c.getInt(INDEX_KIND));

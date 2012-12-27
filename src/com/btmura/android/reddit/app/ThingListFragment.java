@@ -44,22 +44,51 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
+import com.btmura.android.reddit.widget.MessageThreadLoaderAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
-import com.btmura.android.reddit.widget.ThingAdapter;
+import com.btmura.android.reddit.widget.BaseLoaderAdapter;
+import com.btmura.android.reddit.widget.ThingLoaderAdapter;
 
 public class ThingListFragment extends ThingProviderListFragment implements
-        OnScrollListener,
-        OnVoteListener,
-        MultiChoiceModeListener {
+        OnScrollListener, OnVoteListener, MultiChoiceModeListener {
 
     public static final String TAG = "ThingListFragment";
+
+    /** String argument specifying the account being used. */
+    private static final String ARG_ACCOUNT_NAME = "accountName";
+
+    /** String argument specifying the subreddit to load. */
+    private static final String ARG_SUBREDDIT = "subreddit";
+
+    /** String argument specifying the search query to use. */
+    private static final String ARG_QUERY = "query";
+
+    /** String argument specifying the profileUser profile to load. */
+    private static final String ARG_PROFILE_USER = "profileUser";
+
+    /** String argument specifying whose messages to load. */
+    private static final String ARG_MESSAGE_USER = "messageUser";
+
+    /** Integer argument to filter things, profile, or messages. */
+    private static final String ARG_FILTER = "filter";
+
+    /** String argument that is used to paginate things. */
+    private static final String ARG_MORE = "more";
 
     /** Optional bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
-    private static final String STATE_ADAPTER_ARGS = "adapterArgs";
+    private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
+
+    private static final String STATE_PARENT_SUBREDDIT = "parentSubreddit";
+
+    private static final String STATE_SUBREDDIT = ARG_SUBREDDIT;
+
+    /** String argument specifying session ID of the data. */
+    private static final String STATE_SESSION_ID = "sessionId";
+
     private static final String STATE_SELECTED_THING_ID = "selectedThingId";
     private static final String STATE_SELECTED_LINK_ID = "selectedLinkId";
     private static final String STATE_EMPTY_TEXT = "emptyText";
@@ -72,27 +101,24 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     private OnThingSelectedListener listener;
     private OnSubredditEventListener eventListener;
-    private ThingAdapter adapter;
-    private Bundle adapterArgs;
-    private String selectedThingId;
-    private String selectedLinkId;
+    private BaseLoaderAdapter adapter;
     private int emptyText;
     private boolean scrollLoading;
 
     public static ThingListFragment newSubredditInstance(String accountName, String subreddit,
             int filter, int flags) {
         Bundle args = new Bundle(4);
-        args.putString(ThingAdapter.ARG_ACCOUNT_NAME, accountName);
-        args.putString(ThingAdapter.ARG_SUBREDDIT, subreddit);
-        args.putInt(ThingAdapter.ARG_FILTER, filter);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_SUBREDDIT, subreddit);
+        args.putInt(ARG_FILTER, filter);
         args.putInt(ARG_FLAGS, flags);
         return newFragment(args);
     }
 
     public static ThingListFragment newQueryInstance(String accountName, String query, int flags) {
         Bundle args = new Bundle(3);
-        args.putString(ThingAdapter.ARG_ACCOUNT_NAME, accountName);
-        args.putString(ThingAdapter.ARG_QUERY, query);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
         return newFragment(args);
     }
@@ -100,11 +126,11 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public static ThingListFragment newInstance(String accountName, String query,
             String profileUser, String messageUser, int filter, int flags) {
         Bundle args = new Bundle(6);
-        args.putString(ThingAdapter.ARG_ACCOUNT_NAME, accountName);
-        args.putString(ThingAdapter.ARG_QUERY, query);
-        args.putString(ThingAdapter.ARG_PROFILE_USER, profileUser);
-        args.putString(ThingAdapter.ARG_MESSAGE_USER, messageUser);
-        args.putInt(ThingAdapter.ARG_FILTER, filter);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_QUERY, query);
+        args.putString(ARG_PROFILE_USER, profileUser);
+        args.putString(ARG_MESSAGE_USER, messageUser);
+        args.putInt(ARG_FILTER, filter);
         args.putInt(ARG_FLAGS, flags);
         return newFragment(args);
     }
@@ -130,30 +156,36 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!TextUtils.isEmpty(ThingAdapter.getMessageUser(getArguments()))) {
-            adapter = ThingAdapter.newMessageInstance(getActivity());
+        if (!TextUtils.isEmpty(getArguments().getString(ARG_MESSAGE_USER))) {
+            adapter = new MessageThreadLoaderAdapter(getActivity());
         } else {
-            adapter = ThingAdapter.newThingInstance(getActivity());
+            adapter = new ThingLoaderAdapter(getActivity(),
+                    getArguments().getString(ARG_SUBREDDIT),
+                    getArguments().getString(ARG_QUERY),
+                    getArguments().getString(ARG_PROFILE_USER));
         }
+
+        adapter.setAccountName(getArguments().getString(ARG_ACCOUNT_NAME));
+        adapter.setParentSubreddit(getArguments().getString(ARG_SUBREDDIT));
 
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
         adapter.setSingleChoice(singleChoice);
+        adapter.setOnVoteListener(this);
 
-        if (savedInstanceState == null) {
-            adapterArgs = new Bundle(7);
-            adapterArgs.putAll(getArguments());
-        } else {
-            adapterArgs = savedInstanceState.getBundle(STATE_ADAPTER_ARGS);
-            selectedThingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
-            selectedLinkId = savedInstanceState.getString(STATE_SELECTED_LINK_ID);
+        if (savedInstanceState != null) {
+            adapter.setSessionId(savedInstanceState.getLong(STATE_SESSION_ID));
+            adapter.setAccountName(savedInstanceState.getString(STATE_ACCOUNT_NAME));
+            adapter.setParentSubreddit(savedInstanceState.getString(STATE_PARENT_SUBREDDIT));
+            adapter.setSubreddit(savedInstanceState.getString(STATE_SUBREDDIT));
+
+            String thingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
+            String linkId = savedInstanceState.getString(STATE_SELECTED_LINK_ID);
+            adapter.setSelectedThing(thingId, linkId);
+
             emptyText = savedInstanceState.getInt(STATE_EMPTY_TEXT);
         }
 
-        adapter.setAccountName(ThingAdapter.getAccountName(adapterArgs));
-        adapter.setParentSubreddit(ThingAdapter.getSubreddit(adapterArgs));
-        adapter.setOnVoteListener(this);
-        adapter.setSelectedThing(selectedThingId, selectedLinkId);
         setHasOptionsMenu(true);
     }
 
@@ -183,7 +215,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public void loadIfPossible() {
-        if (adapter.isLoadable(adapterArgs)) {
+        if (adapter.isLoadable()) {
             getLoaderManager().initLoader(0, null, this);
         }
     }
@@ -199,45 +231,23 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onCreateLoader args: " + args);
-        }
         if (args != null) {
-            adapterArgs.putAll(args);
+            adapter.setMore(args.getString(ARG_MORE));
         }
-        return adapter.createLoader(getActivity(), adapterArgs);
+        return adapter.getLoader(getActivity());
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
-        }
-
         // Process ThingProvider results.
         super.onLoadFinished(loader, cursor);
 
         scrollLoading = false;
-        adapterArgs.remove(ThingAdapter.ARG_MORE);
-        adapter.updateLoader(getActivity(), loader, adapterArgs);
-
+        adapter.setMore(null);
+        adapter.updateLoaderUri(getActivity(), loader);
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
         getActivity().invalidateOptionsMenu();
-    }
-
-    @Override
-    protected void onSessionIdLoaded(long sessionId) {
-        adapterArgs.putLong(ThingAdapter.ARG_SESSION_ID, sessionId);
-    }
-
-    @Override
-    protected void onSubredditLoaded(String subreddit) {
-        adapterArgs.putString(ThingAdapter.ARG_SUBREDDIT, subreddit);
-        adapter.setParentSubreddit(subreddit);
-        if (eventListener != null) {
-            eventListener.onSubredditDiscovery(subreddit);
-        }
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -245,10 +255,22 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     @Override
+    protected void onSessionIdLoaded(long sessionId) {
+        adapter.setSessionId(sessionId);
+    }
+
+    @Override
+    protected void onSubredditLoaded(String subreddit) {
+        adapter.setParentSubreddit(subreddit);
+        adapter.setSubreddit(subreddit);
+        if (eventListener != null) {
+            eventListener.onSubredditDiscovery(subreddit);
+        }
+    }
+
+    @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         adapter.setSelectedPosition(position);
-        selectedThingId = adapter.getSelectedThingId();
-        selectedLinkId = adapter.getSelectedLinkId();
         if (listener != null) {
             listener.onThingSelected(adapter.getThingBundle(getActivity(), position));
         }
@@ -265,11 +287,11 @@ public class ThingListFragment extends ThingProviderListFragment implements
         if (firstVisibleItem + visibleItemCount * 2 >= totalItemCount) {
             if (getLoaderManager().getLoader(0) != null) {
                 if (!adapter.isEmpty()) {
-                    String more = adapter.getMoreThingId();
+                    String more = adapter.getMore();
                     if (!TextUtils.isEmpty(more)) {
                         scrollLoading = true;
                         Bundle b = new Bundle(1);
-                        b.putString(ThingAdapter.ARG_MORE, more);
+                        b.putString(ARG_MORE, more);
                         getLoaderManager().restartLoader(0, b, this);
                     }
                 }
@@ -281,7 +303,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLike id: " + thingId + " likes: " + likes);
         }
-        String accountName = ThingAdapter.getAccountName(adapterArgs);
+        String accountName = adapter.getAccountName();
         if (!TextUtils.isEmpty(accountName)) {
             Provider.voteAsync(getActivity(), accountName, thingId, likes);
         }
@@ -295,7 +317,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         int count = getListView().getCheckedItemCount();
-        boolean hasAccount = AccountUtils.isAccount(ThingAdapter.getAccountName(adapterArgs));
+        boolean hasAccount = AccountUtils.isAccount(adapter.getAccountName());
         mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
 
         menu.findItem(R.id.menu_reply).setVisible(hasAccount && count == 1);
@@ -321,9 +343,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_reply:
-                return handleReply(mode);
-
             case R.id.menu_compose_message:
                 return handleComposeMessage(mode);
 
@@ -344,16 +363,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
-    private boolean handleReply(ActionMode mode) {
-        int position = getFirstCheckedPosition();
-        String user = adapter.getAuthor(position);
-        Bundle extras = adapter.getReplyExtras(adapterArgs, position);
-        MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.COMPOSITION_MESSAGE_REPLY, user, extras);
-        mode.finish();
-        return true;
-    }
-
     private boolean handleComposeMessage(ActionMode mode) {
         String user = adapter.getAuthor(getFirstCheckedPosition());
         MenuHelper.startComposeActivity(getActivity(),
@@ -363,7 +372,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     private boolean handleSave(ActionMode mode, int action) {
-        String accountName = ThingAdapter.getAccountName(adapterArgs);
+        String accountName = adapter.getAccountName();
         String thingId = adapter.getThingId(getFirstCheckedPosition());
         Provider.saveAsync(getActivity(), accountName, thingId, action);
         mode.finish();
@@ -398,7 +407,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        String subreddit = ThingAdapter.getSubreddit(adapterArgs);
+        String subreddit = adapter.getSubreddit();
         menu.findItem(R.id.menu_view_subreddit_sidebar)
                 .setVisible(subreddit != null && !Subreddits.isFrontPage(subreddit));
     }
@@ -417,16 +426,19 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     private void handleViewSidebar() {
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, ThingAdapter.getSubreddit(adapterArgs));
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, adapter.getSubreddit());
         startActivity(intent);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBundle(STATE_ADAPTER_ARGS, adapterArgs);
-        outState.putString(STATE_SELECTED_THING_ID, selectedThingId);
-        outState.putString(STATE_SELECTED_LINK_ID, selectedLinkId);
+        outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
+        outState.putString(STATE_ACCOUNT_NAME, adapter.getAccountName());
+        outState.putString(STATE_PARENT_SUBREDDIT, adapter.getParentSubreddit());
+        outState.putString(STATE_SUBREDDIT, adapter.getSubreddit());
+        outState.putString(STATE_SELECTED_THING_ID, adapter.getSelectedThingId());
+        outState.putString(STATE_SELECTED_LINK_ID, adapter.getSelectedLinkId());
         outState.putInt(STATE_EMPTY_TEXT, emptyText);
     }
 
@@ -435,32 +447,29 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public void setAccountName(String accountName) {
-        adapterArgs.putString(ThingAdapter.ARG_ACCOUNT_NAME, accountName);
         adapter.setAccountName(accountName);
     }
 
     public void setSelectedThing(String thingId, String linkId) {
-        selectedThingId = thingId;
-        selectedLinkId = linkId;
         adapter.setSelectedThing(thingId, linkId);
     }
 
     public String getAccountName() {
-        return adapterArgs.getString(ThingAdapter.ARG_ACCOUNT_NAME);
+        return adapter.getAccountName();
     }
 
     public void setSubreddit(String subreddit) {
-        if (!Objects.equalsIgnoreCase(subreddit, ThingAdapter.getSubreddit(adapterArgs))) {
-            adapterArgs.putString(ThingAdapter.ARG_SUBREDDIT, subreddit);
+        if (!Objects.equalsIgnoreCase(subreddit, adapter.getSubreddit())) {
+            adapter.setSubreddit(subreddit);
         }
     }
 
     public String getQuery() {
-        return ThingAdapter.getQuery(adapterArgs);
+        return adapter.getQuery();
     }
 
     public int getFilter() {
-        return ThingAdapter.getFilter(adapterArgs);
+        return adapter.getFilterValue();
     }
 
     private int getFirstCheckedPosition() {

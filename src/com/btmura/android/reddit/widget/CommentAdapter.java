@@ -139,7 +139,7 @@ public class CommentAdapter extends LoaderAdapter {
         // CommentActions don't have a score so calculate our own.
         int score = ups - downs;
 
-        // TODO: Remove code duplication with ThingAdapter.
+        // TODO: Remove code duplication with BaseLoaderAdapter.
         // Local votes take precedence over those from reddit.
         int likes = cursor.getInt(INDEX_LIKES);
         if (!cursor.isNull(INDEX_VOTE)) {

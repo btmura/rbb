@@ -143,9 +143,9 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
 
     private void handleMessageReply(String accountName, String body) {
         Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
-        String parentThingId = extras.getString(MessageListFragment.EXTRA_PARENT_THING_ID);
-        long sessionId = extras.getLong(MessageListFragment.EXTRA_SESSION_ID);
-        String thingId = extras.getString(MessageListFragment.EXTRA_THING_ID);
+        String parentThingId = extras.getString(MessageThreadListFragment.EXTRA_PARENT_THING_ID);
+        long sessionId = extras.getLong(MessageThreadListFragment.EXTRA_SESSION_ID);
+        String thingId = extras.getString(MessageThreadListFragment.EXTRA_THING_ID);
         Provider.insertMessageReplyAsync(this, accountName, body, parentThingId, sessionId, thingId);
         finish();
     }

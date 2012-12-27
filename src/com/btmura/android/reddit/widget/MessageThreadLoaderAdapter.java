@@ -17,21 +17,22 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.widget.ThingAdapter.ProviderAdapter;
 
-class MessageProviderAdapter extends ProviderAdapter {
+public class MessageThreadLoaderAdapter extends BaseLoaderAdapter {
 
     private static final String[] PROJECTION = {
             Messages._ID,
@@ -54,12 +55,18 @@ class MessageProviderAdapter extends ProviderAdapter {
     private static final int INDEX_THING_ID = 7;
     private static final int INDEX_WAS_COMMENT = 8;
 
-    @Override
-    Uri getLoaderUri(Bundle args) {
-        long sessionId = getSessionId(args);
-        String accountName = getAccountName(args);
+    public MessageThreadLoaderAdapter(Context context) {
+        super(context, null);
+    }
 
-        switch (getFilter(args)) {
+    @Override
+    public boolean isLoadable() {
+        return accountName != null;
+    }
+
+    @Override
+    protected Uri getLoaderUri() {
+        switch (filter) {
             case FilterAdapter.MESSAGE_INBOX:
                 return ThingProvider.messageInboxUri(sessionId, accountName);
 
@@ -67,102 +74,117 @@ class MessageProviderAdapter extends ProviderAdapter {
                 return ThingProvider.messageSentUri(sessionId, accountName);
 
             default:
-                throw new IllegalStateException();
+                throw new IllegalArgumentException();
         }
     }
 
     @Override
-    Loader<Cursor> getLoader(Context context, Uri uri, Bundle args) {
-        return new CursorLoader(context, uri, PROJECTION, null, null, null);
+    protected String[] getProjection() {
+        return PROJECTION;
     }
 
     @Override
-    boolean isLoadable(Bundle args) {
-        return getAccountName(args) != null && getMessageUser(args) != null;
+    public String getAuthor(int position) {
+        return getString(position, INDEX_AUTHOR);
     }
 
     @Override
-    String getThingId(ThingAdapter adapter, int position) {
-        return adapter.getString(position, INDEX_THING_ID);
-    }
-
-    @Override
-    String getLinkId(ThingAdapter adapter, int position) {
+    public String getLinkId(int position) {
         return null; // Messages don't have link ids.
     }
 
     @Override
-    String getAuthor(ThingAdapter adapter, int position) {
-        return adapter.getString(position, INDEX_AUTHOR);
+    public Bundle getReplyExtras(int position) {
+        return null;
     }
 
     @Override
-    boolean isSaved(ThingAdapter adapter, int position) {
+    public boolean isSaved(int position) {
         return false;
     }
 
     @Override
-    String getTitle(ThingAdapter adapter, int position) {
-        return adapter.getString(position, INDEX_BODY);
+    public String getThingId(int position) {
+        return getString(position, INDEX_THING_ID);
     }
 
     @Override
-    CharSequence getUrl(ThingAdapter adapter, int position) {
+    public String getTitle(int position) {
+        return getString(position, INDEX_BODY);
+    }
+
+    @Override
+    public CharSequence getUrl(int position) {
         // Comment reply messages have a context url we can use.
-        String context = adapter.getString(position, INDEX_CONTEXT);
+        String context = getString(position, INDEX_CONTEXT);
         if (!TextUtils.isEmpty(context)) {
             return Urls.perma(context, null);
         }
 
         // Assume this is a raw message.
-        return Urls.messageThread(getThingId(adapter, position), Urls.TYPE_HTML);
+        return Urls.messageThread(getThingId(position), Urls.TYPE_HTML);
     }
 
     @Override
-    int getKind(ThingAdapter adapter, int position) {
-        return adapter.getInt(position, INDEX_KIND);
+    public int getViewTypeCount() {
+        return 2;
     }
 
     @Override
-    Bundle getReplyExtras(ThingAdapter adapter, Bundle args, int position) {
-        return null;
+    public int getItemViewType(int position) {
+        switch (getInt(position, INDEX_KIND)) {
+            case Kinds.KIND_MORE:
+                return 0;
+
+            default:
+                return 1;
+        }
     }
 
     @Override
-    String getMoreThingId(ThingAdapter adapter) {
-        return null; // Pagination not supported in messages.
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        switch (getInt(cursor.getPosition(), INDEX_KIND)) {
+            case Kinds.KIND_MORE:
+                LayoutInflater inflater = LayoutInflater.from(context);
+                return inflater.inflate(R.layout.thing_more_row, parent, false);
+
+            default:
+                return new ThingView(context);
+        }
     }
 
     @Override
-    void bindThingView(ThingAdapter adapter, View view, Context context, Cursor cursor) {
-        String author = cursor.getString(INDEX_AUTHOR);
-        String body = cursor.getString(INDEX_BODY);
-        long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
-        int kind = cursor.getInt(INDEX_KIND);
-        String subreddit = cursor.getString(INDEX_SUBREDDIT);
-        String thingId = cursor.getString(INDEX_THING_ID);
+    public void bindView(View view, Context context, Cursor cursor) {
+        if (view instanceof ThingView) {
+            String author = cursor.getString(INDEX_AUTHOR);
+            String body = cursor.getString(INDEX_BODY);
+            long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
+            int kind = cursor.getInt(INDEX_KIND);
+            String subreddit = cursor.getString(INDEX_SUBREDDIT);
+            String thingId = cursor.getString(INDEX_THING_ID);
 
-        ThingView tv = (ThingView) view;
-        tv.setData(adapter.accountName, author, body, createdUtc, null, 0, true, kind, 0,
-                null, 0, adapter.nowTimeMs, 0, false, adapter.parentSubreddit, 0, subreddit,
-                adapter.thingBodyWidth, thingId, null, null, 0);
-        tv.setChosen(adapter.singleChoice && Objects.equals(adapter.selectedThingId, thingId));
-        tv.setOnVoteListener(adapter.listener);
+            ThingView tv = (ThingView) view;
+            tv.setData(accountName, author, body, createdUtc, null, 0, true, kind, 0,
+                    null, 0, System.currentTimeMillis(), 0, false, parentSubreddit, 0, subreddit,
+                    thingBodyWidth, thingId, null, null, 0);
+            tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
+            tv.setOnVoteListener(listener);
+        }
     }
 
     @Override
-    Bundle makeThingBundle(Context context, Cursor cursor) {
+    protected Bundle makeThingBundle(Context context, Cursor c) {
         Bundle b = new Bundle(5);
-        ThingBundle.putSubreddit(b, cursor.getString(INDEX_SUBREDDIT));
-        ThingBundle.putKind(b, cursor.getInt(INDEX_KIND));
+        ThingBundle.putSubreddit(b, c.getString(INDEX_SUBREDDIT));
+        ThingBundle.putKind(b, c.getInt(INDEX_KIND));
 
         // Messages don't have titles so use the body for both.
-        String body = cursor.getString(INDEX_BODY);
+        String body = c.getString(INDEX_BODY);
         ThingBundle.putTitle(b, body);
 
-        ThingBundle.putThingId(b, cursor.getString(INDEX_THING_ID));
+        ThingBundle.putThingId(b, c.getString(INDEX_THING_ID));
 
-        String contextUrl = cursor.getString(INDEX_CONTEXT);
+        String contextUrl = c.getString(INDEX_CONTEXT);
         if (!TextUtils.isEmpty(contextUrl)) {
             // If there is a context url, then we have to parse that url to grab
             // the link id embedded inside of it like:
@@ -176,7 +198,7 @@ class MessageProviderAdapter extends ProviderAdapter {
 
         // If this message isn't a comment, then it's simply a message with no
         // comments or links.
-        ThingBundle.putNoComments(b, cursor.getInt(INDEX_WAS_COMMENT) == 0);
+        ThingBundle.putNoComments(b, c.getInt(INDEX_WAS_COMMENT) == 0);
 
         return b;
     }
