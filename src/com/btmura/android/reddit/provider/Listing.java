@@ -25,13 +25,12 @@ import android.os.Bundle;
 interface Listing {
 
     public static final int TYPE_MESSAGE_THREAD_LISTING = 0;
-    public static final int TYPE_MESSAGE_INBOX_LISTING = 1;
-    public static final int TYPE_MESSAGE_SENT_LISTING = 2;
-    public static final int TYPE_SUBREDDIT_LISTING = 3;
-    public static final int TYPE_USER_LISTING = 4;
-    public static final int TYPE_COMMENT_LISTING = 5;
-    public static final int TYPE_SEARCH_LISTING = 6;
-    public static final int TYPE_REDDIT_SEARCH_LISTING = 7;
+    public static final int TYPE_MESSAGE_LISTING = 1;
+    public static final int TYPE_SUBREDDIT_LISTING = 2;
+    public static final int TYPE_USER_LISTING = 3;
+    public static final int TYPE_COMMENT_LISTING = 4;
+    public static final int TYPE_SEARCH_LISTING = 5;
+    public static final int TYPE_REDDIT_SEARCH_LISTING = 6;
 
     ArrayList<ContentValues> getValues() throws IOException;
 

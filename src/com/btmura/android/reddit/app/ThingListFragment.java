@@ -44,10 +44,8 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.widget.MessageThreadLoaderAdapter;
+import com.btmura.android.reddit.widget.ThingAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
-import com.btmura.android.reddit.widget.BaseLoaderAdapter;
-import com.btmura.android.reddit.widget.ThingLoaderAdapter;
 
 public class ThingListFragment extends ThingProviderListFragment implements
         OnScrollListener, OnVoteListener, MultiChoiceModeListener {
@@ -101,7 +99,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     private OnThingSelectedListener listener;
     private OnSubredditEventListener eventListener;
-    private BaseLoaderAdapter adapter;
+    private ThingAdapter adapter;
     private int emptyText;
     private boolean scrollLoading;
 
@@ -156,22 +154,19 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!TextUtils.isEmpty(getArguments().getString(ARG_MESSAGE_USER))) {
-            adapter = new MessageThreadLoaderAdapter(getActivity());
-        } else {
-            adapter = new ThingLoaderAdapter(getActivity(),
-                    getArguments().getString(ARG_SUBREDDIT),
-                    getArguments().getString(ARG_QUERY),
-                    getArguments().getString(ARG_PROFILE_USER));
-        }
+        int flags = getArguments().getInt(ARG_FLAGS);
+        boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
+
+        adapter = new ThingAdapter(getActivity(),
+                getArguments().getString(ARG_SUBREDDIT),
+                getArguments().getString(ARG_QUERY),
+                getArguments().getString(ARG_PROFILE_USER),
+                getArguments().getString(ARG_MESSAGE_USER),
+                getArguments().getInt(ARG_FILTER),
+                this, singleChoice);
 
         adapter.setAccountName(getArguments().getString(ARG_ACCOUNT_NAME));
         adapter.setParentSubreddit(getArguments().getString(ARG_SUBREDDIT));
-
-        int flags = getArguments().getInt(ARG_FLAGS);
-        boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
-        adapter.setSingleChoice(singleChoice);
-        adapter.setOnVoteListener(this);
 
         if (savedInstanceState != null) {
             adapter.setSessionId(savedInstanceState.getLong(STATE_SESSION_ID));
@@ -287,7 +282,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         if (firstVisibleItem + visibleItemCount * 2 >= totalItemCount) {
             if (getLoaderManager().getLoader(0) != null) {
                 if (!adapter.isEmpty()) {
-                    String more = adapter.getMore();
+                    String more = adapter.getNextMore();
                     if (!TextUtils.isEmpty(more)) {
                         scrollLoading = true;
                         Bundle b = new Bundle(1);

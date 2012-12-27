@@ -29,10 +29,10 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.widget.MessageLoaderAdapter;
+import com.btmura.android.reddit.widget.MessageThreadAdapter;
 
 /**
- * {@link ThingProviderListFragment} for showing the messages is a thread.
+ * {@link ThingProviderListFragment} for showing the messages in a thread.
  */
 public class MessageThreadListFragment extends ThingProviderListFragment {
 
@@ -47,7 +47,7 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
     public static final String EXTRA_SESSION_ID = "sessionId";
     public static final String EXTRA_THING_ID = "thingId";
 
-    private MessageLoaderAdapter adapter;
+    private MessageThreadAdapter adapter;
 
     public static MessageThreadListFragment newInstance(String accountName, String thingId) {
         Bundle args = new Bundle(2);
@@ -62,7 +62,7 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new MessageLoaderAdapter(getActivity());
+        adapter = new MessageThreadAdapter(getActivity());
         adapter.setAccountName(getArguments().getString(ARG_ACCOUNT_NAME));
         adapter.setThingId(getArguments().getString(ARG_THING_ID));
         if (savedInstanceState != null) {

@@ -39,7 +39,6 @@ import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 class MessageListing extends JsonParser implements Listing {
 
@@ -48,6 +47,8 @@ class MessageListing extends JsonParser implements Listing {
     private final int listingType;
     private final String accountName;
     private final String thingId;
+    private final int filter;
+    private final String more;
     private final String cookie;
     private final SQLiteOpenHelper dbHelper;
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>();
@@ -55,30 +56,26 @@ class MessageListing extends JsonParser implements Listing {
     private long networkTimeMs;
     private long parseTimeMs;
 
-    /** Returns a listing for an inbox. */
-    static MessageListing newInboxInstance(String accountName, String cookie) {
-        return new MessageListing(Listing.TYPE_MESSAGE_INBOX_LISTING,
-                accountName, null, cookie, null);
-    }
-
-    /** Returns a listing for sent messages. */
-    static MessageListing newSentInstance(String accountName, String cookie) {
-        return new MessageListing(Listing.TYPE_MESSAGE_SENT_LISTING,
-                accountName, null, cookie, null);
+    /** Returns a listing of messages for inbox or sent. */
+    static MessageListing newInstance(String accountName, int filter, String more, String cookie) {
+        return new MessageListing(Listing.TYPE_MESSAGE_LISTING,
+                accountName, null, filter, more, cookie, null);
     }
 
     /** Returns an instance for a message thread. */
     static MessageListing newThreadInstance(String accountName, String thingId, String cookie,
             SQLiteOpenHelper dbHelper) {
         return new MessageListing(Listing.TYPE_MESSAGE_THREAD_LISTING,
-                accountName, thingId, cookie, dbHelper);
+                accountName, thingId, 0, null, cookie, dbHelper);
     }
 
-    private MessageListing(int listingType, String accountName, String thingId, String cookie,
-            SQLiteOpenHelper dbHelper) {
+    private MessageListing(int listingType, String accountName, String thingId, int filter,
+            String more, String cookie, SQLiteOpenHelper dbHelper) {
         this.listingType = listingType;
         this.accountName = accountName;
         this.thingId = thingId;
+        this.filter = filter;
+        this.more = more;
         this.cookie = cookie;
         this.dbHelper = dbHelper;
     }
@@ -105,11 +102,8 @@ class MessageListing extends JsonParser implements Listing {
 
     private CharSequence getUrl() {
         switch (listingType) {
-            case Listing.TYPE_MESSAGE_INBOX_LISTING:
-                return Urls.message(FilterAdapter.MESSAGE_INBOX, null);
-
-            case Listing.TYPE_MESSAGE_SENT_LISTING:
-                return Urls.message(FilterAdapter.MESSAGE_SENT, null);
+            case Listing.TYPE_MESSAGE_LISTING:
+                return Urls.message(filter, more);
 
             case Listing.TYPE_MESSAGE_THREAD_LISTING:
                 return Urls.messageThread(thingId, Urls.TYPE_JSON);

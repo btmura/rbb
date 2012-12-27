@@ -210,24 +210,17 @@ public class ThingProvider extends SessionProvider {
         return b.build();
     }
 
-    public static final Uri messageInboxUri(long sessionId, String accountName) {
+    public static final Uri messageUri(long sessionId, String accountName, int filter, String more) {
         Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_INBOX_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_LISTING));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
+        b.appendQueryParameter(PARAM_FILTER, toString(filter));
         if (sessionId != -1) {
             b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         }
-        return b.build();
-    }
-
-    public static final Uri messageSentUri(long sessionId, String accountName) {
-        Uri.Builder b = MESSAGES_URI.buildUpon();
-        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_SENT_LISTING));
-        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
-        if (sessionId != -1) {
-            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
+        if (!TextUtils.isEmpty(more)) {
+            b.appendQueryParameter(PARAM_MORE, more);
         }
         return b.build();
     }
@@ -324,12 +317,8 @@ public class ThingProvider extends SessionProvider {
                     listing = MessageListing.newThreadInstance(accountName, thingId, cookie, helper);
                     break;
 
-                case Listing.TYPE_MESSAGE_INBOX_LISTING:
-                    listing = MessageListing.newInboxInstance(accountName, cookie);
-                    break;
-
-                case Listing.TYPE_MESSAGE_SENT_LISTING:
-                    listing = MessageListing.newSentInstance(accountName, cookie);
+                case Listing.TYPE_MESSAGE_LISTING:
+                    listing = MessageListing.newInstance(accountName, filter, more, cookie);
                     break;
 
                 case Listing.TYPE_SUBREDDIT_LISTING:

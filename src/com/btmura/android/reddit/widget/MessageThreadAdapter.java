@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.provider.ThingProvider;
 
-public class MessageLoaderAdapter extends LoaderAdapter {
+public class MessageThreadAdapter extends LoaderAdapter {
 
     private static final String[] PROJECTION = {
             Messages._ID,
@@ -46,7 +46,7 @@ public class MessageLoaderAdapter extends LoaderAdapter {
     private String accountName;
     private String thingId;
 
-    public MessageLoaderAdapter(Context context) {
+    public MessageThreadAdapter(Context context) {
         super(context, null, 0);
     }
 
