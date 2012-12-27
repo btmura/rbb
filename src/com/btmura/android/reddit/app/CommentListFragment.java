@@ -73,14 +73,10 @@ public class CommentListFragment extends ThingProviderListFragment implements
     private static final String STATE_URL = ARG_URL;
 
     private OnThingEventListener listener;
-    private long sessionId;
-    private String accountName;
-    private String thingId;
-    private String linkId;
+    private CommentAdapter adapter;
     private String title;
     private CharSequence url;
     private int flags;
-    private CommentAdapter adapter;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
             String linkId, String title, CharSequence url, int flags) {
@@ -110,23 +106,22 @@ public class CommentListFragment extends ThingProviderListFragment implements
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-        thingId = getArguments().getString(ARG_THING_ID);
-        linkId = getArguments().getString(ARG_LINK_ID);
-        flags = getArguments().getInt(ARG_FLAGS);
+        String accountName = getArguments().getString(ARG_ACCOUNT_NAME);
+        String thingId = getArguments().getString(ARG_THING_ID);
+        String linkId = getArguments().getString(ARG_LINK_ID);
+        adapter = new CommentAdapter(getActivity(), accountName, thingId, linkId, this);
 
         // Don't create a new session if changing configuration.
         if (savedInstanceState != null) {
-            sessionId = savedInstanceState.getLong(STATE_SESSION_ID, -1);
+            adapter.setSessionId(savedInstanceState.getLong(STATE_SESSION_ID, -1));
             title = savedInstanceState.getString(STATE_TITLE);
             url = savedInstanceState.getCharSequence(STATE_URL);
         } else {
-            sessionId = -1;
             title = getArguments().getString(ARG_TITLE);
             url = getArguments().getCharSequence(ARG_URL);
         }
 
-        adapter = new CommentAdapter(getActivity(), accountName, this);
+        flags = getArguments().getInt(ARG_FLAGS);
     }
 
     @Override
@@ -148,22 +143,14 @@ public class CommentListFragment extends ThingProviderListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onCreateLoader args: " + args);
-        }
-        return CommentAdapter.getLoader(getActivity(), sessionId, accountName, thingId, linkId);
+        return adapter.getLoader(getActivity());
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
-        }
-
         // Process ThingProvider results.
         super.onLoadFinished(loader, cursor);
 
-        CommentAdapter.updateLoader(getActivity(), loader, sessionId, accountName, thingId, linkId);
-
+        adapter.updateLoaderUri(getActivity(), loader);
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
@@ -184,6 +171,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
         // Broadcast the link if there is one in case the parent doesn't know.
         if (listener != null) {
+            String thingId = adapter.getThingId();
             listener.onTitleDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_TITLE));
             if (!adapter.getBoolean(0, CommentAdapter.INDEX_SELF)) {
                 listener.onLinkDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_URL));
@@ -193,7 +181,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     @Override
     protected void onSessionIdLoaded(long sessionId) {
-        this.sessionId = sessionId;
+        adapter.setSessionId(sessionId);
     }
 
     @Override
@@ -219,7 +207,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
             long[] childIds = CommentLogic.getChildren(this, position);
             Provider.collapseCommentAsync(getActivity(), id, childIds);
         } else {
-            Provider.expandCommentAsync(getActivity(), sessionId, id);
+            Provider.expandCommentAsync(getActivity(), adapter.getSessionId(), id);
         }
     }
 
@@ -227,8 +215,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onLike thingId: " + thingId + " likes: " + likes);
         }
-        if (AccountUtils.isAccount(accountName)) {
-            Provider.voteAsync(getActivity(), accountName, thingId, likes);
+        if (AccountUtils.isAccount(adapter.getAccountName())) {
+            Provider.voteAsync(getActivity(), adapter.getAccountName(), thingId, likes);
         }
     }
 
@@ -321,7 +309,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     private boolean isReplyItemVisible() {
         // You need an account to reply to some comment.
-        if (!AccountUtils.isAccount(accountName)) {
+        if (!AccountUtils.isAccount(adapter.getAccountName())) {
             return false;
         }
 
@@ -347,7 +335,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     private boolean isDeleteItemVisible() {
         // You need an account to delete items.
-        if (!AccountUtils.isAccount(accountName)) {
+        if (!AccountUtils.isAccount(adapter.getAccountName())) {
             return false;
         }
 
@@ -363,7 +351,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
                 // All items must be authored by the current account.
                 String author = adapter.getString(i, CommentAdapter.INDEX_AUTHOR);
-                if (!author.equals(accountName)) {
+                if (!author.equals(adapter.getAccountName())) {
                     return false;
                 }
 
@@ -379,7 +367,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     private boolean isComposeMessageItemVisible() {
         // You need an account to compose a message.
-        if (!AccountUtils.isAccount(accountName)) {
+        if (!AccountUtils.isAccount(adapter.getAccountName())) {
             return false;
         }
         return getListView().getCheckedItemCount() == 1;
@@ -425,8 +413,9 @@ public class CommentListFragment extends ThingProviderListFragment implements
             int nesting = CommentLogic.getInsertNesting(this, position);
             int sequence = CommentLogic.getInsertSequence(this, position);
 
-            Bundle args = CommentReplyActivity.newArgs(parentId, parentNumComments, thingId,
-                    replyAuthor, replyThingId, nesting, sequence, sessionId);
+            Bundle args = CommentReplyActivity.newArgs(parentId, parentNumComments,
+                    adapter.getThingId(), replyAuthor, replyThingId, nesting, sequence,
+                    adapter.getSessionId());
 
             Intent intent = new Intent(getActivity(), CommentReplyActivity.class);
             intent.putExtra(CommentReplyActivity.EXTRA_ARGS, args);
@@ -456,8 +445,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
         String[] thingIds = new String[ids.length];
         boolean[] hasChildren = new boolean[ids.length];
         fillCheckedInfo(thingIds, hasChildren);
-        Provider.deleteCommentAsync(getActivity(), accountName, headerId, headerNumComments,
-                thingId, ids, thingIds, hasChildren);
+        Provider.deleteCommentAsync(getActivity(), adapter.getAccountName(), headerId,
+                headerNumComments, adapter.getThingId(), ids, thingIds, hasChildren);
         mode.finish();
         return true;
     }
@@ -522,7 +511,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(STATE_SESSION_ID, sessionId);
+        outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
         outState.putString(STATE_TITLE, title);
         outState.putCharSequence(STATE_URL, url);
     }

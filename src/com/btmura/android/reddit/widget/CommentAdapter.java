@@ -17,8 +17,6 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.view.View;
@@ -28,7 +26,7 @@ import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
 
-public class CommentAdapter extends BaseCursorAdapter {
+public class CommentAdapter extends LoaderAdapter {
 
     private static final String[] PROJECTION = {
             Things._ID,
@@ -73,32 +71,50 @@ public class CommentAdapter extends BaseCursorAdapter {
     public static int INDEX_VOTE = 18;
 
     private final long nowTimeMs = System.currentTimeMillis();
+
+    private long sessionId = -1;
     private final String accountName;
+    private final String thingId;
+    private final String linkId;
     private final OnVoteListener listener;
 
-    public static Loader<Cursor> getLoader(Context context, long sessionId, String accountName,
-            String thingId, String linkId) {
-        Uri uri = getUri(sessionId, accountName, thingId, linkId);
-        return new CursorLoader(context, uri, PROJECTION, Things.SELECT_VISIBLE, null,
-                Things.SORT_BY_SEQUENCE_AND_ID);
+    public CommentAdapter(Context context, String accountName, String thingId, String linkId,
+            OnVoteListener listener) {
+        super(context, null, 0);
+        this.accountName = accountName;
+        this.thingId = thingId;
+        this.linkId = linkId;
+        this.listener = listener;
     }
 
-    public static void updateLoader(Context context, Loader<Cursor> loader, long sessionId,
-            String accountName, String thingId, String linkId) {
-        if (loader instanceof CursorLoader) {
-            CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(sessionId, accountName, thingId, linkId));
-        }
+    @Override
+    public boolean isLoadable() {
+        return true;
     }
 
-    private static Uri getUri(long sessionId, String accountName, String thingId, String linkId) {
+    @Override
+    protected Uri getLoaderUri() {
         return ThingProvider.commentsUri(sessionId, accountName, thingId, linkId);
     }
 
-    public CommentAdapter(Context context, String accountName, OnVoteListener listener) {
-        super(context, null, 0);
-        this.accountName = accountName;
-        this.listener = listener;
+    @Override
+    protected String[] getProjection() {
+        return PROJECTION;
+    }
+
+    @Override
+    protected String getSelection() {
+        return Things.SELECT_VISIBLE;
+    }
+
+    @Override
+    protected String[] getSelectionArgs() {
+        return null;
+    }
+
+    @Override
+    protected String getSortOrder() {
+        return Things.SORT_BY_SEQUENCE_AND_ID;
     }
 
     @Override
@@ -138,5 +154,21 @@ public class CommentAdapter extends BaseCursorAdapter {
                 nesting, nowTimeMs, numComments, false, null, score, null, 0, thingId, null, title,
                 ups);
         tv.setOnVoteListener(listener);
+    }
+
+    public long getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public String getThingId() {
+        return thingId;
     }
 }
