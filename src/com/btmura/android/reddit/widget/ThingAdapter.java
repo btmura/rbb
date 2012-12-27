@@ -182,7 +182,7 @@ public class ThingAdapter extends LoaderAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        switch (getInt(position, THING_KIND)) {
+        switch (getInt(position, getKindIndex())) {
             case Kinds.KIND_MORE:
                 return 0;
 
@@ -193,7 +193,7 @@ public class ThingAdapter extends LoaderAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        switch (getInt(cursor.getPosition(), THING_KIND)) {
+        switch (getInt(cursor.getPosition(), getKindIndex())) {
             case Kinds.KIND_MORE:
                 LayoutInflater inflater = LayoutInflater.from(context);
                 return inflater.inflate(R.layout.thing_more_row, parent, false);
@@ -348,11 +348,7 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     public String getAuthor(int position) {
-        if (isMessage()) {
-            return getString(position, MESSAGE_AUTHOR);
-        } else {
-            return getString(position, THING_AUTHOR);
-        }
+        return getString(position, getAuthorIndex());
     }
 
     public Bundle getReplyExtras(int position) {
@@ -360,11 +356,7 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     public String getThingId(int position) {
-        if (isMessage()) {
-            return getString(position, MESSAGE_THING_ID);
-        } else {
-            return getString(position, THING_THING_ID);
-        }
+        return getString(position, getThingIdIndex());
     }
 
     public String getLinkId(int position) {
@@ -376,11 +368,7 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     public String getNextMore() {
-        if (isMessage()) {
-            return findNextMore(MESSAGE_KIND, MESSAGE_THING_ID);
-        } else {
-            return findNextMore(THING_KIND, THING_THING_ID);
-        }
+        return findNextMore(getKindIndex(), getThingIdIndex());
     }
 
     private String findNextMore(int kindIndex, int thingIdIndex) {
@@ -443,6 +431,18 @@ public class ThingAdapter extends LoaderAdapter {
         String thingId = getThingId(position);
         String linkId = getLinkId(position);
         return Urls.commentListing(thingId, linkId, Urls.TYPE_HTML);
+    }
+
+    private int getAuthorIndex() {
+        return isMessage() ? MESSAGE_AUTHOR : THING_AUTHOR;
+    }
+
+    private int getKindIndex() {
+        return isMessage() ? MESSAGE_KIND : THING_KIND;
+    }
+
+    private int getThingIdIndex() {
+        return isMessage() ? MESSAGE_THING_ID : THING_THING_ID;
     }
 
     public String getSelectedThingId() {
