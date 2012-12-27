@@ -62,9 +62,6 @@ public class ThingAdapter extends BaseCursorAdapter {
     /** String argument that is used to paginate things. */
     public static final String ARG_MORE = "more";
 
-    /** Boolean argument to tell some loaders to fetch stuff. */
-    public static final String ARG_REFRESH = "refresh";
-
     /**
      * {@link ProviderAdapter} allows different providers to be used by
      * {@link ThingProvider} to create {@link ThingView}s.
