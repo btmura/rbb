@@ -121,6 +121,10 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
 
     public void onComposeForm(String accountName, String destination, String title, String text) {
         switch (getComposition()) {
+            case COMPOSITION_COMMENT_REPLY:
+                handleCommentReply(accountName, text);
+                return;
+
             case COMPOSITION_MESSAGE_REPLY:
                 handleMessageReply(accountName, text);
                 return;
@@ -138,6 +142,20 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     }
 
     public void onComposeFormCancelled() {
+        finish();
+    }
+
+    private void handleCommentReply(String accountName, String body) {
+        Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
+        long parentId = extras.getLong(CommentListFragment.EXTRA_PARENT_ID);
+        int parentNumComments = extras.getInt(CommentListFragment.EXTRA_PARENT_NUM_COMMENTS);
+        String parentThingId = extras.getString(CommentListFragment.EXTRA_PARENT_THING_ID);
+        String replyThingId = extras.getString(CommentListFragment.EXTRA_REPLY_THING_ID);
+        int nesting = extras.getInt(CommentListFragment.EXTRA_NESTING);
+        int sequence = extras.getInt(CommentListFragment.EXTRA_SEQUENCE);
+        long sessionId = extras.getLong(CommentListFragment.EXTRA_SESSION_ID, -1);
+        Provider.insertCommentAsync(this, parentId, parentNumComments, parentThingId, replyThingId,
+                accountName, body, nesting, sequence, sessionId);
         finish();
     }
 

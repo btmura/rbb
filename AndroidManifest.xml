@@ -63,9 +63,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".app.CommentReplyActivity"
-            android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
-        <activity
             android:name=".app.ComposeActivity"
             android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
         <activity

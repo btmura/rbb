@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -52,6 +51,15 @@ public class CommentListFragment extends ThingProviderListFragment implements
         MultiChoiceModeListener, OnVoteListener, CommentList {
 
     public static final String TAG = "CommentListFragment";
+
+    public static final String EXTRA_PARENT_ID = "parentId";
+    public static final String EXTRA_PARENT_NUM_COMMENTS = "parentNumComments";
+    public static final String EXTRA_PARENT_THING_ID = "parentThingId";
+    public static final String EXTRA_REPLY_AUTHOR = "replyAuthor";
+    public static final String EXTRA_REPLY_THING_ID = "replyThingId";
+    public static final String EXTRA_NESTING = "nesting";
+    public static final String EXTRA_SEQUENCE = "sequence";
+    public static final String EXTRA_SESSION_ID = "sessionId";
 
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_ID = "thingId";
@@ -409,20 +417,26 @@ public class CommentListFragment extends ThingProviderListFragment implements
         if (position != -1) {
             long parentId = adapter.getLong(0, CommentAdapter.INDEX_ID);
             int parentNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
+            String parentThingId = adapter.getThingId();
             String replyAuthor = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
             String replyThingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
             int nesting = CommentLogic.getInsertNesting(this, position);
             int sequence = CommentLogic.getInsertSequence(this, position);
+            long sessionId = adapter.getSessionId();
 
-            Bundle args = CommentReplyActivity.newArgs(parentId, parentNumComments,
-                    adapter.getThingId(), replyAuthor, replyThingId, nesting, sequence,
-                    adapter.getSessionId());
+            Bundle args = new Bundle(9);
+            args.putLong(EXTRA_PARENT_ID, parentId);
+            args.putInt(EXTRA_PARENT_NUM_COMMENTS, parentNumComments);
+            args.putString(EXTRA_PARENT_THING_ID, parentThingId);
+            args.putString(EXTRA_REPLY_AUTHOR, replyAuthor);
+            args.putString(EXTRA_REPLY_THING_ID, replyThingId);
+            args.putInt(EXTRA_NESTING, nesting);
+            args.putInt(EXTRA_SEQUENCE, sequence);
+            args.putLong(EXTRA_SESSION_ID, sessionId);
 
-            Intent intent = new Intent(getActivity(), CommentReplyActivity.class);
-            intent.putExtra(CommentReplyActivity.EXTRA_ARGS, args);
-            startActivity(intent);
+            MenuHelper.startComposeActivity(getActivity(),
+                    ComposeActivity.COMPOSITION_COMMENT_REPLY, replyAuthor, args);
         }
-
         mode.finish();
         return true;
     }
