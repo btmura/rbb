@@ -406,10 +406,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_add:
-                handleAdd();
-                return true;
-
             case R.id.menu_view_subreddit_sidebar:
                 handleViewSidebar();
                 return true;
@@ -417,9 +413,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void handleAdd() {
     }
 
     private void handleViewSidebar() {
