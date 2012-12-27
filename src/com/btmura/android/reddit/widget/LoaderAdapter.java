@@ -23,6 +23,10 @@ import android.os.Bundle;
 
 public abstract class LoaderAdapter extends BaseCursorAdapter {
 
+    private long sessionId = -1;
+    private String accountName;
+    private String thingId;
+
     LoaderAdapter(Context context) {
         super(context, null, 0);
     }
@@ -31,15 +35,27 @@ public abstract class LoaderAdapter extends BaseCursorAdapter {
 
     public abstract Loader<Cursor> getLoader(Context context, Bundle args);
 
-    public void setAccountName(String accountName) {
-        // Override this if applicable to your adapter.
+    public long getSessionId() {
+        return sessionId;
     }
 
     public void setSessionId(long sessionId) {
-        // Override this if applicable to your adapter.
+        this.sessionId = sessionId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public String getThingId() {
+        return thingId;
     }
 
     public void setThingId(String thingId) {
-        // Override this if applicable to your adapter.
+        this.thingId = thingId;
     }
 }

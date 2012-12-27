@@ -36,31 +36,23 @@ public class MessageLoaderAdapter extends LoaderAdapter {
             Messages.COLUMN_BODY,
             Messages.COLUMN_CREATED_UTC,
             Messages.COLUMN_KIND,
-            Messages.COLUMN_SESSION_ID,
-            Messages.COLUMN_THING_ID,
     };
 
     private static final int INDEX_AUTHOR = 1;
     private static final int INDEX_BODY = 2;
     private static final int INDEX_CREATED_UTC = 3;
     private static final int INDEX_KIND = 4;
-    private static final int INDEX_SESSION_ID = 5;
-    private static final int INDEX_THING_ID = 6;
-
-    private long sessionId = -1;
-    private String accountName;
-    private String thingId;
 
     public MessageLoaderAdapter(Context context) {
         super(context);
     }
 
     public boolean isLoadable() {
-        return accountName != null && thingId != null;
+        return getAccountName() != null && getThingId() != null;
     }
 
     public Loader<Cursor> getLoader(Context context, Bundle args) {
-        Uri uri = ThingProvider.messageThreadUri(sessionId, accountName, thingId);
+        Uri uri = ThingProvider.messageThreadUri(getSessionId(), getAccountName(), getThingId());
         return new CursorLoader(context, uri, PROJECTION, null, null, null);
     }
 
@@ -77,23 +69,8 @@ public class MessageLoaderAdapter extends LoaderAdapter {
         int kind = cursor.getInt(INDEX_KIND);
 
         ThingView tv = (ThingView) view;
-        tv.setData(accountName, author, body, createdUtc, null, 0, true, kind, 0,
+        tv.setData(getAccountName(), author, body, createdUtc, null, 0, true, kind, 0,
                 null, 0, System.currentTimeMillis(), 0, false, null, 0, null,
                 0, null, null, null, 0);
-    }
-
-    @Override
-    public void setSessionId(long sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    @Override
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
-
-    @Override
-    public void setThingId(String thingId) {
-        this.thingId = thingId;
     }
 }

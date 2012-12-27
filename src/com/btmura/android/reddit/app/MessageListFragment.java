@@ -32,6 +32,8 @@ public class MessageListFragment extends ThingProviderListFragment {
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_ID = "thingId";
 
+    private static final String STATE_SESSION_ID = "sessionId";
+
     private LoaderAdapter adapter;
 
     public static MessageListFragment newInstance(String accountName, String thingId) {
@@ -50,6 +52,9 @@ public class MessageListFragment extends ThingProviderListFragment {
         adapter = new MessageLoaderAdapter(getActivity());
         adapter.setAccountName(getArguments().getString(ARG_ACCOUNT_NAME));
         adapter.setThingId(getArguments().getString(ARG_THING_ID));
+        if (savedInstanceState != null) {
+            adapter.setSessionId(getArguments().getLong(STATE_SESSION_ID));
+        }
     }
 
     @Override
@@ -68,7 +73,7 @@ public class MessageListFragment extends ThingProviderListFragment {
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        // Process ThingProvide results.
+        // Process ThingProvider results.
         super.onLoadFinished(loader, cursor);
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
@@ -87,5 +92,11 @@ public class MessageListFragment extends ThingProviderListFragment {
     @Override
     protected void onSubredditLoaded(String subreddit) {
         throw new IllegalStateException();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
     }
 }
