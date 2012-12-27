@@ -27,7 +27,6 @@ import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.app.ComposeFormFragment.OnComposeFormListener;
 import com.btmura.android.reddit.app.ComposeFragment.OnComposeListener;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.widget.MessageThreadProviderAdapter;
 
 /**
  * {@link Activity} that displays a form for composing submissions and messages
@@ -144,9 +143,9 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
 
     private void handleMessageReply(String accountName, String body) {
         Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
-        String parentThingId = extras.getString(MessageThreadProviderAdapter.EXTRA_PARENT_THING_ID);
-        long sessionId = extras.getLong(MessageThreadProviderAdapter.EXTRA_SESSION_ID);
-        String thingId = extras.getString(MessageThreadProviderAdapter.EXTRA_THING_ID);
+        String parentThingId = extras.getString(MessageListFragment.EXTRA_PARENT_THING_ID);
+        long sessionId = extras.getLong(MessageListFragment.EXTRA_SESSION_ID);
+        String thingId = extras.getString(MessageListFragment.EXTRA_THING_ID);
         Provider.insertMessageReplyAsync(this, accountName, body, parentThingId, sessionId, thingId);
         finish();
     }

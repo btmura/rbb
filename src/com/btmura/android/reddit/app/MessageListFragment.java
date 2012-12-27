@@ -19,6 +19,14 @@ package com.btmura.android.reddit.app;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.widget.MessageLoaderAdapter;
@@ -28,10 +36,16 @@ import com.btmura.android.reddit.widget.MessageLoaderAdapter;
  */
 public class MessageListFragment extends ThingProviderListFragment {
 
+    public static final String TAG = "MessageListFragment";
+
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_ID = "thingId";
 
     private static final String STATE_SESSION_ID = "sessionId";
+
+    public static final String EXTRA_PARENT_THING_ID = "parentThingId";
+    public static final String EXTRA_SESSION_ID = "sessionId";
+    public static final String EXTRA_THING_ID = "thingId";
 
     private MessageLoaderAdapter adapter;
 
@@ -54,6 +68,15 @@ public class MessageListFragment extends ThingProviderListFragment {
         if (savedInstanceState != null) {
             adapter.setSessionId(savedInstanceState.getLong(STATE_SESSION_ID));
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        ListView l = (ListView) v.findViewById(android.R.id.list);
+        registerForContextMenu(l);
+        return v;
     }
 
     @Override
@@ -93,6 +116,35 @@ public class MessageListFragment extends ThingProviderListFragment {
     @Override
     protected void onSubredditLoaded(String subreddit) {
         throw new IllegalStateException();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getActivity().getMenuInflater().inflate(R.menu.message_context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.menu_reply:
+                return handleReply(info);
+
+            default:
+                return false;
+        }
+    }
+
+    private boolean handleReply(AdapterContextMenuInfo info) {
+        String user = adapter.getUser(info.position);
+        Bundle extras = new Bundle(3);
+        extras.putString(EXTRA_PARENT_THING_ID, adapter.getThingId());
+        extras.putLong(EXTRA_SESSION_ID, adapter.getSessionId());
+        extras.putString(EXTRA_THING_ID, adapter.getThingId(info.position));
+        MenuHelper.startComposeActivity(getActivity(),
+                ComposeActivity.COMPOSITION_MESSAGE_REPLY, user, extras);
+        return true;
     }
 
     @Override

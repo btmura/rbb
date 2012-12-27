@@ -33,12 +33,14 @@ public class MessageLoaderAdapter extends LoaderAdapter {
             Messages.COLUMN_BODY,
             Messages.COLUMN_CREATED_UTC,
             Messages.COLUMN_KIND,
+            Messages.COLUMN_THING_ID,
     };
 
     private static final int INDEX_AUTHOR = 1;
     private static final int INDEX_BODY = 2;
     private static final int INDEX_CREATED_UTC = 3;
     private static final int INDEX_KIND = 4;
+    private static final int INDEX_THING_ID = 5;
 
     private long sessionId = -1;
     private String accountName;
@@ -102,5 +104,13 @@ public class MessageLoaderAdapter extends LoaderAdapter {
 
     public void setThingId(String thingId) {
         this.thingId = thingId;
+    }
+
+    public String getUser(int position) {
+        return getString(position, INDEX_AUTHOR);
+    }
+
+    public String getThingId(int position) {
+        return getString(position, INDEX_THING_ID);
     }
 }

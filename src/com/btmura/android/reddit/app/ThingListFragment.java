@@ -132,8 +132,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
         if (!TextUtils.isEmpty(ThingAdapter.getMessageUser(getArguments()))) {
             adapter = ThingAdapter.newMessageInstance(getActivity());
-        } else if (!TextUtils.isEmpty(ThingAdapter.getMessageThreadId(getArguments()))) {
-            adapter = ThingAdapter.newMessageThreadInstance(getActivity());
         } else {
             adapter = ThingAdapter.newThingInstance(getActivity());
         }

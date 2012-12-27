@@ -157,10 +157,6 @@ public class ThingAdapter extends BaseCursorAdapter {
         return new ThingAdapter(context, new MessageProviderAdapter());
     }
 
-    public static ThingAdapter newMessageThreadInstance(Context context) {
-        return new ThingAdapter(context, new MessageThreadProviderAdapter());
-    }
-
     private ThingAdapter(Context context, ProviderAdapter providerAdapter) {
         super(context, null, 0);
         this.inflater = LayoutInflater.from(context);
