@@ -52,7 +52,7 @@ public class MessageListFragment extends ThingProviderListFragment {
         adapter.setAccountName(getArguments().getString(ARG_ACCOUNT_NAME));
         adapter.setThingId(getArguments().getString(ARG_THING_ID));
         if (savedInstanceState != null) {
-            adapter.setSessionId(getArguments().getLong(STATE_SESSION_ID));
+            adapter.setSessionId(savedInstanceState.getLong(STATE_SESSION_ID));
         }
     }
 
