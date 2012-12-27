@@ -45,6 +45,7 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.CommentAdapter;
+import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ThingProviderListFragment implements
@@ -466,7 +467,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     private boolean handleViewProfile(ActionMode mode) {
         String user = adapter.getString(getFirstCheckedPosition(), CommentAdapter.INDEX_AUTHOR);
-        MenuHelper.startProfileActivity(getActivity(), user);
+        MenuHelper.startProfileActivity(getActivity(), user, FilterAdapter.PROFILE_OVERVIEW);
         mode.finish();
         return true;
     }

@@ -44,6 +44,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
+import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.ThingAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
@@ -376,7 +377,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     private boolean handleViewProfile(ActionMode mode) {
         String user = adapter.getAuthor(getFirstCheckedPosition());
-        MenuHelper.startProfileActivity(getActivity(), user);
+        MenuHelper.startProfileActivity(getActivity(), user, FilterAdapter.PROFILE_OVERVIEW);
         mode.finish();
         return true;
     }

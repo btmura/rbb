@@ -37,6 +37,9 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     /** Required string extra that is the user's name. */
     public static final String EXTRA_USER = "user";
 
+    /** Optional int specifying the filter to start using. */
+    public static final String EXTRA_FILTER = "filter";
+
     private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
 
     private FilterAdapter adapter;
@@ -85,7 +88,11 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         prefs = result.prefs;
         accountName = result.getLastAccount();
         adapter.addProfileFilters(this);
-        bar.setSelectedNavigationItem(result.getLastProfileFilter());
+        if (getIntent().hasExtra(EXTRA_FILTER)) {
+            bar.setSelectedNavigationItem(getIntent().getIntExtra(EXTRA_FILTER, 0));
+        } else {
+            bar.setSelectedNavigationItem(result.getLastProfileFilter());
+        }
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
@@ -113,7 +120,11 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         int filter = getFilter();
-        AccountPreferences.setLastProfileFilter(prefs, filter);
+        if (!getIntent().hasExtra(EXTRA_FILTER)) {
+            AccountPreferences.setLastProfileFilter(prefs, filter);
+        } else {
+            getIntent().removeExtra(EXTRA_FILTER);
+        }
 
         ThingListFragment frag = getThingListFragment();
         if (frag == null || !Objects.equals(frag.getAccountName(), accountName)

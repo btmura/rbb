@@ -36,6 +36,9 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     /** Required string extra that is the user's name. */
     public static final String EXTRA_USER = "user";
 
+    /** Optional int specifying the filter to start using. */
+    public static final String EXTRA_FILTER = "filter";
+
     private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
 
     private FilterAdapter adapter;
@@ -84,7 +87,11 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
         prefs = result.prefs;
         accountName = result.getLastAccount();
         adapter.addMessageFilters(this);
-        bar.setSelectedNavigationItem(result.getLastMessageFilter());
+        if (getIntent().hasExtra(EXTRA_FILTER)) {
+            bar.setSelectedNavigationItem(getIntent().getIntExtra(EXTRA_FILTER, 0));
+        } else {
+            bar.setSelectedNavigationItem(result.getLastMessageFilter());
+        }
     }
 
     @Override
@@ -112,7 +119,11 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         int filter = getFilter();
-        AccountPreferences.setLastMessageFilter(prefs, filter);
+        if (!getIntent().hasExtra(EXTRA_FILTER)) {
+            AccountPreferences.setLastMessageFilter(prefs, filter);
+        } else {
+            getIntent().removeExtra(EXTRA_FILTER);
+        }
 
         ThingListFragment frag = getThingListFragment();
         if (frag == null || !Objects.equals(frag.getAccountName(), accountName)

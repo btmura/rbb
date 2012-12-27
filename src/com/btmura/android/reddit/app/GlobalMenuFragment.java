@@ -34,6 +34,7 @@ import android.widget.SearchView.OnQueryTextListener;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.widget.AccountAdapter;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class GlobalMenuFragment extends Fragment implements OnFocusChangeListener,
         OnQueryTextListener, LoaderCallbacks<Cursor> {
@@ -137,8 +138,10 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
             case R.id.menu_profile:
                 return handleProfile();
 
-            case R.id.menu_messages:
             case R.id.menu_unread_messages:
+                return handleUnreadMessages();
+
+            case R.id.menu_messages:
                 return handleMessages();
 
             case R.id.menu_settings:
@@ -170,14 +173,18 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     }
 
     private boolean handleProfile() {
-        MenuHelper.startProfileActivity(getActivity(), accountNameHolder.getAccountName());
+        MenuHelper.startProfileActivity(getActivity(), accountNameHolder.getAccountName(), -1);
+        return true;
+    }
+
+    private boolean handleUnreadMessages() {
+        MenuHelper.startMessageActivity(getActivity(), accountNameHolder.getAccountName(),
+                FilterAdapter.MESSAGE_UNREAD);
         return true;
     }
 
     private boolean handleMessages() {
-        Intent intent = new Intent(getActivity(), MessageActivity.class);
-        intent.putExtra(MessageActivity.EXTRA_USER, accountNameHolder.getAccountName());
-        startActivity(intent);
+        MenuHelper.startMessageActivity(getActivity(), accountNameHolder.getAccountName(), -1);
         return true;
     }
 
