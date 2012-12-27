@@ -17,11 +17,8 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -43,17 +40,26 @@ public class MessageLoaderAdapter extends LoaderAdapter {
     private static final int INDEX_CREATED_UTC = 3;
     private static final int INDEX_KIND = 4;
 
+    private long sessionId = -1;
+    private String accountName;
+    private String thingId;
+
     public MessageLoaderAdapter(Context context) {
-        super(context);
+        super(context, null, 0);
     }
 
     public boolean isLoadable() {
-        return getAccountName() != null && getThingId() != null;
+        return accountName != null && thingId != null;
     }
 
-    public Loader<Cursor> getLoader(Context context, Bundle args) {
-        Uri uri = ThingProvider.messageThreadUri(getSessionId(), getAccountName(), getThingId());
-        return new CursorLoader(context, uri, PROJECTION, null, null, null);
+    @Override
+    public Uri getLoaderUri() {
+        return ThingProvider.messageThreadUri(sessionId, accountName, thingId);
+    }
+
+    @Override
+    protected String[] getProjection() {
+        return PROJECTION;
     }
 
     @Override
@@ -72,5 +78,29 @@ public class MessageLoaderAdapter extends LoaderAdapter {
         tv.setData(getAccountName(), author, body, createdUtc, null, 0, true, kind, 0,
                 null, 0, System.currentTimeMillis(), 0, false, null, 0, null,
                 0, null, null, null, 0);
+    }
+
+    public long getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public String getThingId() {
+        return thingId;
+    }
+
+    public void setThingId(String thingId) {
+        this.thingId = thingId;
     }
 }

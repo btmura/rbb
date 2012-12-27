@@ -16,13 +16,12 @@
 
 package com.btmura.android.reddit.app;
 
-import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.widget.LoaderAdapter;
-import com.btmura.android.reddit.widget.MessageLoaderAdapter;
-
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.widget.MessageLoaderAdapter;
 
 /**
  * {@link ThingProviderListFragment} for showing the messages is a thread.
@@ -34,7 +33,7 @@ public class MessageListFragment extends ThingProviderListFragment {
 
     private static final String STATE_SESSION_ID = "sessionId";
 
-    private LoaderAdapter adapter;
+    private MessageLoaderAdapter adapter;
 
     public static MessageListFragment newInstance(String accountName, String thingId) {
         Bundle args = new Bundle(2);
@@ -68,13 +67,15 @@ public class MessageListFragment extends ThingProviderListFragment {
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return adapter.getLoader(getActivity(), args);
+        return adapter.getLoader(getActivity());
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         // Process ThingProvider results.
         super.onLoadFinished(loader, cursor);
+
+        adapter.updateLoaderUri(getActivity(), loader);
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);

@@ -17,8 +17,6 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.text.TextUtils;
@@ -32,7 +30,7 @@ import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
-public class SubredditAdapter extends BaseCursorAdapter {
+public class SubredditAdapter extends LoaderAdapter {
 
     public static final String TAG = "SubredditAdapter";
 
@@ -52,41 +50,9 @@ public class SubredditAdapter extends BaseCursorAdapter {
     private static final int INDEX_SUBSCRIBERS = 2;
     private static final int INDEX_OVER_18 = 3;
 
+    private long sessionId = -1;
+    private String accountName;
     private String selectedSubreddit;
-
-    public static Loader<Cursor> getLoader(Context context, long sessionId, String accountName,
-            String query) {
-        Uri uri = getUri(sessionId, accountName, query);
-        return getLoader(context, uri, accountName, query);
-    }
-
-    public static void updateLoader(Context context, Loader<Cursor> loader, long sessionId,
-            String accountName, String query) {
-        if (loader instanceof CursorLoader) {
-            CursorLoader cl = (CursorLoader) loader;
-            cl.setUri(getUri(sessionId, accountName, query));
-        }
-    }
-
-    private static Uri getUri(long sessionId, String accountName, String query) {
-        if (!TextUtils.isEmpty(query)) {
-            return ThingProvider.subredditSearchUri(sessionId, accountName, query);
-        }
-        return SubredditProvider.SUBREDDITS_URI;
-    }
-
-    private static Loader<Cursor> getLoader(Context context, Uri uri, String accountName,
-            String query) {
-        if (!TextUtils.isEmpty(query)) {
-            return new CursorLoader(context, uri, PROJECTION_SEARCH, null, null,
-                    Things.SORT_BY_NAME);
-        }
-        return new CursorLoader(context, uri, PROJECTION_SUBREDDITS,
-                Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED,
-                Array.of(accountName),
-                Subreddits.SORT_BY_NAME);
-    }
-
     private final String query;
     private final boolean singleChoice;
 
@@ -94,6 +60,40 @@ public class SubredditAdapter extends BaseCursorAdapter {
         super(context, null, 0);
         this.query = query;
         this.singleChoice = singleChoice;
+    }
+
+    @Override
+    public boolean isLoadable() {
+        return accountName != null;
+    }
+
+    @Override
+    protected Uri getLoaderUri() {
+        if (isQuery()) {
+            return ThingProvider.subredditSearchUri(sessionId, accountName, query);
+        } else {
+            return SubredditProvider.SUBREDDITS_URI;
+        }
+    }
+
+    @Override
+    protected String[] getProjection() {
+        return isQuery() ? PROJECTION_SEARCH : PROJECTION_SUBREDDITS;
+    }
+
+    @Override
+    protected String getSelection() {
+        return isQuery() ? null : Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED;
+    }
+
+    @Override
+    protected String[] getSelectionArgs() {
+        return isQuery() ? null : Array.of(accountName);
+    }
+
+    @Override
+    protected String getSortOrder() {
+        return isQuery() ? Things.SORT_BY_NAME : Subreddits.SORT_BY_NAME;
     }
 
     @Override
@@ -111,6 +111,26 @@ public class SubredditAdapter extends BaseCursorAdapter {
         v.setChosen(singleChoice && Objects.equalsIgnoreCase(selectedSubreddit, name));
     }
 
+    public long getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public String getSelectedSubreddit() {
+        return selectedSubreddit;
+    }
+
     public void setSelectedSubreddit(String subreddit) {
         if (!Objects.equals(selectedSubreddit, subreddit)) {
             selectedSubreddit = subreddit;
@@ -122,6 +142,14 @@ public class SubredditAdapter extends BaseCursorAdapter {
         String subreddit = getString(position, INDEX_NAME);
         setSelectedSubreddit(subreddit);
         return subreddit;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public boolean isQuery() {
+        return !TextUtils.isEmpty(query);
     }
 
     public String getName(int position) {

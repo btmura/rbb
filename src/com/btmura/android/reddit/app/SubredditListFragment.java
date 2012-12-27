@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -36,7 +35,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
@@ -56,9 +54,9 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     private static final String ARG_QUERY = "query";
     private static final String ARG_FLAGS = "flags";
 
+    private static final String STATE_SESSION_ID = "sessionId";
     private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
     private static final String STATE_SELECTED_SUBREDDIT = ARG_SELECTED_SUBREDDIT;
-    private static final String STATE_SESSION_ID = "sessionId";
     private static final String STATE_SELECTED_ACTION_ACCOUNT = "selectedActionAccount";
 
     public interface OnSubredditSelectedListener {
@@ -73,17 +71,14 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         void onSubredditSelected(String subreddit);
     }
 
-    private long sessionId;
-    private String accountName;
-    private String selectedSubreddit;
-    private String query;
+    private OnSubredditSelectedListener listener;
+    private AccountResultHolder accountResultHolder;
+
     private boolean singleChoice;
     private SubredditAdapter adapter;
-    private OnSubredditSelectedListener listener;
 
     private ActionMode actionMode;
     private AccountNameAdapter accountNameAdapter;
-    private AccountResultHolder accountResultHolder;
     private TextView subredditCountText;
     private Spinner accountSpinner;
     private String selectedActionAccount;
@@ -115,24 +110,21 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        query = getArguments().getString(ARG_QUERY);
 
-        if (savedInstanceState == null) {
-            sessionId = -1;
-            accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-            selectedSubreddit = getArguments().getString(ARG_SELECTED_SUBREDDIT);
-        } else {
-            sessionId = savedInstanceState.getLong(STATE_SESSION_ID, -1);
-            accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
-            selectedSubreddit = savedInstanceState.getString(STATE_SELECTED_SUBREDDIT);
-            selectedActionAccount = savedInstanceState.getString(STATE_SELECTED_ACTION_ACCOUNT);
-        }
-
+        String query = getArguments().getString(ARG_QUERY);
         int flags = getArguments().getInt(ARG_FLAGS);
         singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
-
         adapter = new SubredditAdapter(getActivity(), query, singleChoice);
-        adapter.setSelectedSubreddit(selectedSubreddit);
+
+        if (savedInstanceState == null) {
+            adapter.setAccountName(getArguments().getString(ARG_ACCOUNT_NAME));
+            adapter.setSelectedSubreddit(getArguments().getString(ARG_SELECTED_SUBREDDIT));
+        } else {
+            adapter.setSessionId(savedInstanceState.getLong(STATE_SESSION_ID, -1));
+            adapter.setAccountName(savedInstanceState.getString(STATE_ACCOUNT_NAME));
+            adapter.setSelectedSubreddit(savedInstanceState.getString(STATE_SELECTED_SUBREDDIT));
+            selectedActionAccount = savedInstanceState.getString(STATE_SELECTED_ACTION_ACCOUNT);
+        }
     }
 
     @Override
@@ -156,31 +148,24 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     }
 
     public void loadIfPossible() {
-        if (accountName != null) {
+        if (adapter.isLoadable()) {
             getLoaderManager().initLoader(0, null, this);
         }
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onCreateLoader args: " + args);
-        }
-        return SubredditAdapter.getLoader(getActivity(), sessionId, accountName, query);
+        return adapter.getLoader(getActivity());
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onLoadFinished cursor: " + (cursor != null ? cursor.getCount() : "-1"));
-        }
-
         // Process ThingProvider results.
         super.onLoadFinished(loader, cursor);
 
-        SubredditAdapter.updateLoader(getActivity(), loader, sessionId, accountName, query);
+        adapter.updateLoaderUri(getActivity(), loader);
         adapter.swapCursor(cursor);
         setEmptyText(getEmptyText(cursor == null));
-
         setListShown(true);
+
         if (actionMode != null) {
             actionMode.invalidate();
         }
@@ -204,7 +189,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
     @Override
     protected void onSessionIdLoaded(long sessionId) {
-        this.sessionId = sessionId;
+        adapter.setSessionId(sessionId);
     }
 
     @Override
@@ -218,7 +203,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
     @Override
     public void onListItemClick(ListView l, View view, int position, long id) {
-        selectedSubreddit = adapter.setSelectedPosition(position);
+        String selectedSubreddit = adapter.setSelectedPosition(position);
         if (listener != null) {
             listener.onSubredditSelected(selectedSubreddit);
         }
@@ -255,8 +240,8 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         }
 
         // Show spinner in subreddit search and accounts have been loaded.
-        boolean isQuery = query != null;
-        if (isQuery && accountResultHolder != null
+        boolean isQuery = adapter.isQuery();
+        if (adapter.isQuery() && accountResultHolder != null
                 && accountResultHolder.getAccountResult() != null) {
             if (accountNameAdapter == null) {
                 accountNameAdapter = new AccountNameAdapter(getActivity());
@@ -365,30 +350,29 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_ACCOUNT_NAME, accountName);
-        outState.putString(STATE_SELECTED_SUBREDDIT, selectedSubreddit);
-        outState.putLong(STATE_SESSION_ID, sessionId);
+        outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
+        outState.putString(STATE_ACCOUNT_NAME, adapter.getAccountName());
+        outState.putString(STATE_SELECTED_SUBREDDIT, adapter.getSelectedSubreddit());
         outState.putString(STATE_SELECTED_ACTION_ACCOUNT, selectedActionAccount);
     }
 
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
-
     public String getAccountName() {
-        return accountName;
+        return adapter.getAccountName();
     }
 
-    public void setSelectedSubreddit(String subreddit) {
-        selectedSubreddit = subreddit;
-        adapter.setSelectedSubreddit(subreddit);
+    public void setAccountName(String accountName) {
+        adapter.setAccountName(accountName);
     }
 
     public String getSelectedSubreddit() {
-        return selectedSubreddit;
+        return adapter.getSelectedSubreddit();
+    }
+
+    public void setSelectedSubreddit(String subreddit) {
+        adapter.setSelectedSubreddit(subreddit);
     }
 
     public String getQuery() {
-        return query;
+        return adapter.getQuery();
     }
 }
