@@ -31,16 +31,10 @@ public class Messages implements BaseColumns {
     public static final String COLUMN_CREATED_UTC = "createdUtc";
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_NEW = "new";
-
     public static final String COLUMN_SESSION_ID = SharedColumns.COLUMN_SESSION_ID;
-
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_THING_ID = VoteActions.COLUMN_THING_ID;
     public static final String COLUMN_WAS_COMMENT = "wasComment";
-
-    public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
-
-    public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "= ?";
 
     static void createTempTable(SQLiteDatabase db) {
         db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
