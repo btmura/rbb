@@ -219,9 +219,17 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         TextView tv = (TextView) convertView;
-        if (tv == null) {
-            tv = (TextView) inflater.inflate(getDropDownLayout(position), parent, false);
+
+        // Tag each widget with the layout. Check the layout each time to make
+        // sure it's the one we want, since a change in the number of accounts
+        // can cause prior views to be the wrong type for the new slots. The
+        // adapter isn't smart enough to give us the correct views.
+        int layout = getDropDownLayout(position);
+        if (tv == null || layout != ((Integer) tv.getTag())) {
+            tv = (TextView) inflater.inflate(layout, parent, false);
+            tv.setTag(Integer.valueOf(layout));
         }
+
         Item item = getItem(position);
         tv.setText(getTitle(item.text, true));
         return tv;
