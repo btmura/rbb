@@ -16,9 +16,9 @@
 
 package com.btmura.android.reddit.text;
 
-public class Formatter_SubredditsTest extends AbstractFormatterTest {
+public class Formatter_RelativeLinksTest extends AbstractFormatterTest {
 
-    public void testFormat() {
+    public void testFormat_subreddit() {
         CharSequence s = assertSubredditFormat("/r/food", "/r/food");
         assertSubredditSpan(s, 0, 7, "food");
 
@@ -30,5 +30,13 @@ public class Formatter_SubredditsTest extends AbstractFormatterTest {
 
         s = assertSubredditFormat("/r/plus+minus/", "/r/plus+minus/");
         assertSubredditSpan(s, 0, 15, "plus+minus");
+    }
+
+    public void testFormat_user() {
+        CharSequence s = assertSubredditFormat("/u/dude", "/u/dude");
+        assertUserSpan(s, 0, 7, "dude");
+
+        s = assertSubredditFormat("/u/dude/", "/u/dude/");
+        assertUserSpan(s, 0, 8, "dude");
     }
 }

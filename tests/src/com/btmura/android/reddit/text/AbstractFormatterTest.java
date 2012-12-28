@@ -31,7 +31,7 @@ import com.btmura.android.reddit.text.SubredditSpan;
 import com.btmura.android.reddit.text.Formatter.Escaped;
 import com.btmura.android.reddit.text.Formatter.RawLinks;
 import com.btmura.android.reddit.text.Formatter.Styles;
-import com.btmura.android.reddit.text.Formatter.Subreddits;
+import com.btmura.android.reddit.text.Formatter.RelativeLinks;
 
 abstract class AbstractFormatterTest extends AndroidTestCase {
 
@@ -77,7 +77,7 @@ abstract class AbstractFormatterTest extends AndroidTestCase {
     }
 
     CharSequence assertSubredditFormat(String input, String expected) {
-        CharSequence cs = Subreddits.format(matcher, input);
+        CharSequence cs = RelativeLinks.format(matcher, input);
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
@@ -108,12 +108,20 @@ abstract class AbstractFormatterTest extends AndroidTestCase {
         assertEquals(1, spans.length);
     }
 
-    static void assertSubredditSpan(CharSequence cs, int start, int end, String expectedUrl) {
+    static void assertSubredditSpan(CharSequence cs, int start, int end, String expectedSubreddit) {
         SpannableStringBuilder b = (SpannableStringBuilder) cs;
         SubredditSpan[] spans = b.getSpans(start, end, SubredditSpan.class);
         assertEquals(1, spans.length);
-        assertEquals("assertSubredditSpan expected: " + expectedUrl + " actual: "
-                + spans[0].subreddit, expectedUrl, spans[0].subreddit);
+        assertEquals("assertSubredditSpan expected: " + expectedSubreddit + " actual: "
+                + spans[0].subreddit, expectedSubreddit, spans[0].subreddit);
+    }
+
+    static void assertUserSpan(CharSequence cs, int start, int end, String expectedUser) {
+        SpannableStringBuilder b = (SpannableStringBuilder) cs;
+        UserSpan[] spans = b.getSpans(start, end, UserSpan.class);
+        assertEquals(1, spans.length);
+        assertEquals("assertUserSpan expected: " + expectedUser + " actual: " + spans[0].user,
+                expectedUser, spans[0].user);
     }
 
     static void assertUrlSpan(CharSequence cs, int start, int end, String expectedUrl) {

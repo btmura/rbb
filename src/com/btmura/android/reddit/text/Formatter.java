@@ -26,6 +26,7 @@ import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.BulletSpan;
+import android.text.style.ClickableSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
@@ -48,7 +49,7 @@ public class Formatter {
         c = Bullets.format(matcher, c);
         c = NamedLinks.format(c, builder);
         c = RawLinks.format(matcher, c);
-        return Subreddits.format(matcher, c);
+        return RelativeLinks.format(matcher, c);
     }
 
     public CharSequence formatAll(Context context, CharSequence c) {
@@ -292,15 +293,21 @@ public class Formatter {
         }
     }
 
-    static class Subreddits {
+    static class RelativeLinks {
 
-        static Pattern SUBREDDIT_PATTERN = Pattern.compile("/r/([0-9A-Za-z_+]+)/?");
+        static Pattern RELATIVE_LINK_PATTERN = Pattern.compile("/([ru])/([0-9A-Za-z_+]+)/?");
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
-            Matcher m = matcher.usePattern(SUBREDDIT_PATTERN).reset(s);
+            Matcher m = matcher.usePattern(RELATIVE_LINK_PATTERN).reset(s);
             while (m.find()) {
-                SubredditSpan span = new SubredditSpan(m.group(1));
+                String value = m.group(2);
+                ClickableSpan span;
+                if ("r".equals(m.group(1))) {
+                    span = new SubredditSpan(value);
+                } else {
+                    span = new UserSpan(value);
+                }
                 s = Formatter.setSpan(s, m.start(), m.end(), span);
             }
             return s;
