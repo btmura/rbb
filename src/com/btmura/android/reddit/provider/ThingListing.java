@@ -106,7 +106,7 @@ class ThingListing extends JsonParser implements Listing {
         } else if (!TextUtils.isEmpty(query)) {
             url = Urls.search(query, more);
         } else {
-            url = Urls.subreddit(subreddit, filter, more);
+            url = Urls.subreddit(subreddit, filter, more, Urls.TYPE_JSON);
             followRedirects = !Subreddits.NAME_RANDOM.equalsIgnoreCase(subreddit);
         }
 
@@ -122,7 +122,7 @@ class ThingListing extends JsonParser implements Listing {
                 location = location.substring(0, location.length() - 1);
             }
 
-            url = Urls.subreddit(location, filter, more);
+            url = Urls.subreddit(location, filter, more, Urls.TYPE_JSON);
             resolvedSubreddit = location;
 
             // Disconnect and reconnect to the proper URL.

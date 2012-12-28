@@ -44,9 +44,6 @@ import com.btmura.android.reddit.widget.ThingBundle;
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener,
         AccountNameHolder {
 
-    /** String extra used to request a specific subreddit to view. */
-    public static final String EXTRA_SUBREDDIT = "subreddit";
-
     // URI constants and matcher for handling intents with data.
     private static final String AUTHORITY = "www.reddit.com";
     private static final UriMatcher MATCHER = new UriMatcher(0);
@@ -100,11 +97,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         }
 
         // TODO: Do more sanity checks on the url data.
-
-        // Process the intent's extras if available. The data takes precedence.
-        if (TextUtils.isEmpty(requestedSubreddit)) {
-            requestedSubreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
-        }
 
         // Hide the subreddit list when previewing another subreddit or link.
         hasSubredditList = TextUtils.isEmpty(requestedSubreddit);

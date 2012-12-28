@@ -18,10 +18,12 @@ package com.btmura.android.reddit.text;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.text.style.ClickableSpan;
 import android.view.View;
 
 import com.btmura.android.reddit.app.BrowserActivity;
+import com.btmura.android.reddit.net.Urls;
 
 public class SubredditSpan extends ClickableSpan {
 
@@ -33,9 +35,9 @@ public class SubredditSpan extends ClickableSpan {
 
     @Override
     public void onClick(View widget) {
-        Context c = widget.getContext();
-        Intent i = new Intent(c, BrowserActivity.class);
-        i.putExtra(BrowserActivity.EXTRA_SUBREDDIT, subreddit);
-        c.startActivity(i);
+        Context context = widget.getContext();
+        Intent intent = new Intent(context, BrowserActivity.class);
+        intent.setData(Uri.parse(Urls.subreddit(subreddit, -1, null, Urls.TYPE_HTML).toString()));
+        context.startActivity(intent);
     }
 }

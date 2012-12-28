@@ -258,7 +258,7 @@ public class Urls {
         return b;
     }
 
-    public static CharSequence subreddit(String subreddit, int filter, String more) {
+    public static CharSequence subreddit(String subreddit, int filter, String more, int apiType) {
         StringBuilder b = new StringBuilder(BASE_URL);
 
         if (!Subreddits.isFrontPage(subreddit)) {
@@ -267,6 +267,7 @@ public class Urls {
 
         switch (filter) {
             case FilterAdapter.SUBREDDIT_HOT:
+                b.append("/hot");
                 break;
 
             case FilterAdapter.SUBREDDIT_NEW:
@@ -280,12 +281,11 @@ public class Urls {
             case FilterAdapter.SUBREDDIT_TOP:
                 b.append("/top");
                 break;
-
-            default:
-                throw new IllegalArgumentException(Integer.toString(filter));
         }
 
-        b.append("/.json");
+        if (apiType == TYPE_JSON) {
+            b.append("/.json");
+        }
 
         boolean hasSort = filter == FilterAdapter.SUBREDDIT_NEW;
         if (hasSort) {
