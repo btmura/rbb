@@ -46,12 +46,6 @@ public class MessageActions implements BaseColumns {
     /** Unused long column for expiration of this row. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
-    public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + " = ?";
-
-    public static final String SELECT_BY_PARENT_THING_ID = COLUMN_PARENT_THING_ID + " = ?";
-
-    public static final String SORT_BY_ID = _ID + " ASC";
-
     /** Action meaning the user has responded to another comment. */
     public static final int ACTION_INSERT = 0;
 
@@ -63,6 +57,14 @@ public class MessageActions implements BaseColumns {
 
     /** Action meaning the user has marked this message as unread. */
     public static final int ACTION_UNREAD = 3;
+
+    /** Selection for prior pending read and unread messages. */
+    public static final String SELECT_READ_UNREAD_BY_ACCOUNT_AND_THING_ID =
+            MessageActions.COLUMN_ACCOUNT + "=? AND "
+                    + MessageActions.COLUMN_THING_ID + "=? AND "
+                    + MessageActions.COLUMN_ACTION + " IN ("
+                    + MessageActions.ACTION_READ + ","
+                    + MessageActions.ACTION_UNREAD + ")";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("

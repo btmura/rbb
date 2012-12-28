@@ -52,11 +52,6 @@ public class Provider {
             Things.COLUMN_NESTING,
     };
 
-    private static final String SELECT_OTHER_READ_OPS_BY_ACCOUNT =
-            MessageActions.COLUMN_ACCOUNT + "=? AND " + MessageActions.COLUMN_ACTION + " IN ("
-                    + MessageActions.ACTION_READ + ","
-                    + MessageActions.ACTION_UNREAD + ")";
-
     /** Inserts a placeholder comment yet to be synced with Reddit. */
     public static void insertCommentAsync(Context context,
             final long parentId,
@@ -252,22 +247,27 @@ public class Provider {
         });
     }
 
+    /** Mark a message either read or unread. */
     public static void readMessageAsync(final Context context, final String accountName,
             final String thingId, final boolean read) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                int action = read ? MessageActions.ACTION_READ : MessageActions.ACTION_UNREAD;
-
                 ArrayList<ContentProviderOperation> ops =
                         new ArrayList<ContentProviderOperation>(2);
+
+                // Delete prior read and unread states of this thing since the
+                // last action will be the final state anyway.
                 ops.add(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
-                        .withSelection(SELECT_OTHER_READ_OPS_BY_ACCOUNT, Array.of(accountName))
+                        .withSelection(MessageActions.SELECT_READ_UNREAD_BY_ACCOUNT_AND_THING_ID,
+                                Array.of(accountName, thingId))
                         .build());
 
+                // Insert the latest action we want for this message.
                 Uri uri = ThingProvider.MESSAGE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .build();
+                int action = read ? MessageActions.ACTION_READ : MessageActions.ACTION_UNREAD;
                 ops.add(ContentProviderOperation.newInsert(uri)
                         .withValue(MessageActions.COLUMN_ACCOUNT, accountName)
                         .withValue(MessageActions.COLUMN_THING_ID, thingId)
