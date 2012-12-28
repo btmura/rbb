@@ -27,6 +27,7 @@ import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.net.Urls;
 
 public class MenuHelper {
 
@@ -65,10 +66,7 @@ public class MenuHelper {
 
     public static void startProfileActivity(Context context, String user, int filter) {
         Intent intent = new Intent(context, UserProfileActivity.class);
-        intent.putExtra(UserProfileActivity.EXTRA_USER, user);
-        if (filter != -1) {
-            intent.putExtra(UserProfileActivity.EXTRA_FILTER, filter);
-        }
+        intent.setData(Uri.parse(Urls.user(user, filter, null, Urls.TYPE_HTML).toString()));
         context.startActivity(intent);
     }
 

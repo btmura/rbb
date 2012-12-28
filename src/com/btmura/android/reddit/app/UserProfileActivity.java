@@ -21,6 +21,7 @@ import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -35,17 +36,11 @@ import com.btmura.android.reddit.widget.FilterAdapter;
  */
 public class UserProfileActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
-    // TODO: Remove these extras and only support the data uri.
-
-    /** Required string extra that is the user's name. */
-    public static final String EXTRA_USER = "user";
-
-    /** Optional int specifying the filter to start using. */
-    public static final String EXTRA_FILTER = "filter";
-
     private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
 
-    private String profileUser;
+    private String requestedUser;
+    private int requestedFilter = -1;
+
     private FilterAdapter adapter;
     private String accountName;
     private SharedPreferences prefs;
@@ -58,14 +53,14 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     @Override
     protected boolean skipSetup() {
         // Get the user from the intent data or extra.
-        if (getIntent().getData() != null) {
-            profileUser = UriHelper.getUser(getIntent().getData());
-        } else if (getIntent().hasExtra(EXTRA_USER)) {
-            profileUser = getIntent().getStringExtra(EXTRA_USER);
+        Uri data = getIntent().getData();
+        if (data != null) {
+            requestedUser = UriHelper.getUser(data);
+            requestedFilter = UriHelper.getUserFilter(data);
         }
 
         // Quit if there is no profile to view.
-        if (TextUtils.isEmpty(profileUser)) {
+        if (TextUtils.isEmpty(requestedUser)) {
             finish();
             return true;
         }
@@ -81,7 +76,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         adapter = new FilterAdapter(this);
-        adapter.setTitle(profileUser);
+        adapter.setTitle(requestedUser);
 
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
@@ -97,8 +92,8 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         prefs = result.prefs;
         accountName = result.getLastAccount();
         adapter.addProfileFilters(this);
-        if (getIntent().hasExtra(EXTRA_FILTER)) {
-            bar.setSelectedNavigationItem(getIntent().getIntExtra(EXTRA_FILTER, 0));
+        if (requestedFilter != -1) {
+            bar.setSelectedNavigationItem(requestedFilter);
         } else {
             bar.setSelectedNavigationItem(result.getLastProfileFilter());
         }
@@ -128,16 +123,16 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         int filter = getFilter();
-        if (!getIntent().hasExtra(EXTRA_FILTER)) {
-            AccountPreferences.setLastProfileFilter(prefs, filter);
+        if (requestedFilter != -1) {
+            requestedFilter = -1;
         } else {
-            getIntent().removeExtra(EXTRA_FILTER);
+            AccountPreferences.setLastProfileFilter(prefs, filter);
         }
 
         ThingListFragment frag = getThingListFragment();
         if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != filter) {
-            setProfileThingListNavigation(profileUser);
+            setProfileThingListNavigation(requestedUser);
         }
         return true;
     }

@@ -57,7 +57,8 @@ public class Urls {
     private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
-    private static final String BASE_USER_URL = BASE_URL + "/user/";
+    private static final String BASE_USER_HTML_URL = BASE_URL + "/u/";
+    private static final String BASE_USER_JSON_URL = BASE_URL + "/user/";
 
     public static URL newUrl(CharSequence url) {
         try {
@@ -314,7 +315,21 @@ public class Urls {
     }
 
     public static CharSequence user(String user, int filter, String more, int apiType) {
-        StringBuilder b = new StringBuilder(BASE_USER_URL).append(user);
+        StringBuilder b;
+        switch (apiType) {
+            case TYPE_HTML:
+                b = new StringBuilder(BASE_USER_HTML_URL);
+                break;
+
+            case TYPE_JSON:
+                b = new StringBuilder(BASE_USER_JSON_URL);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+        b.append(user);
+
         switch (filter) {
             case FilterAdapter.PROFILE_OVERVIEW:
                 b.append("/overview");

@@ -15,6 +15,7 @@
  */
 package com.btmura.android.reddit.app;
 
+import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.ThingBundle;
 
 import junit.framework.TestCase;
@@ -24,11 +25,21 @@ import android.os.Bundle;
 public class UriHelperTest extends TestCase {
 
     public void testGetSubreddit() {
-        assertSubreddit("pics", "http://www.reddit.com/r/pics");
-        assertSubreddit("funny", "http://reddit.com/r/funny");
-        assertSubreddit("rbb", "http://www.reddit.com/r/rbb/comments/12zl0q/");
-        assertSubreddit("rbb", "http://www.reddit.com/r/rbb/comments/12zl0q/test_1");
-        assertSubreddit(null, "http://www.reddit.com/u/btmura");
+        assertSubreddit("pics", -1, "http://www.reddit.com/r/pics");
+
+        assertSubreddit("pics", FilterAdapter.SUBREDDIT_HOT,
+                "http://reddit.com/r/pics/hot");
+        assertSubreddit("pics", FilterAdapter.SUBREDDIT_NEW,
+                "http://www.reddit.com/r/pics/new");
+        assertSubreddit("pics", FilterAdapter.SUBREDDIT_TOP,
+                "http://reddit.com/r/pics/top");
+        assertSubreddit("pics", FilterAdapter.SUBREDDIT_CONTROVERSIAL,
+                "http://www.reddit.com/r/pics/controversial");
+
+        assertSubreddit("funny", -1, "http://reddit.com/r/funny");
+        assertSubreddit("rbb", -1, "http://www.reddit.com/r/rbb/comments/12zl0q/");
+        assertSubreddit("rbb", -1, "http://www.reddit.com/r/rbb/comments/12zl0q/test_1");
+        assertSubreddit(null, -1, "http://www.reddit.com/u/btmura");
     }
 
     public void testGetThingBundle() {
@@ -38,13 +49,22 @@ public class UriHelperTest extends TestCase {
     }
 
     public void testGetUser() {
-        assertUser("btmura", "http://www.reddit.com/u/btmura");
-        assertUser("rbbtest1", "http://reddit.com/u/rbbtest1");
-        assertUser(null, "http://www.reddit.com/r/pics");
+        assertUser("btmura", -1, "http://www.reddit.com/u/btmura");
+        assertUser("rbbtest1", -1, "http://reddit.com/u/rbbtest1");
+
+        assertUser("rbbtest1", FilterAdapter.PROFILE_OVERVIEW,
+                "http://reddit.com/u/rbbtest1/overview");
+        assertUser("rbbtest2", FilterAdapter.PROFILE_COMMENTS,
+                "http://www.reddit.com/u/rbbtest2/comments");
+        assertUser("rbbtest1", FilterAdapter.PROFILE_SUBMITTED,
+                "http://reddit.com/u/rbbtest1/submitted");
+
+        assertUser(null, -1, "http://www.reddit.com/r/pics");
     }
 
-    private void assertSubreddit(String expected, String url) {
-        assertEquals(expected, UriHelper.getSubreddit(Uri.parse(url)));
+    private void assertSubreddit(String expectedSubreddit, int expectedFilter, String url) {
+        assertEquals(expectedSubreddit, UriHelper.getSubreddit(Uri.parse(url)));
+        assertEquals(expectedFilter, UriHelper.getSubredditFilter(Uri.parse(url)));
     }
 
     private void assertThingBundle(String expectedSubreddit, String expectedThingId, String url) {
@@ -57,7 +77,8 @@ public class UriHelperTest extends TestCase {
         assertNull(UriHelper.getThingBundle(Uri.parse(url)));
     }
 
-    private void assertUser(String expected, String url) {
-        assertEquals(expected, UriHelper.getUser(Uri.parse(url)));
+    private void assertUser(String expectedUser, int expectedFilter, String url) {
+        assertEquals(expectedUser, UriHelper.getUser(Uri.parse(url)));
+        assertEquals(expectedFilter, UriHelper.getUserFilter(Uri.parse(url)));
     }
 }
