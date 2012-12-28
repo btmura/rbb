@@ -34,6 +34,7 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.SaveActions;
+import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
@@ -55,9 +56,6 @@ public class Provider {
             MessageActions.COLUMN_ACCOUNT + "=? AND " + MessageActions.COLUMN_ACTION + " IN ("
                     + MessageActions.ACTION_READ + ","
                     + MessageActions.ACTION_UNREAD + ")";
-
-    private static final String SELECT_SAVES_BY_THING_ID = SaveActions.COLUMN_THING_ID + "=?";
-    private static final String SELECT_VOTES_BY_THING_ID = VoteActions.COLUMN_THING_ID + "=?";
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
     public static void insertCommentAsync(Context context,
@@ -289,7 +287,7 @@ public class Provider {
                 ArrayList<ContentProviderOperation> ops =
                         new ArrayList<ContentProviderOperation>(2);
                 ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVE_ACTIONS_URI)
-                        .withSelection(SELECT_SAVES_BY_THING_ID, Array.of(thingId))
+                        .withSelection(SharedColumns.SELECT_BY_THING_ID, Array.of(thingId))
                         .build());
 
                 Uri uri = ThingProvider.SAVE_ACTIONS_URI.buildUpon()
@@ -315,7 +313,7 @@ public class Provider {
                 ArrayList<ContentProviderOperation> ops =
                         new ArrayList<ContentProviderOperation>(2);
                 ops.add(ContentProviderOperation.newDelete(ThingProvider.VOTE_ACTIONS_URI)
-                        .withSelection(SELECT_VOTES_BY_THING_ID, Array.of(thingId))
+                        .withSelection(SharedColumns.SELECT_BY_THING_ID, Array.of(thingId))
                         .build());
 
                 Uri uri = ThingProvider.VOTE_ACTIONS_URI.buildUpon()

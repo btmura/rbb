@@ -20,10 +20,15 @@ public class SharedColumns {
 
     public static final String COLUMN_SAVE = "save";
 
-    /** Name of the session id column. Use this in table classes for clarity. */
+    /** Long session id referring to the primary key in the sessions table. */
     public static final String COLUMN_SESSION_ID = "sessionId";
+
+    /** Full string name of some thing with the kind tag attached. */
+    public static final String COLUMN_THING_ID = "thingId";
 
     public static final String COLUMN_VOTE = "vote";
 
     public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
+
+    public static final String SELECT_BY_THING_ID = COLUMN_THING_ID + "=?";
 }
