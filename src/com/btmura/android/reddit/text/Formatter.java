@@ -30,6 +30,7 @@ import android.text.style.ClickableSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
+import android.util.Patterns;
 
 public class Formatter {
 
@@ -194,12 +195,7 @@ public class Formatter {
 
     static class RawLinks {
 
-        /**
-         * Pattern capture URLs that don't end with ?, !, ., or ), since people
-         * sometimes put URLs at the end of a sentence.
-         */
-        static final Pattern PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9+-.]*?:"
-                + "//[A-Za-z0-9-._~!@#$%&'()*+,;=:/?]*" + "[A-Za-z0-9-_~@#$%&'(*+,;=:/]");
+        static final Pattern PATTERN = Patterns.WEB_URL;
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;

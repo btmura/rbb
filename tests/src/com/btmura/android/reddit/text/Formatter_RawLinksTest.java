@@ -21,47 +21,39 @@ import com.btmura.android.reddit.text.Formatter.RawLinks;
 public class Formatter_RawLinksTest extends AbstractFormatterTest {
 
     public void testPattern() {
-        // Test basic structure.
-        assertMatch("scheme://authority");
-        assertMatch("scheme://authority?query");
-        assertMatch("scheme://authority?query#fragment");
-        assertMatch("scheme://authority#fragment");
-
         // Test some examples.
-        assertMatch("http://a");
-        assertMatch("http://abcd");
-        assertMatch("http://a/b/c");
-        assertMatch("https://a/b/c");
-        assertMatch("https://a/b/c");
-        assertMatch("HTTP://a/b/c");
-        assertMatch("ftp://a.b.c.d");
+        assertMatch("http://a.com");
+        assertMatch("http://abcd.org");
+        assertMatch("http://a.net/b/c");
+        assertMatch("https://a.net/b/c");
+        assertMatch("https://1.2.3.4/b/c");
     }
 
     public void testFormat() {
-        CharSequence cs = assertRawLinksFormat("http://abcd", "http://abcd");
-        assertUrlSpan(cs, 0, 11, "http://abcd");
+        CharSequence cs = assertRawLinksFormat("http://abcd.com", "http://abcd.com");
+        assertUrlSpan(cs, 0, 11, "http://abcd.com");
 
-        cs = assertRawLinksFormat("https://abcd", "https://abcd");
-        assertUrlSpan(cs, 0, 12, "https://abcd");
+        cs = assertRawLinksFormat("https://abcd.com", "https://abcd.com");
+        assertUrlSpan(cs, 0, 12, "https://abcd.com");
     }
 
     public void testFormat_multipleLine() {
-        CharSequence cs = assertRawLinksFormat("http://abcd\ndef", "http://abcd\ndef");
-        assertUrlSpan(cs, 0, 11, "http://abcd");
+        CharSequence cs = assertRawLinksFormat("http://abcd.net\ndef", "http://abcd.net\ndef");
+        assertUrlSpan(cs, 0, 11, "http://abcd.net");
     }
 
     public void testFormat_endings() {
-        CharSequence cs = assertRawLinksFormat("(http://abcd)", "(http://abcd)");
-        assertUrlSpan(cs, 1, 12, "http://abcd");
+        CharSequence cs = assertRawLinksFormat("(http://abcd.org)", "(http://abcd.org)");
+        assertUrlSpan(cs, 1, 12, "http://abcd.org");
 
-        cs = assertRawLinksFormat("end paren: http://abcd)", "end paren: http://abcd)");
-        assertUrlSpan(cs, 11, 22, "http://abcd");
+        cs = assertRawLinksFormat("end paren: http://abcd.org)", "end paren: http://abcd.org)");
+        assertUrlSpan(cs, 11, 22, "http://abcd.org");
 
-        cs = assertRawLinksFormat("look at http://abcd?", "look at http://abcd?");
-        assertUrlSpan(cs, 8, 19, "http://abcd");
+        cs = assertRawLinksFormat("look at http://abcd.org?", "look at http://abcd.org?");
+        assertUrlSpan(cs, 8, 19, "http://abcd.org");
 
-        cs = assertRawLinksFormat("see diagram (http://abcd)", "see diagram (http://abcd)");
-        assertUrlSpan(cs, 13, 24, "http://abcd");
+        cs = assertRawLinksFormat("see diagram (http://abcd.org)", "see diagram (http://abcd.org)");
+        assertUrlSpan(cs, 13, 24, "http://abcd.org");
     }
 
     private void assertMatch(String input) {
