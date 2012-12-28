@@ -33,6 +33,7 @@ public class MessageThreadAdapter extends LoaderAdapter {
             Messages.COLUMN_BODY,
             Messages.COLUMN_CREATED_UTC,
             Messages.COLUMN_KIND,
+            Messages.COLUMN_NEW,
             Messages.COLUMN_THING_ID,
     };
 
@@ -40,7 +41,8 @@ public class MessageThreadAdapter extends LoaderAdapter {
     private static final int INDEX_BODY = 2;
     private static final int INDEX_CREATED_UTC = 3;
     private static final int INDEX_KIND = 4;
-    private static final int INDEX_THING_ID = 5;
+    private static final int INDEX_NEW = 5;
+    private static final int INDEX_THING_ID = 6;
 
     private long sessionId = -1;
     private String accountName;
@@ -112,5 +114,9 @@ public class MessageThreadAdapter extends LoaderAdapter {
 
     public String getThingId(int position) {
         return getString(position, INDEX_THING_ID);
+    }
+
+    public boolean isNew(int position) {
+        return getBoolean(position, INDEX_NEW);
     }
 }

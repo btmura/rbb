@@ -50,7 +50,10 @@ public class ThingBundle extends BundleSupport {
     private static final String KEY_COMMENT_URL = "commentUrl";
 
     /** Boolean indicating whether this thing has comments at all. */
-    private static final String KEY_NO_COMMENTS = "hasComments";
+    private static final String KEY_NO_COMMENTS = "noComments";
+
+    /** Boolean indicating whether this thing is new. */
+    private static final String KEY_IS_NEW = "isNew";
 
     public static String getSubreddit(Bundle bundle) {
         return getString(bundle, KEY_SUBREDDIT);
@@ -124,8 +127,16 @@ public class ThingBundle extends BundleSupport {
         return getBoolean(bundle, KEY_NO_COMMENTS);
     }
 
-    public static void putNoComments(Bundle bundle, boolean hasComments) {
-        bundle.putBoolean(KEY_NO_COMMENTS, hasComments);
+    public static void putNoComments(Bundle bundle, boolean noComments) {
+        bundle.putBoolean(KEY_NO_COMMENTS, noComments);
+    }
+
+    public static boolean isNew(Bundle bundle) {
+        return getBoolean(bundle, KEY_IS_NEW);
+    }
+
+    public static void putIsNew(Bundle bundle, boolean isNew) {
+        bundle.putBoolean(KEY_IS_NEW, isNew);
     }
 
     private ThingBundle() {

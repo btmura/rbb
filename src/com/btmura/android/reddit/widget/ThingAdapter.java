@@ -101,6 +101,7 @@ public class ThingAdapter extends LoaderAdapter {
             Messages.COLUMN_CONTEXT,
             Messages.COLUMN_CREATED_UTC,
             Messages.COLUMN_KIND,
+            Messages.COLUMN_NEW,
             Messages.COLUMN_SUBREDDIT,
             Messages.COLUMN_THING_ID,
             Messages.COLUMN_WAS_COMMENT,
@@ -111,9 +112,10 @@ public class ThingAdapter extends LoaderAdapter {
     private static final int MESSAGE_CONTEXT = 3;
     private static final int MESSAGE_CREATED_UTC = 4;
     private static final int MESSAGE_KIND = 5;
-    private static final int MESSAGE_SUBREDDIT = 6;
-    private static final int MESSAGE_THING_ID = 7;
-    private static final int MESSAGE_WAS_COMMENT = 8;
+    private static final int MESSAGE_NEW = 6;
+    private static final int MESSAGE_SUBREDDIT = 7;
+    private static final int MESSAGE_THING_ID = 8;
+    private static final int MESSAGE_WAS_COMMENT = 9;
 
     private long sessionId = -1;
     private String accountName;
@@ -312,6 +314,8 @@ public class ThingAdapter extends LoaderAdapter {
             }
         }
 
+        ThingBundle.putIsNew(b, c.getInt(MESSAGE_NEW) == 1);
+
         // If this message isn't a comment, then it's simply a message with no
         // comments or links.
         ThingBundle.putNoComments(b, c.getInt(MESSAGE_WAS_COMMENT) == 0);
@@ -379,6 +383,10 @@ public class ThingAdapter extends LoaderAdapter {
             }
         }
         return null;
+    }
+
+    public boolean isNew(int position) {
+        return isMessage() && getBoolean(position, MESSAGE_NEW);
     }
 
     public boolean isSaved(int position) {
