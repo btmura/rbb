@@ -50,6 +50,15 @@
         android:inputType="textCapSentences|textAutoCorrect"
         android:singleLine="true" />
 
+    <Switch
+        android:id="@+id/link_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/element_padding"
+        android:textOff="@string/compose_text"
+        android:textOn="@string/compose_link" />
+
     <EditText
         android:id="@+id/text_text"
         android:layout_width="match_parent"

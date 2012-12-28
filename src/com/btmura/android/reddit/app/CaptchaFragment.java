@@ -42,7 +42,7 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     public static final String TAG = "CaptchaFragment";
 
     private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
-            InputFilters.NO_SPACES_FILTER,
+            InputFilters.NO_SPACE_FILTER,
     };
 
     private static final String ARG_EXTRAS = "extras";

@@ -71,6 +71,9 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     /** String extra with text from compose dialog. */
     private static final String EXTRA_COMPOSE_TEXT = "text";
 
+    /** Boolean extra indicating whether the text is a link. */
+    private static final String EXTRA_COMPOSE_IS_LINK = "isLink";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,7 +125,8 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
         ft.commit();
     }
 
-    public void onComposeForm(String accountName, String destination, String title, String text) {
+    public void onComposeForm(String accountName, String destination, String title, String text,
+            boolean isLink) {
         switch (getComposition()) {
             case COMPOSITION_COMMENT_REPLY:
                 handleCommentReply(accountName, text);
@@ -140,6 +144,7 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
                 extras.putString(EXTRA_COMPOSE_DESTINATION, destination);
                 extras.putString(EXTRA_COMPOSE_TITLE, title);
                 extras.putString(EXTRA_COMPOSE_TEXT, text);
+                extras.putBoolean(EXTRA_COMPOSE_IS_LINK, isLink);
                 CaptchaFragment.newInstance(extras).show(getFragmentManager(), CaptchaFragment.TAG);
         }
     }
@@ -176,11 +181,12 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
         String destination = extras.getString(EXTRA_COMPOSE_DESTINATION);
         String title = extras.getString(EXTRA_COMPOSE_TITLE);
         String text = extras.getString(EXTRA_COMPOSE_TEXT);
+        boolean isLink = extras.getBoolean(EXTRA_COMPOSE_IS_LINK);
 
         switch (getComposition()) {
             case COMPOSITION_SUBMISSION:
                 Fragment frag = SubmitLinkFragment.newInstance(accountName, destination, title,
-                        text, false, id, guess);
+                        text, isLink, id, guess);
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.add(frag, SubmitLinkFragment.TAG);
                 ft.commit();

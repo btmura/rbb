@@ -21,7 +21,7 @@ import android.text.Spanned;
 
 public class InputFilters {
 
-    public static InputFilter NO_SPACES_FILTER = new InputFilter() {
+    public static InputFilter NO_SPACE_FILTER = new InputFilter() {
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest,
                 int dstart, int dend) {
             for (int i = start; i < end; i++) {
@@ -33,8 +33,6 @@ public class InputFilters {
             return null;
         }
     };
-
-    public static InputFilter LOGIN_FILTER = NO_SPACES_FILTER;
 
     public static InputFilter SUBREDDIT_NAME_FILTER = new InputFilter() {
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest,
@@ -49,7 +47,11 @@ public class InputFilters {
         }
     };
 
+    public static final InputFilter[] NO_SPACE_FILTERS = new InputFilter[] {
+            NO_SPACE_FILTER,
+    };
+
     public static final InputFilter[] SUBREDDIT_NAME_FILTERS = {
-        SUBREDDIT_NAME_FILTER,
+            SUBREDDIT_NAME_FILTER,
     };
 }

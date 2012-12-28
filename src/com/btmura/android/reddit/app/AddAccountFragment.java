@@ -29,7 +29,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.text.InputFilter;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TransformationMethod;
 import android.util.Log;
@@ -59,10 +58,6 @@ public class AddAccountFragment extends Fragment implements
         OnClickListener {
 
     public static final String TAG = "AddAccountFragment";
-
-    private static final InputFilter[] INPUT_FILTERS = new InputFilter[] {
-            InputFilters.LOGIN_FILTER,
-    };
 
     public interface OnAccountAddedListener {
         void onAccountAdded(Bundle result);
@@ -107,7 +102,7 @@ public class AddAccountFragment extends Fragment implements
         View v = inflater.inflate(R.layout.add_account, container, false);
 
         login = (EditText) v.findViewById(R.id.login);
-        login.setFilters(INPUT_FILTERS);
+        login.setFilters(InputFilters.NO_SPACE_FILTERS);
 
         password = (EditText) v.findViewById(R.id.password);
 

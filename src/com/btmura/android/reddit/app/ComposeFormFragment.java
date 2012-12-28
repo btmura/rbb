@@ -16,12 +16,17 @@
 
 package com.btmura.android.reddit.app;
 
+import java.util.regex.Matcher;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +37,7 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
@@ -43,7 +49,7 @@ import com.btmura.android.reddit.widget.AccountNameAdapter;
  * {@link Fragment} that displays a form for composing submissions and messages.
  */
 public class ComposeFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
-        OnClickListener {
+        OnClickListener, TextWatcher {
 
     // This fragment only reports back the user's input and doesn't handle
     // modifying the database. The caller of this fragment should handle that.
@@ -75,8 +81,10 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
          * @param destination whether subreddit or user name
          * @param title or subject of the composition
          * @param text of the composition
+         * @param isLink is true if the text is a link
          */
-        void onComposeForm(String accountName, String destination, String title, String text);
+        void onComposeForm(String accountName, String destination, String title, String text,
+                boolean isLink);
 
         /** Method fired when cancel is pressed. */
         void onComposeFormCancelled();
@@ -100,6 +108,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** {@link EditText} for either title or subject. */
     private EditText titleText;
 
+    /** {@link Switch} indicating text if off and link if on. */
+    private Switch linkSwitch;
+
     /** {@link EditText} for either submission text or message. */
     private EditText textText;
 
@@ -108,6 +119,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
     /** Cancel button visible when this form is a dialog. */
     private View cancel;
+
+    /** Matcher used to check whether the text is a link or not. */
+    private Matcher linkMatcher;
 
     public static ComposeFormFragment newInstance(int composition, String destination) {
         Bundle args = new Bundle(2);
@@ -154,6 +168,8 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
             titleText.requestFocus();
         }
 
+        linkSwitch = (Switch) v.findViewById(R.id.link_switch);
+
         textText = (EditText) v.findViewById(R.id.text_text);
 
         switch (getArguments().getInt(ARG_COMPOSITION)) {
@@ -162,12 +178,16 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 destinationText.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
                 titleText.setHint(R.string.hint_title);
                 textText.setHint(R.string.hint_text_or_link);
+                textText.addTextChangedListener(this);
+                linkSwitch.setVisibility(View.VISIBLE);
                 break;
 
             case COMPOSITION_MESSAGE:
                 destinationText.setHint(R.string.hint_username);
+                destinationText.setFilters(InputFilters.NO_SPACE_FILTERS);
                 titleText.setHint(R.string.hint_subject);
                 textText.setHint(R.string.hint_message);
+                linkSwitch.setVisibility(View.GONE);
                 break;
 
             case COMPOSITION_COMMENT_REPLY:
@@ -175,6 +195,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 destinationText.setVisibility(View.GONE);
                 titleText.setVisibility(View.GONE);
                 textText.setHint(R.string.hint_comment);
+                linkSwitch.setVisibility(View.GONE);
                 break;
 
             default:
@@ -282,9 +303,23 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
             listener.onComposeForm(adapter.getItem(accountSpinner.getSelectedItemPosition()),
                     destinationText.getText().toString(),
                     titleText.getText().toString(),
-                    textText.getText().toString());
+                    textText.getText().toString(),
+                    linkSwitch.isChecked());
         }
 
         return true;
+    }
+
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if (linkMatcher == null) {
+            linkMatcher = Patterns.WEB_URL.matcher(s);
+        }
+        linkSwitch.setChecked(linkMatcher.reset(s).matches());
+    }
+
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    public void afterTextChanged(Editable s) {
     }
 }
