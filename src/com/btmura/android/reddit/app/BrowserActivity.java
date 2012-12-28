@@ -69,6 +69,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     /** Requested thing bundle from intent data. */
     private Bundle requestedThingBundle;
 
+    private boolean hasSubredditList;
+
     private AccountSpinnerAdapter adapter;
     private SharedPreferences prefs;
 
@@ -103,6 +105,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         if (TextUtils.isEmpty(requestedSubreddit)) {
             requestedSubreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
         }
+
+        // Hide the subreddit list when previewing another subreddit or link.
+        hasSubredditList = TextUtils.isEmpty(requestedSubreddit);
 
         // Single pane browser only shows subreddits, so start another activity
         // and finish this one.
@@ -165,7 +170,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected boolean hasSubredditList() {
-        return true;
+        return hasSubredditList;
     }
 
     @Override
