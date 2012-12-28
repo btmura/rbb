@@ -31,6 +31,7 @@ import android.util.Log;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Things;
@@ -49,6 +50,11 @@ public class Provider {
             Things.COLUMN_EXPANDED,
             Things.COLUMN_NESTING,
     };
+
+    private static final String SELECT_OTHER_READ_OPS_BY_ACCOUNT =
+            MessageActions.COLUMN_ACCOUNT + "=? AND " + MessageActions.COLUMN_ACTION + " IN ("
+                    + MessageActions.ACTION_READ + ","
+                    + MessageActions.ACTION_UNREAD + ")";
 
     private static final String SELECT_SAVES_BY_THING_ID = SaveActions.COLUMN_THING_ID + "=?";
     private static final String SELECT_VOTES_BY_THING_ID = VoteActions.COLUMN_THING_ID + "=?";
@@ -241,6 +247,33 @@ public class Provider {
                         .withValue(Messages.COLUMN_KIND, Kinds.KIND_MESSAGE)
                         .withValue(Messages.COLUMN_SESSION_ID, sessionId)
                         .withValue(Messages.COLUMN_WAS_COMMENT, false)
+                        .build());
+
+                applyOps(appContext, ThingProvider.AUTHORITY, ops);
+            }
+        });
+    }
+
+    public static void readMessageAsync(final Context context, final String accountName,
+            final String thingId, final boolean read) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            public void run() {
+                int action = read ? MessageActions.ACTION_READ : MessageActions.ACTION_UNREAD;
+
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(2);
+                ops.add(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
+                        .withSelection(SELECT_OTHER_READ_OPS_BY_ACCOUNT, Array.of(accountName))
+                        .build());
+
+                Uri uri = ThingProvider.MESSAGE_ACTIONS_URI.buildUpon()
+                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
+                        .build();
+                ops.add(ContentProviderOperation.newInsert(uri)
+                        .withValue(MessageActions.COLUMN_ACCOUNT, accountName)
+                        .withValue(MessageActions.COLUMN_THING_ID, thingId)
+                        .withValue(MessageActions.COLUMN_ACTION, action)
                         .build());
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);

@@ -58,6 +58,12 @@ public class MessageActions implements BaseColumns {
     /** Action meaning the user has deleted one of their own comments. */
     public static final int ACTION_DELETE = 1;
 
+    /** Action meaning the user has marked this message as read. */
+    public static final int ACTION_READ = 2;
+
+    /** Action meaning the user has marked this message as unread. */
+    public static final int ACTION_UNREAD = 3;
+
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
