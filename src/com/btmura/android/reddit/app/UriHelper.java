@@ -28,29 +28,29 @@ class UriHelper {
 
     // TODO: Add missing support for /r/pics/top or /u/btmura/overview.
 
-    // URI constants and matcher for handling intents with data.
-    private static final String AUTHORITY = "www.reddit.com";
-    private static final String AUTHORITY2 = "reddit.com";
+    private static final String[] AUTHORITIES = {
+            "www.reddit.com",
+            "reddit.com",
+    };
+
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_SUBREDDIT = 1;
     private static final int MATCH_COMMENTS = 2;
     private static final int MATCH_USER = 3;
     static {
-        // http://www.reddit.com/r/rbb
-        MATCHER.addURI(AUTHORITY, "r/*", MATCH_SUBREDDIT);
-        MATCHER.addURI(AUTHORITY2, "r/*", MATCH_SUBREDDIT);
+        for (int i = 0; i < AUTHORITIES.length; i++) {
+            // http://www.reddit.com/r/rbb
+            MATCHER.addURI(AUTHORITIES[i], "r/*", MATCH_SUBREDDIT);
 
-        // http://www.reddit.com/r/rbb/comments/12zl0q/
-        MATCHER.addURI(AUTHORITY, "r/*/comments/*", MATCH_COMMENTS);
-        MATCHER.addURI(AUTHORITY2, "r/*/comments/*", MATCH_COMMENTS);
+            // http://www.reddit.com/r/rbb/comments/12zl0q/
+            MATCHER.addURI(AUTHORITIES[i], "r/*/comments/*", MATCH_COMMENTS);
 
-        // http://www.reddit.com/r/rbb/comments/12zl0q/test_1
-        MATCHER.addURI(AUTHORITY, "r/*/comments/*/*", MATCH_COMMENTS);
-        MATCHER.addURI(AUTHORITY2, "r/*/comments/*/*", MATCH_COMMENTS);
+            // http://www.reddit.com/r/rbb/comments/12zl0q/test_1
+            MATCHER.addURI(AUTHORITIES[i], "r/*/comments/*/*", MATCH_COMMENTS);
 
-        // http://www.reddit.com/u/btmura
-        MATCHER.addURI(AUTHORITY, "u/*", MATCH_USER);
-        MATCHER.addURI(AUTHORITY2, "u/*", MATCH_USER);
+            // http://www.reddit.com/u/btmura
+            MATCHER.addURI(AUTHORITIES[i], "u/*", MATCH_USER);
+        }
     }
 
     public static String getSubreddit(Uri data) {
