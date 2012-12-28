@@ -43,9 +43,11 @@ public class Urls {
     private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
     private static final String API_ME_URL = BASE_URL + "/api/me";
     private static final String API_NEW_CAPTCHA_URL = BASE_URL + "/api/new_captcha";
+    private static final String API_READ_MESSAGE = BASE_URL + "/api/read_message";
     private static final String API_SAVE_URL = BASE_URL + "/api/save";
     private static final String API_SUBMIT_URL = BASE_URL + "/api/submit/";
     private static final String API_SUBSCRIBE_URL = BASE_URL + "/api/subscribe/";
+    private static final String API_UNREAD_MESSAGE = BASE_URL + "/api/unread_message";
     private static final String API_UNSAVE_URL = BASE_URL + "/api/unsave";
     private static final String API_VOTE_URL = BASE_URL + "/api/vote/";
 
@@ -199,7 +201,19 @@ public class Urls {
         return "api_type=json";
     }
 
+    public static CharSequence readMessage() {
+        return API_READ_MESSAGE;
+    }
+
+    public static CharSequence readMessageQuery(String thingId, String modhash) {
+        return thingQuery(thingId, modhash);
+    }
+
     public static CharSequence saveQuery(String thingId, String modhash) {
+        return thingQuery(thingId, modhash);
+    }
+
+    private static CharSequence thingQuery(String thingId, String modhash) {
         StringBuilder b = new StringBuilder();
         b.append("id=").append(encode(thingId));
         b.append("&uh=").append(encode(modhash));
@@ -312,6 +326,14 @@ public class Urls {
 
     public static CharSequence subscribe() {
         return API_SUBSCRIBE_URL;
+    }
+
+    public static CharSequence unreadMessage() {
+        return API_UNREAD_MESSAGE;
+    }
+
+    public static CharSequence unreadMessageQuery(String thingId, String modhash) {
+        return thingQuery(thingId, modhash);
     }
 
     public static CharSequence user(String user, int filter, String more, int apiType) {
