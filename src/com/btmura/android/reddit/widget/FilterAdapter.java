@@ -58,11 +58,13 @@ public class FilterAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void addProfileFilters(Context context) {
+    public void addProfileFilters(Context context, boolean includeSaved) {
         add(context, R.string.filter_profile_overview);
         add(context, R.string.filter_profile_comments);
         add(context, R.string.filter_profile_submitted);
-        add(context, R.string.filter_profile_saved);
+        if (includeSaved) {
+            add(context, R.string.filter_profile_saved);
+        }
         notifyDataSetChanged();
     }
 

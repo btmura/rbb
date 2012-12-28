@@ -91,7 +91,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         prefs = result.prefs;
         accountName = result.getLastAccount();
-        adapter.addProfileFilters(this);
+        adapter.addProfileFilters(this, Objects.equals(accountName, requestedUser));
         if (requestedFilter != -1) {
             bar.setSelectedNavigationItem(requestedFilter);
         } else {
