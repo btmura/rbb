@@ -16,15 +16,12 @@
 
 package com.btmura.android.reddit.app;
 
-import java.util.List;
-
 import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.ContentResolver;
 import android.content.Loader;
 import android.content.SharedPreferences;
-import android.content.UriMatcher;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,26 +36,9 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener,
         AccountNameHolder {
-
-    // URI constants and matcher for handling intents with data.
-    private static final String AUTHORITY = "www.reddit.com";
-    private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_SUBREDDIT = 1;
-    private static final int MATCH_COMMENTS = 2;
-    static {
-        // http://www.reddit.com/r/rbb
-        MATCHER.addURI(AUTHORITY, "r/*", MATCH_SUBREDDIT);
-
-        // http://www.reddit.com/r/rbb/comments/12zl0q/
-        MATCHER.addURI(AUTHORITY, "r/*/comments/*", MATCH_COMMENTS);
-
-        // http://www.reddit.com/r/rbb/comments/12zl0q/test_1
-        MATCHER.addURI(AUTHORITY, "r/*/comments/*/*", MATCH_COMMENTS);
-    }
 
     /** Requested subreddit from intent data or extra. */
     private String requestedSubreddit;
@@ -81,19 +61,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         // Process the intent's data if available.
         Uri data = getIntent().getData();
         if (data != null) {
-            switch (MATCHER.match(data)) {
-                case MATCH_SUBREDDIT:
-                    requestedSubreddit = data.getLastPathSegment();
-                    break;
-
-                case MATCH_COMMENTS:
-                    List<String> segments = data.getPathSegments();
-                    requestedSubreddit = segments.get(1);
-                    requestedThingBundle = new Bundle(2);
-                    ThingBundle.putSubreddit(requestedThingBundle, requestedSubreddit);
-                    ThingBundle.putThingId(requestedThingBundle, segments.get(3));
-                    break;
-            }
+            requestedSubreddit = UriHelper.getSubreddit(data);
+            requestedThingBundle = UriHelper.getThingBundle(data);
         }
 
         // TODO: Do more sanity checks on the url data.
