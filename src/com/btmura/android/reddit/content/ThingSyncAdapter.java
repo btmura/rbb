@@ -302,10 +302,25 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             try {
                 // Try to sync the comment with the server.
                 Result result = null;
-                if (action == MessageActions.ACTION_INSERT) {
-                    result = RedditApi.comment(thingId, text, cookie, modhash);
-                } else if (action == MessageActions.ACTION_DELETE) {
-                    result = RedditApi.delete(thingId, cookie, modhash);
+                switch (action) {
+                    case MessageActions.ACTION_INSERT:
+                        result = RedditApi.comment(thingId, text, cookie, modhash);
+                        break;
+
+                    case MessageActions.ACTION_DELETE:
+                        result = RedditApi.delete(thingId, cookie, modhash);
+                        break;
+
+                    case MessageActions.ACTION_READ:
+                        result = RedditApi.readMessage(thingId, true, cookie, modhash);
+                        break;
+
+                    case MessageActions.ACTION_UNREAD:
+                        result = RedditApi.readMessage(thingId, false, cookie, modhash);
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException();
                 }
 
                 // Log any errors if there were any.
