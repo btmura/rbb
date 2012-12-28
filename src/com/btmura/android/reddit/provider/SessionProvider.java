@@ -45,8 +45,7 @@ abstract class SessionProvider extends BaseProvider {
 
     /** Returns a session id pointing to the data. */
     long getListingSession(Listing listing, SQLiteDatabase db, long sessionId) throws IOException {
-        // Return existing session if it exists and we're not appending more to
-        // it.
+        // Return existing session if it exists and we're not appending more.
         if (sessionId != -1 && !listing.isAppend()) {
             return sessionId;
         }
@@ -54,20 +53,31 @@ abstract class SessionProvider extends BaseProvider {
         // Fetch values to insert from the network.
         ArrayList<ContentValues> values = listing.getValues();
 
-        // Insert new db values. Delete prior existing session.
+        // Insert new db values.
         db.beginTransaction();
         try {
+            // Delete any existing "Loading..." signs if appending.
+            if (listing.isAppend()) {
+                // Appending requires an existing session to append the data.
+                if (sessionId == -1) {
+                    throw new IllegalStateException();
+                }
+
+                // Delete the row for this append. If there is no such row, then
+                // this might be a duplicate append that got triggered, so just
+                // return the existing session id and hope for the best.
+                int count = db.delete(listing.getTargetTable(),
+                        SELECT_MORE_WITH_SESSION_ID, Array.of(sessionId));
+                if (count == 0) {
+                    return sessionId;
+                }
+            }
+
             // Create a new session if there is no id.
             if (sessionId == -1) {
                 ContentValues v = new ContentValues(1);
                 v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
                 sessionId = db.insert(Sessions.TABLE_NAME, null, v);
-            }
-
-            // Delete any existing "Loading..." signs if appending.
-            if (listing.isAppend()) {
-                db.delete(listing.getTargetTable(), SELECT_MORE_WITH_SESSION_ID,
-                        Array.of(sessionId));
             }
 
             // Add the session id to the data rows.
