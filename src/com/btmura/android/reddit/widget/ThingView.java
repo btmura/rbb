@@ -511,7 +511,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     public boolean onSingleTapUp(MotionEvent e) {
         return VotingArrows.onSingleTapUp(e, getTopOffset(), getLeftOffset(),
-                drawVotingArrows, drawScore, true, listener, thingId);
+                drawVotingArrows, drawScore, true, listener, thingId, likes);
     }
 
     private float getTopOffset() {

@@ -42,6 +42,9 @@ public class VoteActions implements BaseColumns {
     /** Vote column value indicating an upvote. */
     public static final int ACTION_VOTE_UP = 1;
 
+    /** Vote column value indicating a neutral vote. */
+    public static final int ACTION_VOTE_NEUTRAL = 0;
+
     /** Vote column value indicating a downvote. */
     public static final int ACTION_VOTE_DOWN = -1;
 

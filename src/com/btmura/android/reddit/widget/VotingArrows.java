@@ -205,16 +205,25 @@ class VotingArrows {
     }
 
     static boolean onSingleTapUp(MotionEvent e, float top, float left, boolean drawArrows,
-            boolean drawScore, boolean isVotable, OnVoteListener listener, String thingId) {
+            boolean drawScore, boolean isVotable, OnVoteListener listener, String thingId,
+            int likes) {
         if (listener != null) {
             int event = getEvent(e, top, left, drawArrows, drawScore, isVotable);
             switch (event) {
                 case EVENT_UPVOTE:
-                    listener.onVote(thingId, VoteActions.ACTION_VOTE_UP);
+                    if (likes != VoteActions.ACTION_VOTE_UP) {
+                        listener.onVote(thingId, VoteActions.ACTION_VOTE_UP);
+                    } else {
+                        listener.onVote(thingId, VoteActions.ACTION_VOTE_NEUTRAL);
+                    }
                     return true;
 
                 case EVENT_DOWNVOTE:
-                    listener.onVote(thingId, VoteActions.ACTION_VOTE_DOWN);
+                    if (likes != VoteActions.ACTION_VOTE_DOWN) {
+                        listener.onVote(thingId, VoteActions.ACTION_VOTE_DOWN);
+                    } else {
+                        listener.onVote(thingId, VoteActions.ACTION_VOTE_NEUTRAL);
+                    }
                     return true;
             }
         }
