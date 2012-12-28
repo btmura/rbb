@@ -57,6 +57,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
+                    android:host="reddit.com"
+                    android:pathPrefix="/r"
+                    android:scheme="http" />
+                <data
                     android:host="www.reddit.com"
                     android:pathPrefix="/r"
                     android:scheme="http" />
@@ -86,6 +90,10 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
 
+                <data
+                    android:host="reddit.com"
+                    android:pathPrefix="/u"
+                    android:scheme="http" />
                 <data
                     android:host="www.reddit.com"
                     android:pathPrefix="/u"
