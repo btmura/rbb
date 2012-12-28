@@ -251,6 +251,16 @@ public class RedditApi {
         }
     }
 
+    public static Result readMessage(String thingId, boolean read, String cookie, String modhash)
+            throws IOException {
+        if (read) {
+            return postData(Urls.readMessage(), Urls.readMessageQuery(thingId, modhash), cookie);
+        } else {
+            return postData(Urls.unreadMessage(), Urls.unreadMessageQuery(thingId, modhash),
+                    cookie);
+        }
+    }
+
     public static Result save(String thingId, boolean save, String cookie, String modhash)
             throws IOException {
         return postData(Urls.save(save), Urls.saveQuery(thingId, modhash), cookie);
