@@ -18,14 +18,17 @@ package com.btmura.android.reddit.app;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.app.ComposeFormFragment.OnComposeFormListener;
 import com.btmura.android.reddit.app.ComposeFragment.OnComposeListener;
+import com.btmura.android.reddit.app.SubmitLinkFragment.OnSubmitLinkListener;
 import com.btmura.android.reddit.provider.Provider;
 
 /**
@@ -33,7 +36,7 @@ import com.btmura.android.reddit.provider.Provider;
  * and subsequently processing them.
  */
 public class ComposeActivity extends Activity implements OnComposeFormListener,
-        OnCaptchaGuessListener, OnComposeListener {
+        OnCaptchaGuessListener, OnComposeListener, OnSubmitLinkListener {
 
     /** Charsequence extra for the activity's title */
     static final String EXTRA_DESTINATION = "destination";
@@ -169,21 +172,22 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     }
 
     public void onCaptchaGuess(String id, String guess, Bundle extras) {
+        String accountName = extras.getString(EXTRA_COMPOSE_ACCOUNT_NAME);
+        String destination = extras.getString(EXTRA_COMPOSE_DESTINATION);
+        String title = extras.getString(EXTRA_COMPOSE_TITLE);
+        String text = extras.getString(EXTRA_COMPOSE_TEXT);
+
         switch (getComposition()) {
             case COMPOSITION_SUBMISSION:
-                SubmitLinkFragment f = SubmitLinkFragment.newInstance(id, guess, extras);
+                Fragment frag = SubmitLinkFragment.newInstance(accountName, destination, title,
+                        text, false, id, guess);
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(f, SubmitLinkFragment.TAG);
+                ft.add(frag, SubmitLinkFragment.TAG);
                 ft.commit();
                 break;
 
             case COMPOSITION_MESSAGE:
-                String accountName = extras.getString(EXTRA_COMPOSE_ACCOUNT_NAME);
-                String destination = extras.getString(EXTRA_COMPOSE_DESTINATION);
-                String title = extras.getString(EXTRA_COMPOSE_TITLE);
-                String text = extras.getString(EXTRA_COMPOSE_TEXT);
-                ComposeFragment frag = ComposeFragment.newInstance(accountName, destination, title,
-                        text, id, guess);
+                frag = ComposeFragment.newInstance(accountName, destination, title, text, id, guess);
                 ft = getFragmentManager().beginTransaction();
                 ft.add(frag, ComposeFragment.TAG);
                 ft.commit();
@@ -202,6 +206,14 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     }
 
     public void onComposeCancelled() {
+    }
+
+    public void onSubmitLink(String name, String url) {
+        Toast.makeText(getApplicationContext(), url, Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    public void onSubmitLinkCancelled() {
     }
 
     @Override

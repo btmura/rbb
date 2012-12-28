@@ -43,19 +43,10 @@ public class SubmitLinkFragment extends Fragment {
     private static final String ARG_TITLE = "title";
     private static final String ARG_TEXT = "text";
     private static final String ARG_IS_LINK = "isLink";
-
-    private static final String ARG_EXTRAS = "submitExtras";
     private static final String ARG_CAPTCHA_ID = "captchaId";
     private static final String ARG_CAPTCHA_GUESS = "captchaGuess";
 
     private OnSubmitLinkListener listener;
-    private String accountName;
-    private String subreddit;
-    private String title;
-    private String text;
-    private boolean isLink;
-    private String captchaId;
-    private String captchaGuess;
     private SubmitTask submitTask;
 
     public interface OnSubmitLinkListener {
@@ -64,23 +55,16 @@ public class SubmitLinkFragment extends Fragment {
         void onSubmitLinkCancelled();
     }
 
-    public static Bundle newSubmitExtras(String accountName, String subreddit,
-            String title, String text, boolean isLink) {
-        Bundle args = new Bundle(5);
+    public static SubmitLinkFragment newInstance(String accountName, String subreddit,
+            String title, String text, boolean isLink, String captchaId, String captchaGuess) {
+        Bundle args = new Bundle(7);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putString(ARG_TITLE, title);
         args.putString(ARG_TEXT, text);
         args.putBoolean(ARG_IS_LINK, isLink);
-        return args;
-    }
-
-    public static SubmitLinkFragment newInstance(String captchaId, String captchaGuess,
-            Bundle extras) {
-        Bundle args = new Bundle(3);
         args.putString(ARG_CAPTCHA_ID, captchaId);
         args.putString(ARG_CAPTCHA_GUESS, captchaGuess);
-        args.putBundle(ARG_EXTRAS, extras);
 
         SubmitLinkFragment frag = new SubmitLinkFragment();
         frag.setArguments(args);
@@ -99,16 +83,6 @@ public class SubmitLinkFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-        Bundle submitExtras = getArguments().getBundle(ARG_EXTRAS);
-        accountName = submitExtras.getString(ARG_ACCOUNT_NAME);
-        subreddit = submitExtras.getString(ARG_SUBREDDIT);
-        title = submitExtras.getString(ARG_TITLE);
-        text = submitExtras.getString(ARG_TEXT);
-        isLink = submitExtras.getBoolean(ARG_IS_LINK);
-
-        captchaId = getArguments().getString(ARG_CAPTCHA_ID);
-        captchaGuess = getArguments().getString(ARG_CAPTCHA_GUESS);
     }
 
     @Override
@@ -146,6 +120,7 @@ public class SubmitLinkFragment extends Fragment {
         @Override
         protected Result doInBackground(Void... params) {
             try {
+                String accountName = getArguments().getString(ARG_ACCOUNT_NAME);
                 AccountManager manager = AccountManager.get(context);
                 Account account = AccountUtils.getAccount(context, accountName);
                 String cookie = AccountUtils.getCookie(manager, account);
@@ -156,8 +131,17 @@ public class SubmitLinkFragment extends Fragment {
                 if (modhash == null) {
                     return null;
                 }
+
+                String subreddit = getArguments().getString(ARG_SUBREDDIT);
+                String title = getArguments().getString(ARG_TITLE);
+                String text = getArguments().getString(ARG_TEXT);
+                boolean isLink = getArguments().getBoolean(ARG_IS_LINK);
+                String captchaId = getArguments().getString(ARG_CAPTCHA_ID);
+                String captchaGuess = getArguments().getString(ARG_CAPTCHA_GUESS);
+
                 return RedditApi.submit(subreddit, title, text, isLink,
                         captchaId, captchaGuess, cookie, modhash);
+
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage(), e);
             } catch (OperationCanceledException e) {
