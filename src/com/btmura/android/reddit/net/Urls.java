@@ -313,10 +313,11 @@ public class Urls {
         return API_SUBSCRIBE_URL;
     }
 
-    public static CharSequence user(String user, int filter, String more) {
+    public static CharSequence user(String user, int filter, String more, int apiType) {
         StringBuilder b = new StringBuilder(BASE_USER_URL).append(user);
         switch (filter) {
             case FilterAdapter.PROFILE_OVERVIEW:
+                b.append("/overview");
                 break;
 
             case FilterAdapter.PROFILE_COMMENTS:
@@ -330,11 +331,10 @@ public class Urls {
             case FilterAdapter.PROFILE_SAVED:
                 b.append("/saved");
                 break;
-
-            default:
-                throw new IllegalArgumentException(Integer.toString(filter));
         }
-        b.append("/.json");
+        if (apiType == TYPE_JSON) {
+            b.append("/.json");
+        }
         if (more != null) {
             b.append("?count=25&after=").append(encode(more));
         }

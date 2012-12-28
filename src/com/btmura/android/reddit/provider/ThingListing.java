@@ -102,7 +102,7 @@ class ThingListing extends JsonParser implements Listing {
         if (!TextUtils.isEmpty(messageUser)) {
             url = Urls.message(filter, more);
         } else if (!TextUtils.isEmpty(profileUser)) {
-            url = Urls.user(profileUser, filter, more);
+            url = Urls.user(profileUser, filter, more, Urls.TYPE_JSON);
         } else if (!TextUtils.isEmpty(query)) {
             url = Urls.search(query, more);
         } else {
