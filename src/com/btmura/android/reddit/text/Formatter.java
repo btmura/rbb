@@ -376,27 +376,15 @@ public class Formatter {
     }
 
     static Object getUrlSpan(String url, StringBuilder builder) {
-        int srIndex = url.indexOf("/r/");
-        if (srIndex != -1 && srIndex + 3 < url.length()) {
-            int slash = url.indexOf('/', srIndex + 3);
-            if (slash == -1) {
-                return new SubredditSpan(url.substring(srIndex + 3));
-            } else if (slash + 1 == url.length()) {
-                return new SubredditSpan(url.substring(srIndex + 3, slash));
-            }
-        }
-
-        Object span = null;
         if (url.startsWith("/")) {
             url = builder.delete(0, builder.length()).append(Urls.BASE_URL).append(url).toString();
-            span = new URLSpan(url);
+            return new URLSpan(url);
         } else if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = builder.delete(0, builder.length()).append("http://").append(url).toString();
-            span = new URLSpan(url);
+            return new URLSpan(url);
         } else {
             url = builder.delete(0, builder.length()).append(url).toString();
-            span = new URLSpan(url);
+            return new URLSpan(url);
         }
-        return span;
     }
 }
