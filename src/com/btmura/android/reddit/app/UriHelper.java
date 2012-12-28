@@ -26,6 +26,8 @@ import android.os.Bundle;
 
 class UriHelper {
 
+    // TODO: Add missing support for /r/pics/top or /u/btmura/overview.
+
     // URI constants and matcher for handling intents with data.
     private static final String AUTHORITY = "www.reddit.com";
     private static final String AUTHORITY2 = "reddit.com";

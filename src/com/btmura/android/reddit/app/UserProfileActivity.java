@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
@@ -34,6 +35,8 @@ import com.btmura.android.reddit.widget.FilterAdapter;
  */
 public class UserProfileActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
+    // TODO: Remove these extras and only support the data uri.
+
     /** Required string extra that is the user's name. */
     public static final String EXTRA_USER = "user";
 
@@ -42,6 +45,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
 
+    private String profileUser;
     private FilterAdapter adapter;
     private String accountName;
     private SharedPreferences prefs;
@@ -53,6 +57,20 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     protected boolean skipSetup() {
+        // Get the user from the intent data or extra.
+        if (getIntent().getData() != null) {
+            profileUser = UriHelper.getUser(getIntent().getData());
+        } else if (getIntent().hasExtra(EXTRA_USER)) {
+            profileUser = getIntent().getStringExtra(EXTRA_USER);
+        }
+
+        // Quit if there is no profile to view.
+        if (TextUtils.isEmpty(profileUser)) {
+            finish();
+            return true;
+        }
+
+        // Continue on since we have some user.
         return false;
     }
 
@@ -63,7 +81,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         adapter = new FilterAdapter(this);
-        adapter.setTitle(getUserName());
+        adapter.setTitle(profileUser);
 
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
@@ -72,15 +90,6 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         if (savedInstanceState != null) {
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_NAVIGATION_INDEX));
         }
-    }
-
-    private String getUserName() {
-        String user = getIntent().getStringExtra(EXTRA_USER);
-        // TODO: Remove this fallback once things become more stable.
-        if (user == null) {
-            user = "rbbtest1";
-        }
-        return user;
     }
 
     @Override
@@ -96,7 +105,6 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-        accountName = null;
     }
 
     @Override
@@ -129,7 +137,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         ThingListFragment frag = getThingListFragment();
         if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != filter) {
-            setProfileThingListNavigation(getUserName());
+            setProfileThingListNavigation(profileUser);
         }
         return true;
     }

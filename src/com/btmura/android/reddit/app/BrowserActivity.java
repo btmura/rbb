@@ -40,7 +40,7 @@ import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener,
         AccountNameHolder {
 
-    /** Requested subreddit from intent data or extra. */
+    /** Requested subreddit from intent data to view. */
     private String requestedSubreddit;
 
     /** Requested thing bundle from intent data. */
@@ -66,6 +66,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         }
 
         // TODO: Do more sanity checks on the url data.
+
+        // TODO: The line below hides the subreddit list but there is still one.
+        // Fix this to not actually build the subreddit list.
 
         // Hide the subreddit list when previewing another subreddit or link.
         hasSubredditList = TextUtils.isEmpty(requestedSubreddit);
