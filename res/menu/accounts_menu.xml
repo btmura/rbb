@@ -20,5 +20,9 @@
         android:id="@+id/menu_add_account"
         android:showAsAction="ifRoom"
         android:title="@string/menu_add_account"/>
+    <item
+        android:id="@+id/menu_sync_settings"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_sync_settings"/>
 
 </menu>

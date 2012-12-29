@@ -86,6 +86,7 @@
     <string name="menu_share">Share</string>
     <string name="menu_submit">Submit</string>
     <string name="menu_submit_link">Submit a link</string>
+    <string name="menu_sync_settings">Sync settings</string>
     <string name="menu_unread_messages">Unread messages</string>
     <string name="menu_unsave">Unsave</string>
     <string name="menu_view_profile">View profile</string>
