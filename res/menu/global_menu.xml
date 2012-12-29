@@ -54,5 +54,10 @@
         android:orderInCategory="1337"
         android:showAsAction="never"
         android:title="@string/menu_settings"/>
+    <item
+        android:id="@+id/menu_debug"
+        android:orderInCategory="1337"
+        android:showAsAction="never"
+        android:title="@string/menu_debug"/>
 
 </menu>

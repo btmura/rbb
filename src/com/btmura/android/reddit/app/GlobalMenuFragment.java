@@ -31,6 +31,7 @@ import android.view.View.OnFocusChangeListener;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.widget.AccountAdapter;
@@ -121,6 +122,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         menu.findItem(R.id.menu_submit_link).setVisible(isAccount);
         menu.findItem(R.id.menu_profile).setVisible(isAccount);
         menu.findItem(R.id.menu_messages).setVisible(isAccount);
+        menu.findItem(R.id.menu_debug).setVisible(BuildConfig.DEBUG);
     }
 
     @Override
@@ -146,6 +148,9 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
 
             case R.id.menu_settings:
                 return handleSettings();
+
+            case R.id.menu_debug:
+                return handleDebug();
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -186,6 +191,11 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
 
     private boolean handleSettings() {
         startActivity(new Intent(getActivity(), SettingsActivity.class));
+        return true;
+    }
+
+    private boolean handleDebug() {
+        startActivity(new Intent(getActivity(), ContentBrowserActivity.class));
         return true;
     }
 
