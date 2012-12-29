@@ -93,7 +93,6 @@ public class Subreddits implements BaseColumns {
 
     static void insertDefaultSubreddits(SQLiteDatabase db) {
         String[] defaultSubreddits = {
-                NAME_FRONT_PAGE,
                 "AdviceAnimals",
                 "announcements",
                 "AskReddit",
