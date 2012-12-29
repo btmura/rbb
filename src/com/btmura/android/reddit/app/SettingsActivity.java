@@ -81,7 +81,6 @@ public class SettingsActivity extends PreferenceActivity implements LoaderCallba
                 addHeader(0, accountName, AccountPreferenceFragment.class, args, target);
             }
         }
-        addHeader(R.string.settings_debug, null, DebugFragment.class, Bundle.EMPTY, target);
     }
 
     private void addHeader(int titleRes, String title, Class<? extends Fragment> fragClass,
