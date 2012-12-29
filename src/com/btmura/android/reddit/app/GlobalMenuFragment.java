@@ -190,7 +190,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     }
 
     private boolean handleAccounts() {
-        startActivity(new Intent(getActivity(), AccountsActivity.class));
+        startActivity(new Intent(getActivity(), AccountListActivity.class));
         return true;
     }
 

@@ -84,7 +84,7 @@ public class AccountPreferenceFragment extends PreferenceFragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        // TODO: Figure out how to move this somehow to AccountsActivity.
+        // TODO: Figure out how to move this somehow to AccountListActivity.
         menu.findItem(R.id.menu_add_account).setVisible(false);
     }
 

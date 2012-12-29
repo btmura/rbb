@@ -34,9 +34,9 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
-public class AccountsActivity extends PreferenceActivity implements LoaderCallbacks<AccountResult> {
+public class AccountListActivity extends PreferenceActivity implements LoaderCallbacks<AccountResult> {
 
-    public static final String TAG = "AccountsActivity";
+    public static final String TAG = "AccountListActivity";
 
     private static final String[] AUTHORITIES = {
             SubredditProvider.AUTHORITY,
@@ -96,7 +96,7 @@ public class AccountsActivity extends PreferenceActivity implements LoaderCallba
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.accounts_menu, menu);
+        getMenuInflater().inflate(R.menu.account_list_menu, menu);
         return true;
     }
 

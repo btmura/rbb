@@ -42,7 +42,7 @@
             android:label="@string/add_account"
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
-            android:name="com.btmura.android.reddit.app.AccountsActivity"
+            android:name="com.btmura.android.reddit.app.AccountListActivity"
             android:label="@string/label_accounts" />
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
