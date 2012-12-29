@@ -158,8 +158,7 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
             case TYPE_MESSAGES:
                 return MessageThreadListFragment.newInstance(accountName,
-                        ThingBundle.getThingId(thingBundle),
-                        ThingBundle.isNew(thingBundle));
+                        ThingBundle.getThingId(thingBundle));
 
             default:
                 throw new IllegalStateException();

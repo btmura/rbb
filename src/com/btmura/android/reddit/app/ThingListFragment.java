@@ -270,6 +270,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
         if (listener != null) {
             listener.onThingSelected(adapter.getThingBundle(getActivity(), position));
         }
+        if (adapter.isNew(position)) {
+            Provider.readMessageAsync(getActivity(), adapter.getAccountName(),
+                    adapter.getThingId(position), true);
+        }
     }
 
     public void onScrollStateChanged(AbsListView view, int scrollState) {

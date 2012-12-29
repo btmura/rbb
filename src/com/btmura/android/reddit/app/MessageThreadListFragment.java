@@ -29,7 +29,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.widget.MessageThreadAdapter;
 
 /**
@@ -41,10 +40,8 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
 
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_ID = "thingId";
-    private static final String ARG_MARK_READ = "markRead";
 
     private static final String STATE_SESSION_ID = "sessionId";
-    private static final String STATE_MARK_READ = ARG_MARK_READ;
 
     public static final String EXTRA_PARENT_THING_ID = "parentThingId";
     public static final String EXTRA_SESSION_ID = "sessionId";
@@ -52,15 +49,10 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
 
     private MessageThreadAdapter adapter;
 
-    /** Whether to mark this message as read after loading it. */
-    private boolean markRead;
-
-    public static MessageThreadListFragment newInstance(String accountName, String thingId,
-            boolean markRead) {
-        Bundle args = new Bundle(3);
+    public static MessageThreadListFragment newInstance(String accountName, String thingId) {
+        Bundle args = new Bundle(2);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_THING_ID, thingId);
-        args.putBoolean(ARG_MARK_READ, markRead);
 
         MessageThreadListFragment frag = new MessageThreadListFragment();
         frag.setArguments(args);
@@ -73,10 +65,8 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
         adapter = new MessageThreadAdapter(getActivity());
         adapter.setAccountName(getArguments().getString(ARG_ACCOUNT_NAME));
         adapter.setThingId(getArguments().getString(ARG_THING_ID));
-        markRead = getArguments().getBoolean(ARG_MARK_READ);
         if (savedInstanceState != null) {
             adapter.setSessionId(savedInstanceState.getLong(STATE_SESSION_ID));
-            markRead = savedInstanceState.getBoolean(STATE_MARK_READ);
         }
     }
 
@@ -112,12 +102,6 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
-
-        if (adapter.getCount() > 0 && markRead) {
-            markRead = false;
-            Provider.readMessageAsync(getActivity(), adapter.getAccountName(),
-                    adapter.getThingId(), true);
-        }
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -167,6 +151,5 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
-        outState.putBoolean(STATE_MARK_READ, markRead);
     }
 }
