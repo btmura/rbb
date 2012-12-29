@@ -50,10 +50,10 @@
         android:showAsAction="never"
         android:title="@string/menu_messages"/>
     <item
-        android:id="@+id/menu_settings"
+        android:id="@+id/menu_accounts"
         android:orderInCategory="1337"
         android:showAsAction="never"
-        android:title="@string/menu_settings"/>
+        android:title="@string/menu_accounts"/>
     <item
         android:id="@+id/menu_debug"
         android:orderInCategory="1337"

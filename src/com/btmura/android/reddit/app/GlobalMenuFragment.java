@@ -146,8 +146,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
             case R.id.menu_messages:
                 return handleMessages();
 
-            case R.id.menu_settings:
-                return handleSettings();
+            case R.id.menu_accounts:
+                return handleAccounts();
 
             case R.id.menu_debug:
                 return handleDebug();
@@ -189,7 +189,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         return true;
     }
 
-    private boolean handleSettings() {
+    private boolean handleAccounts() {
         startActivity(new Intent(getActivity(), SettingsActivity.class));
         return true;
     }
