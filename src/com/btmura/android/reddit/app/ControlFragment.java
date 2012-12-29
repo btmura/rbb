@@ -65,7 +65,7 @@ public class ControlFragment extends Fragment {
 
     public void setSubreddit(String subreddit) {
         this.subreddit = subreddit;
-        this.isRandom = Subreddits.NAME_RANDOM.equalsIgnoreCase(subreddit);
+        this.isRandom = Subreddits.isRandom(subreddit);
     }
 
     public void setIsRandom(boolean isRandom) {

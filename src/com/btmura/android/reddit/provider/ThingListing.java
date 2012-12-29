@@ -107,7 +107,7 @@ class ThingListing extends JsonParser implements Listing {
             url = Urls.search(query, more);
         } else {
             url = Urls.subreddit(subreddit, filter, more, Urls.TYPE_JSON);
-            followRedirects = !Subreddits.NAME_RANDOM.equalsIgnoreCase(subreddit);
+            followRedirects = !Subreddits.isRandom(subreddit);
         }
 
         HttpURLConnection conn = RedditApi.connect(url, cookie, followRedirects, false);

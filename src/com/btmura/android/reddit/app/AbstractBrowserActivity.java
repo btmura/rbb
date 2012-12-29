@@ -330,7 +330,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     public void onSubredditSelected(String subreddit) {
-        selectSubreddit(subreddit, Subreddits.NAME_RANDOM.equalsIgnoreCase(subreddit), 0);
+        selectSubreddit(subreddit, Subreddits.isRandom(subreddit), 0);
     }
 
     protected void selectSubreddit(String subreddit, boolean isRandom, int flags) {
@@ -421,7 +421,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     public void onSubredditDiscovery(String subreddit) {
         ControlFragment cf = getControlFragment();
-        if (Objects.equalsIgnoreCase(Subreddits.NAME_RANDOM, cf.getSubreddit())) {
+        if (Subreddits.isRandom(cf.getSubreddit())) {
             cf.setSubreddit(subreddit);
             cf.setIsRandom(true);
             refreshActionBar(subreddit, cf.getThingBundle());

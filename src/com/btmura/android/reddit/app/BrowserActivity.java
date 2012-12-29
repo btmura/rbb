@@ -82,7 +82,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 return true;
             } else if (!TextUtils.isEmpty(requestedSubreddit)) {
                 selectSubreddit(requestedSubreddit,
-                        Subreddits.NAME_RANDOM.equalsIgnoreCase(requestedSubreddit),
+                        Subreddits.isRandom(requestedSubreddit),
                         ThingListActivity.FLAG_INSERT_HOME);
                 finish();
                 return true;
@@ -193,7 +193,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             // problem where the last visited subreddit is the resolved random
             // subreddit, because we don't save the subreddit preference when
             // changing filters or on resolving the subreddit!
-            boolean isRandom = Subreddits.NAME_RANDOM.equalsIgnoreCase(subreddit);
+            boolean isRandom = Subreddits.isRandom(subreddit);
 
             setSubredditListNavigation(subreddit, isRandom, null, thingBundle);
         } else if (tlf != null && tlf.getFilter() != filter) {
