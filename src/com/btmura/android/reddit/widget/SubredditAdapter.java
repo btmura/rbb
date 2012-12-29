@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.widget;
 
-import java.util.Locale;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
