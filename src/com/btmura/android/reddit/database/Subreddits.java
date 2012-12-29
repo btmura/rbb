@@ -58,6 +58,10 @@ public class Subreddits implements BaseColumns {
         return TextUtils.isEmpty(subreddit);
     }
 
+    public static boolean isAll(String subreddit) {
+        return NAME_ALL.equalsIgnoreCase(subreddit);
+    }
+
     public static boolean isRandom(String subreddit) {
         return NAME_RANDOM.equalsIgnoreCase(subreddit);
     }
