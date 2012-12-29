@@ -261,11 +261,6 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         ops.add(ContentProviderOperation.newDelete(SubredditProvider.SUBREDDITS_URI)
                 .withSelection(Subreddits.SELECT_BY_ACCOUNT, Array.of(login))
                 .build());
-        ops.add(ContentProviderOperation.newInsert(SubredditProvider.SUBREDDITS_URI)
-                .withValue(Subreddits.COLUMN_ACCOUNT, login)
-                .withValue(Subreddits.COLUMN_NAME, Subreddits.NAME_FRONT_PAGE)
-                .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_INSERTING)
-                .build());
         for (int i = 0; i < count; i++) {
             ops.add(ContentProviderOperation.newInsert(SubredditProvider.SUBREDDITS_URI)
                     .withValue(Subreddits.COLUMN_ACCOUNT, login)
