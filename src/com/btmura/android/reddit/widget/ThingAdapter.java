@@ -398,8 +398,9 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     public boolean isSaved(int position) {
-        return !isMessage() && (getBoolean(position, THING_SAVED)
-                || getInt(position, THING_SAVE_ACTION) == SaveActions.ACTION_SAVE);
+        return !isMessage()
+                && getBoolean(position, THING_SAVED)
+                && getInt(position, THING_SAVE_ACTION) != SaveActions.ACTION_UNSAVE;
     }
 
     public String getTitle(int position) {
