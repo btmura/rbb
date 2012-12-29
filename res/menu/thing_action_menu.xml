@@ -17,16 +17,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_reply"
-        android:icon="@drawable/ic_action_edit"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_reply"/>
-    <item
-        android:id="@+id/menu_compose_message"
-        android:icon="@drawable/ic_action_new_message"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_compose_message"/>
-    <item
         android:id="@+id/menu_save"
         android:icon="@drawable/ic_action_save"
         android:showAsAction="ifRoom"
@@ -41,6 +31,11 @@
         android:icon="@drawable/ic_action_profile"
         android:showAsAction="ifRoom"
         android:title="@string/menu_view_profile"/>
+    <item
+        android:id="@+id/menu_compose_message"
+        android:icon="@drawable/ic_action_new_message"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_compose_message"/>
     <item
         android:id="@+id/menu_copy_url"
         android:showAsAction="ifRoom"

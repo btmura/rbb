@@ -320,7 +320,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
         boolean hasAccount = AccountUtils.isAccount(adapter.getAccountName());
         mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
 
-        menu.findItem(R.id.menu_reply).setVisible(hasAccount && count == 1);
         menu.findItem(R.id.menu_compose_message).setVisible(hasAccount && count == 1);
         menu.findItem(R.id.menu_view_profile).setVisible(count == 1);
         menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
