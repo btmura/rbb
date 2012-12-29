@@ -79,6 +79,7 @@
     <string name="menu_messages">Messages</string>
     <string name="menu_open">Open in another app</string>
     <string name="menu_profile">Profile</string>
+    <string name="menu_remove_account">Remove account</string>
     <string name="menu_reply">Reply</string>
     <string name="menu_save">Save</string>
     <string name="menu_search">Search</string>
@@ -96,6 +97,8 @@
     <string name="provider_things">Things</string>
     <string name="reddit_error">Reddit says: %1$s</string>
     <string name="reddit_error_line">%1$s - %2$s</string>
+    
+    <string name="settings_sync_settings">Sync settings</string>
     <string name="show_password">Show password</string>
     <string name="submit_link_label">Submit a link</string>
     <string name="submit_link_submitting">Submitting…</string>
