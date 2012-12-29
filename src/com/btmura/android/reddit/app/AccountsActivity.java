@@ -96,7 +96,7 @@ public class AccountsActivity extends PreferenceActivity implements LoaderCallba
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.settings_menu, menu);
+        getMenuInflater().inflate(R.menu.accounts_menu, menu);
         return true;
     }
 
