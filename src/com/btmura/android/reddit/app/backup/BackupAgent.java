@@ -98,8 +98,14 @@ public class BackupAgent extends android.app.backup.BackupAgent {
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 1);
         ops.add(ContentProviderOperation.newDelete(SubredditProvider.SUBREDDITS_URI).build());
         for (int i = 0; i < count; i++) {
-            ops.add(ContentProviderOperation.newInsert(SubredditProvider.SUBREDDITS_URI)
-                    .withValue(Subreddits.COLUMN_NAME, in.readUTF()).build());
+            // Don't restore preset subreddits like the front page, all, and
+            // random. They used to be backed up in a previous version.
+            String subreddit = in.readUTF();
+            if (Subreddits.isSyncable(subreddit)) {
+                ops.add(ContentProviderOperation.newInsert(SubredditProvider.SUBREDDITS_URI)
+                        .withValue(Subreddits.COLUMN_NAME, subreddit)
+                        .build());
+            }
         }
         try {
             getContentResolver().applyBatch(SubredditProvider.AUTHORITY, ops);
