@@ -280,22 +280,25 @@ public class Urls {
             b.append("/r/").append(encode(subreddit));
         }
 
-        switch (filter) {
-            case FilterAdapter.SUBREDDIT_HOT:
-                b.append("/hot");
-                break;
+        // Only add the filter for non random subreddits.
+        if (!Subreddits.isRandom(subreddit)) {
+            switch (filter) {
+                case FilterAdapter.SUBREDDIT_HOT:
+                    b.append("/hot");
+                    break;
 
-            case FilterAdapter.SUBREDDIT_NEW:
-                b.append("/new");
-                break;
+                case FilterAdapter.SUBREDDIT_NEW:
+                    b.append("/new");
+                    break;
 
-            case FilterAdapter.SUBREDDIT_CONTROVERSIAL:
-                b.append("/controversial");
-                break;
+                case FilterAdapter.SUBREDDIT_CONTROVERSIAL:
+                    b.append("/controversial");
+                    break;
 
-            case FilterAdapter.SUBREDDIT_TOP:
-                b.append("/top");
-                break;
+                case FilterAdapter.SUBREDDIT_TOP:
+                    b.append("/top");
+                    break;
+            }
         }
 
         if (apiType == TYPE_JSON) {
