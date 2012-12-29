@@ -91,11 +91,7 @@ public class RedditApi {
             return context.getString(R.string.reddit_error, b);
         }
 
-        public boolean shouldRetry() {
-            return hasRateLimitError();
-        }
-
-        private boolean hasRateLimitError() {
+        public boolean hasRateLimitError() {
             if (!Array.isEmpty(errors)) {
                 for (int i = 0; i < errors.length; i++) {
                     if ("RATE_LIMIT".equals(errors[i][0])) {
