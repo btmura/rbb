@@ -132,6 +132,16 @@ public class ThingProvider extends SessionProvider {
             + VoteActions.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")";
 
+    private static final String JOINED_MESSAGES_TABLE = Messages.TABLE_NAME
+            // Join with pending message actions.
+            + " LEFT OUTER JOIN (SELECT "
+            + MessageActions.COLUMN_ACCOUNT + ", "
+            + MessageActions.COLUMN_THING_ID + ", "
+            + MessageActions.COLUMN_ACTION
+            + " FROM " + MessageActions.TABLE_NAME + ") USING ("
+            + MessageActions.COLUMN_ACCOUNT + ", "
+            + SharedColumns.COLUMN_THING_ID + ")";
+
     public static final Uri subredditUri(long sessionId, String accountName, String subreddit,
             int filter, String more) {
         Uri.Builder b = THINGS_URI.buildUpon();
@@ -216,6 +226,7 @@ public class ThingProvider extends SessionProvider {
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_LISTING));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
+        b.appendQueryParameter(PARAM_JOIN, TRUE);
         if (sessionId != -1) {
             b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         }
@@ -256,7 +267,11 @@ public class ThingProvider extends SessionProvider {
                 }
 
             case MATCH_MESSAGES:
-                return Messages.TABLE_NAME;
+                if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
+                    return JOINED_MESSAGES_TABLE;
+                } else {
+                    return Messages.TABLE_NAME;
+                }
 
             case MATCH_COMMENT_ACTIONS:
                 return CommentActions.TABLE_NAME;

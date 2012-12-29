@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
@@ -63,7 +64,7 @@ public class ThingAdapter extends LoaderAdapter {
             Things.COLUMN_UPS,
             Things.COLUMN_URL,
 
-            // Following 2 columns are from joined tables at the end.
+            // Following columns are from joined tables at the end.
             SharedColumns.COLUMN_SAVE,
             SharedColumns.COLUMN_VOTE,
     };
@@ -90,7 +91,7 @@ public class ThingAdapter extends LoaderAdapter {
     private static final int THING_UPS = 20;
     private static final int THING_URL = 21;
 
-    // Following 2 columns are from joined tables at the end.
+    // Following columns are from joined tables at the end.
     private static final int THING_SAVE_ACTION = 22;
     private static final int THING_VOTE = 23;
 
@@ -105,6 +106,9 @@ public class ThingAdapter extends LoaderAdapter {
             Messages.COLUMN_SUBREDDIT,
             Messages.COLUMN_THING_ID,
             Messages.COLUMN_WAS_COMMENT,
+
+            // Following columns are from joined tables.
+            MessageActions.COLUMN_ACTION,
     };
 
     private static final int MESSAGE_AUTHOR = 1;
@@ -116,6 +120,7 @@ public class ThingAdapter extends LoaderAdapter {
     private static final int MESSAGE_SUBREDDIT = 7;
     private static final int MESSAGE_THING_ID = 8;
     private static final int MESSAGE_WAS_COMMENT = 9;
+    private static final int MESSAGE_ACTION = 10;
 
     private long sessionId = -1;
     private String accountName;
@@ -384,7 +389,12 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     public boolean isNew(int position) {
-        return isMessage() && getBoolean(position, MESSAGE_NEW);
+        // Consider the message new if reddit thinks it's new and we don't have
+        // a pending action to mark it read.
+        return isMessage()
+                && getBoolean(position, MESSAGE_NEW)
+                && getInt(position, MESSAGE_ACTION) != MessageActions.ACTION_READ;
+
     }
 
     public boolean isSaved(int position) {
