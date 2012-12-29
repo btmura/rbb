@@ -41,6 +41,9 @@
             android:name=".accounts.AccountAuthenticatorActivity"
             android:label="@string/add_account"
             android:theme="@android:style/Theme.Holo.Dialog" />
+        <activity
+            android:name="com.btmura.android.reddit.app.AccountsActivity"
+            android:label="@string/label_accounts" />
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.BrowserActivity"
@@ -74,9 +77,6 @@
             android:label="@string/content_browser" />
         <activity android:name=".app.MessageActivity" />
         <activity android:name=".app.SearchActivity" />
-        <activity
-            android:name=".app.SettingsActivity"
-            android:label="@string/settings_label" />
         <activity
             android:name=".app.SidebarActivity"
             android:theme="@android:style/Theme.Holo.DialogWhenLarge" />

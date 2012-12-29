@@ -34,9 +34,9 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
-public class SettingsActivity extends PreferenceActivity implements LoaderCallbacks<AccountResult> {
+public class AccountsActivity extends PreferenceActivity implements LoaderCallbacks<AccountResult> {
 
-    public static final String TAG = "SettingsActivity";
+    public static final String TAG = "AccountsActivity";
 
     private static final String[] AUTHORITIES = {
             SubredditProvider.AUTHORITY,
