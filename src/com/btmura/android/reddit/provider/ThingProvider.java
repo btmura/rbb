@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -111,7 +110,8 @@ public class ThingProvider extends SessionProvider {
     static final String PARAM_THING_ID = "thingId";
     static final String PARAM_LINK_ID = "linkId";
     static final String PARAM_JOIN = "join";
-    static final String PARAM_NOTIFY_OTHERS = "notifyOthers";
+    static final String PARAM_NOTIFY_THINGS = "notifyThings";
+    static final String PARAM_NOTIFY_MESSAGES = "notifyMessages";
 
     private static final String JOINED_THING_TABLE = Things.TABLE_NAME
             // Join with pending saves to fake that the save happened.
@@ -133,7 +133,7 @@ public class ThingProvider extends SessionProvider {
             + Things.COLUMN_THING_ID + ")";
 
     private static final String JOINED_MESSAGES_TABLE = Messages.TABLE_NAME
-            // Join with pending message actions.
+            // Join with pending actions to decide if need to mark as read.
             + " LEFT OUTER JOIN (SELECT "
             + MessageActions.COLUMN_ACCOUNT + ", "
             + MessageActions.COLUMN_THING_ID + ", "
@@ -254,11 +254,7 @@ public class ThingProvider extends SessionProvider {
 
     @Override
     protected String getTable(Uri uri) {
-        int match = MATCHER.match(uri);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "getTable match: " + match);
-        }
-        switch (match) {
+        switch (MATCHER.match(uri)) {
             case MATCH_THINGS:
                 if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
                     return JOINED_THING_TABLE;
@@ -428,9 +424,11 @@ public class ThingProvider extends SessionProvider {
     @Override
     protected void notifyChange(Uri uri) {
         super.notifyChange(uri);
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_OTHERS, false)) {
-            ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(ThingProvider.THINGS_URI, null);
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_THINGS, false)) {
+            getContext().getContentResolver().notifyChange(THINGS_URI, null);
+        }
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_MESSAGES, false)) {
+            getContext().getContentResolver().notifyChange(MESSAGES_URI, null);
         }
     }
 }

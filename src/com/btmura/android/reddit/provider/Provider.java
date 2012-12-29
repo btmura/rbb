@@ -266,6 +266,7 @@ public class Provider {
                 // Insert the latest action we want for this message.
                 Uri uri = ThingProvider.MESSAGE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_MESSAGES, TRUE)
                         .build();
                 int action = read ? MessageActions.ACTION_READ : MessageActions.ACTION_UNREAD;
                 ops.add(ContentProviderOperation.newInsert(uri)
@@ -292,7 +293,7 @@ public class Provider {
 
                 Uri uri = ThingProvider.SAVE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
                         .build();
                 ops.add(ContentProviderOperation.newInsert(uri)
                         .withValue(SaveActions.COLUMN_ACCOUNT, accountName)
@@ -318,7 +319,7 @@ public class Provider {
 
                 Uri uri = ThingProvider.VOTE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_OTHERS, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
                         .build();
                 ops.add(ContentProviderOperation.newInsert(uri)
                         .withValue(VoteActions.COLUMN_ACCOUNT, accountName)
