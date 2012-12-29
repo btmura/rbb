@@ -27,9 +27,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -41,7 +38,7 @@ import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
 public class AddSubredditFragment extends DialogFragment implements LoaderCallbacks<AccountResult>,
-        OnCheckedChangeListener, OnClickListener {
+        OnClickListener {
 
     public static final String TAG = "AddSubredditFragment";
 
@@ -50,7 +47,6 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
     private boolean restoringState;
     private Spinner accountSpinner;
     private EditText nameField;
-    private CheckBox addFrontPage;
     private Button cancel;
     private Button ok;
 
@@ -91,9 +87,6 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
         nameField.setSelection(length, length);
         nameField.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
 
-        addFrontPage = (CheckBox) v.findViewById(R.id.add_front_page);
-        addFrontPage.setOnCheckedChangeListener(this);
-
         cancel = (Button) v.findViewById(R.id.cancel);
         cancel.setOnClickListener(this);
 
@@ -130,13 +123,6 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
         adapter.clear();
     }
 
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        nameField.setEnabled(!isChecked);
-        if (!nameField.isEnabled()) {
-            nameField.setError(null);
-        }
-    }
-
     public void onClick(View v) {
         if (v == cancel) {
             handleCancel();
@@ -150,20 +136,14 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
     }
 
     private void handleOk() {
-        String subredditName;
-        if (addFrontPage.isChecked()) {
-            subredditName = "";
-        } else {
-            subredditName = nameField.getText().toString();
-        }
-
-        if (!addFrontPage.isChecked() && TextUtils.isEmpty(subredditName)) {
+        String subreddit = nameField.getText().toString();
+        if (TextUtils.isEmpty(subreddit)) {
             nameField.setError(getString(R.string.error_blank_field));
             return;
         }
 
         String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
-        SubredditProvider.insertInBackground(getActivity(), accountName, subredditName);
+        SubredditProvider.insertInBackground(getActivity(), accountName, subreddit);
         dismiss();
     }
 }

@@ -32,6 +32,7 @@
         android:id="@+id/subreddit_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/element_padding"
@@ -39,16 +40,6 @@
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
-
-    <CheckBox
-        android:id="@+id/add_front_page"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/padding"
-        android:layout_marginLeft="@dimen/padding"
-        android:layout_marginRight="@dimen/padding"
-        android:layout_marginTop="@dimen/element_padding"
-        android:text="@string/add_front_page" />
 
     <include
         android:layout_width="match_parent"

@@ -19,7 +19,6 @@
     <string name="account_app_storage">App storage</string>
     <string name="account_type">com.btmura.android.reddit.account</string>
     <string name="add_account">Add account</string>
-    <string name="add_front_page">Add front page</string>
     <string name="add_subreddit">Add subreddit</string>
     <string name="app_name">reddit by brian</string>
     <string name="authority_accounts">com.btmura.android.reddit.provider.accounts</string>
