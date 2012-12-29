@@ -18,8 +18,11 @@ package com.btmura.android.reddit.app;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
@@ -48,14 +51,31 @@ public class ContentBrowserActivity extends Activity implements OnUriClickListen
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.debug_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
 
+            case R.id.menu_app_info:
+                handleAppInfo();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void handleAppInfo() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:com.btmura.android.reddit"));
+        startActivity(intent);
     }
 }
