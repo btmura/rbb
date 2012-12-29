@@ -16,25 +16,19 @@
 
 package com.btmura.android.reddit.app;
 
-import java.util.List;
-
 import android.app.ActionBar;
-import android.app.Fragment;
-import android.app.LoaderManager.LoaderCallbacks;
+import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.Loader;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.AccountLoader;
-import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
-public class AccountListActivity extends PreferenceActivity implements LoaderCallbacks<AccountResult> {
+public class AccountListActivity extends Activity {
 
     public static final String TAG = "AccountListActivity";
 
@@ -42,13 +36,12 @@ public class AccountListActivity extends PreferenceActivity implements LoaderCal
             SubredditProvider.AUTHORITY,
     };
 
-    private AccountResult result;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.account_list);
         setupActionBar();
-        getLoaderManager().initLoader(0, null, this);
+        setupFragments(savedInstanceState);
     }
 
     private void setupActionBar() {
@@ -56,41 +49,12 @@ public class AccountListActivity extends PreferenceActivity implements LoaderCal
         bar.setDisplayHomeAsUpEnabled(true);
     }
 
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, false);
-    }
-
-    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        this.result = result;
-        invalidateHeaders();
-    }
-
-    public void onLoaderReset(Loader<AccountResult> loader) {
-        this.result = null;
-        invalidateHeaders();
-    }
-
-    @Override
-    public void onBuildHeaders(List<Header> target) {
-        if (result != null) {
-            int length = result.accountNames.length;
-            for (int i = 0; i < length; i++) {
-                String accountName = result.accountNames[i];
-                Bundle args = new Bundle(1);
-                args.putString(AccountPreferenceFragment.ARG_ACCOUNT_NAME, accountName);
-                addHeader(0, accountName, AccountPreferenceFragment.class, args, target);
-            }
+    private void setupFragments(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.account_list_container, AccountListFragment.newInstance());
+            ft.commit();
         }
-    }
-
-    private void addHeader(int titleRes, String title, Class<? extends Fragment> fragClass,
-            Bundle fragArgs, List<Header> target) {
-        Header header = new Header();
-        header.titleRes = header.breadCrumbTitleRes = header.breadCrumbShortTitleRes = titleRes;
-        header.title = header.breadCrumbTitle = header.breadCrumbShortTitle = title;
-        header.fragment = fragClass.getName();
-        header.fragmentArguments = fragArgs;
-        target.add(header);
     }
 
     @Override
