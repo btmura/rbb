@@ -46,7 +46,7 @@
     <string name="filter_subreddit_new">new</string>
     <string name="filter_subreddit_controversial">controversial</string>
     <string name="filter_subreddit_top">top</string>
-    <string name="front_page">front page</string>
+    <string name="front_page">FRONT</string>
     <string name="hint_captcha">Captcha</string>
     <string name="hint_comment">Comment</string>
     <string name="hint_login">Login</string>

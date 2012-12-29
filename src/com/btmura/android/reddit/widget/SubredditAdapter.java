@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.widget;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -54,9 +56,9 @@ public class SubredditAdapter extends LoaderAdapter {
 
     private static final MatrixCursor PRESETS_CURSOR = new MatrixCursor(PROJECTION_SUBREDDITS, 3);
     static {
-        PRESETS_CURSOR.newRow().add(-1).add(Subreddits.NAME_FRONT_PAGE);
-        PRESETS_CURSOR.newRow().add(-2).add(Subreddits.NAME_ALL);
-        PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM);
+        PRESETS_CURSOR.newRow().add(-1).add(Subreddits.NAME_FRONT_PAGE.toUpperCase(Locale.US));
+        PRESETS_CURSOR.newRow().add(-2).add(Subreddits.NAME_ALL.toUpperCase(Locale.US));
+        PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM.toUpperCase(Locale.US));
     }
 
     private long sessionId = -1;
@@ -73,7 +75,8 @@ public class SubredditAdapter extends LoaderAdapter {
 
     @Override
     public Cursor swapCursor(Cursor newCursor) {
-        // Add preset subreddits to the cursor if we're not doing a search query.
+        // Add preset subreddits to the cursor if we're not doing a search
+        // query.
         if (!isQuery()) {
             newCursor = new MergeCursor(new Cursor[] {PRESETS_CURSOR, newCursor});
         }
