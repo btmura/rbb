@@ -48,12 +48,14 @@ public class SubredditAdapter extends LoaderAdapter {
             Things.COLUMN_OVER_18,
     };
 
+    private static final int INDEX_ID = 0;
     private static final int INDEX_NAME = 1;
     private static final int INDEX_SUBSCRIBERS = 2;
     private static final int INDEX_OVER_18 = 3;
 
     private static final MatrixCursor PRESETS_CURSOR = new MatrixCursor(PROJECTION_SUBREDDITS, 3);
     static {
+        // Use negative IDs for presets. See isDeletable.
         PRESETS_CURSOR.newRow().add(-1).add(Subreddits.NAME_FRONT_PAGE);
         PRESETS_CURSOR.newRow().add(-2).add(Subreddits.NAME_ALL);
         PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM);
@@ -173,5 +175,10 @@ public class SubredditAdapter extends LoaderAdapter {
 
     public String getName(int position) {
         return getString(position, INDEX_NAME);
+    }
+
+    public boolean isDeletable(int position) {
+        // Non-presets are deletable. Presents have negative ids.
+        return getLong(position, INDEX_ID) >= 0;
     }
 }

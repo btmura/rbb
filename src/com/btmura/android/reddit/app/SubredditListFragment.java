@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.app;
 
+import java.util.Arrays;
+
 import android.app.Activity;
 import android.content.Loader;
 import android.database.Cursor;
@@ -335,16 +337,16 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     }
 
     private String[] getCheckedSubreddits() {
-        SparseBooleanArray positions = getListView().getCheckedItemPositions();
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
         int checkedCount = getListView().getCheckedItemCount();
         String[] subreddits = new String[checkedCount];
         int i = 0, j = 0, count = adapter.getCount();
         for (; i < count; i++) {
-            if (positions.get(i)) {
+            if (checked.get(i) && adapter.isDeletable(i)) {
                 subreddits[j++] = adapter.getName(i);
             }
         }
-        return subreddits;
+        return Arrays.copyOf(subreddits, j);
     }
 
     @Override
