@@ -56,9 +56,9 @@ public class SubredditAdapter extends LoaderAdapter {
 
     private static final MatrixCursor PRESETS_CURSOR = new MatrixCursor(PROJECTION_SUBREDDITS, 3);
     static {
-        PRESETS_CURSOR.newRow().add(-1).add(Subreddits.NAME_FRONT_PAGE.toUpperCase(Locale.US));
-        PRESETS_CURSOR.newRow().add(-2).add(Subreddits.NAME_ALL.toUpperCase(Locale.US));
-        PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM.toUpperCase(Locale.US));
+        PRESETS_CURSOR.newRow().add(-1).add(Subreddits.NAME_FRONT_PAGE);
+        PRESETS_CURSOR.newRow().add(-2).add(Subreddits.NAME_ALL);
+        PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM);
     }
 
     private long sessionId = -1;
