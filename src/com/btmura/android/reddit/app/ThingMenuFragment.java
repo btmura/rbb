@@ -58,13 +58,13 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_view_thing_sidebar).setVisible(!TextUtils.isEmpty(subreddit));
-        hideExtraViewSidebarItems(menu);
+        menu.findItem(R.id.menu_about_subreddit).setVisible(!TextUtils.isEmpty(subreddit));
+        hideExtraAboutSubredditItems(menu);
     }
 
-    private void hideExtraViewSidebarItems(Menu menu) {
-        MenuItem thingSidebarItem = menu.findItem(R.id.menu_view_thing_sidebar);
-        MenuItem subredditSidebarItem = menu.findItem(R.id.menu_view_subreddit_sidebar);
+    private void hideExtraAboutSubredditItems(Menu menu) {
+        MenuItem thingSidebarItem = menu.findItem(R.id.menu_about_subreddit);
+        MenuItem subredditSidebarItem = menu.findItem(R.id.menu_about_subreddit);
         if (thingSidebarItem != null && thingSidebarItem.isVisible()
                 && subredditSidebarItem != null && subredditSidebarItem.isVisible()) {
             thingSidebarItem.setVisible(false);
@@ -74,8 +74,8 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_view_thing_sidebar:
-                handleViewSidebar();
+            case R.id.menu_about_subreddit:
+                handleAboutSubreddit();
                 return true;
 
             default:
@@ -83,7 +83,7 @@ public class ThingMenuFragment extends Fragment {
         }
     }
 
-    private void handleViewSidebar() {
+    private void handleAboutSubreddit() {
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
         intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getArguments().getString(ARG_SUBREDDIT));
         startActivity(intent);

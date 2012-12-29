@@ -407,7 +407,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         String subreddit = adapter.getSubreddit();
-        menu.findItem(R.id.menu_view_subreddit_sidebar).setVisible(subreddit != null
+        menu.findItem(R.id.menu_about_subreddit).setVisible(subreddit != null
                 && !Subreddits.isFrontPage(subreddit)
                 && !Subreddits.isAll(subreddit));
     }
@@ -415,8 +415,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_view_subreddit_sidebar:
-                handleViewSidebar();
+            case R.id.menu_about_subreddit:
+                handleAboutSubreddit();
                 return true;
 
             default:
@@ -424,7 +424,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
-    private void handleViewSidebar() {
+    private void handleAboutSubreddit() {
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
         intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, adapter.getSubreddit());
         startActivity(intent);

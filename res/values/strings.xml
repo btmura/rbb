@@ -62,6 +62,7 @@
     <string name="login_error">There was a problem: %1$s</string>
     <string name="login_importing_subreddits">Importing subreddits…</string>
     <string name="login_logging_in">Logging in…</string>
+    <string name="menu_about_subreddit">About subreddit</string>
     <string name="menu_add">Add</string>
     <string name="menu_add_account">Add account</string>
     <string name="menu_add_subreddit">Add subreddit</string>
@@ -84,8 +85,7 @@
     <string name="menu_submit_link">Submit a link</string>
     <string name="menu_unread_messages">Unread messages</string>
     <string name="menu_unsave">Unsave</string>
-    <string name="menu_view_profile">View profile</string>
-    <string name="menu_view_sidebar">View sidebar</string>
+    <string name="menu_view_profile">View profile</string>    
     <string name="nsfw">"NSFW"</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
     <string name="provider_accounts">Accounts</string>
