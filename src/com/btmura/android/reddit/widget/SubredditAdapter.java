@@ -18,6 +18,8 @@ package com.btmura.android.reddit.widget;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.MergeCursor;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
@@ -50,6 +52,13 @@ public class SubredditAdapter extends LoaderAdapter {
     private static final int INDEX_SUBSCRIBERS = 2;
     private static final int INDEX_OVER_18 = 3;
 
+    private static final MatrixCursor PRESETS_CURSOR = new MatrixCursor(PROJECTION_SUBREDDITS, 3);
+    static {
+        PRESETS_CURSOR.newRow().add(-1).add(Subreddits.NAME_FRONT_PAGE);
+        PRESETS_CURSOR.newRow().add(-2).add(Subreddits.NAME_ALL);
+        PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM);
+    }
+
     private long sessionId = -1;
     private String accountName;
     private String selectedSubreddit;
@@ -60,6 +69,15 @@ public class SubredditAdapter extends LoaderAdapter {
         super(context, null, 0);
         this.query = query;
         this.singleChoice = singleChoice;
+    }
+
+    @Override
+    public Cursor swapCursor(Cursor newCursor) {
+        // Add preset subreddits to the cursor if we're not doing a search query.
+        if (!isQuery()) {
+            newCursor = new MergeCursor(new Cursor[] {PRESETS_CURSOR, newCursor});
+        }
+        return super.swapCursor(newCursor);
     }
 
     @Override
