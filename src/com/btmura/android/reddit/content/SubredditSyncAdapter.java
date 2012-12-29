@@ -60,7 +60,8 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
             Subreddits._ID,
             Subreddits.COLUMN_NAME,
             Subreddits.COLUMN_STATE,
-            Subreddits.COLUMN_EXPIRATION,};
+            Subreddits.COLUMN_EXPIRATION,
+    };
 
     private static final int INDEX_ID = 0;
     private static final int INDEX_NAME = 1;
