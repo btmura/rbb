@@ -16,26 +16,40 @@
 
 package com.btmura.android.reddit.app;
 
+import java.io.IOException;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
 public class AccountListFragment extends ListFragment implements LoaderCallbacks<AccountResult>,
         MultiChoiceModeListener {
+
+    public static final String TAG = "AccountListFragment";
 
     private AccountNameAdapter adapter;
 
@@ -94,7 +108,54 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        return false;
+        switch (item.getItemId()) {
+            case R.id.menu_delete:
+                handleDelete(mode);
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    private void handleDelete(ActionMode mode) {
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int count = adapter.getCount();
+        for (int i = 0; i < count; i++) {
+            if (checked.get(i)) {
+                removeAccount(adapter.getItem(i));
+            }
+        }
+        mode.finish();
+    }
+
+    private void removeAccount(String accountName) {
+        AccountManager manager = AccountManager.get(getActivity());
+        String accountType = AccountAuthenticator.getAccountType(getActivity());
+        Account account = new Account(accountName, accountType);
+        final AccountManagerFuture<Boolean> result = manager.removeAccount(account, null, null);
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    return result.getResult();
+                } catch (OperationCanceledException e) {
+                    Log.e(TAG, "handleRemoveAccount", e);
+                } catch (AuthenticatorException e) {
+                    Log.e(TAG, "handleRemoveAccount", e);
+                } catch (IOException e) {
+                    Log.e(TAG, "handleRemoveAccount", e);
+                }
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                if (!result) {
+                    Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }.execute();
     }
 
     public void onDestroyActionMode(ActionMode mode) {
