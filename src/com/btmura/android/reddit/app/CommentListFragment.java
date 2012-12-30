@@ -311,7 +311,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
         menu.findItem(R.id.menu_reply).setVisible(isReplyItemVisible());
         menu.findItem(R.id.menu_delete).setVisible(isDeleteItemVisible());
-        menu.findItem(R.id.menu_compose_message).setVisible(isComposeMessageItemVisible());
+        menu.findItem(R.id.menu_new_message).setVisible(isNewMessageItemVisible());
         menu.findItem(R.id.menu_copy_url).setVisible(isCopyUrlItemVisible());
         return true;
     }
@@ -374,7 +374,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return true;
     }
 
-    private boolean isComposeMessageItemVisible() {
+    private boolean isNewMessageItemVisible() {
         // You need an account to compose a message.
         if (!AccountUtils.isAccount(adapter.getAccountName())) {
             return false;
@@ -401,8 +401,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
             case R.id.menu_view_profile:
                 return handleViewProfile(mode);
 
-            case R.id.menu_compose_message:
-                return handleComposeMessage(mode);
+            case R.id.menu_new_message:
+                return handleNewMessage(mode);
 
             case R.id.menu_copy_url:
                 return handleCopyUrl(mode);
@@ -486,7 +486,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return true;
     }
 
-    private boolean handleComposeMessage(ActionMode mode) {
+    private boolean handleNewMessage(ActionMode mode) {
         String user = adapter.getString(getFirstCheckedPosition(), CommentAdapter.INDEX_AUTHOR);
         MenuHelper.startComposeActivity(getActivity(),
                 ComposeActivity.COMPOSITION_MESSAGE, user, null);

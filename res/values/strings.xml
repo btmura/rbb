@@ -26,8 +26,6 @@
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
     <string name="captcha_image">Captcha image</string>
     <string name="captcha_title">Are you a robot?</string>
-    <string name="comment_reply_title">Reply to %s</string>
-    <string name="compose_message_title">Compose message</string>
     <string name="compose_link">LINK</string>
     <string name="compose_text">TEXT</string>
     <string name="content_browser">Content providers</string>
@@ -58,6 +56,9 @@
     <string name="hint_title">Title</string>
     <string name="hint_username">Username</string>
     <string name="label_accounts">Accounts</string>
+    <string name="label_reply">Reply to %s</string>
+    <string name="label_new_message">New message</string>
+    <string name="label_new_post">New post</string>
     <string name="loading">Loading…</string>
     <string name="login_adding_account">Adding account…</string>
     <string name="login_error">There was a problem: %1$s</string>
@@ -70,13 +71,13 @@
     <string name="menu_add_subreddit">Add subreddit</string>
     <string name="menu_app_info">App info</string>
     <string name="menu_comments">View comments</string>
-    <string name="menu_compose">Compose</string>
-    <string name="menu_compose_message">Compose message</string>
     <string name="menu_copy_url">Copy URL</string>
     <string name="menu_debug">Debug</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_link">View link</string>
     <string name="menu_messages">Messages</string>
+    <string name="menu_new_message">New message</string>
+    <string name="menu_new_post">New post</string>
     <string name="menu_open">Open in another app</string>
     <string name="menu_profile">Profile</string>
     <string name="menu_reply">Reply</string>
@@ -84,7 +85,6 @@
     <string name="menu_search">Search</string>
     <string name="menu_share">Share</string>
     <string name="menu_submit">Submit</string>
-    <string name="menu_submit_link">Submit a link</string>
     <string name="menu_sync_settings">Sync settings</string>
     <string name="menu_unread_messages">Unread messages</string>
     <string name="menu_unsave">Unsave</string>
@@ -97,7 +97,6 @@
     <string name="reddit_error">Reddit says: %1$s</string>
     <string name="reddit_error_line">%1$s - %2$s</string>
     <string name="show_password">Show password</string>
-    <string name="submit_link_label">Submit a link</string>
     <string name="submit_link_submitting">Submitting…</string>
     <string name="tab_posts">Posts</string>
     <string name="tab_subreddits">Subreddits</string>

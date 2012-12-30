@@ -119,7 +119,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 && adapter.hasMessages(accountNameHolder.getAccountName());
 
         menu.findItem(R.id.menu_unread_messages).setVisible(hasMessages);
-        menu.findItem(R.id.menu_submit_link).setVisible(isAccount);
+        menu.findItem(R.id.menu_new_post).setVisible(isAccount);
         menu.findItem(R.id.menu_profile).setVisible(isAccount);
         menu.findItem(R.id.menu_messages).setVisible(isAccount);
         menu.findItem(R.id.menu_debug).setVisible(BuildConfig.DEBUG);
@@ -131,8 +131,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
             case R.id.menu_add_subreddit:
                 return handleAddSubreddit();
 
-            case R.id.menu_submit_link:
-                return handleSubmitLink();
+            case R.id.menu_new_post:
+                return handleNewPost();
 
             case R.id.menu_search:
                 return handleSearch();
@@ -162,7 +162,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         return true;
     }
 
-    private boolean handleSubmitLink() {
+    private boolean handleNewPost() {
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_SUBMISSION,
                 subredditNameHolder.getSubredditName(), null);
         return true;

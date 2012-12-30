@@ -143,15 +143,15 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_compose:
-                return handleCompose();
+            case R.id.menu_new_message:
+                return handleNewMessage();
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private boolean handleCompose() {
+    private boolean handleNewMessage() {
         Intent intent = new Intent(this, ComposeActivity.class);
         intent.putExtra(ComposeActivity.EXTRA_COMPOSITION, ComposeActivity.COMPOSITION_MESSAGE);
         startActivity(intent);

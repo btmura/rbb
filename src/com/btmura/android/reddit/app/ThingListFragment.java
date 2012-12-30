@@ -320,7 +320,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         boolean hasAccount = AccountUtils.isAccount(adapter.getAccountName());
         mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
 
-        menu.findItem(R.id.menu_compose_message).setVisible(hasAccount && count == 1);
+        menu.findItem(R.id.menu_new_message).setVisible(hasAccount && count == 1);
         menu.findItem(R.id.menu_view_profile).setVisible(count == 1);
         menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
 
@@ -342,8 +342,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_compose_message:
-                return handleComposeMessage(mode);
+            case R.id.menu_new_message:
+                return handleNewMessage(mode);
 
             case R.id.menu_save:
                 return handleSave(mode, SaveActions.ACTION_SAVE);
@@ -362,7 +362,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
-    private boolean handleComposeMessage(ActionMode mode) {
+    private boolean handleNewMessage(ActionMode mode) {
         String user = adapter.getAuthor(getFirstCheckedPosition());
         MenuHelper.startComposeActivity(getActivity(),
                 ComposeActivity.COMPOSITION_MESSAGE, user, null);

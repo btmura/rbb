@@ -95,14 +95,14 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     private String getComposeTitle() {
         switch (getIntent().getIntExtra(EXTRA_COMPOSITION, -1)) {
             case COMPOSITION_SUBMISSION:
-                return getString(R.string.submit_link_label);
+                return getString(R.string.label_new_post);
 
             case COMPOSITION_MESSAGE:
-                return getString(R.string.compose_message_title);
+                return getString(R.string.label_new_message);
 
             case COMPOSITION_COMMENT_REPLY:
             case COMPOSITION_MESSAGE_REPLY:
-                return getString(R.string.comment_reply_title,
+                return getString(R.string.label_reply,
                         getIntent().getStringExtra(EXTRA_COMPOSE_DESTINATION));
 
             default:

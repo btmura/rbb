@@ -22,10 +22,10 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_reply"/>
     <item
-        android:id="@+id/menu_compose_message"
+        android:id="@+id/menu_new_message"
         android:icon="@drawable/ic_action_new_message"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_compose_message"/>
+        android:title="@string/menu_new_message"/>
     <item
         android:id="@+id/menu_view_profile"
         android:icon="@drawable/ic_action_profile"
