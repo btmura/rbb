@@ -75,10 +75,6 @@ public class AccountListActivity extends Activity {
                 handleAddAccount();
                 return true;
 
-            case R.id.menu_sync_settings:
-                handleSyncSettings();
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -87,12 +83,6 @@ public class AccountListActivity extends Activity {
     private void handleAddAccount() {
         Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
         intent.putExtra(Settings.EXTRA_AUTHORITIES, AUTHORITIES);
-        startActivity(intent);
-    }
-
-    private void handleSyncSettings() {
-        Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
-        intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {SubredditProvider.AUTHORITY});
         startActivity(intent);
     }
 }
