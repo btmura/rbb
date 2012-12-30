@@ -60,7 +60,7 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new AccountNameAdapter(getActivity(), R.layout.list_row);
+        adapter = new AccountNameAdapter(getActivity(), R.layout.account_list_row);
     }
 
     @Override
