@@ -28,7 +28,15 @@
         tools:ignore="UselessParent" >
 
         <Button
-            android:id="@+id/add_account_button"
+            android:id="@+id/cancel"
+            style="@style/ButtonBarButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@android:string/cancel" />
+
+        <Button
+            android:id="@+id/add_account"
             style="@style/ButtonBarButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

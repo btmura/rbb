@@ -39,6 +39,9 @@ public class AccountListActivity extends Activity implements OnClickListener {
             SubredditProvider.AUTHORITY,
     };
 
+    private View addAccount;
+    private View cancel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,8 +56,11 @@ public class AccountListActivity extends Activity implements OnClickListener {
             bar.setDisplayHomeAsUpEnabled(true);
         } else {
             ViewStub vs = (ViewStub) findViewById(R.id.button_bar_stub);
-            View addAccount = vs.inflate().findViewById(R.id.add_account_button);
+            View buttonBar = vs.inflate();
+            addAccount = buttonBar.findViewById(R.id.add_account);
             addAccount.setOnClickListener(this);
+            cancel = buttonBar.findViewById(R.id.cancel);
+            cancel.setOnClickListener(this);
         }
     }
 
@@ -67,7 +73,11 @@ public class AccountListActivity extends Activity implements OnClickListener {
     }
 
     public void onClick(View v) {
-        handleAddAccount();
+        if (v == addAccount) {
+            handleAddAccount();
+        } else {
+            finish();
+        }
     }
 
     @Override
