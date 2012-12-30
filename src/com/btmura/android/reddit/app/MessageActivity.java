@@ -47,7 +47,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void setContentView() {
-        setContentView(R.layout.mail);
+        setContentView(R.layout.message);
     }
 
     @Override
