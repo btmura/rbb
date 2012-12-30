@@ -45,8 +45,8 @@
         <item quantity="other">%1$,d subscribers</item>
     </plurals>
     <plurals name="things">
-        <item quantity="one">1 thing</item>
-        <item quantity="other">%1$,d things</item>
+        <item quantity="one">1 item</item>
+        <item quantity="other">%1$,d items</item>
     </plurals>
     <plurals name="time_seconds">
         <item quantity="one">1 second ago</item>
