@@ -205,7 +205,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         // ThingMenuFragment. Otherwise, make sure to remove the prior
         // ThingMenuFragment for some other thing.
         if (thingBundle != null) {
-            Fragment mf = ThingMenuFragment.newInstance(subreddit);
+            Fragment mf = ThingMenuFragment.newInstance(subreddit,
+                    ThingBundle.isSaved(thingBundle));
             ft.add(mf, ThingMenuFragment.TAG);
         } else {
             Fragment mf = getThingMenuFragment();
@@ -405,10 +406,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String accountName = getAccountName();
         String subreddit = ThingBundle.getSubreddit(thingBundle);
         int filter = getFilter();
+        boolean saved = ThingBundle.isSaved(thingBundle);
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, false, thingBundle,
                 filter);
-        Fragment mf = ThingMenuFragment.newInstance(subreddit);
+        Fragment mf = ThingMenuFragment.newInstance(subreddit, saved);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);

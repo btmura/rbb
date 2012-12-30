@@ -52,6 +52,9 @@ public class ThingBundle extends BundleSupport {
     /** Boolean indicating whether this thing has comments at all. */
     private static final String KEY_NO_COMMENTS = "noComments";
 
+    /** Boolean indicating whether this thing has been saved. */
+    private static final String KEY_SAVED = "saved";
+
     public static String getSubreddit(Bundle bundle) {
         return getString(bundle, KEY_SUBREDDIT);
     }
@@ -126,6 +129,14 @@ public class ThingBundle extends BundleSupport {
 
     public static void putNoComments(Bundle bundle, boolean noComments) {
         bundle.putBoolean(KEY_NO_COMMENTS, noComments);
+    }
+
+    public static boolean isSaved(Bundle bundle) {
+        return getBoolean(bundle, KEY_SAVED);
+    }
+
+    public static void putSaved(Bundle bundle, boolean saved) {
+        bundle.putBoolean(KEY_SAVED, saved);
     }
 
     private ThingBundle() {

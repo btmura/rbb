@@ -30,13 +30,15 @@ public class ThingMenuFragment extends Fragment {
     public static final String TAG = "ThingMenuFragment";
 
     private static final String ARG_SUBREDDIT = "subreddit";
+    private static final String ARG_SAVED = "saved";
 
-    public static ThingMenuFragment newInstance(String subreddit) {
+    public static ThingMenuFragment newInstance(String subreddit, boolean saved) {
         Bundle args = new Bundle(1);
         args.putString(ARG_SUBREDDIT, subreddit);
-        ThingMenuFragment f = new ThingMenuFragment();
-        f.setArguments(args);
-        return f;
+        args.putBoolean(ARG_SAVED, saved);
+        ThingMenuFragment frag = new ThingMenuFragment();
+        frag.setArguments(args);
+        return frag;
     }
 
     @Override
@@ -49,6 +51,14 @@ public class ThingMenuFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        boolean saved = getArguments().getBoolean(ARG_SAVED);
+        menu.findItem(R.id.menu_save).setVisible(!saved);
+        menu.findItem(R.id.menu_unsave).setVisible(saved);
     }
 
     @Override

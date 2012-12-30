@@ -297,7 +297,7 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     private Bundle makeMessageThingBundle(Context context, Cursor c) {
-        Bundle b = new Bundle(5);
+        Bundle b = new Bundle(6);
         ThingBundle.putSubreddit(b, c.getString(MESSAGE_SUBREDDIT));
         ThingBundle.putKind(b, c.getInt(MESSAGE_KIND));
 
@@ -327,7 +327,7 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     private Bundle makeThingBundle(Context context, Cursor c) {
-        Bundle b = new Bundle(6);
+        Bundle b = new Bundle(8);
         ThingBundle.putSubreddit(b, c.getString(THING_SUBREDDIT));
         ThingBundle.putKind(b, c.getInt(THING_KIND));
 
@@ -350,6 +350,8 @@ public class ThingAdapter extends LoaderAdapter {
         if (!TextUtils.isEmpty(permaLink)) {
             ThingBundle.putCommentUrl(b, Urls.perma(permaLink, null));
         }
+
+        ThingBundle.putSaved(b, isSaved(c.getPosition()));
 
         return b;
     }
