@@ -24,17 +24,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.database.Kinds;
 
 public class ThingMenuFragment extends Fragment {
 
     public static final String TAG = "ThingMenuFragment";
 
     private static final String ARG_SUBREDDIT = "subreddit";
+    private static final String ARG_KIND = "kind";
     private static final String ARG_SAVED = "saved";
 
-    public static ThingMenuFragment newInstance(String subreddit, boolean saved) {
+    public static ThingMenuFragment newInstance(String subreddit, int kind, boolean saved) {
         Bundle args = new Bundle(1);
         args.putString(ARG_SUBREDDIT, subreddit);
+        args.putInt(ARG_KIND, kind);
         args.putBoolean(ARG_SAVED, saved);
         ThingMenuFragment frag = new ThingMenuFragment();
         frag.setArguments(args);
@@ -56,9 +59,10 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        boolean saveable = getArguments().getInt(ARG_KIND) != Kinds.KIND_MESSAGE;
         boolean saved = getArguments().getBoolean(ARG_SAVED);
-        menu.findItem(R.id.menu_save).setVisible(!saved);
-        menu.findItem(R.id.menu_unsave).setVisible(saved);
+        menu.findItem(R.id.menu_save).setVisible(saveable && !saved);
+        menu.findItem(R.id.menu_unsave).setVisible(saveable && saved);
     }
 
     @Override

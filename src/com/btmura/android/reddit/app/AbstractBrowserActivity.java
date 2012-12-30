@@ -206,6 +206,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         // ThingMenuFragment for some other thing.
         if (thingBundle != null) {
             Fragment mf = ThingMenuFragment.newInstance(subreddit,
+                    ThingBundle.getKind(thingBundle),
                     ThingBundle.isSaved(thingBundle));
             ft.add(mf, ThingMenuFragment.TAG);
         } else {
@@ -404,13 +405,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
-        String subreddit = ThingBundle.getSubreddit(thingBundle);
         int filter = getFilter();
+
+        String subreddit = ThingBundle.getSubreddit(thingBundle);
+        int kind = ThingBundle.getKind(thingBundle);
         boolean saved = ThingBundle.isSaved(thingBundle);
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, false, thingBundle,
                 filter);
-        Fragment mf = ThingMenuFragment.newInstance(subreddit, saved);
+        Fragment mf = ThingMenuFragment.newInstance(subreddit, kind, saved);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
