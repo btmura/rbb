@@ -24,11 +24,14 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewStub;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
-public class AccountListActivity extends Activity {
+public class AccountListActivity extends Activity implements OnClickListener {
 
     public static final String TAG = "AccountListActivity";
 
@@ -46,7 +49,13 @@ public class AccountListActivity extends Activity {
 
     private void setupActionBar() {
         ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        } else {
+            ViewStub vs = (ViewStub) findViewById(R.id.button_bar_stub);
+            View addAccount = vs.inflate().findViewById(R.id.add_account_button);
+            addAccount.setOnClickListener(this);
+        }
     }
 
     private void setupFragments(Bundle savedInstanceState) {
@@ -55,6 +64,10 @@ public class AccountListActivity extends Activity {
             ft.replace(R.id.account_list_container, AccountListFragment.newInstance());
             ft.commit();
         }
+    }
+
+    public void onClick(View v) {
+        handleAddAccount();
     }
 
     @Override
