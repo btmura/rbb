@@ -18,6 +18,7 @@
 
     <item
         android:id="@+id/menu_add_account"
+        android:icon="@drawable/ic_action_add"
         android:showAsAction="ifRoom"
         android:title="@string/menu_add_account"/>
 
