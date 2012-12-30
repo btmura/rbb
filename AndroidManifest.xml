@@ -43,8 +43,7 @@
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
             android:name="com.btmura.android.reddit.app.AccountListActivity"
-            android:label="@string/label_accounts"
-            android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
+            android:label="@string/label_accounts" />
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.BrowserActivity"
