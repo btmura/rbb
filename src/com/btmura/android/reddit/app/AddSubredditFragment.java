@@ -65,7 +65,7 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new AccountNameAdapter(getActivity());
+        adapter = new AccountNameAdapter(getActivity(), R.layout.account_name_row);
         adapter.add(getString(R.string.loading));
         restoringState = savedInstanceState != null;
     }

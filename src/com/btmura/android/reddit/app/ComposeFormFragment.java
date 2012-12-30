@@ -147,7 +147,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         restoringState = savedInstanceState != null;
 
         // Fill the adapter with loading to avoid jank.
-        adapter = new AccountNameAdapter(getActivity());
+        adapter = new AccountNameAdapter(getActivity(), R.layout.account_name_row);
         adapter.add(getString(R.string.loading));
     }
 

@@ -36,9 +36,11 @@ public class AccountNameAdapter extends BaseAdapter {
 
     private final ArrayList<String> accountNames = new ArrayList<String>();
     private final LayoutInflater inflater;
+    private final int layout;
 
-    public AccountNameAdapter(Context context) {
-        inflater = LayoutInflater.from(context.getApplicationContext());
+    public AccountNameAdapter(Context context, int layout) {
+        this.inflater = LayoutInflater.from(context.getApplicationContext());
+        this.layout = layout;
     }
 
     public void clear() {
@@ -79,7 +81,7 @@ public class AccountNameAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        TextView tv = (TextView) inflater.inflate(R.layout.account_name_row, parent, false);
+        TextView tv = (TextView) inflater.inflate(layout, parent, false);
         setDisplayName(tv, position);
         return tv;
     }

@@ -246,7 +246,8 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         if (adapter.isQuery() && accountResultHolder != null
                 && accountResultHolder.getAccountResult() != null) {
             if (accountNameAdapter == null) {
-                accountNameAdapter = new AccountNameAdapter(getActivity());
+                accountNameAdapter = new AccountNameAdapter(getActivity(),
+                        R.layout.account_name_row);
             } else {
                 accountNameAdapter.clear();
             }
