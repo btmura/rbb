@@ -101,10 +101,13 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        return false;
+        int count = getListView().getCheckedItemCount();
+        mode.setTitle(getResources().getQuantityString(R.plurals.accounts, count, count));
+        return true;
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        mode.invalidate();
     }
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
