@@ -18,8 +18,8 @@
     xmlns:tools="http://schemas.android.com/tools" >
 
     <item
-        android:id="@+id/menu_about_subreddit"
-        android:orderInCategory="1336"
+        android:id="@+id/menu_about_thing_subreddit"
+        android:orderInCategory="500"
         android:title="@string/menu_about_subreddit"/>
 
 </menu>

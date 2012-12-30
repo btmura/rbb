@@ -406,8 +406,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        boolean redundant = menu.findItem(R.id.menu_about_thing_subreddit) != null;
         String subreddit = adapter.getSubreddit();
-        menu.findItem(R.id.menu_about_subreddit).setVisible(subreddit != null
+        menu.findItem(R.id.menu_about_subreddit).setVisible(!redundant
+                && subreddit != null
                 && !Subreddits.isFrontPage(subreddit)
                 && !Subreddits.isAll(subreddit));
     }

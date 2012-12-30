@@ -19,7 +19,6 @@ package com.btmura.android.reddit.app;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,8 +30,6 @@ public class ThingMenuFragment extends Fragment {
     public static final String TAG = "ThingMenuFragment";
 
     private static final String ARG_SUBREDDIT = "subreddit";
-
-    private String subreddit;
 
     public static ThingMenuFragment newInstance(String subreddit) {
         Bundle args = new Bundle(1);
@@ -46,7 +43,6 @@ public class ThingMenuFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        subreddit = getArguments().getString(ARG_SUBREDDIT);
     }
 
     @Override
@@ -56,25 +52,9 @@ public class ThingMenuFragment extends Fragment {
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_about_subreddit).setVisible(!TextUtils.isEmpty(subreddit));
-        hideExtraAboutSubredditItems(menu);
-    }
-
-    private void hideExtraAboutSubredditItems(Menu menu) {
-        MenuItem thingSidebarItem = menu.findItem(R.id.menu_about_subreddit);
-        MenuItem subredditSidebarItem = menu.findItem(R.id.menu_about_subreddit);
-        if (thingSidebarItem != null && thingSidebarItem.isVisible()
-                && subredditSidebarItem != null && subredditSidebarItem.isVisible()) {
-            thingSidebarItem.setVisible(false);
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_about_subreddit:
+            case R.id.menu_about_thing_subreddit:
                 handleAboutSubreddit();
                 return true;
 

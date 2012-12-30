@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/menu_about_subreddit"
-        android:orderInCategory="1336"
+        android:orderInCategory="500"
         android:title="@string/menu_about_subreddit"/>
 
 </menu>
