@@ -47,11 +47,10 @@ public class AccountListActivity extends Activity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account_list);
-        setupActionBar();
-        setupFragments(savedInstanceState);
+        setupViews(savedInstanceState);
     }
 
-    private void setupActionBar() {
+    private void setupViews(Bundle savedInstanceState) {
         ActionBar bar = getActionBar();
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
@@ -66,9 +65,7 @@ public class AccountListActivity extends Activity implements OnClickListener {
             cancel = findViewById(R.id.cancel);
             cancel.setOnClickListener(this);
         }
-    }
 
-    private void setupFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.account_list_container, AccountListFragment.newInstance());
