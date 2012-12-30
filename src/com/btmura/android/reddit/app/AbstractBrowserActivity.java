@@ -602,7 +602,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public CharSequence getSubredditName() {
+    public String getSubredditName() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
             String subreddit = cf.getSubreddit();

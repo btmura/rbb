@@ -164,7 +164,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
 
     private boolean handleSubmitLink() {
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_SUBMISSION,
-                subredditNameHolder.getSubredditName().toString(), null);
+                subredditNameHolder.getSubredditName(), null);
         return true;
     }
 

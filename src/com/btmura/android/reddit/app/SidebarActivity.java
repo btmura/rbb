@@ -84,8 +84,8 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
         }
     }
 
-    public CharSequence getSubredditName() {
-        return adapter.getPageTitle(pager.getCurrentItem());
+    public String getSubredditName() {
+        return adapter.getPageTitle(pager.getCurrentItem()).toString();
     }
 
     @Override
