@@ -309,6 +309,41 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.thing_list_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        boolean redundant = menu.findItem(R.id.menu_about_thing_subreddit) != null;
+        String subreddit = adapter.getSubreddit();
+        menu.findItem(R.id.menu_about_subreddit).setVisible(!redundant
+                && subreddit != null
+                && !Subreddits.isFrontPage(subreddit)
+                && !Subreddits.isAll(subreddit));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_about_subreddit:
+                handleAboutSubreddit();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void handleAboutSubreddit() {
+        Intent intent = new Intent(getActivity(), SidebarActivity.class);
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, adapter.getSubreddit());
+        startActivity(intent);
+    }
+
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.thing_action_menu, menu);
@@ -395,41 +430,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public void onDestroyActionMode(ActionMode mode) {
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.thing_list_menu, menu);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        boolean redundant = menu.findItem(R.id.menu_about_thing_subreddit) != null;
-        String subreddit = adapter.getSubreddit();
-        menu.findItem(R.id.menu_about_subreddit).setVisible(!redundant
-                && subreddit != null
-                && !Subreddits.isFrontPage(subreddit)
-                && !Subreddits.isAll(subreddit));
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_about_subreddit:
-                handleAboutSubreddit();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void handleAboutSubreddit() {
-        Intent intent = new Intent(getActivity(), SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, adapter.getSubreddit());
-        startActivity(intent);
     }
 
     @Override
