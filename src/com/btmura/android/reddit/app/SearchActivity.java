@@ -124,7 +124,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected String getAccountName() {
+    public String getAccountName() {
         return accountName;
     }
 

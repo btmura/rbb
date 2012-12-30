@@ -37,8 +37,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 
-public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener,
-        AccountNameHolder {
+public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
     /** Requested subreddit from intent data to view. */
     private String requestedSubreddit;

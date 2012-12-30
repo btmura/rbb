@@ -103,7 +103,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     }
 
     @Override
-    protected String getAccountName() {
+    public String getAccountName() {
         return accountName;
     }
 

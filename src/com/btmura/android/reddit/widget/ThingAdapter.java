@@ -189,7 +189,7 @@ public class ThingAdapter extends LoaderAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        switch (getInt(position, getKindIndex())) {
+        switch (getKind(position)) {
             case Kinds.KIND_MORE:
                 return 0;
 
@@ -200,7 +200,7 @@ public class ThingAdapter extends LoaderAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        switch (getInt(cursor.getPosition(), getKindIndex())) {
+        switch (getKind(cursor.getPosition())) {
             case Kinds.KIND_MORE:
                 LayoutInflater inflater = LayoutInflater.from(context);
                 return inflater.inflate(R.layout.thing_more_row, parent, false);
@@ -360,6 +360,10 @@ public class ThingAdapter extends LoaderAdapter {
         return getString(position, getAuthorIndex());
     }
 
+    public int getKind(int position) {
+        return getInt(position, getKindIndex());
+    }
+
     public Bundle getReplyExtras(int position) {
         return null;
     }
@@ -391,18 +395,33 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     public boolean isNew(int position) {
-        // Consider the message new if reddit thinks it's new and we don't have
-        // a pending action to mark it read.
-        return isMessage()
-                && getBoolean(position, MESSAGE_NEW)
-                && getInt(position, MESSAGE_ACTION) != MessageActions.ACTION_READ;
+        // Only messages can't be marked as new.
+        if (!isMessage()) {
+            return false;
+        }
 
+        // If no local read actions are pending, then rely on what reddit thinks.
+        if (isNull(position, MESSAGE_ACTION)) {
+            return getBoolean(position, MESSAGE_NEW);
+        }
+
+        // We have a local pending action so use that to indicate if it's new.
+        return getInt(position, MESSAGE_ACTION) != MessageActions.ACTION_UNREAD;
     }
 
     public boolean isSaved(int position) {
-        return !isMessage()
-                && getBoolean(position, THING_SAVED)
-                && getInt(position, THING_SAVE_ACTION) != SaveActions.ACTION_UNSAVE;
+        // Messages can't be saved.
+        if (isMessage()) {
+            return false;
+        }
+
+        // If no local save actions are pending, then rely on what reddit thinks.
+        if (isNull(position, THING_SAVE_ACTION)) {
+            return getBoolean(position, THING_SAVED);
+        }
+
+        // We have a local pending action so use that to indicate if it's read.
+        return getInt(position, THING_SAVE_ACTION) == SaveActions.ACTION_SAVE;
     }
 
     public String getTitle(int position) {

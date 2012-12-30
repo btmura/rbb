@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,24 +25,40 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.SaveActions;
+import com.btmura.android.reddit.provider.Provider;
 
 public class ThingMenuFragment extends Fragment {
 
     public static final String TAG = "ThingMenuFragment";
 
     private static final String ARG_SUBREDDIT = "subreddit";
+    private static final String ARG_THING_ID = "thingId";
     private static final String ARG_KIND = "kind";
     private static final String ARG_SAVED = "saved";
 
-    public static ThingMenuFragment newInstance(String subreddit, int kind, boolean saved) {
-        Bundle args = new Bundle(1);
+    private AccountNameHolder accountNameHolder;
+
+    public static ThingMenuFragment newInstance(String subreddit,
+            String thingId, int kind, boolean saved) {
+        Bundle args = new Bundle(4);
         args.putString(ARG_SUBREDDIT, subreddit);
+        args.putString(ARG_THING_ID, thingId);
         args.putInt(ARG_KIND, kind);
         args.putBoolean(ARG_SAVED, saved);
         ThingMenuFragment frag = new ThingMenuFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof AccountNameHolder) {
+            accountNameHolder = (AccountNameHolder) activity;
+        }
     }
 
     @Override
@@ -59,10 +76,12 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        boolean saveable = getArguments().getInt(ARG_KIND) != Kinds.KIND_MESSAGE;
+        boolean saveable = accountNameHolder != null
+                && AccountUtils.isAccount(accountNameHolder.getAccountName())
+                && getArguments().getInt(ARG_KIND) != Kinds.KIND_MESSAGE;
         boolean saved = getArguments().getBoolean(ARG_SAVED);
-        menu.findItem(R.id.menu_save).setVisible(saveable && !saved);
-        menu.findItem(R.id.menu_unsave).setVisible(saveable && saved);
+        menu.findItem(R.id.menu_saved).setVisible(saveable && saved);
+        menu.findItem(R.id.menu_unsaved).setVisible(saveable && !saved);
     }
 
     @Override
@@ -70,6 +89,14 @@ public class ThingMenuFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_about_thing_subreddit:
                 handleAboutSubreddit();
+                return true;
+
+            case R.id.menu_saved:
+                handleSave(SaveActions.ACTION_UNSAVE);
+                return true;
+
+            case R.id.menu_unsaved:
+                handleSave(SaveActions.ACTION_SAVE);
                 return true;
 
             default:
@@ -81,5 +108,13 @@ public class ThingMenuFragment extends Fragment {
         Intent intent = new Intent(getActivity(), SidebarActivity.class);
         intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getArguments().getString(ARG_SUBREDDIT));
         startActivity(intent);
+    }
+
+    private void handleSave(int action) {
+        if (accountNameHolder != null) {
+            String accountName = accountNameHolder.getAccountName();
+            String thingId = getArguments().getString(ARG_THING_ID);
+            Provider.saveAsync(getActivity(), accountName, thingId, action);
+        }
     }
 }

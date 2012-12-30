@@ -54,6 +54,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         OnThingSelectedListener,
         OnThingEventListener,
         OnBackStackChangedListener,
+        AccountNameHolder,
         SubredditNameHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
@@ -153,7 +154,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     public abstract void onLoaderReset(Loader<AccountResult> loader);
 
-    protected abstract String getAccountName();
+    public abstract String getAccountName();
 
     protected abstract int getFilter();
 
@@ -206,6 +207,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         // ThingMenuFragment for some other thing.
         if (thingBundle != null) {
             Fragment mf = ThingMenuFragment.newInstance(subreddit,
+                    ThingBundle.getThingId(thingBundle),
                     ThingBundle.getKind(thingBundle),
                     ThingBundle.isSaved(thingBundle));
             ft.add(mf, ThingMenuFragment.TAG);
@@ -410,10 +412,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String subreddit = ThingBundle.getSubreddit(thingBundle);
         int kind = ThingBundle.getKind(thingBundle);
         boolean saved = ThingBundle.isSaved(thingBundle);
+        String thingId = ThingBundle.getThingId(thingBundle);
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, false, thingBundle,
                 filter);
-        Fragment mf = ThingMenuFragment.newInstance(subreddit, kind, saved);
+        Fragment mf = ThingMenuFragment.newInstance(subreddit, thingId, kind, saved);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);

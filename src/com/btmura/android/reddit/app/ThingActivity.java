@@ -75,6 +75,7 @@ public class ThingActivity extends GlobalMenuActivity implements
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
             ft.add(ThingMenuFragment.newInstance(ThingBundle.getSubreddit(thingBundle),
+                    ThingBundle.getThingId(thingBundle),
                     ThingBundle.getKind(thingBundle),
                     ThingBundle.isSaved(thingBundle)),
                     ThingMenuFragment.TAG);
@@ -101,6 +102,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = result.getLastAccount();
         pager.setAdapter(new ThingPagerAdapter(getFragmentManager(), accountName, thingBundle));
+        invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {

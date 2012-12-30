@@ -39,6 +39,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
@@ -359,14 +360,15 @@ public class ThingListFragment extends ThingProviderListFragment implements
         menu.findItem(R.id.menu_view_profile).setVisible(count == 1);
         menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
 
-        boolean showSave = false;
-        boolean showUnsave = false;
+        boolean saveable = false;
+        boolean saved = false;
         if (hasAccount && count == 1) {
-            showSave = !adapter.isSaved(getFirstCheckedPosition());
-            showUnsave = !showSave;
+            int position = getFirstCheckedPosition();
+            saveable = adapter.getKind(position) != Kinds.KIND_MESSAGE;
+            saved = adapter.isSaved(position);
         }
-        menu.findItem(R.id.menu_save).setVisible(showSave);
-        menu.findItem(R.id.menu_unsave).setVisible(showUnsave);
+        menu.findItem(R.id.menu_saved).setVisible(saveable && saved);
+        menu.findItem(R.id.menu_unsaved).setVisible(saveable && !saved);
 
         return true;
     }
@@ -380,11 +382,11 @@ public class ThingListFragment extends ThingProviderListFragment implements
             case R.id.menu_new_message:
                 return handleNewMessage(mode);
 
-            case R.id.menu_save:
-                return handleSave(mode, SaveActions.ACTION_SAVE);
+            case R.id.menu_saved:
+                return handleSaved(mode, SaveActions.ACTION_UNSAVE);
 
-            case R.id.menu_unsave:
-                return handleSave(mode, SaveActions.ACTION_UNSAVE);
+            case R.id.menu_unsaved:
+                return handleSaved(mode, SaveActions.ACTION_SAVE);
 
             case R.id.menu_view_profile:
                 return handleViewProfile(mode);
@@ -405,7 +407,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         return true;
     }
 
-    private boolean handleSave(ActionMode mode, int action) {
+    private boolean handleSaved(ActionMode mode, int action) {
         String accountName = adapter.getAccountName();
         String thingId = adapter.getThingId(getFirstCheckedPosition());
         Provider.saveAsync(getActivity(), accountName, thingId, action);
