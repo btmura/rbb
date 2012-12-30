@@ -147,7 +147,8 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         boolean showSubreddit = !TextUtils.isEmpty(subreddit)
                 && !subreddit.equalsIgnoreCase(parentSubreddit);
-        boolean showPoints = !drawVotingArrows && kind != Kinds.KIND_MESSAGE;
+        boolean showPoints = !drawScore && kind != Kinds.KIND_MESSAGE;
+
         boolean showNumComments = kind == Kinds.KIND_LINK;
         setStatusText(over18, showSubreddit, showPoints, showNumComments,
                 author, createdUtc, nowTimeMs, numComments, score, subreddit);
