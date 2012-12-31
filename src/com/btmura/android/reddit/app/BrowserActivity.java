@@ -20,6 +20,7 @@ import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -27,6 +28,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
@@ -36,6 +39,7 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
@@ -218,5 +222,83 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public void onSubredditSelected(String subreddit) {
         super.onSubredditSelected(subreddit);
         AccountPreferences.setLastSubreddit(prefs, getAccountName(), subreddit);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.browser_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        boolean isAccount = AccountUtils.isAccount(getAccountName());
+        boolean hasMessages = false;
+
+        menu.findItem(R.id.menu_unread_messages).setVisible(hasMessages);
+        menu.findItem(R.id.menu_new_post).setVisible(isAccount);
+        menu.findItem(R.id.menu_profile).setVisible(isAccount);
+        menu.findItem(R.id.menu_messages).setVisible(isAccount);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_unread_messages:
+                return handleUnreadMessages();
+
+            case R.id.menu_new_post:
+                return handleNewPost();
+
+            case R.id.menu_add_subreddit:
+                return handleAddSubreddit();
+
+            case R.id.menu_profile:
+                return handleProfile();
+
+            case R.id.menu_messages:
+                return handleMessages();
+
+            case R.id.menu_accounts:
+                return handleAccounts();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private boolean handleUnreadMessages() {
+        MenuHelper.startMessageActivity(this, getAccountName(), FilterAdapter.MESSAGE_UNREAD);
+        return true;
+    }
+
+    private boolean handleNewPost() {
+        MenuHelper.startComposeActivity(this, ComposeActivity.COMPOSITION_SUBMISSION,
+                getSubredditName(), null);
+        return true;
+    }
+
+    private boolean handleAddSubreddit() {
+        AddSubredditFragment.newInstance().show(getFragmentManager(), AddSubredditFragment.TAG);
+        return true;
+    }
+
+    private boolean handleProfile() {
+        MenuHelper.startProfileActivity(this, getAccountName(), -1);
+        return true;
+    }
+
+    private boolean handleMessages() {
+        MenuHelper.startMessageActivity(this, getAccountName(), -1);
+        return true;
+    }
+
+    private boolean handleAccounts() {
+        startActivity(new Intent(this, AccountListActivity.class));
+        return true;
     }
 }

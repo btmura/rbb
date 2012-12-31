@@ -18,10 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,12 +30,9 @@ import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.widget.AccountAdapter;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class GlobalMenuFragment extends Fragment implements OnFocusChangeListener,
-        OnQueryTextListener, LoaderCallbacks<Cursor> {
+        OnQueryTextListener {
 
     public static final String TAG = "GlobalMenuFragment";
 
@@ -49,9 +43,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     }
 
     private SubredditNameHolder subredditNameHolder;
-    private AccountNameHolder accountNameHolder;
     private OnSearchQuerySubmittedListener listener;
-    private AccountAdapter adapter;
     private MenuItem searchItem;
     private SearchView searchView;
 
@@ -65,9 +57,6 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         if (activity instanceof SubredditNameHolder) {
             subredditNameHolder = (SubredditNameHolder) activity;
         }
-        if (activity instanceof AccountNameHolder) {
-            accountNameHolder = (AccountNameHolder) activity;
-        }
         if (activity instanceof OnSearchQuerySubmittedListener) {
             listener = (OnSearchQuerySubmittedListener) activity;
         }
@@ -77,26 +66,6 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        adapter = new AccountAdapter(getActivity());
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return AccountAdapter.getLoader(getActivity());
-    }
-
-    public void onLoadFinished(Loader<Cursor> loader, Cursor c) {
-        adapter.swapCursor(c);
-        getActivity().invalidateOptionsMenu();
-    }
-
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
     }
 
     @Override
@@ -112,42 +81,14 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-
-        boolean isAccount = accountNameHolder != null
-                && AccountUtils.isAccount(accountNameHolder.getAccountName());
-        boolean hasMessages = isAccount
-                && adapter.hasMessages(accountNameHolder.getAccountName());
-
-        menu.findItem(R.id.menu_unread_messages).setVisible(hasMessages);
-        menu.findItem(R.id.menu_new_post).setVisible(isAccount);
-        menu.findItem(R.id.menu_profile).setVisible(isAccount);
-        menu.findItem(R.id.menu_messages).setVisible(isAccount);
         menu.findItem(R.id.menu_debug).setVisible(BuildConfig.DEBUG);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_add_subreddit:
-                return handleAddSubreddit();
-
-            case R.id.menu_new_post:
-                return handleNewPost();
-
             case R.id.menu_search:
                 return handleSearch();
-
-            case R.id.menu_profile:
-                return handleProfile();
-
-            case R.id.menu_unread_messages:
-                return handleUnreadMessages();
-
-            case R.id.menu_messages:
-                return handleMessages();
-
-            case R.id.menu_accounts:
-                return handleAccounts();
 
             case R.id.menu_debug:
                 return handleDebug();
@@ -157,40 +98,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         }
     }
 
-    private boolean handleAddSubreddit() {
-        AddSubredditFragment.newInstance().show(getFragmentManager(), AddSubredditFragment.TAG);
-        return true;
-    }
-
-    private boolean handleNewPost() {
-        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_SUBMISSION,
-                subredditNameHolder.getSubredditName(), null);
-        return true;
-    }
-
     public boolean handleSearch() {
         searchItem.expandActionView();
-        return true;
-    }
-
-    private boolean handleProfile() {
-        MenuHelper.startProfileActivity(getActivity(), accountNameHolder.getAccountName(), -1);
-        return true;
-    }
-
-    private boolean handleUnreadMessages() {
-        MenuHelper.startMessageActivity(getActivity(), accountNameHolder.getAccountName(),
-                FilterAdapter.MESSAGE_UNREAD);
-        return true;
-    }
-
-    private boolean handleMessages() {
-        MenuHelper.startMessageActivity(getActivity(), accountNameHolder.getAccountName(), -1);
-        return true;
-    }
-
-    private boolean handleAccounts() {
-        startActivity(new Intent(getActivity(), AccountListActivity.class));
         return true;
     }
 
