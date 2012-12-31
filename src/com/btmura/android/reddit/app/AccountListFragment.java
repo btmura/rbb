@@ -54,6 +54,7 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
 
     public interface OnAccountEventListener {
         void onAccountSelected(String accountName);
+
         void onAccountsRemoved(String[] accountNames);
     }
 
@@ -103,7 +104,7 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         adapter.clear();
         adapter.addAll(result.accountNames);
-        setEmptyText(getString(result != null ? R.string.empty_list : R.string.error));
+        setEmptyText(getString(result != null ? R.string.empty_accounts : R.string.error));
         setListShown(true);
     }
 

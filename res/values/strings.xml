@@ -29,6 +29,7 @@
     <string name="compose_link">LINK</string>
     <string name="compose_text">TEXT</string>
     <string name="content_browser">Content providers</string>
+    <string name="empty_accounts">You have no accounts.</string>
     <string name="empty_list">Nothing to see here…</string>
     <string name="error">Something went wrong…</string>
     <string name="error_blank_field">This field cannot be blank.</string>
