@@ -220,7 +220,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-        ft.commit();
+
+        // Use commitAllowingStateLoss to allow changing accounts when the
+        // account list activity is a dialog on large devices and we remove an
+        // account causing new fragment transactions to occur.
+        ft.commitAllowingStateLoss();
 
         refreshSubredditListVisibility();
         refreshActionBar(subreddit, thingBundle);
