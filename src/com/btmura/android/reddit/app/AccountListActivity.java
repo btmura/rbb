@@ -24,17 +24,24 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewStub;
+import android.widget.Button;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
-public class AccountListActivity extends Activity {
+public class AccountListActivity extends Activity implements OnClickListener {
 
     public static final String TAG = "AccountListActivity";
 
     private static final String[] AUTHORITIES = {
             SubredditProvider.AUTHORITY,
     };
+
+    private Button addAccount;
+    private View cancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +52,32 @@ public class AccountListActivity extends Activity {
 
     private void setupViews(Bundle savedInstanceState) {
         ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        } else {
+            ViewStub vs = (ViewStub) findViewById(R.id.button_bar_stub);
+            View buttonBar = vs.inflate();
+
+            addAccount = (Button) buttonBar.findViewById(R.id.ok);
+            addAccount.setText(R.string.add_account);
+            addAccount.setOnClickListener(this);
+
+            cancel = findViewById(R.id.cancel);
+            cancel.setOnClickListener(this);
+        }
 
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.account_list_container, AccountListFragment.newInstance());
             ft.commit();
+        }
+    }
+
+    public void onClick(View v) {
+        if (v == addAccount) {
+            handleAddAccount();
+        } else {
+            finish();
         }
     }
 
