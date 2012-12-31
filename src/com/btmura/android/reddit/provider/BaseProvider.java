@@ -27,13 +27,11 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.CursorExtrasWrapper;
 import com.btmura.android.reddit.database.DbHelper;
 import com.btmura.android.reddit.util.Array;
 
@@ -41,9 +39,9 @@ abstract class BaseProvider extends ContentProvider {
 
     public static final String ID_SELECTION = BaseColumns._ID + "= ?";
 
-    public static final String TRUE = Boolean.toString(true);
+    static final String TRUE = Boolean.toString(true);
 
-    public static final String FALSE = Boolean.toString(false);
+    static final String FALSE = Boolean.toString(false);
 
     /**
      * Sync changes back to the network. Don't set this in sync adapters or else
@@ -56,13 +54,6 @@ abstract class BaseProvider extends ContentProvider {
      * This is by default true.
      */
     public static final String PARAM_NOTIFY = "notify";
-
-    /** Selection is a bundle of a selection and its arguments. */
-    static class Selection {
-        String selection;
-        String[] selectionArgs;
-        Bundle extras;
-    }
 
     protected String logTag;
     protected DbHelper helper;
@@ -89,16 +80,9 @@ abstract class BaseProvider extends ContentProvider {
         Cursor c = null;
         db.beginTransaction();
         try {
-            Selection newSelection = processUri(uri, db, null, selection, selectionArgs);
-            if (newSelection != null) {
-                selection = newSelection.selection;
-                selectionArgs = newSelection.selectionArgs;
-            }
-
-            c = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
-            c.setNotificationUri(getContext().getContentResolver(), uri);
-            if (newSelection != null && newSelection.extras != null) {
-                c = new CursorExtrasWrapper(c, newSelection.extras);
+            c = innerQuery(uri, db, table, projection, selection, selectionArgs, sortOrder);
+            if (c != null) {
+                c.setNotificationUri(getContext().getContentResolver(), uri);
             }
             db.setTransactionSuccessful();
         } finally {
@@ -115,8 +99,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            processUri(uri, db, values, null, null);
-            id = db.insert(table, null, values);
+            id = innerInsert(uri, db, table, null, values);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -140,13 +123,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            Selection newSelection = processUri(uri, db, values, selection, selectionArgs);
-            if (newSelection != null) {
-                selection = newSelection.selection;
-                selectionArgs = newSelection.selectionArgs;
-            }
-
-            count = db.update(table, values, selection, selectionArgs);
+            count = innerUpdate(uri, db, table, values, selection, selectionArgs);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -169,13 +146,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            Selection newSelection = processUri(uri, db, null, selection, selectionArgs);
-            if (newSelection != null) {
-                selection = newSelection.selection;
-                selectionArgs = newSelection.selectionArgs;
-            }
-
-            count = db.delete(table, selection, selectionArgs);
+            count = innerDelete(uri, db, table, selection, selectionArgs);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -197,15 +168,24 @@ abstract class BaseProvider extends ContentProvider {
 
     protected abstract String getTable(Uri uri);
 
-    /**
-     * Processes the database inputs and returns a new selection to use for
-     * querying or null to indicate that no changes to the selection need to be
-     * made to the selection.
-     */
-    protected Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
+    protected Cursor innerQuery(Uri uri, SQLiteDatabase db, String table,
+            String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        return db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
+    }
+
+    protected long innerInsert(Uri uri, SQLiteDatabase db, String table,
+            String nullColumnHack, ContentValues values) {
+        return db.insert(table, nullColumnHack, values);
+    }
+
+    protected int innerUpdate(Uri uri, SQLiteDatabase db, String table,
+            ContentValues values, String selection, String[] selectionArgs) {
+        return db.update(table, values, selection, selectionArgs);
+    }
+
+    protected int innerDelete(Uri uri, SQLiteDatabase db, String table,
             String selection, String[] selectionArgs) {
-        // Do nothing by default. Override to do more processing of URIs.
-        return null;
+        return db.delete(table, selection, selectionArgs);
     }
 
     protected void notifyChange(Uri uri) {

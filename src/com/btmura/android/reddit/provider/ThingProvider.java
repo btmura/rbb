@@ -23,6 +23,7 @@ import android.accounts.OperationCanceledException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.CursorExtrasWrapper;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.SaveActions;
@@ -290,23 +292,16 @@ public class ThingProvider extends SessionProvider {
     }
 
     @Override
-    protected Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
-            String selection, String[] selectionArgs) {
+    protected Cursor innerQuery(Uri uri, SQLiteDatabase db, String table, String[] projection,
+            String selection, String[] selectionArgs, String sortOrder) {
         if (uri.getBooleanQueryParameter(PARAM_LISTING_GET, false)) {
-            return handleListingGet(uri, db, selection, selectionArgs);
-        } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_REPLY, false)) {
-            handleCommentReply(uri, db, values);
-        } else if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
-            handleCommentDelete(uri, db);
-        } else if (uri.getBooleanQueryParameter(PARAM_MESSAGE_REPLY, false)) {
-            handleMessageReply(uri, db, values);
+            return handleListingGet(uri, db, table, projection, selection, selectionArgs, sortOrder);
         }
-
-        return null;
+        return super.innerQuery(uri, db, table, projection, selection, selectionArgs, sortOrder);
     }
 
-    private Selection handleListingGet(Uri uri, SQLiteDatabase db, String selection,
-            String[] selectionArgs) {
+    private Cursor handleListingGet(Uri uri, SQLiteDatabase db, String table, String[] projection,
+            String selection, String[] selectionArgs, String sortOrder) {
         try {
             Context context = getContext();
             long sessionId = getLongParameter(uri, PARAM_SESSION_ID, -1);
@@ -364,16 +359,15 @@ public class ThingProvider extends SessionProvider {
             }
 
             sessionId = getListingSession(listing, db, sessionId);
+            selection = appendSelection(selection, SharedColumns.SELECT_BY_SESSION_ID);
+            selectionArgs = appendSelectionArg(selectionArgs, Long.toString(sessionId));
 
-            Selection newSelection = new Selection();
-            newSelection.selection = appendSelection(selection, SharedColumns.SELECT_BY_SESSION_ID);
-            newSelection.selectionArgs = appendSelectionArg(selectionArgs, Long.toString(sessionId));
+            Cursor c = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
 
-            newSelection.extras = new Bundle(2);
-            newSelection.extras.putLong(EXTRA_SESSION_ID, sessionId);
-            listing.addCursorExtras(newSelection.extras);
-
-            return newSelection;
+            Bundle extras = new Bundle(2);
+            extras.putLong(EXTRA_SESSION_ID, sessionId);
+            listing.addCursorExtras(extras);
+            return new CursorExtrasWrapper(c, extras);
 
         } catch (OperationCanceledException e) {
             Log.e(TAG, e.getMessage(), e);
@@ -383,6 +377,17 @@ public class ThingProvider extends SessionProvider {
             Log.e(TAG, e.getMessage(), e);
         }
         return null;
+    }
+
+    @Override
+    protected long innerInsert(Uri uri, SQLiteDatabase db, String table, String nullColumnHack,
+            ContentValues values) {
+        if (uri.getBooleanQueryParameter(PARAM_COMMENT_REPLY, false)) {
+            handleCommentReply(uri, db, values);
+        } else if (uri.getBooleanQueryParameter(PARAM_MESSAGE_REPLY, false)) {
+            handleMessageReply(uri, db, values);
+        }
+        return super.innerInsert(uri, db, table, nullColumnHack, values);
     }
 
     private void handleCommentReply(Uri uri, SQLiteDatabase db, ContentValues values) {
@@ -398,19 +403,6 @@ public class ThingProvider extends SessionProvider {
         db.insert(CommentActions.TABLE_NAME, null, v);
     }
 
-    private void handleCommentDelete(Uri uri, SQLiteDatabase db) {
-        String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
-        String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
-        String thingId = uri.getQueryParameter(PARAM_THING_ID);
-
-        ContentValues v = new ContentValues(4);
-        v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE);
-        v.put(CommentActions.COLUMN_ACCOUNT, accountName);
-        v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
-        v.put(CommentActions.COLUMN_THING_ID, thingId);
-        db.insert(CommentActions.TABLE_NAME, null, v);
-    }
-
     private void handleMessageReply(Uri uri, SQLiteDatabase db, ContentValues values) {
         // Get the thing ID of the thing we are replying to.
         String thingId = uri.getQueryParameter(PARAM_THING_ID);
@@ -423,6 +415,37 @@ public class ThingProvider extends SessionProvider {
         v.put(MessageActions.COLUMN_THING_ID, thingId);
         v.put(MessageActions.COLUMN_TEXT, values.getAsString(Messages.COLUMN_BODY));
         db.insert(MessageActions.TABLE_NAME, null, v);
+    }
+
+    @Override
+    protected int innerUpdate(Uri uri, SQLiteDatabase db, String table, ContentValues values,
+            String selection, String[] selectionArgs) {
+        if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
+            handleCommentDelete(uri, db);
+        }
+        return super.innerUpdate(uri, db, table, values, selection, selectionArgs);
+    }
+
+    @Override
+    protected int innerDelete(Uri uri, SQLiteDatabase db, String table, String selection,
+            String[] selectionArgs) {
+        if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
+            handleCommentDelete(uri, db);
+        }
+        return super.innerDelete(uri, db, table, selection, selectionArgs);
+    }
+
+    private void handleCommentDelete(Uri uri, SQLiteDatabase db) {
+        String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
+        String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
+        String thingId = uri.getQueryParameter(PARAM_THING_ID);
+
+        ContentValues v = new ContentValues(4);
+        v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE);
+        v.put(CommentActions.COLUMN_ACCOUNT, accountName);
+        v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
+        v.put(CommentActions.COLUMN_THING_ID, thingId);
+        db.insert(CommentActions.TABLE_NAME, null, v);
     }
 
     @Override

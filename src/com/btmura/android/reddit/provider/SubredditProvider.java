@@ -20,11 +20,9 @@ import java.util.ArrayList;
 
 import android.app.backup.BackupManager;
 import android.content.ContentProviderOperation;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
@@ -58,11 +56,6 @@ public class SubredditProvider extends SessionProvider {
 
     protected String getTable(Uri uri) {
         return Subreddits.TABLE_NAME;
-    }
-
-    protected Selection processUri(Uri uri, SQLiteDatabase db, ContentValues values,
-            String selection, String[] selectionArgs) {
-        return null;
     }
 
     public static void insertInBackground(Context context, String accountName,
