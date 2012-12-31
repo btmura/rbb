@@ -113,6 +113,14 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         adapter.setFilter(result.getLastSubredditFilter());
 
         int index = adapter.findAccountName(accountName);
+
+        // If the selected navigation index is the same, then the action bar
+        // won't fire onNavigationItemSelected. Resetting the adapter and then
+        // calling setSelectedNavigationItem again seems to unjam it.
+        if (bar.getSelectedNavigationIndex() == index) {
+            bar.setListNavigationCallbacks(adapter, this);
+        }
+
         bar.setSelectedNavigationItem(index);
     }
 
