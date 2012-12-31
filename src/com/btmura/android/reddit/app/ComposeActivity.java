@@ -184,23 +184,21 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
         boolean isLink = extras.getBoolean(EXTRA_COMPOSE_IS_LINK);
 
         switch (getComposition()) {
-            case COMPOSITION_SUBMISSION:
-                Fragment frag = SubmitLinkFragment.newInstance(accountName, destination, title,
-                        text, isLink, id, guess);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(frag, SubmitLinkFragment.TAG);
-                ft.commit();
-                break;
-
             case COMPOSITION_MESSAGE:
-                frag = ComposeFragment.newInstance(accountName, destination, title, text, id, guess);
-                ft = getFragmentManager().beginTransaction();
+                Fragment frag = ComposeFragment.newInstance(accountName, destination, title, text,
+                        id, guess);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.add(frag, ComposeFragment.TAG);
                 ft.commit();
                 break;
 
             default:
-                throw new IllegalArgumentException();
+                frag = SubmitLinkFragment.newInstance(accountName, destination, title, text,
+                        isLink, id, guess);
+                ft = getFragmentManager().beginTransaction();
+                ft.add(frag, SubmitLinkFragment.TAG);
+                ft.commit();
+                break;
         }
     }
 
