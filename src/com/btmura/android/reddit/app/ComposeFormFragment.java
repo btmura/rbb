@@ -241,20 +241,24 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        boolean hasAccounts = result.accountNames.length > 0;
+        accountSpinner.setEnabled(hasAccounts);
         if (ok != null) {
-            ok.setEnabled(true);
+            ok.setEnabled(hasAccounts);
         }
 
-        accountSpinner.setEnabled(true);
         adapter.clear();
-        adapter.addAll(result.accountNames);
+        if (hasAccounts) {
+            adapter.addAll(result.accountNames);
 
-        // Only setup spinner when not changing configs. Widget will handle
-        // selecting the last account on config changes on its own.
-        if (!restoringState) {
-            accountSpinner.setSelection(adapter.findAccountName(result.getLastAccount()));
+            // Only setup spinner when not changing configs. Widget will handle
+            // selecting the last account on config changes on its own.
+            if (!restoringState) {
+                accountSpinner.setSelection(adapter.findAccountName(result.getLastAccount()));
+            }
+        } else {
+            adapter.add(getString(R.string.empty_accounts));
         }
-
         getActivity().invalidateOptionsMenu();
     }
 
