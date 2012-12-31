@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
@@ -76,10 +75,7 @@ public class ThingActivity extends GlobalMenuActivity implements
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
             ft.add(ThingMenuFragment.newInstance(ThingBundle.getSubreddit(thingBundle),
-                    ThingBundle.getThingId(thingBundle),
-                    ThingBundle.getKind(thingBundle),
-                    ThingBundle.isSaved(thingBundle)),
-                    ThingMenuFragment.TAG);
+                    ThingBundle.getThingId(thingBundle)), ThingMenuFragment.TAG);
             ft.commit();
         }
     }
@@ -128,7 +124,10 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     public void onSavedDiscovery(String thingId, boolean saved) {
-        Log.d(TAG, "thingId: " + thingId + " saved: " + saved);
+        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))) {
+            ThingMenuFragment mf = getThingMenuFragment();
+            mf.setSaved(saved);
+        }
     }
 
     public void onLinkMenuItemClick() {
@@ -178,5 +177,9 @@ public class ThingActivity extends GlobalMenuActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBundle(STATE_THING_BUNDLE, thingBundle);
+    }
+
+    private ThingMenuFragment getThingMenuFragment() {
+        return (ThingMenuFragment) getFragmentManager().findFragmentByTag(ThingMenuFragment.TAG);
     }
 }

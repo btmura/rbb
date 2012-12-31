@@ -351,8 +351,6 @@ public class ThingAdapter extends LoaderAdapter {
             ThingBundle.putCommentUrl(b, Urls.perma(permaLink, null));
         }
 
-        ThingBundle.putSaved(b, isSaved(c.getPosition()));
-
         return b;
     }
 

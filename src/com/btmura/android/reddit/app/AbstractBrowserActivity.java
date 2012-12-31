@@ -207,9 +207,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         // ThingMenuFragment for some other thing.
         if (thingBundle != null) {
             Fragment mf = ThingMenuFragment.newInstance(subreddit,
-                    ThingBundle.getThingId(thingBundle),
-                    ThingBundle.getKind(thingBundle),
-                    ThingBundle.isSaved(thingBundle));
+                    ThingBundle.getThingId(thingBundle));
             ft.add(mf, ThingMenuFragment.TAG);
         } else {
             Fragment mf = getThingMenuFragment();
@@ -417,13 +415,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         int filter = getFilter();
 
         String subreddit = ThingBundle.getSubreddit(thingBundle);
-        int kind = ThingBundle.getKind(thingBundle);
-        boolean saved = ThingBundle.isSaved(thingBundle);
         String thingId = ThingBundle.getThingId(thingBundle);
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, false, thingBundle,
                 filter);
-        Fragment mf = ThingMenuFragment.newInstance(subreddit, thingId, kind, saved);
+        Fragment mf = ThingMenuFragment.newInstance(subreddit, thingId);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
@@ -468,7 +464,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     public void onSavedDiscovery(String thingId, boolean saved) {
-        Log.d(TAG, "thingId: " + thingId + " saved: " + saved);
+        ControlFragment cf = getControlFragment();
+        Bundle thingBundle = cf.getThingBundle();
+        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))) {
+            ThingMenuFragment mf = getThingMenuFragment();
+            mf.setSaved(saved);
+        }
     }
 
     public void onLinkMenuItemClick() {

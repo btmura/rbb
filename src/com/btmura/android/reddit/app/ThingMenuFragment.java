@@ -25,8 +25,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.provider.Provider;
 
@@ -36,18 +34,15 @@ public class ThingMenuFragment extends Fragment {
 
     private static final String ARG_SUBREDDIT = "subreddit";
     private static final String ARG_THING_ID = "thingId";
-    private static final String ARG_KIND = "kind";
-    private static final String ARG_SAVED = "saved";
 
     private AccountNameHolder accountNameHolder;
+    private boolean saveable;
+    private boolean saved;
 
-    public static ThingMenuFragment newInstance(String subreddit,
-            String thingId, int kind, boolean saved) {
-        Bundle args = new Bundle(4);
+    public static ThingMenuFragment newInstance(String subreddit, String thingId) {
+        Bundle args = new Bundle(2);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putString(ARG_THING_ID, thingId);
-        args.putInt(ARG_KIND, kind);
-        args.putBoolean(ARG_SAVED, saved);
         ThingMenuFragment frag = new ThingMenuFragment();
         frag.setArguments(args);
         return frag;
@@ -67,6 +62,12 @@ public class ThingMenuFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    public void setSaved(boolean saved) {
+        this.saveable = true;
+        this.saved = saved;
+        getActivity().invalidateOptionsMenu();
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -76,10 +77,6 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        boolean saveable = accountNameHolder != null
-                && AccountUtils.isAccount(accountNameHolder.getAccountName())
-                && getArguments().getInt(ARG_KIND) != Kinds.KIND_MESSAGE;
-        boolean saved = getArguments().getBoolean(ARG_SAVED);
         menu.findItem(R.id.menu_saved).setVisible(saveable && saved);
         menu.findItem(R.id.menu_unsaved).setVisible(saveable && !saved);
     }
