@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
+import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
@@ -61,9 +62,9 @@ class ThingListing extends JsonParser implements Listing {
     private String resolvedSubreddit;
     private String moreThingId;
 
-    static ThingListing newSearchInstance(Context context, String accountName, String query,
-            String cookie) {
-        return new ThingListing(context, accountName, null, query, null, null, 0, null, cookie);
+    static ThingListing newSearchInstance(Context context, String accountName, String subreddit,
+            String query, String cookie) {
+        return new ThingListing(context, accountName, subreddit, query, null, null, 0, null, cookie);
     }
 
     static ThingListing newSubredditInstance(Context context, String accountName, String subreddit,
@@ -104,10 +105,14 @@ class ThingListing extends JsonParser implements Listing {
         } else if (!TextUtils.isEmpty(profileUser)) {
             url = Urls.user(profileUser, filter, more, Urls.TYPE_JSON);
         } else if (!TextUtils.isEmpty(query)) {
-            url = Urls.search(query, more);
+            url = Urls.search(subreddit, query, more);
         } else {
             url = Urls.subreddit(subreddit, filter, more, Urls.TYPE_JSON);
             followRedirects = !Subreddits.isRandom(subreddit);
+        }
+
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "getValues url: " + url);
         }
 
         HttpURLConnection conn = RedditApi.connect(url, cookie, followRedirects, false);

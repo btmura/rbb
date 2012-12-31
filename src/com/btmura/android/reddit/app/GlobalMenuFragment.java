@@ -216,6 +216,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
             Intent intent = new Intent(getActivity(), SearchActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
                     | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            intent.putExtra(SearchActivity.EXTRA_SUBREDDIT,
+                    subredditNameHolder.getSubredditName());
             intent.putExtra(SearchActivity.EXTRA_QUERY, query);
             startActivityForResult(intent, REQUEST_SEARCH);
         }

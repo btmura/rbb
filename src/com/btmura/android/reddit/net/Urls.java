@@ -55,7 +55,8 @@ public class Urls {
     private static final String BASE_COMMENTS_URL = BASE_URL + "/comments/";
     private static final String BASE_MESSAGE_URL = BASE_URL + "/message/";
     private static final String BASE_MESSAGE_THREAD_URL = BASE_URL + "/message/messages/";
-    private static final String BASE_SEARCH_URL = BASE_URL + "/search.json?q=";
+    private static final String BASE_SEARCH_QUERY = "/search.json?q=";
+    private static final String BASE_SEARCH_URL = BASE_URL + BASE_SEARCH_QUERY;
     private static final String BASE_SUBREDDIT_LIST_URL = BASE_URL + "/reddits/mine/.json";
     private static final String BASE_SUBREDDIT_SEARCH_URL = BASE_URL + "/reddits/search.json?q=";
     private static final String BASE_SUBREDDIT_URL = BASE_URL + "/r/";
@@ -243,12 +244,19 @@ public class Urls {
         return save ? API_SAVE_URL : API_UNSAVE_URL;
     }
 
-    public static CharSequence search(String query, String more) {
-        return newSearchUrl(BASE_SEARCH_URL, query, more);
+    public static CharSequence search(String subreddit, String query, String more) {
+        if (!TextUtils.isEmpty(subreddit)) {
+            StringBuilder b = new StringBuilder(BASE_SUBREDDIT_URL);
+            b.append(encode(subreddit));
+            b.append(BASE_SEARCH_QUERY);
+            return newSearchUrl(b.toString(), query, more, true);
+        } else {
+            return newSearchUrl(BASE_SEARCH_URL, query, more, false);
+        }
     }
 
     public static CharSequence sidebar(String name) {
-        return new StringBuilder(BASE_SUBREDDIT_URL).append(name).append("/about.json");
+        return new StringBuilder(BASE_SUBREDDIT_URL).append(encode(name)).append("/about.json");
     }
 
     public static CharSequence submit() {
@@ -324,7 +332,7 @@ public class Urls {
     }
 
     public static CharSequence subredditSearch(String query, String more) {
-        return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, more);
+        return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, more, false);
     }
 
     public static CharSequence subscribe() {
@@ -394,10 +402,14 @@ public class Urls {
         return b;
     }
 
-    private static CharSequence newSearchUrl(String base, String query, String more) {
+    private static CharSequence newSearchUrl(String base, String query, String more,
+            boolean restrict) {
         StringBuilder b = new StringBuilder(base).append(encode(query));
         if (more != null) {
             b.append("&count=25&after=").append(encode(more));
+        }
+        if (restrict) {
+            b.append("&restrict_sr=on");
         }
         return b;
     }

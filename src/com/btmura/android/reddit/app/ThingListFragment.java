@@ -115,18 +115,21 @@ public class ThingListFragment extends ThingProviderListFragment implements
         return newFragment(args);
     }
 
-    public static ThingListFragment newQueryInstance(String accountName, String query, int flags) {
-        Bundle args = new Bundle(3);
+    public static ThingListFragment newQueryInstance(String accountName, String subreddit,
+            String query, int flags) {
+        Bundle args = new Bundle(4);
         args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_SUBREDDIT, subreddit);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
         return newFragment(args);
     }
 
-    public static ThingListFragment newInstance(String accountName, String query,
+    public static ThingListFragment newInstance(String accountName, String subreddit, String query,
             String profileUser, String messageUser, int filter, int flags) {
-        Bundle args = new Bundle(6);
+        Bundle args = new Bundle(7);
         args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_SUBREDDIT, subreddit);
         args.putString(ARG_QUERY, query);
         args.putString(ARG_PROFILE_USER, profileUser);
         args.putString(ARG_MESSAGE_USER, messageUser);
@@ -460,6 +463,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public String getAccountName() {
         return adapter.getAccountName();
+    }
+
+    public String getSubreddit() {
+        return adapter.getSubreddit();
     }
 
     public void setSubreddit(String subreddit) {

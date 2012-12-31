@@ -163,15 +163,15 @@ public class ThingAdapter extends LoaderAdapter {
 
     @Override
     protected Uri getLoaderUri() {
-        // Empty but non-null subreddit means front page.
-        if (subreddit != null) {
-            return ThingProvider.subredditUri(sessionId, accountName, subreddit, filter, more);
-        } else if (!TextUtils.isEmpty(query)) {
-            return ThingProvider.searchUri(sessionId, accountName, query);
-        } else if (!TextUtils.isEmpty(profileUser)) {
+        if (!TextUtils.isEmpty(profileUser)) {
             return ThingProvider.profileUri(sessionId, accountName, profileUser, filter, more);
         } else if (!TextUtils.isEmpty(messageUser)) {
             return ThingProvider.messageUri(sessionId, accountName, filter, more);
+        } else if (!TextUtils.isEmpty(query)) {
+            return ThingProvider.searchUri(sessionId, accountName, subreddit, query);
+        } else if (subreddit != null) {
+            // Empty but non-null subreddit means front page.
+            return ThingProvider.subredditUri(sessionId, accountName, subreddit, filter, more);
         } else {
             throw new IllegalArgumentException();
         }
@@ -400,7 +400,8 @@ public class ThingAdapter extends LoaderAdapter {
             return false;
         }
 
-        // If no local read actions are pending, then rely on what reddit thinks.
+        // If no local read actions are pending, then rely on what reddit
+        // thinks.
         if (isNull(position, MESSAGE_ACTION)) {
             return getBoolean(position, MESSAGE_NEW);
         }
@@ -415,7 +416,8 @@ public class ThingAdapter extends LoaderAdapter {
             return false;
         }
 
-        // If no local save actions are pending, then rely on what reddit thinks.
+        // If no local save actions are pending, then rely on what reddit
+        // thinks.
         if (isNull(position, THING_SAVE_ACTION)) {
             return getBoolean(position, THING_SAVED);
         }

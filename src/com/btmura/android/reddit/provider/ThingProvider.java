@@ -194,13 +194,17 @@ public class ThingProvider extends SessionProvider {
         return b.build();
     }
 
-    public static final Uri searchUri(long sessionId, String accountName, String query) {
+    public static final Uri searchUri(long sessionId, String accountName, String subreddit,
+            String query) {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_SEARCH_LISTING));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_QUERY, query);
         b.appendQueryParameter(PARAM_JOIN, TRUE);
+        if (!TextUtils.isEmpty(subreddit)) {
+            b.appendQueryParameter(PARAM_SUBREDDIT, subreddit);
+        }
         if (sessionId != -1) {
             b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
         }
@@ -347,7 +351,8 @@ public class ThingProvider extends SessionProvider {
                     break;
 
                 case Listing.TYPE_SEARCH_LISTING:
-                    listing = ThingListing.newSearchInstance(context, accountName, query, cookie);
+                    listing = ThingListing.newSearchInstance(context, accountName, subreddit,
+                            query, cookie);
                     break;
 
                 case Listing.TYPE_REDDIT_SEARCH_LISTING:
