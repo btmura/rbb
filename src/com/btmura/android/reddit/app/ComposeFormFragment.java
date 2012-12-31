@@ -60,6 +60,12 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** String extra to pre-fill the destination field if possible. */
     public static final String ARG_DESTINATION = "destination";
 
+    /** Optional string extra with suggested title. */
+    private static final String ARG_TITLE = "title";
+
+    /** Optional string extra with suggested text. */
+    private static final String ARG_TEXT = "text";
+
     /** Type of composition when submitting a link or text. */
     public static final int COMPOSITION_SUBMISSION = 0;
 
@@ -123,10 +129,13 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** Matcher used to check whether the text is a link or not. */
     private Matcher linkMatcher;
 
-    public static ComposeFormFragment newInstance(int composition, String destination) {
-        Bundle args = new Bundle(2);
+    public static ComposeFormFragment newInstance(int composition, String destination,
+            String title, String text) {
+        Bundle args = new Bundle(4);
         args.putInt(ARG_COMPOSITION, composition);
         args.putString(ARG_DESTINATION, destination);
+        args.putString(ARG_TITLE, title);
+        args.putString(ARG_TEXT, text);
         ComposeFormFragment frag = new ComposeFormFragment();
         frag.setArguments(args);
         return frag;
@@ -164,6 +173,8 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         destinationText.setText(getArguments().getString(ARG_DESTINATION));
 
         titleText = (EditText) v.findViewById(R.id.title_text);
+        titleText.setText(getArguments().getString(ARG_TITLE));
+
         if (!TextUtils.isEmpty(destinationText.getText())) {
             titleText.requestFocus();
         }
@@ -171,17 +182,12 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         linkSwitch = (Switch) v.findViewById(R.id.link_switch);
 
         textText = (EditText) v.findViewById(R.id.text_text);
+        textText.setText(getArguments().getString(ARG_TEXT));
+        if (textText.length() > 0) {
+            validateText(textText.getText());
+        }
 
         switch (getArguments().getInt(ARG_COMPOSITION)) {
-            case COMPOSITION_SUBMISSION:
-                destinationText.setHint(R.string.hint_subreddit);
-                destinationText.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
-                titleText.setHint(R.string.hint_title);
-                textText.setHint(R.string.hint_text_or_link);
-                textText.addTextChangedListener(this);
-                linkSwitch.setVisibility(View.VISIBLE);
-                break;
-
             case COMPOSITION_MESSAGE:
                 destinationText.setHint(R.string.hint_username);
                 destinationText.setFilters(InputFilters.NO_SPACE_FILTERS);
@@ -199,7 +205,13 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 break;
 
             default:
-                throw new IllegalStateException();
+                destinationText.setHint(R.string.hint_subreddit);
+                destinationText.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
+                titleText.setHint(R.string.hint_title);
+                textText.setHint(R.string.hint_text_or_link);
+                textText.addTextChangedListener(this);
+                linkSwitch.setVisibility(View.VISIBLE);
+                break;
         }
 
         if (getActivity().getActionBar() == null) {
@@ -311,6 +323,10 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     }
 
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+        validateText(s);
+    }
+
+    private void validateText(CharSequence s) {
         if (linkMatcher == null) {
             linkMatcher = Patterns.WEB_URL.matcher(s);
         }

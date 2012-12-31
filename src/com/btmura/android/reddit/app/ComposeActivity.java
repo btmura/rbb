@@ -20,6 +20,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -94,9 +95,6 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
 
     private String getComposeTitle() {
         switch (getIntent().getIntExtra(EXTRA_COMPOSITION, -1)) {
-            case COMPOSITION_SUBMISSION:
-                return getString(R.string.label_new_post);
-
             case COMPOSITION_MESSAGE:
                 return getString(R.string.label_new_message);
 
@@ -106,7 +104,7 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
                         getIntent().getStringExtra(EXTRA_COMPOSE_DESTINATION));
 
             default:
-                throw new IllegalArgumentException();
+                return getString(R.string.label_new_post);
         }
     }
 
@@ -118,7 +116,9 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
 
         int composition = getIntent().getIntExtra(EXTRA_COMPOSITION, -1);
         String destination = getIntent().getStringExtra(EXTRA_COMPOSE_DESTINATION);
-        ComposeFormFragment frag = ComposeFormFragment.newInstance(composition, destination);
+        String title = getIntent().getStringExtra(Intent.EXTRA_SUBJECT);
+        String text = getIntent().getStringExtra(Intent.EXTRA_TEXT);
+        Fragment frag = ComposeFormFragment.newInstance(composition, destination, title, text);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.compose_form_container, frag);
