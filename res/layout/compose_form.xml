@@ -69,7 +69,7 @@
         android:layout_marginTop="@dimen/element_padding"
         android:layout_weight="1"
         android:gravity="top"
-        android:inputType="textCapSentences|textAutoCorrect" />
+        android:inputType="textCapSentences|textAutoCorrect|textMultiLine" />
 
     <ViewStub
         android:id="@+id/button_bar_stub"
