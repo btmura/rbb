@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -40,6 +41,7 @@ public class CommentAdapter extends LoaderAdapter {
             Things.COLUMN_NESTING,
             Things.COLUMN_NUM_COMMENTS,
             Things.COLUMN_PERMA_LINK,
+            Things.COLUMN_SAVED,
             Things.COLUMN_SELF,
             Things.COLUMN_SEQUENCE,
             Things.COLUMN_SESSION_ID,
@@ -47,28 +49,35 @@ public class CommentAdapter extends LoaderAdapter {
             Things.COLUMN_THING_ID,
             Things.COLUMN_UPS,
             Things.COLUMN_URL,
+
+            // Following columns are from joined tables at the end.
+            SharedColumns.COLUMN_SAVE,
             SharedColumns.COLUMN_VOTE,
     };
 
-    public static int INDEX_ID = 0;
-    public static int INDEX_AUTHOR = 1;
-    public static int INDEX_BODY = 2;
-    public static int INDEX_CREATED_UTC = 3;
-    public static int INDEX_DOWNS = 4;
-    public static int INDEX_EXPANDED = 5;
-    public static int INDEX_KIND = 6;
-    public static int INDEX_LIKES = 7;
-    public static int INDEX_NESTING = 8;
-    public static int INDEX_NUM_COMMENTS = 9;
-    public static int INDEX_PERMA_LINK = 10;
-    public static int INDEX_SELF = 11;
-    public static int INDEX_SEQUENCE = 12;
-    public static int INDEX_SESSION_ID = 13;
-    public static int INDEX_TITLE = 14;
-    public static int INDEX_THING_ID = 15;
-    public static int INDEX_UPS = 16;
-    public static int INDEX_URL = 17;
-    public static int INDEX_VOTE = 18;
+    public static final int INDEX_ID = 0;
+    public static final int INDEX_AUTHOR = 1;
+    public static final int INDEX_BODY = 2;
+    public static final int INDEX_CREATED_UTC = 3;
+    public static final int INDEX_DOWNS = 4;
+    public static final int INDEX_EXPANDED = 5;
+    public static final int INDEX_KIND = 6;
+    public static final int INDEX_LIKES = 7;
+    public static final int INDEX_NESTING = 8;
+    public static final int INDEX_NUM_COMMENTS = 9;
+    public static final int INDEX_PERMA_LINK = 10;
+    public static final int INDEX_SAVED = 11;
+    public static final int INDEX_SELF = 12;
+    public static final int INDEX_SEQUENCE = 13;
+    public static final int INDEX_SESSION_ID = 14;
+    public static final int INDEX_TITLE = 15;
+    public static final int INDEX_THING_ID = 16;
+    public static final int INDEX_UPS = 17;
+    public static final int INDEX_URL = 18;
+
+    // Following columns are from joined tables at the end.
+    public static final int INDEX_SAVE_ACTION = 19;
+    public static final int INDEX_VOTE = 20;
 
     private final long nowTimeMs = System.currentTimeMillis();
 
@@ -166,6 +175,16 @@ public class CommentAdapter extends LoaderAdapter {
 
     public String getAccountName() {
         return accountName;
+    }
+
+    public boolean isSaved(int position) {
+        // If no local save actions are pending, then rely on server info.
+        if (isNull(position, INDEX_SAVE_ACTION)) {
+            return getBoolean(position, INDEX_SAVED);
+        }
+
+        // We have a local pending action so use that to indicate if it's read.
+        return getInt(position, INDEX_SAVE_ACTION) == SaveActions.ACTION_SAVE;
     }
 
     public String getThingId() {

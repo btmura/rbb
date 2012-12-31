@@ -416,8 +416,7 @@ public class ThingAdapter extends LoaderAdapter {
             return false;
         }
 
-        // If no local save actions are pending, then rely on what reddit
-        // thinks.
+        // If no local save actions are pending, then rely on server info.
         if (isNull(position, THING_SAVE_ACTION)) {
             return getBoolean(position, THING_SAVED);
         }

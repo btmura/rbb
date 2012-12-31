@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
@@ -124,6 +125,10 @@ public class ThingActivity extends GlobalMenuActivity implements
             adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
             pager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
         }
+    }
+
+    public void onSavedDiscovery(String thingId, boolean saved) {
+        Log.d(TAG, "thingId: " + thingId + " saved: " + saved);
     }
 
     public void onLinkMenuItemClick() {

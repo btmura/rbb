@@ -467,6 +467,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
+    public void onSavedDiscovery(String thingId, boolean saved) {
+        Log.d(TAG, "thingId: " + thingId + " saved: " + saved);
+    }
+
     public void onLinkMenuItemClick() {
         thingPager.setCurrentItem(ThingPagerAdapter.PAGE_LINK);
     }
@@ -493,10 +497,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (cf != null) {
             String subreddit = cf.getSubreddit();
             Bundle thingBundle = cf.getThingBundle();
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "onBackStackChanged subreddit: " + subreddit
-                        + " thingBundle: " + thingBundle);
-            }
             refreshActionBar(subreddit, thingBundle);
             refreshViews(thingBundle);
             refreshCheckedItems();
@@ -568,26 +568,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private void refreshCheckedItems() {
         ControlFragment cf = getControlFragment();
 
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "refreshCheckedItems subreddit:" + cf.getSubreddit());
+        SubredditListFragment sf = getSubredditListFragment();
+        if (sf != null) {
+            sf.setSelectedSubreddit(cf.isRandom() ? Subreddits.NAME_RANDOM : cf.getSubreddit());
         }
 
-        SubredditListFragment slf = getSubredditListFragment();
-        if (slf != null) {
-            slf.setSelectedSubreddit(cf.isRandom() ? Subreddits.NAME_RANDOM : cf.getSubreddit());
-        }
-
-        ThingListFragment tlf = getThingListFragment();
-        if (tlf != null) {
-            tlf.setSelectedThing(ThingBundle.getThingId(cf.getThingBundle()),
+        ThingListFragment tf = getThingListFragment();
+        if (tf != null) {
+            tf.setSelectedThing(ThingBundle.getThingId(cf.getThingBundle()),
                     ThingBundle.getLinkId(cf.getThingBundle()));
         }
     }
 
     private void refreshThingPager(Bundle thingBundle) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "refreshThingPager thingBundle: " + thingBundle);
-        }
         if (thingBundle != null) {
             ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(),
                     getAccountName(), thingBundle);

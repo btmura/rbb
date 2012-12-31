@@ -203,6 +203,11 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     }
 
     @Override
+    public void onSaved(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_SAVED, reader.nextBoolean());
+    }
+
+    @Override
     public void onSelfText(JsonReader reader, int index) throws IOException {
         CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
         values.get(index).put(Things.COLUMN_BODY, body.toString());

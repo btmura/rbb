@@ -185,6 +185,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
             if (!adapter.getBoolean(0, CommentAdapter.INDEX_SELF)) {
                 listener.onLinkDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_URL));
             }
+            listener.onSavedDiscovery(thingId, adapter.isSaved(0));
         }
     }
 
