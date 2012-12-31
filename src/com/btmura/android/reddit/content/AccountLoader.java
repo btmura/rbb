@@ -81,14 +81,13 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
     private SharedPreferences prefs;
     private AccountManager manager;
     private boolean includeNoAccount;
-
+    private boolean listenerAdded;
     private AccountResult result;
 
     public AccountLoader(Context context, boolean includeNoAccount) {
         super(context);
         this.prefs = AccountPreferences.getPreferences(context);
         this.manager = AccountManager.get(getContext());
-        this.manager.addOnAccountsUpdatedListener(this, null, false);
         this.includeNoAccount = includeNoAccount;
     }
 
@@ -144,6 +143,10 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         if (result != null) {
             deliverResult(result);
         }
+        if (!listenerAdded) {
+            manager.addOnAccountsUpdatedListener(this, null, false);
+            listenerAdded = true;
+        }
         if (takeContentChanged() || result == null) {
             forceLoad();
         }
@@ -154,6 +157,10 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         super.onReset();
         onStopLoading();
         result = null;
+        if (listenerAdded) {
+            manager.removeOnAccountsUpdatedListener(this);
+            listenerAdded = false;
+        }
     }
 
     public void onAccountsUpdated(Account[] accounts) {
