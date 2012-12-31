@@ -16,23 +16,38 @@
 
 package com.btmura.android.reddit.app;
 
+import java.io.IOException;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewStub;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountAuthenticator;
+import com.btmura.android.reddit.app.AccountListFragment.OnAccountEventListener;
+import com.btmura.android.reddit.content.SelectAccountBroadcast;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
-public class AccountListActivity extends Activity implements OnClickListener {
+public class AccountListActivity extends Activity implements OnAccountEventListener,
+        OnClickListener {
 
     public static final String TAG = "AccountListActivity";
 
@@ -71,6 +86,48 @@ public class AccountListActivity extends Activity implements OnClickListener {
             ft.replace(R.id.account_list_container, AccountListFragment.newInstance());
             ft.commit();
         }
+    }
+
+    public void onAccountSelected(String accountName) {
+        SelectAccountBroadcast.sendBroadcast(this, accountName);
+        finish();
+    }
+
+    public void onAccountsRemoved(final String[] accountNames) {
+        final Context appContext = getApplicationContext();
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... voidRay) {
+                AccountManager manager = AccountManager.get(appContext);
+                String accountType = AccountAuthenticator.getAccountType(appContext);
+                int length = accountNames.length;
+                int removed = 0;
+                for (int i = 0; i < length; i++) {
+                    Account account = new Account(accountNames[i], accountType);
+                    AccountManagerFuture<Boolean> result =
+                            manager.removeAccount(account, null, null);
+                    try {
+                        if (result.getResult()) {
+                            removed++;
+                        }
+                    } catch (OperationCanceledException e) {
+                        Log.e(TAG, e.getMessage(), e);
+                    } catch (AuthenticatorException e) {
+                        Log.e(TAG, e.getMessage(), e);
+                    } catch (IOException e) {
+                        Log.e(TAG, e.getMessage(), e);
+                    }
+                }
+                return removed;
+            }
+
+            @Override
+            protected void onPostExecute(Integer suceeded) {
+                String text = getResources().getQuantityString(R.plurals.accounts,
+                        suceeded, suceeded);
+                Toast.makeText(appContext, text, Toast.LENGTH_SHORT).show();
+            }
+        }.execute();
     }
 
     public void onClick(View v) {

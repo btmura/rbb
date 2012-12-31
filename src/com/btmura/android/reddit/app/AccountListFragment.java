@@ -23,6 +23,7 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
@@ -51,10 +52,24 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
 
     public static final String TAG = "AccountListFragment";
 
+    public interface OnAccountEventListener {
+        void onAccountSelected(String accountName);
+        void onAccountsRemoved(String[] accountNames);
+    }
+
+    private OnAccountEventListener listener;
     private AccountNameAdapter adapter;
 
     public static AccountListFragment newInstance() {
         return new AccountListFragment();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnAccountEventListener) {
+            listener = (OnAccountEventListener) activity;
+        }
     }
 
     @Override
@@ -93,6 +108,13 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        if (listener != null) {
+            listener.onAccountSelected(adapter.getItem(position));
+        }
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {

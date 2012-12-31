@@ -23,7 +23,9 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.OnAccountsUpdateListener;
 import android.content.AsyncTaskLoader;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -78,10 +80,19 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
     };
 
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String accountName = intent.getStringExtra(SelectAccountBroadcast.EXTRA_ACCOUNT);
+            AccountPreferences.setLastAccount(prefs, accountName);
+            onContentChanged();
+        }
+    };
+
     private SharedPreferences prefs;
     private AccountManager manager;
     private boolean includeNoAccount;
-    private boolean listenerAdded;
+    private boolean listening;
     private AccountResult result;
 
     public AccountLoader(Context context, boolean includeNoAccount) {
@@ -143,9 +154,10 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         if (result != null) {
             deliverResult(result);
         }
-        if (!listenerAdded) {
+        if (!listening) {
             manager.addOnAccountsUpdatedListener(this, null, false);
-            listenerAdded = true;
+            SelectAccountBroadcast.registerReceiver(getContext(), receiver);
+            listening = true;
         }
         if (takeContentChanged() || result == null) {
             forceLoad();
@@ -157,9 +169,10 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         super.onReset();
         onStopLoading();
         result = null;
-        if (listenerAdded) {
+        if (listening) {
             manager.removeOnAccountsUpdatedListener(this);
-            listenerAdded = false;
+            SelectAccountBroadcast.unregisterReceiver(getContext(), receiver);
+            listening = false;
         }
     }
 
