@@ -22,23 +22,22 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_reply"/>
     <item
-        android:id="@+id/menu_new_message"
-        android:icon="@drawable/ic_action_new_message"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_new_message"/>
-    <item
-        android:id="@+id/menu_view_profile"
-        android:icon="@drawable/ic_action_profile"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_view_profile"/>
-    <item
         android:id="@+id/menu_delete"
         android:icon="@drawable/ic_action_delete"
         android:showAsAction="ifRoom"
         android:title="@string/menu_delete"/>
     <item
         android:id="@+id/menu_copy_url"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_copy_url"/>
+    <!-- Convenience actions in the overflow menu. -->
+    <item
+        android:id="@+id/menu_new_message"
+        android:showAsAction="never"
+        android:title="@string/menu_new_message"/>
+    <item
+        android:id="@+id/menu_view_profile"
+        android:showAsAction="never"
+        android:title="@string/menu_view_profile"/>
 
 </menu>
