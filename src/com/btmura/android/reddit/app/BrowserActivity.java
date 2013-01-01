@@ -279,18 +279,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             case R.id.menu_unread_messages:
                 return handleUnreadMessages();
 
-            case R.id.menu_new_post:
-                handleNewPost();
-                return true;
-
-            case R.id.menu_about_subreddit:
-                handleAboutSubreddit();
-                return true;
-
-            case R.id.menu_add_subreddit:
-                handleAddSubreddit();
-                return true;
-
             case R.id.menu_profile:
                 return handleProfile();
 
@@ -310,18 +298,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         return true;
     }
 
-    private void handleNewPost() {
-        MenuHelper.startComposeActivity(this, ComposeActivity.COMPOSITION_SUBMISSION,
-                getSubredditName(), null);
-    }
-
-    private void handleAboutSubreddit() {
-        MenuHelper.startSidebarActivity(this, getSubredditName());
-    }
-
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager());
-    }
 
     private boolean handleProfile() {
         MenuHelper.startProfileActivity(this, getAccountName(), -1);

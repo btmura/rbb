@@ -126,7 +126,22 @@ public class GlobalMenuFragment extends Fragment implements LoaderCallbacks<Curs
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // GlobalMenuFragment handles more menu items than it presents for
+        // convenience. Some other items have complicated visibility logic, so
+        // they aren't inflated in this fragment.
         switch (item.getItemId()) {
+            case R.id.menu_new_post:
+                handleNewPost();
+                return true;
+
+            case R.id.menu_about_subreddit:
+                handleAboutSubreddit();
+                return true;
+
+            case R.id.menu_add_subreddit:
+                handleAddSubreddit();
+                return true;
+
             case R.id.menu_search:
                 handleSearch();
                 return true;
@@ -138,6 +153,19 @@ public class GlobalMenuFragment extends Fragment implements LoaderCallbacks<Curs
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void handleNewPost() {
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_SUBMISSION,
+                subredditNameHolder.getSubredditName(), null);
+    }
+
+    private void handleAboutSubreddit() {
+        MenuHelper.startSidebarActivity(getActivity(), subredditNameHolder.getSubredditName());
+    }
+
+    private void handleAddSubreddit() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager());
     }
 
     public void handleSearch() {

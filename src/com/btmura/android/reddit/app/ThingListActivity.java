@@ -60,8 +60,9 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private ActionBar bar;
     private FilterAdapter adapter;
     private String accountName;
-    private SharedPreferences prefs;
     private String subreddit;
+    private SharedPreferences prefs;
+    private MenuItem aboutItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +138,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     public void onSubredditDiscovery(String subreddit) {
         this.subreddit = subreddit;
         adapter.setTitle(subreddit);
-        refreshGlobalMenuItems();
+        refreshMenuItems();
     }
 
     public void onThingSelected(Bundle thingBundle) {
@@ -163,7 +164,21 @@ public class ThingListActivity extends GlobalMenuActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.thing_list_menu, menu);
+        aboutItem = menu.findItem(R.id.menu_about_subreddit);
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        refreshMenuItems();
+        return true;
+    }
+
+    private void refreshMenuItems() {
+        if (aboutItem != null) {
+            aboutItem.setVisible(Subreddits.hasSidebar(subreddit));
+        }
     }
 
     @Override
