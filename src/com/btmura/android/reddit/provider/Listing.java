@@ -20,28 +20,41 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
+/**
+ * {@link Listing} is an internal interface to enforce some uniformity on
+ * grabbing values to present to the user.
+ */
 interface Listing {
 
-    public static final int TYPE_MESSAGE_THREAD_LISTING = 0;
-    public static final int TYPE_MESSAGE_LISTING = 1;
-    public static final int TYPE_SUBREDDIT_LISTING = 2;
-    public static final int TYPE_USER_LISTING = 3;
-    public static final int TYPE_COMMENT_LISTING = 4;
-    public static final int TYPE_SEARCH_LISTING = 5;
-    public static final int TYPE_REDDIT_SEARCH_LISTING = 6;
+    static final int TYPE_MESSAGE_THREAD_LISTING = 0;
+    static final int TYPE_MESSAGE_LISTING = 1;
+    static final int TYPE_SUBREDDIT_LISTING = 2;
+    static final int TYPE_USER_LISTING = 3;
+    static final int TYPE_COMMENT_LISTING = 4;
+    static final int TYPE_SEARCH_LISTING = 5;
+    static final int TYPE_REDDIT_SEARCH_LISTING = 6;
 
+    /** Get the values for this listing possibly using the network. */
     ArrayList<ContentValues> getValues() throws IOException;
 
+    /** Called within an existing transaction to perform additional ops. */
+    void doExtraDatabaseOps(SQLiteDatabase db);
+
+    /** Add additional extras to a bundle if applicable. */
     void addCursorExtras(Bundle bundle);
 
     /** Return the name of the table where the values should be inserted. */
     String getTargetTable();
 
+    /** Return whether this query is appending to an existing data set. */
     boolean isAppend();
 
+    /** Return the network time for statistical purposes. */
     long getNetworkTimeMs();
 
+    /** Return the parsing time for statistical purposes. */
     long getParseTimeMs();
 }

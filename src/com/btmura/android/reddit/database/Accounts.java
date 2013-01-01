@@ -32,6 +32,8 @@ public class Accounts implements BaseColumns {
     /** Integer either 0 or 1 indicating whether the account has mail. */
     public static final String COLUMN_HAS_MAIL = "hasMail";
 
+    public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "=?";
+
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY,"

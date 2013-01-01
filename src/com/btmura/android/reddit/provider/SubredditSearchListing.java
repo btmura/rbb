@@ -24,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.JsonReader;
 
@@ -74,6 +75,9 @@ class SubredditSearchListing extends JsonParser implements Listing {
             input.close();
             conn.disconnect();
         }
+    }
+
+    public void doExtraDatabaseOps(SQLiteDatabase db) {
     }
 
     public void addCursorExtras(Bundle bundle) {

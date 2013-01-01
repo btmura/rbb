@@ -32,6 +32,7 @@ import android.text.TextUtils;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
@@ -44,6 +45,23 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 class MessageListing extends JsonParser implements Listing {
 
     public static final String TAG = "MessageListing";
+
+    private static final String[] MERGE_PROJECTION = {
+            MessageActions._ID,
+            MessageActions.COLUMN_ACCOUNT,
+            MessageActions.COLUMN_ACTION,
+            MessageActions.COLUMN_THING_ID,
+            MessageActions.COLUMN_TEXT,
+    };
+
+    private static final int MERGE_INDEX_ACCOUNT = 1;
+    private static final int MERGE_INDEX_ACTION = 2;
+    private static final int MERGE_INDEX_THING_ID = 3;
+    private static final int MERGE_INDEX_TEXT = 4;
+
+    private static final String MERGE_SELECTION = MessageActions.COLUMN_PARENT_THING_ID + "=?";
+
+    private static final String MERGE_SORT = MessageActions._ID + " ASC";
 
     private final int listingType;
     private final String accountName;
@@ -104,13 +122,32 @@ class MessageListing extends JsonParser implements Listing {
     private CharSequence getUrl() {
         switch (listingType) {
             case Listing.TYPE_MESSAGE_LISTING:
-                return Urls.message(filter, more, filter == FilterAdapter.MESSAGE_UNREAD);
+                return Urls.message(filter, more, shouldClearUnreadIndicator());
 
             case Listing.TYPE_MESSAGE_THREAD_LISTING:
                 return Urls.messageThread(thingId, Urls.TYPE_JSON);
 
             default:
                 throw new IllegalArgumentException();
+        }
+    }
+
+    private boolean shouldClearUnreadIndicator() {
+        return listingType == Listing.TYPE_MESSAGE_LISTING
+                && (filter == FilterAdapter.MESSAGE_INBOX || filter == FilterAdapter.MESSAGE_SENT);
+    }
+
+    public void doExtraDatabaseOps(SQLiteDatabase db) {
+        if (shouldClearUnreadIndicator()) {
+            ContentValues v = new ContentValues(2);
+            v.put(Accounts.COLUMN_ACCOUNT, accountName);
+            v.put(Accounts.COLUMN_HAS_MAIL, false);
+
+            int count = db.update(Accounts.TABLE_NAME, v,
+                    Accounts.SELECT_BY_ACCOUNT, Array.of(accountName));
+            if (count == 0) {
+                db.insert(Accounts.TABLE_NAME, null, v);
+            }
         }
     }
 
@@ -200,23 +237,6 @@ class MessageListing extends JsonParser implements Listing {
             mergeActions();
         }
     }
-
-    static final String[] MERGE_PROJECTION = {
-            MessageActions._ID,
-            MessageActions.COLUMN_ACCOUNT,
-            MessageActions.COLUMN_ACTION,
-            MessageActions.COLUMN_THING_ID,
-            MessageActions.COLUMN_TEXT,
-    };
-
-    static final int MERGE_INDEX_ACCOUNT = 1;
-    static final int MERGE_INDEX_ACTION = 2;
-    static final int MERGE_INDEX_THING_ID = 3;
-    static final int MERGE_INDEX_TEXT = 4;
-
-    static final String MERGE_SELECTION = MessageActions.COLUMN_PARENT_THING_ID + "=?";
-
-    static final String MERGE_SORT = MessageActions._ID + " ASC";
 
     private void mergeActions() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();

@@ -51,8 +51,6 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "AccountSyncAdapter";
 
-    private static final String ACCOUNT_SELECTION = Accounts.COLUMN_ACCOUNT + "=?";
-
     public static class Service extends android.app.Service {
         @Override
         public IBinder onBind(Intent intent) {
@@ -89,10 +87,10 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Delete and then insert to use a single transaction rather than
             // doing a update and then insert which can't be done in a
-            // transaction as easily.
+            // transaction as easily without a db reference.
             ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(2);
             ops.add(ContentProviderOperation.newDelete(AccountProvider.ACCOUNTS_URI)
-                    .withSelection(ACCOUNT_SELECTION, Array.of(account.name))
+                    .withSelection(Accounts.SELECT_BY_ACCOUNT, Array.of(account.name))
                     .build());
             ops.add(ContentProviderOperation.newInsert(AccountProvider.ACCOUNTS_URI)
                     .withValue(Accounts.COLUMN_ACCOUNT, account.name)
