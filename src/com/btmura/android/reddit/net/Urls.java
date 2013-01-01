@@ -169,7 +169,7 @@ public class Urls {
         return b;
     }
 
-    public static CharSequence message(int filter, String more) {
+    public static CharSequence message(int filter, String more, boolean mark) {
         StringBuilder b = new StringBuilder(BASE_MESSAGE_URL);
         switch (filter) {
             case FilterAdapter.MESSAGE_INBOX:
@@ -188,8 +188,14 @@ public class Urls {
                 throw new IllegalArgumentException(Integer.toString(filter));
         }
         b.append("/.json");
+        if (more != null || mark) {
+            b.append("?");
+        }
         if (more != null) {
-            b.append("?count=25&after=").append(encode(more));
+            b.append("&count=25&after=").append(encode(more));
+        }
+        if (mark) {
+            b.append("&mark=true");
         }
         return b;
     }

@@ -39,6 +39,7 @@ import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 class MessageListing extends JsonParser implements Listing {
 
@@ -51,33 +52,33 @@ class MessageListing extends JsonParser implements Listing {
     private final String more;
     private final String cookie;
     private final SQLiteOpenHelper dbHelper;
-    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>();
+    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
 
     private long networkTimeMs;
     private long parseTimeMs;
 
     /** Returns a listing of messages for inbox or sent. */
     static MessageListing newInstance(String accountName, int filter, String more, String cookie) {
-        return new MessageListing(Listing.TYPE_MESSAGE_LISTING,
-                accountName, null, filter, more, cookie, null);
+        return new MessageListing(null, Listing.TYPE_MESSAGE_LISTING, accountName,
+                null, filter, more, cookie);
     }
 
     /** Returns an instance for a message thread. */
     static MessageListing newThreadInstance(String accountName, String thingId, String cookie,
             SQLiteOpenHelper dbHelper) {
-        return new MessageListing(Listing.TYPE_MESSAGE_THREAD_LISTING,
-                accountName, thingId, 0, null, cookie, dbHelper);
+        return new MessageListing(dbHelper, Listing.TYPE_MESSAGE_THREAD_LISTING, accountName,
+                thingId, 0, null, cookie);
     }
 
-    private MessageListing(int listingType, String accountName, String thingId, int filter,
-            String more, String cookie, SQLiteOpenHelper dbHelper) {
+    private MessageListing(SQLiteOpenHelper dbHelper, int listingType, String accountName,
+            String thingId, int filter, String more, String cookie) {
+        this.dbHelper = dbHelper;
         this.listingType = listingType;
         this.accountName = accountName;
         this.thingId = thingId;
         this.filter = filter;
         this.more = more;
         this.cookie = cookie;
-        this.dbHelper = dbHelper;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {
@@ -103,7 +104,7 @@ class MessageListing extends JsonParser implements Listing {
     private CharSequence getUrl() {
         switch (listingType) {
             case Listing.TYPE_MESSAGE_LISTING:
-                return Urls.message(filter, more);
+                return Urls.message(filter, more, filter == FilterAdapter.MESSAGE_UNREAD);
 
             case Listing.TYPE_MESSAGE_THREAD_LISTING:
                 return Urls.messageThread(thingId, Urls.TYPE_JSON);

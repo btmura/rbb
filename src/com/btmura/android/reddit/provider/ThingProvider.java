@@ -308,9 +308,7 @@ public class ThingProvider extends SessionProvider {
             String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
             String subreddit = uri.getQueryParameter(PARAM_SUBREDDIT);
             String query = uri.getQueryParameter(PARAM_QUERY);
-            String profileUser = uri.getQueryParameter(PARAM_PROFILE_USER);
             String thingId = uri.getQueryParameter(PARAM_THING_ID);
-            String linkId = uri.getQueryParameter(PARAM_LINK_ID);
             int filter = getIntParameter(uri, PARAM_FILTER, 0);
             String more = uri.getQueryParameter(PARAM_MORE);
 
@@ -336,11 +334,13 @@ public class ThingProvider extends SessionProvider {
                     break;
 
                 case Listing.TYPE_USER_LISTING:
+                    String profileUser = uri.getQueryParameter(PARAM_PROFILE_USER);
                     listing = ThingListing.newUserInstance(context, accountName, profileUser,
                             filter, more, cookie);
                     break;
 
                 case Listing.TYPE_COMMENT_LISTING:
+                    String linkId = uri.getQueryParameter(PARAM_LINK_ID);
                     listing = CommentListing.newInstance(context, helper, accountName, thingId,
                             linkId, cookie);
                     break;

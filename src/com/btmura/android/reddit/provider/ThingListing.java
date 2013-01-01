@@ -50,7 +50,6 @@ class ThingListing extends JsonParser implements Listing {
     private final String subreddit;
     private final String query;
     private final String profileUser;
-    private final String messageUser;
     private final int filter;
     private final String more;
     private final String cookie;
@@ -64,29 +63,28 @@ class ThingListing extends JsonParser implements Listing {
 
     static ThingListing newSearchInstance(Context context, String accountName, String subreddit,
             String query, String cookie) {
-        return new ThingListing(context, accountName, subreddit, query, null, null, 0, null, cookie);
+        return new ThingListing(context, accountName, subreddit, query, null, 0, null, cookie);
     }
 
     static ThingListing newSubredditInstance(Context context, String accountName, String subreddit,
             int filter, String more, String cookie) {
-        return new ThingListing(context, accountName, subreddit, null, null, null, filter, more,
+        return new ThingListing(context, accountName, subreddit, null, null, filter, more,
                 cookie);
     }
 
     static ThingListing newUserInstance(Context context, String accountName, String profileUser,
             int filter, String more, String cookie) {
-        return new ThingListing(context, accountName, null, null, profileUser, null, filter, more,
+        return new ThingListing(context, accountName, null, null, profileUser, filter, more,
                 cookie);
     }
 
     private ThingListing(Context context, String accountName, String subreddit, String query,
-            String profileUser, String messageUser, int filter, String more, String cookie) {
+            String profileUser, int filter, String more, String cookie) {
         this.context = context;
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;
         this.profileUser = profileUser;
-        this.messageUser = messageUser;
         this.filter = filter;
         this.more = more;
         this.cookie = cookie;
@@ -100,9 +98,7 @@ class ThingListing extends JsonParser implements Listing {
         boolean followRedirects = true;
 
         CharSequence url;
-        if (!TextUtils.isEmpty(messageUser)) {
-            url = Urls.message(filter, more);
-        } else if (!TextUtils.isEmpty(profileUser)) {
+        if (!TextUtils.isEmpty(profileUser)) {
             url = Urls.user(profileUser, filter, more, Urls.TYPE_JSON);
         } else if (!TextUtils.isEmpty(query)) {
             url = Urls.search(subreddit, query, more);
