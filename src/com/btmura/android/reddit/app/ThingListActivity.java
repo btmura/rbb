@@ -25,6 +25,7 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -136,6 +137,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     public void onSubredditDiscovery(String subreddit) {
         this.subreddit = subreddit;
         adapter.setTitle(subreddit);
+        refreshGlobalMenuItems();
     }
 
     public void onThingSelected(Bundle thingBundle) {
@@ -155,6 +157,13 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public String getSubredditName() {
         return subreddit;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.thing_list_menu, menu);
+        return true;
     }
 
     @Override

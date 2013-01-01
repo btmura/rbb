@@ -21,31 +21,39 @@
         android:icon="@drawable/ic_action_messages"
         android:showAsAction="ifRoom"
         android:title="@string/menu_unread_messages"/>
-    <item
-        android:id="@+id/menu_new_post"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/menu_new_post"/>
-    <item
-        android:id="@+id/menu_add_subreddit"
-        android:orderInCategory="1337"
-        android:showAsAction="never"
-        android:title="@string/menu_add_subreddit"/>
-    <item
-        android:id="@+id/menu_profile"
-        android:icon="@drawable/ic_action_profile"
-        android:orderInCategory="1337"
-        android:showAsAction="never"
-        android:title="@string/menu_profile"/>
-    <item
-        android:id="@+id/menu_messages"
-        android:orderInCategory="1337"
-        android:showAsAction="never"
-        android:title="@string/menu_messages"/>
-    <item
-        android:id="@+id/menu_accounts"
-        android:orderInCategory="1337"
-        android:showAsAction="never"
-        android:title="@string/menu_accounts"/>
+
+    <group android:id="@+id/thingless" >
+        <item
+            android:id="@+id/menu_new_post"
+            android:orderInCategory="50"
+            android:showAsAction="never"
+            android:title="@string/menu_new_post"/>
+        <item
+            android:id="@+id/menu_about_subreddit"
+            android:orderInCategory="100"
+            android:showAsAction="never"
+            android:title="@string/menu_about_subreddit"/>
+        <item
+            android:id="@+id/menu_add_subreddit"
+            android:orderInCategory="100"
+            android:showAsAction="never"
+            android:title="@string/menu_add_subreddit"/>
+        <item
+            android:id="@+id/menu_profile"
+            android:icon="@drawable/ic_action_profile"
+            android:orderInCategory="500"
+            android:showAsAction="never"
+            android:title="@string/menu_profile"/>
+        <item
+            android:id="@+id/menu_messages"
+            android:orderInCategory="500"
+            android:showAsAction="never"
+            android:title="@string/menu_messages"/>
+        <item
+            android:id="@+id/menu_accounts"
+            android:orderInCategory="500"
+            android:showAsAction="never"
+            android:title="@string/menu_accounts"/>
+    </group>
 
 </menu>

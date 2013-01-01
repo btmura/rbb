@@ -53,6 +53,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     private AccountSpinnerAdapter adapter;
     private SharedPreferences prefs;
+    private MenuItem postItem;
+    private MenuItem aboutItem;
+
+    private MenuItem profileItem;
+
+    private MenuItem messagesItem;
 
     @Override
     protected void setContentView() {
@@ -213,7 +219,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         // Invalidate menu so that mail icon disappears when switching back to
         // app storage account.
-        invalidateOptionsMenu();
+        refreshGlobalMenuItems();
 
         return true;
     }
@@ -228,19 +234,41 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
+        postItem = menu.findItem(R.id.menu_new_post);
+        aboutItem = menu.findItem(R.id.menu_about_subreddit);
+        profileItem = menu.findItem(R.id.menu_profile);
+        messagesItem = menu.findItem(R.id.menu_messages);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onPrepareOptionsMenu");
+        }
         super.onPrepareOptionsMenu(menu);
-        boolean isAccount = AccountUtils.isAccount(getAccountName());
-        boolean hasMessages = false;
 
-        menu.findItem(R.id.menu_unread_messages).setVisible(hasMessages);
-        menu.findItem(R.id.menu_new_post).setVisible(isAccount);
-        menu.findItem(R.id.menu_profile).setVisible(isAccount);
-        menu.findItem(R.id.menu_messages).setVisible(isAccount);
+        boolean showThingless = isSinglePane || !hasThing();
+        menu.setGroupVisible(R.id.thingless, showThingless);
+        if (showThingless) {
+            boolean hasAccount = AccountUtils.isAccount(getAccountName());
+            if (postItem != null) {
+                postItem.setVisible(hasAccount);
+            }
+
+            if (aboutItem != null) {
+                boolean showAbout = Subreddits.hasSidebar(getSubredditName());
+                aboutItem.setVisible(showAbout);
+            }
+
+            if (profileItem != null) {
+                profileItem.setVisible(hasAccount);
+            }
+
+            if (messagesItem != null) {
+                messagesItem.setVisible(hasAccount);
+            }
+        }
 
         return true;
     }
@@ -252,10 +280,16 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 return handleUnreadMessages();
 
             case R.id.menu_new_post:
-                return handleNewPost();
+                handleNewPost();
+                return true;
+
+            case R.id.menu_about_subreddit:
+                handleAboutSubreddit();
+                return true;
 
             case R.id.menu_add_subreddit:
-                return handleAddSubreddit();
+                handleAddSubreddit();
+                return true;
 
             case R.id.menu_profile:
                 return handleProfile();
@@ -276,15 +310,17 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         return true;
     }
 
-    private boolean handleNewPost() {
+    private void handleNewPost() {
         MenuHelper.startComposeActivity(this, ComposeActivity.COMPOSITION_SUBMISSION,
                 getSubredditName(), null);
-        return true;
     }
 
-    private boolean handleAddSubreddit() {
-        AddSubredditFragment.newInstance().show(getFragmentManager(), AddSubredditFragment.TAG);
-        return true;
+    private void handleAboutSubreddit() {
+        MenuHelper.startSidebarActivity(this, getSubredditName());
+    }
+
+    private void handleAddSubreddit() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager());
     }
 
     private boolean handleProfile() {

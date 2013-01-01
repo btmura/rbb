@@ -644,6 +644,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
+    protected boolean hasThing() {
+        return getThingMenuFragment() != null;
+    }
+
     private ControlFragment getControlFragment() {
         return (ControlFragment) getFragmentManager()
                 .findFragmentByTag(ControlFragment.TAG);

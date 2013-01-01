@@ -18,7 +18,6 @@ package com.btmura.android.reddit.app;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +25,7 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.SaveActions;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 
 public class ThingMenuFragment extends Fragment {
@@ -38,6 +38,12 @@ public class ThingMenuFragment extends Fragment {
     private AccountNameHolder accountNameHolder;
     private boolean saveable;
     private boolean saved;
+    private MenuItem savedItem;
+    private MenuItem unsavedItem;
+
+    private MenuItem aboutItem;
+
+    private MenuItem addItem;
 
     public static ThingMenuFragment newInstance(String subreddit, String thingId) {
         Bundle args = new Bundle(2);
@@ -65,29 +71,48 @@ public class ThingMenuFragment extends Fragment {
     public void setSaved(boolean saved) {
         this.saveable = true;
         this.saved = saved;
-        getActivity().invalidateOptionsMenu();
+        refreshMenuItems();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.thing_menu, menu);
+        inflater.inflate(R.menu.thing_menu_menu, menu);
+        savedItem = menu.findItem(R.id.menu_saved);
+        unsavedItem = menu.findItem(R.id.menu_unsaved);
+        aboutItem = menu.findItem(R.id.menu_about_thing_subreddit);
+        addItem = menu.findItem(R.id.menu_add_thing_subreddit);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_saved).setVisible(saveable && saved);
-        menu.findItem(R.id.menu_unsaved).setVisible(saveable && !saved);
+        refreshMenuItems();
+    }
+
+    private void refreshMenuItems() {
+        if (savedItem != null) {
+            savedItem.setVisible(saveable && saved);
+        }
+
+        if (unsavedItem != null) {
+            unsavedItem.setVisible(saveable && !saved);
+        }
+
+        boolean hasSubreddit = Subreddits.hasSidebar(getArguments().getString(ARG_SUBREDDIT));
+
+        if (aboutItem != null) {
+            aboutItem.setVisible(hasSubreddit);
+        }
+
+        if (addItem != null) {
+            addItem.setVisible(hasSubreddit);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_about_thing_subreddit:
-                handleAboutSubreddit();
-                return true;
-
             case R.id.menu_saved:
                 handleSave(SaveActions.ACTION_UNSAVE);
                 return true;
@@ -96,15 +121,17 @@ public class ThingMenuFragment extends Fragment {
                 handleSave(SaveActions.ACTION_SAVE);
                 return true;
 
+            case R.id.menu_about_thing_subreddit:
+                handleAboutSubreddit();
+                return true;
+
+            case R.id.menu_add_thing_subreddit:
+                handleAddSubreddit();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void handleAboutSubreddit() {
-        Intent intent = new Intent(getActivity(), SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, getArguments().getString(ARG_SUBREDDIT));
-        startActivity(intent);
     }
 
     private void handleSave(int action) {
@@ -113,5 +140,13 @@ public class ThingMenuFragment extends Fragment {
             String thingId = getArguments().getString(ARG_THING_ID);
             Provider.saveAsync(getActivity(), accountName, thingId, action);
         }
+    }
+
+    private void handleAboutSubreddit() {
+        MenuHelper.startSidebarActivity(getActivity(), getArguments().getString(ARG_SUBREDDIT));
+    }
+
+    private void handleAddSubreddit() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager());
     }
 }

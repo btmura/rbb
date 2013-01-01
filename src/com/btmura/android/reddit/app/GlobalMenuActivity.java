@@ -34,6 +34,10 @@ abstract class GlobalMenuActivity extends Activity {
         }
     }
 
+    protected void refreshGlobalMenuItems() {
+        getGlobalMenuFragment().refreshMenuItems();
+    }
+
     private GlobalMenuFragment getGlobalMenuFragment() {
         return (GlobalMenuFragment) getFragmentManager().findFragmentByTag(GlobalMenuFragment.TAG);
     }

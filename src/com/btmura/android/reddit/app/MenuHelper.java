@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.FragmentManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -46,6 +47,10 @@ public class MenuHelper {
         provider.setShareIntent(intent);
     }
 
+    public static void showAddSubredditDialog(FragmentManager fm) {
+        AddSubredditFragment.newInstance().show(fm, AddSubredditFragment.TAG);
+    }
+
     public static void startComposeActivity(Context context, int composition, String destination,
             Bundle extras) {
         Intent intent = new Intent(context, ComposeActivity.class);
@@ -67,6 +72,12 @@ public class MenuHelper {
     public static void startProfileActivity(Context context, String user, int filter) {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.setData(Uri.parse(Urls.user(user, filter, null, Urls.TYPE_HTML).toString()));
+        context.startActivity(intent);
+    }
+
+    public static void startSidebarActivity(Context context, String subreddit) {
+        Intent intent = new Intent(context, SidebarActivity.class);
+        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, subreddit);
         context.startActivity(intent);
     }
 

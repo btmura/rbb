@@ -87,6 +87,11 @@ public class CommentListFragment extends ThingProviderListFragment implements
     private CharSequence url;
     private int flags;
 
+    private MenuItem openItem;
+    private MenuItem copyUrlItem;
+    private MenuItem linkItem;
+    private MenuItem shareItem;
+
     public static CommentListFragment newInstance(String accountName, String thingId,
             String linkId, String title, CharSequence url, int flags) {
         Bundle args = new Bundle(4);
@@ -175,7 +180,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
                     url = Urls.perma(permaLink, null);
                 }
             }
-            getActivity().invalidateOptionsMenu();
+            refreshMenuItems();
         }
 
         // Broadcast the link if there is one in case the parent doesn't know.
@@ -235,33 +240,43 @@ public class CommentListFragment extends ThingProviderListFragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onCreateOptionsMenu");
-        }
         inflater.inflate(R.menu.comment_menu, menu);
+        shareItem = menu.findItem(R.id.menu_comment_share);
+        openItem = menu.findItem(R.id.menu_comment_open);
+        copyUrlItem = menu.findItem(R.id.menu_comment_copy_url);
+        linkItem = menu.findItem(R.id.menu_link);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onPrepareOptionsMenu");
-        }
+        refreshMenuItems();
+    }
 
+    private void refreshMenuItems() {
         boolean linkReady = !TextUtils.isEmpty(title) && !TextUtils.isEmpty(url);
-        menu.findItem(R.id.menu_comment_open).setVisible(linkReady);
-        menu.findItem(R.id.menu_comment_copy_url).setVisible(linkReady);
 
-        MenuItem shareItem = menu.findItem(R.id.menu_comment_share);
-        shareItem.setVisible(linkReady);
-        if (linkReady) {
-            MenuHelper.setShareProvider(shareItem, title, url);
+        if (openItem != null) {
+            openItem.setVisible(linkReady);
         }
 
-        boolean linkConfirmed = Flag.isEnabled(flags, FLAG_SHOW_LINK_MENU_ITEM);
-        boolean showLink = linkConfirmed || (adapter.getCursor() != null
-                && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF));
-        menu.findItem(R.id.menu_link).setVisible(showLink);
+        if (copyUrlItem != null) {
+            copyUrlItem.setVisible(linkReady);
+        }
+
+        if (shareItem != null) {
+            shareItem.setVisible(linkReady);
+            if (linkReady) {
+                MenuHelper.setShareProvider(shareItem, title, url);
+            }
+        }
+
+        if (linkItem != null) {
+            boolean linkConfirmed = Flag.isEnabled(flags, FLAG_SHOW_LINK_MENU_ITEM);
+            boolean showLink = linkConfirmed || (adapter.getCursor() != null
+                    && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF));
+            linkItem.setVisible(showLink);
+        }
     }
 
     @Override

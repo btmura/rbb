@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -41,13 +40,12 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
-import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
-import com.btmura.android.reddit.widget.ThingAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
+import com.btmura.android.reddit.widget.ThingAdapter;
 
 public class ThingListFragment extends ThingProviderListFragment implements
         OnScrollListener, OnVoteListener, MultiChoiceModeListener {
@@ -185,8 +183,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
             emptyText = savedInstanceState.getInt(STATE_EMPTY_TEXT);
         }
-
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -247,7 +243,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
-        getActivity().invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -311,41 +306,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
         if (!TextUtils.isEmpty(accountName)) {
             Provider.voteAsync(getActivity(), accountName, thingId, likes);
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.thing_list_menu, menu);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        boolean redundant = menu.findItem(R.id.menu_about_thing_subreddit) != null;
-        String subreddit = adapter.getSubreddit();
-        menu.findItem(R.id.menu_about_subreddit).setVisible(!redundant
-                && subreddit != null
-                && !Subreddits.isFrontPage(subreddit)
-                && !Subreddits.isAll(subreddit));
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_about_subreddit:
-                handleAboutSubreddit();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void handleAboutSubreddit() {
-        Intent intent = new Intent(getActivity(), SidebarActivity.class);
-        intent.putExtra(SidebarActivity.EXTRA_SUBREDDIT, adapter.getSubreddit());
-        startActivity(intent);
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {

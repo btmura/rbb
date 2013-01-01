@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.widget;
 
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Objects;
@@ -47,11 +48,13 @@ public class AccountAdapter extends BaseCursorAdapter {
     }
 
     public boolean hasMessages(String accountName) {
-        Cursor c = getCursor();
-        if (c != null) {
-            for (c.moveToPosition(-1); c.moveToNext();) {
-                if (Objects.equals(accountName, c.getString(INDEX_ACCOUNT))) {
-                    return c.getInt(INDEX_HAS_MAIL) == 1;
+        if (AccountUtils.isAccount(accountName)) {
+            Cursor c = getCursor();
+            if (c != null) {
+                for (c.moveToPosition(-1); c.moveToNext();) {
+                    if (Objects.equals(accountName, c.getString(INDEX_ACCOUNT))) {
+                        return c.getInt(INDEX_HAS_MAIL) == 1;
+                    }
                 }
             }
         }

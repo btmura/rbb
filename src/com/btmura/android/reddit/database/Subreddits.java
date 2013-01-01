@@ -72,6 +72,10 @@ public class Subreddits implements BaseColumns {
                 && !NAME_RANDOM.equalsIgnoreCase(subreddit);
     }
 
+    public static boolean hasSidebar(String subreddit) {
+        return !isFrontPage(subreddit) && !isAll(subreddit) && !isRandom(subreddit);
+    }
+
     public static String getTitle(Context c, String subreddit) {
         return isFrontPage(subreddit) ? c.getString(R.string.front_page) : subreddit;
     }
