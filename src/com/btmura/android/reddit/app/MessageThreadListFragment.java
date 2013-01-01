@@ -143,7 +143,7 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
         extras.putLong(EXTRA_SESSION_ID, adapter.getSessionId());
         extras.putString(EXTRA_THING_ID, adapter.getThingId(info.position));
         MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.COMPOSITION_MESSAGE_REPLY, user, extras);
+                ComposeActivity.COMPOSITION_MESSAGE_REPLY, user, null, extras);
         return true;
     }
 

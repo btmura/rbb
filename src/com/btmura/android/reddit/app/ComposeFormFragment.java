@@ -175,16 +175,18 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         titleText = (EditText) v.findViewById(R.id.title_text);
         titleText.setText(getArguments().getString(ARG_TITLE));
 
-        if (!TextUtils.isEmpty(destinationText.getText())) {
-            titleText.requestFocus();
-        }
-
         linkSwitch = (Switch) v.findViewById(R.id.link_switch);
 
         textText = (EditText) v.findViewById(R.id.text_text);
         textText.setText(getArguments().getString(ARG_TEXT));
         if (textText.length() > 0) {
             validateText(textText.getText());
+        }
+
+        if (!TextUtils.isEmpty(titleText.getText())) {
+            textText.requestFocus();
+        } else if (!TextUtils.isEmpty(destinationText.getText())) {
+            titleText.requestFocus();
         }
 
         switch (getArguments().getInt(ARG_COMPOSITION)) {

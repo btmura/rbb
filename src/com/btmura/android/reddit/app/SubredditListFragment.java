@@ -225,7 +225,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
 
         MenuInflater menuInflater = mode.getMenuInflater();
-        menuInflater.inflate(R.menu.sr_action_menu, menu);
+        menuInflater.inflate(R.menu.subreddit_action_menu, menu);
         return true;
     }
 

@@ -52,10 +52,11 @@ public class MenuHelper {
     }
 
     public static void startComposeActivity(Context context, int composition, String destination,
-            Bundle extras) {
+            String title, Bundle extras) {
         Intent intent = new Intent(context, ComposeActivity.class);
         intent.putExtra(ComposeActivity.EXTRA_COMPOSITION, composition);
         intent.putExtra(ComposeActivity.EXTRA_DESTINATION, destination);
+        intent.putExtra(ComposeActivity.EXTRA_TITLE, title);
         intent.putExtra(ComposeActivity.EXTRA_EXTRAS, extras);
         context.startActivity(intent);
     }

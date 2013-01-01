@@ -363,9 +363,11 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     private boolean handleNewMessage(ActionMode mode) {
-        String user = adapter.getAuthor(getFirstCheckedPosition());
+        int position = getFirstCheckedPosition();
+        String user = adapter.getAuthor(position);
+        String title = adapter.getTitle(position);
         MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.COMPOSITION_MESSAGE, user, null);
+                ComposeActivity.COMPOSITION_MESSAGE, user, title, null);
         mode.finish();
         return true;
     }

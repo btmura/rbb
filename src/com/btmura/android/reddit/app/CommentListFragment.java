@@ -453,7 +453,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
             args.putLong(EXTRA_SESSION_ID, sessionId);
 
             MenuHelper.startComposeActivity(getActivity(),
-                    ComposeActivity.COMPOSITION_COMMENT_REPLY, replyAuthor, args);
+                    ComposeActivity.COMPOSITION_COMMENT_REPLY, replyAuthor, null, args);
         }
         mode.finish();
         return true;
@@ -505,9 +505,10 @@ public class CommentListFragment extends ThingProviderListFragment implements
     }
 
     private boolean handleNewMessage(ActionMode mode) {
-        String user = adapter.getString(getFirstCheckedPosition(), CommentAdapter.INDEX_AUTHOR);
+        int position = getFirstCheckedPosition();
+        String user = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
         MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.COMPOSITION_MESSAGE, user, null);
+                ComposeActivity.COMPOSITION_MESSAGE, user, getLabel(position), null);
         mode.finish();
         return true;
     }
@@ -516,12 +517,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         int position = getFirstCheckedPosition();
 
         // Determine the label of the text to copy to the clipboard.
-        CharSequence label;
-        if (position != 0) {
-            label = adapter.getString(position, CommentAdapter.INDEX_BODY);
-        } else {
-            label = adapter.getString(0, CommentAdapter.INDEX_TITLE);
-        }
+        String label = getLabel(position);
 
         // Determine the text to copy to the clipboard.
         String thingId;
@@ -536,6 +532,14 @@ public class CommentListFragment extends ThingProviderListFragment implements
         // Copy to the clipboard and present a toast.
         MenuHelper.setClipAndToast(getActivity(), label, text);
         return true;
+    }
+
+    private String getLabel(int position) {
+        if (position != 0) {
+            return adapter.getString(position, CommentAdapter.INDEX_BODY);
+        } else {
+            return adapter.getString(0, CommentAdapter.INDEX_TITLE);
+        }
     }
 
     public void onDestroyActionMode(ActionMode mode) {

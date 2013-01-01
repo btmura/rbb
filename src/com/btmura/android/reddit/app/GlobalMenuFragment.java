@@ -157,7 +157,7 @@ public class GlobalMenuFragment extends Fragment implements LoaderCallbacks<Curs
 
     private void handleNewPost() {
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_SUBMISSION,
-                subredditNameHolder.getSubredditName(), null);
+                subredditNameHolder.getSubredditName(), null, null);
     }
 
     private void handleAboutSubreddit() {

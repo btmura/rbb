@@ -42,6 +42,12 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     /** Charsequence extra for the activity's title */
     static final String EXTRA_DESTINATION = "destination";
 
+    /** Optional string extra specifying the title. */
+    static final String EXTRA_TITLE = Intent.EXTRA_SUBJECT;
+
+    /** Optional string extra specifying the text. */
+    static final String EXTRA_TEXT = Intent.EXTRA_TEXT;
+
     /** Integer extra indicating the type of composition. */
     static final String EXTRA_COMPOSITION = "composition";
 
@@ -116,8 +122,8 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
 
         int composition = getIntent().getIntExtra(EXTRA_COMPOSITION, -1);
         String destination = getIntent().getStringExtra(EXTRA_COMPOSE_DESTINATION);
-        String title = getIntent().getStringExtra(Intent.EXTRA_SUBJECT);
-        String text = getIntent().getStringExtra(Intent.EXTRA_TEXT);
+        String title = getIntent().getStringExtra(EXTRA_TITLE);
+        String text = getIntent().getStringExtra(EXTRA_TEXT);
         Fragment frag = ComposeFormFragment.newInstance(composition, destination, title, text);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
