@@ -19,10 +19,12 @@ package com.btmura.android.reddit.app;
 import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,6 +40,7 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.AccountProvider;
+import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
@@ -52,13 +55,29 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private boolean hasSubredditList;
 
     private AccountSpinnerAdapter adapter;
+    private AccountAdapter mailAdapter;
     private SharedPreferences prefs;
+
+    private MenuItem unreadItem;
     private MenuItem postItem;
     private MenuItem aboutItem;
-
     private MenuItem profileItem;
-
     private MenuItem messagesItem;
+
+    private LoaderCallbacks<Cursor> mailLoaderCallbacks = new LoaderCallbacks<Cursor>() {
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return AccountAdapter.getLoader(BrowserActivity.this);
+        }
+
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            mailAdapter.swapCursor(cursor);
+            refreshUnreadMessagesMenuItem();
+        }
+
+        public void onLoaderReset(Loader<Cursor> loader) {
+            mailAdapter.swapCursor(null);
+        }
+    };
 
     @Override
     protected void setContentView() {
@@ -108,9 +127,11 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         adapter = new AccountSpinnerAdapter(this, !isSinglePane);
+        mailAdapter = new AccountAdapter(this);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         bar.setListNavigationCallbacks(adapter, this);
+        getLoaderManager().initLoader(1, null, mailLoaderCallbacks);
     }
 
     @Override
@@ -217,9 +238,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             replaceThingListFragmentMultiPane();
         }
 
-        // Invalidate menu so that mail icon disappears when switching back to
-        // app storage account.
-        refreshGlobalMenuItems();
+        // Invalidate mail icon when switching accounts.
+        refreshUnreadMessagesMenuItem();
 
         return true;
     }
@@ -234,6 +254,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
+        unreadItem = menu.findItem(R.id.menu_unread_messages);
         postItem = menu.findItem(R.id.menu_new_post);
         aboutItem = menu.findItem(R.id.menu_about_subreddit);
         profileItem = menu.findItem(R.id.menu_profile);
@@ -247,6 +268,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             Log.d(TAG, "onPrepareOptionsMenu");
         }
         super.onPrepareOptionsMenu(menu);
+
+        refreshUnreadMessagesMenuItem();
 
         boolean showThingless = isSinglePane || !hasThing();
         menu.setGroupVisible(R.id.thingless, showThingless);
@@ -273,6 +296,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         return true;
     }
 
+    void refreshUnreadMessagesMenuItem() {
+        if (unreadItem != null) {
+            unreadItem.setVisible(mailAdapter.hasMessages(getAccountName()));
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -297,7 +326,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         MenuHelper.startMessageActivity(this, getAccountName(), FilterAdapter.MESSAGE_UNREAD);
         return true;
     }
-
 
     private boolean handleProfile() {
         MenuHelper.startProfileActivity(this, getAccountName(), -1);

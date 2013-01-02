@@ -18,10 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,10 +30,9 @@ import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.widget.AccountAdapter;
 
-public class GlobalMenuFragment extends Fragment implements LoaderCallbacks<Cursor>,
-        OnFocusChangeListener, OnQueryTextListener {
+public class GlobalMenuFragment extends Fragment implements OnFocusChangeListener,
+        OnQueryTextListener {
 
     public static final String TAG = "GlobalMenuFragment";
 
@@ -46,13 +42,10 @@ public class GlobalMenuFragment extends Fragment implements LoaderCallbacks<Curs
         boolean onSearchQuerySubmitted(String query);
     }
 
-    private AccountNameHolder accountNameHolder;
     private SubredditNameHolder subredditNameHolder;
     private OnSearchQuerySubmittedListener listener;
-    private AccountAdapter adapter;
     private SearchView searchView;
     private MenuItem searchItem;
-    private MenuItem unreadItem;
 
     public static GlobalMenuFragment newInstance() {
         return new GlobalMenuFragment();
@@ -61,9 +54,6 @@ public class GlobalMenuFragment extends Fragment implements LoaderCallbacks<Curs
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof AccountNameHolder) {
-            accountNameHolder = (AccountNameHolder) activity;
-        }
         if (activity instanceof SubredditNameHolder) {
             subredditNameHolder = (SubredditNameHolder) activity;
         }
@@ -76,26 +66,6 @@ public class GlobalMenuFragment extends Fragment implements LoaderCallbacks<Curs
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        adapter = new AccountAdapter(getActivity());
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return AccountAdapter.getLoader(getActivity());
-    }
-
-    public void onLoadFinished(Loader<Cursor> loader, Cursor c) {
-        adapter.swapCursor(c);
-        refreshMenuItems();
-    }
-
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
     }
 
     @Override
@@ -106,22 +76,7 @@ public class GlobalMenuFragment extends Fragment implements LoaderCallbacks<Curs
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextFocusChangeListener(this);
         searchView.setOnQueryTextListener(this);
-
-        unreadItem = menu.findItem(R.id.menu_unread_messages);
         menu.findItem(R.id.menu_debug).setVisible(BuildConfig.DEBUG);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        refreshMenuItems();
-    }
-
-    protected void refreshMenuItems() {
-        if (unreadItem != null) {
-            boolean showUnread = adapter.hasMessages(accountNameHolder.getAccountName());
-            unreadItem.setVisible(showUnread);
-        }
     }
 
     @Override
