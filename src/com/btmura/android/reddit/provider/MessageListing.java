@@ -122,7 +122,7 @@ class MessageListing extends JsonParser implements Listing {
     private CharSequence getUrl() {
         switch (listingType) {
             case Listing.TYPE_MESSAGE_LISTING:
-                return Urls.message(filter, more, shouldClearUnreadIndicator());
+                return Urls.message(filter, more, shouldMarkMessages());
 
             case Listing.TYPE_MESSAGE_THREAD_LISTING:
                 return Urls.messageThread(thingId, Urls.TYPE_JSON);
@@ -132,13 +132,13 @@ class MessageListing extends JsonParser implements Listing {
         }
     }
 
-    private boolean shouldClearUnreadIndicator() {
+    private boolean shouldMarkMessages() {
         return listingType == Listing.TYPE_MESSAGE_LISTING
-                && (filter == FilterAdapter.MESSAGE_INBOX || filter == FilterAdapter.MESSAGE_SENT);
+                && (filter == FilterAdapter.MESSAGE_INBOX || filter == FilterAdapter.MESSAGE_UNREAD);
     }
 
     public void doExtraDatabaseOps(SQLiteDatabase db) {
-        if (shouldClearUnreadIndicator()) {
+        if (shouldMarkMessages()) {
             ContentValues v = new ContentValues(2);
             v.put(Accounts.COLUMN_ACCOUNT, accountName);
             v.put(Accounts.COLUMN_HAS_MAIL, false);
