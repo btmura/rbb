@@ -177,7 +177,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void refreshActionBar(String subreddit, Bundle thingBundle) {
-        bar.setDisplayHomeAsUpEnabled(thingBundle != null);
+        bar.setDisplayHomeAsUpEnabled(!hasSubredditList || thingBundle != null);
         adapter.setSubreddit(subreddit);
     }
 
