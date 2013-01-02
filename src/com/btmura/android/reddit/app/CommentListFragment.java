@@ -499,7 +499,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     private boolean handleViewProfile(ActionMode mode) {
         String user = adapter.getString(getFirstCheckedPosition(), CommentAdapter.INDEX_AUTHOR);
-        MenuHelper.startProfileActivity(getActivity(), user, FilterAdapter.PROFILE_OVERVIEW);
+        MenuHelper.startProfileActivity(getActivity(), user, -1);
         mode.finish();
         return true;
     }

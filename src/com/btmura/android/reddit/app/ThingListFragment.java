@@ -389,7 +389,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     private void handleViewProfile(ActionMode mode) {
         String user = adapter.getAuthor(getFirstCheckedPosition());
-        MenuHelper.startProfileActivity(getActivity(), user, FilterAdapter.PROFILE_OVERVIEW);
+        MenuHelper.startProfileActivity(getActivity(), user, -1);
         mode.finish();
     }
 
