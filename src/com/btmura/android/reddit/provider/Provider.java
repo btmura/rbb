@@ -222,11 +222,12 @@ public class Provider {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                // Insert or replace the existing row and notify any loaders.
-                ContentValues values = new ContentValues(2);
-                values.put(Accounts.COLUMN_ACCOUNT, accountName);
+                // Update the existing row. If there isn't such a row, it will
+                // be created upon sync, where it will have the proper value.
+                ContentValues values = new ContentValues(1);
                 values.put(Accounts.COLUMN_HAS_MAIL, false);
-                cr.insert(AccountProvider.ACCOUNTS_NOTIFY_URI, values);
+                cr.update(AccountProvider.ACCOUNTS_NOTIFY_URI, values,
+                        Accounts.SELECT_BY_ACCOUNT, Array.of(accountName));
             }
         });
     }
