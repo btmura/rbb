@@ -24,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -32,7 +33,6 @@ import android.text.TextUtils;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
@@ -40,7 +40,6 @@ import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 class MessageListing extends JsonParser implements Listing {
 
@@ -68,6 +67,7 @@ class MessageListing extends JsonParser implements Listing {
     private final String thingId;
     private final int filter;
     private final String more;
+    private final boolean mark;
     private final String cookie;
     private final SQLiteOpenHelper dbHelper;
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
@@ -76,26 +76,28 @@ class MessageListing extends JsonParser implements Listing {
     private long parseTimeMs;
 
     /** Returns a listing of messages for inbox or sent. */
-    static MessageListing newInstance(String accountName, int filter, String more, String cookie) {
+    static MessageListing newInstance(String accountName, int filter, String more, boolean mark,
+            String cookie) {
         return new MessageListing(null, Listing.TYPE_MESSAGE_LISTING, accountName,
-                null, filter, more, cookie);
+                null, filter, more, mark, cookie);
     }
 
     /** Returns an instance for a message thread. */
     static MessageListing newThreadInstance(String accountName, String thingId, String cookie,
             SQLiteOpenHelper dbHelper) {
         return new MessageListing(dbHelper, Listing.TYPE_MESSAGE_THREAD_LISTING, accountName,
-                thingId, 0, null, cookie);
+                thingId, 0, null, false, cookie);
     }
 
     private MessageListing(SQLiteOpenHelper dbHelper, int listingType, String accountName,
-            String thingId, int filter, String more, String cookie) {
+            String thingId, int filter, String more, boolean mark, String cookie) {
         this.dbHelper = dbHelper;
         this.listingType = listingType;
         this.accountName = accountName;
         this.thingId = thingId;
         this.filter = filter;
         this.more = more;
+        this.mark = mark;
         this.cookie = cookie;
     }
 
@@ -122,7 +124,7 @@ class MessageListing extends JsonParser implements Listing {
     private CharSequence getUrl() {
         switch (listingType) {
             case Listing.TYPE_MESSAGE_LISTING:
-                return Urls.message(filter, more, shouldMarkMessages());
+                return Urls.message(filter, more, mark);
 
             case Listing.TYPE_MESSAGE_THREAD_LISTING:
                 return Urls.messageThread(thingId, Urls.TYPE_JSON);
@@ -132,22 +134,9 @@ class MessageListing extends JsonParser implements Listing {
         }
     }
 
-    private boolean shouldMarkMessages() {
-        return listingType == Listing.TYPE_MESSAGE_LISTING
-                && (filter == FilterAdapter.MESSAGE_INBOX || filter == FilterAdapter.MESSAGE_UNREAD);
-    }
-
-    public void doExtraDatabaseOps(SQLiteDatabase db) {
-        if (shouldMarkMessages()) {
-            ContentValues v = new ContentValues(2);
-            v.put(Accounts.COLUMN_ACCOUNT, accountName);
-            v.put(Accounts.COLUMN_HAS_MAIL, false);
-
-            int count = db.update(Accounts.TABLE_NAME, v,
-                    Accounts.SELECT_BY_ACCOUNT, Array.of(accountName));
-            if (count == 0) {
-                db.insert(Accounts.TABLE_NAME, null, v);
-            }
+    public void performExtraWork(Context context) {
+        if (mark) {
+            Provider.clearNewMessageIndicator(context, accountName, false);
         }
     }
 

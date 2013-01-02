@@ -92,9 +92,6 @@ abstract class SessionProvider extends BaseProvider {
                 helper.insert(values.get(i));
             }
 
-            // Do additional database operations that should be in the transaction.
-            listing.doExtraDatabaseOps(db);
-
             db.setTransactionSuccessful();
 
             if (BuildConfig.DEBUG) {

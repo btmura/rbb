@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Context;
 import android.os.Bundle;
 
 /**
@@ -40,8 +40,8 @@ interface Listing {
     /** Get the values for this listing possibly using the network. */
     ArrayList<ContentValues> getValues() throws IOException;
 
-    /** Called within an existing transaction to perform additional ops. */
-    void doExtraDatabaseOps(SQLiteDatabase db);
+    /** Called after the insertion transaction to perform additional ops. */
+    void performExtraWork(Context context);
 
     /** Add additional extras to a bundle if applicable. */
     void addCursorExtras(Bundle bundle);

@@ -110,7 +110,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         }
     }
 
-    public void doExtraDatabaseOps(SQLiteDatabase db) {
+    public void performExtraWork(Context context) {
     }
 
     public void addCursorExtras(Bundle bundle) {

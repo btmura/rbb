@@ -39,6 +39,7 @@ import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
  * URI MATCHING PATTERNS:
@@ -107,10 +108,12 @@ public class ThingProvider extends SessionProvider {
     static final String PARAM_PROFILE_USER = "profileUser";
     static final String PARAM_FILTER = "filter";
     static final String PARAM_MORE = "more";
+    static final String PARAM_MARK = "mark";
     static final String PARAM_PARENT_THING_ID = "parentThingId";
     static final String PARAM_THING_ID = "thingId";
     static final String PARAM_LINK_ID = "linkId";
     static final String PARAM_JOIN = "join";
+    static final String PARAM_NOTIFY_ACCOUNTS = "notifyAccounts";
     static final String PARAM_NOTIFY_THINGS = "notifyThings";
     static final String PARAM_NOTIFY_MESSAGES = "notifyMessages";
 
@@ -237,6 +240,10 @@ public class ThingProvider extends SessionProvider {
         }
         if (!TextUtils.isEmpty(more)) {
             b.appendQueryParameter(PARAM_MORE, more);
+        } else if (filter == FilterAdapter.MESSAGE_INBOX
+                || filter == FilterAdapter.MESSAGE_UNREAD) {
+            b.appendQueryParameter(PARAM_MARK, TRUE);
+            b.appendQueryParameter(PARAM_NOTIFY_ACCOUNTS, TRUE);
         }
         return b.build();
     }
@@ -325,7 +332,8 @@ public class ThingProvider extends SessionProvider {
                     break;
 
                 case Listing.TYPE_MESSAGE_LISTING:
-                    listing = MessageListing.newInstance(accountName, filter, more, cookie);
+                    boolean mark = uri.getBooleanQueryParameter(PARAM_MARK, false);
+                    listing = MessageListing.newInstance(accountName, filter, more, mark, cookie);
                     break;
 
                 case Listing.TYPE_SUBREDDIT_LISTING:
@@ -367,6 +375,7 @@ public class ThingProvider extends SessionProvider {
             Bundle extras = new Bundle(2);
             extras.putLong(EXTRA_SESSION_ID, sessionId);
             listing.addCursorExtras(extras);
+            listing.performExtraWork(getContext());
             return new CursorExtrasWrapper(c, extras);
 
         } catch (OperationCanceledException e) {
@@ -451,6 +460,9 @@ public class ThingProvider extends SessionProvider {
     @Override
     protected void notifyChange(Uri uri) {
         super.notifyChange(uri);
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_ACCOUNTS, false)) {
+            getContext().getContentResolver().notifyChange(AccountProvider.ACCOUNTS_URI, null);
+        }
         if (uri.getBooleanQueryParameter(PARAM_NOTIFY_THINGS, false)) {
             getContext().getContentResolver().notifyChange(THINGS_URI, null);
         }

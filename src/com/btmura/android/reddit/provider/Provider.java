@@ -30,6 +30,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
+import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
@@ -211,6 +212,29 @@ public class Provider {
                 }
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);
+            }
+        });
+    }
+
+    public static void clearNewMessageIndicator(Context context, final String accountName,
+            final boolean hasMail) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            public void run() {
+                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(2);
+                ops.add(ContentProviderOperation.newDelete(AccountProvider.ACCOUNTS_URI)
+                        .withSelection(Accounts.SELECT_BY_ACCOUNT, Array.of(accountName))
+                        .build());
+
+                Uri uri = AccountProvider.ACCOUNTS_URI.buildUpon()
+                        .appendQueryParameter(AccountProvider.PARAM_NOTIFY, AccountProvider.TRUE)
+                        .build();
+                ops.add(ContentProviderOperation.newInsert(uri)
+                        .withValue(Accounts.COLUMN_ACCOUNT, accountName)
+                        .withValue(Accounts.COLUMN_HAS_MAIL, hasMail)
+                        .build());
+
+                applyOps(appContext, AccountProvider.AUTHORITY, ops);
             }
         });
     }
