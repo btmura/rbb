@@ -343,57 +343,68 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_new_message:
-                return handleNewMessage(mode);
+                handleNewMessage(mode);
+                return true;
 
             case R.id.menu_saved:
-                return handleSaved(mode, SaveActions.ACTION_UNSAVE);
+                handleSaved(mode, SaveActions.ACTION_UNSAVE);
+                return true;
 
             case R.id.menu_unsaved:
-                return handleSaved(mode, SaveActions.ACTION_SAVE);
+                handleSaved(mode, SaveActions.ACTION_SAVE);
+                return true;
 
             case R.id.menu_view_profile:
-                return handleViewProfile(mode);
+                handleViewProfile(mode);
+                return true;
+
+            case R.id.menu_view_subreddit:
+                handleViewSubreddit(mode);
+                return true;
 
             case R.id.menu_copy_url:
-                return handleCopyUrl(mode);
+                handleCopyUrl(mode);
+                return true;
 
             default:
                 return false;
         }
     }
 
-    private boolean handleNewMessage(ActionMode mode) {
+    private void handleNewMessage(ActionMode mode) {
         int position = getFirstCheckedPosition();
         String user = adapter.getAuthor(position);
         String title = adapter.getTitle(position);
         MenuHelper.startComposeActivity(getActivity(),
                 ComposeActivity.COMPOSITION_MESSAGE, user, title, null);
         mode.finish();
-        return true;
     }
 
-    private boolean handleSaved(ActionMode mode, int action) {
+    private void handleSaved(ActionMode mode, int action) {
         String accountName = adapter.getAccountName();
         String thingId = adapter.getThingId(getFirstCheckedPosition());
         Provider.saveAsync(getActivity(), accountName, thingId, action);
         mode.finish();
-        return true;
     }
 
-    private boolean handleViewProfile(ActionMode mode) {
+    private void handleViewProfile(ActionMode mode) {
         String user = adapter.getAuthor(getFirstCheckedPosition());
         MenuHelper.startProfileActivity(getActivity(), user, FilterAdapter.PROFILE_OVERVIEW);
         mode.finish();
-        return true;
     }
 
-    private boolean handleCopyUrl(ActionMode mode) {
+    private void handleViewSubreddit(ActionMode mode) {
+        String subreddit = adapter.getSubreddit(getFirstCheckedPosition());
+        MenuHelper.startSubredditActivity(getActivity(), subreddit);
+        mode.finish();
+    }
+
+    private void handleCopyUrl(ActionMode mode) {
         int position = getFirstCheckedPosition();
         String title = adapter.getTitle(position);
         CharSequence url = adapter.getUrl(position);
         MenuHelper.setClipAndToast(getActivity(), title, url);
         mode.finish();
-        return true;
     }
 
     public void onDestroyActionMode(ActionMode mode) {

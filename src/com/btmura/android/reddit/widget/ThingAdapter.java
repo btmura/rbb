@@ -423,6 +423,10 @@ public class ThingAdapter extends LoaderAdapter {
         return getInt(position, THING_SAVE_ACTION) == SaveActions.ACTION_SAVE;
     }
 
+    public String getSubreddit(int position) {
+        return getString(position, getSubredditIndex());
+    }
+
     public String getTitle(int position) {
         if (isMessage()) {
             return getString(position, MESSAGE_BODY);
@@ -476,6 +480,10 @@ public class ThingAdapter extends LoaderAdapter {
 
     private int getKindIndex() {
         return isMessage() ? MESSAGE_KIND : THING_KIND;
+    }
+
+    private int getSubredditIndex() {
+        return isMessage() ? MESSAGE_SUBREDDIT : THING_SUBREDDIT;
     }
 
     private int getThingIdIndex() {

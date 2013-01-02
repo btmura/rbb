@@ -38,12 +38,12 @@ public class ThingMenuFragment extends Fragment {
     private AccountNameHolder accountNameHolder;
     private boolean saveable;
     private boolean saved;
+
     private MenuItem savedItem;
     private MenuItem unsavedItem;
-
     private MenuItem aboutItem;
-
     private MenuItem addItem;
+    private MenuItem viewItem;
 
     public static ThingMenuFragment newInstance(String subreddit, String thingId) {
         Bundle args = new Bundle(2);
@@ -82,6 +82,7 @@ public class ThingMenuFragment extends Fragment {
         unsavedItem = menu.findItem(R.id.menu_unsaved);
         aboutItem = menu.findItem(R.id.menu_about_thing_subreddit);
         addItem = menu.findItem(R.id.menu_add_thing_subreddit);
+        viewItem = menu.findItem(R.id.menu_view_subreddit);
     }
 
     @Override
@@ -99,7 +100,7 @@ public class ThingMenuFragment extends Fragment {
             unsavedItem.setVisible(saveable && !saved);
         }
 
-        boolean hasSubreddit = Subreddits.hasSidebar(getArguments().getString(ARG_SUBREDDIT));
+        boolean hasSubreddit = Subreddits.hasSidebar(getSubreddit());
 
         if (aboutItem != null) {
             aboutItem.setVisible(hasSubreddit);
@@ -107,6 +108,10 @@ public class ThingMenuFragment extends Fragment {
 
         if (addItem != null) {
             addItem.setVisible(hasSubreddit);
+        }
+
+        if (viewItem != null) {
+            viewItem.setVisible(hasSubreddit);
         }
     }
 
@@ -129,6 +134,10 @@ public class ThingMenuFragment extends Fragment {
                 handleAddSubreddit();
                 return true;
 
+            case R.id.menu_view_subreddit:
+                handleViewSubreddit();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -137,16 +146,27 @@ public class ThingMenuFragment extends Fragment {
     private void handleSave(int action) {
         if (accountNameHolder != null) {
             String accountName = accountNameHolder.getAccountName();
-            String thingId = getArguments().getString(ARG_THING_ID);
-            Provider.saveAsync(getActivity(), accountName, thingId, action);
+            Provider.saveAsync(getActivity(), accountName, getThingId(), action);
         }
     }
 
     private void handleAboutSubreddit() {
-        MenuHelper.startSidebarActivity(getActivity(), getArguments().getString(ARG_SUBREDDIT));
+        MenuHelper.startSidebarActivity(getActivity(), getSubreddit());
     }
 
     private void handleAddSubreddit() {
         MenuHelper.showAddSubredditDialog(getFragmentManager());
+    }
+
+    private void handleViewSubreddit() {
+        MenuHelper.startSubredditActivity(getActivity(), getSubreddit());
+    }
+
+    private String getSubreddit() {
+        return getArguments().getString(ARG_SUBREDDIT);
+    }
+
+    private String getThingId() {
+        return getArguments().getString(ARG_THING_ID);
     }
 }

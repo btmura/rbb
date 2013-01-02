@@ -82,6 +82,13 @@ public class MenuHelper {
         context.startActivity(intent);
     }
 
+    public static void startSubredditActivity(Context context, String subreddit) {
+        // TODO: Remove duplication with SubredditSpan.
+        Intent intent = new Intent(context, BrowserActivity.class);
+        intent.setData(Uri.parse(Urls.subreddit(subreddit, -1, null, Urls.TYPE_HTML).toString()));
+        context.startActivity(intent);
+    }
+
     /**
      * Sets a plain text {@link ClipData} with the provided label and text to
      * the clipboard and shows a toast with the text.
