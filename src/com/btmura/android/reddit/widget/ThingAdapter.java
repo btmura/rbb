@@ -59,7 +59,7 @@ public class ThingAdapter extends LoaderAdapter {
             Things.COLUMN_SELF,
             Things.COLUMN_SUBREDDIT,
             Things.COLUMN_TITLE,
-            Things.COLUMN_THING_ID,
+            Things.TABLE_NAME + "." + Things.COLUMN_THING_ID,
             Things.COLUMN_THUMBNAIL_URL,
             Things.COLUMN_UPS,
             Things.COLUMN_URL,

@@ -34,7 +34,7 @@ public class MessageThreadAdapter extends LoaderAdapter {
             Messages.COLUMN_CREATED_UTC,
             Messages.COLUMN_KIND,
             Messages.COLUMN_NEW,
-            Messages.COLUMN_THING_ID,
+            Messages.TABLE_NAME + "." + Messages.COLUMN_THING_ID,
     };
 
     private static final int INDEX_AUTHOR = 1;

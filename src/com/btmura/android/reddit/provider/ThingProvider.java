@@ -120,8 +120,8 @@ public class ThingProvider extends SessionProvider {
     private static final String JOINED_THING_TABLE = Things.TABLE_NAME
             // Join with pending saves to fake that the save happened.
             + " LEFT OUTER JOIN (SELECT "
-            + SaveActions.COLUMN_ACCOUNT + ", "
-            + SaveActions.COLUMN_THING_ID + ", "
+            + SaveActions.COLUMN_ACCOUNT + ","
+            + SaveActions.COLUMN_THING_ID + ","
             + SaveActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_SAVE
             + " FROM " + SaveActions.TABLE_NAME + ") USING ("
             + SaveActions.COLUMN_ACCOUNT + ", "

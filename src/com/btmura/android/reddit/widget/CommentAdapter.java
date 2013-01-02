@@ -46,7 +46,7 @@ public class CommentAdapter extends LoaderAdapter {
             Things.COLUMN_SEQUENCE,
             Things.COLUMN_SESSION_ID,
             Things.COLUMN_TITLE,
-            Things.COLUMN_THING_ID,
+            Things.TABLE_NAME + "." + Things.COLUMN_THING_ID,
             Things.COLUMN_UPS,
             Things.COLUMN_URL,
 
