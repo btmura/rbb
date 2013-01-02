@@ -17,18 +17,15 @@
 package com.btmura.android.reddit.content;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import android.accounts.Account;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -41,7 +38,6 @@ import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.AccountResult;
 import com.btmura.android.reddit.provider.AccountProvider;
-import com.btmura.android.reddit.util.Array;
 
 /**
  * {@link AbstractThreadedSyncAdapter} for periodically syncing account
@@ -85,21 +81,12 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             // Get the account information.
             AccountResult result = RedditApi.me(cookie);
 
-            // Delete and then insert to use a single transaction rather than
-            // doing a update and then insert which can't be done in a
-            // transaction as easily without a db reference.
-            ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(2);
-            ops.add(ContentProviderOperation.newDelete(AccountProvider.ACCOUNTS_URI)
-                    .withSelection(Accounts.SELECT_BY_ACCOUNT, Array.of(account.name))
-                    .build());
-            ops.add(ContentProviderOperation.newInsert(AccountProvider.ACCOUNTS_URI)
-                    .withValue(Accounts.COLUMN_ACCOUNT, account.name)
-                    .withValue(Accounts.COLUMN_HAS_MAIL, result.hasMail)
-                    .build());
+            // Insert or replace the existing row and notify any loaders.
+            ContentValues values = new ContentValues(2);
+            values.put(Accounts.COLUMN_ACCOUNT, account.name);
+            values.put(Accounts.COLUMN_HAS_MAIL, result.hasMail);
+            provider.insert(AccountProvider.ACCOUNTS_NOTIFY_URI, values);
 
-            // Tally up the results.
-            ContentProviderResult[] results = provider.applyBatch(ops);
-            syncResult.stats.numDeletes = results[0].count;
             syncResult.stats.numInserts++;
 
         } catch (OperationCanceledException e) {
@@ -112,9 +99,6 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             Log.e(TAG, e.getMessage(), e);
             syncResult.stats.numAuthExceptions++;
         } catch (RemoteException e) {
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
-        } catch (OperationApplicationException e) {
             Log.e(TAG, e.getMessage(), e);
             syncResult.databaseError = true;
         }

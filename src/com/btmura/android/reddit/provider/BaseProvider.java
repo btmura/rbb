@@ -175,7 +175,7 @@ abstract class BaseProvider extends ContentProvider {
 
     protected long innerInsert(Uri uri, SQLiteDatabase db, String table,
             String nullColumnHack, ContentValues values) {
-        return db.insert(table, nullColumnHack, values);
+        return db.replace(table, nullColumnHack, values);
     }
 
     protected int innerUpdate(Uri uri, SQLiteDatabase db, String table,

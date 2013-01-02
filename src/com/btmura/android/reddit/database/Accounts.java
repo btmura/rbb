@@ -37,7 +37,7 @@ public class Accounts implements BaseColumns {
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
+                + COLUMN_ACCOUNT + " TEXT NOT NULL UNIQUE,"
                 + COLUMN_HAS_MAIL + " INTEGER DEFAULT 0)");
     }
 }

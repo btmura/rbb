@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
@@ -28,9 +29,9 @@ import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
-import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
@@ -218,23 +219,14 @@ public class Provider {
 
     public static void clearNewMessageIndicator(Context context, final String accountName,
             final boolean hasMail) {
-        final Context appContext = context.getApplicationContext();
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(2);
-                ops.add(ContentProviderOperation.newDelete(AccountProvider.ACCOUNTS_URI)
-                        .withSelection(Accounts.SELECT_BY_ACCOUNT, Array.of(accountName))
-                        .build());
-
-                Uri uri = AccountProvider.ACCOUNTS_URI.buildUpon()
-                        .appendQueryParameter(AccountProvider.PARAM_NOTIFY, AccountProvider.TRUE)
-                        .build();
-                ops.add(ContentProviderOperation.newInsert(uri)
-                        .withValue(Accounts.COLUMN_ACCOUNT, accountName)
-                        .withValue(Accounts.COLUMN_HAS_MAIL, hasMail)
-                        .build());
-
-                applyOps(appContext, AccountProvider.AUTHORITY, ops);
+                // Insert or replace the existing row and notify any loaders.
+                ContentValues values = new ContentValues(2);
+                values.put(Accounts.COLUMN_ACCOUNT, accountName);
+                values.put(Accounts.COLUMN_HAS_MAIL, false);
+                cr.insert(AccountProvider.ACCOUNTS_NOTIFY_URI, values);
             }
         });
     }
