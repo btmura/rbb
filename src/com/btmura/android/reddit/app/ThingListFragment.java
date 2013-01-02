@@ -43,7 +43,6 @@ import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
 

@@ -44,7 +44,6 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.CommentAdapter;
-import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ThingProviderListFragment implements
