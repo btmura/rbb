@@ -140,6 +140,12 @@ public class RedditApi {
      */
     public static class AccountResult extends JsonParser {
 
+        /** Amount of link karma. */
+        public int linkKarma;
+
+        /** Amount of comment karma. */
+        public int commentKarma;
+
         /** True if the account has mail. False otherwise. */
         public boolean hasMail;
 
@@ -152,6 +158,16 @@ public class RedditApi {
 
         private AccountResult() {
             // Use the fromJsonReader method.
+        }
+
+        @Override
+        public void onLinkKarma(JsonReader reader, int index) throws IOException {
+            linkKarma = reader.nextInt();
+        }
+
+        @Override
+        public void onCommentKarma(JsonReader reader, int index) throws IOException {
+            commentKarma = reader.nextInt();
         }
 
         @Override

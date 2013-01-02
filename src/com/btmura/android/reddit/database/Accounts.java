@@ -24,10 +24,19 @@ import android.provider.BaseColumns;
  */
 public class Accounts implements BaseColumns {
 
+    // Considered using AccountManager#setUserData but comments it is meant to
+    // be used by the account authenticator as a scratch pad.
+
     public static final String TABLE_NAME = "accounts";
 
-    /** Account name of the account. */
-    public static final String COLUMN_ACCOUNT = VoteActions.COLUMN_ACCOUNT;
+    /** String account name. */
+    public static final String COLUMN_ACCOUNT = SharedColumns.COLUMN_ACCOUNT;
+
+    /** Integer amount of link karma. */
+    public static final String COLUMN_LINK_KARMA = "linkKarma";
+
+    /** Integer amount of comment karma. */
+    public static final String COLUMN_COMMENT_KARMA = "commentKarma";
 
     /** Integer either 0 or 1 indicating whether the account has mail. */
     public static final String COLUMN_HAS_MAIL = "hasMail";
@@ -38,6 +47,8 @@ public class Accounts implements BaseColumns {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACCOUNT + " TEXT NOT NULL UNIQUE,"
+                + COLUMN_LINK_KARMA + " INTEGER DEFAULT 0,"
+                + COLUMN_COMMENT_KARMA + " INTEGER DEFAULT 0,"
                 + COLUMN_HAS_MAIL + " INTEGER DEFAULT 0)");
     }
 }

@@ -183,6 +183,10 @@ public class JsonParser {
                 onNew(r, i);
             } else if ("was_comment".equals(name)) {
                 onWasComment(r, i);
+            } else if ("link_karma".equals(name)) {
+                onLinkKarma(r, i);
+            } else if ("comment_karma".equals(name)) {
+                onCommentKarma(r, i);
             } else if ("has_mail".equals(name)) {
                 onHasMail(r, i);
             } else if ("display_name".equals(name)) {
@@ -335,6 +339,14 @@ public class JsonParser {
     }
 
     public void onWasComment(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onLinkKarma(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onCommentKarma(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 

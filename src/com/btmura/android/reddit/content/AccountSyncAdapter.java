@@ -82,8 +82,10 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             AccountResult result = RedditApi.me(cookie);
 
             // Insert or replace the existing row and notify any loaders.
-            ContentValues values = new ContentValues(2);
+            ContentValues values = new ContentValues(4);
             values.put(Accounts.COLUMN_ACCOUNT, account.name);
+            values.put(Accounts.COLUMN_LINK_KARMA, result.linkKarma);
+            values.put(Accounts.COLUMN_COMMENT_KARMA, result.commentKarma);
             values.put(Accounts.COLUMN_HAS_MAIL, result.hasMail);
             provider.insert(AccountProvider.ACCOUNTS_NOTIFY_URI, values);
 
