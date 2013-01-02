@@ -297,7 +297,8 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     private Bundle makeMessageThingBundle(Context context, Cursor c) {
-        Bundle b = new Bundle(6);
+        Bundle b = new Bundle(7);
+        ThingBundle.putAuthor(b, c.getString(MESSAGE_AUTHOR));
         ThingBundle.putSubreddit(b, c.getString(MESSAGE_SUBREDDIT));
         ThingBundle.putKind(b, c.getInt(MESSAGE_KIND));
 
@@ -327,7 +328,8 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     private Bundle makeThingBundle(Context context, Cursor c) {
-        Bundle b = new Bundle(8);
+        Bundle b = new Bundle(10);
+        ThingBundle.putAuthor(b, c.getString(THING_AUTHOR));
         ThingBundle.putSubreddit(b, c.getString(THING_SUBREDDIT));
         ThingBundle.putKind(b, c.getInt(THING_KIND));
 

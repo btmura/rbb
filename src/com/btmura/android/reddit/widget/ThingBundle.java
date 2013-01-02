@@ -52,6 +52,9 @@ public class ThingBundle extends BundleSupport {
     /** Boolean indicating whether this thing has comments at all. */
     private static final String KEY_NO_COMMENTS = "noComments";
 
+    /** String name of the author of this thing. */
+    private static final String KEY_AUTHOR = "author";
+
     public static String getSubreddit(Bundle bundle) {
         return getString(bundle, KEY_SUBREDDIT);
     }
@@ -126,6 +129,18 @@ public class ThingBundle extends BundleSupport {
 
     public static void putNoComments(Bundle bundle, boolean noComments) {
         bundle.putBoolean(KEY_NO_COMMENTS, noComments);
+    }
+
+    public static String getAuthor(Bundle bundle) {
+        return getString(bundle, KEY_AUTHOR);
+    }
+
+    public static boolean hasAuthor(Bundle bundle) {
+        return !TextUtils.isEmpty(getAuthor(bundle));
+    }
+
+    public static void putAuthor(Bundle bundle, String author) {
+        bundle.putString(KEY_AUTHOR, author);
     }
 
     private ThingBundle() {

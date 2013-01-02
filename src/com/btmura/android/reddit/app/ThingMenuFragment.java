@@ -19,6 +19,7 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,6 +35,7 @@ public class ThingMenuFragment extends Fragment {
 
     private static final String ARG_SUBREDDIT = "subreddit";
     private static final String ARG_THING_ID = "thingId";
+    private static final String ARG_AUTHOR = "author";
 
     private AccountNameHolder accountNameHolder;
     private boolean saveable;
@@ -41,14 +43,16 @@ public class ThingMenuFragment extends Fragment {
 
     private MenuItem savedItem;
     private MenuItem unsavedItem;
-    private MenuItem aboutItem;
-    private MenuItem addItem;
-    private MenuItem viewItem;
+    private MenuItem viewProfileItem;
+    private MenuItem aboutSubredditItem;
+    private MenuItem addSubredditItem;
+    private MenuItem viewSubredditItem;
 
-    public static ThingMenuFragment newInstance(String subreddit, String thingId) {
-        Bundle args = new Bundle(2);
+    public static ThingMenuFragment newInstance(String subreddit, String thingId, String author) {
+        Bundle args = new Bundle(3);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putString(ARG_THING_ID, thingId);
+        args.putString(ARG_AUTHOR, author);
         ThingMenuFragment frag = new ThingMenuFragment();
         frag.setArguments(args);
         return frag;
@@ -80,9 +84,10 @@ public class ThingMenuFragment extends Fragment {
         inflater.inflate(R.menu.thing_menu_menu, menu);
         savedItem = menu.findItem(R.id.menu_saved);
         unsavedItem = menu.findItem(R.id.menu_unsaved);
-        aboutItem = menu.findItem(R.id.menu_about_thing_subreddit);
-        addItem = menu.findItem(R.id.menu_add_thing_subreddit);
-        viewItem = menu.findItem(R.id.menu_view_subreddit);
+        viewProfileItem = menu.findItem(R.id.menu_view_profile);
+        aboutSubredditItem = menu.findItem(R.id.menu_about_thing_subreddit);
+        addSubredditItem = menu.findItem(R.id.menu_add_thing_subreddit);
+        viewSubredditItem = menu.findItem(R.id.menu_view_subreddit);
     }
 
     @Override
@@ -100,18 +105,22 @@ public class ThingMenuFragment extends Fragment {
             unsavedItem.setVisible(saveable && !saved);
         }
 
+        if (viewProfileItem != null) {
+            viewProfileItem.setVisible(!TextUtils.isEmpty(getAuthor()));
+        }
+
         boolean hasSubreddit = Subreddits.hasSidebar(getSubreddit());
 
-        if (aboutItem != null) {
-            aboutItem.setVisible(hasSubreddit);
+        if (aboutSubredditItem != null) {
+            aboutSubredditItem.setVisible(hasSubreddit);
         }
 
-        if (addItem != null) {
-            addItem.setVisible(hasSubreddit);
+        if (addSubredditItem != null) {
+            addSubredditItem.setVisible(hasSubreddit);
         }
 
-        if (viewItem != null) {
-            viewItem.setVisible(hasSubreddit);
+        if (viewSubredditItem != null) {
+            viewSubredditItem.setVisible(hasSubreddit);
         }
     }
 
@@ -124,6 +133,10 @@ public class ThingMenuFragment extends Fragment {
 
             case R.id.menu_unsaved:
                 handleSave(SaveActions.ACTION_SAVE);
+                return true;
+
+            case R.id.menu_view_profile:
+                handleViewProfile();
                 return true;
 
             case R.id.menu_about_thing_subreddit:
@@ -150,6 +163,10 @@ public class ThingMenuFragment extends Fragment {
         }
     }
 
+    private void handleViewProfile() {
+        MenuHelper.startProfileActivity(getActivity(), getAuthor(), -1);
+    }
+
     private void handleAboutSubreddit() {
         MenuHelper.startSidebarActivity(getActivity(), getSubreddit());
     }
@@ -168,5 +185,9 @@ public class ThingMenuFragment extends Fragment {
 
     private String getThingId() {
         return getArguments().getString(ARG_THING_ID);
+    }
+
+    private String getAuthor() {
+        return getArguments().getString(ARG_AUTHOR);
     }
 }
