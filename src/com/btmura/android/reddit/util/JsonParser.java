@@ -181,6 +181,8 @@ public class JsonParser {
                 onContext(r, i);
             } else if ("new".equals(name)) {
                 onNew(r, i);
+            } else if ("subject".equals(name)) {
+                onSubject(r, i);
             } else if ("was_comment".equals(name)) {
                 onWasComment(r, i);
             } else if ("link_karma".equals(name)) {
@@ -335,6 +337,10 @@ public class JsonParser {
     }
 
     public void onNew(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onSubject(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 

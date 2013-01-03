@@ -103,6 +103,7 @@ public class ThingAdapter extends LoaderAdapter {
             Messages.COLUMN_CREATED_UTC,
             Messages.COLUMN_KIND,
             Messages.COLUMN_NEW,
+            Messages.COLUMN_SUBJECT,
             Messages.COLUMN_SUBREDDIT,
             Messages.COLUMN_THING_ID,
             Messages.COLUMN_WAS_COMMENT,
@@ -117,10 +118,11 @@ public class ThingAdapter extends LoaderAdapter {
     private static final int MESSAGE_CREATED_UTC = 4;
     private static final int MESSAGE_KIND = 5;
     private static final int MESSAGE_NEW = 6;
-    private static final int MESSAGE_SUBREDDIT = 7;
-    private static final int MESSAGE_THING_ID = 8;
-    private static final int MESSAGE_WAS_COMMENT = 9;
-    private static final int MESSAGE_ACTION = 10;
+    private static final int MESSAGE_SUBJECT = 7;
+    private static final int MESSAGE_SUBREDDIT = 8;
+    private static final int MESSAGE_THING_ID = 9;
+    private static final int MESSAGE_WAS_COMMENT = 10;
+    private static final int MESSAGE_ACTION = 11;
 
     private long sessionId = -1;
     private String accountName;
@@ -410,6 +412,10 @@ public class ThingAdapter extends LoaderAdapter {
         return getInt(position, MESSAGE_ACTION) != MessageActions.ACTION_UNREAD;
     }
 
+    public int getNumComments(int position) {
+        return isMessage() ? -1 : getInt(position, THING_NUM_COMMENTS);
+    }
+
     public boolean isSaved(int position) {
         // Messages can't be saved.
         if (isMessage()) {
@@ -431,7 +437,7 @@ public class ThingAdapter extends LoaderAdapter {
 
     public String getTitle(int position) {
         if (isMessage()) {
-            return getString(position, MESSAGE_BODY);
+            return getString(position, MESSAGE_SUBJECT);
         } else {
             // Link and comment posts have a title.
             String title = getString(position, THING_TITLE);

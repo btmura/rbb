@@ -22,7 +22,6 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
@@ -140,19 +139,11 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_new_message:
-                handleNewMessage();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void handleNewMessage() {
-        MenuHelper.startNewMessageActivity(this, null, null);
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        boolean showThingless = isSinglePane || !hasThing();
+        menu.setGroupVisible(R.id.thingless, showThingless);
+        return true;
     }
 
     @Override

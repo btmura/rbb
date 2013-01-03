@@ -40,8 +40,12 @@ import com.btmura.android.reddit.app.ComposeFragment.OnComposeListener;
 import com.btmura.android.reddit.app.SubmitLinkFragment.OnSubmitLinkListener;
 import com.btmura.android.reddit.provider.Provider;
 
-public class ComposeActivity extends Activity implements OnPageChangeListener, OnClickListener,
-        OnComposeFormListener, OnCaptchaGuessListener, OnSubmitLinkListener, OnComposeListener {
+public class ComposeActivity extends Activity implements OnPageChangeListener,
+        OnClickListener,
+        OnComposeFormListener,
+        OnCaptchaGuessListener,
+        OnSubmitLinkListener,
+        OnComposeListener {
 
     /** Type of composition when submitting a link or text. */
     public static final int TYPE_POST = 0;
@@ -49,13 +53,13 @@ public class ComposeActivity extends Activity implements OnPageChangeListener, O
     /** Type of composition when crafting a new message. */
     public static final int TYPE_MESSAGE = 1;
 
-    /** Type of composition when replying to some comment. */
+    /** Type when replying to some comment. */
     public static final int TYPE_COMMENT_REPLY = 2;
 
     /** Type of composition when replying to some message. */
     public static final int TYPE_MESSAGE_REPLY = 3;
 
-    /** Default set of types supported when sharing something. */
+    /** Default set of types supported when sharing something to the app. */
     public static final int[] DEFAULT_TYPE_SET = {
             TYPE_POST,
             TYPE_MESSAGE,
@@ -66,7 +70,7 @@ public class ComposeActivity extends Activity implements OnPageChangeListener, O
             TYPE_MESSAGE,
     };
 
-    /** Set of types when replying to a comment. */
+    /** Set of types when replying to some comment. */
     public static final int[] COMMENT_REPLY_TYPE_SET = {
             TYPE_COMMENT_REPLY,
             TYPE_MESSAGE,
@@ -94,6 +98,13 @@ public class ComposeActivity extends Activity implements OnPageChangeListener, O
 
     /** Bundle of extras to pass through. */
     public static final String EXTRA_EXTRAS = "extras";
+
+    // The following extras are for commenting on something from the thing list.
+    // In other words when not viewing something directly.
+
+    public static final String EXTRA_COMMENT_THING_ID = "thingId";
+
+    public static final String EXTRA_COMMENT_NUM_COMMENTS = "numComments";
 
     // Internal extras used by the activity to pass extras to the captcha
     // fragment and back without storing member data in this activity.
@@ -270,6 +281,9 @@ public class ComposeActivity extends Activity implements OnPageChangeListener, O
                 ft.add(frag, ComposeFragment.TAG);
                 ft.commit();
                 break;
+
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -304,7 +318,7 @@ public class ComposeActivity extends Activity implements OnPageChangeListener, O
         int nesting = extras.getInt(CommentListFragment.EXTRA_NESTING);
         int sequence = extras.getInt(CommentListFragment.EXTRA_SEQUENCE);
         long sessionId = extras.getLong(CommentListFragment.EXTRA_SESSION_ID, -1);
-        Provider.insertCommentAsync(this, parentId, parentNumComments, parentThingId, replyThingId,
+        Provider.commentReplyAsync(this, parentId, parentNumComments, parentThingId, replyThingId,
                 accountName, body, nesting, sequence, sessionId);
         finish();
     }

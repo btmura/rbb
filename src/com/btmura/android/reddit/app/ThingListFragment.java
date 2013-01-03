@@ -348,16 +348,20 @@ public class ThingListFragment extends ThingProviderListFragment implements
                 handleSaved(mode, SaveActions.ACTION_SAVE);
                 return true;
 
+            case R.id.menu_copy_url:
+                handleCopyUrl(mode);
+                return true;
+
+            case R.id.menu_new_message:
+                handleNewMessage(mode);
+                return true;
+
             case R.id.menu_view_profile:
                 handleViewProfile(mode);
                 return true;
 
             case R.id.menu_view_subreddit:
                 handleViewSubreddit(mode);
-                return true;
-
-            case R.id.menu_copy_url:
-                handleCopyUrl(mode);
                 return true;
 
             default:
@@ -372,6 +376,23 @@ public class ThingListFragment extends ThingProviderListFragment implements
         mode.finish();
     }
 
+    private void handleCopyUrl(ActionMode mode) {
+        int position = getFirstCheckedPosition();
+        String title = adapter.getTitle(position);
+        CharSequence url = adapter.getUrl(position);
+        MenuHelper.setClipAndToast(getActivity(), title, url);
+        mode.finish();
+    }
+
+    private void handleNewMessage(ActionMode mode) {
+        int position = getFirstCheckedPosition();
+        String user = adapter.getAuthor(position);
+        String title = adapter.getTitle(position);
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_TYPE_SET, null,
+                user, title, null);
+        mode.finish();
+    }
+
     private void handleViewProfile(ActionMode mode) {
         String user = adapter.getAuthor(getFirstCheckedPosition());
         MenuHelper.startProfileActivity(getActivity(), user, -1);
@@ -381,14 +402,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private void handleViewSubreddit(ActionMode mode) {
         String subreddit = adapter.getSubreddit(getFirstCheckedPosition());
         MenuHelper.startSubredditActivity(getActivity(), subreddit);
-        mode.finish();
-    }
-
-    private void handleCopyUrl(ActionMode mode) {
-        int position = getFirstCheckedPosition();
-        String title = adapter.getTitle(position);
-        CharSequence url = adapter.getUrl(position);
-        MenuHelper.setClipAndToast(getActivity(), title, url);
         mode.finish();
     }
 

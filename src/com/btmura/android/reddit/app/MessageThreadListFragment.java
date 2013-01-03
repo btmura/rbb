@@ -19,13 +19,15 @@ package com.btmura.android.reddit.app;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
@@ -34,7 +36,8 @@ import com.btmura.android.reddit.widget.MessageThreadAdapter;
 /**
  * {@link ThingProviderListFragment} for showing the messages in a thread.
  */
-public class MessageThreadListFragment extends ThingProviderListFragment {
+public class MessageThreadListFragment extends ThingProviderListFragment implements
+        MultiChoiceModeListener {
 
     public static final String TAG = "MessageThreadListFragment";
 
@@ -75,7 +78,8 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
             Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         ListView l = (ListView) v.findViewById(android.R.id.list);
-        registerForContextMenu(l);
+        l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        l.setMultiChoiceModeListener(this);
         return v;
     }
 
@@ -118,38 +122,65 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
         throw new IllegalStateException();
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        getActivity().getMenuInflater().inflate(R.menu.message_context_menu, menu);
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.message_thread_action_menu, menu);
+        return true;
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        int count = getListView().getCheckedItemCount();
+        menu.findItem(R.id.menu_new_comment).setVisible(count == 1);
+        return true;
+    }
+
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        mode.invalidate();
+    }
+
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_new_comment:
-                return handleNewComment(info);
+                handleNewComment();
+                mode.finish();
+                return true;
 
             default:
                 return false;
         }
+
     }
 
-    private boolean handleNewComment(AdapterContextMenuInfo info) {
-        String user = adapter.getUser(info.position);
+    private void handleNewComment() {
+        int position = getFirstCheckedPosition();
+
+        String user = adapter.getUser(position);
         Bundle extras = new Bundle(3);
         extras.putString(EXTRA_PARENT_THING_ID, adapter.getThingId());
         extras.putLong(EXTRA_SESSION_ID, adapter.getSessionId());
-        extras.putString(EXTRA_THING_ID, adapter.getThingId(info.position));
+        extras.putString(EXTRA_THING_ID, adapter.getThingId(position));
+
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_REPLY_TYPE_SET,
-                user, null, extras);
-        return true;
+                null, user, null, extras);
+    }
+
+    public void onDestroyActionMode(ActionMode mode) {
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
+    }
+
+    private int getFirstCheckedPosition() {
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int size = adapter.getCount();
+        for (int i = 0; i < size; i++) {
+            if (checked.get(i)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

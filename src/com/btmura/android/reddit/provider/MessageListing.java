@@ -206,6 +206,11 @@ class MessageListing extends JsonParser implements Listing {
     }
 
     @Override
+    public void onSubject(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Messages.COLUMN_SUBJECT, reader.nextString());
+    }
+
+    @Override
     public void onSubreddit(JsonReader reader, int index) throws IOException {
         values.get(index).put(Messages.COLUMN_SUBREDDIT, readTrimmedString(reader, null));
     }

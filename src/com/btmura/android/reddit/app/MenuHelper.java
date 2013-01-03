@@ -51,37 +51,13 @@ public class MenuHelper {
         AddSubredditFragment.newInstance().show(fm, AddSubredditFragment.TAG);
     }
 
-    public static void startNewMessageActivity(Context context, String destination, String title) {
-        Intent intent = new Intent(context, ComposeActivity.class);
-        intent.putExtra(ComposeActivity.EXTRA_TYPES, ComposeActivity.MESSAGE_TYPE_SET);
-        intent.putExtra(ComposeActivity.EXTRA_MESSAGE_DESTINATION, destination);
-        intent.putExtra(ComposeActivity.EXTRA_TITLE, title);
-        context.startActivity(intent);
-    }
-
-    public static void startNewPostActivity(Context context, String subredditDestination) {
-        Intent intent = new Intent(context, ComposeActivity.class);
-        intent.putExtra(ComposeActivity.EXTRA_TYPES, ComposeActivity.DEFAULT_TYPE_SET);
-        intent.putExtra(ComposeActivity.EXTRA_SUBREDDIT_DESTINATION, subredditDestination);
-        context.startActivity(intent);
-    }
-
-    public static void startNewCommentActivity(Context context, String destination, String title,
-            Bundle extras) {
-        Intent intent = new Intent(context, ComposeActivity.class);
-        intent.putExtra(ComposeActivity.EXTRA_TYPES, ComposeActivity.COMMENT_REPLY_TYPE_SET);
-        intent.putExtra(ComposeActivity.EXTRA_MESSAGE_DESTINATION, destination);
-        intent.putExtra(ComposeActivity.EXTRA_TITLE, title);
-        intent.putExtra(ComposeActivity.EXTRA_EXTRAS, extras);
-        context.startActivity(intent);
-    }
-
-    public static void startComposeActivity(Context context, int[] types, String destination,
-            String title, Bundle extras) {
+    public static void startComposeActivity(Context context, int[] types,
+            String subredditDestination, String messageDestination, String title, Bundle extras) {
         Intent intent = new Intent(context, ComposeActivity.class);
         intent.putExtra(ComposeActivity.EXTRA_TYPES, types);
-        // intent.putExtra(ComposeActivity, destination);
-        // intent.putExtra(ComposeActivity.EXTRA_TITLE, title);
+        intent.putExtra(ComposeActivity.EXTRA_SUBREDDIT_DESTINATION, subredditDestination);
+        intent.putExtra(ComposeActivity.EXTRA_MESSAGE_DESTINATION, messageDestination);
+        intent.putExtra(ComposeActivity.EXTRA_TITLE, title);
         intent.putExtra(ComposeActivity.EXTRA_EXTRAS, extras);
         context.startActivity(intent);
     }

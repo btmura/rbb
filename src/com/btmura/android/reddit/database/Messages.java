@@ -32,6 +32,7 @@ public class Messages implements BaseColumns {
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_NEW = "new";
     public static final String COLUMN_SESSION_ID = SharedColumns.COLUMN_SESSION_ID;
+    public static final String COLUMN_SUBJECT = "subject";
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_THING_ID = SharedColumns.COLUMN_THING_ID;
     public static final String COLUMN_WAS_COMMENT = "wasComment";
@@ -47,6 +48,7 @@ public class Messages implements BaseColumns {
                 + COLUMN_KIND + " INTEGER NOT NULL, "
                 + COLUMN_NEW + " INTEGER DEFAULT 0, "
                 + COLUMN_SESSION_ID + " TEXT, "
+                + COLUMN_SUBJECT + " TEXT, "
                 + COLUMN_SUBREDDIT + " TEXT, "
                 + COLUMN_THING_ID + " TEXT, "
                 + COLUMN_WAS_COMMENT + " INTEGER DEFAULT 0)");

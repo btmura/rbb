@@ -282,13 +282,16 @@ public class CommentListFragment extends ThingProviderListFragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_link:
-                return handleLink();
+                handleLink();
+                return true;
 
             case R.id.menu_comment_open:
-                return handleOpen();
+                handleOpen();
+                return true;
 
             case R.id.menu_comment_copy_url:
-                return handleCopyUrl();
+                handleCopyUrlItem();
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -307,7 +310,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return true;
     }
 
-    private boolean handleCopyUrl() {
+    // TODO: Figure out why we need handleCopyUrl duplicate.
+    private boolean handleCopyUrlItem() {
         MenuHelper.setClipAndToast(getActivity(), title, url);
         return true;
     }
@@ -401,49 +405,54 @@ public class CommentListFragment extends ThingProviderListFragment implements
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_new_comment:
-                return handleNewComment(mode);
+                handleNewComment();
+                mode.finish();
+                return true;
 
             case R.id.menu_delete:
-                return handleDelete(mode);
+                handleDelete();
+                mode.finish();
+                return true;
 
             case R.id.menu_view_profile:
-                return handleViewProfile(mode);
+                handleViewProfile();
+                mode.finish();
+                return true;
 
             case R.id.menu_copy_url:
-                return handleCopyUrl(mode);
+                handleCopyUrl();
+                mode.finish();
+                return true;
 
             default:
                 return false;
         }
     }
 
-    private boolean handleNewComment(ActionMode mode) {
+    private void handleNewComment() {
         int position = getFirstCheckedPosition();
-        if (position != -1) {
-            long parentId = adapter.getLong(0, CommentAdapter.INDEX_ID);
-            int parentNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
-            String parentThingId = adapter.getThingId();
-            String replyAuthor = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
-            String replyThingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
-            int nesting = CommentLogic.getInsertNesting(this, position);
-            int sequence = CommentLogic.getInsertSequence(this, position);
-            long sessionId = adapter.getSessionId();
 
-            Bundle args = new Bundle(9);
-            args.putLong(EXTRA_PARENT_ID, parentId);
-            args.putInt(EXTRA_PARENT_NUM_COMMENTS, parentNumComments);
-            args.putString(EXTRA_PARENT_THING_ID, parentThingId);
-            args.putString(EXTRA_REPLY_AUTHOR, replyAuthor);
-            args.putString(EXTRA_REPLY_THING_ID, replyThingId);
-            args.putInt(EXTRA_NESTING, nesting);
-            args.putInt(EXTRA_SEQUENCE, sequence);
-            args.putLong(EXTRA_SESSION_ID, sessionId);
+        long parentId = adapter.getLong(0, CommentAdapter.INDEX_ID);
+        int parentNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
+        String parentThingId = adapter.getThingId();
+        String replyToAuthor = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
+        String replyToThingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
+        int nesting = CommentLogic.getInsertNesting(this, position);
+        int sequence = CommentLogic.getInsertSequence(this, position);
+        long sessionId = adapter.getSessionId();
 
-            String title = String.format("Re: %s", getLabel(position));
-            MenuHelper.startNewCommentActivity(getActivity(), replyAuthor, title, args);
-        }
-        mode.finish();
-        return true;
+        Bundle args = new Bundle(8);
+        args.putLong(EXTRA_PARENT_ID, parentId);
+        args.putInt(EXTRA_PARENT_NUM_COMMENTS, parentNumComments);
+        args.putString(EXTRA_PARENT_THING_ID, parentThingId);
+        args.putString(EXTRA_REPLY_AUTHOR, replyToAuthor);
+        args.putString(EXTRA_REPLY_THING_ID, replyToThingId);
+        args.putInt(EXTRA_NESTING, nesting);
+        args.putInt(EXTRA_SEQUENCE, sequence);
+        args.putLong(EXTRA_SESSION_ID, sessionId);
+
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMMENT_REPLY_TYPE_SET,
+                null, replyToAuthor, getLabel(position), args);
     }
 
     private int getFirstCheckedPosition() {
@@ -457,7 +466,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return -1;
     }
 
-    private boolean handleDelete(ActionMode mode) {
+    private void handleDelete() {
         long headerId = adapter.getLong(0, CommentAdapter.INDEX_ID);
         int headerNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
 
@@ -467,8 +476,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
         fillCheckedInfo(thingIds, hasChildren);
         Provider.deleteCommentAsync(getActivity(), adapter.getAccountName(), headerId,
                 headerNumComments, adapter.getThingId(), ids, thingIds, hasChildren);
-        mode.finish();
-        return true;
     }
 
     private void fillCheckedInfo(String[] thingIds, boolean[] hasChildren) {
@@ -484,14 +491,12 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
     }
 
-    private boolean handleViewProfile(ActionMode mode) {
+    private void handleViewProfile() {
         String user = adapter.getString(getFirstCheckedPosition(), CommentAdapter.INDEX_AUTHOR);
         MenuHelper.startProfileActivity(getActivity(), user, -1);
-        mode.finish();
-        return true;
     }
 
-    private boolean handleCopyUrl(ActionMode mode) {
+    private void handleCopyUrl() {
         int position = getFirstCheckedPosition();
 
         // Determine the label of the text to copy to the clipboard.
@@ -509,7 +514,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
         // Copy to the clipboard and present a toast.
         MenuHelper.setClipAndToast(getActivity(), label, text);
-        return true;
     }
 
     private String getLabel(int position) {

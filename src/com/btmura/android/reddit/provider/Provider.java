@@ -55,7 +55,7 @@ public class Provider {
     };
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
-    public static void insertCommentAsync(Context context,
+    public static void commentReplyAsync(Context context,
             final long parentId,
             final int parentNumComments,
             final String parentThingId,

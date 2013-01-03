@@ -89,6 +89,10 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 handleNewPost();
                 return true;
 
+            case R.id.menu_new_message:
+                handleNewMessage();
+                return true;
+
             case R.id.menu_about_subreddit:
                 handleAboutSubreddit();
                 return true;
@@ -111,7 +115,13 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     }
 
     private void handleNewPost() {
-        MenuHelper.startNewPostActivity(getActivity(), subredditNameHolder.getSubredditName());
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.DEFAULT_TYPE_SET,
+                subredditNameHolder.getSubredditName(), null, null, null);
+    }
+
+    private void handleNewMessage() {
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_TYPE_SET,
+                null, null, null, null);
     }
 
     private void handleAboutSubreddit() {

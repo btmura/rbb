@@ -41,6 +41,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ComposeActivity.OnComposeActivityListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
@@ -159,45 +160,92 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         accountSpinner.setAdapter(adapter);
 
         destinationText = (EditText) v.findViewById(R.id.destination_text);
-
         titleText = (EditText) v.findViewById(R.id.title_text);
-        titleText.setText(getArguments().getString(ARG_TITLE));
-
         linkSwitch = (Switch) v.findViewById(R.id.link_switch);
-
         textText = (EditText) v.findViewById(R.id.text_text);
+
+        int type = getArguments().getInt(ARG_TYPE);
+
+        // Set the title for all types.
+        String title = getArguments().getString(ARG_TITLE);
+        // TODO: Trim title if it's too long.
+        switch (type) {
+            case ComposeActivity.TYPE_POST:
+                titleText.setText(title);
+                titleText.setHint(R.string.hint_title);
+                break;
+
+            case ComposeActivity.TYPE_MESSAGE:
+                if (!TextUtils.isEmpty(title)) {
+                    title = getString(R.string.compose_message_title, title);
+                    titleText.setText(title);
+                }
+                titleText.setHint(R.string.hint_subject);
+                break;
+
+            case ComposeActivity.TYPE_COMMENT_REPLY:
+            case ComposeActivity.TYPE_MESSAGE_REPLY:
+                titleText.setVisibility(View.GONE);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        // Set the destination for all types.
+        switch (type) {
+            case ComposeActivity.TYPE_POST:
+                String subredditDestination = getArguments().getString(ARG_SUBREDDIT_DESTINATION);
+                if (!Subreddits.hasSidebar(subredditDestination)) {
+                    subredditDestination = null;
+                }
+                destinationText.setText(subredditDestination);
+                destinationText.setHint(R.string.hint_subreddit);
+                destinationText.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
+                break;
+
+            case ComposeActivity.TYPE_MESSAGE:
+                String messageDestination = getArguments().getString(ARG_MESSAGE_DESTINATION);
+                destinationText.setText(messageDestination);
+                destinationText.setHint(R.string.hint_username);
+                destinationText.setFilters(InputFilters.NO_SPACE_FILTERS);
+                break;
+
+            case ComposeActivity.TYPE_COMMENT_REPLY:
+            case ComposeActivity.TYPE_MESSAGE_REPLY:
+                destinationText.setVisibility(View.GONE);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        // Set text and link switch for all types.
         textText.setText(getArguments().getString(ARG_TEXT));
         if (textText.length() > 0) {
             validateText(textText.getText());
         }
 
-        switch (getArguments().getInt(ARG_TYPE)) {
+        switch (type) {
+            case ComposeActivity.TYPE_POST:
+                textText.setHint(R.string.hint_text_or_link);
+                textText.addTextChangedListener(this);
+                linkSwitch.setVisibility(View.VISIBLE);
+                break;
+
             case ComposeActivity.TYPE_MESSAGE:
-                destinationText.setText(getArguments().getString(ARG_MESSAGE_DESTINATION));
-                destinationText.setHint(R.string.hint_username);
-                destinationText.setFilters(InputFilters.NO_SPACE_FILTERS);
-                titleText.setHint(R.string.hint_subject);
                 textText.setHint(R.string.hint_message);
                 linkSwitch.setVisibility(View.GONE);
                 break;
 
             case ComposeActivity.TYPE_COMMENT_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
-                destinationText.setVisibility(View.GONE);
-                titleText.setVisibility(View.GONE);
                 textText.setHint(R.string.hint_comment);
                 linkSwitch.setVisibility(View.GONE);
                 break;
 
             default:
-                destinationText.setText(getArguments().getString(ARG_SUBREDDIT_DESTINATION));
-                destinationText.setHint(R.string.hint_subreddit);
-                destinationText.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
-                titleText.setHint(R.string.hint_title);
-                textText.setHint(R.string.hint_text_or_link);
-                textText.addTextChangedListener(this);
-                linkSwitch.setVisibility(View.VISIBLE);
-                break;
+                throw new IllegalArgumentException();
         }
 
         if (!TextUtils.isEmpty(titleText.getText())) {

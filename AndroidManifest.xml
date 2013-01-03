@@ -70,13 +70,11 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
+        <!-- Ignore exported activity warning. We want to be exposed to share things. -->
         <activity
             android:name=".app.ComposeActivity"
-            android:theme="@android:style/Theme.Holo.DialogWhenLarge" >
-        </activity>
-        <activity
-            android:name="com.btmura.android.reddit.app.ComposeActivity"
-            android:theme="@android:style/Theme.Holo.DialogWhenLarge" >
+            android:theme="@android:style/Theme.Holo.DialogWhenLarge"
+            tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 

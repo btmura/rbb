@@ -32,6 +32,7 @@
     <string name="compose_title_message">New message</string>
     <string name="compose_title_post">New post</string>
     <string name="compose_title_reply">Reply to %s</string>
+    <string name="compose_message_title">Re: %s</string>
     <string name="compose_link">LINK</string>
     <string name="compose_text">TEXT</string>
     <string name="content_browser">Content providers</string>
@@ -63,10 +64,6 @@
     <string name="hint_title">Title</string>
     <string name="hint_username">Username</string>
     <string name="label_accounts">Accounts</string>
-    <string name="label_reply">Reply to %s</string>
-    <string name="label_new_message">New message</string>
-    <string name="label_new_post">New post</string>
-    <string name="label_new">New</string>
     <string name="loading">Loading…</string>
     <string name="login_adding_account">Adding account…</string>
     <string name="login_error">There was a problem: %1$s</string>
