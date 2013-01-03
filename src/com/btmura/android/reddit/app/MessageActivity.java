@@ -18,7 +18,6 @@ package com.btmura.android.reddit.app;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
-import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -144,18 +143,16 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_new_message:
-                return handleNewMessage();
+                handleNewMessage();
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private boolean handleNewMessage() {
-        Intent intent = new Intent(this, ComposeActivity.class);
-        intent.putExtra(ComposeActivity.EXTRA_COMPOSITION, ComposeActivity.COMPOSITION_MESSAGE);
-        startActivity(intent);
-        return true;
+    private void handleNewMessage() {
+        MenuHelper.startNewMessageActivity(this, null, null);
     }
 
     @Override

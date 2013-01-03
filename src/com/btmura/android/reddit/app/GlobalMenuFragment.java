@@ -111,8 +111,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     }
 
     private void handleNewPost() {
-        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMPOSITION_SUBMISSION,
-                subredditNameHolder.getSubredditName(), null, null);
+        MenuHelper.startNewPostActivity(getActivity(), subredditNameHolder.getSubredditName());
     }
 
     private void handleAboutSubreddit() {

@@ -32,14 +32,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.ComposeActivity.OnComposeActivityListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.text.InputFilters;
@@ -49,16 +48,19 @@ import com.btmura.android.reddit.widget.AccountNameAdapter;
  * {@link Fragment} that displays a form for composing submissions and messages.
  */
 public class ComposeFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
-        OnClickListener, TextWatcher {
+        TextWatcher, OnComposeActivityListener {
 
     // This fragment only reports back the user's input and doesn't handle
     // modifying the database. The caller of this fragment should handle that.
 
     /** Integer argument indicating the type of composition. */
-    public static final String ARG_COMPOSITION = "composition";
+    public static final String ARG_TYPE = "composition";
 
-    /** String extra to pre-fill the destination field if possible. */
-    public static final String ARG_DESTINATION = "destination";
+    /** String extra to pre-fill the subreddit field for new posts. */
+    public static final String ARG_SUBREDDIT_DESTINATION = "subredditDestination";
+
+    /** String extra to pre-fill the user name field for new messages. */
+    public static final String ARG_MESSAGE_DESTINATION = "messageDestination";
 
     /** Optional string extra with suggested title. */
     private static final String ARG_TITLE = "title";
@@ -66,17 +68,8 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** Optional string extra with suggested text. */
     private static final String ARG_TEXT = "text";
 
-    /** Type of composition when submitting a link or text. */
-    public static final int COMPOSITION_SUBMISSION = 0;
-
-    /** Type of composition when crafting a new message. */
-    public static final int COMPOSITION_MESSAGE = 1;
-
-    /** Type of composition when replying to some comment. */
-    public static final int COMPOSITION_COMMENT_REPLY = 2;
-
-    /** Type of composition when replying to some message. */
-    public static final int COMPOSITION_MESSAGE_REPLY = 3;
+    /** Integer ID that may be used to identify this fragment. */
+    private static final String ARG_ID = "id";
 
     public interface OnComposeFormListener {
 
@@ -91,9 +84,6 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
          */
         void onComposeForm(String accountName, String destination, String title, String text,
                 boolean isLink);
-
-        /** Method fired when cancel is pressed. */
-        void onComposeFormCancelled();
     }
 
     /** Listener to notify on compose events. */
@@ -120,22 +110,18 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** {@link EditText} for either submission text or message. */
     private EditText textText;
 
-    /** Ok button visible when this form is a dialog. */
-    private View ok;
-
-    /** Cancel button visible when this form is a dialog. */
-    private View cancel;
-
     /** Matcher used to check whether the text is a link or not. */
     private Matcher linkMatcher;
 
-    public static ComposeFormFragment newInstance(int composition, String destination,
-            String title, String text) {
-        Bundle args = new Bundle(4);
-        args.putInt(ARG_COMPOSITION, composition);
-        args.putString(ARG_DESTINATION, destination);
+    public static ComposeFormFragment newInstance(int type, String subredditDestination,
+            String messageDestination, String title, String text, int id) {
+        Bundle args = new Bundle(6);
+        args.putInt(ARG_TYPE, type);
+        args.putString(ARG_SUBREDDIT_DESTINATION, subredditDestination);
+        args.putString(ARG_MESSAGE_DESTINATION, messageDestination);
         args.putString(ARG_TITLE, title);
         args.putString(ARG_TEXT, text);
+        args.putInt(ARG_ID, id);
         ComposeFormFragment frag = new ComposeFormFragment();
         frag.setArguments(args);
         return frag;
@@ -146,6 +132,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         super.onAttach(activity);
         if (activity instanceof OnComposeFormListener) {
             listener = (OnComposeFormListener) activity;
+        }
+        if (activity instanceof ComposeActivity) {
+            ((ComposeActivity) activity).addOnComposeActivityListener(this);
         }
     }
 
@@ -170,7 +159,6 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         accountSpinner.setAdapter(adapter);
 
         destinationText = (EditText) v.findViewById(R.id.destination_text);
-        destinationText.setText(getArguments().getString(ARG_DESTINATION));
 
         titleText = (EditText) v.findViewById(R.id.title_text);
         titleText.setText(getArguments().getString(ARG_TITLE));
@@ -183,14 +171,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
             validateText(textText.getText());
         }
 
-        if (!TextUtils.isEmpty(titleText.getText())) {
-            textText.requestFocus();
-        } else if (!TextUtils.isEmpty(destinationText.getText())) {
-            titleText.requestFocus();
-        }
-
-        switch (getArguments().getInt(ARG_COMPOSITION)) {
-            case COMPOSITION_MESSAGE:
+        switch (getArguments().getInt(ARG_TYPE)) {
+            case ComposeActivity.TYPE_MESSAGE:
+                destinationText.setText(getArguments().getString(ARG_MESSAGE_DESTINATION));
                 destinationText.setHint(R.string.hint_username);
                 destinationText.setFilters(InputFilters.NO_SPACE_FILTERS);
                 titleText.setHint(R.string.hint_subject);
@@ -198,8 +181,8 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 linkSwitch.setVisibility(View.GONE);
                 break;
 
-            case COMPOSITION_COMMENT_REPLY:
-            case COMPOSITION_MESSAGE_REPLY:
+            case ComposeActivity.TYPE_COMMENT_REPLY:
+            case ComposeActivity.TYPE_MESSAGE_REPLY:
                 destinationText.setVisibility(View.GONE);
                 titleText.setVisibility(View.GONE);
                 textText.setHint(R.string.hint_comment);
@@ -207,6 +190,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 break;
 
             default:
+                destinationText.setText(getArguments().getString(ARG_SUBREDDIT_DESTINATION));
                 destinationText.setHint(R.string.hint_subreddit);
                 destinationText.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
                 titleText.setHint(R.string.hint_title);
@@ -216,16 +200,10 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 break;
         }
 
-        if (getActivity().getActionBar() == null) {
-            ViewStub vs = (ViewStub) v.findViewById(R.id.button_bar_stub);
-            View buttonBar = vs.inflate();
-            ok = buttonBar.findViewById(R.id.ok);
-            ok.setOnClickListener(this);
-            cancel = buttonBar.findViewById(R.id.cancel);
-            cancel.setOnClickListener(this);
-
-            // Don't enable OK until the accounts are loaded.
-            ok.setEnabled(false);
+        if (!TextUtils.isEmpty(titleText.getText())) {
+            textText.requestFocus();
+        } else if (!TextUtils.isEmpty(destinationText.getText())) {
+            titleText.requestFocus();
         }
 
         return v;
@@ -245,9 +223,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         boolean hasAccounts = result.accountNames.length > 0;
         accountSpinner.setEnabled(hasAccounts);
-        if (ok != null) {
-            ok.setEnabled(hasAccounts);
-        }
+        // if (ok != null) {
+        // ok.setEnabled(hasAccounts);
+        // }
 
         adapter.clear();
         if (hasAccounts) {
@@ -290,18 +268,17 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         }
     }
 
-    public void onClick(View v) {
-        if (v == ok) {
+    public void onOkClicked(int id) {
+        if (getArguments().getInt(ARG_ID) == id) {
             handleSubmit();
-        } else if (v == cancel && listener != null) {
-            listener.onComposeFormCancelled();
         }
     }
 
     private boolean handleSubmit() {
         // CommentActions don't have a choice of destination or title.
-        int composition = getArguments().getInt(ARG_COMPOSITION);
-        if (composition == COMPOSITION_SUBMISSION || composition == COMPOSITION_MESSAGE) {
+        int composition = getArguments().getInt(ARG_TYPE);
+        if (composition == ComposeActivity.TYPE_POST
+                || composition == ComposeActivity.TYPE_MESSAGE) {
             if (TextUtils.isEmpty(destinationText.getText())) {
                 destinationText.setError(getString(R.string.error_blank_field));
                 return true;

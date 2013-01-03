@@ -326,9 +326,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
         int count = getListView().getCheckedItemCount();
         mode.setTitle(getResources().getQuantityString(R.plurals.comments, count, count));
 
-        menu.findItem(R.id.menu_reply).setVisible(isReplyItemVisible());
+        menu.findItem(R.id.menu_new_comment).setVisible(isReplyItemVisible());
         menu.findItem(R.id.menu_delete).setVisible(isDeleteItemVisible());
-        menu.findItem(R.id.menu_new_message).setVisible(isNewMessageItemVisible());
         menu.findItem(R.id.menu_copy_url).setVisible(isCopyUrlItemVisible());
         return true;
     }
@@ -391,14 +390,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return true;
     }
 
-    private boolean isNewMessageItemVisible() {
-        // You need an account to compose a message.
-        if (!AccountUtils.isAccount(adapter.getAccountName())) {
-            return false;
-        }
-        return getListView().getCheckedItemCount() == 1;
-    }
-
     private boolean isCopyUrlItemVisible() {
         return getListView().getCheckedItemCount() == 1;
     }
@@ -409,17 +400,14 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_reply:
-                return handleReply(mode);
+            case R.id.menu_new_comment:
+                return handleNewComment(mode);
 
             case R.id.menu_delete:
                 return handleDelete(mode);
 
             case R.id.menu_view_profile:
                 return handleViewProfile(mode);
-
-            case R.id.menu_new_message:
-                return handleNewMessage(mode);
 
             case R.id.menu_copy_url:
                 return handleCopyUrl(mode);
@@ -429,7 +417,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
     }
 
-    private boolean handleReply(ActionMode mode) {
+    private boolean handleNewComment(ActionMode mode) {
         int position = getFirstCheckedPosition();
         if (position != -1) {
             long parentId = adapter.getLong(0, CommentAdapter.INDEX_ID);
@@ -451,8 +439,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
             args.putInt(EXTRA_SEQUENCE, sequence);
             args.putLong(EXTRA_SESSION_ID, sessionId);
 
-            MenuHelper.startComposeActivity(getActivity(),
-                    ComposeActivity.COMPOSITION_COMMENT_REPLY, replyAuthor, null, args);
+            String title = String.format("Re: %s", getLabel(position));
+            MenuHelper.startNewCommentActivity(getActivity(), replyAuthor, title, args);
         }
         mode.finish();
         return true;
@@ -499,15 +487,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
     private boolean handleViewProfile(ActionMode mode) {
         String user = adapter.getString(getFirstCheckedPosition(), CommentAdapter.INDEX_AUTHOR);
         MenuHelper.startProfileActivity(getActivity(), user, -1);
-        mode.finish();
-        return true;
-    }
-
-    private boolean handleNewMessage(ActionMode mode) {
-        int position = getFirstCheckedPosition();
-        String user = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
-        MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.COMPOSITION_MESSAGE, user, getLabel(position), null);
         mode.finish();
         return true;
     }

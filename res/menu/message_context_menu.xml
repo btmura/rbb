@@ -17,9 +17,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_reply"
+        android:id="@+id/menu_new_comment"
         android:icon="@drawable/ic_action_edit"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_reply"/>
+        android:title="@string/menu_new_comment"/>
 
 </menu>

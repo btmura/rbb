@@ -27,14 +27,15 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_save"/>
     <item
+        android:id="@+id/menu_new_comment"
+        android:icon="@drawable/ic_action_edit"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_new_comment"/>
+    <item
         android:id="@+id/menu_copy_url"
         android:showAsAction="ifRoom"
         android:title="@string/menu_copy_url"/>
     <!-- Convenience actions in the overflow menu. -->
-    <item
-        android:id="@+id/menu_new_message"
-        android:showAsAction="never"
-        android:title="@string/menu_new_message"/>
     <item
         android:id="@+id/menu_view_profile"
         android:showAsAction="never"

@@ -318,7 +318,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
         boolean hasAccount = AccountUtils.isAccount(adapter.getAccountName());
         mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
 
-        menu.findItem(R.id.menu_new_message).setVisible(hasAccount && count == 1);
         menu.findItem(R.id.menu_view_profile).setVisible(count == 1);
         menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
 
@@ -341,10 +340,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_new_message:
-                handleNewMessage(mode);
-                return true;
-
             case R.id.menu_saved:
                 handleSaved(mode, SaveActions.ACTION_UNSAVE);
                 return true;
@@ -368,15 +363,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
             default:
                 return false;
         }
-    }
-
-    private void handleNewMessage(ActionMode mode) {
-        int position = getFirstCheckedPosition();
-        String user = adapter.getAuthor(position);
-        String title = adapter.getTitle(position);
-        MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.COMPOSITION_MESSAGE, user, title, null);
-        mode.finish();
     }
 
     private void handleSaved(ActionMode mode, int action) {

@@ -73,6 +73,10 @@
         <activity
             android:name=".app.ComposeActivity"
             android:theme="@android:style/Theme.Holo.DialogWhenLarge" >
+        </activity>
+        <activity
+            android:name="com.btmura.android.reddit.app.ComposeActivity"
+            android:theme="@android:style/Theme.Holo.DialogWhenLarge" >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 

@@ -34,9 +34,14 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <!-- TODO: remove this style since it's not used anymore. -->
     <style name="PagerTitleStrip">
         <item name="android:background">#666666</item>
         <item name="android:textAppearance">@android:style/TextAppearance.Holo.Inverse</item>
+    </style>
+
+    <style name="PagerTabStrip">
+        <item name="android:textAppearance">@android:style/TextAppearance.Holo.Widget.ActionBar.Menu</item>
     </style>
 
     <style name="SlimProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">

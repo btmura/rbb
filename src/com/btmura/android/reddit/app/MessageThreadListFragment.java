@@ -128,22 +128,22 @@ public class MessageThreadListFragment extends ThingProviderListFragment {
     public boolean onContextItemSelected(MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
-            case R.id.menu_reply:
-                return handleReply(info);
+            case R.id.menu_new_comment:
+                return handleNewComment(info);
 
             default:
                 return false;
         }
     }
 
-    private boolean handleReply(AdapterContextMenuInfo info) {
+    private boolean handleNewComment(AdapterContextMenuInfo info) {
         String user = adapter.getUser(info.position);
         Bundle extras = new Bundle(3);
         extras.putString(EXTRA_PARENT_THING_ID, adapter.getThingId());
         extras.putLong(EXTRA_SESSION_ID, adapter.getSessionId());
         extras.putString(EXTRA_THING_ID, adapter.getThingId(info.position));
-        MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.COMPOSITION_MESSAGE_REPLY, user, null, extras);
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_REPLY_TYPE_SET,
+                user, null, extras);
         return true;
     }
 

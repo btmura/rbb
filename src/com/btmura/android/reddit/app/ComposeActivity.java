@@ -16,13 +16,21 @@
 
 package com.btmura.android.reddit.app;
 
+import java.util.ArrayList;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.PagerTabStrip;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewStub;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
@@ -32,39 +40,63 @@ import com.btmura.android.reddit.app.ComposeFragment.OnComposeListener;
 import com.btmura.android.reddit.app.SubmitLinkFragment.OnSubmitLinkListener;
 import com.btmura.android.reddit.provider.Provider;
 
-/**
- * {@link Activity} that displays a form for composing submissions and messages
- * and subsequently processing them.
- */
-public class ComposeActivity extends Activity implements OnComposeFormListener,
-        OnCaptchaGuessListener, OnComposeListener, OnSubmitLinkListener {
-
-    /** Charsequence extra for the activity's title */
-    static final String EXTRA_DESTINATION = "destination";
-
-    /** Optional string extra specifying the title. */
-    static final String EXTRA_TITLE = Intent.EXTRA_SUBJECT;
-
-    /** Optional string extra specifying the text. */
-    static final String EXTRA_TEXT = Intent.EXTRA_TEXT;
-
-    /** Integer extra indicating the type of composition. */
-    static final String EXTRA_COMPOSITION = "composition";
-
-    /** Bundle of extras to pass through. */
-    static final String EXTRA_EXTRAS = "extras";
+public class ComposeActivity extends Activity implements OnPageChangeListener, OnClickListener,
+        OnComposeFormListener, OnCaptchaGuessListener, OnSubmitLinkListener, OnComposeListener {
 
     /** Type of composition when submitting a link or text. */
-    static final int COMPOSITION_SUBMISSION = ComposeFormFragment.COMPOSITION_SUBMISSION;
+    public static final int TYPE_POST = 0;
 
     /** Type of composition when crafting a new message. */
-    static final int COMPOSITION_MESSAGE = ComposeFormFragment.COMPOSITION_MESSAGE;
+    public static final int TYPE_MESSAGE = 1;
 
     /** Type of composition when replying to some comment. */
-    static final int COMPOSITION_COMMENT_REPLY = ComposeFormFragment.COMPOSITION_COMMENT_REPLY;
+    public static final int TYPE_COMMENT_REPLY = 2;
 
     /** Type of composition when replying to some message. */
-    static final int COMPOSITION_MESSAGE_REPLY = ComposeFormFragment.COMPOSITION_MESSAGE_REPLY;
+    public static final int TYPE_MESSAGE_REPLY = 3;
+
+    /** Default set of types supported when sharing something. */
+    public static final int[] DEFAULT_TYPE_SET = {
+            TYPE_POST,
+            TYPE_MESSAGE,
+    };
+
+    /** Set of types when sending a message to somebody. */
+    public static final int[] MESSAGE_TYPE_SET = {
+            TYPE_MESSAGE,
+    };
+
+    /** Set of types when replying to a comment. */
+    public static final int[] COMMENT_REPLY_TYPE_SET = {
+            TYPE_COMMENT_REPLY,
+            TYPE_MESSAGE,
+    };
+
+    /** Set of types when replying in a message thread. */
+    public static final int[] MESSAGE_REPLY_TYPE_SET = {
+            TYPE_MESSAGE_REPLY,
+    };
+
+    /** Array of ints specifying what types to show we can compose. */
+    public static final String EXTRA_TYPES = "types";
+
+    /** Optional string extra to specify the subreddit of a post. */
+    public static final String EXTRA_SUBREDDIT_DESTINATION = "subredditDestination";
+
+    /** Optional string extra to specify the destination of a message. */
+    public static final String EXTRA_MESSAGE_DESTINATION = "messageDestination";
+
+    /** Optional string extra to specify the title of a post or message. */
+    public static final String EXTRA_TITLE = Intent.EXTRA_SUBJECT;
+
+    /** Optional string extra to specify the text of a post or message. */
+    public static final String EXTRA_TEXT = Intent.EXTRA_TEXT;
+
+    /** Bundle of extras to pass through. */
+    public static final String EXTRA_EXTRAS = "extras";
+
+    // Internal extras used by the activity to pass extras to the captcha
+    // fragment and back without storing member data in this activity.
 
     /** String extra with account name from compose dialog. */
     private static final String EXTRA_COMPOSE_ACCOUNT_NAME = "accountName";
@@ -81,82 +113,186 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
     /** Boolean extra indicating whether the text is a link. */
     private static final String EXTRA_COMPOSE_IS_LINK = "isLink";
 
+    interface OnComposeActivityListener {
+        void onOkClicked(int id);
+    }
+
+    private final ArrayList<OnComposeActivityListener> listeners =
+            new ArrayList<OnComposeActivityListener>(2);
+
+    /** ViewPager that holds the pages to compose different things. */
+    private ViewPager pager;
+
+    /** Adapter of the ViewPager used to swipe between screens. */
+    private ComposePagerAdapter adapter;
+
+    /** Ok button visible when this form is a dialog. */
+    private View ok;
+
+    /** Cancel button visible when this form is a dialog. */
+    private View cancel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.compose);
-        setupActionBar();
-        setupFragments(savedInstanceState);
+        setupViews();
     }
 
-    private void setupActionBar() {
-        setTitle(getComposeTitle());
-
+    private void setupViews() {
         // No action bar will be available on large devices.
         ActionBar bar = getActionBar();
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
         }
+
+        int[] types = getIntent().getIntArrayExtra(EXTRA_TYPES);
+        if (types == null) {
+            types = DEFAULT_TYPE_SET;
+        }
+
+        adapter = new ComposePagerAdapter(this, getFragmentManager(), types,
+                getIntent().getStringExtra(EXTRA_SUBREDDIT_DESTINATION),
+                getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION),
+                getIntent().getStringExtra(EXTRA_TITLE),
+                getIntent().getStringExtra(EXTRA_TEXT));
+
+        pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(adapter);
+        pager.setOnPageChangeListener(this);
+        onPageSelected(0);
+
+        PagerTabStrip pagerStrip = (PagerTabStrip) findViewById(R.id.pager_strip);
+        pagerStrip.setTabIndicatorColorResource(android.R.color.holo_blue_light);
+        pagerStrip.setVisibility(types.length > 1 ? View.VISIBLE : View.GONE);
+
+        if (getActionBar() == null) {
+            ViewStub vs = (ViewStub) findViewById(R.id.button_bar_stub);
+            View buttonBar = vs.inflate();
+            ok = buttonBar.findViewById(R.id.ok);
+            ok.setOnClickListener(this);
+            cancel = buttonBar.findViewById(R.id.cancel);
+            cancel.setOnClickListener(this);
+        }
     }
 
-    private String getComposeTitle() {
-        switch (getIntent().getIntExtra(EXTRA_COMPOSITION, -1)) {
-            case COMPOSITION_MESSAGE:
-                return getString(R.string.label_new_message);
+    public void onPageSelected(int position) {
+        setTitle(getTitle(position));
+    }
 
-            case COMPOSITION_COMMENT_REPLY:
-            case COMPOSITION_MESSAGE_REPLY:
-                return getString(R.string.label_reply,
-                        getIntent().getStringExtra(EXTRA_COMPOSE_DESTINATION));
+    private String getTitle(int position) {
+        switch (adapter.getType(position)) {
+            case ComposeActivity.TYPE_POST:
+                return getString(R.string.compose_title_post);
+
+            case ComposeActivity.TYPE_MESSAGE:
+                return getString(R.string.compose_title_message);
+
+            case ComposeActivity.TYPE_COMMENT_REPLY:
+            case ComposeActivity.TYPE_MESSAGE_REPLY:
+                return getString(R.string.compose_title_reply,
+                        getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION));
 
             default:
-                return getString(R.string.label_new_post);
+                throw new IllegalArgumentException();
         }
     }
 
-    private void setupFragments(Bundle savedInstanceState) {
-        // Fragments will be restored on config changes.
-        if (savedInstanceState != null) {
-            return;
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    public void onPageScrollStateChanged(int state) {
+    }
+
+    public void onClick(View v) {
+        if (v == ok) {
+            int size = listeners.size();
+            for (int i = 0; i < size; i++) {
+                listeners.get(i).onOkClicked(pager.getCurrentItem());
+            }
+        } else if (v == cancel) {
+            finish();
         }
+    }
 
-        int composition = getIntent().getIntExtra(EXTRA_COMPOSITION, -1);
-        String destination = getIntent().getStringExtra(EXTRA_COMPOSE_DESTINATION);
-        String title = getIntent().getStringExtra(EXTRA_TITLE);
-        String text = getIntent().getStringExtra(EXTRA_TEXT);
-        Fragment frag = ComposeFormFragment.newInstance(composition, destination, title, text);
-
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.compose_form_container, frag);
-        ft.commit();
+    public void addOnComposeActivityListener(OnComposeActivityListener listener) {
+        listeners.add(listener);
     }
 
     public void onComposeForm(String accountName, String destination, String title, String text,
             boolean isLink) {
-        switch (getComposition()) {
-            case COMPOSITION_COMMENT_REPLY:
-                handleCommentReply(accountName, text);
-                return;
-
-            case COMPOSITION_MESSAGE_REPLY:
-                handleMessageReply(accountName, text);
-                return;
-
-            default:
+        // TODO: Don't reply on the current page.
+        switch (getCurrentType()) {
+            case TYPE_POST:
+            case TYPE_MESSAGE:
                 // Bundle up extras from the form to pass through the captcha
                 // fragment and then back to callbacks in this activity.
-                Bundle extras = new Bundle(4);
+                Bundle extras = new Bundle(5);
                 extras.putString(EXTRA_COMPOSE_ACCOUNT_NAME, accountName);
                 extras.putString(EXTRA_COMPOSE_DESTINATION, destination);
                 extras.putString(EXTRA_COMPOSE_TITLE, title);
                 extras.putString(EXTRA_COMPOSE_TEXT, text);
                 extras.putBoolean(EXTRA_COMPOSE_IS_LINK, isLink);
                 CaptchaFragment.newInstance(extras).show(getFragmentManager(), CaptchaFragment.TAG);
+                break;
+
+            case TYPE_COMMENT_REPLY:
+                handleCommentReply(accountName, text);
+                break;
+
+            case TYPE_MESSAGE_REPLY:
+                handleMessageReply(accountName, text);
+                break;
         }
     }
 
-    public void onComposeFormCancelled() {
+    public void onCaptchaGuess(String id, String guess, Bundle extras) {
+        String accountName = extras.getString(EXTRA_COMPOSE_ACCOUNT_NAME);
+        String destination = extras.getString(EXTRA_COMPOSE_DESTINATION);
+        String title = extras.getString(EXTRA_COMPOSE_TITLE);
+        String text = extras.getString(EXTRA_COMPOSE_TEXT);
+        boolean isLink = extras.getBoolean(EXTRA_COMPOSE_IS_LINK);
+
+        // TODO: Don't reply on the current page.
+        switch (getCurrentType()) {
+            case TYPE_POST:
+                Fragment frag = SubmitLinkFragment.newInstance(accountName,
+                        destination, title, text, isLink, id, guess);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.add(frag, SubmitLinkFragment.TAG);
+                ft.commit();
+                break;
+
+            case TYPE_MESSAGE:
+                frag = ComposeFragment.newInstance(accountName,
+                        destination, title, text, id, guess);
+                ft = getFragmentManager().beginTransaction();
+                ft.add(frag, ComposeFragment.TAG);
+                ft.commit();
+                break;
+        }
+    }
+
+    // TODO: Do we need these?
+    public void onCaptchaCancelled() {
+    }
+
+    // TODO: Rename these to something more specific.
+    public void onSubmitLink(String name, String url) {
+        Toast.makeText(getApplicationContext(), url, Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    // TODO: Do we need these?
+    public void onSubmitLinkCancelled() {
+    }
+
+    // TODO: Rename these to something more specific.
+    public void onCompose() {
+    }
+
+    // TODO: Do we need these?
+    public void onComposeCancelled() {
     }
 
     private void handleCommentReply(String accountName, String body) {
@@ -182,50 +318,6 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
         finish();
     }
 
-    public void onCaptchaGuess(String id, String guess, Bundle extras) {
-        String accountName = extras.getString(EXTRA_COMPOSE_ACCOUNT_NAME);
-        String destination = extras.getString(EXTRA_COMPOSE_DESTINATION);
-        String title = extras.getString(EXTRA_COMPOSE_TITLE);
-        String text = extras.getString(EXTRA_COMPOSE_TEXT);
-        boolean isLink = extras.getBoolean(EXTRA_COMPOSE_IS_LINK);
-
-        switch (getComposition()) {
-            case COMPOSITION_MESSAGE:
-                Fragment frag = ComposeFragment.newInstance(accountName, destination, title, text,
-                        id, guess);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(frag, ComposeFragment.TAG);
-                ft.commit();
-                break;
-
-            default:
-                frag = SubmitLinkFragment.newInstance(accountName, destination, title, text,
-                        isLink, id, guess);
-                ft = getFragmentManager().beginTransaction();
-                ft.add(frag, SubmitLinkFragment.TAG);
-                ft.commit();
-                break;
-        }
-    }
-
-    public void onCaptchaCancelled() {
-    }
-
-    public void onCompose() {
-        finish();
-    }
-
-    public void onComposeCancelled() {
-    }
-
-    public void onSubmitLink(String name, String url) {
-        Toast.makeText(getApplicationContext(), url, Toast.LENGTH_SHORT).show();
-        finish();
-    }
-
-    public void onSubmitLinkCancelled() {
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -238,7 +330,7 @@ public class ComposeActivity extends Activity implements OnComposeFormListener,
         }
     }
 
-    private int getComposition() {
-        return getIntent().getIntExtra(EXTRA_COMPOSITION, -1);
+    private int getCurrentType() {
+        return adapter.getType(pager.getCurrentItem());
     }
 }
