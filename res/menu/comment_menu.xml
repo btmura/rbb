@@ -17,13 +17,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
 
-    <!-- Ignore usability warning since we want Share to be shown no matter what. -->
     <item
         android:id="@+id/menu_comment_share"
         android:actionProviderClass="android.widget.ShareActionProvider"
-        android:showAsAction="always"
-        android:title="@string/menu_share"
-        tools:ignore="AlwaysShowAction"/>
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_share"/>
     <item
         android:id="@+id/menu_link"
         android:icon="@drawable/ic_action_link"
