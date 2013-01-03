@@ -43,6 +43,7 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.text.InputFilters;
+import com.btmura.android.reddit.util.StringUtils;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
 /**
@@ -167,7 +168,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         int type = getArguments().getInt(ARG_TYPE);
 
         // Set the title for all types.
-        String title = getArguments().getString(ARG_TITLE);
+        String title = StringUtils.ellipsize(getArguments().getString(ARG_TITLE), 35);
         // TODO: Trim title if it's too long.
         switch (type) {
             case ComposeActivity.TYPE_POST:
