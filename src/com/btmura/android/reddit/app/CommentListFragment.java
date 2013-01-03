@@ -51,15 +51,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     public static final String TAG = "CommentListFragment";
 
-    public static final String EXTRA_PARENT_ID = "parentId";
-    public static final String EXTRA_PARENT_NUM_COMMENTS = "parentNumComments";
-    public static final String EXTRA_PARENT_THING_ID = "parentThingId";
-    public static final String EXTRA_REPLY_AUTHOR = "replyAuthor";
-    public static final String EXTRA_REPLY_THING_ID = "replyThingId";
-    public static final String EXTRA_NESTING = "nesting";
-    public static final String EXTRA_SEQUENCE = "sequence";
-    public static final String EXTRA_SESSION_ID = "sessionId";
-
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_ID = "thingId";
     private static final String ARG_LINK_ID = "linkId";
@@ -435,24 +426,26 @@ public class CommentListFragment extends ThingProviderListFragment implements
         long parentId = adapter.getLong(0, CommentAdapter.INDEX_ID);
         int parentNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
         String parentThingId = adapter.getThingId();
-        String replyToAuthor = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
-        String replyToThingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
-        int nesting = CommentLogic.getInsertNesting(this, position);
-        int sequence = CommentLogic.getInsertSequence(this, position);
         long sessionId = adapter.getSessionId();
 
+        String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
+        String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
+
+        int nesting = CommentLogic.getInsertNesting(this, position);
+        int sequence = CommentLogic.getInsertSequence(this, position);
+
         Bundle args = new Bundle(8);
-        args.putLong(EXTRA_PARENT_ID, parentId);
-        args.putInt(EXTRA_PARENT_NUM_COMMENTS, parentNumComments);
-        args.putString(EXTRA_PARENT_THING_ID, parentThingId);
-        args.putString(EXTRA_REPLY_AUTHOR, replyToAuthor);
-        args.putString(EXTRA_REPLY_THING_ID, replyToThingId);
-        args.putInt(EXTRA_NESTING, nesting);
-        args.putInt(EXTRA_SEQUENCE, sequence);
-        args.putLong(EXTRA_SESSION_ID, sessionId);
+        args.putLong(ComposeActivity.EXTRA_COMMENT_PARENT_ID, parentId);
+        args.putInt(ComposeActivity.EXTRA_COMMENT_PARENT_NUM_COMMENTS, parentNumComments);
+        args.putString(ComposeActivity.EXTRA_COMMENT_PARENT_THING_ID, parentThingId);
+        args.putString(ComposeActivity.EXTRA_COMMENT_AUTHOR, author);
+        args.putString(ComposeActivity.EXTRA_COMMENT_THING_ID, thingId);
+        args.putInt(ComposeActivity.EXTRA_COMMENT_NESTING, nesting);
+        args.putInt(ComposeActivity.EXTRA_COMMENT_SEQUENCE, sequence);
+        args.putLong(ComposeActivity.EXTRA_COMMENT_SESSION_ID, sessionId);
 
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMMENT_REPLY_TYPE_SET,
-                null, replyToAuthor, getLabel(position), args);
+                null, author, getLabel(position), args);
     }
 
     private int getFirstCheckedPosition() {

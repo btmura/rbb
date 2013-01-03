@@ -99,12 +99,22 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     /** Bundle of extras to pass through. */
     public static final String EXTRA_EXTRAS = "extras";
 
-    // The following extras are for commenting on something from the thing list.
-    // In other words when not viewing something directly.
+    // The following extras should be passed for COMMENT_REPLY.
 
+    public static final String EXTRA_COMMENT_PARENT_ID = "parentId";
+    public static final String EXTRA_COMMENT_PARENT_NUM_COMMENTS = "parentNumComments";
+    public static final String EXTRA_COMMENT_PARENT_THING_ID = "parentThingId";
+    public static final String EXTRA_COMMENT_AUTHOR = "author";
     public static final String EXTRA_COMMENT_THING_ID = "thingId";
+    public static final String EXTRA_COMMENT_NESTING = "nesting";
+    public static final String EXTRA_COMMENT_SEQUENCE = "sequence";
+    public static final String EXTRA_COMMENT_SESSION_ID = "sessionId";
 
-    public static final String EXTRA_COMMENT_NUM_COMMENTS = "numComments";
+    // The following extras should be passed for MESSAGE_REPLY.
+
+    public static final String EXTRA_MESSAGE_PARENT_THING_ID = "parentThingId";
+    public static final String EXTRA_MESSAGE_SESSION_ID = "sessionId";
+    public static final String EXTRA_MESSAGE_THING_ID = "thingId";
 
     // Internal extras used by the activity to pass extras to the captcha
     // fragment and back without storing member data in this activity.
@@ -311,13 +321,13 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
 
     private void handleCommentReply(String accountName, String body) {
         Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
-        long parentId = extras.getLong(CommentListFragment.EXTRA_PARENT_ID);
-        int parentNumComments = extras.getInt(CommentListFragment.EXTRA_PARENT_NUM_COMMENTS);
-        String parentThingId = extras.getString(CommentListFragment.EXTRA_PARENT_THING_ID);
-        String replyThingId = extras.getString(CommentListFragment.EXTRA_REPLY_THING_ID);
-        int nesting = extras.getInt(CommentListFragment.EXTRA_NESTING);
-        int sequence = extras.getInt(CommentListFragment.EXTRA_SEQUENCE);
-        long sessionId = extras.getLong(CommentListFragment.EXTRA_SESSION_ID, -1);
+        long parentId = extras.getLong(EXTRA_COMMENT_PARENT_ID);
+        int parentNumComments = extras.getInt(EXTRA_COMMENT_PARENT_NUM_COMMENTS);
+        String parentThingId = extras.getString(EXTRA_COMMENT_PARENT_THING_ID);
+        String replyThingId = extras.getString(EXTRA_COMMENT_THING_ID);
+        int nesting = extras.getInt(EXTRA_COMMENT_NESTING);
+        int sequence = extras.getInt(EXTRA_COMMENT_SEQUENCE);
+        long sessionId = extras.getLong(EXTRA_COMMENT_SESSION_ID, -1);
         Provider.commentReplyAsync(this, parentId, parentNumComments, parentThingId, replyThingId,
                 accountName, body, nesting, sequence, sessionId);
         finish();
@@ -325,9 +335,9 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
 
     private void handleMessageReply(String accountName, String body) {
         Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
-        String parentThingId = extras.getString(MessageThreadListFragment.EXTRA_PARENT_THING_ID);
-        long sessionId = extras.getLong(MessageThreadListFragment.EXTRA_SESSION_ID);
-        String thingId = extras.getString(MessageThreadListFragment.EXTRA_THING_ID);
+        String parentThingId = extras.getString(EXTRA_MESSAGE_PARENT_THING_ID);
+        long sessionId = extras.getLong(EXTRA_MESSAGE_SESSION_ID);
+        String thingId = extras.getString(EXTRA_MESSAGE_THING_ID);
         Provider.insertMessageReplyAsync(this, accountName, body, parentThingId, sessionId, thingId);
         finish();
     }

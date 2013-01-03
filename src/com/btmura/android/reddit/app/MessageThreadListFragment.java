@@ -46,10 +46,6 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
 
     private static final String STATE_SESSION_ID = "sessionId";
 
-    public static final String EXTRA_PARENT_THING_ID = "parentThingId";
-    public static final String EXTRA_SESSION_ID = "sessionId";
-    public static final String EXTRA_THING_ID = "thingId";
-
     private MessageThreadAdapter adapter;
 
     public static MessageThreadListFragment newInstance(String accountName, String thingId) {
@@ -155,10 +151,11 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         int position = getFirstCheckedPosition();
 
         String user = adapter.getUser(position);
+
         Bundle extras = new Bundle(3);
-        extras.putString(EXTRA_PARENT_THING_ID, adapter.getThingId());
-        extras.putLong(EXTRA_SESSION_ID, adapter.getSessionId());
-        extras.putString(EXTRA_THING_ID, adapter.getThingId(position));
+        extras.putString(ComposeActivity.EXTRA_MESSAGE_PARENT_THING_ID, adapter.getThingId());
+        extras.putLong(ComposeActivity.EXTRA_MESSAGE_SESSION_ID, adapter.getSessionId());
+        extras.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, adapter.getThingId(position));
 
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_REPLY_TYPE_SET,
                 null, user, null, extras);
