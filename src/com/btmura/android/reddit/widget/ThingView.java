@@ -193,7 +193,9 @@ public class ThingView extends CustomView implements OnGestureListener {
             statusText.append(r.getQuantityString(R.plurals.points, score, score)).append("  ");
         }
 
-        statusText.append(RelativeTime.format(c, nowTimeMs, createdUtc)).append("  ");
+        if (createdUtc != 0) {
+            statusText.append(RelativeTime.format(c, nowTimeMs, createdUtc)).append("  ");
+        }
 
         if (showNumComments) {
             statusText.append(r.getQuantityString(R.plurals.comments, numComments, numComments));
