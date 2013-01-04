@@ -62,12 +62,12 @@ public class Provider {
             Things.COLUMN_NESTING,
     };
 
-    public static void insertInBackground(Context context, String accountName,
+    public static void addSubredditAsync(Context context, String accountName,
             String... subreddits) {
         modifyInBackground(context, accountName, subreddits, true);
     }
 
-    public static void deleteInBackground(Context context, String accountName,
+    public static void removeSubredditAsync(Context context, String accountName,
             String... subreddits) {
         modifyInBackground(context, accountName, subreddits, false);
     }

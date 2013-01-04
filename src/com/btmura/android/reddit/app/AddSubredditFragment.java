@@ -143,7 +143,7 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
         }
 
         String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
-        Provider.insertInBackground(getActivity(), accountName, subreddit);
+        Provider.addSubredditAsync(getActivity(), accountName, subreddit);
         dismiss();
     }
 }

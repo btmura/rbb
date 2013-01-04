@@ -317,7 +317,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     private boolean handleAdd(ActionMode mode) {
         String accountName = getSelectedAccountName();
         String[] subreddits = getCheckedSubreddits();
-        Provider.insertInBackground(getActivity(), accountName, subreddits);
+        Provider.addSubredditAsync(getActivity(), accountName, subreddits);
         mode.finish();
         return true;
     }
@@ -325,7 +325,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     private boolean handleDelete(ActionMode mode) {
         String accountName = getSelectedAccountName();
         String[] subreddits = getCheckedSubreddits();
-        Provider.deleteInBackground(getActivity(), accountName, subreddits);
+        Provider.removeSubredditAsync(getActivity(), accountName, subreddits);
         mode.finish();
         return true;
     }
