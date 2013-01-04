@@ -31,14 +31,14 @@ public class SaveActions implements BaseColumns {
     /** Account that either saved on unsaved this thing. */
     public static final String COLUMN_ACCOUNT = "account";
 
-    /** String ID of the thing that the user wants to save or unsave. */
-    public static final String COLUMN_THING_ID = "thingId";
-
     /** Integer column indicating action whether to save or unsave. */
     public static final String COLUMN_ACTION = "action";
 
     /** Unused long column for expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
+
+    /** String ID of the thing that the user wants to save or unsave. */
+    public static final String COLUMN_THING_ID = "thingId";
 
     /** Action column value to save something. */
     public static final int ACTION_SAVE = 1;
