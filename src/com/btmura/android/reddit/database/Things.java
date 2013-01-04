@@ -38,7 +38,10 @@ public class Things implements BaseColumns {
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_LINK_ID = "linkId";
     public static final String COLUMN_LINK_TITLE = "linkTitle";
+
+    // TODO: Split apart subreddit search back to its own table.
     public static final String COLUMN_NAME = "name";
+
     public static final String COLUMN_NESTING = "nesting";
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_OVER_18 = "over18";

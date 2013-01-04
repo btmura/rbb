@@ -257,7 +257,7 @@ public class ThingAdapter extends LoaderAdapter {
         String title = cursor.getString(THING_TITLE);
         int ups = cursor.getInt(THING_UPS);
 
-        // CommentActions don't have a score so calculate our own.
+        // Comments don't have a score so calculate our own.
         if (kind == Kinds.KIND_COMMENT) {
             score = ups - downs;
         }

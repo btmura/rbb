@@ -20,8 +20,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
- * {@link SaveActions} is a table that stores pending saves and unsaves before they
- * are synced back the server.
+ * {@link SaveActions} is a table that stores pending saves and unsaves before
+ * they are synced back the server.
  */
 public class SaveActions implements BaseColumns {
 
@@ -40,6 +40,48 @@ public class SaveActions implements BaseColumns {
     /** String ID of the thing that the user wants to save or unsave. */
     public static final String COLUMN_THING_ID = "thingId";
 
+    // The following columns allow us to show pending saves to the user before
+    // we have had a chance to sync them back to the server.
+
+    /** String author name of the saved item. */
+    public static final String COLUMN_AUTHOR = Things.COLUMN_AUTHOR;
+
+    /** Long UTC creation time of the saved item. */
+    public static final String COLUMN_CREATED_UTC = Things.COLUMN_CREATED_UTC;
+
+    /** String domain of the thing. */
+    public static final String COLUMN_DOMAIN = "domain";
+
+    /** Integer number of downvotes. */
+    public static final String COLUMN_DOWNS = "downs";
+
+    /** Integer number of comments. */
+    public static final String COLUMN_NUM_COMMENTS = Things.COLUMN_NUM_COMMENTS;
+
+    /** Boolean indicating whether this is for over 18 folks. */
+    public static final String COLUMN_OVER_18 = Things.COLUMN_OVER_18;
+
+    /** String URL on reddit of the thing. */
+    public static final String COLUMN_PERMA_LINK = Things.COLUMN_PERMA_LINK;
+
+    /** Integer score of the thing. */
+    public static final String COLUMN_SCORE = Things.COLUMN_SCORE;
+
+    /** String subreddit name of the thing. */
+    public static final String COLUMN_SUBREDDIT = Things.COLUMN_SUBREDDIT;
+
+    /** String title of this thing. */
+    public static final String COLUMN_TITLE = "title";
+
+    /** String URL of the thumbnail. */
+    public static final String COLUMN_THUMBNAIL_URL = Things.COLUMN_THUMBNAIL_URL;
+
+    /** Integer amount of upvotes for this thing. */
+    public static final String COLUMN_UPS = "ups";
+
+    /** String URL of the thing. */
+    public static final String COLUMN_URL = Things.COLUMN_URL;
+
     /** Action column value to save something. */
     public static final int ACTION_SAVE = 1;
 
@@ -55,6 +97,22 @@ public class SaveActions implements BaseColumns {
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
                 + COLUMN_ACTION + " INTEGER NOT NULL, "
-                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0)");
+                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
+
+                // The following columns are for storing enough information so
+                // we can show the user we're going to save their item.
+                + COLUMN_AUTHOR + " TEXT, "
+                + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
+                + COLUMN_DOMAIN + " TEXT, "
+                + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
+                + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
+                + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
+                + COLUMN_PERMA_LINK + " TEXT, "
+                + COLUMN_SCORE + " INTEGER DEFAULT 0, "
+                + COLUMN_SUBREDDIT + " TEXT, "
+                + COLUMN_TITLE + " TEXT, "
+                + COLUMN_THUMBNAIL_URL + " TEXT, "
+                + COLUMN_UPS + " INTEGER DEFAULT 0, "
+                + COLUMN_URL + " TEXT)");
     }
 }
