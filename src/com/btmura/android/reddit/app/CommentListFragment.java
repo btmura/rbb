@@ -442,8 +442,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
                 mode.finish();
                 return true;
 
-            case R.id.menu_view_profile:
-                handleViewProfile();
+            case R.id.menu_author:
+                handleAuthor();
                 mode.finish();
                 return true;
 
@@ -521,7 +521,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
     }
 
-    private void handleViewProfile() {
+    private void handleAuthor() {
         String user = adapter.getString(getFirstCheckedPosition(), CommentAdapter.INDEX_AUTHOR);
         MenuHelper.startProfileActivity(getActivity(), user, -1);
     }

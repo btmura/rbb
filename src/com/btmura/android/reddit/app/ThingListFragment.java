@@ -319,7 +319,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
         mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
         menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
-        menu.findItem(R.id.menu_view_profile).setVisible(count == 1);
+        menu.findItem(R.id.menu_author).setVisible(count == 1);
 
         boolean hasSubreddit = count == 1
                 && Subreddits.hasSidebar(adapter.getSubreddit(position));
@@ -362,13 +362,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
                 mode.finish();
                 return true;
 
-            case R.id.menu_new_message:
-                handleNewMessage();
-                mode.finish();
-                return true;
-
-            case R.id.menu_view_profile:
-                handleViewProfile();
+            case R.id.menu_author:
+                handleAuthor();
                 mode.finish();
                 return true;
 
@@ -407,15 +402,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         MenuHelper.setClipAndToast(getActivity(), title, url);
     }
 
-    private void handleNewMessage() {
-        int position = getFirstCheckedPosition();
-        String user = adapter.getAuthor(position);
-        String title = adapter.getTitle(position);
-        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_TYPE_SET,
-                null, user, title, null);
-    }
-
-    private void handleViewProfile() {
+    private void handleAuthor() {
         String user = adapter.getAuthor(getFirstCheckedPosition());
         MenuHelper.startProfileActivity(getActivity(), user, -1);
     }

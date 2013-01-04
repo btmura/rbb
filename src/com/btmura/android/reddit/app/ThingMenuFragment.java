@@ -57,7 +57,7 @@ public class ThingMenuFragment extends Fragment {
 
     private MenuItem savedItem;
     private MenuItem unsavedItem;
-    private MenuItem viewProfileItem;
+    private MenuItem authorItem;
     private MenuItem aboutSubredditItem;
     private MenuItem addSubredditItem;
     private MenuItem viewSubredditItem;
@@ -99,7 +99,7 @@ public class ThingMenuFragment extends Fragment {
         inflater.inflate(R.menu.thing_menu_menu, menu);
         savedItem = menu.findItem(R.id.menu_saved);
         unsavedItem = menu.findItem(R.id.menu_unsaved);
-        viewProfileItem = menu.findItem(R.id.menu_view_profile);
+        authorItem = menu.findItem(R.id.menu_author);
         subredditItem = menu.findItem(R.id.menu_subreddit);
         aboutSubredditItem = menu.findItem(R.id.menu_about_thing_subreddit);
         addSubredditItem = menu.findItem(R.id.menu_add_thing_subreddit);
@@ -121,8 +121,8 @@ public class ThingMenuFragment extends Fragment {
             unsavedItem.setVisible(saveable && !saved);
         }
 
-        if (viewProfileItem != null) {
-            viewProfileItem.setVisible(!TextUtils.isEmpty(getAuthor()));
+        if (authorItem != null) {
+            authorItem.setVisible(!TextUtils.isEmpty(getAuthor()));
         }
 
         boolean hasSubreddit = Subreddits.hasSidebar(getSubreddit());
@@ -155,8 +155,8 @@ public class ThingMenuFragment extends Fragment {
                 handleUnsaved();
                 return true;
 
-            case R.id.menu_view_profile:
-                handleViewProfile();
+            case R.id.menu_author:
+                handleAuthor();
                 return true;
 
             case R.id.menu_about_thing_subreddit:
@@ -188,7 +188,7 @@ public class ThingMenuFragment extends Fragment {
         }
     }
 
-    private void handleViewProfile() {
+    private void handleAuthor() {
         MenuHelper.startProfileActivity(getActivity(), getAuthor(), -1);
     }
 
