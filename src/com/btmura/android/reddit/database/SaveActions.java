@@ -90,29 +90,30 @@ public class SaveActions implements BaseColumns {
 
     /** Creates the savedThings table. */
     static void createTable(SQLiteDatabase db) {
-        // TODO: Add unique constraint for account + thingId
-        // TODO: Add index for account + thingId ?
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY, "
-                + COLUMN_ACCOUNT + " TEXT NOT NULL, "
-                + COLUMN_THING_ID + " TEXT NOT NULL, "
-                + COLUMN_ACTION + " INTEGER NOT NULL, "
+                + _ID + " INTEGER PRIMARY KEY,"
+                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
+                + COLUMN_THING_ID + " TEXT NOT NULL,"
+                + COLUMN_ACTION + " INTEGER NOT NULL,"
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
 
                 // The following columns are for storing enough information so
                 // we can show the user we're going to save their item.
-                + COLUMN_AUTHOR + " TEXT, "
-                + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
-                + COLUMN_DOMAIN + " TEXT, "
-                + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
-                + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
-                + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
-                + COLUMN_PERMA_LINK + " TEXT, "
-                + COLUMN_SCORE + " INTEGER DEFAULT 0, "
-                + COLUMN_SUBREDDIT + " TEXT, "
-                + COLUMN_TITLE + " TEXT, "
-                + COLUMN_THUMBNAIL_URL + " TEXT, "
-                + COLUMN_UPS + " INTEGER DEFAULT 0, "
-                + COLUMN_URL + " TEXT)");
+                + COLUMN_AUTHOR + " TEXT,"
+                + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
+                + COLUMN_DOMAIN + " TEXT,"
+                + COLUMN_DOWNS + " INTEGER DEFAULT 0,"
+                + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0,"
+                + COLUMN_OVER_18 + " INTEGER DEFAULT 0,"
+                + COLUMN_PERMA_LINK + " TEXT,"
+                + COLUMN_SCORE + " INTEGER DEFAULT 0,"
+                + COLUMN_SUBREDDIT + " TEXT,"
+                + COLUMN_TITLE + " TEXT,"
+                + COLUMN_THUMBNAIL_URL + " TEXT,"
+                + COLUMN_UPS + " INTEGER DEFAULT 0,"
+                + COLUMN_URL + " TEXT,"
+
+                // Add constraint to make it easy to replace actions.
+                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
     }
 }

@@ -303,15 +303,13 @@ public class Provider {
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(2);
-                ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVE_ACTIONS_URI)
-                        .withSelection(SharedColumns.SELECT_BY_THING_ID, Array.of(thingId))
-                        .build());
+                        new ArrayList<ContentProviderOperation>(1);
 
                 Uri uri = ThingProvider.SAVE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
                         .build();
+
                 ops.add(ContentProviderOperation.newInsert(uri)
                         .withValue(SaveActions.COLUMN_ACCOUNT, accountName)
                         .withValue(SaveActions.COLUMN_THING_ID, thingId)
