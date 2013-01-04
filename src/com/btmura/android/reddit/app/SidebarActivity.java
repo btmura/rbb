@@ -64,7 +64,7 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
             cancel.setOnClickListener(this);
         }
 
-        String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
+        String subreddit = getSubreddit();
         setTitle(Subreddits.getTitle(this, subreddit));
 
         String[] subreddits = subreddit.split("\\+");
@@ -112,6 +112,10 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
     }
 
     private void handleAddSubreddit() {
-        AddSubredditFragment.newInstance().show(getFragmentManager(), null);
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
+    }
+
+    private String getSubreddit() {
+        return getIntent().getStringExtra(EXTRA_SUBREDDIT);
     }
 }

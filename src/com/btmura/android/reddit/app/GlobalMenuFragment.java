@@ -129,7 +129,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     }
 
     private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager());
+        MenuHelper.showAddSubredditDialog(getFragmentManager(),
+                subredditNameHolder.getSubredditName());
     }
 
     public void handleSearch() {

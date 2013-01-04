@@ -190,7 +190,7 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager());
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
     private void handleViewSubreddit() {

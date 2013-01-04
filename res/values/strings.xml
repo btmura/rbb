@@ -69,7 +69,7 @@
     <string name="login_error">There was a problem: %1$s</string>
     <string name="login_importing_subreddits">Importing subreddits…</string>
     <string name="login_logging_in">Logging in…</string>
-    <string name="menu_about_subreddit">About subreddit</string>
+    <string name="menu_about">About</string>
     <string name="menu_accounts">Accounts</string>
     <string name="menu_add">Add</string>
     <string name="menu_add_account">Add account</string>
@@ -89,9 +89,11 @@
     <string name="menu_save">Save</string>
     <string name="menu_search">Search</string>
     <string name="menu_share">Share</string>
+    <string name="menu_subreddit">Subreddit</string>
     <string name="menu_submit">Submit</string>
     <string name="menu_unread_messages">Unread messages</string>
     <string name="menu_unsave">Unsave</string>
+    <string name="menu_view">View</string>
     <string name="menu_view_profile">View profile</string>
     <string name="menu_view_subreddit">View subreddit</string>
     <string name="nsfw">"NSFW"</string>

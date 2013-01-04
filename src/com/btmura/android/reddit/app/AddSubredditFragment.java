@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
@@ -43,7 +42,8 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
 
     public static final String TAG = "AddSubredditFragment";
 
-    private SubredditNameHolder subredditNameHolder;
+    private static final String ARG_SUBREDDIT = "subreddit";
+
     private AccountNameAdapter adapter;
     private boolean restoringState;
     private Spinner accountSpinner;
@@ -51,16 +51,13 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
     private Button cancel;
     private Button ok;
 
-    public static AddSubredditFragment newInstance() {
-        return new AddSubredditFragment();
-    }
+    public static AddSubredditFragment newInstance(String subreddit) {
+        Bundle args = new Bundle(1);
+        args.putString(ARG_SUBREDDIT, subreddit);
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof SubredditNameHolder) {
-            subredditNameHolder = (SubredditNameHolder) activity;
-        }
+        AddSubredditFragment frag = new AddSubredditFragment();
+        frag.setArguments(args);
+        return frag;
     }
 
     @Override
@@ -81,7 +78,7 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
         accountSpinner.setEnabled(false);
         accountSpinner.setAdapter(adapter);
 
-        String name = subredditNameHolder.getSubredditName();
+        String name = getArguments().getString(ARG_SUBREDDIT);
         if (!Subreddits.hasSidebar(name)) {
             name = null;
         }

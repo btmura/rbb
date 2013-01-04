@@ -364,6 +364,16 @@ public class ThingListFragment extends ThingProviderListFragment implements
                 mode.finish();
                 return true;
 
+            case R.id.menu_about_subreddit:
+                handleAboutSubreddit();
+                mode.finish();
+                return true;
+
+            case R.id.menu_add_subreddit:
+                handleAddSubreddit();
+                mode.finish();
+                return true;
+
             case R.id.menu_view_subreddit:
                 handleViewSubreddit();
                 mode.finish();
@@ -400,6 +410,16 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private void handleViewProfile() {
         String user = adapter.getAuthor(getFirstCheckedPosition());
         MenuHelper.startProfileActivity(getActivity(), user, -1);
+    }
+
+    private void handleAboutSubreddit() {
+        String subreddit = adapter.getSubreddit(getFirstCheckedPosition());
+        MenuHelper.startSidebarActivity(getActivity(), subreddit);
+    }
+
+    private void handleAddSubreddit() {
+        String subreddit = adapter.getSubreddit(getFirstCheckedPosition());
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), subreddit);
     }
 
     private void handleViewSubreddit() {

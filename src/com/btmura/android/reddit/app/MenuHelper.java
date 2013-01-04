@@ -47,8 +47,8 @@ public class MenuHelper {
         provider.setShareIntent(intent);
     }
 
-    public static void showAddSubredditDialog(FragmentManager fm) {
-        AddSubredditFragment.newInstance().show(fm, AddSubredditFragment.TAG);
+    public static void showAddSubredditDialog(FragmentManager fm, String subreddit) {
+        AddSubredditFragment.newInstance(subreddit).show(fm, AddSubredditFragment.TAG);
     }
 
     public static void startComposeActivity(Context context, int[] types,
