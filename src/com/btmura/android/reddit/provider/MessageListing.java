@@ -58,7 +58,8 @@ class MessageListing extends JsonParser implements Listing {
     private static final int MERGE_INDEX_THING_ID = 3;
     private static final int MERGE_INDEX_TEXT = 4;
 
-    private static final String MERGE_SELECTION = MessageActions.COLUMN_PARENT_THING_ID + "=?";
+    private static final String MERGE_SELECTION = MessageActions.COLUMN_ACCOUNT + "=? AND "
+            + MessageActions.COLUMN_PARENT_THING_ID + "=?";
 
     private static final String MERGE_SORT = MessageActions._ID + " ASC";
 
@@ -235,7 +236,7 @@ class MessageListing extends JsonParser implements Listing {
     private void mergeActions() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(MessageActions.TABLE_NAME, MERGE_PROJECTION,
-                MERGE_SELECTION, Array.of(thingId), null, null, MERGE_SORT);
+                MERGE_SELECTION, Array.of(accountName, thingId), null, null, MERGE_SORT);
         try {
             while (c.moveToNext()) {
                 String actionAccountName = c.getString(MERGE_INDEX_ACCOUNT);
