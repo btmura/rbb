@@ -39,7 +39,7 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
@@ -317,7 +317,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     private boolean handleAdd(ActionMode mode) {
         String accountName = getSelectedAccountName();
         String[] subreddits = getCheckedSubreddits();
-        SubredditProvider.insertInBackground(getActivity(), accountName, subreddits);
+        Provider.insertInBackground(getActivity(), accountName, subreddits);
         mode.finish();
         return true;
     }
@@ -325,7 +325,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     private boolean handleDelete(ActionMode mode) {
         String accountName = getSelectedAccountName();
         String[] subreddits = getCheckedSubreddits();
-        SubredditProvider.deleteInBackground(getActivity(), accountName, subreddits);
+        Provider.deleteInBackground(getActivity(), accountName, subreddits);
         mode.finish();
         return true;
     }

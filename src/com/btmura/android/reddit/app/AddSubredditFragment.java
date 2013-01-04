@@ -33,7 +33,7 @@ import android.widget.Spinner;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
@@ -143,7 +143,7 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
         }
 
         String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
-        SubredditProvider.insertInBackground(getActivity(), accountName, subreddit);
+        Provider.insertInBackground(getActivity(), accountName, subreddit);
         dismiss();
     }
 }
