@@ -151,6 +151,7 @@ public class CommentAdapter extends LoaderAdapter {
         int kind = cursor.getInt(INDEX_KIND);
         int nesting = cursor.getInt(INDEX_NESTING);
         int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
+        boolean over18 = cursor.getInt(INDEX_OVER_18) != 0;
         String title = cursor.getString(INDEX_TITLE);
         String thingId = cursor.getString(INDEX_THING_ID);
         int ups = cursor.getInt(INDEX_UPS);
@@ -170,7 +171,7 @@ public class CommentAdapter extends LoaderAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setData(accountName, author, body, createdUtc, null, downs, expanded, kind, likes, null,
-                nesting, nowTimeMs, numComments, false, null, score, null, 0, thingId, null, title,
+                nesting, nowTimeMs, numComments, over18, null, score, null, 0, thingId, null, title,
                 ups);
         tv.setOnVoteListener(listener);
     }
