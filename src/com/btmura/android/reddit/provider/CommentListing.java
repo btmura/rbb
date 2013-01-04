@@ -290,8 +290,10 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         int delta = 0;
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+
         Cursor c = db.query(CommentActions.TABLE_NAME, PROJECTION,
-                CommentActions.SELECT_BY_PARENT_THING_ID, Array.of(thingId),
+                CommentActions.SELECT_BY_ACCOUNT_AND_PARENT_THING_ID,
+                Array.of(accountName, thingId),
                 null, null, CommentActions.SORT_BY_ID);
         try {
             while (c.moveToNext()) {
@@ -362,7 +364,12 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             ContentValues v = values.get(i);
             String id = v.getAsString(Things.COLUMN_THING_ID);
             if (deleteId.equals(id)) {
-                if (CommentLogic.hasChildren(this, i)) {
+                // Mark the header comment or comment with children as
+                // [deleted] instead of completely removing it.
+                if (i == 0) {
+                    v.put(Things.COLUMN_AUTHOR, Things.DELETED);
+                    return false;
+                } else if (CommentLogic.hasChildren(this, i)) {
                     v.put(Things.COLUMN_AUTHOR, Things.DELETED);
                     v.put(Things.COLUMN_BODY, Things.DELETED);
                     return false;

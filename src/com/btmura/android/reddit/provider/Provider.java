@@ -44,6 +44,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
+import com.btmura.android.reddit.util.Objects;
 
 /**
  * Provider is a collection of static methods that do user actions which
@@ -187,7 +188,7 @@ public class Provider {
             final String accountName,
             final long headerId,
             final int headerNumComments,
-            final String parentThingId,
+            final String parentId,
             final long[] ids,
             final String[] thingIds,
             final boolean[] hasChildren) {
@@ -201,14 +202,26 @@ public class Provider {
                 int numDeletes = 0;
                 for (int i = 0; i < count; i++) {
                     Uri uri = ThingProvider.THINGS_URI.buildUpon()
-                            .appendQueryParameter(ThingProvider.PARAM_COMMENT_DELETE, TRUE)
+                            .appendQueryParameter(ThingProvider.PARAM_NOTIFY, TRUE)
                             .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
+                            .appendQueryParameter(ThingProvider.PARAM_COMMENT_DELETE, TRUE)
                             .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
-                            .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID,
-                                    parentThingId)
+                            .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID, parentId)
                             .appendQueryParameter(ThingProvider.PARAM_THING_ID, thingIds[i])
                             .build();
-                    if (hasChildren[i]) {
+                    // Make sure to sync this logic is duplicated in
+                    // CommentListing#deleteThing.
+                    if (Objects.equals(parentId, thingIds[i])) {
+                        // Update things viewed by this account as [deleted]
+                        // even in the thing list.
+                        // TODO: Make ThingProvider also show [deleted] in thing
+                        // list on refresh.
+                        ops.add(ContentProviderOperation.newUpdate(uri)
+                                .withValue(Things.COLUMN_AUTHOR, Things.DELETED)
+                                .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
+                                        Array.of(accountName, parentId))
+                                .build());
+                    } else if (hasChildren[i]) {
                         ops.add(ContentProviderOperation.newUpdate(uri)
                                 .withValue(Things.COLUMN_AUTHOR, Things.DELETED)
                                 .withValue(Things.COLUMN_BODY, Things.DELETED)

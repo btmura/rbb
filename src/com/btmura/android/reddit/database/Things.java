@@ -73,7 +73,7 @@ public class Things implements BaseColumns {
     public static final String DELETED = "[deleted]";
 
     public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
-            COLUMN_ACCOUNT + " = ? AND " + COLUMN_THING_ID + " = ?";
+            COLUMN_ACCOUNT + "=? AND " + COLUMN_THING_ID + "=?";
 
     public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
 
