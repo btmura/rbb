@@ -337,9 +337,10 @@ public class ThingView extends CustomView implements OnGestureListener {
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         // Move from left to right one more time.
-        int x = PADDING;
+        int x = PADDING + (PADDING * nesting);
         if (drawVotingArrows) {
             x += VotingArrows.getWidth(drawVotingArrows);
+            x += PADDING;
         }
         if (bodyLayout != null) {
             bodyBounds.left = x;
@@ -352,6 +353,10 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         if (linkTitleLayout != null) {
             y += linkTitleLayout.getHeight() + ELEMENT_PADDING;
+        }
+
+        if (titleLayout != null) {
+            y += titleLayout.getHeight() + ELEMENT_PADDING;
         }
 
         if (isTopStatus() && statusLayout != null) {
