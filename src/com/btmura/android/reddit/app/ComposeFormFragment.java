@@ -169,7 +169,6 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
         // Set the title for all types.
         String title = StringUtils.ellipsize(getArguments().getString(ARG_TITLE), 35);
-        // TODO: Trim title if it's too long.
         switch (type) {
             case ComposeActivity.TYPE_POST:
                 titleText.setText(title);

@@ -27,8 +27,6 @@ import android.os.Bundle;
 
 class UriHelper {
 
-    // TODO: Add missing support for /r/pics/top or /u/btmura/overview.
-
     private static final String[] AUTHORITIES = {
             "www.reddit.com",
             "reddit.com",
