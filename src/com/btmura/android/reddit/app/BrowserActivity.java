@@ -274,7 +274,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         boolean showThingless = isSinglePane || !hasThing();
         menu.setGroupVisible(R.id.thingless, showThingless);
         if (showThingless) {
-            boolean hasAccount = AccountUtils.isAccount(getAccountName());
+            boolean hasAccount = adapter != null
+                    && AccountUtils.isAccount(adapter.getAccountName());
             if (postItem != null) {
                 postItem.setVisible(hasAccount);
             }
@@ -298,7 +299,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     void refreshUnreadMessagesMenuItem() {
         if (unreadItem != null) {
-            unreadItem.setVisible(mailAdapter.hasMessages(getAccountName()));
+            unreadItem.setVisible(adapter != null
+                    && mailAdapter != null
+                    && mailAdapter.hasMessages(adapter.getAccountName()));
         }
     }
 
