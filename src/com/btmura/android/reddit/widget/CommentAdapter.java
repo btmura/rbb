@@ -170,6 +170,7 @@ public class CommentAdapter extends LoaderAdapter {
         }
 
         ThingView tv = (ThingView) view;
+        tv.setType(ThingView.TYPE_COMMENT_LIST);
         tv.setData(accountName, author, body, createdUtc, null, downs, expanded, kind, likes, null,
                 nesting, nowTimeMs, numComments, over18, null, score, null, 0, thingId, null, title,
                 ups);

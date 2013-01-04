@@ -36,6 +36,12 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     public static final String TAG = "ThingView";
 
+    /** Type of ThingView used when listing a subreddit's things. */
+    public static final int TYPE_THING_LIST = 0;
+
+    /** Type of ThingView used when listing the comments on some thing. */
+    public static final int TYPE_COMMENT_LIST = 1;
+
     // TODO: Fix thread safety issue here.
     private static final Formatter FORMATTER = new Formatter();
 
@@ -62,6 +68,11 @@ public class ThingView extends CustomView implements OnGestureListener {
     private StyleSpan italicSpan;
     private final SpannableStringBuilder longDetailsText = new SpannableStringBuilder();
     private String shortDetailsText;
+
+    private int linkTitlePaint;
+    private int titlePaint;
+    private int bodyPaint;
+    private int statusPaint;
 
     private Layout linkTitleLayout;
     private Layout titleLayout;
@@ -91,6 +102,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private void init(Context context) {
         VotingArrows.init(context);
         Thumbnail.init(context);
+        setType(TYPE_THING_LIST);
     }
 
     public void setOnVoteListener(OnVoteListener listener) {
@@ -100,6 +112,24 @@ public class ThingView extends CustomView implements OnGestureListener {
     public void setThumbnailBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
         invalidate();
+    }
+
+    public void setType(int type) {
+        switch (type) {
+            case TYPE_COMMENT_LIST:
+                linkTitlePaint = THING_LINK_TITLE; // No style yet.
+                titlePaint = COMMENT_TITLE;
+                bodyPaint = COMMENT_BODY;
+                statusPaint = COMMENT_STATUS;
+                break;
+
+            default:
+                linkTitlePaint = THING_LINK_TITLE;
+                titlePaint = THING_TITLE;
+                bodyPaint = THING_BODY;
+                statusPaint = THING_STATUS;
+                break;
+        }
     }
 
     public void setData(String accountName,
@@ -389,20 +419,20 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     private Layout createLinkTitleLayout(int width) {
         CharSequence truncated = TextUtils.ellipsize(linkTitle,
-                TEXT_PAINTS[THING_LINK_TITLE], width, TruncateAt.END);
-        return makeStaticLayout(THING_LINK_TITLE, truncated, width);
+                TEXT_PAINTS[linkTitlePaint], width, TruncateAt.END);
+        return makeStaticLayout(linkTitlePaint, truncated, width);
     }
 
     private Layout createTitleLayout(int width) {
-        return makeStaticLayout(THING_TITLE, title, width);
+        return makeStaticLayout(titlePaint, title, width);
     }
 
     private Layout createBodyLayout(int width) {
-        return makeStaticLayout(THING_BODY, bodyText, width);
+        return makeStaticLayout(bodyPaint, bodyText, width);
     }
 
     private Layout createStatusLayout(int width) {
-        return makeBoringLayout(THING_STATUS, statusText, width, Alignment.ALIGN_NORMAL);
+        return makeBoringLayout(statusPaint, statusText, width, Alignment.ALIGN_NORMAL);
     }
 
     private static Layout makeStaticLayout(int paint, CharSequence text, int width) {
