@@ -320,47 +320,47 @@ public class Provider {
             final String url) {
 
         final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Boolean doInBackground(Void... voidRay) {
                 Uri uri = ThingProvider.SAVE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
                         .build();
 
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(1);
-                ops.add(ContentProviderOperation.newInsert(uri)
-                        .withValue(SaveActions.COLUMN_ACCOUNT, accountName)
-                        .withValue(SaveActions.COLUMN_THING_ID, thingId)
-                        .withValue(SaveActions.COLUMN_ACTION, SaveActions.ACTION_SAVE)
+                ContentValues v = new ContentValues(17);
+                v.put(SaveActions.COLUMN_ACCOUNT, accountName);
+                v.put(SaveActions.COLUMN_THING_ID, thingId);
+                v.put(SaveActions.COLUMN_ACTION, SaveActions.ACTION_SAVE);
 
-                        // Following values are for faking a thing.
-                        .withValue(SaveActions.COLUMN_AUTHOR, author)
-                        .withValue(SaveActions.COLUMN_CREATED_UTC, createdUtc)
-                        .withValue(SaveActions.COLUMN_DOMAIN, domain)
-                        .withValue(SaveActions.COLUMN_DOWNS, downs)
-                        .withValue(SaveActions.COLUMN_LIKES, likes)
-                        .withValue(SaveActions.COLUMN_NUM_COMMENTS, numComments)
-                        .withValue(SaveActions.COLUMN_OVER_18, over18)
-                        .withValue(SaveActions.COLUMN_PERMA_LINK, permaLink)
-                        .withValue(SaveActions.COLUMN_SCORE, score)
-                        .withValue(SaveActions.COLUMN_SUBREDDIT, subreddit)
-                        .withValue(SaveActions.COLUMN_TITLE, title)
-                        .withValue(SaveActions.COLUMN_THUMBNAIL_URL, thumbnailUrl)
-                        .withValue(SaveActions.COLUMN_UPS, ups)
-                        .withValue(SaveActions.COLUMN_URL, url)
+                // Following values are for faking a thing.
+                v.put(SaveActions.COLUMN_AUTHOR, author);
+                v.put(SaveActions.COLUMN_CREATED_UTC, createdUtc);
+                v.put(SaveActions.COLUMN_DOMAIN, domain);
+                v.put(SaveActions.COLUMN_DOWNS, downs);
+                v.put(SaveActions.COLUMN_LIKES, likes);
+                v.put(SaveActions.COLUMN_NUM_COMMENTS, numComments);
+                v.put(SaveActions.COLUMN_OVER_18, over18);
+                v.put(SaveActions.COLUMN_PERMA_LINK, permaLink);
+                v.put(SaveActions.COLUMN_SCORE, score);
+                v.put(SaveActions.COLUMN_SUBREDDIT, subreddit);
+                v.put(SaveActions.COLUMN_TITLE, title);
+                v.put(SaveActions.COLUMN_THUMBNAIL_URL, thumbnailUrl);
+                v.put(SaveActions.COLUMN_UPS, ups);
+                v.put(SaveActions.COLUMN_URL, url);
 
-                        .build());
-
-                applyOps(appContext, ThingProvider.AUTHORITY, ops);
-                return null;
+                ContentResolver cr = appContext.getContentResolver();
+                return cr.insert(uri, v) != null;
             }
 
             @Override
-            protected void onPostExecute(Void result) {
-                String msg = appContext.getResources()
-                        .getQuantityString(R.plurals.things_saved, 1, 1);
+            protected void onPostExecute(Boolean success) {
+                String msg;
+                if (success) {
+                    msg = appContext.getResources().getQuantityString(R.plurals.things_saved, 1, 1);
+                } else {
+                    msg = appContext.getString(R.string.error);
+                }
                 Toast.makeText(appContext, msg, Toast.LENGTH_SHORT).show();
             }
         }.execute();
@@ -369,30 +369,32 @@ public class Provider {
     public static void unsaveAsync(final Context context, final String accountName,
             final String thingId) {
         final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Void doInBackground(Void... drVoidberg) {
+            protected Boolean doInBackground(Void... drVoidberg) {
                 Uri uri = ThingProvider.SAVE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
                         .build();
 
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(1);
-                ops.add(ContentProviderOperation.newInsert(uri)
-                        .withValue(SaveActions.COLUMN_ACCOUNT, accountName)
-                        .withValue(SaveActions.COLUMN_THING_ID, thingId)
-                        .withValue(SaveActions.COLUMN_ACTION, SaveActions.ACTION_UNSAVE)
-                        .build());
+                ContentValues v = new ContentValues(3);
+                v.put(SaveActions.COLUMN_ACCOUNT, accountName);
+                v.put(SaveActions.COLUMN_THING_ID, thingId);
+                v.put(SaveActions.COLUMN_ACTION, SaveActions.ACTION_UNSAVE);
 
-                applyOps(appContext, ThingProvider.AUTHORITY, ops);
-                return null;
+                ContentResolver cr = appContext.getContentResolver();
+                return cr.insert(uri, v) != null;
             }
 
             @Override
-            protected void onPostExecute(Void result) {
-                String msg = appContext.getResources()
-                        .getQuantityString(R.plurals.things_unsaved, 1, 1);
+            protected void onPostExecute(Boolean result) {
+                String msg;
+                if (result) {
+                    msg = appContext.getResources()
+                            .getQuantityString(R.plurals.things_unsaved, 1, 1);
+                } else {
+                    msg = appContext.getString(R.string.error);
+                }
                 Toast.makeText(appContext, msg, Toast.LENGTH_SHORT).show();
             }
         }.execute();
