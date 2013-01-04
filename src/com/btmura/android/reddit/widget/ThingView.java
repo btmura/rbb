@@ -479,6 +479,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         int action = e.getAction();
         if ((action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
                 && bodyText instanceof Spannable
+                && bodyLayout != null
                 && bodyBounds != null
                 && bodyBounds.contains(e.getX(), e.getY())) {
             float localX = e.getX() - bodyBounds.left;
