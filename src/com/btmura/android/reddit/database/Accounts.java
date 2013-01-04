@@ -24,8 +24,8 @@ import android.provider.BaseColumns;
  */
 public class Accounts implements BaseColumns {
 
-    // Considered using AccountManager#setUserData but comments it is meant to
-    // be used by the account authenticator as a scratch pad.
+    // Considered using AccountManager#setUserData but comments say it is meant
+    // to be used by the account authenticator as a scratch pad.
 
     public static final String TABLE_NAME = "accounts";
 
@@ -44,6 +44,7 @@ public class Accounts implements BaseColumns {
     public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "=?";
 
     static void createTable(SQLiteDatabase db) {
+        // Account is a unique column.
         db.execSQL("CREATE TABLE " + TABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACCOUNT + " TEXT NOT NULL UNIQUE,"
