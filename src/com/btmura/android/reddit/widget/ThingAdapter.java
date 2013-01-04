@@ -229,12 +229,13 @@ public class ThingAdapter extends LoaderAdapter {
         String body = cursor.getString(MESSAGE_BODY);
         long createdUtc = cursor.getLong(MESSAGE_CREATED_UTC);
         int kind = cursor.getInt(MESSAGE_KIND);
+        String subject = cursor.getString(MESSAGE_SUBJECT);
         String subreddit = cursor.getString(MESSAGE_SUBREDDIT);
         String thingId = cursor.getString(MESSAGE_THING_ID);
 
         ThingView tv = (ThingView) view;
         tv.setData(accountName, author, body, createdUtc, null, 0, true, kind, 0,
-                null, 0, System.currentTimeMillis(), 0, false, parentSubreddit, 0, subreddit,
+                subject, 0, System.currentTimeMillis(), 0, false, parentSubreddit, 0, subreddit,
                 thingBodyWidth, thingId, null, null, 0);
         tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
         tv.setOnVoteListener(listener);
