@@ -38,7 +38,6 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.SaveActions;
-import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
@@ -402,26 +401,22 @@ public class Provider {
 
     public static void voteAsync(final Context context, final String accountName,
             final String thingId, final int likes) {
-        final Context appContext = context.getApplicationContext();
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(2);
-                ops.add(ContentProviderOperation.newDelete(ThingProvider.VOTE_ACTIONS_URI)
-                        .withSelection(SharedColumns.SELECT_BY_THING_ID, Array.of(thingId))
-                        .build());
-
                 Uri uri = ThingProvider.VOTE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
                         .build();
-                ops.add(ContentProviderOperation.newInsert(uri)
-                        .withValue(VoteActions.COLUMN_ACCOUNT, accountName)
-                        .withValue(VoteActions.COLUMN_THING_ID, thingId)
-                        .withValue(VoteActions.COLUMN_ACTION, likes)
-                        .build());
 
-                applyOps(appContext, ThingProvider.AUTHORITY, ops);
+                ContentValues v = new ContentValues(3);
+                v.put(VoteActions.COLUMN_ACCOUNT, accountName);
+                v.put(VoteActions.COLUMN_THING_ID, thingId);
+                v.put(VoteActions.COLUMN_ACTION, likes);
+
+                // No toast needed, since the vote arrows will reflect success
+                // or not.
+                cr.insert(uri, v);
             }
         });
     }

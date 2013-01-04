@@ -20,8 +20,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
- * {@link VoteActions} is a table that stores pending upvotes and downvotes before
- * they are synced back to the server.
+ * {@link VoteActions} is a table that stores pending upvotes and downvotes
+ * before they are synced back to the server.
  */
 public class VoteActions implements BaseColumns {
 
@@ -50,13 +50,14 @@ public class VoteActions implements BaseColumns {
 
     /** Creates the votes table. */
     static void createTable(SQLiteDatabase db) {
-        // TODO: Add unique constraint for account + thingId
-        // TODO: Add index for account + thingId ?
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_THING_ID + " TEXT NOT NULL, "
                 + COLUMN_ACTION + " INTEGER NOT NULL, "
-                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0)");
+                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
+
+                // Add constraint to make it easy to replace actions.
+                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
     }
 }
