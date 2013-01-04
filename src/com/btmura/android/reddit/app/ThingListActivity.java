@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -62,6 +63,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private String accountName;
     private String subreddit;
     private SharedPreferences prefs;
+    private MenuItem postItem;
     private MenuItem aboutItem;
 
     @Override
@@ -164,6 +166,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.thing_list_menu, menu);
+        postItem = menu.findItem(R.id.menu_new_post);
         aboutItem = menu.findItem(R.id.menu_about_subreddit);
         return true;
     }
@@ -176,6 +179,10 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     private void refreshMenuItems() {
+        if (postItem != null) {
+            postItem.setVisible(AccountUtils.isAccount(accountName));
+        }
+
         if (aboutItem != null) {
             aboutItem.setVisible(Subreddits.hasSidebar(subreddit));
         }
