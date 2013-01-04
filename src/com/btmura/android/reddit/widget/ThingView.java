@@ -134,9 +134,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
 
-        drawVotingArrows = AccountUtils.isAccount(accountName)
-                && kind != Kinds.KIND_MESSAGE
-                && expanded;
+        drawVotingArrows = AccountUtils.isAccount(accountName) && kind != Kinds.KIND_MESSAGE;
         drawScore = drawVotingArrows && kind == Kinds.KIND_LINK;
         if (drawScore) {
             if (scoreBounds == null) {
@@ -296,7 +294,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         detailsWidth = Math.max(0, detailsWidth);
 
         int leftHeight = 0;
-        if (drawVotingArrows) {
+        if (drawVotingArrows && expanded) {
             leftHeight = Math.max(leftHeight, VotingArrows.getHeight(drawVotingArrows, drawScore));
         }
         if (kind == Kinds.KIND_LINK) {
@@ -437,7 +435,9 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         if (drawVotingArrows) {
-            VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes, drawScore, true);
+            if (expanded) {
+                VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes, drawScore, true);
+            }
             c.translate(VotingArrows.getWidth(drawVotingArrows) + PADDING, 0);
         }
 
