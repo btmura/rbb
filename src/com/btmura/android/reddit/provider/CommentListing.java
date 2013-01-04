@@ -139,7 +139,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void onEntityStart(int index) {
-        ContentValues v = new ContentValues(18);
+        ContentValues v = new ContentValues(19);
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_SEQUENCE, index);
         values.add(v);
@@ -159,6 +159,11 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     @Override
     public void onCreatedUtc(JsonReader reader, int index) throws IOException {
         values.get(index).put(Things.COLUMN_CREATED_UTC, reader.nextLong());
+    }
+
+    @Override
+    public void onDomain(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_DOMAIN, reader.nextString());
     }
 
     @Override
@@ -201,6 +206,11 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     }
 
     @Override
+    public void onOver18(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_OVER_18, reader.nextBoolean());
+    }
+
+    @Override
     public void onPermaLink(JsonReader reader, int index) throws IOException {
         values.get(index).put(Things.COLUMN_PERMA_LINK, reader.nextString());
     }
@@ -211,9 +221,20 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     }
 
     @Override
+    public void onScore(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_SCORE, reader.nextInt());
+    }
+
+    @Override
     public void onSelfText(JsonReader reader, int index) throws IOException {
         CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
         values.get(index).put(Things.COLUMN_BODY, body.toString());
+    }
+
+    @Override
+    public void onSubreddit(JsonReader reader, int index) throws IOException {
+        // TODO: Seems like a waste since these are all in the same subreddit.
+        values.get(index).put(Things.COLUMN_SUBREDDIT, reader.nextString());
     }
 
     @Override
@@ -230,6 +251,15 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     @Override
     public void onUrl(JsonReader reader, int index) throws IOException {
         values.get(index).put(Things.COLUMN_URL, reader.nextString());
+    }
+
+    @Override
+    public void onThumbnail(JsonReader reader, int index) throws IOException {
+        // TODO: Remove code duplication with ThingListing.
+        String thumbnail = readTrimmedString(reader, null);
+        if (!TextUtils.isEmpty(thumbnail) && thumbnail.startsWith("http")) {
+            values.get(index).put(Things.COLUMN_THUMBNAIL_URL, thumbnail);
+        }
     }
 
     @Override

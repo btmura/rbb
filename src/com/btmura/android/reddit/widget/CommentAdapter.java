@@ -34,19 +34,24 @@ public class CommentAdapter extends LoaderAdapter {
             Things.COLUMN_AUTHOR,
             Things.COLUMN_BODY,
             Things.COLUMN_CREATED_UTC,
+            Things.COLUMN_DOMAIN,
             Things.COLUMN_DOWNS,
             Things.COLUMN_EXPANDED,
             Things.COLUMN_KIND,
             Things.COLUMN_LIKES,
             Things.COLUMN_NESTING,
             Things.COLUMN_NUM_COMMENTS,
+            Things.COLUMN_OVER_18,
             Things.COLUMN_PERMA_LINK,
             Things.COLUMN_SAVED,
+            Things.COLUMN_SCORE,
             Things.COLUMN_SELF,
             Things.COLUMN_SEQUENCE,
             Things.COLUMN_SESSION_ID,
+            Things.COLUMN_SUBREDDIT,
             Things.COLUMN_TITLE,
             Things.TABLE_NAME + "." + Things.COLUMN_THING_ID,
+            Things.COLUMN_THUMBNAIL_URL,
             Things.COLUMN_UPS,
             Things.COLUMN_URL,
 
@@ -59,25 +64,30 @@ public class CommentAdapter extends LoaderAdapter {
     public static final int INDEX_AUTHOR = 1;
     public static final int INDEX_BODY = 2;
     public static final int INDEX_CREATED_UTC = 3;
-    public static final int INDEX_DOWNS = 4;
-    public static final int INDEX_EXPANDED = 5;
-    public static final int INDEX_KIND = 6;
-    public static final int INDEX_LIKES = 7;
-    public static final int INDEX_NESTING = 8;
-    public static final int INDEX_NUM_COMMENTS = 9;
-    public static final int INDEX_PERMA_LINK = 10;
-    public static final int INDEX_SAVED = 11;
-    public static final int INDEX_SELF = 12;
-    public static final int INDEX_SEQUENCE = 13;
-    public static final int INDEX_SESSION_ID = 14;
-    public static final int INDEX_TITLE = 15;
-    public static final int INDEX_THING_ID = 16;
-    public static final int INDEX_UPS = 17;
-    public static final int INDEX_URL = 18;
+    public static final int INDEX_DOMAIN = 4;
+    public static final int INDEX_DOWNS = 5;
+    public static final int INDEX_EXPANDED = 6;
+    public static final int INDEX_KIND = 7;
+    public static final int INDEX_LIKES = 8;
+    public static final int INDEX_NESTING = 9;
+    public static final int INDEX_NUM_COMMENTS = 10;
+    public static final int INDEX_OVER_18 = 11;
+    public static final int INDEX_PERMA_LINK = 12;
+    public static final int INDEX_SAVED = 13;
+    public static final int INDEX_SCORE = 14;
+    public static final int INDEX_SELF = 15;
+    public static final int INDEX_SEQUENCE = 16;
+    public static final int INDEX_SESSION_ID = 17;
+    public static final int INDEX_SUBREDDIT = 18;
+    public static final int INDEX_TITLE = 19;
+    public static final int INDEX_THING_ID = 20;
+    public static final int INDEX_THUMBNAIL_URL = 21;
+    public static final int INDEX_UPS = 22;
+    public static final int INDEX_URL = 23;
 
     // Following columns are from joined tables at the end.
-    public static final int INDEX_SAVE_ACTION = 19;
-    public static final int INDEX_VOTE = 20;
+    public static final int INDEX_SAVE_ACTION = 24;
+    public static final int INDEX_VOTE = 25;
 
     private final long nowTimeMs = System.currentTimeMillis();
 

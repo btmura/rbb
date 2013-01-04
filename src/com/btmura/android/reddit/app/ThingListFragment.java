@@ -39,7 +39,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
@@ -341,27 +340,33 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_saved:
-                handleSaved(mode, SaveActions.ACTION_UNSAVE);
+                handleSaved();
+                mode.finish();
                 return true;
 
             case R.id.menu_unsaved:
-                handleSaved(mode, SaveActions.ACTION_SAVE);
+                handleUnsaved();
+                mode.finish();
                 return true;
 
             case R.id.menu_copy_url:
-                handleCopyUrl(mode);
+                handleCopyUrl();
+                mode.finish();
                 return true;
 
             case R.id.menu_new_message:
-                handleNewMessage(mode);
+                handleNewMessage();
+                mode.finish();
                 return true;
 
             case R.id.menu_view_profile:
-                handleViewProfile(mode);
+                handleViewProfile();
+                mode.finish();
                 return true;
 
             case R.id.menu_view_subreddit:
-                handleViewSubreddit(mode);
+                handleViewSubreddit();
+                mode.finish();
                 return true;
 
             default:
@@ -369,40 +374,37 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
-    private void handleSaved(ActionMode mode, int action) {
-        String accountName = adapter.getAccountName();
-        String thingId = adapter.getThingId(getFirstCheckedPosition());
-        Provider.saveAsync(getActivity(), accountName, thingId, action);
-        mode.finish();
+    private void handleSaved() {
+        adapter.unsave(getActivity(), getFirstCheckedPosition());
     }
 
-    private void handleCopyUrl(ActionMode mode) {
+    private void handleUnsaved() {
+        adapter.save(getActivity(), getFirstCheckedPosition());
+    }
+
+    private void handleCopyUrl() {
         int position = getFirstCheckedPosition();
         String title = adapter.getTitle(position);
         CharSequence url = adapter.getUrl(position);
         MenuHelper.setClipAndToast(getActivity(), title, url);
-        mode.finish();
     }
 
-    private void handleNewMessage(ActionMode mode) {
+    private void handleNewMessage() {
         int position = getFirstCheckedPosition();
         String user = adapter.getAuthor(position);
         String title = adapter.getTitle(position);
-        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_TYPE_SET, null,
-                user, title, null);
-        mode.finish();
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_TYPE_SET,
+                null, user, title, null);
     }
 
-    private void handleViewProfile(ActionMode mode) {
+    private void handleViewProfile() {
         String user = adapter.getAuthor(getFirstCheckedPosition());
         MenuHelper.startProfileActivity(getActivity(), user, -1);
-        mode.finish();
     }
 
-    private void handleViewSubreddit(ActionMode mode) {
+    private void handleViewSubreddit() {
         String subreddit = adapter.getSubreddit(getFirstCheckedPosition());
         MenuHelper.startSubredditActivity(getActivity(), subreddit);
-        mode.finish();
     }
 
     public void onDestroyActionMode(ActionMode mode) {

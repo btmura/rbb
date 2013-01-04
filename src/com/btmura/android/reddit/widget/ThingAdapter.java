@@ -33,6 +33,7 @@ import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Objects;
 
@@ -356,6 +357,36 @@ public class ThingAdapter extends LoaderAdapter {
         }
 
         return b;
+    }
+
+    public void save(Context context, int position) {
+        if (isMessage()) {
+            throw new IllegalStateException();
+        }
+
+        Provider.saveAsync(context, accountName, getThingId(position),
+                getString(position, THING_AUTHOR),
+                getLong(position, THING_CREATED_UTC),
+                getString(position, THING_DOMAIN),
+                getInt(position, THING_DOWNS),
+                getInt(position, THING_LIKES),
+                getInt(position, THING_NUM_COMMENTS),
+                getBoolean(position, THING_OVER_18),
+                getString(position, THING_PERMA_LINK),
+                getInt(position, THING_SCORE),
+                getString(position, THING_SUBREDDIT),
+                getString(position, THING_TITLE),
+                getString(position, THING_THUMBNAIL_URL),
+                getInt(position, THING_UPS),
+                getString(position, THING_URL));
+    }
+
+    public void unsave(Context context, int position) {
+        if (isMessage()) {
+            throw new IllegalStateException();
+        }
+
+        Provider.unsaveAsync(context, accountName, getThingId(position));
     }
 
     public String getAuthor(int position) {

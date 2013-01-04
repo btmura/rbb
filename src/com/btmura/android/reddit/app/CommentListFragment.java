@@ -41,7 +41,6 @@ import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuEventListenerHol
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
@@ -317,17 +316,29 @@ public class CommentListFragment extends ThingProviderListFragment implements
     }
 
     public void onSavedItemSelected() {
-        save(SaveActions.ACTION_UNSAVE);
+        String accountName = adapter.getAccountName();
+        String thingId = adapter.getThingId();
+        Provider.unsaveAsync(getActivity(), accountName, thingId);
     }
 
     public void onUnsavedItemSelected() {
-        save(SaveActions.ACTION_SAVE);
-    }
-
-    private void save(int action) {
         String accountName = adapter.getAccountName();
         String thingId = adapter.getThingId();
-        Provider.saveAsync(getActivity(), accountName, thingId, action);
+        Provider.saveAsync(getActivity(), accountName, thingId,
+                adapter.getString(0, CommentAdapter.INDEX_AUTHOR),
+                adapter.getLong(0, CommentAdapter.INDEX_CREATED_UTC),
+                adapter.getString(0, CommentAdapter.INDEX_DOMAIN),
+                adapter.getInt(0, CommentAdapter.INDEX_DOWNS),
+                adapter.getInt(0, CommentAdapter.INDEX_LIKES),
+                adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS),
+                adapter.getBoolean(0, CommentAdapter.INDEX_OVER_18),
+                adapter.getString(0, CommentAdapter.INDEX_PERMA_LINK),
+                adapter.getInt(0, CommentAdapter.INDEX_SCORE),
+                adapter.getString(0, CommentAdapter.INDEX_SUBREDDIT),
+                adapter.getString(0, CommentAdapter.INDEX_TITLE),
+                adapter.getString(0, CommentAdapter.INDEX_THUMBNAIL_URL),
+                adapter.getInt(0, CommentAdapter.INDEX_UPS),
+                adapter.getString(0, CommentAdapter.INDEX_URL));
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {

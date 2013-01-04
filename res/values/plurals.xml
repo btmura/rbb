@@ -48,6 +48,14 @@
         <item quantity="one">1 item</item>
         <item quantity="other">%1$,d items</item>
     </plurals>
+    <plurals name="things_saved">
+        <item quantity="one">1 saved</item>
+        <item quantity="other">%1$,d saved</item>
+    </plurals>
+    <plurals name="things_unsaved">
+        <item quantity="one">1 unsaved</item>
+        <item quantity="other">%1$,d unsaved</item>
+    </plurals>
     <plurals name="time_seconds">
         <item quantity="one">1 second ago</item>
         <item quantity="other">%1$,d seconds ago</item>

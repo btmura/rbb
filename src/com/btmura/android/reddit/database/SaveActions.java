@@ -50,10 +50,13 @@ public class SaveActions implements BaseColumns {
     public static final String COLUMN_CREATED_UTC = Things.COLUMN_CREATED_UTC;
 
     /** String domain of the thing. */
-    public static final String COLUMN_DOMAIN = "domain";
+    public static final String COLUMN_DOMAIN = Things.COLUMN_DOMAIN;
 
     /** Integer number of downvotes. */
-    public static final String COLUMN_DOWNS = "downs";
+    public static final String COLUMN_DOWNS = Things.COLUMN_DOWNS;
+
+    /** Integer either -1, 0, 1 to represent if the user liked it. */
+    public static final String COLUMN_LIKES = Things.COLUMN_LIKES;
 
     /** Integer number of comments. */
     public static final String COLUMN_NUM_COMMENTS = Things.COLUMN_NUM_COMMENTS;
@@ -88,6 +91,16 @@ public class SaveActions implements BaseColumns {
     /** Action column value to unsave something. */
     public static final int ACTION_UNSAVE = -1;
 
+    public static final String SELECT_SAVED_AND_UNSAVED_BY_ACCOUNT =
+            COLUMN_ACCOUNT + "=? AND " + COLUMN_ACTION + " IN ("
+                    + ACTION_SAVE + "," + ACTION_UNSAVE + ")";
+
+    public static final String SELECT_UNSAVED_BY_ACCOUNT =
+            COLUMN_ACCOUNT + "=? AND " + COLUMN_ACTION + " IN ("
+                    + ACTION_UNSAVE + ")";
+
+    public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
+
     /** Creates the savedThings table. */
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
@@ -103,6 +116,7 @@ public class SaveActions implements BaseColumns {
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
                 + COLUMN_DOMAIN + " TEXT,"
                 + COLUMN_DOWNS + " INTEGER DEFAULT 0,"
+                + COLUMN_LIKES + " INTEGER DEFAULT 0, "
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0,"
                 + COLUMN_OVER_18 + " INTEGER DEFAULT 0,"
                 + COLUMN_PERMA_LINK + " TEXT,"

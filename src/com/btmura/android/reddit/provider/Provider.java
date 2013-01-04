@@ -28,7 +28,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
@@ -297,28 +299,103 @@ public class Provider {
         });
     }
 
-    public static void saveAsync(final Context context, final String accountName,
-            final String thingId, final int action) {
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            public void run() {
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(1);
+    public static void saveAsync(final Context context,
+            final String accountName,
+            final String thingId,
 
+            // Following parameters are for faking a thing.
+            final String author,
+            final long createdUtc,
+            final String domain,
+            final int downs,
+            final int likes,
+            final int numComments,
+            final boolean over18,
+            final String permaLink,
+            final int score,
+            final String subreddit,
+            final String title,
+            final String thumbnailUrl,
+            final int ups,
+            final String url) {
+
+        final Context appContext = context.getApplicationContext();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
                 Uri uri = ThingProvider.SAVE_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
                         .build();
 
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(1);
                 ops.add(ContentProviderOperation.newInsert(uri)
                         .withValue(SaveActions.COLUMN_ACCOUNT, accountName)
                         .withValue(SaveActions.COLUMN_THING_ID, thingId)
-                        .withValue(SaveActions.COLUMN_ACTION, action)
+                        .withValue(SaveActions.COLUMN_ACTION, SaveActions.ACTION_SAVE)
+
+                        // Following values are for faking a thing.
+                        .withValue(SaveActions.COLUMN_AUTHOR, author)
+                        .withValue(SaveActions.COLUMN_CREATED_UTC, createdUtc)
+                        .withValue(SaveActions.COLUMN_DOMAIN, domain)
+                        .withValue(SaveActions.COLUMN_DOWNS, downs)
+                        .withValue(SaveActions.COLUMN_LIKES, likes)
+                        .withValue(SaveActions.COLUMN_NUM_COMMENTS, numComments)
+                        .withValue(SaveActions.COLUMN_OVER_18, over18)
+                        .withValue(SaveActions.COLUMN_PERMA_LINK, permaLink)
+                        .withValue(SaveActions.COLUMN_SCORE, score)
+                        .withValue(SaveActions.COLUMN_SUBREDDIT, subreddit)
+                        .withValue(SaveActions.COLUMN_TITLE, title)
+                        .withValue(SaveActions.COLUMN_THUMBNAIL_URL, thumbnailUrl)
+                        .withValue(SaveActions.COLUMN_UPS, ups)
+                        .withValue(SaveActions.COLUMN_URL, url)
+
                         .build());
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);
+                return null;
             }
-        });
+
+            @Override
+            protected void onPostExecute(Void result) {
+                String msg = appContext.getResources()
+                        .getQuantityString(R.plurals.things_saved, 1, 1);
+                Toast.makeText(appContext, msg, Toast.LENGTH_SHORT).show();
+            }
+        }.execute();
+    }
+
+    public static void unsaveAsync(final Context context, final String accountName,
+            final String thingId) {
+        final Context appContext = context.getApplicationContext();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... drVoidberg) {
+                Uri uri = ThingProvider.SAVE_ACTIONS_URI.buildUpon()
+                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
+                        .build();
+
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(1);
+                ops.add(ContentProviderOperation.newInsert(uri)
+                        .withValue(SaveActions.COLUMN_ACCOUNT, accountName)
+                        .withValue(SaveActions.COLUMN_THING_ID, thingId)
+                        .withValue(SaveActions.COLUMN_ACTION, SaveActions.ACTION_UNSAVE)
+                        .build());
+
+                applyOps(appContext, ThingProvider.AUTHORITY, ops);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                String msg = appContext.getResources()
+                        .getQuantityString(R.plurals.things_unsaved, 1, 1);
+                Toast.makeText(appContext, msg, Toast.LENGTH_SHORT).show();
+            }
+        }.execute();
     }
 
     public static void voteAsync(final Context context, final String accountName,

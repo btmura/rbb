@@ -25,6 +25,9 @@ import java.util.ArrayList;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.JsonReader;
@@ -33,19 +36,60 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 class ThingListing extends JsonParser implements Listing {
 
     public static final String TAG = "ThingListing";
 
+    private static final String[] SAVE_PROJECTION = {
+            SaveActions._ID,
+            SaveActions.COLUMN_ACTION,
+            SaveActions.COLUMN_AUTHOR,
+            SaveActions.COLUMN_CREATED_UTC,
+            SaveActions.COLUMN_DOMAIN,
+            SaveActions.COLUMN_DOWNS,
+            SaveActions.COLUMN_LIKES,
+            SaveActions.COLUMN_NUM_COMMENTS,
+            SaveActions.COLUMN_OVER_18,
+            SaveActions.COLUMN_PERMA_LINK,
+            SaveActions.COLUMN_SCORE,
+            SaveActions.COLUMN_SUBREDDIT,
+            SaveActions.COLUMN_THING_ID,
+            SaveActions.COLUMN_TITLE,
+            SaveActions.COLUMN_THUMBNAIL_URL,
+            SaveActions.COLUMN_UPS,
+            SaveActions.COLUMN_URL,
+    };
+
+    private static final int SAVE_ACTION = 1;
+    private static final int SAVE_AUTHOR = 2;
+    private static final int SAVE_CREATED_UTC = 3;
+    private static final int SAVE_DOMAIN = 4;
+    private static final int SAVE_DOWNS = 5;
+    private static final int SAVE_LIKES = 6;
+    private static final int SAVE_NUM_COMMENTS = 7;
+    private static final int SAVE_OVER_18 = 8;
+    private static final int SAVE_PERMA_LINK = 9;
+    private static final int SAVE_SCORE = 10;
+    private static final int SAVE_SUBREDDIT = 11;
+    private static final int SAVE_THING_ID = 12;
+    private static final int SAVE_TITLE = 13;
+    private static final int SAVE_THUMBNAIL_URL = 14;
+    private static final int SAVE_UPS = 15;
+    private static final int SAVE_URL = 16;
+
     private final Formatter formatter = new Formatter();
     private final Context context;
+    private final SQLiteOpenHelper dbHelper;
     private final String accountName;
     private final String subreddit;
     private final String query;
@@ -61,26 +105,29 @@ class ThingListing extends JsonParser implements Listing {
     private String resolvedSubreddit;
     private String moreThingId;
 
-    static ThingListing newSearchInstance(Context context, String accountName, String subreddit,
-            String query, String cookie) {
-        return new ThingListing(context, accountName, subreddit, query, null, 0, null, cookie);
+    static ThingListing newSearchInstance(Context context, SQLiteOpenHelper dbHelper,
+            String accountName, String subreddit, String query, String cookie) {
+        return new ThingListing(context, dbHelper, accountName, subreddit, query, null, 0,
+                null, cookie);
     }
 
-    static ThingListing newSubredditInstance(Context context, String accountName, String subreddit,
-            int filter, String more, String cookie) {
-        return new ThingListing(context, accountName, subreddit, null, null, filter, more,
-                cookie);
+    static ThingListing newSubredditInstance(Context context, SQLiteOpenHelper dbHelper,
+            String accountName, String subreddit, int filter, String more, String cookie) {
+        return new ThingListing(context, dbHelper, accountName, subreddit, null, null, filter,
+                more, cookie);
     }
 
-    static ThingListing newUserInstance(Context context, String accountName, String profileUser,
-            int filter, String more, String cookie) {
-        return new ThingListing(context, accountName, null, null, profileUser, filter, more,
-                cookie);
+    static ThingListing newUserInstance(Context context, SQLiteOpenHelper dbHelper,
+            String accountName, String profileUser, int filter, String more, String cookie) {
+        return new ThingListing(context, dbHelper, accountName, null, null, profileUser, filter,
+                more, cookie);
     }
 
-    private ThingListing(Context context, String accountName, String subreddit, String query,
-            String profileUser, int filter, String more, String cookie) {
+    private ThingListing(Context context, SQLiteOpenHelper dbHelper, String accountName,
+            String subreddit, String query, String profileUser, int filter, String more,
+            String cookie) {
         this.context = context;
+        this.dbHelper = dbHelper;
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;
@@ -308,6 +355,10 @@ class ThingListing extends JsonParser implements Listing {
         if (!TextUtils.isEmpty(moreThingId)) {
             values.add(newContentValues(Kinds.KIND_MORE, moreThingId, 0));
         }
+
+        if (!TextUtils.isEmpty(profileUser) && filter == FilterAdapter.PROFILE_SAVED) {
+            mergeSaveActions();
+        }
     }
 
     private ContentValues newContentValues(int kind, String thingId, int extraCapacity) {
@@ -316,5 +367,66 @@ class ThingListing extends JsonParser implements Listing {
         v.put(Things.COLUMN_KIND, kind);
         v.put(Things.COLUMN_THING_ID, thingId);
         return v;
+    }
+
+    private void mergeSaveActions() {
+        // We throw all the saved things on the first page, so don't merge the
+        // saves if we're just scrolling further down.
+        String selection;
+        if (TextUtils.isEmpty(more)) {
+            selection = SaveActions.SELECT_SAVED_AND_UNSAVED_BY_ACCOUNT;
+        } else {
+            selection = SaveActions.SELECT_UNSAVED_BY_ACCOUNT;
+        }
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(SaveActions.TABLE_NAME, SAVE_PROJECTION,
+                selection, Array.of(accountName), null, null, SaveActions.SORT_BY_ID);
+        while (c.moveToNext()) {
+            switch (c.getInt(SAVE_ACTION)) {
+                case SaveActions.ACTION_SAVE:
+                    mergeSave(c);
+                    break;
+
+                case SaveActions.ACTION_UNSAVE:
+                    mergeUnsave(c);
+                    break;
+            }
+        }
+        c.close();
+    }
+
+    private void mergeSave(Cursor c) {
+        ContentValues v = new ContentValues(15);
+        v.put(Things.COLUMN_ACCOUNT, accountName);
+        v.put(Things.COLUMN_AUTHOR, c.getString(SAVE_AUTHOR));
+        v.put(Things.COLUMN_CREATED_UTC, c.getLong(SAVE_CREATED_UTC));
+        v.put(Things.COLUMN_DOMAIN, c.getString(SAVE_DOMAIN));
+        v.put(Things.COLUMN_DOWNS, c.getString(SAVE_DOWNS));
+        v.put(Things.COLUMN_KIND, Kinds.KIND_LINK);
+        v.put(Things.COLUMN_LIKES, c.getInt(SAVE_LIKES));
+        v.put(Things.COLUMN_NUM_COMMENTS, c.getInt(SAVE_NUM_COMMENTS));
+        v.put(Things.COLUMN_OVER_18, c.getInt(SAVE_OVER_18) != 0);
+        v.put(Things.COLUMN_PERMA_LINK, c.getString(SAVE_PERMA_LINK));
+        v.put(Things.COLUMN_SCORE, c.getInt(SAVE_SCORE));
+        v.put(Things.COLUMN_SUBREDDIT, c.getString(SAVE_SUBREDDIT));
+        v.put(Things.COLUMN_TITLE, c.getString(SAVE_TITLE));
+        v.put(Things.COLUMN_THING_ID, c.getString(SAVE_THING_ID));
+        v.put(Things.COLUMN_THUMBNAIL_URL, c.getString(SAVE_THUMBNAIL_URL));
+        v.put(Things.COLUMN_UPS, c.getInt(SAVE_UPS));
+        v.put(Things.COLUMN_URL, c.getString(SAVE_URL));
+        values.add(0, v);
+    }
+
+    private void mergeUnsave(Cursor c) {
+        String targetThingId = c.getString(SAVE_THING_ID);
+        int size = values.size();
+        for (int i = 0; i < size; i++) {
+            String thingId = values.get(i).getAsString(Things.COLUMN_THING_ID);
+            if (thingId.equals(targetThingId)) {
+                values.remove(i);
+                break;
+            }
+        }
     }
 }

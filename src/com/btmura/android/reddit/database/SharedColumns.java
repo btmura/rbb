@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.database;
 
+import android.provider.BaseColumns;
+
 public class SharedColumns {
 
     /** String account name. */
@@ -31,7 +33,11 @@ public class SharedColumns {
 
     public static final String COLUMN_VOTE = "vote";
 
+    public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "=?";
+
     public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";
 
     public static final String SELECT_BY_THING_ID = COLUMN_THING_ID + "=?";
+
+    public static final String SORT_BY_ID = BaseColumns._ID + " ASC";
 }

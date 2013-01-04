@@ -337,25 +337,25 @@ public class ThingProvider extends SessionProvider {
                     break;
 
                 case Listing.TYPE_SUBREDDIT_LISTING:
-                    listing = ThingListing.newSubredditInstance(context, accountName, subreddit,
-                            filter, more, cookie);
+                    listing = ThingListing.newSubredditInstance(context, helper,
+                            accountName, subreddit, filter, more, cookie);
                     break;
 
                 case Listing.TYPE_USER_LISTING:
                     String profileUser = uri.getQueryParameter(PARAM_PROFILE_USER);
-                    listing = ThingListing.newUserInstance(context, accountName, profileUser,
-                            filter, more, cookie);
+                    listing = ThingListing.newUserInstance(context, helper,
+                            accountName, profileUser, filter, more, cookie);
                     break;
 
                 case Listing.TYPE_COMMENT_LISTING:
                     String linkId = uri.getQueryParameter(PARAM_LINK_ID);
-                    listing = CommentListing.newInstance(context, helper, accountName, thingId,
-                            linkId, cookie);
+                    listing = CommentListing.newInstance(context, helper,
+                            accountName, thingId, linkId, cookie);
                     break;
 
                 case Listing.TYPE_SEARCH_LISTING:
-                    listing = ThingListing.newSearchInstance(context, accountName, subreddit,
-                            query, cookie);
+                    listing = ThingListing.newSearchInstance(context, helper,
+                            accountName, subreddit, query, cookie);
                     break;
 
                 case Listing.TYPE_REDDIT_SEARCH_LISTING:
