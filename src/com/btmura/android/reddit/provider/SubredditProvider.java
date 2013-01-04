@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.provider;
 
-import android.content.UriMatcher;
 import android.net.Uri;
 
 import com.btmura.android.reddit.database.Subreddits;
@@ -30,12 +29,6 @@ public class SubredditProvider extends SessionProvider {
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
     static final String PATH_SUBREDDITS = "subreddits";
     public static final Uri SUBREDDITS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_SUBREDDITS);
-
-    private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_SUBREDDITS = 1;
-    static {
-        MATCHER.addURI(AUTHORITY, PATH_SUBREDDITS, MATCH_SUBREDDITS);
-    }
 
     public SubredditProvider() {
         super(TAG);

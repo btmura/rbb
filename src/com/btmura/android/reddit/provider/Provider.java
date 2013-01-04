@@ -64,20 +64,20 @@ public class Provider {
 
     public static void addSubredditAsync(Context context, String accountName,
             String... subreddits) {
-        modifyInBackground(context, accountName, subreddits, true);
+        changeSubredditAsync(context, accountName, subreddits, true);
     }
 
     public static void removeSubredditAsync(Context context, String accountName,
             String... subreddits) {
-        modifyInBackground(context, accountName, subreddits, false);
+        changeSubredditAsync(context, accountName, subreddits, false);
     }
 
-    private static void modifyInBackground(Context context, final String accountName,
+    private static void changeSubredditAsync(Context context, final String accountName,
             final String[] subreddits, final boolean add) {
         final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Boolean doInBackground(Void... fillTheVoid) {
                 // Only trigger a sync on real accounts.
                 Uri syncUri = SubredditProvider.SUBREDDITS_URI;
                 if (AccountUtils.isAccount(accountName)) {
@@ -88,39 +88,40 @@ public class Provider {
 
                 int count = subreddits.length;
                 ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(count * 2);
+                        new ArrayList<ContentProviderOperation>(count);
                 int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
                 for (int i = 0; i < count; i++) {
-                    ops.add(ContentProviderOperation.newDelete(syncUri)
-                            .withSelection(Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
-                                    Array.of(accountName, subreddits[i]))
-                            .build());
-
-                    // Don't insert deletion rows for app storage account,
-                    // since they don't need to be synced back.
-                    if (AccountUtils.isAccount(accountName) || add) {
+                    // All subreddit additions require an insert. The insert
+                    // would remove any deletes due to table constraints.
+                    //
+                    // Deletes for an account require an insert with delete
+                    // state. However, app storage accounts should just
+                    // remove the row altogether.
+                    if (add || AccountUtils.isAccount(accountName)) {
                         ops.add(ContentProviderOperation.newInsert(syncUri)
                                 .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                                 .withValue(Subreddits.COLUMN_NAME, subreddits[i])
                                 .withValue(Subreddits.COLUMN_STATE, state)
                                 .build());
+                    } else {
+                        ops.add(ContentProviderOperation.newDelete(syncUri)
+                                .withSelection(Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
+                                        Array.of(accountName, subreddits[i]))
+                                .build());
                     }
                 }
 
-                try {
-                    appContext.getContentResolver().applyBatch(SubredditProvider.AUTHORITY, ops);
-                } catch (RemoteException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, e.getMessage(), e);
-                }
-                return null;
+                return applyOps(appContext, SubredditProvider.AUTHORITY, ops);
             }
 
             @Override
-            protected void onPostExecute(Void intoTheVoid) {
-                showChangeToast(appContext, add, subreddits.length);
-                scheduleBackup(appContext, accountName);
+            protected void onPostExecute(Boolean success) {
+                if (success) {
+                    showChangeToast(appContext, add, subreddits.length);
+                    scheduleBackup(appContext, accountName);
+                } else {
+                    Toast.makeText(appContext, R.string.error, Toast.LENGTH_SHORT).show();
+                }
             }
         }.execute();
     }
@@ -503,10 +504,11 @@ public class Provider {
         });
     }
 
-    static void applyOps(Context context, String authority,
+    static boolean applyOps(Context context, String authority,
             ArrayList<ContentProviderOperation> ops) {
         try {
             context.getContentResolver().applyBatch(authority, ops);
+            return true;
         } catch (RemoteException e) {
             Log.e(TAG, e.getMessage(), e);
         } catch (OperationApplicationException e) {
@@ -514,5 +516,6 @@ public class Provider {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
+        return false;
     }
 }
