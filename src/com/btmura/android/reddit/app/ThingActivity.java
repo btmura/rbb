@@ -127,7 +127,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     public void onSavedDiscovery(String thingId, boolean saved) {
         if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))) {
             ThingMenuFragment mf = getThingMenuFragment();
-            mf.setSaved(saved);
+            mf.setSavedThingStatus(saved);
         }
     }
 

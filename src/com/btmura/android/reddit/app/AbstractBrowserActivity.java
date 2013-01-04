@@ -474,7 +474,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         Bundle thingBundle = cf.getThingBundle();
         if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))) {
             ThingMenuFragment mf = getThingMenuFragment();
-            mf.setSaved(saved);
+            mf.setSavedThingStatus(saved);
         }
     }
 

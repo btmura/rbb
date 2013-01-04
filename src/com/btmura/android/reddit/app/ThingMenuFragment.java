@@ -85,7 +85,7 @@ public class ThingMenuFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    public void setSaved(boolean saved) {
+    public void setSavedThingStatus(boolean saved) {
         this.saveable = true;
         this.saved = saved;
         refreshMenuItems();

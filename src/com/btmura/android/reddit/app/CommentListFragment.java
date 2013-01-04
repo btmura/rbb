@@ -167,8 +167,9 @@ public class CommentListFragment extends ThingProviderListFragment implements
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
 
-        // Update the title and url if they weren't provided already.
         if (adapter.getCount() > 0) {
+
+            // Update the title and url if they weren't provided already.
             if (TextUtils.isEmpty(title)) {
                 title = adapter.getString(0, CommentAdapter.INDEX_TITLE);
             }
@@ -178,19 +179,21 @@ public class CommentListFragment extends ThingProviderListFragment implements
                     url = Urls.perma(permaLink, null);
                 }
             }
-            refreshMenuItems();
-        }
 
-        // Broadcast the link if there is one in case the parent doesn't know.
-        if (listener != null) {
-            String thingId = adapter.getThingId();
-            listener.onTitleDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_TITLE));
-            if (!adapter.getBoolean(0, CommentAdapter.INDEX_SELF)) {
-                listener.onLinkDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_URL));
+            // Broadcast various info to the parent who might not know.
+            if (listener != null) {
+                String thingId = adapter.getThingId();
+                listener.onTitleDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_TITLE));
+                if (!adapter.getBoolean(0, CommentAdapter.INDEX_SELF)) {
+                    listener.onLinkDiscovery(thingId,
+                            adapter.getString(0, CommentAdapter.INDEX_URL));
+                }
+                if (AccountUtils.isAccount(adapter.getAccountName())) {
+                    listener.onSavedDiscovery(thingId, adapter.isSaved(0));
+                }
             }
-            if (AccountUtils.isAccount(adapter.getAccountName())) {
-                listener.onSavedDiscovery(thingId, adapter.isSaved(0));
-            }
+
+            refreshMenuItems();
         }
     }
 
