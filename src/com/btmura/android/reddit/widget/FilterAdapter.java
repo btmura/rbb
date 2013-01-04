@@ -129,12 +129,11 @@ public class FilterAdapter extends BaseAdapter {
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        if (v == null) {
-            v = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+        TextView tv = (TextView) convertView;
+        if (tv == null) {
+            tv = (TextView) inflater.inflate(R.layout.account_spinner_dropdown_row, parent, false);
         }
-        TextView tv = (TextView) v.findViewById(android.R.id.text1);
         tv.setText(getItem(position));
-        return v;
+        return tv;
     }
 }
