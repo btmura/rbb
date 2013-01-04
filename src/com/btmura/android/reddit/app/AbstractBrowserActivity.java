@@ -41,6 +41,8 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
+import com.btmura.android.reddit.app.ThingMenuFragment.OnThingMenuEventListener;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuEventListenerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
@@ -53,9 +55,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         OnSubredditEventListener,
         OnThingSelectedListener,
         OnThingEventListener,
+        OnThingMenuEventListener,
         OnBackStackChangedListener,
         AccountNameHolder,
-        SubredditNameHolder {
+        SubredditNameHolder,
+        ThingMenuEventListenerHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
 
@@ -84,6 +88,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private AnimatorSet closeNavAnimator;
     private AnimatorSet openSubredditListAnimator;
     private AnimatorSet closeSubredditListAnimator;
+
+    private OnThingMenuEventListener thingMenuEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,7 +213,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         // ThingMenuFragment for some other thing.
         if (thingBundle != null) {
             Fragment mf = ThingMenuFragment.newInstance(subreddit,
-                    ThingBundle.getThingId(thingBundle),
                     ThingBundle.getAuthor(thingBundle));
             ft.add(mf, ThingMenuFragment.TAG);
         } else {
@@ -416,12 +421,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         int filter = getFilter();
 
         String subreddit = ThingBundle.getSubreddit(thingBundle);
-        String thingId = ThingBundle.getThingId(thingBundle);
         String author = ThingBundle.getAuthor(thingBundle);
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit,
                 Subreddits.isRandom(subreddit), thingBundle, filter);
-        Fragment mf = ThingMenuFragment.newInstance(subreddit, thingId, author);
+        Fragment mf = ThingMenuFragment.newInstance(subreddit, author);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
@@ -480,6 +484,22 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     public void onCommentMenuItemClick() {
         thingPager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
+    }
+
+    public void setOnThingMenuEventListener(OnThingMenuEventListener listener) {
+        this.thingMenuEventListener = listener;
+    }
+
+    public void onSavedItemSelected() {
+        if (thingMenuEventListener != null) {
+            thingMenuEventListener.onSavedItemSelected();
+        }
+    }
+
+    public void onUnsavedItemSelected() {
+        if (thingMenuEventListener != null) {
+            thingMenuEventListener.onUnsavedItemSelected();
+        }
     }
 
     private void safePopBackStackImmediate() {

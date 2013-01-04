@@ -75,7 +75,6 @@ public class ThingActivity extends GlobalMenuActivity implements
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
             ft.add(ThingMenuFragment.newInstance(ThingBundle.getSubreddit(thingBundle),
-                    ThingBundle.getThingId(thingBundle),
                     ThingBundle.getAuthor(thingBundle)),
                     ThingMenuFragment.TAG);
             ft.commit();

@@ -36,9 +36,12 @@ import android.widget.ListView;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.ThingMenuFragment.OnThingMenuEventListener;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuEventListenerHolder;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
@@ -47,7 +50,10 @@ import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ThingProviderListFragment implements
-        MultiChoiceModeListener, OnVoteListener, CommentList {
+        MultiChoiceModeListener,
+        OnThingMenuEventListener,
+        OnVoteListener,
+        CommentList {
 
     public static final String TAG = "CommentListFragment";
 
@@ -102,6 +108,9 @@ public class CommentListFragment extends ThingProviderListFragment implements
         super.onAttach(activity);
         if (activity instanceof OnThingEventListener) {
             listener = (OnThingEventListener) activity;
+        }
+        if (activity instanceof ThingMenuEventListenerHolder) {
+            ((ThingMenuEventListenerHolder) activity).setOnThingMenuEventListener(this);
         }
     }
 
@@ -305,6 +314,20 @@ public class CommentListFragment extends ThingProviderListFragment implements
     private boolean handleCopyUrlItem() {
         MenuHelper.setClipAndToast(getActivity(), title, url);
         return true;
+    }
+
+    public void onSavedItemSelected() {
+        save(SaveActions.ACTION_UNSAVE);
+    }
+
+    public void onUnsavedItemSelected() {
+        save(SaveActions.ACTION_SAVE);
+    }
+
+    private void save(int action) {
+        String accountName = adapter.getAccountName();
+        String thingId = adapter.getThingId();
+        Provider.saveAsync(getActivity(), accountName, thingId, action);
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {

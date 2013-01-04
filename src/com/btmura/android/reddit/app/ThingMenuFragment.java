@@ -25,19 +25,33 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.provider.Provider;
 
 public class ThingMenuFragment extends Fragment {
 
     public static final String TAG = "ThingMenuFragment";
 
     private static final String ARG_SUBREDDIT = "subreddit";
-    private static final String ARG_THING_ID = "thingId";
     private static final String ARG_AUTHOR = "author";
 
-    private AccountNameHolder accountNameHolder;
+    interface ThingMenuEventListenerHolder {
+        void setOnThingMenuEventListener(OnThingMenuEventListener listener);
+    }
+
+    /**
+     * Interface that activities should implement to be aware of when the user
+     * selects menu items that ThingMenuFragment cannot handle on its own.
+     */
+    interface OnThingMenuEventListener {
+
+        /** Listener method fired when the user clicks the saved item. */
+        void onSavedItemSelected();
+
+        /** Listener method fired when the user clicks the unsaved item. */
+        void onUnsavedItemSelected();
+    }
+
+    private OnThingMenuEventListener listener;
     private boolean saveable;
     private boolean saved;
 
@@ -48,10 +62,9 @@ public class ThingMenuFragment extends Fragment {
     private MenuItem addSubredditItem;
     private MenuItem viewSubredditItem;
 
-    public static ThingMenuFragment newInstance(String subreddit, String thingId, String author) {
+    public static ThingMenuFragment newInstance(String subreddit, String author) {
         Bundle args = new Bundle(3);
         args.putString(ARG_SUBREDDIT, subreddit);
-        args.putString(ARG_THING_ID, thingId);
         args.putString(ARG_AUTHOR, author);
         ThingMenuFragment frag = new ThingMenuFragment();
         frag.setArguments(args);
@@ -61,8 +74,8 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof AccountNameHolder) {
-            accountNameHolder = (AccountNameHolder) activity;
+        if (activity instanceof OnThingMenuEventListener) {
+            listener = (OnThingMenuEventListener) activity;
         }
     }
 
@@ -128,11 +141,11 @@ public class ThingMenuFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_saved:
-                handleSave(SaveActions.ACTION_UNSAVE);
+                handleSaved();
                 return true;
 
             case R.id.menu_unsaved:
-                handleSave(SaveActions.ACTION_SAVE);
+                handleUnsaved();
                 return true;
 
             case R.id.menu_view_profile:
@@ -156,10 +169,15 @@ public class ThingMenuFragment extends Fragment {
         }
     }
 
-    private void handleSave(int action) {
-        if (accountNameHolder != null) {
-            String accountName = accountNameHolder.getAccountName();
-            Provider.saveAsync(getActivity(), accountName, getThingId(), action);
+    private void handleSaved() {
+        if (listener != null) {
+            listener.onSavedItemSelected();
+        }
+    }
+
+    private void handleUnsaved() {
+        if (listener != null) {
+            listener.onUnsavedItemSelected();
         }
     }
 
@@ -181,10 +199,6 @@ public class ThingMenuFragment extends Fragment {
 
     private String getSubreddit() {
         return getArguments().getString(ARG_SUBREDDIT);
-    }
-
-    private String getThingId() {
-        return getArguments().getString(ARG_THING_ID);
     }
 
     private String getAuthor() {
