@@ -313,6 +313,9 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
 
     // TODO: Rename these to something more specific.
     public void onCompose() {
+        Toast.makeText(getApplicationContext(), R.string.compose_message_sent,
+                Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     // TODO: Do we need these?
