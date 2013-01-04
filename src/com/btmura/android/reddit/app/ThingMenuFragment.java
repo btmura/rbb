@@ -62,6 +62,8 @@ public class ThingMenuFragment extends Fragment {
     private MenuItem addSubredditItem;
     private MenuItem viewSubredditItem;
 
+    private MenuItem subredditItem;
+
     public static ThingMenuFragment newInstance(String subreddit, String author) {
         Bundle args = new Bundle(3);
         args.putString(ARG_SUBREDDIT, subreddit);
@@ -98,6 +100,7 @@ public class ThingMenuFragment extends Fragment {
         savedItem = menu.findItem(R.id.menu_saved);
         unsavedItem = menu.findItem(R.id.menu_unsaved);
         viewProfileItem = menu.findItem(R.id.menu_view_profile);
+        subredditItem = menu.findItem(R.id.menu_subreddit);
         aboutSubredditItem = menu.findItem(R.id.menu_about_thing_subreddit);
         addSubredditItem = menu.findItem(R.id.menu_add_thing_subreddit);
         viewSubredditItem = menu.findItem(R.id.menu_view_subreddit);
@@ -123,6 +126,10 @@ public class ThingMenuFragment extends Fragment {
         }
 
         boolean hasSubreddit = Subreddits.hasSidebar(getSubreddit());
+
+        if (subredditItem != null) {
+            subredditItem.setVisible(hasSubreddit);
+        }
 
         if (aboutSubredditItem != null) {
             aboutSubredditItem.setVisible(hasSubreddit);

@@ -39,6 +39,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
@@ -313,17 +314,24 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        int position = getFirstCheckedPosition();
         int count = getListView().getCheckedItemCount();
-        boolean hasAccount = AccountUtils.isAccount(adapter.getAccountName());
-        mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
 
-        menu.findItem(R.id.menu_view_profile).setVisible(count == 1);
+        mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
         menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
+        menu.findItem(R.id.menu_view_profile).setVisible(count == 1);
+
+        boolean hasSubreddit = count == 1
+                && Subreddits.hasSidebar(adapter.getSubreddit(position));
+        menu.findItem(R.id.menu_subreddit).setVisible(hasSubreddit);
+        menu.findItem(R.id.menu_about_subreddit).setVisible(hasSubreddit);
+        menu.findItem(R.id.menu_add_subreddit).setVisible(hasSubreddit);
+        menu.findItem(R.id.menu_view_subreddit).setVisible(hasSubreddit);
 
         boolean saveable = false;
         boolean saved = false;
-        if (hasAccount && count == 1) {
-            int position = getFirstCheckedPosition();
+        boolean hasAccount = count == 1 && AccountUtils.isAccount(adapter.getAccountName());
+        if (hasAccount) {
             saveable = adapter.getKind(position) != Kinds.KIND_MESSAGE;
             saved = adapter.isSaved(position);
         }
