@@ -34,6 +34,7 @@ public class MessageThreadAdapter extends LoaderAdapter {
             Messages.COLUMN_CREATED_UTC,
             Messages.COLUMN_KIND,
             Messages.COLUMN_NEW,
+            Messages.COLUMN_SUBJECT,
             Messages.TABLE_NAME + "." + Messages.COLUMN_THING_ID,
     };
 
@@ -42,7 +43,8 @@ public class MessageThreadAdapter extends LoaderAdapter {
     private static final int INDEX_CREATED_UTC = 3;
     private static final int INDEX_KIND = 4;
     private static final int INDEX_NEW = 5;
-    private static final int INDEX_THING_ID = 6;
+    private static final int INDEX_SUBJECT = 6;
+    private static final int INDEX_THING_ID = 7;
 
     private long sessionId = -1;
     private String accountName;
@@ -78,10 +80,14 @@ public class MessageThreadAdapter extends LoaderAdapter {
         long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
         int kind = cursor.getInt(INDEX_KIND);
 
+        // Only show the subject on the header message.
+        String title = cursor.getPosition() == 0 ? cursor.getString(INDEX_SUBJECT) : null;
+
         ThingView tv = (ThingView) view;
+        tv.setType(ThingView.TYPE_MESSAGE_THREAD_LIST);
         tv.setData(getAccountName(), author, body, createdUtc, null, 0, true, kind, 0,
                 null, 0, System.currentTimeMillis(), 0, false, null, 0, null,
-                0, null, null, null, 0);
+                0, null, null, title, 0);
     }
 
     public long getSessionId() {

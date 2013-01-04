@@ -42,6 +42,9 @@ public class ThingView extends CustomView implements OnGestureListener {
     /** Type of ThingView used when listing the comments on some thing. */
     public static final int TYPE_COMMENT_LIST = 1;
 
+    /** Type of ThingView used when listing the messages in one thread. */
+    public static final int TYPE_MESSAGE_THREAD_LIST = 2;
+
     // TODO: Fix thread safety issue here.
     private static final Formatter FORMATTER = new Formatter();
 
@@ -115,7 +118,9 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public void setType(int type) {
+        // TODO: Clean up styles for the different types.
         switch (type) {
+            case TYPE_MESSAGE_THREAD_LIST: // No style of its own yet.
             case TYPE_COMMENT_LIST:
                 linkTitlePaint = THING_LINK_TITLE; // No style yet.
                 titlePaint = COMMENT_TITLE;
