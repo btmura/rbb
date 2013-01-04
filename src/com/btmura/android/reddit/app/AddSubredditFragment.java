@@ -33,6 +33,7 @@ import android.widget.Spinner;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
@@ -80,7 +81,10 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
         accountSpinner.setEnabled(false);
         accountSpinner.setAdapter(adapter);
 
-        CharSequence name = subredditNameHolder.getSubredditName();
+        String name = subredditNameHolder.getSubredditName();
+        if (!Subreddits.hasSidebar(name)) {
+            name = null;
+        }
         int length = name != null ? name.length() : 0;
         nameField = (EditText) v.findViewById(R.id.subreddit_name);
         nameField.setText(name);
