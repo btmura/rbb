@@ -258,28 +258,14 @@ class MessageListing extends JsonParser implements Listing {
     }
 
     private void insertThing(String actionAccountName, String targetId, String body) {
-        int size = values.size();
-        for (int i = 0; i < size; i++) {
-            ContentValues v = values.get(i);
-            String id = v.getAsString(Messages.COLUMN_THING_ID);
+        // Allocate extra space for session ID later.
+        ContentValues p = new ContentValues(4 + 1);
+        p.put(Messages.COLUMN_ACCOUNT, actionAccountName);
+        p.put(Messages.COLUMN_AUTHOR, actionAccountName);
+        p.put(Messages.COLUMN_BODY, body);
+        p.put(Messages.COLUMN_KIND, Kinds.KIND_MESSAGE);
 
-            // This thing could be a placeholder we previously inserted.
-            if (TextUtils.isEmpty(id)) {
-                continue;
-            }
-
-            if (id.equals(targetId)) {
-                // Allocate extra space for session ID that provider will
-                // insert.
-                ContentValues p = new ContentValues(5);
-                p.put(Messages.COLUMN_ACCOUNT, actionAccountName);
-                p.put(Messages.COLUMN_AUTHOR, actionAccountName);
-                p.put(Messages.COLUMN_BODY, body);
-                p.put(Messages.COLUMN_KIND, Kinds.KIND_MESSAGE);
-
-                values.add(i + 1, p);
-                size++;
-            }
-        }
+        // Just append to the bottom for messages.
+        values.add(p);
     }
 }
