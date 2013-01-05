@@ -136,13 +136,18 @@ public class ThingProvider extends SessionProvider {
             + VoteActions.COLUMN_ACCOUNT + ", "
             + Things.COLUMN_THING_ID + ")";
 
+    // TODO: Make a separate table for just read actions?
     private static final String JOINED_MESSAGES_TABLE = Messages.TABLE_NAME
             // Join with pending actions to decide if need to mark as read.
             + " LEFT OUTER JOIN (SELECT "
             + MessageActions.COLUMN_ACCOUNT + ", "
             + MessageActions.COLUMN_THING_ID + ", "
             + MessageActions.COLUMN_ACTION
-            + " FROM " + MessageActions.TABLE_NAME + ") USING ("
+            + " FROM " + MessageActions.TABLE_NAME
+            + " WHERE " + MessageActions.COLUMN_ACTION + " IN ("
+            + MessageActions.ACTION_READ + ","
+            + MessageActions.ACTION_UNREAD + ")"
+            + ") USING ("
             + MessageActions.COLUMN_ACCOUNT + ", "
             + SharedColumns.COLUMN_THING_ID + ")";
 
@@ -234,6 +239,8 @@ public class ThingProvider extends SessionProvider {
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_LISTING));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
+
+
         b.appendQueryParameter(PARAM_JOIN, TRUE);
         if (sessionId != -1) {
             b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
@@ -369,7 +376,6 @@ public class ThingProvider extends SessionProvider {
             sessionId = getListingSession(listing, db, sessionId);
             selection = appendSelection(selection, SharedColumns.SELECT_BY_SESSION_ID);
             selectionArgs = appendSelectionArg(selectionArgs, Long.toString(sessionId));
-
             Cursor c = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
 
             Bundle extras = new Bundle(2);

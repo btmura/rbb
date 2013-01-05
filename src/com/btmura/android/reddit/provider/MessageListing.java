@@ -162,7 +162,7 @@ class MessageListing extends JsonParser implements Listing {
 
     @Override
     public void onEntityStart(int index) {
-        values.add(newContentValues(9));
+        values.add(newContentValues(11));
     }
 
     private ContentValues newContentValues(int capacity) {
