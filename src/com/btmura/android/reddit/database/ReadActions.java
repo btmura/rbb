@@ -19,41 +19,37 @@ package com.btmura.android.reddit.database;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
-/**
- * {@link VoteActions} is a table that stores pending upvotes and downvotes
- * before they are synced back to the server.
- */
-public class VoteActions implements BaseColumns {
+public class ReadActions implements BaseColumns {
 
-    public static final String TABLE_NAME = "voteActions";
+    public static final String TABLE_NAME = "readActions";
 
-    /** Account that liked this thing. */
-    public static final String COLUMN_ACCOUNT = "account";
+    /** Account that created or deleted this comment. */
+    public static final String COLUMN_ACCOUNT = SharedColumns.COLUMN_ACCOUNT;
 
-    /** Integer column indicating either an upvote or downvote. */
+    /** Action this row represents like adding or deleting. */
     public static final String COLUMN_ACTION = "action";
 
-    /** Unused long column for expiration. */
+    /** Unused long column for expiration of this row. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
-    /** String ID of the thing that the user wants to vote on. */
+    /** ID of the thing that we are marking as read or unread. */
     public static final String COLUMN_THING_ID = "thingId";
 
-    /** Vote column value indicating an upvote. */
-    public static final int ACTION_VOTE_UP = 1;
+    /** Action meaning the user has marked this message as read. */
+    public static final int ACTION_READ = 0;
 
-    /** Vote column value indicating a neutral vote. */
-    public static final int ACTION_VOTE_NEUTRAL = 0;
+    /** Action meaning the user has marked this message as unread. */
+    public static final int ACTION_UNREAD = 1;
 
-    /** Vote column value indicating a downvote. */
-    public static final int ACTION_VOTE_DOWN = -1;
+    /** Selection for prior pending read and unread messages. */
+    public static final String SELECT_READ_UNREAD_BY_ACCOUNT_AND_THING_ID =
+            ReadActions.COLUMN_ACCOUNT + "=? AND " + ReadActions.COLUMN_THING_ID + "=?";
 
-    /** Creates the votes table. */
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
-                + COLUMN_ACTION + " INTEGER NOT NULL,"
+                + _ID + " INTEGER PRIMARY KEY, "
+                + COLUMN_ACTION + " INTEGER NOT NULL, "
+                + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
                 + COLUMN_THING_ID + " TEXT NOT NULL,"
 

@@ -29,6 +29,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
+import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
@@ -441,7 +442,7 @@ public class ThingAdapter extends LoaderAdapter {
         }
 
         // We have a local pending action so use that to indicate if it's new.
-        return getInt(position, MESSAGE_ACTION) != MessageActions.ACTION_UNREAD;
+        return getInt(position, MESSAGE_ACTION) != ReadActions.ACTION_UNREAD;
     }
 
     public int getNumComments(int position) {

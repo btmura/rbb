@@ -50,6 +50,7 @@ public class DbHelperTest extends AndroidTestCase {
             SaveActions.TABLE_NAME,
             Messages.TABLE_NAME,
             MessageActions.TABLE_NAME,
+            ReadActions.TABLE_NAME,
     };
 
     @Override

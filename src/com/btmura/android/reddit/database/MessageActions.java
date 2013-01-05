@@ -24,7 +24,7 @@ public class MessageActions implements BaseColumns {
     public static final String TABLE_NAME = "messageActions";
 
     /** Account that created or deleted this comment. */
-    public static final String COLUMN_ACCOUNT = VoteActions.COLUMN_ACCOUNT;
+    public static final String COLUMN_ACCOUNT = SharedColumns.COLUMN_ACCOUNT;
 
     /** Action this row represents like adding or deleting. */
     public static final String COLUMN_ACTION = "action";
@@ -37,7 +37,6 @@ public class MessageActions implements BaseColumns {
     public static final String COLUMN_PARENT_THING_ID = "parentThingId";
 
     /** ID of the thing that we are commenting on or deleting. */
-    // TODO: Rename to targetID in this table and CommentActions table.
     public static final String COLUMN_THING_ID = "thingId";
 
     /** Text of the reply. */
@@ -51,20 +50,6 @@ public class MessageActions implements BaseColumns {
 
     /** Action meaning the user has deleted one of their own comments. */
     public static final int ACTION_DELETE = 1;
-
-    /** Action meaning the user has marked this message as read. */
-    public static final int ACTION_READ = 2;
-
-    /** Action meaning the user has marked this message as unread. */
-    public static final int ACTION_UNREAD = 3;
-
-    /** Selection for prior pending read and unread messages. */
-    public static final String SELECT_READ_UNREAD_BY_ACCOUNT_AND_THING_ID =
-            MessageActions.COLUMN_ACCOUNT + "=? AND "
-                    + MessageActions.COLUMN_THING_ID + "=? AND "
-                    + MessageActions.COLUMN_ACTION + " IN ("
-                    + MessageActions.ACTION_READ + ","
-                    + MessageActions.ACTION_UNREAD + ")";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("

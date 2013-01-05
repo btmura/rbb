@@ -36,20 +36,11 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.CommentActions;
-import com.btmura.android.reddit.database.MessageActions;
-import com.btmura.android.reddit.database.SaveActions;
-import com.btmura.android.reddit.database.Things;
-import com.btmura.android.reddit.database.VoteActions;
-import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
-import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.util.Array;
 
 public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -82,52 +73,14 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private static final String[] COMMENT_PROJECTION = {
-            CommentActions._ID,
-            CommentActions.COLUMN_ACTION,
-            CommentActions.COLUMN_THING_ID,
-            CommentActions.COLUMN_TEXT,
+    // Sync votes first due to loose rate limit.
+    private static final Syncer[] SYNCERS = {
+        new VoteSyncer(),
+        new ReadSyncer(),
+        new SaveSyncer(),
+        new MessageSyncer(),
+        new CommentSyncer(),
     };
-
-    private static final int COMMENT_ID = 0;
-    private static final int COMMENT_ACTION = 1;
-    private static final int COMMENT_THING_ID = 2;
-    private static final int COMMENT_TEXT = 3;
-
-    private static final String[] MESSAGE_PROJECTION = {
-            MessageActions._ID,
-            MessageActions.COLUMN_ACTION,
-            MessageActions.COLUMN_THING_ID,
-            MessageActions.COLUMN_TEXT,
-    };
-
-    private static final int MESSAGE_ID = 0;
-    private static final int MESSAGE_ACTION = 1;
-    private static final int MESSAGE_THING_ID = 2;
-    private static final int MESSAGE_TEXT = 3;
-
-    private static final String[] SAVE_PROJECTION = {
-            SaveActions._ID,
-            SaveActions.COLUMN_THING_ID,
-            SaveActions.COLUMN_ACTION,
-    };
-
-    private static final int SAVE_ID = 0;
-    private static final int SAVE_THING_ID = 1;
-    private static final int SAVE_ACTION = 2;
-
-    private static final String[] VOTE_PROJECTION = {
-            VoteActions._ID,
-            VoteActions.COLUMN_THING_ID,
-            VoteActions.COLUMN_ACTION,
-    };
-
-    private static final int VOTE_ID = 0;
-    private static final int VOTE_THING_ID = 1;
-    private static final int VOTE_VOTE = 2;
-
-    private static final String SELECT_BY_ACCOUNT = VoteActions.COLUMN_ACCOUNT + " = ?";
-    private static final String SORT_BY_ID = BaseColumns._ID + " ASC";
 
     public ThingSyncAdapter(Context context) {
         super(context, true);
@@ -165,11 +118,12 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
             RateLimiter limiter = new RateLimiter();
 
-            // Sync votes first due to loose rate limit.
-            syncVotes(account, extras, authority, provider, syncResult, limiter, cookie, modhash);
-            syncSaves(account, extras, authority, provider, syncResult, limiter, cookie, modhash);
-            syncMessages(account, extras, authority, provider, syncResult, limiter, cookie, modhash);
-            syncComments(account, extras, authority, provider, syncResult, limiter, cookie, modhash);
+
+            int count = SYNCERS.length;
+            for (int i = 0; i < count; i++) {
+                sync(account, extras, authority, provider, syncResult, SYNCERS[i], limiter,
+                        cookie, modhash);
+            }
 
             // SyncManager code seems to be using delayUntil as a timestamp even
             // though the docs say its more of a duration.
@@ -215,198 +169,13 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private void syncVotes(Account account, Bundle extras, String authority,
-            ContentProviderClient provider, SyncResult syncResult, RateLimiter limiter,
-            String cookie, String modhash) {
+    private void sync(Account account, Bundle extras, String authority,
+            ContentProviderClient provider, SyncResult syncResult, Syncer syncer,
+            RateLimiter limiter, String cookie, String modhash) {
         Cursor c = null;
         try {
-            // Get all pending votes for this account that haven't been synced.
-            c = provider.query(ThingProvider.VOTE_ACTIONS_URI, VOTE_PROJECTION,
-                    SELECT_BY_ACCOUNT, Array.of(account.name), null);
-
-            int count = c.getCount();
-
-            // Bail out early if there is nothing to do.
-            if (count == 0) {
-                return;
-            }
-
-            // Record skipped if the rate limit has been reached.
-            if (limiter.rateLimit > 0) {
-                syncResult.stats.numSkippedEntries += count;
-                return;
-            }
-
-            // 2 ops per vote: 1 for vote and 1 to update affected sessions.
-            ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(count * 2);
-
-            // Process as many votes until we hit some rate limit.
-            for (; c.moveToNext(); count--) {
-                long id = c.getLong(VOTE_ID);
-                String thingId = c.getString(VOTE_THING_ID);
-                int vote = c.getInt(VOTE_VOTE);
-
-                try {
-                    Result result = RedditApi.vote(getContext(), thingId, vote, cookie, modhash);
-                    if (BuildConfig.DEBUG) {
-                        result.logAnyErrors(TAG);
-                    }
-
-                    // Quit processing votes if we hit a rate limit.
-                    if (result.hasRateLimitError()) {
-                        limiter.updateLimit(result, count > 0);
-                        syncResult.stats.numSkippedEntries += count;
-                        break;
-                    }
-
-                    // Delete the row corresponding to the pending vote.
-                    ops.add(ContentProviderOperation.newDelete(ThingProvider.VOTE_ACTIONS_URI)
-                            .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                            .build());
-
-                    // Update the tables that join with the votes table
-                    // since we will delete the pending vote rows.
-                    String[] selectionArgs = Array.of(account.name, thingId);
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                            .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
-                            .withValue(Things.COLUMN_LIKES, vote)
-                            .build());
-
-                } catch (IOException e) {
-                    // If we had a network problem then increment the exception
-                    // count to indicate a soft error. The sync manager will
-                    // keep retrying this with exponential back-off.
-                    Log.e(TAG, e.getMessage(), e);
-                    syncResult.stats.numIoExceptions++;
-                }
-            }
-
-            if (!ops.isEmpty()) {
-                ContentProviderResult[] results = provider.applyBatch(ops);
-                int opCount = ops.size();
-                for (int i = 0; i < opCount;) {
-                    syncResult.stats.numDeletes += results[i++].count;
-                    syncResult.stats.numUpdates += results[i++].count;
-                }
-            }
-
-        } catch (RemoteException e) {
-            // Hard error so the sync manager won't retry.
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
-        } catch (OperationApplicationException e) {
-            // Hard error so the sync manager won't retry.
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
-    private void syncSaves(Account account, Bundle extras, String authority,
-            ContentProviderClient provider, SyncResult syncResult, RateLimiter limiter,
-            String cookie, String modhash) {
-        Cursor c = null;
-        try {
-            // Get all pending saves for this account that haven't been synced.
-            c = provider.query(ThingProvider.SAVE_ACTIONS_URI, SAVE_PROJECTION,
-                    SELECT_BY_ACCOUNT, Array.of(account.name), null);
-
-            int count = c.getCount();
-
-            // Bail out early if there is nothing to do.
-            if (count == 0) {
-                return;
-            }
-
-            // Record skipped if the rate limit has been reached.
-            if (limiter.rateLimit > 0) {
-                syncResult.stats.numSkippedEntries += count;
-                return;
-            }
-
-            // 2 ops per save. 1 for save and 1 to update affected sessions.
-            ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(count * 2);
-
-            // Process as many saves until we hit some rate limit.
-            for (; c.moveToNext(); count--) {
-                long id = c.getLong(SAVE_ID);
-                String thingId = c.getString(SAVE_THING_ID);
-                int action = c.getInt(SAVE_ACTION);
-                boolean saved = action == SaveActions.ACTION_SAVE;
-
-                try {
-                    Result result = RedditApi.save(thingId, saved, cookie, modhash);
-                    if (BuildConfig.DEBUG) {
-                        result.logAnyErrors(TAG);
-                    }
-
-                    // Quit processing votes if we hit a rate limit.
-                    if (result.hasRateLimitError()) {
-                        limiter.updateLimit(result, count > 0);
-                        syncResult.stats.numSkippedEntries += count;
-                        break;
-                    }
-
-                    // Delete the row corresponding to the pending save.
-                    ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVE_ACTIONS_URI)
-                            .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                            .build());
-
-                    // Update the tables that join with the saves table
-                    // since we will delete the pending save rows.
-                    String[] selectionArgs = Array.of(account.name, thingId);
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                            .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
-                            .withValue(Things.COLUMN_SAVED, saved)
-                            .build());
-
-                } catch (IOException e) {
-                    // If we had a network problem then increment the exception
-                    // count to indicate a soft error. The sync manager will
-                    // keep retrying this with exponential back-off.
-                    Log.e(TAG, e.getMessage(), e);
-                    syncResult.stats.numIoExceptions++;
-                }
-            }
-
-            if (!ops.isEmpty()) {
-                ContentProviderResult[] results = provider.applyBatch(ops);
-                int opCount = ops.size();
-                for (int i = 0; i < opCount;) {
-                    syncResult.stats.numDeletes += results[i++].count;
-                    syncResult.stats.numUpdates += results[i++].count;
-                }
-            }
-
-        } catch (RemoteException e) {
-            // Hard error so the sync manager won't retry.
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
-        } catch (OperationApplicationException e) {
-            // Hard error so the sync manager won't retry.
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
-    // TODO: Remove duplicate logic with ThingSyncAdapter.
-    private void syncMessages(Account account, Bundle extras, String authority,
-            ContentProviderClient provider, SyncResult syncResult, RateLimiter limiter,
-            String cookie, String modhash) {
-        Cursor c = null;
-        try {
-            // Get all pending comments that have not been synced.
-            c = provider.query(ThingProvider.MESSAGE_ACTIONS_URI, MESSAGE_PROJECTION,
-                    SELECT_BY_ACCOUNT, Array.of(account.name), SORT_BY_ID);
+            // Get all pending actions for this account that haven't been synced.
+            c = syncer.query(provider, account.name);
 
             int count = c.getCount();
 
@@ -422,53 +191,25 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(count);
+                    new ArrayList<ContentProviderOperation>(syncer.getOpCount(count));
 
-            // Process as many messages until we hit a rate limit.
+            // Process as many actions until we hit some rate limit.
             for (; c.moveToNext(); count--) {
-                long id = c.getLong(MESSAGE_ID);
-                int action = c.getInt(MESSAGE_ACTION);
-                String thingId = c.getString(MESSAGE_THING_ID);
-                String text = c.getString(MESSAGE_TEXT);
-
                 try {
-                    // Try to sync the message with the server.
-                    Result result = null;
-                    switch (action) {
-                        case MessageActions.ACTION_INSERT:
-                            result = RedditApi.comment(thingId, text, cookie, modhash);
-
-                        case MessageActions.ACTION_DELETE:
-                            result = RedditApi.delete(thingId, cookie, modhash);
-                            break;
-
-                        case MessageActions.ACTION_READ:
-                            result = RedditApi.readMessage(thingId, true, cookie, modhash);
-                            break;
-
-                        case MessageActions.ACTION_UNREAD:
-                            result = RedditApi.readMessage(thingId, false, cookie, modhash);
-                            break;
-
-                        default:
-                            throw new IllegalArgumentException();
-                    }
-
+                    // Sync the local action to the server over the network.
+                    Result result = syncer.sync(getContext(), c, cookie, modhash);
                     if (BuildConfig.DEBUG) {
                         result.logAnyErrors(TAG);
                     }
 
-                    // Quit processing messages if we hit a rate limit.
+                    // Quit processing actions if we hit a rate limit.
                     if (result.hasRateLimitError()) {
                         limiter.updateLimit(result, count > 0);
                         syncResult.stats.numSkippedEntries += count;
                         break;
                     }
 
-                    // Delete the row corresponding to the pending action.
-                    ops.add(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
-                            .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                            .build());
+                    syncer.addOps(account.name, c, ops);
 
                 } catch (IOException e) {
                     // If we had a network problem then increment the exception
@@ -481,105 +222,7 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
             if (!ops.isEmpty()) {
                 ContentProviderResult[] results = provider.applyBatch(ops);
-                int opCount = ops.size();
-                for (int i = 0; i < opCount; i++) {
-                    syncResult.stats.numDeletes += results[i].count;
-                }
-            }
-
-        } catch (RemoteException e) {
-            // Hard error so the sync manager won't retry.
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
-        } catch (OperationApplicationException e) {
-            // Hard error so the sync manager won't retry.
-            Log.e(TAG, e.getMessage(), e);
-            syncResult.databaseError = true;
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
-    private void syncComments(Account account, Bundle extras, String authority,
-            ContentProviderClient provider, SyncResult syncResult, RateLimiter limiter,
-            String cookie, String modhash) {
-        Cursor c = null;
-        try {
-            // Get all pending replies that have not been synced.
-            c = provider.query(ThingProvider.COMMENT_ACTIONS_URI, COMMENT_PROJECTION,
-                    CommentActions.SELECT_BY_ACCOUNT, Array.of(account.name), SORT_BY_ID);
-
-            int count = c.getCount();
-
-            // Bail out early if there is nothing to do.
-            if (count == 0) {
-                return;
-            }
-
-            // Record skipped if the rate limit has been reached.
-            if (limiter.rateLimit > 0) {
-                syncResult.stats.numSkippedEntries += count;
-                return;
-            }
-
-            ArrayList<ContentProviderOperation> ops =
-                    new ArrayList<ContentProviderOperation>(count);
-
-            // Process as many comments until we hit a rate limit.
-            for (; c.moveToNext(); count--) {
-                long id = c.getLong(COMMENT_ID);
-                int action = c.getInt(COMMENT_ACTION);
-                String thingId = c.getString(COMMENT_THING_ID);
-                String text = c.getString(COMMENT_TEXT);
-
-                try {
-                    // Try to sync the comment with the server.
-                    Result result = null;
-                    switch (action) {
-                        case CommentActions.ACTION_INSERT:
-                            result = RedditApi.comment(thingId, text, cookie, modhash);
-                            break;
-
-                        case CommentActions.ACTION_DELETE:
-                            result = RedditApi.delete(thingId, cookie, modhash);
-                            break;
-
-                        default:
-                            throw new IllegalArgumentException();
-                    }
-
-                    if (BuildConfig.DEBUG) {
-                        result.logAnyErrors(TAG);
-                    }
-
-                    // Quit processing comments if we hit a rate limit.
-                    if (result.hasRateLimitError()) {
-                        limiter.updateLimit(result, count > 0);
-                        syncResult.stats.numSkippedEntries += count;
-                        break;
-                    }
-
-                    ops.add(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
-                            .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                            .build());
-
-                } catch (IOException e) {
-                    // If we had a network problem then increment the exception
-                    // count to indicate a soft error. The sync manager will
-                    // keep retrying this with exponential back-off.
-                    Log.e(TAG, e.getMessage(), e);
-                    syncResult.stats.numIoExceptions++;
-                }
-            }
-
-            if (!ops.isEmpty()) {
-                ContentProviderResult[] results = provider.applyBatch(ops);
-                int opCount = ops.size();
-                for (int i = 0; i < opCount; i++) {
-                    syncResult.stats.numDeletes += results[i].count;
-                }
+                syncer.tallyOpResults(results, syncResult);
             }
 
         } catch (RemoteException e) {

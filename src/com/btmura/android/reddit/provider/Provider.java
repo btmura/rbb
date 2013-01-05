@@ -37,8 +37,8 @@ import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
+import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
@@ -364,32 +364,20 @@ public class Provider {
     /** Mark a message either read or unread. */
     public static void readMessageAsync(final Context context, final String accountName,
             final String thingId, final boolean read) {
-        final Context appContext = context.getApplicationContext();
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(2);
-
-                // Delete prior read and unread states of this thing since the
-                // last action will be the final state anyway.
-                ops.add(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
-                        .withSelection(MessageActions.SELECT_READ_UNREAD_BY_ACCOUNT_AND_THING_ID,
-                                Array.of(accountName, thingId))
-                        .build());
-
-                // Insert the latest action we want for this message.
-                Uri uri = ThingProvider.MESSAGE_ACTIONS_URI.buildUpon()
+                Uri uri = ThingProvider.READ_ACTIONS_URI.buildUpon()
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_NOTIFY_MESSAGES, TRUE)
                         .build();
-                int action = read ? MessageActions.ACTION_READ : MessageActions.ACTION_UNREAD;
-                ops.add(ContentProviderOperation.newInsert(uri)
-                        .withValue(MessageActions.COLUMN_ACCOUNT, accountName)
-                        .withValue(MessageActions.COLUMN_THING_ID, thingId)
-                        .withValue(MessageActions.COLUMN_ACTION, action)
-                        .build());
 
-                applyOps(appContext, ThingProvider.AUTHORITY, ops);
+                int action = read ? ReadActions.ACTION_READ : ReadActions.ACTION_UNREAD;
+                ContentValues v = new ContentValues(3);
+                v.put(ReadActions.COLUMN_ACCOUNT, accountName);
+                v.put(ReadActions.COLUMN_THING_ID, thingId);
+                v.put(ReadActions.COLUMN_ACTION, action);
+                cr.insert(uri, v);
             }
         });
     }

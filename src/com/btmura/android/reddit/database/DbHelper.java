@@ -84,6 +84,7 @@ public class DbHelper extends SQLiteOpenHelper {
         Accounts.createTable(db);
         CommentActions.createTable(db);
         MessageActions.createTable(db);
+        ReadActions.createTable(db);
         SaveActions.createTable(db);
         VoteActions.createTable(db);
     }

@@ -229,11 +229,11 @@ class MessageListing extends JsonParser implements Listing {
     @Override
     public void onParseEnd() {
         if (listingType == Listing.TYPE_MESSAGE_THREAD_LISTING) {
-            mergeActions();
+            mergeThreadActions();
         }
     }
 
-    private void mergeActions() {
+    private void mergeThreadActions() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(MessageActions.TABLE_NAME, MERGE_PROJECTION,
                 MERGE_SELECTION, Array.of(accountName, thingId), null, null, MERGE_SORT);
