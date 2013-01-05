@@ -32,7 +32,7 @@
     <string name="compose_title_message">New message</string>
     <string name="compose_title_post">New post</string>
     <string name="compose_title_reply">Reply to %s</string>
-    <string name="compose_message_title">Re: %s</string>
+    <string name="compose_message_reply_title">re: %s</string>
     <string name="compose_message_sent">Message sent</string>
     <string name="compose_link">LINK</string>
     <string name="compose_text">TEXT</string>

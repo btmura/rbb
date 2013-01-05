@@ -482,7 +482,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         args.putLong(ComposeActivity.EXTRA_COMMENT_SESSION_ID, sessionId);
 
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMMENT_REPLY_TYPE_SET,
-                null, author, getLabel(position), args);
+                null, author, getLabel(position), args, true);
     }
 
     private int getFirstCheckedPosition() {

@@ -30,9 +30,11 @@ public class ComposePagerAdapter extends FragmentStateItemPagerAdapter {
     private final String messageDestination;
     private final String title;
     private final String text;
+    private final boolean isReply;
 
     public ComposePagerAdapter(Context context, FragmentManager fm, int[] types,
-            String subredditDestination, String messageDestination, String title, String text) {
+            String subredditDestination, String messageDestination, String title, String text,
+            boolean isReply) {
         super(fm);
         this.context = context.getApplicationContext();
         this.types = types;
@@ -40,6 +42,7 @@ public class ComposePagerAdapter extends FragmentStateItemPagerAdapter {
         this.messageDestination = messageDestination;
         this.title = title;
         this.text = text;
+        this.isReply = isReply;
     }
 
     @Override
@@ -68,7 +71,7 @@ public class ComposePagerAdapter extends FragmentStateItemPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         return ComposeFormFragment.newInstance(types[position], subredditDestination,
-                messageDestination, title, text, position);
+                messageDestination, title, text, isReply, position);
     }
 
     public int getType(int position) {

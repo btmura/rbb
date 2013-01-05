@@ -96,6 +96,9 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     /** Optional string extra to specify the text of a post or message. */
     public static final String EXTRA_TEXT = Intent.EXTRA_TEXT;
 
+    /** Optional boolean indicating whether this is a reply to something. */
+    public static final String EXTRA_IS_REPLY = "isReply";
+
     /** Bundle of extras to pass through. */
     public static final String EXTRA_EXTRAS = "extras";
 
@@ -176,7 +179,8 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
                 getIntent().getStringExtra(EXTRA_SUBREDDIT_DESTINATION),
                 getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION),
                 getIntent().getStringExtra(EXTRA_TITLE),
-                getIntent().getStringExtra(EXTRA_TEXT));
+                getIntent().getStringExtra(EXTRA_TEXT),
+                getIntent().getBooleanExtra(EXTRA_IS_REPLY, false));
 
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);

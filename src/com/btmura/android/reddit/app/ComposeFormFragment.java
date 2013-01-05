@@ -70,6 +70,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     /** Optional string extra with suggested text. */
     private static final String ARG_TEXT = "text";
 
+    /** Optional boolean extra indicating whether this is a reply. */
+    private static final String ARG_IS_REPLY = "isReply";
+
     /** Integer ID that may be used to identify this fragment. */
     private static final String ARG_ID = "id";
 
@@ -116,13 +119,14 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     private Matcher linkMatcher;
 
     public static ComposeFormFragment newInstance(int type, String subredditDestination,
-            String messageDestination, String title, String text, int id) {
+            String messageDestination, String title, String text, boolean isReply, int id) {
         Bundle args = new Bundle(6);
         args.putInt(ARG_TYPE, type);
         args.putString(ARG_SUBREDDIT_DESTINATION, subredditDestination);
         args.putString(ARG_MESSAGE_DESTINATION, messageDestination);
         args.putString(ARG_TITLE, title);
         args.putString(ARG_TEXT, text);
+        args.putBoolean(ARG_IS_REPLY, isReply);
         args.putInt(ARG_ID, id);
         ComposeFormFragment frag = new ComposeFormFragment();
         frag.setArguments(args);
@@ -176,10 +180,10 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 break;
 
             case ComposeActivity.TYPE_MESSAGE:
-                if (!TextUtils.isEmpty(title)) {
-                    title = getString(R.string.compose_message_title, title);
-                    titleText.setText(title);
+                if (!TextUtils.isEmpty(title) && getArguments().getBoolean(ARG_IS_REPLY)) {
+                    title = getString(R.string.compose_message_reply_title, title);
                 }
+                titleText.setText(title);
                 titleText.setHint(R.string.hint_subject);
                 break;
 
