@@ -40,16 +40,17 @@ abstract class CustomView extends View {
     static int MIN_DETAILS_WIDTH;
     static int MAX_DETAILS_WIDTH;
 
-    static final int NUM_TEXT_PAINTS = 9;
+    static final int NUM_TEXT_PAINTS = 10;
     static final int SUBREDDIT_TITLE = 0;
     static final int SUBREDDIT_STATUS = 1;
     static final int THING_LINK_TITLE = 2;
     static final int THING_TITLE = 3;
     static final int THING_BODY = 4;
-    static final int THING_STATUS = 5;
-    static final int COMMENT_TITLE = 6;
-    static final int COMMENT_BODY = 7;
-    static final int COMMENT_STATUS = 8;
+    static final int THING_NEW_BODY = 5;
+    static final int THING_STATUS = 6;
+    static final int COMMENT_TITLE = 7;
+    static final int COMMENT_BODY = 8;
+    static final int COMMENT_STATUS = 9;
     static final TextPaint[] TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
 
     /**
@@ -89,6 +90,7 @@ abstract class CustomView extends View {
                     R.style.ThingLinkTitleText,
                     R.style.ThingTitleText,
                     R.style.ThingBodyText,
+                    R.style.ThingNewBodyText,
                     R.style.ThingStatusText,
                     R.style.CommentTitleText,
                     R.style.CommentBodyText,

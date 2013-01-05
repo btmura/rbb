@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.text.Formatter;
 
 public class MessageThreadAdapter extends LoaderAdapter {
 
@@ -45,6 +46,8 @@ public class MessageThreadAdapter extends LoaderAdapter {
     private static final int INDEX_NEW = 5;
     private static final int INDEX_SUBJECT = 6;
     private static final int INDEX_THING_ID = 7;
+
+    private final Formatter formatter = new Formatter();
 
     private long sessionId = -1;
     private String accountName;
@@ -85,7 +88,8 @@ public class MessageThreadAdapter extends LoaderAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_MESSAGE_THREAD_LIST);
-        tv.setData(getAccountName(), author, body, createdUtc, null, 0, true, kind, 0,
+        tv.setBody(body, false, formatter);
+        tv.setData(getAccountName(), author, createdUtc, null, 0, true, kind, 0,
                 null, 0, System.currentTimeMillis(), 0, false, null, 0, null,
                 0, null, null, title, 0);
     }

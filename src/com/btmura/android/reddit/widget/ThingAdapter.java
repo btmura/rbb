@@ -36,6 +36,7 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Objects;
 
 public class ThingAdapter extends LoaderAdapter {
@@ -136,6 +137,7 @@ public class ThingAdapter extends LoaderAdapter {
     private final int filter;
     private String more;
 
+    private final Formatter formatter = new Formatter();
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final OnVoteListener listener;
     private final boolean singleChoice;
@@ -230,12 +232,14 @@ public class ThingAdapter extends LoaderAdapter {
         String body = cursor.getString(MESSAGE_BODY);
         long createdUtc = cursor.getLong(MESSAGE_CREATED_UTC);
         int kind = cursor.getInt(MESSAGE_KIND);
+        boolean isNew = cursor.getInt(MESSAGE_NEW) != 0;
         String subject = cursor.getString(MESSAGE_SUBJECT);
         String subreddit = cursor.getString(MESSAGE_SUBREDDIT);
         String thingId = cursor.getString(MESSAGE_THING_ID);
 
         ThingView tv = (ThingView) view;
-        tv.setData(accountName, author, body, createdUtc, null, 0, true, kind, 0,
+        tv.setBody(body, isNew, formatter);
+        tv.setData(accountName, author, createdUtc, null, 0, true, kind, 0,
                 subject, 0, System.currentTimeMillis(), 0, false, parentSubreddit, 0, subreddit,
                 thingBodyWidth, thingId, null, null, 0);
         tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
@@ -277,7 +281,8 @@ public class ThingAdapter extends LoaderAdapter {
         }
 
         ThingView tv = (ThingView) view;
-        tv.setData(accountName, author, body, createdUtc, domain, downs, true, kind,
+        tv.setBody(body, false, formatter);
+        tv.setData(accountName, author, createdUtc, domain, downs, true, kind,
                 likes, linkTitle, 0, System.currentTimeMillis(), numComments, over18,
                 parentSubreddit, score, subreddit, thingBodyWidth, thingId,
                 thumbnailUrl, title, ups);

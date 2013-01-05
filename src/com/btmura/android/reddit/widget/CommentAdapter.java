@@ -26,6 +26,7 @@ import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.text.Formatter;
 
 public class CommentAdapter extends LoaderAdapter {
 
@@ -89,6 +90,7 @@ public class CommentAdapter extends LoaderAdapter {
     public static final int INDEX_SAVE_ACTION = 24;
     public static final int INDEX_VOTE = 25;
 
+    private final Formatter formatter = new Formatter();
     private final long nowTimeMs = System.currentTimeMillis();
 
     private long sessionId = -1;
@@ -171,7 +173,8 @@ public class CommentAdapter extends LoaderAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_COMMENT_LIST);
-        tv.setData(accountName, author, body, createdUtc, null, downs, expanded, kind, likes, null,
+        tv.setBody(body, false, formatter);
+        tv.setData(accountName, author, createdUtc, null, downs, expanded, kind, likes, null,
                 nesting, nowTimeMs, numComments, over18, null, score, null, 0, thingId, null, title,
                 ups);
         tv.setOnVoteListener(listener);

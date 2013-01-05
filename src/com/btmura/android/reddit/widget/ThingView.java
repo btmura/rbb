@@ -45,9 +45,6 @@ public class ThingView extends CustomView implements OnGestureListener {
     /** Type of ThingView used when listing the messages in one thread. */
     public static final int TYPE_MESSAGE_THREAD_LIST = 2;
 
-    // TODO: Fix thread safety issue here.
-    private static final Formatter FORMATTER = new Formatter();
-
     private final GestureDetector detector;
     private OnVoteListener listener;
 
@@ -137,9 +134,22 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
     }
 
+    public void setBody(String body, boolean isNew, Formatter formatter) {
+        if (!TextUtils.isEmpty(body)) {
+            bodyText = formatter.formatSpans(getContext(), body);
+            if (bodyBounds == null) {
+                bodyBounds = new RectF();
+            }
+        } else {
+            bodyText = null;
+        }
+
+        bodyPaint = isNew ? THING_NEW_BODY : THING_BODY;
+        requestLayout();
+    }
+
     public void setData(String accountName,
             String author,
-            String body,
             long createdUtc,
             String domain,
             int downs,
@@ -188,15 +198,6 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         boolean showUpsDowns = kind == Kinds.KIND_LINK || kind == Kinds.KIND_COMMENT;
         setDetailsText(showUpsDowns, domain, downs, ups);
-
-        if (!TextUtils.isEmpty(body)) {
-            bodyText = FORMATTER.formatSpans(getContext(), body);
-            if (bodyBounds == null) {
-                bodyBounds = new RectF();
-            }
-        } else {
-            bodyText = null;
-        }
 
         requestLayout();
     }

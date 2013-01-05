@@ -65,6 +65,10 @@
 
     <style name="ThingBodyText" parent="@style/SubredditTitleText" />
 
+    <style name="ThingNewBodyText" parent="@style/ThingBodyText">
+        <item name="android:textColor">@android:color/holo_blue_light</item>
+    </style>
+
     <style name="ThingStatusText" parent="@style/SubredditStatusText" />
 
     <style name="ThingNeutralScoreText" parent="@style/SubredditStatusText">
