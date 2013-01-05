@@ -29,14 +29,15 @@ import android.os.Bundle;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.JsonParser;
 
-class SubredditSearchListing extends JsonParser implements Listing {
+class SubredditResultListing extends JsonParser implements Listing {
 
-    public static final String TAG = "SubredditSearchListing";
+    public static final String TAG = "SubredditResultListing";
 
     private final String accountName;
     private final String query;
@@ -46,11 +47,11 @@ class SubredditSearchListing extends JsonParser implements Listing {
     private long networkTimeMs;
     private long parseTimeMs;
 
-    static SubredditSearchListing newInstance(String accountName, String query, String cookie) {
-        return new SubredditSearchListing(accountName, query, cookie);
+    static SubredditResultListing newInstance(String accountName, String query, String cookie) {
+        return new SubredditResultListing(accountName, query, cookie);
     }
 
-    SubredditSearchListing(String accountName, String query, String cookie) {
+    SubredditResultListing(String accountName, String query, String cookie) {
         this.accountName = accountName;
         this.query = query;
         this.cookie = cookie;
@@ -92,7 +93,7 @@ class SubredditSearchListing extends JsonParser implements Listing {
     }
 
     public String getTargetTable() {
-        return Things.TABLE_NAME;
+        return SubredditResults.TABLE_NAME;
     }
 
     public boolean isAppend() {
@@ -101,23 +102,23 @@ class SubredditSearchListing extends JsonParser implements Listing {
 
     @Override
     public void onEntityStart(int index) {
-        ContentValues v = new ContentValues(6);
+        ContentValues v = new ContentValues(5);
         v.put(Things.COLUMN_ACCOUNT, accountName);
         values.add(v);
     }
 
     @Override
     public void onDisplayName(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_NAME, readTrimmedString(reader, ""));
+        values.get(index).put(SubredditResults.COLUMN_NAME, readTrimmedString(reader, ""));
     }
 
     @Override
     public void onOver18(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_OVER_18, reader.nextBoolean());
+        values.get(index).put(SubredditResults.COLUMN_OVER_18, reader.nextBoolean());
     }
 
     @Override
     public void onSubscribers(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_SUBSCRIBERS, reader.nextInt());
+        values.get(index).put(SubredditResults.COLUMN_SUBSCRIBERS, reader.nextInt());
     }
 }

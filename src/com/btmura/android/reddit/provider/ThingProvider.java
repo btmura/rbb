@@ -38,6 +38,7 @@ import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
+import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.widget.FilterAdapter;
@@ -48,6 +49,7 @@ import com.btmura.android.reddit.widget.FilterAdapter;
  * <pre>
  * /things
  * /messages
+ * /subreddits
  * /actions/comments
  * /actions/messages
  * /actions/reads
@@ -67,6 +69,7 @@ public class ThingProvider extends SessionProvider {
 
     private static final String PATH_THINGS = "things";
     private static final String PATH_MESSAGES = "messages";
+    private static final String PATH_SUBREDDITS = "subreddits";
     private static final String PATH_COMMENT_ACTIONS = "actions/comments";
     private static final String PATH_MESSAGE_ACTIONS = "actions/messages";
     private static final String PATH_READ_ACTIONS = "actions/read";
@@ -75,6 +78,7 @@ public class ThingProvider extends SessionProvider {
 
     public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
     public static final Uri MESSAGES_URI = Uri.parse(AUTHORITY_URI + PATH_MESSAGES);
+    public static final Uri SUBREDDITS_URI = Uri.parse(AUTHORITY_URI + PATH_SUBREDDITS);
     public static final Uri COMMENT_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENT_ACTIONS);
     public static final Uri MESSAGE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_MESSAGE_ACTIONS);
     public static final Uri READ_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_READ_ACTIONS);
@@ -84,14 +88,16 @@ public class ThingProvider extends SessionProvider {
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;
     private static final int MATCH_MESSAGES = 2;
-    private static final int MATCH_COMMENT_ACTIONS = 3;
-    private static final int MATCH_MESSAGE_ACTIONS = 4;
-    private static final int MATCH_READ_ACTIONS = 5;
-    private static final int MATCH_SAVE_ACTIONS = 6;
-    private static final int MATCH_VOTE_ACTIONS = 7;
+    private static final int MATCH_SUBREDDITS = 3;
+    private static final int MATCH_COMMENT_ACTIONS = 4;
+    private static final int MATCH_MESSAGE_ACTIONS = 5;
+    private static final int MATCH_READ_ACTIONS = 6;
+    private static final int MATCH_SAVE_ACTIONS = 7;
+    private static final int MATCH_VOTE_ACTIONS = 8;
     static {
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
         MATCHER.addURI(AUTHORITY, PATH_MESSAGES, MATCH_MESSAGES);
+        MATCHER.addURI(AUTHORITY, PATH_SUBREDDITS, MATCH_SUBREDDITS);
         MATCHER.addURI(AUTHORITY, PATH_COMMENT_ACTIONS, MATCH_COMMENT_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_MESSAGE_ACTIONS, MATCH_MESSAGE_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_READ_ACTIONS, MATCH_READ_ACTIONS);
@@ -224,7 +230,7 @@ public class ThingProvider extends SessionProvider {
     }
 
     public static final Uri subredditSearchUri(long sessionId, String accountName, String query) {
-        Uri.Builder b = THINGS_URI.buildUpon();
+        Uri.Builder b = SUBREDDITS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_REDDIT_SEARCH_LISTING));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
@@ -241,7 +247,6 @@ public class ThingProvider extends SessionProvider {
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_LISTING));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
-
 
         b.appendQueryParameter(PARAM_JOIN, TRUE);
         if (sessionId != -1) {
@@ -289,6 +294,9 @@ public class ThingProvider extends SessionProvider {
                 } else {
                     return Messages.TABLE_NAME;
                 }
+
+            case MATCH_SUBREDDITS:
+                return SubredditResults.TABLE_NAME;
 
             case MATCH_COMMENT_ACTIONS:
                 return CommentActions.TABLE_NAME;
@@ -371,7 +379,7 @@ public class ThingProvider extends SessionProvider {
                     break;
 
                 case Listing.TYPE_REDDIT_SEARCH_LISTING:
-                    listing = SubredditSearchListing.newInstance(accountName, query, cookie);
+                    listing = SubredditResultListing.newInstance(accountName, query, cookie);
                     break;
 
                 default:

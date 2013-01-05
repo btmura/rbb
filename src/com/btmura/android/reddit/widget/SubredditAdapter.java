@@ -25,8 +25,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
@@ -42,10 +42,10 @@ public class SubredditAdapter extends LoaderAdapter {
     };
 
     private static final String[] PROJECTION_SEARCH = {
-            Things._ID,
-            Things.COLUMN_NAME,
-            Things.COLUMN_SUBSCRIBERS,
-            Things.COLUMN_OVER_18,
+            SubredditResults._ID,
+            SubredditResults.COLUMN_NAME,
+            SubredditResults.COLUMN_SUBSCRIBERS,
+            SubredditResults.COLUMN_OVER_18,
     };
 
     private static final int INDEX_ID = 0;
@@ -114,7 +114,7 @@ public class SubredditAdapter extends LoaderAdapter {
 
     @Override
     protected String getSortOrder() {
-        return isQuery() ? Things.SORT_BY_NAME : Subreddits.SORT_BY_NAME;
+        return isQuery() ? SubredditResults.SORT_BY_NAME : Subreddits.SORT_BY_NAME;
     }
 
     @Override

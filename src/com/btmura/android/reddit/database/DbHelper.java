@@ -58,6 +58,7 @@ public class DbHelper extends SQLiteOpenHelper {
             Sessions.createTempTable(db);
             Things.createTempTable(db);
             Messages.createTempTable(db);
+            SubredditResults.createTempTable(db);
         }
     }
 

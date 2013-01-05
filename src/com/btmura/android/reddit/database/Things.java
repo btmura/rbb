@@ -20,6 +20,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 public class Things implements BaseColumns {
+
     public static final String TABLE_NAME = "things";
 
     /** Account for joining with the votes table. */
@@ -38,10 +39,6 @@ public class Things implements BaseColumns {
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_LINK_ID = "linkId";
     public static final String COLUMN_LINK_TITLE = "linkTitle";
-
-    // TODO: Split apart subreddit search back to its own table.
-    public static final String COLUMN_NAME = "name";
-
     public static final String COLUMN_NESTING = "nesting";
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_OVER_18 = "over18";
@@ -52,10 +49,6 @@ public class Things implements BaseColumns {
     public static final String COLUMN_SELF_TEXT = "selfText";
     public static final String COLUMN_SEQUENCE = "sequence";
     public static final String COLUMN_SESSION_ID = SharedColumns.COLUMN_SESSION_ID;
-
-    /** Number of subscribers to this subreddit. */
-    public static final String COLUMN_SUBSCRIBERS = "subscribers";
-
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_THING_ID = SharedColumns.COLUMN_THING_ID;
@@ -83,8 +76,6 @@ public class Things implements BaseColumns {
 
     public static final String SELECT_VISIBLE = COLUMN_VISIBLE + "=1";
 
-    public static final String SORT_BY_NAME = COLUMN_NAME + " COLLATE NOCASE ASC";
-
     // TODO: Do we need an index for sequence and id?
     public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
 
@@ -102,7 +93,6 @@ public class Things implements BaseColumns {
                 + COLUMN_LIKES + " INTEGER DEFAULT 0, "
                 + COLUMN_LINK_ID + " TEXT, "
                 + COLUMN_LINK_TITLE + " TEXT, "
-                + COLUMN_NAME + " TEXT, "
                 + COLUMN_NESTING + " INTEGER, "
                 + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
                 + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
@@ -113,7 +103,6 @@ public class Things implements BaseColumns {
                 + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "
                 + COLUMN_SEQUENCE + " INTEGER, "
                 + COLUMN_SESSION_ID + " TEXT NOT NULL, "
-                + COLUMN_SUBSCRIBERS + " INTEGER, "
                 + COLUMN_SUBREDDIT + " TEXT, "
                 + COLUMN_THING_ID + " TEXT, "
                 + COLUMN_TITLE + " TEXT, "
