@@ -186,7 +186,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         setStatusText(over18, showSubreddit, showPoints, showNumComments,
                 author, createdUtc, nowTimeMs, numComments, score, subreddit);
 
-        boolean showUpsDowns = kind == Kinds.KIND_LINK;
+        boolean showUpsDowns = kind == Kinds.KIND_LINK || kind == Kinds.KIND_COMMENT;
         setDetailsText(showUpsDowns, domain, downs, ups);
 
         if (!TextUtils.isEmpty(body)) {
