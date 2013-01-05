@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -73,16 +74,18 @@ class MessageListing extends JsonParser implements Listing {
     private long networkTimeMs;
     private long parseTimeMs;
 
+    private String moreThingId;
+
     /** Returns a listing of messages for inbox or sent. */
-    static MessageListing newInstance(String accountName, int filter, String more, boolean mark,
-            String cookie) {
-        return new MessageListing(null, Listing.TYPE_MESSAGE_LISTING, accountName,
+    static MessageListing newInstance(SQLiteOpenHelper dbHelper, String accountName, int filter,
+            String more, boolean mark, String cookie) {
+        return new MessageListing(dbHelper, Listing.TYPE_MESSAGE_LISTING, accountName,
                 null, filter, more, mark, cookie);
     }
 
     /** Returns an instance for a message thread. */
-    static MessageListing newThreadInstance(String accountName, String thingId, String cookie,
-            SQLiteOpenHelper dbHelper) {
+    static MessageListing newThreadInstance(SQLiteOpenHelper dbHelper, String accountName,
+            String thingId, String cookie) {
         return new MessageListing(dbHelper, Listing.TYPE_MESSAGE_THREAD_LISTING, accountName,
                 thingId, 0, null, false, cookie);
     }
@@ -154,7 +157,7 @@ class MessageListing extends JsonParser implements Listing {
     }
 
     public boolean isAppend() {
-        return false;
+        return !TextUtils.isEmpty(more);
     }
 
     @Override
@@ -224,9 +227,22 @@ class MessageListing extends JsonParser implements Listing {
     }
 
     @Override
+    public void onAfter(JsonReader reader) throws IOException {
+        moreThingId = readTrimmedString(reader, null);
+    }
+
+    @Override
     public void onParseEnd() {
         if (listingType == Listing.TYPE_MESSAGE_THREAD_LISTING) {
             mergeThreadActions();
+        }
+
+        if (!TextUtils.isEmpty(moreThingId)) {
+            ContentValues v = new ContentValues(3 + 1); // 1 for session id.
+            v.put(Messages.COLUMN_ACCOUNT, accountName);
+            v.put(Messages.COLUMN_KIND, Kinds.KIND_MORE);
+            v.put(Messages.COLUMN_THING_ID, moreThingId);
+            values.add(v);
         }
     }
 

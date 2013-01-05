@@ -348,12 +348,14 @@ public class ThingProvider extends SessionProvider {
             Listing listing = null;
             switch (listingType) {
                 case Listing.TYPE_MESSAGE_THREAD_LISTING:
-                    listing = MessageListing.newThreadInstance(accountName, thingId, cookie, helper);
+                    listing = MessageListing.newThreadInstance(helper,
+                            accountName, thingId, cookie);
                     break;
 
                 case Listing.TYPE_MESSAGE_LISTING:
                     boolean mark = uri.getBooleanQueryParameter(PARAM_MARK, false);
-                    listing = MessageListing.newInstance(accountName, filter, more, mark, cookie);
+                    listing = MessageListing.newInstance(helper,
+                            accountName, filter, more, mark, cookie);
                     break;
 
                 case Listing.TYPE_SUBREDDIT_LISTING:
@@ -379,7 +381,8 @@ public class ThingProvider extends SessionProvider {
                     break;
 
                 case Listing.TYPE_REDDIT_SEARCH_LISTING:
-                    listing = SubredditResultListing.newInstance(accountName, query, cookie);
+                    listing = SubredditResultListing.newInstance(
+                            accountName, query, cookie);
                     break;
 
                 default:
