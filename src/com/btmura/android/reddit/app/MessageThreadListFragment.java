@@ -19,6 +19,7 @@ package com.btmura.android.reddit.app;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -126,7 +127,13 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         int count = getListView().getCheckedItemCount();
-        menu.findItem(R.id.menu_new_comment).setVisible(count == 1);
+
+        boolean showNewComment = count == 1;
+        if (showNewComment) {
+            showNewComment &= !TextUtils.isEmpty(adapter.getThingId(getFirstCheckedPosition()));
+        }
+
+        menu.findItem(R.id.menu_new_comment).setVisible(showNewComment);
         return true;
     }
 
