@@ -160,7 +160,11 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         String user = adapter.getUser(position);
 
         Bundle extras = new Bundle(3);
-        extras.putString(ComposeActivity.EXTRA_MESSAGE_PARENT_THING_ID, adapter.getThingId());
+
+        // Message threads are odd in that the thing id doesn't refer to the
+        // topmost message, so the actions may not match up with the id. So get
+        // the parent id from the first element.
+        extras.putString(ComposeActivity.EXTRA_MESSAGE_PARENT_THING_ID, adapter.getThingId(0));
         extras.putLong(ComposeActivity.EXTRA_MESSAGE_SESSION_ID, adapter.getSessionId());
         extras.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, adapter.getThingId(position));
 

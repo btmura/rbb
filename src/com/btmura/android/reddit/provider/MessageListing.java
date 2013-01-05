@@ -29,7 +29,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -49,14 +48,12 @@ class MessageListing extends JsonParser implements Listing {
             MessageActions._ID,
             MessageActions.COLUMN_ACCOUNT,
             MessageActions.COLUMN_ACTION,
-            MessageActions.COLUMN_THING_ID,
             MessageActions.COLUMN_TEXT,
     };
 
     private static final int MERGE_INDEX_ACCOUNT = 1;
     private static final int MERGE_INDEX_ACTION = 2;
-    private static final int MERGE_INDEX_THING_ID = 3;
-    private static final int MERGE_INDEX_TEXT = 4;
+    private static final int MERGE_INDEX_TEXT = 3;
 
     private static final String MERGE_SELECTION = MessageActions.COLUMN_ACCOUNT + "=? AND "
             + MessageActions.COLUMN_PARENT_THING_ID + "=?";
@@ -234,18 +231,26 @@ class MessageListing extends JsonParser implements Listing {
     }
 
     private void mergeThreadActions() {
+        if (values.isEmpty()) {
+            return; // Something went wrong.
+        }
+
+        // Message threads are odd in that the thing id doesn't refer to the
+        // topmost message, so the actions may not match up with the id. So get
+        // the parent id from the first element.
+        String parentId = values.get(0).getAsString(Messages.COLUMN_THING_ID);
+
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(MessageActions.TABLE_NAME, MERGE_PROJECTION,
-                MERGE_SELECTION, Array.of(accountName, thingId), null, null, MERGE_SORT);
+                MERGE_SELECTION, Array.of(accountName, parentId), null, null, MERGE_SORT);
         try {
             while (c.moveToNext()) {
                 String actionAccountName = c.getString(MERGE_INDEX_ACCOUNT);
                 int action = c.getInt(MERGE_INDEX_ACTION);
-                String targetId = c.getString(MERGE_INDEX_THING_ID);
                 String text = c.getString(MERGE_INDEX_TEXT);
                 switch (action) {
                     case MessageActions.ACTION_INSERT:
-                        insertThing(actionAccountName, targetId, text);
+                        insertThing(actionAccountName, text);
                         break;
 
                     default:
@@ -257,7 +262,7 @@ class MessageListing extends JsonParser implements Listing {
         }
     }
 
-    private void insertThing(String actionAccountName, String targetId, String body) {
+    private void insertThing(String actionAccountName, String body) {
         // Allocate extra space for session ID later.
         ContentValues p = new ContentValues(4 + 1);
         p.put(Messages.COLUMN_ACCOUNT, actionAccountName);
