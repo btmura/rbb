@@ -400,28 +400,23 @@ public class ThingProvider extends SessionProvider {
     }
 
     private void handleCommentReply(Uri uri, SQLiteDatabase db, ContentValues values) {
-        String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
-        String thingId = uri.getQueryParameter(PARAM_THING_ID);
-
+        // Insert an action to sync the reply back to the network eventually.
         ContentValues v = new ContentValues(5);
-        v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
         v.put(CommentActions.COLUMN_ACCOUNT, values.getAsString(Things.COLUMN_ACCOUNT));
-        v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
-        v.put(CommentActions.COLUMN_THING_ID, thingId);
+        v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
+        v.put(CommentActions.COLUMN_PARENT_THING_ID, uri.getQueryParameter(PARAM_PARENT_THING_ID));
+        v.put(CommentActions.COLUMN_THING_ID, uri.getQueryParameter(PARAM_THING_ID));
         v.put(CommentActions.COLUMN_TEXT, values.getAsString(Things.COLUMN_BODY));
         db.insert(CommentActions.TABLE_NAME, null, v);
     }
 
     private void handleMessageReply(Uri uri, SQLiteDatabase db, ContentValues values) {
-        // Get the thing ID of the thing we are replying to.
-        String thingId = uri.getQueryParameter(PARAM_THING_ID);
-
         // Insert an action to sync the reply back to the network eventually.
         ContentValues v = new ContentValues(5);
         v.put(MessageActions.COLUMN_ACCOUNT, values.getAsString(Messages.COLUMN_ACCOUNT));
         v.put(MessageActions.COLUMN_ACTION, MessageActions.ACTION_INSERT);
-        v.put(MessageActions.COLUMN_PARENT_THING_ID, uri.getLastPathSegment());
-        v.put(MessageActions.COLUMN_THING_ID, thingId);
+        v.put(MessageActions.COLUMN_PARENT_THING_ID, uri.getQueryParameter(PARAM_PARENT_THING_ID));
+        v.put(MessageActions.COLUMN_THING_ID, uri.getQueryParameter(PARAM_THING_ID));
         v.put(MessageActions.COLUMN_TEXT, values.getAsString(Messages.COLUMN_BODY));
         db.insert(MessageActions.TABLE_NAME, null, v);
     }
