@@ -374,7 +374,7 @@ class ThingListing extends JsonParser implements Listing {
         // saves if we're just scrolling further down.
         String selection;
         if (TextUtils.isEmpty(more)) {
-            selection = SaveActions.SELECT_SAVED_AND_UNSAVED_BY_ACCOUNT;
+            selection = SaveActions.SELECT_BY_ACCOUNT;
         } else {
             selection = SaveActions.SELECT_UNSAVED_BY_ACCOUNT;
         }

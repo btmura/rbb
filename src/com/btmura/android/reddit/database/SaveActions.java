@@ -91,13 +91,10 @@ public class SaveActions implements BaseColumns {
     /** Action column value to unsave something. */
     public static final int ACTION_UNSAVE = -1;
 
-    public static final String SELECT_SAVED_AND_UNSAVED_BY_ACCOUNT =
-            COLUMN_ACCOUNT + "=? AND " + COLUMN_ACTION + " IN ("
-                    + ACTION_SAVE + "," + ACTION_UNSAVE + ")";
+    public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
 
-    public static final String SELECT_UNSAVED_BY_ACCOUNT =
-            COLUMN_ACCOUNT + "=? AND " + COLUMN_ACTION + " IN ("
-                    + ACTION_UNSAVE + ")";
+    public static final String SELECT_UNSAVED_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
+            + " AND " + COLUMN_ACTION + "=" + ACTION_UNSAVE;
 
     public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
 

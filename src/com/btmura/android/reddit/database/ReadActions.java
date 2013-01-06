@@ -41,10 +41,6 @@ public class ReadActions implements BaseColumns {
     /** Action meaning the user has marked this message as unread. */
     public static final int ACTION_UNREAD = 1;
 
-    /** Selection for prior pending read and unread messages. */
-    public static final String SELECT_READ_UNREAD_BY_ACCOUNT_AND_THING_ID =
-            ReadActions.COLUMN_ACCOUNT + "=? AND " + ReadActions.COLUMN_THING_ID + "=?";
-
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "

@@ -49,7 +49,7 @@ public class CommentActions implements BaseColumns {
     /** Unused long column for expiration of this row. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
-    public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "=?";
+    public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
 
     public static final String SELECT_BY_ACCOUNT_AND_PARENT_THING_ID = COLUMN_ACCOUNT + "=? AND "
             + COLUMN_PARENT_THING_ID + " = ?";

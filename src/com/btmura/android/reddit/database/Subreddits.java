@@ -46,7 +46,7 @@ public class Subreddits implements BaseColumns {
     public static final int STATE_INSERTING = 1;
     public static final int STATE_DELETING = 2;
 
-    public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "= ?";
+    public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
     public static final String SELECT_BY_ACCOUNT_NOT_DELETED =
             SELECT_BY_ACCOUNT + " AND " + COLUMN_STATE + "!= " + STATE_DELETING;
     public static final String SELECT_BY_ACCOUNT_AND_NAME =
