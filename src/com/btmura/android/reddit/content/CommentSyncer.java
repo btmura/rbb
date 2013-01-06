@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.SharedColumns;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -32,6 +33,7 @@ import android.content.ContentProviderResult;
 import android.content.Context;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.RemoteException;
 
 class CommentSyncer implements Syncer {
@@ -39,14 +41,14 @@ class CommentSyncer implements Syncer {
     private static final String[] COMMENT_PROJECTION = {
             CommentActions._ID,
             CommentActions.COLUMN_ACTION,
-            CommentActions.COLUMN_THING_ID,
             CommentActions.COLUMN_TEXT,
+            CommentActions.COLUMN_THING_ID,
     };
 
     private static final int COMMENT_ID = 0;
     private static final int COMMENT_ACTION = 1;
-    private static final int COMMENT_THING_ID = 2;
-    private static final int COMMENT_TEXT = 3;
+    private static final int COMMENT_TEXT = 2;
+    private static final int COMMENT_THING_ID = 3;
 
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
         return provider.query(ThingProvider.COMMENT_ACTIONS_URI, COMMENT_PROJECTION,
@@ -78,12 +80,22 @@ class CommentSyncer implements Syncer {
         ops.add(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
+
+        Uri uri = ThingProvider.THINGS_URI.buildUpon()
+                .appendQueryParameter(ThingProvider.PARAM_NOTIFY, ThingProvider.TRUE)
+                .build();
+
+        ops.add(ContentProviderOperation.newUpdate(uri)
+                .withSelection(Things.SELECT_BY_COMMENT_ACTION_ID, Array.of(id))
+                .withValue(Things.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
+                .build());
     }
 
     public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
         int count = results.length;
-        for (int i = 0; i < count; i++) {
-            syncResult.stats.numDeletes += results[i].count;
+        for (int i = 0; i < count;) {
+            syncResult.stats.numDeletes += results[i++].count;
+            syncResult.stats.numUpdates += results[i++].count;
         }
     }
 }

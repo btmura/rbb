@@ -39,9 +39,9 @@ abstract class BaseProvider extends ContentProvider {
 
     public static final String ID_SELECTION = BaseColumns._ID + "= ?";
 
-    static final String TRUE = Boolean.toString(true);
+    public static final String TRUE = Boolean.toString(true);
 
-    static final String FALSE = Boolean.toString(false);
+    public static final String FALSE = Boolean.toString(false);
 
     /**
      * Sync changes back to the network. Don't set this in sync adapters or else
@@ -76,6 +76,7 @@ abstract class BaseProvider extends ContentProvider {
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
+
         String table = getTable(uri);
         Cursor c = null;
         db.beginTransaction();

@@ -94,7 +94,7 @@ public class RedditApi {
         public boolean hasRateLimitError() {
             if (!Array.isEmpty(errors)) {
                 for (int i = 0; i < errors.length; i++) {
-                    if ("RATE_LIMIT".equals(errors[i][0])) {
+                    if ("RATELIMIT".equals(errors[i][0])) {
                         return true;
                     }
                 }

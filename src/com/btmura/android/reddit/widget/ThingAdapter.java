@@ -144,6 +144,7 @@ public class ThingAdapter extends LoaderAdapter {
     private int thingBodyWidth;
     private String selectedThingId;
     private String selectedLinkId;
+    private long nowTimeMs;
 
     public ThingAdapter(Context context, String subreddit, String query, String profileUser,
             String messageUser, int filter, OnVoteListener listener, boolean singleChoice) {
@@ -205,6 +206,12 @@ public class ThingAdapter extends LoaderAdapter {
     }
 
     @Override
+    public Cursor swapCursor(Cursor newCursor) {
+        nowTimeMs = System.currentTimeMillis();
+        return super.swapCursor(newCursor);
+    }
+
+    @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         switch (getKind(cursor.getPosition())) {
             case Kinds.KIND_MORE:
@@ -239,9 +246,8 @@ public class ThingAdapter extends LoaderAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setBody(body, isNew, formatter);
-        tv.setData(accountName, author, createdUtc, null, 0, true, kind, 0,
-                subject, 0, System.currentTimeMillis(), 0, false, parentSubreddit, 0, subreddit,
-                thingBodyWidth, thingId, null, null, 0);
+        tv.setData(accountName, author, createdUtc, null, 0, true, kind, 0, subject, 0, nowTimeMs,
+                0, false, parentSubreddit, 0, subreddit, thingBodyWidth, thingId, null, null, 0);
         tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
         tv.setOnVoteListener(listener);
     }
@@ -282,10 +288,9 @@ public class ThingAdapter extends LoaderAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setBody(body, false, formatter);
-        tv.setData(accountName, author, createdUtc, domain, downs, true, kind,
-                likes, linkTitle, 0, System.currentTimeMillis(), numComments, over18,
-                parentSubreddit, score, subreddit, thingBodyWidth, thingId,
-                thumbnailUrl, title, ups);
+        tv.setData(accountName, author, createdUtc, domain, downs, true, kind, likes, linkTitle, 0,
+                nowTimeMs, numComments, over18, parentSubreddit, score, subreddit, thingBodyWidth,
+                thingId, thumbnailUrl, title, ups);
         tv.setChosen(singleChoice
                 && Objects.equals(selectedThingId, thingId)
                 && Objects.equals(selectedLinkId, linkId));
