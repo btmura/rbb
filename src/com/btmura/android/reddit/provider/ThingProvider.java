@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -108,10 +107,6 @@ public class ThingProvider extends SessionProvider {
     static final String PARAM_LISTING_GET = "getListing";
     static final String PARAM_LISTING_TYPE = "listingType";
 
-    static final String PARAM_COMMENT_DELETE = "commentDelete";
-
-    static final String PARAM_MESSAGE_REPLY = "messageReply";
-
     static final String PARAM_SESSION_ID = "sessionId";
     static final String PARAM_ACCOUNT = "account";
     static final String PARAM_SUBREDDIT = "subreddit";
@@ -120,7 +115,6 @@ public class ThingProvider extends SessionProvider {
     static final String PARAM_FILTER = "filter";
     static final String PARAM_MORE = "more";
     static final String PARAM_MARK = "mark";
-    static final String PARAM_PARENT_THING_ID = "parentThingId";
     static final String PARAM_THING_ID = "thingId";
     static final String PARAM_LINK_ID = "linkId";
     static final String PARAM_JOIN = "join";
@@ -407,37 +401,6 @@ public class ThingProvider extends SessionProvider {
             Log.e(TAG, e.getMessage(), e);
         }
         return null;
-    }
-
-    @Override
-    protected int innerUpdate(Uri uri, SQLiteDatabase db, String table, ContentValues values,
-            String selection, String[] selectionArgs) {
-        if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
-            handleCommentDelete(uri, db);
-        }
-        return super.innerUpdate(uri, db, table, values, selection, selectionArgs);
-    }
-
-    @Override
-    protected int innerDelete(Uri uri, SQLiteDatabase db, String table, String selection,
-            String[] selectionArgs) {
-        if (uri.getBooleanQueryParameter(PARAM_COMMENT_DELETE, false)) {
-            handleCommentDelete(uri, db);
-        }
-        return super.innerDelete(uri, db, table, selection, selectionArgs);
-    }
-
-    private void handleCommentDelete(Uri uri, SQLiteDatabase db) {
-        String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
-        String parentThingId = uri.getQueryParameter(PARAM_PARENT_THING_ID);
-        String thingId = uri.getQueryParameter(PARAM_THING_ID);
-
-        ContentValues v = new ContentValues(4);
-        v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE);
-        v.put(CommentActions.COLUMN_ACCOUNT, accountName);
-        v.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
-        v.put(CommentActions.COLUMN_THING_ID, thingId);
-        db.insert(CommentActions.TABLE_NAME, null, v);
     }
 
     @Override

@@ -205,18 +205,17 @@ public class Provider {
             public void run() {
                 int count = ids.length;
                 ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(count + 1);
+                        new ArrayList<ContentProviderOperation>(count * 2 + 1);
 
                 int numDeletes = 0;
                 for (int i = 0; i < count; i++) {
-                    Uri uri = ThingProvider.THINGS_URI.buildUpon()
-                            .appendQueryParameter(ThingProvider.PARAM_NOTIFY, TRUE)
-                            .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                            .appendQueryParameter(ThingProvider.PARAM_COMMENT_DELETE, TRUE)
-                            .appendQueryParameter(ThingProvider.PARAM_ACCOUNT, accountName)
-                            .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID, parentId)
-                            .appendQueryParameter(ThingProvider.PARAM_THING_ID, thingIds[i])
-                            .build();
+                    ops.add(ContentProviderOperation.newInsert(ThingProvider.COMMENT_ACTIONS_URI)
+                            .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE)
+                            .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
+                            .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentId)
+                            .withValue(CommentActions.COLUMN_THING_ID, thingIds[i])
+                            .build());
+
                     // Make sure to sync this logic is duplicated in
                     // CommentListing#deleteThing.
                     if (Objects.equals(parentId, thingIds[i])) {
@@ -224,28 +223,33 @@ public class Provider {
                         // even in the thing list.
                         // TODO: Make ThingProvider also show [deleted] in thing
                         // list on refresh.
-                        ops.add(ContentProviderOperation.newUpdate(uri)
+                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                                 .withValue(Things.COLUMN_AUTHOR, Things.DELETED)
                                 .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
                                         Array.of(accountName, parentId))
                                 .build());
                     } else if (hasChildren[i]) {
-                        ops.add(ContentProviderOperation.newUpdate(uri)
+                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                                 .withValue(Things.COLUMN_AUTHOR, Things.DELETED)
                                 .withValue(Things.COLUMN_BODY, Things.DELETED)
                                 .withSelection(BaseProvider.ID_SELECTION, Array.of(ids[i]))
                                 .build());
                     } else {
-                        ops.add(ContentProviderOperation.newDelete(uri)
+                        ops.add(ContentProviderOperation.newDelete(ThingProvider.THINGS_URI)
                                 .withSelection(BaseProvider.ID_SELECTION, Array.of(ids[i]))
                                 .build());
                         numDeletes++;
                     }
                 }
 
+                Uri uri = ThingProvider.THINGS_URI.buildUpon()
+                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
+                        .build();
+
                 // Update the header comment by how comments were truly deleted.
-                ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                        .withSelection(BaseProvider.ID_SELECTION, Array.of(headerId))
+                ops.add(ContentProviderOperation.newUpdate(uri)
+                        .withSelection(Things.COLUMN_THING_ID, Array.of(parentId))
                         .withValue(Things.COLUMN_NUM_COMMENTS, headerNumComments - numDeletes)
                         .build());
 
