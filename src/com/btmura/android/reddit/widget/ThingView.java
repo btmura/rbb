@@ -61,6 +61,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private Bitmap bitmap;
     private boolean drawVotingArrows;
     private boolean drawScore;
+    private boolean isVotable;
 
     private CharSequence bodyText;
     private String scoreText;
@@ -180,6 +181,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.title = title;
 
         drawVotingArrows = AccountUtils.isAccount(accountName) && kind != Kinds.KIND_MESSAGE;
+        isVotable = drawVotingArrows && !TextUtils.isEmpty(thingId);
         drawScore = drawVotingArrows && kind == Kinds.KIND_LINK;
         if (drawScore) {
             if (scoreBounds == null) {
@@ -472,7 +474,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         if (drawVotingArrows) {
             if (expanded) {
-                VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes, drawScore, true);
+                VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes, drawScore, isVotable);
             }
             c.translate(VotingArrows.getWidth(drawVotingArrows) + PADDING, 0);
         }
@@ -551,12 +553,12 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     public boolean onDown(MotionEvent e) {
         return VotingArrows.onDown(e, getTopOffset(), getLeftOffset(),
-                drawVotingArrows, drawScore, true);
+                drawVotingArrows, drawScore, isVotable);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
         return VotingArrows.onSingleTapUp(e, getTopOffset(), getLeftOffset(),
-                drawVotingArrows, drawScore, true, listener, thingId, likes);
+                drawVotingArrows, drawScore, isVotable, listener, thingId, likes);
     }
 
     private float getTopOffset() {
