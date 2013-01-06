@@ -236,10 +236,13 @@ public class Provider {
                 }
 
                 // Update the header comment by how comments were truly deleted.
-                ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_NOTIFY_SYNC_URI)
-                        .withSelection(Things.COLUMN_THING_ID, Array.of(parentId))
-                        .withValue(Things.COLUMN_NUM_COMMENTS, headerNumComments - numDeletes)
-                        .build());
+                if (numDeletes > 0) {
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_NOTIFY_SYNC_URI)
+                            .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
+                                    Array.of(accountName, parentId))
+                            .withValue(Things.COLUMN_NUM_COMMENTS, headerNumComments - numDeletes)
+                            .build());
+                }
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);
             }
