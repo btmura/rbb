@@ -382,6 +382,14 @@ public class Urls {
                 b.append("/submitted");
                 break;
 
+            case FilterAdapter.PROFILE_LIKED:
+                b.append("/liked");
+                break;
+
+            case FilterAdapter.PROFILE_DISLIKED:
+                b.append("/disliked");
+                break;
+
             case FilterAdapter.PROFILE_SAVED:
                 b.append("/saved");
                 break;
