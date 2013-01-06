@@ -57,6 +57,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             CommentActions.COLUMN_TEXT,
     };
 
+    private static final int INDEX_ID = 0;
     private static final int INDEX_ACCOUNT_NAME = 1;
     private static final int INDEX_ACTION = 2;
     private static final int INDEX_THING_ID = 3;
@@ -297,19 +298,20 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 null, null, CommentActions.SORT_BY_ID);
         try {
             while (c.moveToNext()) {
+                long actionId = c.getLong(INDEX_ID);
                 String actionAccountName = c.getString(INDEX_ACCOUNT_NAME);
                 int action = c.getInt(INDEX_ACTION);
-                String id = c.getString(INDEX_THING_ID);
                 String text = c.getString(INDEX_TEXT);
+                String actionThingId = c.getString(INDEX_THING_ID);
                 switch (action) {
                     case CommentActions.ACTION_INSERT:
-                        if (insertThing(actionAccountName, id, text)) {
+                        if (insertThing(actionId, actionAccountName, text, actionThingId)) {
                             delta++;
                         }
                         break;
 
                     case CommentActions.ACTION_DELETE:
-                        if (deleteThing(id)) {
+                        if (deleteThing(actionThingId)) {
                             delta--;
                         }
                         break;
@@ -329,7 +331,8 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         }
     }
 
-    private boolean insertThing(String actionAccountName, String replyId, String body) {
+    private boolean insertThing(long actionId, String actionAccountName, String body,
+            String actionThingId) {
         int size = values.size();
         for (int i = 0; i < size; i++) {
             ContentValues v = values.get(i);
@@ -340,11 +343,12 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 continue;
             }
 
-            if (id.equals(replyId)) {
-                ContentValues p = new ContentValues(8);
+            if (id.equals(actionThingId)) {
+                ContentValues p = new ContentValues(7 + 1); // +1 for session id.
                 p.put(Things.COLUMN_ACCOUNT, actionAccountName);
                 p.put(Things.COLUMN_AUTHOR, actionAccountName);
                 p.put(Things.COLUMN_BODY, body);
+                p.put(Things.COLUMN_COMMENT_ACTION_ID, actionId);
                 p.put(Things.COLUMN_KIND, Kinds.KIND_COMMENT);
                 p.put(Things.COLUMN_NESTING, CommentLogic.getInsertNesting(this, i));
                 p.put(Things.COLUMN_SEQUENCE, CommentLogic.getInsertSequence(this, i));
