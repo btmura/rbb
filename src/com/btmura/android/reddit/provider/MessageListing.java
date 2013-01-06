@@ -36,6 +36,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
+import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.Array;
@@ -47,19 +48,16 @@ class MessageListing extends JsonParser implements Listing {
 
     private static final String[] MERGE_PROJECTION = {
             MessageActions._ID,
-            MessageActions.COLUMN_ACCOUNT,
             MessageActions.COLUMN_ACTION,
             MessageActions.COLUMN_TEXT,
     };
 
-    private static final int MERGE_INDEX_ACCOUNT = 1;
-    private static final int MERGE_INDEX_ACTION = 2;
-    private static final int MERGE_INDEX_TEXT = 3;
+    private static final int MERGE_ID = 0;
+    private static final int MERGE_ACTION = 1;
+    private static final int MERGE_TEXT = 2;
 
     private static final String MERGE_SELECTION = MessageActions.COLUMN_ACCOUNT + "=? AND "
             + MessageActions.COLUMN_PARENT_THING_ID + "=?";
-
-    private static final String MERGE_SORT = MessageActions._ID + " ASC";
 
     private final int listingType;
     private final String accountName;
@@ -251,42 +249,37 @@ class MessageListing extends JsonParser implements Listing {
             return; // Something went wrong.
         }
 
-        // Message threads are odd in that the thing id doesn't refer to the
-        // topmost message, so the actions may not match up with the id. So get
-        // the parent id from the first element.
+        // Message threads are odd in that the thing ID doesn't refer to the
+        // topmost message, so the actions may not match up with that ID.
+        // So get the parent id from the first element.
         String parentId = values.get(0).getAsString(Messages.COLUMN_THING_ID);
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(MessageActions.TABLE_NAME, MERGE_PROJECTION,
-                MERGE_SELECTION, Array.of(accountName, parentId), null, null, MERGE_SORT);
-        try {
-            while (c.moveToNext()) {
-                String actionAccountName = c.getString(MERGE_INDEX_ACCOUNT);
-                int action = c.getInt(MERGE_INDEX_ACTION);
-                String text = c.getString(MERGE_INDEX_TEXT);
-                switch (action) {
-                    case MessageActions.ACTION_INSERT:
-                        insertThing(actionAccountName, text);
-                        break;
+                MERGE_SELECTION, Array.of(accountName, parentId),
+                null, null, SharedColumns.SORT_BY_ID);
+        while (c.moveToNext()) {
+            switch (c.getInt(MERGE_ACTION)) {
+                case MessageActions.ACTION_INSERT:
+                    insertMessage(c);
+                    break;
 
-                    default:
-                        throw new IllegalStateException();
-                }
+                default:
+                    throw new IllegalStateException();
             }
-        } finally {
-            c.close();
         }
+        c.close();
     }
 
-    private void insertThing(String actionAccountName, String body) {
-        // Allocate extra space for session ID later.
-        ContentValues p = new ContentValues(4 + 1);
-        p.put(Messages.COLUMN_ACCOUNT, actionAccountName);
-        p.put(Messages.COLUMN_AUTHOR, actionAccountName);
-        p.put(Messages.COLUMN_BODY, body);
-        p.put(Messages.COLUMN_KIND, Kinds.KIND_MESSAGE);
+    private void insertMessage(Cursor c) {
+        ContentValues v = new ContentValues(5 + 1); // +1 for session id.
+        v.put(Messages.COLUMN_ACCOUNT, accountName);
+        v.put(Messages.COLUMN_AUTHOR, accountName);
+        v.put(Messages.COLUMN_BODY, c.getString(MERGE_TEXT));
+        v.put(Messages.COLUMN_KIND, Kinds.KIND_MESSAGE);
+        v.put(Messages.COLUMN_MESSAGE_ACTION_ID, c.getLong(MERGE_ID));
 
         // Just append to the bottom for messages.
-        values.add(p);
+        values.add(v);
     }
 }

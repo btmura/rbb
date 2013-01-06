@@ -41,6 +41,9 @@ public class Messages implements BaseColumns {
     public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
             COLUMN_ACCOUNT + "=? AND " + COLUMN_THING_ID + "=?";
 
+    public static final String SELECT_BY_MESSAGE_ACTION_ID =
+            COLUMN_MESSAGE_ACTION_ID + "=?";
+
     static void createTempTable(SQLiteDatabase db) {
         db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"

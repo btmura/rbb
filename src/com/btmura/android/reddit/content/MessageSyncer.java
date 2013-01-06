@@ -25,10 +25,13 @@ import android.content.ContentProviderResult;
 import android.content.Context;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.RemoteException;
 
 import com.btmura.android.reddit.database.MessageActions;
+import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.SharedColumns;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -71,21 +74,30 @@ class MessageSyncer implements Syncer {
     }
 
     public int getOpCount(int count) {
-        return count;
+        return count * 2;
     }
 
     public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
-        // Delete the row corresponding to the pending action.
         long id = c.getLong(MESSAGE_ID);
         ops.add(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
+                .build());
+
+        Uri uri = ThingProvider.MESSAGES_URI.buildUpon()
+                .appendQueryParameter(ThingProvider.PARAM_NOTIFY, ThingProvider.TRUE)
+                .build();
+
+        ops.add(ContentProviderOperation.newUpdate(uri)
+                .withSelection(Messages.SELECT_BY_MESSAGE_ACTION_ID, Array.of(id))
+                .withValue(Things.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
                 .build());
     }
 
     public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
         int count = results.length;
-        for (int i = 0; i < count; i++) {
-            syncResult.stats.numDeletes += results[i].count;
+        for (int i = 0; i < count;) {
+            syncResult.stats.numDeletes += results[i++].count;
+            syncResult.stats.numUpdates += results[i++].count;
         }
     }
 }

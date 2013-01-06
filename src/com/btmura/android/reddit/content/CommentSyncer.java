@@ -72,7 +72,7 @@ class CommentSyncer implements Syncer {
     }
 
     public int getOpCount(int count) {
-        return count;
+        return count * 2;
     }
 
     public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
