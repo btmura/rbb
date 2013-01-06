@@ -63,10 +63,21 @@ public class Provider {
             Things.COLUMN_NESTING,
     };
 
-    /** Uri to use when marking messages read. */
-    private static final Uri MARK_MESSAGE_READ_URI =
-            ThingProvider.READ_ACTIONS_NOTIFY_SYNC_URI.buildUpon()
+    private static final Uri READ_ACTIONS_NOTIFY_SYNC_URI =
+            ThingProvider.READ_ACTIONS_URI.buildUpon()
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_MESSAGES, ThingProvider.TRUE)
+                    .build();
+
+    private static final Uri SAVE_ACTIONS_NOTIFY_SYNC_URI =
+            ThingProvider.SAVE_ACTIONS_URI.buildUpon()
+                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, ThingProvider.TRUE)
+                    .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
+                    .build();
+
+    private static final Uri VOTE_ACTIONS_NOTIFY_SYNC_URI =
+            ThingProvider.VOTE_ACTIONS_URI.buildUpon()
+                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, ThingProvider.TRUE)
+                    .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
 
     public static void addSubredditAsync(Context context, String accountName,
@@ -384,7 +395,7 @@ public class Provider {
                 v.put(ReadActions.COLUMN_ACCOUNT, accountName);
                 v.put(ReadActions.COLUMN_THING_ID, thingId);
                 v.put(ReadActions.COLUMN_ACTION, action);
-                cr.insert(MARK_MESSAGE_READ_URI, v);
+                cr.insert(READ_ACTIONS_NOTIFY_SYNC_URI, v);
             }
         });
     }
@@ -435,7 +446,7 @@ public class Provider {
                 v.put(SaveActions.COLUMN_URL, url);
 
                 ContentResolver cr = appContext.getContentResolver();
-                return cr.insert(ThingProvider.SAVE_ACTIONS_NOTIFY_SYNC_URI, v) != null;
+                return cr.insert(SAVE_ACTIONS_NOTIFY_SYNC_URI, v) != null;
             }
 
             @Override
@@ -463,7 +474,7 @@ public class Provider {
                 v.put(SaveActions.COLUMN_ACTION, SaveActions.ACTION_UNSAVE);
 
                 ContentResolver cr = appContext.getContentResolver();
-                return cr.insert(ThingProvider.SAVE_ACTIONS_NOTIFY_SYNC_URI, v) != null;
+                return cr.insert(SAVE_ACTIONS_NOTIFY_SYNC_URI, v) != null;
             }
 
             @Override
@@ -526,7 +537,7 @@ public class Provider {
                 v.put(VoteActions.COLUMN_URL, url);
 
                 // No toast needed, since the vote arrows will reflect success.
-                cr.insert(ThingProvider.VOTE_ACTIONS_NOTIFY_SYNC_URI, v);
+                cr.insert(VOTE_ACTIONS_NOTIFY_SYNC_URI, v);
             }
         });
     }

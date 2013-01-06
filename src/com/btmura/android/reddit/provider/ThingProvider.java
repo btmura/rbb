@@ -89,9 +89,6 @@ public class ThingProvider extends SessionProvider {
 
     public static final Uri THINGS_NOTIFY_SYNC_URI = makeNotifySyncUri(THINGS_URI);
     public static final Uri MESSAGES_NOTIFY_SYNC_URI = makeNotifySyncUri(MESSAGES_URI);
-    public static final Uri READ_ACTIONS_NOTIFY_SYNC_URI = makeNotifySyncUri(READ_ACTIONS_URI);
-    public static final Uri SAVE_ACTIONS_NOTIFY_SYNC_URI = makeNotifySyncUri(SAVE_ACTIONS_URI);
-    public static final Uri VOTE_ACTIONS_NOTIFY_SYNC_URI = makeNotifySyncUri(VOTE_ACTIONS_URI);
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;
