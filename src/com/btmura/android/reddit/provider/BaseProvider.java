@@ -55,6 +55,21 @@ abstract class BaseProvider extends ContentProvider {
      */
     public static final String PARAM_NOTIFY = "notify";
 
+    protected static Uri makeNotifyUri(Uri uri) {
+        return uri.buildUpon().appendQueryParameter(PARAM_NOTIFY, TRUE).build();
+    }
+
+    protected static Uri makeSyncUri(Uri uri) {
+        return uri.buildUpon().appendQueryParameter(PARAM_SYNC, TRUE).build();
+    }
+
+    protected static Uri makeNotifySyncUri(Uri uri) {
+        return uri.buildUpon()
+                .appendQueryParameter(PARAM_NOTIFY, TRUE)
+                .appendQueryParameter(PARAM_SYNC, TRUE)
+                .build();
+    }
+
     protected String logTag;
     protected DbHelper helper;
 

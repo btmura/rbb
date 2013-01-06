@@ -29,6 +29,7 @@ public class SubredditProvider extends SessionProvider {
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
     static final String PATH_SUBREDDITS = "subreddits";
     public static final Uri SUBREDDITS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_SUBREDDITS);
+    public static final Uri SUBREDDITS_SYNC_URI = makeSyncUri(SUBREDDITS_URI);
 
     public SubredditProvider() {
         super(TAG);

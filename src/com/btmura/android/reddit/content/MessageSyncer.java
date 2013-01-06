@@ -25,7 +25,6 @@ import android.content.ContentProviderResult;
 import android.content.Context;
 import android.content.SyncResult;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.RemoteException;
 
 import com.btmura.android.reddit.database.MessageActions;
@@ -82,12 +81,7 @@ class MessageSyncer implements Syncer {
         ops.add(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
-
-        Uri uri = ThingProvider.MESSAGES_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.PARAM_NOTIFY, ThingProvider.TRUE)
-                .build();
-
-        ops.add(ContentProviderOperation.newUpdate(uri)
+        ops.add(ContentProviderOperation.newUpdate(ThingProvider.MESSAGES_NOTIFY_URI)
                 .withSelection(Messages.SELECT_BY_MESSAGE_ACTION_ID, Array.of(id))
                 .withValue(Things.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
                 .build());

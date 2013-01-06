@@ -19,6 +19,14 @@ package com.btmura.android.reddit.content;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import android.content.ContentProviderClient;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.Context;
+import android.content.SyncResult;
+import android.database.Cursor;
+import android.os.RemoteException;
+
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
@@ -26,15 +34,6 @@ import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
-
-import android.content.ContentProviderClient;
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
-import android.content.Context;
-import android.content.SyncResult;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.RemoteException;
 
 class CommentSyncer implements Syncer {
 
@@ -80,12 +79,7 @@ class CommentSyncer implements Syncer {
         ops.add(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
-
-        Uri uri = ThingProvider.THINGS_URI.buildUpon()
-                .appendQueryParameter(ThingProvider.PARAM_NOTIFY, ThingProvider.TRUE)
-                .build();
-
-        ops.add(ContentProviderOperation.newUpdate(uri)
+        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_NOTIFY_URI)
                 .withSelection(Things.SELECT_BY_COMMENT_ACTION_ID, Array.of(id))
                 .withValue(Things.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
                 .build());

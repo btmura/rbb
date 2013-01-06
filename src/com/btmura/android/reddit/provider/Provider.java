@@ -56,8 +56,6 @@ public class Provider {
 
     public static final String TAG = "Provider";
 
-    private static final String TRUE = Boolean.toString(true);
-
     /** Projection used by {@link #expandInBackground(Context, long)}. */
     private static final String[] EXPAND_PROJECTION = {
             Things._ID,
@@ -82,11 +80,11 @@ public class Provider {
             @Override
             protected Boolean doInBackground(Void... fillTheVoid) {
                 // Only trigger a sync on real accounts.
-                Uri syncUri = SubredditProvider.SUBREDDITS_URI;
+                Uri uri;
                 if (AccountUtils.isAccount(accountName)) {
-                    syncUri = syncUri.buildUpon()
-                            .appendQueryParameter(SubredditProvider.PARAM_SYNC, TRUE)
-                            .build();
+                    uri = SubredditProvider.SUBREDDITS_SYNC_URI;
+                } else {
+                    uri = SubredditProvider.SUBREDDITS_URI;
                 }
 
                 int count = subreddits.length;
@@ -101,13 +99,13 @@ public class Provider {
                     // state. However, app storage accounts should just
                     // remove the row altogether.
                     if (add || AccountUtils.isAccount(accountName)) {
-                        ops.add(ContentProviderOperation.newInsert(syncUri)
+                        ops.add(ContentProviderOperation.newInsert(uri)
                                 .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
                                 .withValue(Subreddits.COLUMN_NAME, subreddits[i])
                                 .withValue(Subreddits.COLUMN_STATE, state)
                                 .build());
                     } else {
-                        ops.add(ContentProviderOperation.newDelete(syncUri)
+                        ops.add(ContentProviderOperation.newDelete(uri)
                                 .withSelection(Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
                                         Array.of(accountName, subreddits[i]))
                                 .build());
@@ -171,12 +169,7 @@ public class Provider {
                         .withValue(CommentActions.COLUMN_THING_ID, thingId)
                         .build());
 
-                Uri uri = ThingProvider.THINGS_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                        .build();
-
-                ops.add(ContentProviderOperation.newInsert(uri)
+                ops.add(ContentProviderOperation.newInsert(ThingProvider.THINGS_NOTIFY_SYNC_URI)
                         .withValue(Things.COLUMN_ACCOUNT, accountName)
                         .withValue(Things.COLUMN_AUTHOR, accountName)
                         .withValue(Things.COLUMN_BODY, body)
@@ -242,13 +235,8 @@ public class Provider {
                     }
                 }
 
-                Uri uri = ThingProvider.THINGS_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                        .build();
-
                 // Update the header comment by how comments were truly deleted.
-                ops.add(ContentProviderOperation.newUpdate(uri)
+                ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_NOTIFY_SYNC_URI)
                         .withSelection(Things.COLUMN_THING_ID, Array.of(parentId))
                         .withValue(Things.COLUMN_NUM_COMMENTS, headerNumComments - numDeletes)
                         .build());
@@ -361,12 +349,7 @@ public class Provider {
                         .withValue(MessageActions.COLUMN_THING_ID, thingId)
                         .build());
 
-                Uri uri = ThingProvider.MESSAGES_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                        .build();
-
-                ops.add(ContentProviderOperation.newInsert(uri)
+                ops.add(ContentProviderOperation.newInsert(ThingProvider.MESSAGES_NOTIFY_SYNC_URI)
                         .withValue(Messages.COLUMN_ACCOUNT, accountName)
                         .withValue(Messages.COLUMN_AUTHOR, accountName)
                         .withValue(Messages.COLUMN_BODY, body)
@@ -387,17 +370,12 @@ public class Provider {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                Uri uri = ThingProvider.READ_ACTIONS_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_MESSAGES, TRUE)
-                        .build();
-
                 int action = read ? ReadActions.ACTION_READ : ReadActions.ACTION_UNREAD;
                 ContentValues v = new ContentValues(3);
                 v.put(ReadActions.COLUMN_ACCOUNT, accountName);
                 v.put(ReadActions.COLUMN_THING_ID, thingId);
                 v.put(ReadActions.COLUMN_ACTION, action);
-                cr.insert(uri, v);
+                cr.insert(ThingProvider.READ_ACTIONS_NOTIFY_SYNC_URI, v);
             }
         });
     }
@@ -426,11 +404,6 @@ public class Provider {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... voidRay) {
-                Uri uri = ThingProvider.SAVE_ACTIONS_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
-                        .build();
-
                 ContentValues v = new ContentValues(17);
                 v.put(SaveActions.COLUMN_ACCOUNT, accountName);
                 v.put(SaveActions.COLUMN_THING_ID, thingId);
@@ -453,7 +426,7 @@ public class Provider {
                 v.put(SaveActions.COLUMN_URL, url);
 
                 ContentResolver cr = appContext.getContentResolver();
-                return cr.insert(uri, v) != null;
+                return cr.insert(ThingProvider.SAVE_ACTIONS_NOTIFY_SYNC_URI, v) != null;
             }
 
             @Override
@@ -475,18 +448,13 @@ public class Provider {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... drVoidberg) {
-                Uri uri = ThingProvider.SAVE_ACTIONS_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
-                        .build();
-
                 ContentValues v = new ContentValues(3);
                 v.put(SaveActions.COLUMN_ACCOUNT, accountName);
                 v.put(SaveActions.COLUMN_THING_ID, thingId);
                 v.put(SaveActions.COLUMN_ACTION, SaveActions.ACTION_UNSAVE);
 
                 ContentResolver cr = appContext.getContentResolver();
-                return cr.insert(uri, v) != null;
+                return cr.insert(ThingProvider.SAVE_ACTIONS_NOTIFY_SYNC_URI, v) != null;
             }
 
             @Override
@@ -508,19 +476,13 @@ public class Provider {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                Uri uri = ThingProvider.VOTE_ACTIONS_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, TRUE)
-                        .build();
-
                 ContentValues v = new ContentValues(3);
                 v.put(VoteActions.COLUMN_ACCOUNT, accountName);
                 v.put(VoteActions.COLUMN_THING_ID, thingId);
                 v.put(VoteActions.COLUMN_ACTION, likes);
 
-                // No toast needed, since the vote arrows will reflect success
-                // or not.
-                cr.insert(uri, v);
+                // No toast needed, since the vote arrows will reflect success.
+                cr.insert(ThingProvider.VOTE_ACTIONS_NOTIFY_SYNC_URI, v);
             }
         });
     }
