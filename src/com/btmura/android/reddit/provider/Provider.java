@@ -66,6 +66,7 @@ public class Provider {
     private static final Uri READ_ACTIONS_NOTIFY_SYNC_URI =
             ThingProvider.READ_ACTIONS_URI.buildUpon()
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_MESSAGES, ThingProvider.TRUE)
+                    .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
 
     private static final Uri SAVE_ACTIONS_NOTIFY_SYNC_URI =
@@ -186,7 +187,7 @@ public class Provider {
                         .withValue(CommentActions.COLUMN_THING_ID, thingId)
                         .build());
 
-                ops.add(ContentProviderOperation.newInsert(ThingProvider.THINGS_NOTIFY_SYNC_URI)
+                ops.add(ContentProviderOperation.newInsert(ThingProvider.THINGS_SYNC_URI)
                         .withValue(Things.COLUMN_ACCOUNT, accountName)
                         .withValue(Things.COLUMN_AUTHOR, accountName)
                         .withValue(Things.COLUMN_BODY, body)
@@ -254,7 +255,7 @@ public class Provider {
 
                 // Update the header comment by how comments were truly deleted.
                 if (numDeletes > 0) {
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_NOTIFY_SYNC_URI)
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_SYNC_URI)
                             .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
                                     Array.of(accountName, parentId))
                             .withValue(Things.COLUMN_NUM_COMMENTS, headerNumComments - numDeletes)
@@ -343,7 +344,7 @@ public class Provider {
                 // be created upon sync, where it will have the proper value.
                 ContentValues values = new ContentValues(1);
                 values.put(Accounts.COLUMN_HAS_MAIL, false);
-                cr.update(AccountProvider.ACCOUNTS_NOTIFY_URI, values,
+                cr.update(AccountProvider.ACCOUNTS_URI, values,
                         Accounts.SELECT_BY_ACCOUNT, Array.of(accountName));
             }
         });
@@ -369,7 +370,7 @@ public class Provider {
                         .withValue(MessageActions.COLUMN_THING_ID, thingId)
                         .build());
 
-                ops.add(ContentProviderOperation.newInsert(ThingProvider.MESSAGES_NOTIFY_SYNC_URI)
+                ops.add(ContentProviderOperation.newInsert(ThingProvider.MESSAGES_SYNC_URI)
                         .withValue(Messages.COLUMN_ACCOUNT, accountName)
                         .withValue(Messages.COLUMN_AUTHOR, accountName)
                         .withValue(Messages.COLUMN_BODY, body)

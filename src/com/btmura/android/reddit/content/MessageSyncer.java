@@ -81,7 +81,7 @@ class MessageSyncer implements Syncer {
         ops.add(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
-        ops.add(ContentProviderOperation.newUpdate(ThingProvider.MESSAGES_NOTIFY_URI)
+        ops.add(ContentProviderOperation.newUpdate(ThingProvider.MESSAGES_URI)
                 .withSelection(Messages.SELECT_BY_MESSAGE_ACTION_ID, Array.of(id))
                 .withValue(Things.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
                 .build());

@@ -79,7 +79,7 @@ class CommentSyncer implements Syncer {
         ops.add(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
-        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_NOTIFY_URI)
+        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                 .withSelection(Things.SELECT_BY_COMMENT_ACTION_ID, Array.of(id))
                 .withValue(Things.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
                 .build());

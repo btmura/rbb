@@ -87,7 +87,7 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             values.put(Accounts.COLUMN_LINK_KARMA, result.linkKarma);
             values.put(Accounts.COLUMN_COMMENT_KARMA, result.commentKarma);
             values.put(Accounts.COLUMN_HAS_MAIL, result.hasMail);
-            provider.insert(AccountProvider.ACCOUNTS_NOTIFY_URI, values);
+            provider.insert(AccountProvider.ACCOUNTS_URI, values);
 
             syncResult.stats.numInserts++;
 

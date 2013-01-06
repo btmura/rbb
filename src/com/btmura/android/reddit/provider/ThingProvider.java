@@ -71,7 +71,7 @@ public class ThingProvider extends SessionProvider {
     private static final String PATH_SUBREDDITS = "subreddits";
     private static final String PATH_COMMENT_ACTIONS = "actions/comments";
     private static final String PATH_MESSAGE_ACTIONS = "actions/messages";
-    private static final String PATH_READ_ACTIONS = "actions/read";
+    private static final String PATH_READ_ACTIONS = "actions/reads";
     private static final String PATH_SAVE_ACTIONS = "actions/saves";
     private static final String PATH_VOTE_ACTIONS = "actions/votes";
 
@@ -84,11 +84,8 @@ public class ThingProvider extends SessionProvider {
     public static final Uri SAVE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_SAVE_ACTIONS);
     public static final Uri VOTE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_VOTE_ACTIONS);
 
-    public static final Uri THINGS_NOTIFY_URI = makeNotifyUri(THINGS_URI);
-    public static final Uri MESSAGES_NOTIFY_URI = makeNotifyUri(MESSAGES_URI);
-
-    public static final Uri THINGS_NOTIFY_SYNC_URI = makeNotifySyncUri(THINGS_URI);
-    public static final Uri MESSAGES_NOTIFY_SYNC_URI = makeNotifySyncUri(MESSAGES_URI);
+    public static final Uri THINGS_SYNC_URI = makeSyncUri(THINGS_URI);
+    public static final Uri MESSAGES_SYNC_URI = makeSyncUri(MESSAGES_URI);
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;

@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.provider;
 
-import android.content.UriMatcher;
 import android.net.Uri;
 
 import com.btmura.android.reddit.database.Accounts;
@@ -31,13 +30,6 @@ public class AccountProvider extends BaseProvider {
 
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
     public static final Uri ACCOUNTS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_ACCOUNTS);
-    public static final Uri ACCOUNTS_NOTIFY_URI = makeNotifyUri(ACCOUNTS_URI);
-
-    private static final UriMatcher MATCHER = new UriMatcher(0);
-    private static final int MATCH_ACCOUNTS = 0;
-    static {
-        MATCHER.addURI(AUTHORITY, PATH_ACCOUNTS, MATCH_ACCOUNTS);
-    }
 
     public AccountProvider() {
         super(TAG);
