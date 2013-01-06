@@ -23,7 +23,7 @@ import android.provider.BaseColumns;
  * {@link VoteActions} is a table that stores pending upvotes and downvotes
  * before they are synced back to the server.
  */
-public class VoteActions implements BaseColumns {
+public class VoteActions implements BaseThingColumns, BaseColumns {
 
     public static final String TABLE_NAME = "voteActions";
 
@@ -48,7 +48,16 @@ public class VoteActions implements BaseColumns {
     /** Vote column value indicating a downvote. */
     public static final int ACTION_VOTE_DOWN = -1;
 
-    /** Creates the votes table. */
+    public static final String SELECT_UP_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
+            + " AND " + COLUMN_ACTION + "=" + ACTION_VOTE_UP;
+
+    public static final String SELECT_DOWN_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
+            + " AND " + COLUMN_ACTION + "=" + ACTION_VOTE_DOWN;
+
+    public static final String SELECT_NOT_NEUTRAL_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
+            + " AND " + COLUMN_ACTION + "!=" + ACTION_VOTE_NEUTRAL;
+
+    /** Creates the voteActions table. */
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
@@ -56,6 +65,10 @@ public class VoteActions implements BaseColumns {
                 + COLUMN_ACTION + " INTEGER NOT NULL,"
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
                 + COLUMN_THING_ID + " TEXT NOT NULL,"
+
+                // Create thing columns to store enough info needed to display a
+                // fake item in certain listing.
+                + CREATE_THING_COLUMNS + ","
 
                 // Add constraint to make it easy to replace actions.
                 + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");

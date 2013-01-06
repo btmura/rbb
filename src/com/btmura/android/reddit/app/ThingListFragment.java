@@ -21,7 +21,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -35,7 +34,6 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Kinds;
@@ -297,13 +295,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
-    public void onVote(String thingId, int likes) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onLike id: " + thingId + " likes: " + likes);
-        }
-        String accountName = adapter.getAccountName();
-        if (!TextUtils.isEmpty(accountName)) {
-            Provider.voteAsync(getActivity(), accountName, thingId, likes);
+    public void onVote(View view, int action) {
+        if (!TextUtils.isEmpty(adapter.getAccountName())) {
+            int position = getListView().getPositionForView(view);
+            adapter.vote(getActivity(), position, action);
         }
     }
 

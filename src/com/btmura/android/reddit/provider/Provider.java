@@ -480,15 +480,50 @@ public class Provider {
         }.execute();
     }
 
-    public static void voteAsync(final Context context, final String accountName,
-            final String thingId, final int likes) {
+    public static void voteAsync(Context context,
+            final String accountName,
+            final String thingId,
+            final int action,
+
+            // Following parameters are for faking a thing.
+            final String author,
+            final long createdUtc,
+            final String domain,
+            final int downs,
+            final int likes,
+            final int numComments,
+            final boolean over18,
+            final String permaLink,
+            final int score,
+            final String subreddit,
+            final String title,
+            final String thumbnailUrl,
+            final int ups,
+            final String url) {
+
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentValues v = new ContentValues(3);
                 v.put(VoteActions.COLUMN_ACCOUNT, accountName);
+                v.put(VoteActions.COLUMN_ACTION, action);
                 v.put(VoteActions.COLUMN_THING_ID, thingId);
-                v.put(VoteActions.COLUMN_ACTION, likes);
+
+                // Following values are for faking a thing.
+                v.put(VoteActions.COLUMN_AUTHOR, author);
+                v.put(VoteActions.COLUMN_CREATED_UTC, createdUtc);
+                v.put(VoteActions.COLUMN_DOMAIN, domain);
+                v.put(VoteActions.COLUMN_DOWNS, downs);
+                v.put(VoteActions.COLUMN_LIKES, likes);
+                v.put(VoteActions.COLUMN_NUM_COMMENTS, numComments);
+                v.put(VoteActions.COLUMN_OVER_18, over18);
+                v.put(VoteActions.COLUMN_PERMA_LINK, permaLink);
+                v.put(VoteActions.COLUMN_SCORE, score);
+                v.put(VoteActions.COLUMN_SUBREDDIT, subreddit);
+                v.put(VoteActions.COLUMN_TITLE, title);
+                v.put(VoteActions.COLUMN_THUMBNAIL_URL, thumbnailUrl);
+                v.put(VoteActions.COLUMN_UPS, ups);
+                v.put(VoteActions.COLUMN_URL, url);
 
                 // No toast needed, since the vote arrows will reflect success.
                 cr.insert(ThingProvider.VOTE_ACTIONS_NOTIFY_SYNC_URI, v);

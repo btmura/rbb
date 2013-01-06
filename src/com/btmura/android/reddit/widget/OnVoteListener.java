@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.widget;
 
+import android.view.View;
+
 public interface OnVoteListener {
-    void onVote(String thingId, int likes);
+    void onVote(View view, int action);
 }

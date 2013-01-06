@@ -39,6 +39,7 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
@@ -86,6 +87,43 @@ class ThingListing extends JsonParser implements Listing {
     private static final int SAVE_THUMBNAIL_URL = 14;
     private static final int SAVE_UPS = 15;
     private static final int SAVE_URL = 16;
+
+    private static final String[] VOTE_PROJECTION = {
+            VoteActions._ID,
+            VoteActions.COLUMN_ACTION,
+            VoteActions.COLUMN_AUTHOR,
+            VoteActions.COLUMN_CREATED_UTC,
+            VoteActions.COLUMN_DOMAIN,
+            VoteActions.COLUMN_DOWNS,
+            VoteActions.COLUMN_LIKES,
+            VoteActions.COLUMN_NUM_COMMENTS,
+            VoteActions.COLUMN_OVER_18,
+            VoteActions.COLUMN_PERMA_LINK,
+            VoteActions.COLUMN_SCORE,
+            VoteActions.COLUMN_SUBREDDIT,
+            VoteActions.COLUMN_THING_ID,
+            VoteActions.COLUMN_TITLE,
+            VoteActions.COLUMN_THUMBNAIL_URL,
+            VoteActions.COLUMN_UPS,
+            VoteActions.COLUMN_URL,
+    };
+
+    private static final int VOTE_ACTION = 1;
+    private static final int VOTE_AUTHOR = 2;
+    private static final int VOTE_CREATED_UTC = 3;
+    private static final int VOTE_DOMAIN = 4;
+    private static final int VOTE_DOWNS = 5;
+    private static final int VOTE_LIKES = 6;
+    private static final int VOTE_NUM_COMMENTS = 7;
+    private static final int VOTE_OVER_18 = 8;
+    private static final int VOTE_PERMA_LINK = 9;
+    private static final int VOTE_SCORE = 10;
+    private static final int VOTE_SUBREDDIT = 11;
+    private static final int VOTE_THING_ID = 12;
+    private static final int VOTE_TITLE = 13;
+    private static final int VOTE_THUMBNAIL_URL = 14;
+    private static final int VOTE_UPS = 15;
+    private static final int VOTE_URL = 16;
 
     private final Formatter formatter = new Formatter();
     private final Context context;
@@ -352,12 +390,23 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onParseEnd() {
-        if (!TextUtils.isEmpty(moreThingId)) {
-            values.add(newContentValues(Kinds.KIND_MORE, moreThingId, 0));
+        // TODO: Get the cursor for these operations when connecting to the
+        // network to do things in parallel.
+        if (!TextUtils.isEmpty(profileUser)) {
+            switch (filter) {
+                case FilterAdapter.PROFILE_SAVED:
+                    mergeSaveActions();
+                    break;
+
+                case FilterAdapter.PROFILE_LIKED:
+                case FilterAdapter.PROFILE_DISLIKED:
+                    mergeVoteActions(filter);
+                    break;
+            }
         }
 
-        if (!TextUtils.isEmpty(profileUser) && filter == FilterAdapter.PROFILE_SAVED) {
-            mergeSaveActions();
+        if (!TextUtils.isEmpty(moreThingId)) {
+            values.add(newContentValues(Kinds.KIND_MORE, moreThingId, 1));
         }
     }
 
@@ -371,7 +420,7 @@ class ThingListing extends JsonParser implements Listing {
 
     private void mergeSaveActions() {
         // We throw all the saved things on the first page, so don't merge the
-        // saves if we're just scrolling further down.
+        // saves that would add new items if we're just scrolling further down.
         String selection;
         if (TextUtils.isEmpty(more)) {
             selection = SaveActions.SELECT_BY_ACCOUNT;
@@ -385,18 +434,55 @@ class ThingListing extends JsonParser implements Listing {
         while (c.moveToNext()) {
             switch (c.getInt(SAVE_ACTION)) {
                 case SaveActions.ACTION_SAVE:
-                    mergeSave(c);
+                    addSave(c);
                     break;
 
                 case SaveActions.ACTION_UNSAVE:
-                    mergeUnsave(c);
+                    removeByThingId(c.getString(SAVE_THING_ID));
                     break;
             }
         }
         c.close();
     }
 
-    private void mergeSave(Cursor c) {
+    private void mergeVoteActions(int filter) {
+        // We throw all the vote things on the first page, so don't merge the
+        // votes that would add new items if we're just scrolling further down.
+        boolean hasMore = !TextUtils.isEmpty(more);
+        String selection;
+        switch (filter) {
+            case FilterAdapter.PROFILE_LIKED:
+                selection = hasMore ? VoteActions.SELECT_DOWN_BY_ACCOUNT
+                        : VoteActions.SELECT_NOT_NEUTRAL_BY_ACCOUNT;
+                break;
+
+            case FilterAdapter.PROFILE_DISLIKED:
+                selection = hasMore ? VoteActions.SELECT_UP_BY_ACCOUNT
+                        : VoteActions.SELECT_NOT_NEUTRAL_BY_ACCOUNT;
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(VoteActions.TABLE_NAME, VOTE_PROJECTION,
+                selection, Array.of(accountName), null, null, SaveActions.SORT_BY_ID);
+        while (c.moveToNext()) {
+            int action = c.getInt(VOTE_ACTION);
+            if (action == VoteActions.ACTION_VOTE_UP
+                    && filter == FilterAdapter.PROFILE_LIKED
+                    || action == VoteActions.ACTION_VOTE_DOWN
+                    && filter == FilterAdapter.PROFILE_DISLIKED) {
+                addVote(c);
+            } else {
+                removeByThingId(c.getString(VOTE_THING_ID));
+            }
+        }
+        c.close();
+    }
+
+    private void addSave(Cursor c) {
         ContentValues v = new ContentValues(15);
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_AUTHOR, c.getString(SAVE_AUTHOR));
@@ -418,8 +504,29 @@ class ThingListing extends JsonParser implements Listing {
         values.add(0, v);
     }
 
-    private void mergeUnsave(Cursor c) {
-        String targetThingId = c.getString(SAVE_THING_ID);
+    private void addVote(Cursor c) {
+        ContentValues v = new ContentValues(15);
+        v.put(Things.COLUMN_ACCOUNT, accountName);
+        v.put(Things.COLUMN_AUTHOR, c.getString(VOTE_AUTHOR));
+        v.put(Things.COLUMN_CREATED_UTC, c.getLong(VOTE_CREATED_UTC));
+        v.put(Things.COLUMN_DOMAIN, c.getString(VOTE_DOMAIN));
+        v.put(Things.COLUMN_DOWNS, c.getString(VOTE_DOWNS));
+        v.put(Things.COLUMN_KIND, Kinds.KIND_LINK);
+        v.put(Things.COLUMN_LIKES, c.getInt(VOTE_LIKES));
+        v.put(Things.COLUMN_NUM_COMMENTS, c.getInt(VOTE_NUM_COMMENTS));
+        v.put(Things.COLUMN_OVER_18, c.getInt(VOTE_OVER_18) != 0);
+        v.put(Things.COLUMN_PERMA_LINK, c.getString(VOTE_PERMA_LINK));
+        v.put(Things.COLUMN_SCORE, c.getInt(VOTE_SCORE));
+        v.put(Things.COLUMN_SUBREDDIT, c.getString(VOTE_SUBREDDIT));
+        v.put(Things.COLUMN_TITLE, c.getString(VOTE_TITLE));
+        v.put(Things.COLUMN_THING_ID, c.getString(VOTE_THING_ID));
+        v.put(Things.COLUMN_THUMBNAIL_URL, c.getString(VOTE_THUMBNAIL_URL));
+        v.put(Things.COLUMN_UPS, c.getInt(VOTE_UPS));
+        v.put(Things.COLUMN_URL, c.getString(VOTE_URL));
+        values.add(0, v);
+    }
+
+    private void removeByThingId(String targetThingId) {
         int size = values.size();
         for (int i = 0; i < size; i++) {
             String thingId = values.get(i).getAsString(Things.COLUMN_THING_ID);

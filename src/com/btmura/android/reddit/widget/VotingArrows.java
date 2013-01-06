@@ -30,6 +30,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.VoteActions;
@@ -205,25 +206,18 @@ class VotingArrows {
     }
 
     static boolean onSingleTapUp(MotionEvent e, float top, float left, boolean drawArrows,
-            boolean drawScore, boolean isVotable, OnVoteListener listener, String thingId,
-            int likes) {
+            boolean drawScore, boolean isVotable, OnVoteListener listener, View view, int likes) {
         if (listener != null) {
             int event = getEvent(e, top, left, drawArrows, drawScore, isVotable);
             switch (event) {
                 case EVENT_UPVOTE:
-                    if (likes != VoteActions.ACTION_VOTE_UP) {
-                        listener.onVote(thingId, VoteActions.ACTION_VOTE_UP);
-                    } else {
-                        listener.onVote(thingId, VoteActions.ACTION_VOTE_NEUTRAL);
-                    }
+                    listener.onVote(view, likes != VoteActions.ACTION_VOTE_UP ?
+                            VoteActions.ACTION_VOTE_UP : VoteActions.ACTION_VOTE_NEUTRAL);
                     return true;
 
                 case EVENT_DOWNVOTE:
-                    if (likes != VoteActions.ACTION_VOTE_DOWN) {
-                        listener.onVote(thingId, VoteActions.ACTION_VOTE_DOWN);
-                    } else {
-                        listener.onVote(thingId, VoteActions.ACTION_VOTE_NEUTRAL);
-                    }
+                    listener.onVote(view, likes != VoteActions.ACTION_VOTE_DOWN ?
+                            VoteActions.ACTION_VOTE_DOWN : VoteActions.ACTION_VOTE_NEUTRAL);
                     return true;
             }
         }

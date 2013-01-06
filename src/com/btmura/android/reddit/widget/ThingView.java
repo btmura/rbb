@@ -55,7 +55,6 @@ public class ThingView extends CustomView implements OnGestureListener {
     private String linkTitle;
     private int thingBodyWidth;
     private String thumbnailUrl;
-    private String thingId;
     private String title;
 
     private Bitmap bitmap;
@@ -176,7 +175,6 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.likes = likes;
         this.linkTitle = linkTitle;
         this.thingBodyWidth = thingBodyWidth;
-        this.thingId = thingId;
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
 
@@ -558,7 +556,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     public boolean onSingleTapUp(MotionEvent e) {
         return VotingArrows.onSingleTapUp(e, getTopOffset(), getLeftOffset(),
-                drawVotingArrows, drawScore, isVotable, listener, thingId, likes);
+                drawVotingArrows, drawScore, isVotable, listener, this, likes);
     }
 
     private float getTopOffset() {
