@@ -108,7 +108,6 @@ public class ThingProvider extends SessionProvider {
     static final String PARAM_LISTING_GET = "getListing";
     static final String PARAM_LISTING_TYPE = "listingType";
 
-    static final String PARAM_COMMENT_REPLY = "commentReply";
     static final String PARAM_COMMENT_DELETE = "commentDelete";
 
     static final String PARAM_MESSAGE_REPLY = "messageReply";
@@ -408,39 +407,6 @@ public class ThingProvider extends SessionProvider {
             Log.e(TAG, e.getMessage(), e);
         }
         return null;
-    }
-
-    @Override
-    protected long innerInsert(Uri uri, SQLiteDatabase db, String table, String nullColumnHack,
-            ContentValues values) {
-        if (uri.getBooleanQueryParameter(PARAM_COMMENT_REPLY, false)) {
-            handleCommentReply(uri, db, values);
-        } else if (uri.getBooleanQueryParameter(PARAM_MESSAGE_REPLY, false)) {
-            handleMessageReply(uri, db, values);
-        }
-        return super.innerInsert(uri, db, table, nullColumnHack, values);
-    }
-
-    private void handleCommentReply(Uri uri, SQLiteDatabase db, ContentValues values) {
-        // Insert an action to sync the reply back to the network eventually.
-        ContentValues v = new ContentValues(5);
-        v.put(CommentActions.COLUMN_ACCOUNT, values.getAsString(Things.COLUMN_ACCOUNT));
-        v.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
-        v.put(CommentActions.COLUMN_PARENT_THING_ID, uri.getQueryParameter(PARAM_PARENT_THING_ID));
-        v.put(CommentActions.COLUMN_THING_ID, uri.getQueryParameter(PARAM_THING_ID));
-        v.put(CommentActions.COLUMN_TEXT, values.getAsString(Things.COLUMN_BODY));
-        db.insert(CommentActions.TABLE_NAME, null, v);
-    }
-
-    private void handleMessageReply(Uri uri, SQLiteDatabase db, ContentValues values) {
-        // Insert an action to sync the reply back to the network eventually.
-        ContentValues v = new ContentValues(5);
-        v.put(MessageActions.COLUMN_ACCOUNT, values.getAsString(Messages.COLUMN_ACCOUNT));
-        v.put(MessageActions.COLUMN_ACTION, MessageActions.ACTION_INSERT);
-        v.put(MessageActions.COLUMN_PARENT_THING_ID, uri.getQueryParameter(PARAM_PARENT_THING_ID));
-        v.put(MessageActions.COLUMN_THING_ID, uri.getQueryParameter(PARAM_THING_ID));
-        v.put(MessageActions.COLUMN_TEXT, values.getAsString(Messages.COLUMN_BODY));
-        db.insert(MessageActions.TABLE_NAME, null, v);
     }
 
     @Override

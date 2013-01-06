@@ -28,6 +28,7 @@ public class Things implements BaseColumns {
 
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_BODY = "body";
+    public static final String COLUMN_COMMENT_ACTION_ID = "commentActionId";
     public static final String COLUMN_CREATED_UTC = "createdUtc";
     public static final String COLUMN_DOMAIN = "domain";
     public static final String COLUMN_DOWNS = "downs";
@@ -85,6 +86,7 @@ public class Things implements BaseColumns {
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_AUTHOR + " TEXT, "
                 + COLUMN_BODY + " TEXT, "
+                + COLUMN_COMMENT_ACTION_ID + " INTEGER,"
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
                 + COLUMN_DOMAIN + " TEXT, "
                 + COLUMN_DOWNS + " INTEGER DEFAULT 0, "

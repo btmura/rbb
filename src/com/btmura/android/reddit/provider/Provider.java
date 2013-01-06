@@ -34,9 +34,11 @@ import android.widget.Toast;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Accounts;
+import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
@@ -144,7 +146,7 @@ public class Provider {
             final long parentId,
             final int parentNumComments,
             final String parentThingId,
-            final String replyThingId,
+            final String thingId,
             final String accountName,
             final String body,
             final int nesting,
@@ -154,21 +156,26 @@ public class Provider {
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(2);
+                        new ArrayList<ContentProviderOperation>(3);
 
-                // Increment the header's number of comments.
                 ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                         .withSelection(BaseProvider.ID_SELECTION, Array.of(parentId))
                         .withValue(Things.COLUMN_NUM_COMMENTS, parentNumComments + 1)
                         .build());
 
-                // Insert the placeholder comment.
+                ops.add(ContentProviderOperation.newInsert(ThingProvider.COMMENT_ACTIONS_URI)
+                        .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
+                        .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT)
+                        .withValue(CommentActions.COLUMN_TEXT, body)
+                        .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentThingId)
+                        .withValue(CommentActions.COLUMN_THING_ID, thingId)
+                        .build());
+
                 Uri uri = ThingProvider.THINGS_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_COMMENT_REPLY, TRUE)
+                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID, parentThingId)
-                        .appendQueryParameter(ThingProvider.PARAM_THING_ID, replyThingId)
                         .build();
+
                 ops.add(ContentProviderOperation.newInsert(uri)
                         .withValue(Things.COLUMN_ACCOUNT, accountName)
                         .withValue(Things.COLUMN_AUTHOR, accountName)
@@ -177,6 +184,7 @@ public class Provider {
                         .withValue(Things.COLUMN_NESTING, nesting)
                         .withValue(Things.COLUMN_SEQUENCE, sequence)
                         .withValue(Things.COLUMN_SESSION_ID, sessionId)
+                        .withValueBackReference(Things.COLUMN_COMMENT_ACTION_ID, 1)
                         .build());
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);
@@ -338,15 +346,22 @@ public class Provider {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(2);
+
+                ops.add(ContentProviderOperation.newInsert(ThingProvider.MESSAGE_ACTIONS_URI)
+                        .withValue(MessageActions.COLUMN_ACCOUNT, accountName)
+                        .withValue(MessageActions.COLUMN_ACTION, MessageActions.ACTION_INSERT)
+                        .withValue(MessageActions.COLUMN_PARENT_THING_ID, parentThingId)
+                        .withValue(MessageActions.COLUMN_TEXT, body)
+                        .withValue(MessageActions.COLUMN_THING_ID, thingId)
+                        .build());
+
                 Uri uri = ThingProvider.MESSAGES_URI.buildUpon()
-                        .appendQueryParameter(ThingProvider.PARAM_MESSAGE_REPLY, TRUE)
-                        .appendQueryParameter(ThingProvider.PARAM_PARENT_THING_ID, parentThingId)
-                        .appendQueryParameter(ThingProvider.PARAM_THING_ID, thingId)
+                        .appendQueryParameter(ThingProvider.PARAM_NOTIFY, TRUE)
                         .appendQueryParameter(ThingProvider.PARAM_SYNC, TRUE)
                         .build();
 
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(1);
                 ops.add(ContentProviderOperation.newInsert(uri)
                         .withValue(Messages.COLUMN_ACCOUNT, accountName)
                         .withValue(Messages.COLUMN_AUTHOR, accountName)
@@ -354,6 +369,7 @@ public class Provider {
                         .withValue(Messages.COLUMN_KIND, Kinds.KIND_MESSAGE)
                         .withValue(Messages.COLUMN_SESSION_ID, sessionId)
                         .withValue(Messages.COLUMN_WAS_COMMENT, false)
+                        .withValueBackReference(Messages.COLUMN_MESSAGE_ACTION_ID, 0)
                         .build());
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);
