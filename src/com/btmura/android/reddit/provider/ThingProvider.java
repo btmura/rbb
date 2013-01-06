@@ -249,7 +249,6 @@ public class ThingProvider extends SessionProvider {
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_LISTING));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
-
         b.appendQueryParameter(PARAM_JOIN, TRUE);
         if (sessionId != -1) {
             b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));

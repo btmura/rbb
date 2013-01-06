@@ -239,7 +239,7 @@ public class ThingAdapter extends LoaderAdapter {
         String body = cursor.getString(MESSAGE_BODY);
         long createdUtc = cursor.getLong(MESSAGE_CREATED_UTC);
         int kind = cursor.getInt(MESSAGE_KIND);
-        boolean isNew = cursor.getInt(MESSAGE_NEW) != 0;
+        boolean isNew = isNew(cursor.getPosition());
         String subject = cursor.getString(MESSAGE_SUBJECT);
         String subreddit = cursor.getString(MESSAGE_SUBREDDIT);
         String thingId = cursor.getString(MESSAGE_THING_ID);
@@ -452,7 +452,7 @@ public class ThingAdapter extends LoaderAdapter {
         }
 
         // We have a local pending action so use that to indicate if it's new.
-        return getInt(position, MESSAGE_ACTION) != ReadActions.ACTION_UNREAD;
+        return getInt(position, MESSAGE_ACTION) == ReadActions.ACTION_UNREAD;
     }
 
     public int getNumComments(int position) {

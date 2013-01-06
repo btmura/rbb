@@ -63,6 +63,12 @@ public class Provider {
             Things.COLUMN_NESTING,
     };
 
+    /** Uri to use when marking messages read. */
+    private static final Uri MARK_MESSAGE_READ_URI =
+            ThingProvider.READ_ACTIONS_NOTIFY_SYNC_URI.buildUpon()
+                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_MESSAGES, ThingProvider.TRUE)
+                    .build();
+
     public static void addSubredditAsync(Context context, String accountName,
             String... subreddits) {
         changeSubredditAsync(context, accountName, subreddits, true);
@@ -378,7 +384,7 @@ public class Provider {
                 v.put(ReadActions.COLUMN_ACCOUNT, accountName);
                 v.put(ReadActions.COLUMN_THING_ID, thingId);
                 v.put(ReadActions.COLUMN_ACTION, action);
-                cr.insert(ThingProvider.READ_ACTIONS_NOTIFY_SYNC_URI, v);
+                cr.insert(MARK_MESSAGE_READ_URI, v);
             }
         });
     }
