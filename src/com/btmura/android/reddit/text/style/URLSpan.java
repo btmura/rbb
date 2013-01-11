@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.text.style;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -45,9 +46,32 @@ public class URLSpan extends ClickableSpan {
     @Override
     public void onClick(View widget) {
         Uri uri = Uri.parse(url);
-        Context context = widget.getContext();
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+
+        Context context = widget.getContext();
         intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
-        context.startActivity(intent);
+
+        if (!startActivity(context, intent)) {
+            // There was no activity found so try adding an http scheme if it
+            // was missing and some authority is present.
+            if (uri.getScheme() == null) {
+                uri = uri.buildUpon().scheme("http").build();
+                intent.setData(uri);
+                startActivity(context, intent);
+            }
+        }
+    }
+
+    /**
+     * Start an activity for the intent and return true on success or false if
+     * no activity to handle the intent was found.
+     */
+    private boolean startActivity(Context context, Intent intent) {
+        try {
+            context.startActivity(intent);
+            return true;
+        } catch (ActivityNotFoundException e) {
+            return false;
+        }
     }
 }
