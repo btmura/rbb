@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
+import android.database.DatabaseUtils;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -45,6 +46,15 @@ abstract class SessionProvider extends BaseProvider {
 
     /** Returns a session id pointing to the data. */
     long getListingSession(Listing listing, SQLiteDatabase db, long sessionId) throws IOException {
+        // Double check that the session exists if specified.
+        if (sessionId != -1) {
+            long count = DatabaseUtils.queryNumEntries(db, Sessions.TABLE_NAME,
+                    Sessions.SELECT_BY_SESSION_ID, Array.of(sessionId));
+            if (count == 0) {
+                sessionId = -1;
+            }
+        }
+
         // Return existing session if it exists and we're not appending more.
         if (sessionId != -1 && !listing.isAppend()) {
             return sessionId;
