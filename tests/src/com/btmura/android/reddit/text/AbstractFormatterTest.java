@@ -24,14 +24,13 @@ import android.text.style.BulletSpan;
 import android.text.style.ImageSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
-import android.text.style.URLSpan;
 
-import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.Formatter.Escaped;
 import com.btmura.android.reddit.text.Formatter.RawLinks;
-import com.btmura.android.reddit.text.Formatter.Styles;
 import com.btmura.android.reddit.text.Formatter.RelativeLinks;
+import com.btmura.android.reddit.text.Formatter.Styles;
 import com.btmura.android.reddit.text.style.SubredditSpan;
+import com.btmura.android.reddit.text.style.URLSpan;
 import com.btmura.android.reddit.text.style.UserSpan;
 
 abstract class AbstractFormatterTest extends AndroidTestCase {
