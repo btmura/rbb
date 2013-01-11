@@ -208,6 +208,29 @@ public class CommentAdapter extends LoaderAdapter {
         return thingId;
     }
 
+    public void save(Context context) {
+        Provider.saveAsync(context, accountName, thingId,
+                getString(0, INDEX_AUTHOR),
+                getLong(0, INDEX_CREATED_UTC),
+                getString(0, INDEX_DOMAIN),
+                getInt(0, INDEX_DOWNS),
+                getInt(0, INDEX_LIKES),
+                getInt(0, INDEX_NUM_COMMENTS),
+                getBoolean(0, INDEX_OVER_18),
+                getString(0, INDEX_PERMA_LINK),
+                getInt(0, INDEX_SCORE),
+                getBoolean(0, INDEX_SELF),
+                getString(0, INDEX_SUBREDDIT),
+                getString(0, INDEX_TITLE),
+                getString(0, INDEX_THUMBNAIL_URL),
+                getInt(0, INDEX_UPS),
+                getString(0, INDEX_URL));
+    }
+
+    public void unsave(Context context) {
+        Provider.unsaveAsync(context, accountName, thingId);
+    }
+
     public void vote(Context context, int action, int position) {
         if (position == 0) {
             // Store additional information when the user votes on the header
@@ -223,6 +246,7 @@ public class CommentAdapter extends LoaderAdapter {
                     getBoolean(position, INDEX_OVER_18),
                     getString(position, INDEX_PERMA_LINK),
                     getInt(position, INDEX_SCORE),
+                    getBoolean(position, INDEX_SELF),
                     getString(position, INDEX_SUBREDDIT),
                     getString(position, INDEX_THING_ID),
                     getString(position, INDEX_TITLE),

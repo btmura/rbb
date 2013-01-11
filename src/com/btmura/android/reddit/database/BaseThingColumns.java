@@ -45,6 +45,9 @@ interface BaseThingColumns {
     /** String URL on reddit of the thing. */
     public static final String COLUMN_PERMA_LINK = Things.COLUMN_PERMA_LINK;
 
+    /** Boolean indicating whether this is a self post or link. */
+    public static final String COLUMN_SELF = "self";
+
     /** Integer score of the thing. */
     public static final String COLUMN_SCORE = Things.COLUMN_SCORE;
 
@@ -75,6 +78,7 @@ interface BaseThingColumns {
         + COLUMN_OVER_18 + " INTEGER DEFAULT 0,"
         + COLUMN_PERMA_LINK + " TEXT,"
         + COLUMN_SCORE + " INTEGER DEFAULT 0,"
+        + COLUMN_SELF + " INTEGER DEFAULT 0, "
         + COLUMN_SUBREDDIT + " TEXT,"
         + COLUMN_TITLE + " TEXT,"
         + COLUMN_THUMBNAIL_URL + " TEXT,"

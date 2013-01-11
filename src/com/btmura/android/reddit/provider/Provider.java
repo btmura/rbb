@@ -415,6 +415,7 @@ public class Provider {
             final boolean over18,
             final String permaLink,
             final int score,
+            final boolean self,
             final String subreddit,
             final String title,
             final String thumbnailUrl,
@@ -425,7 +426,7 @@ public class Provider {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... voidRay) {
-                ContentValues v = new ContentValues(17);
+                ContentValues v = new ContentValues(18);
                 v.put(SaveActions.COLUMN_ACCOUNT, accountName);
                 v.put(SaveActions.COLUMN_THING_ID, thingId);
                 v.put(SaveActions.COLUMN_ACTION, SaveActions.ACTION_SAVE);
@@ -439,6 +440,7 @@ public class Provider {
                 v.put(SaveActions.COLUMN_NUM_COMMENTS, numComments);
                 v.put(SaveActions.COLUMN_OVER_18, over18);
                 v.put(SaveActions.COLUMN_PERMA_LINK, permaLink);
+                v.put(SaveActions.COLUMN_SELF, self);
                 v.put(SaveActions.COLUMN_SCORE, score);
                 v.put(SaveActions.COLUMN_SUBREDDIT, subreddit);
                 v.put(SaveActions.COLUMN_TITLE, title);
@@ -533,6 +535,7 @@ public class Provider {
             final boolean over18,
             final String permaLink,
             final int score,
+            final boolean self,
             final String subreddit,
             final String thingId,
             final String title,
@@ -543,7 +546,7 @@ public class Provider {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                ContentValues v = new ContentValues(18);
+                ContentValues v = new ContentValues(19);
                 v.put(VoteActions.COLUMN_ACCOUNT, accountName);
                 v.put(VoteActions.COLUMN_ACTION, action);
                 v.put(VoteActions.COLUMN_SHOW_IN_LISTING, true);
@@ -559,6 +562,7 @@ public class Provider {
                 v.put(VoteActions.COLUMN_OVER_18, over18);
                 v.put(VoteActions.COLUMN_PERMA_LINK, permaLink);
                 v.put(VoteActions.COLUMN_SCORE, score);
+                v.put(VoteActions.COLUMN_SELF, self);
                 v.put(VoteActions.COLUMN_SUBREDDIT, subreddit);
                 v.put(VoteActions.COLUMN_TITLE, title);
                 v.put(VoteActions.COLUMN_THUMBNAIL_URL, thumbnailUrl);
