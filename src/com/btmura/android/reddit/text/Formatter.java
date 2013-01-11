@@ -20,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.text.style.SubredditSpan;
+import com.btmura.android.reddit.text.style.UserSpan;
 
 import android.content.Context;
 import android.graphics.Typeface;

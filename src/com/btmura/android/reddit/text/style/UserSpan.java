@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.text;
+package com.btmura.android.reddit.text.style;
 
 import android.content.Context;
 import android.content.Intent;
