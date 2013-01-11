@@ -42,6 +42,11 @@ public class Formatter_RawLinksTest extends AbstractFormatterTest {
         assertUrlSpan(cs, 0, 11, "http://abcd.net");
     }
 
+    public void testFormat_noScheme() {
+        CharSequence cs = assertRawLinksFormat("www.acm.org", "www.acm.org");
+        assertUrlSpan(cs, 0, 11, "http://www.acm.org");
+    }
+
     public void testFormat_endings() {
         CharSequence cs = assertRawLinksFormat("(http://abcd.org)", "(http://abcd.org)");
         assertUrlSpan(cs, 1, 12, "http://abcd.org");
