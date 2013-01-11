@@ -446,19 +446,23 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     private void mergeVoteActions(int filter) {
-        // We throw all the vote things on the first page, so don't merge the
-        // votes that would add new items if we're just scrolling further down.
         boolean hasMore = !TextUtils.isEmpty(more);
         String selection;
         switch (filter) {
             case FilterAdapter.PROFILE_LIKED:
-                selection = hasMore ? VoteActions.SELECT_DOWN_BY_ACCOUNT
-                        : VoteActions.SELECT_NOT_NEUTRAL_BY_ACCOUNT;
+                // If we're on the first page, then grab both likes and
+                // dislikes. The liked items will be prepended to the top and
+                // disliked items will be pruned.
+                //
+                // If we're just appending, then just grab the disliked items we
+                // need to prune.
+                selection = !hasMore ? VoteActions.SELECT_NOT_NEUTRAL_BY_ACCOUNT
+                        : VoteActions.SELECT_DOWN_BY_ACCOUNT;
                 break;
 
             case FilterAdapter.PROFILE_DISLIKED:
-                selection = hasMore ? VoteActions.SELECT_UP_BY_ACCOUNT
-                        : VoteActions.SELECT_NOT_NEUTRAL_BY_ACCOUNT;
+                selection = !hasMore ? VoteActions.SELECT_NOT_NEUTRAL_BY_ACCOUNT
+                        : VoteActions.SELECT_UP_BY_ACCOUNT;
                 break;
 
             default:

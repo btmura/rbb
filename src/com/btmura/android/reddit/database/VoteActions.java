@@ -36,6 +36,9 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
     /** Unused long column for expiration. */
     public static final String COLUMN_EXPIRATION = "expiration";
 
+    /** Boolean column indicating whether to show this in the liked listing. */
+    public static final String COLUMN_SHOW_IN_LISTING = "showInListing";
+
     /** String ID of the thing that the user wants to vote on. */
     public static final String COLUMN_THING_ID = "thingId";
 
@@ -48,13 +51,16 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
     /** Vote column value indicating a downvote. */
     public static final int ACTION_VOTE_DOWN = -1;
 
-    public static final String SELECT_UP_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
+    private static final String SELECT_SHOWABLE_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
+            + " AND " + COLUMN_SHOW_IN_LISTING + "=1";
+
+    public static final String SELECT_UP_BY_ACCOUNT = SELECT_SHOWABLE_BY_ACCOUNT
             + " AND " + COLUMN_ACTION + "=" + ACTION_VOTE_UP;
 
-    public static final String SELECT_DOWN_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
+    public static final String SELECT_DOWN_BY_ACCOUNT = SELECT_SHOWABLE_BY_ACCOUNT
             + " AND " + COLUMN_ACTION + "=" + ACTION_VOTE_DOWN;
 
-    public static final String SELECT_NOT_NEUTRAL_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
+    public static final String SELECT_NOT_NEUTRAL_BY_ACCOUNT = SELECT_SHOWABLE_BY_ACCOUNT
             + " AND " + COLUMN_ACTION + "!=" + ACTION_VOTE_NEUTRAL;
 
     /** Creates the voteActions table. */
@@ -64,6 +70,7 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
                 + COLUMN_ACCOUNT + " TEXT NOT NULL,"
                 + COLUMN_ACTION + " INTEGER NOT NULL,"
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
+                + COLUMN_SHOW_IN_LISTING + " INTEGER DEFAULT 0,"
                 + COLUMN_THING_ID + " TEXT NOT NULL,"
 
                 // Create thing columns to store enough info needed to display a

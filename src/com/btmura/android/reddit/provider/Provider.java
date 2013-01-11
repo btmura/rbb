@@ -492,9 +492,35 @@ public class Provider {
         }.execute();
     }
 
+    /**
+     * Vote on something but don't make it visible in the liked/disliked listing
+     * while the vote is still pending.
+     */
     public static void voteAsync(Context context,
             final String accountName,
-            final String thingId,
+            final int action,
+            final String thingId) {
+
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            public void run() {
+                ContentValues v = new ContentValues(3);
+                v.put(VoteActions.COLUMN_ACCOUNT, accountName);
+                v.put(VoteActions.COLUMN_ACTION, action);
+                v.put(VoteActions.COLUMN_THING_ID, thingId);
+
+                // No toast needed, since the vote arrows will reflect success.
+                cr.insert(VOTE_ACTIONS_NOTIFY_SYNC_URI, v);
+            }
+        });
+    }
+
+    /**
+     * Vote on something and store additional information to make it visible in
+     * the liked/disliked listing while the vote is still pending.
+     */
+    public static void voteAsync(Context context,
+            final String accountName,
             final int action,
 
             // Following parameters are for faking a thing.
@@ -508,6 +534,7 @@ public class Provider {
             final String permaLink,
             final int score,
             final String subreddit,
+            final String thingId,
             final String title,
             final String thumbnailUrl,
             final int ups,
@@ -516,9 +543,10 @@ public class Provider {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                ContentValues v = new ContentValues(3);
+                ContentValues v = new ContentValues(18);
                 v.put(VoteActions.COLUMN_ACCOUNT, accountName);
                 v.put(VoteActions.COLUMN_ACTION, action);
+                v.put(VoteActions.COLUMN_SHOW_IN_LISTING, true);
                 v.put(VoteActions.COLUMN_THING_ID, thingId);
 
                 // Following values are for faking a thing.

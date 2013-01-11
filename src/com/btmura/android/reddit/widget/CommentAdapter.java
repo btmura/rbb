@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
 
@@ -175,7 +176,8 @@ public class CommentAdapter extends LoaderAdapter {
         tv.setType(ThingView.TYPE_COMMENT_LIST);
         tv.setBody(body, false, formatter);
         tv.setData(accountName, author, createdUtc, null, downs, expanded, kind, likes, null,
-                nesting, nowTimeMs, numComments, over18, null, score, null, 0, thingId, null, title,
+                nesting, nowTimeMs, numComments, over18, null, score, null, 0, thingId, null,
+                title,
                 ups);
         tv.setOnVoteListener(listener);
     }
@@ -204,5 +206,35 @@ public class CommentAdapter extends LoaderAdapter {
 
     public String getThingId() {
         return thingId;
+    }
+
+    public void vote(Context context, int action, int position) {
+        if (position == 0) {
+            // Store additional information when the user votes on the header
+            // comment which represents the overall thing so that it appears in
+            // the liked and disliked listing when the vote is still pending.
+            Provider.voteAsync(context, accountName, action,
+                    getString(position, INDEX_AUTHOR),
+                    getLong(position, INDEX_CREATED_UTC),
+                    getString(position, INDEX_DOMAIN),
+                    getInt(position, INDEX_DOWNS),
+                    getInt(position, INDEX_LIKES),
+                    getInt(position, INDEX_NUM_COMMENTS),
+                    getBoolean(position, INDEX_OVER_18),
+                    getString(position, INDEX_PERMA_LINK),
+                    getInt(position, INDEX_SCORE),
+                    getString(position, INDEX_SUBREDDIT),
+                    getString(position, INDEX_THING_ID),
+                    getString(position, INDEX_TITLE),
+                    getString(position, INDEX_THUMBNAIL_URL),
+                    getInt(position, INDEX_UPS),
+                    getString(position, INDEX_URL));
+        } else {
+            // Voting on just the comments won't appear in the liked/disliked
+            // listing, so there is no need to send additional info about what
+            // we voted upon except the id.
+            Provider.voteAsync(context, accountName, action,
+                    getString(position, INDEX_THING_ID));
+        }
     }
 }

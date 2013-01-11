@@ -228,25 +228,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
     }
 
     public void onVote(View view, int action) {
-        String accountName = adapter.getAccountName();
-        if (AccountUtils.isAccount(accountName)) {
-            int position = getListView().getPositionForView(view);
-            Provider.voteAsync(getActivity(), accountName, adapter.getThingId(), action,
-                    adapter.getString(position, CommentAdapter.INDEX_AUTHOR),
-                    adapter.getLong(position, CommentAdapter.INDEX_CREATED_UTC),
-                    adapter.getString(position, CommentAdapter.INDEX_DOMAIN),
-                    adapter.getInt(position, CommentAdapter.INDEX_DOWNS),
-                    adapter.getInt(position, CommentAdapter.INDEX_LIKES),
-                    adapter.getInt(position, CommentAdapter.INDEX_NUM_COMMENTS),
-                    adapter.getBoolean(position, CommentAdapter.INDEX_OVER_18),
-                    adapter.getString(position, CommentAdapter.INDEX_PERMA_LINK),
-                    adapter.getInt(position, CommentAdapter.INDEX_SCORE),
-                    adapter.getString(position, CommentAdapter.INDEX_SUBREDDIT),
-                    adapter.getString(position, CommentAdapter.INDEX_TITLE),
-                    adapter.getString(position, CommentAdapter.INDEX_THUMBNAIL_URL),
-                    adapter.getInt(position, CommentAdapter.INDEX_UPS),
-                    adapter.getString(position, CommentAdapter.INDEX_URL));
-        }
+        int position = getListView().getPositionForView(view);
+        adapter.vote(getActivity(), action, position);
     }
 
     @Override

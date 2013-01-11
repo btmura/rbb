@@ -407,8 +407,7 @@ public class ThingAdapter extends LoaderAdapter {
             throw new IllegalStateException();
         }
 
-        Provider.voteAsync(context, accountName, getThingId(position), action,
-                getString(position, THING_AUTHOR),
+        Provider.voteAsync(context, accountName, action, getString(position, THING_AUTHOR),
                 getLong(position, THING_CREATED_UTC),
                 getString(position, THING_DOMAIN),
                 getInt(position, THING_DOWNS),
@@ -418,6 +417,7 @@ public class ThingAdapter extends LoaderAdapter {
                 getString(position, THING_PERMA_LINK),
                 getInt(position, THING_SCORE),
                 getString(position, THING_SUBREDDIT),
+                getThingId(position),
                 getString(position, THING_TITLE),
                 getString(position, THING_THUMBNAIL_URL),
                 getInt(position, THING_UPS),
