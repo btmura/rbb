@@ -49,7 +49,7 @@ abstract class SessionProvider extends BaseProvider {
         // Double check that the session exists if specified.
         if (sessionId != -1) {
             long count = DatabaseUtils.queryNumEntries(db, Sessions.TABLE_NAME,
-                    Sessions.SELECT_BY_SESSION_ID, Array.of(sessionId));
+                    Sessions.SELECT_BY_ID, Array.of(sessionId));
             if (count == 0) {
                 sessionId = -1;
             }

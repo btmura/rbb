@@ -26,7 +26,7 @@ public class Sessions implements BaseColumns {
     /** Long timestamp when the session was created. */
     public static final String COLUMN_TIMESTAMP = "timestamp";
 
-    public static final String SELECT_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID;
+    public static final String SELECT_BY_ID = SharedColumns.SELECT_BY_ID;
 
     static void createTempTable(SQLiteDatabase db) {
         db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
