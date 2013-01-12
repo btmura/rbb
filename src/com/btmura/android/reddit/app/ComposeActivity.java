@@ -297,7 +297,7 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     public void onCaptchaCancelled() {
     }
 
-    public void onCompose(int type, String name, String url) {
+    public void onComposeSuccess(int type, String name, String url) {
         switch (type) {
             case TYPE_POST:
                 Toast.makeText(getApplicationContext(), url, Toast.LENGTH_SHORT).show();

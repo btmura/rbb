@@ -51,7 +51,7 @@ public class ComposeFragment extends Fragment {
     private static final String ARG_CAPTCHA_GUESS = "captchaGuess";
 
     public interface OnComposeListener {
-        void onCompose(int type, String name, String url);
+        void onComposeSuccess(int type, String name, String url);
 
         void onComposeCancelled();
     }
@@ -201,7 +201,7 @@ public class ComposeFragment extends Fragment {
                 MessageDialogFragment.showMessage(getFragmentManager(),
                         result.getErrorMessage(context));
             } else if (listener != null) {
-                listener.onCompose(type, result.name, result.url);
+                listener.onComposeSuccess(type, result.name, result.url);
             }
         }
     }
