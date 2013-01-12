@@ -37,14 +37,12 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.app.ComposeFormFragment.OnComposeFormListener;
 import com.btmura.android.reddit.app.ComposeFragment.OnComposeListener;
-import com.btmura.android.reddit.app.SubmitLinkFragment.OnSubmitLinkListener;
 import com.btmura.android.reddit.provider.Provider;
 
 public class ComposeActivity extends Activity implements OnPageChangeListener,
         OnClickListener,
         OnComposeFormListener,
         OnCaptchaGuessListener,
-        OnSubmitLinkListener,
         OnComposeListener {
 
     /** Type of composition when submitting a link or text. */
@@ -279,19 +277,13 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
         boolean isLink = extras.getBoolean(EXTRA_COMPOSE_IS_LINK);
 
         // TODO: Don't reply on the current page.
-        switch (getCurrentType()) {
+        int type = getCurrentType();
+        switch (type) {
             case TYPE_POST:
-                Fragment frag = SubmitLinkFragment.newInstance(accountName,
-                        destination, title, text, isLink, id, guess);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(frag, SubmitLinkFragment.TAG);
-                ft.commit();
-                break;
-
             case TYPE_MESSAGE:
-                frag = ComposeFragment.newInstance(accountName,
-                        destination, title, text, id, guess);
-                ft = getFragmentManager().beginTransaction();
+                Fragment frag = ComposeFragment.newInstance(type, accountName, destination, title,
+                        text, isLink, id, guess);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.add(frag, ComposeFragment.TAG);
                 ft.commit();
                 break;
@@ -305,21 +297,22 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     public void onCaptchaCancelled() {
     }
 
-    // TODO: Rename these to something more specific.
-    public void onSubmitLink(String name, String url) {
-        Toast.makeText(getApplicationContext(), url, Toast.LENGTH_SHORT).show();
-        finish();
-    }
+    public void onCompose(int type, String name, String url) {
+        switch (type) {
+            case TYPE_POST:
+                Toast.makeText(getApplicationContext(), url, Toast.LENGTH_SHORT).show();
+                finish();
+                break;
 
-    // TODO: Do we need these?
-    public void onSubmitLinkCancelled() {
-    }
+            case TYPE_MESSAGE:
+                Toast.makeText(getApplicationContext(), R.string.compose_message_sent,
+                        Toast.LENGTH_SHORT).show();
+                finish();
+                break;
 
-    // TODO: Rename these to something more specific.
-    public void onCompose() {
-        Toast.makeText(getApplicationContext(), R.string.compose_message_sent,
-                Toast.LENGTH_SHORT).show();
-        finish();
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     // TODO: Do we need these?

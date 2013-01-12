@@ -41,15 +41,17 @@ public class ComposeFragment extends Fragment {
 
     public static final String TAG = "ComposeFragment";
 
+    private static final String ARG_TYPE = "type";
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_DESTINATION = "destination";
     private static final String ARG_TITLE = "title";
     private static final String ARG_TEXT = "text";
+    private static final String ARG_IS_LINK = "isLink";
     private static final String ARG_CAPTCHA_ID = "captchaId";
     private static final String ARG_CAPTCHA_GUESS = "captchaGuess";
 
     public interface OnComposeListener {
-        void onCompose();
+        void onCompose(int type, String name, String url);
 
         void onComposeCancelled();
     }
@@ -57,13 +59,15 @@ public class ComposeFragment extends Fragment {
     private OnComposeListener listener;
     private ComposeTask task;
 
-    public static ComposeFragment newInstance(String accountName, String destination,
-            String title, String text, String captchaId, String captchaGuess) {
-        Bundle args = new Bundle(6);
+    public static ComposeFragment newInstance(int type, String accountName, String destination,
+            String title, String text, boolean isLink, String captchaId, String captchaGuess) {
+        Bundle args = new Bundle(9);
+        args.putInt(ARG_TYPE, type);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_DESTINATION, destination);
         args.putString(ARG_TITLE, title);
         args.putString(ARG_TEXT, text);
+        args.putBoolean(ARG_IS_LINK, isLink);
         args.putString(ARG_CAPTCHA_ID, captchaId);
         args.putString(ARG_CAPTCHA_GUESS, captchaGuess);
 
@@ -92,13 +96,15 @@ public class ComposeFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (task == null) {
+            int type = getArguments().getInt(ARG_TYPE);
             String accountName = getArguments().getString(ARG_ACCOUNT_NAME);
             String destination = getArguments().getString(ARG_DESTINATION);
             String title = getArguments().getString(ARG_TITLE);
             String text = getArguments().getString(ARG_TEXT);
+            boolean isLink = getArguments().getBoolean(ARG_IS_LINK);
             String captchaId = getArguments().getString(ARG_CAPTCHA_ID);
             String captchaGuess = getArguments().getString(ARG_CAPTCHA_GUESS);
-            task = new ComposeTask(getActivity(), accountName, destination, title, text,
+            task = new ComposeTask(getActivity(), type, accountName, destination, title, text, isLink,
                     captchaId, captchaGuess);
             task.execute();
         }
@@ -116,20 +122,24 @@ public class ComposeFragment extends Fragment {
     class ComposeTask extends AsyncTask<Void, Void, Result> {
 
         private final Context context;
+        private final int type;
         private final String accountName;
         private final String destination;
         private final String title;
         private final String text;
+        private final boolean isLink;
         private final String captchaId;
         private final String captchaGuess;
 
-        ComposeTask(Context context, String accountName, String destination, String title,
-                String text, String captchaId, String captchaGuess) {
+        ComposeTask(Context context, int type, String accountName, String destination,
+                String title, String text, boolean isLink, String captchaId, String captchaGuess) {
             this.context = context.getApplicationContext();
+            this.type = type;
             this.accountName = accountName;
             this.destination = destination;
             this.title = title;
             this.text = text;
+            this.isLink = isLink;
             this.captchaId = captchaId;
             this.captchaGuess = captchaGuess;
         }
@@ -158,8 +168,18 @@ public class ComposeFragment extends Fragment {
                     return null;
                 }
 
-                return RedditApi.compose(destination, title, text,
-                        captchaId, captchaGuess, cookie, modhash);
+                switch (type) {
+                    case ComposeActivity.TYPE_POST:
+                        return RedditApi.submit(destination, title, text, isLink,
+                                captchaId, captchaGuess, cookie, modhash);
+
+                    case ComposeActivity.TYPE_MESSAGE:
+                        return RedditApi.compose(destination, title, text,
+                                captchaId, captchaGuess, cookie, modhash);
+
+                    default:
+                        throw new IllegalArgumentException();
+                }
 
             } catch (OperationCanceledException e) {
                 Log.e(TAG, e.getMessage(), e);
@@ -181,7 +201,7 @@ public class ComposeFragment extends Fragment {
                 MessageDialogFragment.showMessage(getFragmentManager(),
                         result.getErrorMessage(context));
             } else if (listener != null) {
-                listener.onCompose();
+                listener.onCompose(type, result.name, result.url);
             }
         }
     }
