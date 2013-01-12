@@ -26,7 +26,7 @@ import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
 
-public class MessageThreadAdapter extends LoaderAdapter {
+public class MessageThreadAdapter extends BaseLoaderAdapter {
 
     private static final String[] PROJECTION = {
             Messages._ID,

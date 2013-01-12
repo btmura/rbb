@@ -29,7 +29,7 @@ import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
 
-public class CommentAdapter extends LoaderAdapter {
+public class CommentAdapter extends BaseLoaderAdapter {
 
     private static final String[] PROJECTION = {
             Things._ID,

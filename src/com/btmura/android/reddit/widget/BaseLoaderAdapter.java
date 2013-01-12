@@ -22,9 +22,9 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 
-public abstract class LoaderAdapter extends BaseCursorAdapter {
+public abstract class BaseLoaderAdapter extends BaseCursorAdapter {
 
-    public LoaderAdapter(Context context, Cursor cursor, int flags) {
+    public BaseLoaderAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, flags);
     }
 

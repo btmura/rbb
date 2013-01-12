@@ -40,7 +40,7 @@ import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Objects;
 
 // TODO: Split this into an interface and 2 adapters.
-public class ThingAdapter extends LoaderAdapter {
+public class ThingAdapter extends BaseLoaderAdapter {
 
     public static final String TAG = "ThingAdapter";
 
