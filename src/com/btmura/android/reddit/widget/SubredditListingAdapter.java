@@ -51,9 +51,14 @@ class SubredditListingAdapter extends SubredditAdapter {
         PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM);
     }
 
-    SubredditListingAdapter(Context context, boolean filterQuery, boolean singleChoice) {
+    private boolean showPresets;
+
+    SubredditListingAdapter(Context context, boolean showPresets, boolean addFilter,
+            boolean singleChoice) {
         super(context, singleChoice);
-        if (filterQuery) {
+        this.showPresets = showPresets;
+        if (addFilter) {
+            showPresets = false;
             // Attach filter that executes a query as the user types.
             final Context appContext = context.getApplicationContext();
             setFilterQueryProvider(new FilterQueryProvider() {
@@ -66,7 +71,9 @@ class SubredditListingAdapter extends SubredditAdapter {
 
     @Override
     public Cursor swapCursor(Cursor newCursor) {
-        newCursor = new MergeCursor(new Cursor[] {PRESETS_CURSOR, newCursor});
+        if (showPresets) {
+            newCursor = new MergeCursor(new Cursor[] {PRESETS_CURSOR, newCursor});
+        }
         return super.swapCursor(newCursor);
     }
 
