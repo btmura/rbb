@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.widget;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -24,7 +25,9 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FilterQueryProvider;
 
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.SubredditProvider;
@@ -32,6 +35,7 @@ import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
+// TODO: Split this into an interface and 2 adapters.
 public class SubredditAdapter extends LoaderAdapter {
 
     public static final String TAG = "SubredditAdapter";
@@ -61,23 +65,52 @@ public class SubredditAdapter extends LoaderAdapter {
         PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM);
     }
 
+    private final boolean showPresets;
+    private final boolean singleChoice;
+
     private long sessionId = -1;
     private String accountName;
     private String selectedSubreddit;
-    private final String query;
-    private final boolean singleChoice;
+    private String query;
 
-    public SubredditAdapter(Context context, String query, boolean singleChoice) {
+    /** Creates an adapter for showing the user's subreddits with presets. */
+    public static SubredditAdapter newSubredditsInstance(Context context, boolean singleChoice) {
+        return new SubredditAdapter(context, true, singleChoice);
+    }
+
+    /** Creates an adapter for searching for subreddits. */
+    public static SubredditAdapter newSearchInstance(Context context, String query,
+            boolean singleChoice) {
+        // Don't show presets when searching. Single choice depends on layout.
+        SubredditAdapter adapter = new SubredditAdapter(context, false, singleChoice);
+        adapter.setQuery(query);
+        return adapter;
+    }
+
+    /** Creates an adapter for use with AutoCompleteTextView. */
+    public static SubredditAdapter newAutoCompleteInstance(Context context) {
+        // Don't show presets or make it single choice for AutoCompleteTextView.
+        final SubredditAdapter adapter = new SubredditAdapter(context, false, false);
+
+        // Attach FilterQueryProvider that executes a query as the user types.
+        final Context appContext = context.getApplicationContext();
+        adapter.setFilterQueryProvider(new FilterQueryProvider() {
+            public Cursor runQuery(CharSequence constraint) {
+                return adapter.getFilterCursor(appContext, constraint);
+            }
+        });
+        return adapter;
+    }
+
+    private SubredditAdapter(Context context, boolean showPresets, boolean singleChoice) {
         super(context, null, 0);
-        this.query = query;
+        this.showPresets = showPresets;
         this.singleChoice = singleChoice;
     }
 
     @Override
     public Cursor swapCursor(Cursor newCursor) {
-        // Add preset subreddits to the cursor if we're not doing a search
-        // query.
-        if (!isQuery()) {
+        if (showPresets) {
             newCursor = new MergeCursor(new Cursor[] {PRESETS_CURSOR, newCursor});
         }
         return super.swapCursor(newCursor);
@@ -145,7 +178,10 @@ public class SubredditAdapter extends LoaderAdapter {
     }
 
     public void setAccountName(String accountName) {
-        this.accountName = accountName;
+        if (!Objects.equals(this.accountName, accountName)) {
+            this.accountName = accountName;
+            notifyDataSetChanged();
+        }
     }
 
     public String getSelectedSubreddit() {
@@ -169,6 +205,10 @@ public class SubredditAdapter extends LoaderAdapter {
         return query;
     }
 
+    void setQuery(String query) {
+        this.query = query;
+    }
+
     public boolean isQuery() {
         return !TextUtils.isEmpty(query);
     }
@@ -180,5 +220,18 @@ public class SubredditAdapter extends LoaderAdapter {
     public boolean isDeletable(int position) {
         // Non-presets are deletable. Presents have negative ids.
         return getLong(position, INDEX_ID) >= 0;
+    }
+
+    /** Returns a {@link Cursor} using the constraint or null if not ready. */
+    Cursor getFilterCursor(Context context, CharSequence constraint) {
+        if (AccountUtils.isAccount(accountName) && !TextUtils.isEmpty(constraint)) {
+            String namePattern = new StringBuilder(constraint).append("%").toString();
+            ContentResolver cr = context.getApplicationContext().getContentResolver();
+            return cr.query(SubredditProvider.SUBREDDITS_URI, PROJECTION_SUBREDDITS,
+                    Subreddits.SELECT_NOT_DELETED_BY_ACCOUNT_AND_LIKE_NAME,
+                    Array.of(accountName, namePattern),
+                    Subreddits.SORT_BY_NAME);
+        }
+        return null;
     }
 }

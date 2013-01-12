@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -116,7 +117,11 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         String query = getArguments().getString(ARG_QUERY);
         int flags = getArguments().getInt(ARG_FLAGS);
         singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
-        adapter = new SubredditAdapter(getActivity(), query, singleChoice);
+        if (!TextUtils.isEmpty(query)) {
+            adapter = SubredditAdapter.newSearchInstance(getActivity(), query, singleChoice);
+        } else {
+            adapter = SubredditAdapter.newSubredditsInstance(getActivity(), singleChoice);
+        }
 
         if (savedInstanceState == null) {
             adapter.setAccountName(getArguments().getString(ARG_ACCOUNT_NAME));

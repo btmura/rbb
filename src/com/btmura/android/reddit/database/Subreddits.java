@@ -51,6 +51,8 @@ public class Subreddits implements BaseColumns {
             SELECT_BY_ACCOUNT + " AND " + COLUMN_STATE + "!= " + STATE_DELETING;
     public static final String SELECT_BY_ACCOUNT_AND_NAME =
             SELECT_BY_ACCOUNT + " AND " + COLUMN_NAME + "= ?";
+    public static final String SELECT_NOT_DELETED_BY_ACCOUNT_AND_LIKE_NAME =
+            SELECT_BY_ACCOUNT_NOT_DELETED + " AND " + COLUMN_NAME + " LIKE ?";
 
     public static final String SORT_BY_NAME = COLUMN_NAME + " COLLATE NOCASE ASC";
 

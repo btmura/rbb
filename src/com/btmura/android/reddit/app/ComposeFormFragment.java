@@ -33,6 +33,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -45,12 +49,16 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.util.StringUtils;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
+import com.btmura.android.reddit.widget.SubredditAdapter;
 
 /**
  * {@link Fragment} that displays a form for composing submissions and messages.
  */
 public class ComposeFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
-        TextWatcher, OnComposeActivityListener {
+        OnItemSelectedListener,
+        OnItemClickListener,
+        OnComposeActivityListener,
+        TextWatcher {
 
     // This fragment only reports back the user's input and doesn't handle
     // modifying the database. The caller of this fragment should handle that.
@@ -104,7 +112,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     private Spinner accountSpinner;
 
     /** {@link EditText} for either subreddit or username. */
-    private EditText destinationText;
+    private AutoCompleteTextView destinationText;
 
     /** {@link EditText} for either title or subject. */
     private EditText titleText;
@@ -117,6 +125,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
     /** Matcher used to check whether the text is a link or not. */
     private Matcher linkMatcher;
+
+    /** Adapter used to provide subreddit suggestions. */
+    private SubredditAdapter subredditAdapter;
 
     public static ComposeFormFragment newInstance(int type, String subredditDestination,
             String messageDestination, String title, String text, boolean isReply, int id) {
@@ -163,8 +174,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
         accountSpinner.setEnabled(false);
         accountSpinner.setAdapter(adapter);
+        accountSpinner.setOnItemSelectedListener(this);
 
-        destinationText = (EditText) v.findViewById(R.id.destination_text);
+        destinationText = (AutoCompleteTextView) v.findViewById(R.id.destination_text);
         titleText = (EditText) v.findViewById(R.id.title_text);
         linkSwitch = (Switch) v.findViewById(R.id.link_switch);
         textText = (EditText) v.findViewById(R.id.text_text);
@@ -206,6 +218,10 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 destinationText.setText(subredditDestination);
                 destinationText.setHint(R.string.hint_subreddit);
                 destinationText.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
+
+                subredditAdapter = SubredditAdapter.newAutoCompleteInstance(getActivity());
+                destinationText.setAdapter(subredditAdapter);
+                destinationText.setOnItemClickListener(this);
                 break;
 
             case ComposeActivity.TYPE_MESSAGE:
@@ -274,11 +290,6 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         boolean hasAccounts = result.accountNames.length > 0;
-        accountSpinner.setEnabled(hasAccounts);
-        // if (ok != null) {
-        // ok.setEnabled(hasAccounts);
-        // }
-
         adapter.clear();
         if (hasAccounts) {
             adapter.addAll(result.accountNames);
@@ -291,10 +302,28 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         } else {
             adapter.add(getString(R.string.empty_accounts));
         }
+
+        accountSpinner.setEnabled(hasAccounts);
         getActivity().invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
+    }
+
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+        if (subredditAdapter != null) {
+            String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
+            subredditAdapter.setAccountName(accountName);
+        }
+    }
+
+    public void onNothingSelected(AdapterView<?> adapterView) {
+    }
+
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        String subreddit = subredditAdapter.getName(position);
+        destinationText.setText(subreddit);
+        destinationText.setSelection(subreddit.length(), subreddit.length());
     }
 
     @Override

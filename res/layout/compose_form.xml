@@ -13,7 +13,8 @@
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
      See the License for the specific language governing permissions and
      limitations under the License.
---><LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -27,13 +28,14 @@
         android:layout_marginTop="@dimen/padding"
         android:paddingLeft="@dimen/spinner_padding" />
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/destination_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/element_padding"
+        android:completionThreshold="1"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
@@ -77,6 +79,5 @@
         android:layout_weight="1"
         android:gravity="top"
         android:inputType="textCapSentences|textAutoCorrect|textMultiLine" />
-
 
 </LinearLayout>
