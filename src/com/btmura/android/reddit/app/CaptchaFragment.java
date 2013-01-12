@@ -45,6 +45,7 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
             InputFilters.NO_SPACE_FILTER,
     };
 
+    private static final String ARG_CAPTCHA_ID = "captchaId";
     private static final String ARG_EXTRAS = "extras";
 
     public interface OnCaptchaGuessListener {
@@ -54,8 +55,8 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     }
 
     private OnCaptchaGuessListener listener;
-    private Bundle extras;
     private String captchaId;
+    private Bundle extras;
 
     private View progress;
     private ViewStub errorStub;
@@ -64,13 +65,14 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     private Button cancel;
     private Button ok;
 
-    public static CaptchaFragment newInstance(Bundle extras) {
-        Bundle args = new Bundle(1);
+    public static CaptchaFragment newInstance(String captchaId, Bundle extras) {
+        Bundle args = new Bundle(2);
+        args.putString(ARG_CAPTCHA_ID, captchaId);
         args.putBundle(ARG_EXTRAS, extras);
 
-        CaptchaFragment f = new CaptchaFragment();
-        f.setArguments(args);
-        return f;
+        CaptchaFragment frag = new CaptchaFragment();
+        frag.setArguments(args);
+        return frag;
     }
 
     @Override
@@ -84,6 +86,7 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        captchaId = getArguments().getString(ARG_CAPTCHA_ID);
         extras = getArguments().getBundle(ARG_EXTRAS);
     }
 
@@ -116,7 +119,7 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     }
 
     public Loader<CaptchaResult> onCreateLoader(int id, Bundle args) {
-        return new CaptchaLoader(getActivity());
+        return new CaptchaLoader(getActivity(), captchaId);
     }
 
     public void onLoadFinished(Loader<CaptchaResult> loader, CaptchaResult result) {
@@ -134,8 +137,6 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     }
 
     public void onLoaderReset(Loader<CaptchaResult> loader) {
-        progress.setVisibility(View.GONE);
-        captchaId = null;
         captcha.setImageBitmap(null);
     }
 

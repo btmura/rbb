@@ -53,14 +53,26 @@ public class RedditApi {
     private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
 
     public static class Result {
+
+        /** Error for missing or incorrect captcha guess. */
+        private static final String ERROR_BAD_CAPTCHA = "BAD_CAPTCHA";
+
+        /** Error for too much user activity. */
+        private static final String ERROR_RATELIMIT = "RATELIMIT";
+
         public double rateLimit;
 
-        /** Example: [["BAD_CAPTCHA", "care to try these again?", "captcha"]] */
+        /**
+         * Example:
+         * [[BAD_CAPTCHA, care to try these again?, captcha],
+         *  [RATELIMIT, you are doing that too much. try again in 6 minutes., ratelimit]]
+         */
         public String[][] errors;
 
         /** Example: D5GggaXa0GWshObkjzzEPzzrK8zpQfeB */
         public String captcha;
 
+        /** Captcha id returned when asking for a new captcha. */
         public String iden;
 
         /** Example: http://www.reddit.com/r/rbb/comments/w5mhh/test/ */
@@ -91,10 +103,22 @@ public class RedditApi {
             return context.getString(R.string.reddit_error, b);
         }
 
+        public boolean hasErrors() {
+            return !Array.isEmpty(errors);
+        }
+
         public boolean hasRateLimitError() {
+            return hasError(ERROR_RATELIMIT);
+        }
+
+        public boolean hasBadCaptchaError() {
+            return hasError(ERROR_BAD_CAPTCHA);
+        }
+
+        private boolean hasError(String errorCode) {
             if (!Array.isEmpty(errors)) {
                 for (int i = 0; i < errors.length; i++) {
-                    if ("RATELIMIT".equals(errors[i][0])) {
+                    if (errorCode.equals(errors[i][0])) {
                         return true;
                     }
                 }

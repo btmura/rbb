@@ -39,19 +39,25 @@ import com.btmura.android.reddit.net.RedditApi.Result;
  */
 public class ComposeFragment extends Fragment {
 
+    // TODO: Rename this to "SubmitFragment"
+
     public static final String TAG = "ComposeFragment";
 
     private static final String ARG_TYPE = "type";
-    private static final String ARG_ACCOUNT_NAME = "accountName";
-    private static final String ARG_DESTINATION = "destination";
-    private static final String ARG_TITLE = "title";
-    private static final String ARG_TEXT = "text";
-    private static final String ARG_IS_LINK = "isLink";
+    private static final String ARG_EXTRAS = "extras";
     private static final String ARG_CAPTCHA_ID = "captchaId";
     private static final String ARG_CAPTCHA_GUESS = "captchaGuess";
 
+    private static final String EXTRA_ACCOUNT_NAME = "accountName";
+    private static final String EXTRA_DESTINATION = "destination";
+    private static final String EXTRA_TITLE = "title";
+    private static final String EXTRA_TEXT = "text";
+    private static final String EXTRA_IS_LINK = "isLink";
+
     public interface OnComposeListener {
         void onComposeSuccess(int type, String name, String url);
+
+        void onComposeCaptchaFailure(String captchaId, Bundle extras);
 
         void onComposeCancelled();
     }
@@ -59,15 +65,22 @@ public class ComposeFragment extends Fragment {
     private OnComposeListener listener;
     private ComposeTask task;
 
-    public static ComposeFragment newInstance(int type, String accountName, String destination,
-            String title, String text, boolean isLink, String captchaId, String captchaGuess) {
-        Bundle args = new Bundle(9);
+    public static Bundle newExtras(String accountName, String destination, String title,
+            String text, boolean isLink) {
+        Bundle extras = new Bundle(5);
+        extras.putString(EXTRA_ACCOUNT_NAME, accountName);
+        extras.putString(EXTRA_DESTINATION, destination);
+        extras.putString(EXTRA_TITLE, title);
+        extras.putString(EXTRA_TEXT, text);
+        extras.putBoolean(EXTRA_IS_LINK, isLink);
+        return extras;
+    }
+
+    public static ComposeFragment newInstance(int type, Bundle extras, String captchaId,
+            String captchaGuess) {
+        Bundle args = new Bundle(4);
         args.putInt(ARG_TYPE, type);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_DESTINATION, destination);
-        args.putString(ARG_TITLE, title);
-        args.putString(ARG_TEXT, text);
-        args.putBoolean(ARG_IS_LINK, isLink);
+        args.putBundle(ARG_EXTRAS, extras);
         args.putString(ARG_CAPTCHA_ID, captchaId);
         args.putString(ARG_CAPTCHA_GUESS, captchaGuess);
 
@@ -97,15 +110,10 @@ public class ComposeFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         if (task == null) {
             int type = getArguments().getInt(ARG_TYPE);
-            String accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-            String destination = getArguments().getString(ARG_DESTINATION);
-            String title = getArguments().getString(ARG_TITLE);
-            String text = getArguments().getString(ARG_TEXT);
-            boolean isLink = getArguments().getBoolean(ARG_IS_LINK);
+            Bundle extras = getArguments().getBundle(ARG_EXTRAS);
             String captchaId = getArguments().getString(ARG_CAPTCHA_ID);
             String captchaGuess = getArguments().getString(ARG_CAPTCHA_GUESS);
-            task = new ComposeTask(getActivity(), type, accountName, destination, title, text, isLink,
-                    captchaId, captchaGuess);
+            task = new ComposeTask(getActivity(), type, extras, captchaId, captchaGuess);
             task.execute();
         }
     }
@@ -123,23 +131,15 @@ public class ComposeFragment extends Fragment {
 
         private final Context context;
         private final int type;
-        private final String accountName;
-        private final String destination;
-        private final String title;
-        private final String text;
-        private final boolean isLink;
+        private final Bundle extras;
         private final String captchaId;
         private final String captchaGuess;
 
-        ComposeTask(Context context, int type, String accountName, String destination,
-                String title, String text, boolean isLink, String captchaId, String captchaGuess) {
+        ComposeTask(Context context, int type, Bundle extras, String captchaId,
+                String captchaGuess) {
             this.context = context.getApplicationContext();
             this.type = type;
-            this.accountName = accountName;
-            this.destination = destination;
-            this.title = title;
-            this.text = text;
-            this.isLink = isLink;
+            this.extras = extras;
             this.captchaId = captchaId;
             this.captchaGuess = captchaGuess;
         }
@@ -154,6 +154,7 @@ public class ComposeFragment extends Fragment {
         protected Result doInBackground(Void... voidRay) {
             try {
                 AccountManager manager = AccountManager.get(context);
+                String accountName = extras.getString(EXTRA_ACCOUNT_NAME);
                 Account account = AccountUtils.getAccount(context, accountName);
 
                 // Get account cookie or bail out.
@@ -167,6 +168,11 @@ public class ComposeFragment extends Fragment {
                 if (modhash == null) {
                     return null;
                 }
+
+                String destination = extras.getString(EXTRA_DESTINATION);
+                String title = extras.getString(EXTRA_TITLE);
+                String text = extras.getString(EXTRA_TEXT);
+                boolean isLink = extras.getBoolean(EXTRA_IS_LINK);
 
                 switch (type) {
                     case ComposeActivity.TYPE_POST:
@@ -195,14 +201,24 @@ public class ComposeFragment extends Fragment {
         protected void onPostExecute(Result result) {
             ProgressDialogFragment.dismissDialog(getFragmentManager());
             if (result == null) {
-                MessageDialogFragment.showMessage(getFragmentManager(),
-                        getString(R.string.error));
-            } else if (result.errors != null) {
-                MessageDialogFragment.showMessage(getFragmentManager(),
-                        result.getErrorMessage(context));
-            } else if (listener != null) {
-                listener.onComposeSuccess(type, result.name, result.url);
+                showMessage(getString(R.string.error));
+            } else if (result.hasRateLimitError()) {
+                showMessage(result.getErrorMessage(context));
+            } else if (result.hasBadCaptchaError()) {
+                if (listener != null) {
+                    listener.onComposeCaptchaFailure(result.captcha, extras);
+                }
+            } else if (result.hasErrors()) {
+                showMessage(result.getErrorMessage(context));
+            } else {
+                if (listener != null) {
+                    listener.onComposeSuccess(type, result.name, result.url);
+                }
             }
+        }
+
+        private void showMessage(CharSequence error) {
+            MessageDialogFragment.showMessage(getFragmentManager(), error);
         }
     }
 }

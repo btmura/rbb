@@ -117,28 +117,11 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     public static final String EXTRA_MESSAGE_SESSION_ID = "sessionId";
     public static final String EXTRA_MESSAGE_THING_ID = "thingId";
 
-    // Internal extras used by the activity to pass extras to the captcha
-    // fragment and back without storing member data in this activity.
-
-    /** String extra with account name from compose dialog. */
-    private static final String EXTRA_COMPOSE_ACCOUNT_NAME = "accountName";
-
-    /** String extra with destination from compose dialog. */
-    private static final String EXTRA_COMPOSE_DESTINATION = "destination";
-
-    /** String extra with title from compose dialog. */
-    private static final String EXTRA_COMPOSE_TITLE = "title";
-
-    /** String extra with text from compose dialog. */
-    private static final String EXTRA_COMPOSE_TEXT = "text";
-
-    /** Boolean extra indicating whether the text is a link. */
-    private static final String EXTRA_COMPOSE_IS_LINK = "isLink";
-
     interface OnComposeActivityListener {
         void onOkClicked(int id);
     }
 
+    // TODO: Replace with String[] to reduce fingerprint.
     private final ArrayList<OnComposeActivityListener> listeners =
             new ArrayList<OnComposeActivityListener>(2);
 
@@ -242,21 +225,20 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
         listeners.add(listener);
     }
 
+    // TODO: Use bundle for onComposeForm.
     public void onComposeForm(String accountName, String destination, String title, String text,
             boolean isLink) {
         // TODO: Don't reply on the current page.
-        switch (getCurrentType()) {
+        int type = getCurrentType();
+        switch (type) {
             case TYPE_POST:
             case TYPE_MESSAGE:
-                // Bundle up extras from the form to pass through the captcha
-                // fragment and then back to callbacks in this activity.
-                Bundle extras = new Bundle(5);
-                extras.putString(EXTRA_COMPOSE_ACCOUNT_NAME, accountName);
-                extras.putString(EXTRA_COMPOSE_DESTINATION, destination);
-                extras.putString(EXTRA_COMPOSE_TITLE, title);
-                extras.putString(EXTRA_COMPOSE_TEXT, text);
-                extras.putBoolean(EXTRA_COMPOSE_IS_LINK, isLink);
-                CaptchaFragment.newInstance(extras).show(getFragmentManager(), CaptchaFragment.TAG);
+                Bundle extras = ComposeFragment.newExtras(accountName, destination, title, text,
+                        isLink);
+                Fragment frag = ComposeFragment.newInstance(type, extras, null, null);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.add(frag, ComposeFragment.TAG);
+                ft.commit();
                 break;
 
             case TYPE_COMMENT_REPLY:
@@ -267,34 +249,6 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
                 handleMessageReply(accountName, text);
                 break;
         }
-    }
-
-    public void onCaptchaGuess(String id, String guess, Bundle extras) {
-        String accountName = extras.getString(EXTRA_COMPOSE_ACCOUNT_NAME);
-        String destination = extras.getString(EXTRA_COMPOSE_DESTINATION);
-        String title = extras.getString(EXTRA_COMPOSE_TITLE);
-        String text = extras.getString(EXTRA_COMPOSE_TEXT);
-        boolean isLink = extras.getBoolean(EXTRA_COMPOSE_IS_LINK);
-
-        // TODO: Don't reply on the current page.
-        int type = getCurrentType();
-        switch (type) {
-            case TYPE_POST:
-            case TYPE_MESSAGE:
-                Fragment frag = ComposeFragment.newInstance(type, accountName, destination, title,
-                        text, isLink, id, guess);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(frag, ComposeFragment.TAG);
-                ft.commit();
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-    // TODO: Do we need these?
-    public void onCaptchaCancelled() {
     }
 
     public void onComposeSuccess(int type, String name, String url) {
@@ -315,8 +269,34 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
         }
     }
 
+    public void onComposeCaptchaFailure(String captchaId, Bundle extras) {
+        CaptchaFragment.newInstance(captchaId, extras)
+                .show(getFragmentManager(), CaptchaFragment.TAG);
+    }
+
     // TODO: Do we need these?
     public void onComposeCancelled() {
+    }
+
+    public void onCaptchaGuess(String id, String guess, Bundle extras) {
+        // TODO: Don't reply on the current page.
+        int type = getCurrentType();
+        switch (type) {
+            case TYPE_POST:
+            case TYPE_MESSAGE:
+                Fragment frag = ComposeFragment.newInstance(type, extras, id, guess);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.add(frag, ComposeFragment.TAG);
+                ft.commit();
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    // TODO: Do we need these?
+    public void onCaptchaCancelled() {
     }
 
     private void handleCommentReply(String accountName, String body) {

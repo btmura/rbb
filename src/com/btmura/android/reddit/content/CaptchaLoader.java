@@ -23,10 +23,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.content.CaptchaLoader.CaptchaResult;
 import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.net.RedditApi.Result;
 
 public class CaptchaLoader extends AsyncTaskLoader<CaptchaResult> {
 
@@ -37,22 +35,20 @@ public class CaptchaLoader extends AsyncTaskLoader<CaptchaResult> {
         public Bitmap captchaBitmap;
     }
 
+    private final String captchaId;
     private CaptchaResult result;
 
-    public CaptchaLoader(Context context) {
+    public CaptchaLoader(Context context, String captchaId) {
         super(context);
+        this.captchaId = captchaId;
     }
 
     @Override
     public CaptchaResult loadInBackground() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground");
-        }
         try {
             CaptchaResult captchaResult = new CaptchaResult();
-            Result result = RedditApi.newCaptcha();
-            captchaResult.iden = result.iden;
-            captchaResult.captchaBitmap = RedditApi.getCaptcha(result.iden);
+            captchaResult.iden = captchaId;
+            captchaResult.captchaBitmap = RedditApi.getCaptcha(captchaId);
             return captchaResult;
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
