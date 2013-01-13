@@ -16,15 +16,19 @@
 
 package com.btmura.android.reddit.app;
 
-/**
- * Interface used to tell other parts of the app about the thing that is
- * currently being viewed as well as when links or comments are selected.
- */
-interface OnThingEventListener {
+interface ThingHolder {
 
-    void onThingLoaded(ThingHolder thingHolder);
+    String getThingId();
 
-    void onLinkMenuItemClick();
+    String getTitle();
 
-    void onCommentMenuItemClick();
+    String getUrl();
+
+    boolean isReplyable();
+
+    boolean isSavable();
+
+    boolean isSaved();
+
+    boolean isSelf();
 }

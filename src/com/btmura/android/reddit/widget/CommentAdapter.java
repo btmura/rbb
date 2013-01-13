@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
@@ -194,18 +195,42 @@ public class CommentAdapter extends BaseLoaderAdapter {
         return accountName;
     }
 
-    public boolean isSaved(int position) {
+    public String getThingId() {
+        return thingId;
+    }
+
+    public String getTitle() {
+        return getString(0, INDEX_TITLE);
+    }
+
+    public String getLinkUrl() {
+        return getString(0, INDEX_URL);
+    }
+
+    public boolean isReplyable() {
+        return AccountUtils.isAccount(accountName);
+    }
+
+    public boolean isSavable() {
+        return AccountUtils.isAccount(accountName);
+    }
+
+    public boolean isSaved() {
+        if (!isSavable()) {
+            return false;
+        }
+
         // If no local save actions are pending, then rely on server info.
-        if (isNull(position, INDEX_SAVE_ACTION)) {
-            return getBoolean(position, INDEX_SAVED);
+        if (isNull(0, INDEX_SAVE_ACTION)) {
+            return getBoolean(0, INDEX_SAVED);
         }
 
         // We have a local pending action so use that to indicate if it's read.
-        return getInt(position, INDEX_SAVE_ACTION) == SaveActions.ACTION_SAVE;
+        return getInt(0, INDEX_SAVE_ACTION) == SaveActions.ACTION_SAVE;
     }
 
-    public String getThingId() {
-        return thingId;
+    public boolean isSelf() {
+        return getBoolean(0, INDEX_SELF);
     }
 
     public void save(Context context) {

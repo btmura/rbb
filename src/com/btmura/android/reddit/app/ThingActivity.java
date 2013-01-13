@@ -106,28 +106,23 @@ public class ThingActivity extends GlobalMenuActivity implements
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
-    public void onTitleDiscovery(String thingId, String title) {
-        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))
-                && !ThingBundle.hasTitle(thingBundle)) {
-            ThingBundle.putTitle(thingBundle, title);
-            refreshTitle();
-        }
-    }
+    public void onThingLoaded(ThingHolder thingHolder) {
+        if (Objects.equals(thingHolder.getThingId(), ThingBundle.getThingId(thingBundle))) {
+            if (!ThingBundle.hasTitle(thingBundle)) {
+                ThingBundle.putTitle(thingBundle, thingHolder.getTitle());
+                refreshTitle();
+            }
 
-    public void onLinkDiscovery(String thingId, String url) {
-        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))
-                && !ThingBundle.hasLinkUrl(thingBundle)) {
-            ThingBundle.putLinkUrl(thingBundle, url);
-            ThingPagerAdapter adapter = (ThingPagerAdapter) pager.getAdapter();
-            adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
-            pager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
-        }
-    }
+            if (!thingHolder.isSelf() && !ThingBundle.hasLinkUrl(thingBundle)) {
+                ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
+                ThingPagerAdapter adapter = (ThingPagerAdapter) pager.getAdapter();
+                adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
+                pager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
+            }
 
-    public void onSavedDiscovery(String thingId, boolean saved) {
-        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))) {
             ThingMenuFragment mf = getThingMenuFragment();
-            mf.setSavedThingStatus(saved);
+            mf.setMenuItems(thingHolder.isReplyable(), thingHolder.isSavable(),
+                    thingHolder.isSaved());
         }
     }
 

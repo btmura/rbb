@@ -44,6 +44,9 @@ public class ThingMenuFragment extends Fragment {
      */
     interface OnThingMenuEventListener {
 
+        /** Listener method fired when the user clicks the new item. */
+        void onNewItemSelected();
+
         /** Listener method fired when the user clicks the saved item. */
         void onSavedItemSelected();
 
@@ -52,17 +55,19 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private OnThingMenuEventListener listener;
-    private boolean saveable;
+
+    private boolean showNewCommentItem;
+    private boolean showSaveItems;
     private boolean saved;
 
     private MenuItem savedItem;
     private MenuItem unsavedItem;
+    private MenuItem newCommentItem;
     private MenuItem authorItem;
+    private MenuItem subredditItem;
     private MenuItem aboutSubredditItem;
     private MenuItem addSubredditItem;
     private MenuItem viewSubredditItem;
-
-    private MenuItem subredditItem;
 
     public static ThingMenuFragment newInstance(String subreddit, String author) {
         Bundle args = new Bundle(3);
@@ -87,8 +92,9 @@ public class ThingMenuFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    public void setSavedThingStatus(boolean saved) {
-        this.saveable = true;
+    public void setMenuItems(boolean showNewCommentItem, boolean showSaveItems, boolean saved) {
+        this.showNewCommentItem = showNewCommentItem;
+        this.showSaveItems = showSaveItems;
         this.saved = saved;
         refreshMenuItems();
     }
@@ -99,6 +105,7 @@ public class ThingMenuFragment extends Fragment {
         inflater.inflate(R.menu.thing_menu_menu, menu);
         savedItem = menu.findItem(R.id.menu_saved);
         unsavedItem = menu.findItem(R.id.menu_unsaved);
+        newCommentItem = menu.findItem(R.id.menu_new_comment);
         authorItem = menu.findItem(R.id.menu_author);
         subredditItem = menu.findItem(R.id.menu_subreddit);
         aboutSubredditItem = menu.findItem(R.id.menu_about_thing_subreddit);
@@ -113,33 +120,17 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void refreshMenuItems() {
+        // If one item is found, then all the others have been found too.
         if (savedItem != null) {
-            savedItem.setVisible(saveable && saved);
-        }
-
-        if (unsavedItem != null) {
-            unsavedItem.setVisible(saveable && !saved);
-        }
-
-        if (authorItem != null) {
+            savedItem.setVisible(showSaveItems && saved);
+            unsavedItem.setVisible(showSaveItems && !saved);
+            newCommentItem.setVisible(showNewCommentItem);
             authorItem.setVisible(!TextUtils.isEmpty(getAuthor()));
-        }
 
-        boolean hasSubreddit = Subreddits.hasSidebar(getSubreddit());
-
-        if (subredditItem != null) {
+            boolean hasSubreddit = Subreddits.hasSidebar(getSubreddit());
             subredditItem.setVisible(hasSubreddit);
-        }
-
-        if (aboutSubredditItem != null) {
             aboutSubredditItem.setVisible(hasSubreddit);
-        }
-
-        if (addSubredditItem != null) {
             addSubredditItem.setVisible(hasSubreddit);
-        }
-
-        if (viewSubredditItem != null) {
             viewSubredditItem.setVisible(hasSubreddit);
         }
     }
@@ -153,6 +144,10 @@ public class ThingMenuFragment extends Fragment {
 
             case R.id.menu_unsaved:
                 handleUnsaved();
+                return true;
+
+            case R.id.menu_new_comment:
+                handleNewComment();
                 return true;
 
             case R.id.menu_author:
@@ -185,6 +180,12 @@ public class ThingMenuFragment extends Fragment {
     private void handleUnsaved() {
         if (listener != null) {
             listener.onUnsavedItemSelected();
+        }
+    }
+
+    private void handleNewComment() {
+        if (listener != null) {
+            listener.onNewItemSelected();
         }
     }
 

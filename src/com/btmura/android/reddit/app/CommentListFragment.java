@@ -50,6 +50,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         MultiChoiceModeListener,
         OnThingMenuEventListener,
         OnVoteListener,
+        ThingHolder,
         CommentList {
 
     public static final String TAG = "CommentListFragment";
@@ -178,17 +179,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
                 }
             }
 
-            // Broadcast various info to the parent who might not know.
             if (listener != null) {
-                String thingId = adapter.getThingId();
-                listener.onTitleDiscovery(thingId, adapter.getString(0, CommentAdapter.INDEX_TITLE));
-                if (!adapter.getBoolean(0, CommentAdapter.INDEX_SELF)) {
-                    listener.onLinkDiscovery(thingId,
-                            adapter.getString(0, CommentAdapter.INDEX_URL));
-                }
-                if (AccountUtils.isAccount(adapter.getAccountName())) {
-                    listener.onSavedDiscovery(thingId, adapter.isSaved(0));
-                }
+                listener.onThingLoaded(this);
             }
 
             refreshMenuItems();
@@ -320,6 +312,10 @@ public class CommentListFragment extends ThingProviderListFragment implements
         adapter.save(getActivity());
     }
 
+    public void onNewItemSelected() {
+        handleNewComment(0);
+    }
+
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         if (adapter.getCursor() == null) {
             getListView().clearChoices();
@@ -409,7 +405,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_new_comment:
-                handleNewComment();
+                handleNewComment(getFirstCheckedPosition());
                 mode.finish();
                 return true;
 
@@ -433,9 +429,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
     }
 
-    private void handleNewComment() {
-        int position = getFirstCheckedPosition();
-
+    private void handleNewComment(int position) {
         long parentId = adapter.getLong(0, CommentAdapter.INDEX_ID);
         int parentNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
         String parentThingId = adapter.getThingId();
@@ -540,6 +534,38 @@ public class CommentListFragment extends ThingProviderListFragment implements
         outState.putString(STATE_TITLE, title);
         outState.putCharSequence(STATE_URL, url);
     }
+
+    // ThingHolder interface implementation.
+
+    public String getThingId() {
+        return adapter.getThingId();
+    }
+
+    public String getTitle() {
+        return adapter.getTitle();
+    }
+
+    public String getUrl() {
+        return adapter.getLinkUrl();
+    }
+
+    public boolean isReplyable() {
+        return adapter.isReplyable();
+    }
+
+    public boolean isSavable() {
+        return adapter.isSavable();
+    }
+
+    public boolean isSaved() {
+        return adapter.isSaved();
+    }
+
+    public boolean isSelf() {
+        return adapter.isSelf();
+    }
+
+    // CommentList interface implementation.
 
     public int getCommentCount() {
         return adapter.getCount();

@@ -445,36 +445,27 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public void onTitleDiscovery(String thingId, String title) {
+    public void onThingLoaded(ThingHolder thingHolder) {
         ControlFragment cf = getControlFragment();
         Bundle thingBundle = cf.getThingBundle();
-        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))
-                && !ThingBundle.hasTitle(thingBundle)) {
-            ThingBundle.putTitle(thingBundle, title);
-            cf.setThingBundle(thingBundle);
-        }
-    }
+        if (Objects.equals(thingHolder.getThingId(), ThingBundle.getThingId(thingBundle))) {
+            if (!ThingBundle.hasTitle(thingBundle)) {
+                ThingBundle.putTitle(thingBundle, thingHolder.getThingId());
+                cf.setThingBundle(thingBundle);
+            }
 
-    public void onLinkDiscovery(String thingId, String url) {
-        ControlFragment cf = getControlFragment();
-        Bundle thingBundle = cf.getThingBundle();
-        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))
-                && !ThingBundle.hasLinkUrl(thingBundle)) {
-            ThingBundle.putLinkUrl(thingBundle, url);
-            cf.setThingBundle(thingBundle);
+            if (!thingHolder.isSelf() && !ThingBundle.hasLinkUrl(thingBundle)) {
+                ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
+                cf.setThingBundle(thingBundle);
 
-            ThingPagerAdapter adapter = (ThingPagerAdapter) thingPager.getAdapter();
-            adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
-            thingPager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
-        }
-    }
+                ThingPagerAdapter adapter = (ThingPagerAdapter) thingPager.getAdapter();
+                adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
+                thingPager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
+            }
 
-    public void onSavedDiscovery(String thingId, boolean saved) {
-        ControlFragment cf = getControlFragment();
-        Bundle thingBundle = cf.getThingBundle();
-        if (Objects.equals(thingId, ThingBundle.getThingId(thingBundle))) {
             ThingMenuFragment mf = getThingMenuFragment();
-            mf.setSavedThingStatus(saved);
+            mf.setMenuItems(thingHolder.isReplyable(), thingHolder.isSavable(),
+                    thingHolder.isSaved());
         }
     }
 
@@ -499,6 +490,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public void onUnsavedItemSelected() {
         if (thingMenuEventListener != null) {
             thingMenuEventListener.onUnsavedItemSelected();
+        }
+    }
+
+    public void onNewItemSelected() {
+        if (thingMenuEventListener != null) {
+            thingMenuEventListener.onNewItemSelected();
         }
     }
 
