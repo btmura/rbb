@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.Activity;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -32,13 +33,17 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.ThingMenuFragment.OnThingMenuEventListener;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuEventListenerHolder;
 import com.btmura.android.reddit.widget.MessageThreadAdapter;
 
 /**
  * {@link ThingProviderListFragment} for showing the messages in a thread.
  */
 public class MessageThreadListFragment extends ThingProviderListFragment implements
-        MultiChoiceModeListener {
+        MultiChoiceModeListener,
+        OnThingMenuEventListener,
+        ThingHolder {
 
     public static final String TAG = "MessageThreadListFragment";
 
@@ -47,6 +52,7 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
 
     private static final String STATE_SESSION_ID = "sessionId";
 
+    private OnThingEventListener listener;
     private MessageThreadAdapter adapter;
 
     public static MessageThreadListFragment newInstance(String accountName, String thingId) {
@@ -57,6 +63,17 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         MessageThreadListFragment frag = new MessageThreadListFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnThingEventListener) {
+            listener = (OnThingEventListener) activity;
+        }
+        if (activity instanceof ThingMenuEventListenerHolder) {
+            ((ThingMenuEventListenerHolder) activity).setOnThingMenuEventListener(this);
+        }
     }
 
     @Override
@@ -103,6 +120,10 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
+
+        if (adapter.getCount() > 0 && listener != null) {
+            listener.onThingLoaded(this);
+        }
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -144,19 +165,16 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_new_comment:
-                handleNewComment();
+                handleNewComment(getFirstCheckedPosition());
                 mode.finish();
                 return true;
 
             default:
                 return false;
         }
-
     }
 
-    private void handleNewComment() {
-        int position = getFirstCheckedPosition();
-
+    private void handleNewComment(int position) {
         String user = adapter.getUser(position);
 
         Bundle extras = new Bundle(3);
@@ -179,6 +197,50 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
+    }
+
+    // OnThingMenuEventListener implementation
+
+    public void onSavedItemSelected() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void onUnsavedItemSelected() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void onNewItemSelected() {
+        handleNewComment(0);
+    }
+
+    // ThingHolder implementation
+
+    public String getThingId() {
+        return adapter.getThingId();
+    }
+
+    public String getTitle() {
+        return adapter.getSubject();
+    }
+
+    public String getUrl() {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean isReplyable() {
+        return true;
+    }
+
+    public boolean isSavable() {
+        return false;
+    }
+
+    public boolean isSaved() {
+        return false;
+    }
+
+    public boolean isSelf() {
+        return true;
     }
 
     private int getFirstCheckedPosition() {

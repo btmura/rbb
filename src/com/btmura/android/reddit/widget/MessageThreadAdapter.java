@@ -118,6 +118,10 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
         this.thingId = thingId;
     }
 
+    public String getSubject(){
+        return getString(0, INDEX_SUBJECT);
+    }
+
     public String getUser(int position) {
         return getString(position, INDEX_AUTHOR);
     }
