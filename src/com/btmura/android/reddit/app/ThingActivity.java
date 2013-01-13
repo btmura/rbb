@@ -26,6 +26,8 @@ import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.ThingMenuFragment.OnThingMenuEventListener;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuEventListenerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.util.Flag;
@@ -35,8 +37,10 @@ import com.btmura.android.reddit.widget.ThingBundle;
 public class ThingActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnThingEventListener,
+        OnThingMenuEventListener,
         AccountNameHolder,
-        SubredditNameHolder {
+        SubredditNameHolder,
+        ThingMenuEventListenerHolder {
 
     public static final String TAG = "ThingActivity";
 
@@ -50,6 +54,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     private ViewPager pager;
     private Bundle thingBundle;
     private String accountName;
+    private OnThingMenuEventListener thingMenuEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,12 +139,34 @@ public class ThingActivity extends GlobalMenuActivity implements
         pager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
     }
 
+    public void onSavedItemSelected() {
+        if (thingMenuEventListener != null) {
+            thingMenuEventListener.onSavedItemSelected();
+        }
+    }
+
+    public void onUnsavedItemSelected() {
+        if (thingMenuEventListener != null) {
+            thingMenuEventListener.onUnsavedItemSelected();
+        }
+    }
+
+    public void onNewItemSelected() {
+        if (thingMenuEventListener != null) {
+            thingMenuEventListener.onNewItemSelected();
+        }
+    }
+
     public String getAccountName() {
         return accountName;
     }
 
     public String getSubredditName() {
         return ThingBundle.getSubreddit(thingBundle);
+    }
+
+    public void setOnThingMenuEventListener(OnThingMenuEventListener listener) {
+        thingMenuEventListener = listener;
     }
 
     @Override
