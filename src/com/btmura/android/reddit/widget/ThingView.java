@@ -179,7 +179,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.title = title;
 
         drawVotingArrows = AccountUtils.isAccount(accountName) && kind != Kinds.KIND_MESSAGE;
-        isVotable = drawVotingArrows && !TextUtils.isEmpty(thingId);
+        isVotable = drawVotingArrows && !TextUtils.isEmpty(thingId) && expanded;
         drawScore = drawVotingArrows && kind == Kinds.KIND_LINK;
         if (drawScore) {
             if (scoreBounds == null) {
