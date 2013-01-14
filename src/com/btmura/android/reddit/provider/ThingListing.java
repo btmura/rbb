@@ -454,23 +454,23 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     private void mergeVoteActions(int filter) {
-        boolean hasMore = !TextUtils.isEmpty(more);
+        boolean firstPage = TextUtils.isEmpty(more);
         String selection;
         switch (filter) {
             case FilterAdapter.PROFILE_LIKED:
-                // If we're on the first page, then grab both likes and
-                // dislikes. The liked items will be prepended to the top and
-                // disliked items will be pruned.
+                // If we're on the first page, then grab both likes, dislikes,
+                // and neutral votes. The liked items will be prepended to the
+                // top and disliked and netural items will be pruned.
                 //
-                // If we're just appending, then just grab the disliked items we
-                // need to prune.
-                selection = !hasMore ? VoteActions.SELECT_NOT_NEUTRAL_BY_ACCOUNT
-                        : VoteActions.SELECT_DOWN_BY_ACCOUNT;
+                // If we're just appending, then just grab the disliked and
+                // neutral items we need to prune.
+                selection = firstPage ? VoteActions.SELECT_SHOWABLE_BY_ACCOUNT
+                        : VoteActions.SELECT_SHOWABLE_NOT_UP_BY_ACCOUNT;
                 break;
 
             case FilterAdapter.PROFILE_DISLIKED:
-                selection = !hasMore ? VoteActions.SELECT_NOT_NEUTRAL_BY_ACCOUNT
-                        : VoteActions.SELECT_UP_BY_ACCOUNT;
+                selection = firstPage ? VoteActions.SELECT_SHOWABLE_BY_ACCOUNT
+                        : VoteActions.SELECT_SHOWABLE_NOT_DOWN_BY_ACCOUNT;
                 break;
 
             default:
@@ -479,7 +479,7 @@ class ThingListing extends JsonParser implements Listing {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(VoteActions.TABLE_NAME, VOTE_PROJECTION,
-                selection, Array.of(accountName), null, null, SaveActions.SORT_BY_ID);
+                selection, Array.of(accountName), null, null, VoteActions.SORT_BY_ID);
         while (c.moveToNext()) {
             int action = c.getInt(VOTE_ACTION);
             if (action == VoteActions.ACTION_VOTE_UP

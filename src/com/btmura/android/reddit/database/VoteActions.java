@@ -51,17 +51,16 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
     /** Vote column value indicating a downvote. */
     public static final int ACTION_VOTE_DOWN = -1;
 
-    private static final String SELECT_SHOWABLE_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
+    public static final String SELECT_SHOWABLE_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
             + " AND " + COLUMN_SHOW_IN_LISTING + "=1";
 
-    public static final String SELECT_UP_BY_ACCOUNT = SELECT_SHOWABLE_BY_ACCOUNT
-            + " AND " + COLUMN_ACTION + "=" + ACTION_VOTE_UP;
+    public static final String SELECT_SHOWABLE_NOT_DOWN_BY_ACCOUNT = SELECT_SHOWABLE_BY_ACCOUNT
+            + " AND " + COLUMN_ACTION + "!=" + ACTION_VOTE_DOWN;
 
-    public static final String SELECT_DOWN_BY_ACCOUNT = SELECT_SHOWABLE_BY_ACCOUNT
-            + " AND " + COLUMN_ACTION + "=" + ACTION_VOTE_DOWN;
+    public static final String SELECT_SHOWABLE_NOT_UP_BY_ACCOUNT = SELECT_SHOWABLE_BY_ACCOUNT
+            + " AND " + COLUMN_ACTION + "!=" + ACTION_VOTE_UP;
 
-    public static final String SELECT_NOT_NEUTRAL_BY_ACCOUNT = SELECT_SHOWABLE_BY_ACCOUNT
-            + " AND " + COLUMN_ACTION + "!=" + ACTION_VOTE_NEUTRAL;
+    public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
 
     /** Creates the voteActions table. */
     static void createTable(SQLiteDatabase db) {
