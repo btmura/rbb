@@ -140,6 +140,9 @@ class ThingListing extends JsonParser implements Listing {
     private final String more;
     private final String cookie;
 
+    /** Whether to prune more things from the listing. */
+    private final boolean ignoreMoreThings;
+
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
     private long networkTimeMs;
     private long parseTimeMs;
@@ -150,24 +153,24 @@ class ThingListing extends JsonParser implements Listing {
     static ThingListing newSearchInstance(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String subreddit, String query, String cookie) {
         return new ThingListing(context, dbHelper, accountName, subreddit, query, null, 0,
-                null, cookie);
+                null, cookie, true);
     }
 
     static ThingListing newSubredditInstance(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String subreddit, int filter, String more, String cookie) {
         return new ThingListing(context, dbHelper, accountName, subreddit, null, null, filter,
-                more, cookie);
+                more, cookie, false);
     }
 
     static ThingListing newUserInstance(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String profileUser, int filter, String more, String cookie) {
         return new ThingListing(context, dbHelper, accountName, null, null, profileUser, filter,
-                more, cookie);
+                more, cookie, false);
     }
 
     private ThingListing(Context context, SQLiteOpenHelper dbHelper, String accountName,
             String subreddit, String query, String profileUser, int filter, String more,
-            String cookie) {
+            String cookie, boolean ignoreMoreThings) {
         this.context = context;
         this.dbHelper = dbHelper;
         this.accountName = accountName;
@@ -177,6 +180,7 @@ class ThingListing extends JsonParser implements Listing {
         this.filter = filter;
         this.more = more;
         this.cookie = cookie;
+        this.ignoreMoreThings = ignoreMoreThings;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {
@@ -409,7 +413,7 @@ class ThingListing extends JsonParser implements Listing {
             }
         }
 
-        if (!TextUtils.isEmpty(moreThingId)) {
+        if (!ignoreMoreThings && !TextUtils.isEmpty(moreThingId)) {
             values.add(newContentValues(Kinds.KIND_MORE, moreThingId, 1));
         }
     }
