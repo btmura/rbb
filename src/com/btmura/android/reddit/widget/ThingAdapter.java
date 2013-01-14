@@ -213,6 +213,11 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     @Override
+    public boolean isEnabled(int position) {
+        return getKind(position) != Kinds.KIND_MORE;
+    }
+
+    @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         switch (getKind(cursor.getPosition())) {
             case Kinds.KIND_MORE:
