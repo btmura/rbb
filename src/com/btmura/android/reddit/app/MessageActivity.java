@@ -27,6 +27,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.util.Objects;
+import com.btmura.android.reddit.widget.AccountFilterAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class MessageActivity extends AbstractBrowserActivity implements OnNavigationListener {
@@ -39,8 +40,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
 
-    private FilterAdapter adapter;
-    private String accountName;
+    private AccountFilterAdapter adapter;
     private SharedPreferences prefs;
 
     @Override
@@ -59,8 +59,8 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
-        adapter = new FilterAdapter(this);
-        adapter.setTitle(getUserName());
+        adapter = new AccountFilterAdapter(this);
+        adapter.addMessageFilters(this);
 
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
@@ -71,25 +71,33 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
         }
     }
 
-    private String getUserName() {
-        String user = getIntent().getStringExtra(EXTRA_USER);
-        // TODO: Remove this fallback once things become more stable.
-        if (user == null) {
-            user = "rbbtest1";
-        }
-        return user;
-    }
-
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         prefs = result.prefs;
-        accountName = result.getLastAccount();
-        adapter.addMessageFilters(this);
-        if (getIntent().hasExtra(EXTRA_FILTER)) {
-            bar.setSelectedNavigationItem(getIntent().getIntExtra(EXTRA_FILTER, 0));
-        } else {
-            bar.setSelectedNavigationItem(result.getLastMessageFilter());
+        adapter.setAccountNames(result.accountNames);
+
+        String accountName = result.getLastAccount();
+        if (getIntent().hasExtra(EXTRA_USER)) {
+            accountName = getIntent().getStringExtra(EXTRA_USER);
         }
+        adapter.setAccountName(accountName);
+
+        int filter = result.getLastMessageFilter();
+        if (getIntent().hasExtra(EXTRA_FILTER)) {
+            filter = getIntent().getIntExtra(EXTRA_FILTER, FilterAdapter.MESSAGE_INBOX);
+        }
+        adapter.setFilter(filter);
+
+        int index = adapter.findAccountName(accountName);
+
+        // If the selected navigation index is the same, then the action bar
+        // won't fire onNavigationItemSelected. Resetting the adapter and then
+        // calling setSelectedNavigationItem again seems to unjam it.
+        if (bar.getSelectedNavigationIndex() == index) {
+            bar.setListNavigationCallbacks(adapter, this);
+        }
+
+        bar.setSelectedNavigationItem(index);
     }
 
     @Override
@@ -98,12 +106,12 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     public String getAccountName() {
-        return accountName;
+        return adapter.getAccountName();
     }
 
     @Override
     protected int getFilter() {
-        return adapter.getFilter(bar.getSelectedNavigationIndex());
+        return adapter.getFilter();
     }
 
     @Override
@@ -116,17 +124,24 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        int filter = getFilter();
-        if (!getIntent().hasExtra(EXTRA_FILTER)) {
-            AccountPreferences.setLastMessageFilter(prefs, filter);
-        } else {
+        adapter.updateState(itemPosition);
+
+        String accountName = adapter.getAccountName();
+        if (getIntent().hasExtra(EXTRA_USER)) {
+            getIntent().removeExtra(EXTRA_USER);
+        }
+
+        int filter = adapter.getFilter();
+        if (getIntent().hasExtra(EXTRA_FILTER)) {
             getIntent().removeExtra(EXTRA_FILTER);
+        } else {
+            AccountPreferences.setLastMessageFilter(prefs, filter);
         }
 
         ThingListFragment frag = getThingListFragment();
         if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != filter) {
-            setMessageThingListNavigation(getUserName());
+            setMessageThingListNavigation(accountName);
         }
         return true;
     }

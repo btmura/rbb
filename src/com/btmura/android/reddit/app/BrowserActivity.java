@@ -160,7 +160,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
-        adapter.setAccountNames(null);
     }
 
     @Override
