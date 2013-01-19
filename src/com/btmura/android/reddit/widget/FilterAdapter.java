@@ -135,7 +135,7 @@ public class FilterAdapter extends BaseAdapter {
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         TextView tv = (TextView) convertView;
         if (tv == null) {
-            tv = (TextView) inflater.inflate(R.layout.account_spinner_dropdown_row, parent, false);
+            tv = (TextView) inflater.inflate(R.layout.account_filter_dropdown_row, parent, false);
         }
         tv.setText(getItem(position));
         return tv;

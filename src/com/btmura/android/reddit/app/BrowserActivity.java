@@ -41,7 +41,7 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountAdapter;
-import com.btmura.android.reddit.widget.AccountSpinnerAdapter;
+import com.btmura.android.reddit.widget.AccountFilterAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
@@ -54,7 +54,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     private boolean hasSubredditList;
 
-    private AccountSpinnerAdapter adapter;
+    private AccountFilterAdapter adapter;
     private AccountAdapter mailAdapter;
     private SharedPreferences prefs;
 
@@ -126,7 +126,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
-        adapter = new AccountSpinnerAdapter(this, !isSinglePane);
+        adapter = new AccountFilterAdapter(this, !isSinglePane);
         mailAdapter = new AccountAdapter(this);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);

@@ -29,7 +29,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
 
-public class AccountSpinnerAdapter extends BaseAdapter {
+public class AccountFilterAdapter extends BaseAdapter {
 
     static class Item {
         static final int NUM_TYPES = 3;
@@ -57,7 +57,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     private String subreddit;
     private int filter;
 
-    public AccountSpinnerAdapter(Context context, boolean showFilters) {
+    public AccountFilterAdapter(Context context, boolean showFilters) {
         this.context = context.getApplicationContext();
         this.inflater = LayoutInflater.from(context);
         if (showFilters) {
@@ -199,7 +199,7 @@ public class AccountSpinnerAdapter extends BaseAdapter {
     }
 
     private View makeView(ViewGroup parent) {
-        View v = inflater.inflate(R.layout.account_spinner_row, parent, false);
+        View v = inflater.inflate(R.layout.account_filter_row, parent, false);
         ViewHolder h = new ViewHolder();
         h.accountName = (TextView) v.findViewById(R.id.account_name);
         h.subreddit = (TextView) v.findViewById(R.id.subreddit_name);
@@ -239,10 +239,10 @@ public class AccountSpinnerAdapter extends BaseAdapter {
         switch (getItemViewType(position)) {
             case Item.TYPE_ACCOUNT_NAME:
             case Item.TYPE_FILTER:
-                return R.layout.account_spinner_dropdown_row;
+                return R.layout.account_filter_dropdown_row;
 
             case Item.TYPE_CATEGORY:
-                return R.layout.account_spinner_category_row;
+                return R.layout.account_filter_category_row;
 
             default:
                 throw new IllegalArgumentException();
