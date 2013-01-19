@@ -22,14 +22,13 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
 
-public class AccountFilterAdapter extends BaseAdapter {
+public class AccountFilterAdapter extends BaseFilterAdapter {
 
     static class Item {
         static final int NUM_TYPES = 3;
@@ -51,28 +50,22 @@ public class AccountFilterAdapter extends BaseAdapter {
     private final Context context;
     private final LayoutInflater inflater;
     private final ArrayList<Item> items = new ArrayList<Item>();
-    private final ArrayList<Item> filters;
-
+    private ArrayList<Item> filters;
     private String accountName;
     private String subreddit;
     private int filter;
 
-    public AccountFilterAdapter(Context context, boolean showFilters) {
+    public AccountFilterAdapter(Context context) {
         this.context = context.getApplicationContext();
         this.inflater = LayoutInflater.from(context);
-        if (showFilters) {
-            filters = new ArrayList<Item>(4);
-            add(R.string.filter_subreddit_hot, FilterAdapter.SUBREDDIT_HOT);
-            add(R.string.filter_subreddit_top, FilterAdapter.SUBREDDIT_TOP);
-            add(R.string.filter_subreddit_controversial, FilterAdapter.SUBREDDIT_CONTROVERSIAL);
-            add(R.string.filter_subreddit_new, FilterAdapter.SUBREDDIT_NEW);
-        } else {
-            filters = null;
-        }
     }
 
-    private void add(int textId, int value) {
-        filters.add(new Item(Item.TYPE_FILTER, context.getString(textId), value));
+    @Override
+    protected void add(Context context, int resId, int value) {
+        if (filters == null) {
+            filters = new ArrayList<Item>(6);
+        }
+        filters.add(new Item(Item.TYPE_FILTER, context.getString(resId), value));
     }
 
     public void setAccountNames(String[] accountNames) {

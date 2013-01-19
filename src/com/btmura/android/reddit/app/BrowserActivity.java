@@ -126,7 +126,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
-        adapter = new AccountFilterAdapter(this, !isSinglePane);
+        adapter = new AccountFilterAdapter(this);
+        if (!isSinglePane) {
+            adapter.addSubredditFilters(this);
+        }
         mailAdapter = new AccountAdapter(this);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);

@@ -36,7 +36,7 @@ public class FilterAdapter extends BaseFilterAdapter {
         inflater = LayoutInflater.from(context);
     }
 
-    protected void add(Context context, int resId) {
+    protected void add(Context context, int resId, int value) {
         names.add(context.getString(resId));
     }
 

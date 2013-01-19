@@ -43,31 +43,31 @@ abstract class BaseFilterAdapter extends BaseAdapter {
     public static final int SUBREDDIT_NEW = 3;
 
     public void addMessageFilters(Context context) {
-        add(context, R.string.filter_message_inbox);
-        add(context, R.string.filter_message_unread);
-        add(context, R.string.filter_message_sent);
+        add(context, R.string.filter_message_inbox, MESSAGE_INBOX);
+        add(context, R.string.filter_message_unread, MESSAGE_UNREAD);
+        add(context, R.string.filter_message_sent, MESSAGE_SENT);
         notifyDataSetChanged();
     }
 
     public void addProfileFilters(Context context, boolean hasAccount) {
-        add(context, R.string.filter_profile_overview);
-        add(context, R.string.filter_profile_comments);
-        add(context, R.string.filter_profile_submitted);
+        add(context, R.string.filter_profile_overview, PROFILE_OVERVIEW);
+        add(context, R.string.filter_profile_comments, PROFILE_COMMENTS);
+        add(context, R.string.filter_profile_submitted, PROFILE_SUBMITTED);
         if (hasAccount) {
-            add(context, R.string.filter_profile_liked);
-            add(context, R.string.filter_profile_disliked);
-            add(context, R.string.filter_profile_saved);
+            add(context, R.string.filter_profile_liked, PROFILE_LIKED);
+            add(context, R.string.filter_profile_disliked, PROFILE_DISLIKED);
+            add(context, R.string.filter_profile_saved, PROFILE_SAVED);
         }
         notifyDataSetChanged();
     }
 
     public void addSubredditFilters(Context context) {
-        add(context, R.string.filter_subreddit_hot);
-        add(context, R.string.filter_subreddit_top);
-        add(context, R.string.filter_subreddit_controversial);
-        add(context, R.string.filter_subreddit_new);
+        add(context, R.string.filter_subreddit_hot, SUBREDDIT_HOT);
+        add(context, R.string.filter_subreddit_top, SUBREDDIT_TOP);
+        add(context, R.string.filter_subreddit_controversial, SUBREDDIT_CONTROVERSIAL);
+        add(context, R.string.filter_subreddit_new, SUBREDDIT_NEW);
         notifyDataSetChanged();
     }
 
-    protected abstract void add(Context context, int resId);
+    protected abstract void add(Context context, int resId, int value);
 }
