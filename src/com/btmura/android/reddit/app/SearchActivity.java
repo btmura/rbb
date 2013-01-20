@@ -30,6 +30,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.GlobalMenuFragment.OnSearchQuerySubmittedListener;
+import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
@@ -117,6 +118,11 @@ public class SearchActivity extends AbstractBrowserActivity implements
                 && !Subreddits.isFrontPage(subreddit)
                 && !Subreddits.isAll(subreddit)
                 && !Subreddits.isRandom(subreddit);
+    }
+
+    @Override
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(this, true);
     }
 
     @Override

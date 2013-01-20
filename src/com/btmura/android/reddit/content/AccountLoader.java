@@ -65,10 +65,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
             return AccountPreferences.getLastMessageFilter(prefs, 0);
         }
 
-        public int getLastProfileFilter() {
-            return AccountPreferences.getLastProfileFilter(prefs, 0);
-        }
-
         public int getLastSubredditFilter() {
             return AccountPreferences.getLastSubredditFilter(prefs, 0);
         }

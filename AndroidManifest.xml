@@ -88,6 +88,7 @@
             android:label="@string/content_browser" />
         <activity android:name=".app.MessageActivity" />
         <activity android:name=".app.SearchActivity" />
+        <activity android:name=".app.SelfProfileActivity" />
         <activity
             android:name=".app.SidebarActivity"
             android:theme="@android:style/Theme.Holo.DialogWhenLarge" />

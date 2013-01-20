@@ -73,6 +73,15 @@ public class MenuHelper {
         context.startActivity(intent);
     }
 
+    public static void startSelfProfileActivity(Context context, String user, int filter) {
+        Intent intent = new Intent(context, SelfProfileActivity.class);
+        intent.putExtra(MessageActivity.EXTRA_USER, user);
+        if (filter != -1) {
+            intent.putExtra(MessageActivity.EXTRA_FILTER, filter);
+        }
+        context.startActivity(intent);
+    }
+
     public static void startProfileActivity(Context context, String user, int filter) {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.setData(Uri.parse(Urls.user(user, filter, null, Urls.TYPE_HTML).toString()));

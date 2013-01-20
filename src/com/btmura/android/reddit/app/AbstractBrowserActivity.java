@@ -43,7 +43,6 @@ import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedLi
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.OnThingMenuEventListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuEventListenerHolder;
-import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
@@ -152,9 +151,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract void setupActionBar(Bundle savedInstanceState);
 
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true);
-    }
+    public abstract Loader<AccountResult> onCreateLoader(int id, Bundle args);
 
     public abstract void onLoadFinished(Loader<AccountResult> loader, AccountResult result);
 

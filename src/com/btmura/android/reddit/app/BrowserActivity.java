@@ -37,6 +37,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.AccountProvider;
@@ -135,6 +136,11 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         bar.setListNavigationCallbacks(adapter, this);
         getLoaderManager().initLoader(1, null, mailLoaderCallbacks);
+    }
+
+    @Override
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(this, true);
     }
 
     @Override
@@ -333,7 +339,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     private boolean handleProfile() {
-        MenuHelper.startProfileActivity(this, getAccountName(), -1);
+        MenuHelper.startSelfProfileActivity(this, getAccountName(), -1);
         return true;
     }
 

@@ -27,6 +27,7 @@ import android.text.TextUtils;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
+import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
@@ -47,7 +48,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     protected void setContentView() {
-        setContentView(R.layout.user_profile);
+        setContentView(R.layout.profile);
     }
 
     @Override
@@ -88,6 +89,11 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     }
 
     @Override
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(this, true);
+    }
+
+    @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         prefs = result.prefs;
         accountName = result.getLastAccount();
@@ -95,7 +101,8 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         if (requestedFilter != -1) {
             bar.setSelectedNavigationItem(requestedFilter);
         } else {
-            bar.setSelectedNavigationItem(result.getLastProfileFilter());
+            bar.setSelectedNavigationItem(AccountPreferences.getLastProfileFilter(prefs,
+                    FilterAdapter.PROFILE_OVERVIEW));
         }
     }
 

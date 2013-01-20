@@ -122,35 +122,35 @@ class UriHelper {
     }
 
     public static String getUser(Uri data) {
-        switch (MATCHER.match(data)) {
-            case MATCH_USER:
-            case MATCH_USER_OVERVIEW:
-            case MATCH_USER_COMMENTS:
-            case MATCH_USER_SUBMITTED:
-            case MATCH_USER_SAVED:
-                return data.getPathSegments().get(1);
-
-            default:
-                return null;
+        if (data != null) {
+            switch (MATCHER.match(data)) {
+                case MATCH_USER:
+                case MATCH_USER_OVERVIEW:
+                case MATCH_USER_COMMENTS:
+                case MATCH_USER_SUBMITTED:
+                case MATCH_USER_SAVED:
+                    return data.getPathSegments().get(1);
+            }
         }
+        return null;
     }
 
     public static int getUserFilter(Uri data) {
-        switch (MATCHER.match(data)) {
-            case MATCH_USER_OVERVIEW:
-                return FilterAdapter.PROFILE_OVERVIEW;
+        if (data != null) {
+            switch (MATCHER.match(data)) {
+                case MATCH_USER_OVERVIEW:
+                    return FilterAdapter.PROFILE_OVERVIEW;
 
-            case MATCH_USER_COMMENTS:
-                return FilterAdapter.PROFILE_COMMENTS;
+                case MATCH_USER_COMMENTS:
+                    return FilterAdapter.PROFILE_COMMENTS;
 
-            case MATCH_USER_SUBMITTED:
-                return FilterAdapter.PROFILE_SUBMITTED;
+                case MATCH_USER_SUBMITTED:
+                    return FilterAdapter.PROFILE_SUBMITTED;
 
-            case MATCH_USER_SAVED:
-                return FilterAdapter.PROFILE_SAVED;
-
-            default:
-                return -1;
+                case MATCH_USER_SAVED:
+                    return FilterAdapter.PROFILE_SAVED;
+            }
         }
+        return -1;
     }
 }

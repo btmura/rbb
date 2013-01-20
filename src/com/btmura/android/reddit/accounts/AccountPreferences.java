@@ -32,7 +32,10 @@ public class AccountPreferences {
     /** Global preference for the last mail filter by any account. */
     private static final String GLOBAL_LAST_MESSAGE_FILTER = "lastMailFilter";
 
-    /** Global preference for the last profile filter by any account. */
+    /** Global preference for the last profile filter when viewing one's own profile. */
+    private static final String GLOBAL_LAST_SELF_PROFILE_FILTER = "lastSelfProfileFilter";
+
+    /** Global preference for the last profile filter when viewing someone else's profile. */
     private static final String GLOBAL_LAST_PROFILE_FILTER = "lastProfileFilter";
 
     /** Global preference for the last selected filter by any account. */
@@ -61,6 +64,14 @@ public class AccountPreferences {
 
     public static void setLastMessageFilter(SharedPreferences prefs, int filter) {
         prefs.edit().putInt(GLOBAL_LAST_MESSAGE_FILTER, filter).apply();
+    }
+
+    public static int getLastSelfProfileFilter(SharedPreferences prefs, int defValue) {
+        return prefs.getInt(GLOBAL_LAST_SELF_PROFILE_FILTER, defValue);
+    }
+
+    public static void setLastSelfProfileFilter(SharedPreferences prefs, int filter) {
+        prefs.edit().putInt(GLOBAL_LAST_SELF_PROFILE_FILTER, filter).apply();
     }
 
     public static int getLastProfileFilter(SharedPreferences prefs, int defValue) {
