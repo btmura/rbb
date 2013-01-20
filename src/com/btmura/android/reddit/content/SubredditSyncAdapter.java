@@ -91,7 +91,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         }
 
         // Always schedule the next sync to get new subreddits added.
-        ContentResolver.addPeriodicSync(account, authority, extras, POLL_FREQUENCY_SECONDS);
+        ContentResolver.addPeriodicSync(account, authority, Bundle.EMPTY, POLL_FREQUENCY_SECONDS);
     }
 
     private void doSync(Account account, Bundle extras, String authority,
