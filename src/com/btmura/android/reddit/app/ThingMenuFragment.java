@@ -26,13 +26,17 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.util.Flag;
 
 public class ThingMenuFragment extends Fragment {
 
     public static final String TAG = "ThingMenuFragment";
 
+    public static final int FLAG_SHOW_NEW_COMMENT_ITEM = 0x1;
+
     private static final String ARG_SUBREDDIT = "subreddit";
     private static final String ARG_AUTHOR = "author";
+    private static final String ARG_FLAGS = "flags";
 
     interface ThingMenuEventListenerHolder {
         void setOnThingMenuEventListener(OnThingMenuEventListener listener);
@@ -56,7 +60,7 @@ public class ThingMenuFragment extends Fragment {
 
     private OnThingMenuEventListener listener;
 
-    private boolean showNewCommentItem;
+    private boolean newCommentItemEnabled;
     private boolean showSaveItems;
     private boolean saved;
 
@@ -69,10 +73,11 @@ public class ThingMenuFragment extends Fragment {
     private MenuItem addSubredditItem;
     private MenuItem viewSubredditItem;
 
-    public static ThingMenuFragment newInstance(String subreddit, String author) {
+    public static ThingMenuFragment newInstance(String subreddit, String author, int flags) {
         Bundle args = new Bundle(3);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putString(ARG_AUTHOR, author);
+        args.putInt(ARG_FLAGS, flags);
         ThingMenuFragment frag = new ThingMenuFragment();
         frag.setArguments(args);
         return frag;
@@ -92,8 +97,12 @@ public class ThingMenuFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    public void setMenuItems(boolean showNewCommentItem, boolean showSaveItems, boolean saved) {
-        this.showNewCommentItem = showNewCommentItem;
+    public void setNewCommentItemEnabled(boolean enabled) {
+        newCommentItemEnabled = enabled;
+        refreshNewCommentItem();
+    }
+
+    public void setSaveMenuItems(boolean showSaveItems, boolean saved) {
         this.showSaveItems = showSaveItems;
         this.saved = saved;
         refreshMenuItems();
@@ -124,7 +133,6 @@ public class ThingMenuFragment extends Fragment {
         if (savedItem != null) {
             savedItem.setVisible(showSaveItems && saved);
             unsavedItem.setVisible(showSaveItems && !saved);
-            newCommentItem.setVisible(showNewCommentItem);
             authorItem.setVisible(!TextUtils.isEmpty(getAuthor()));
 
             boolean hasSubreddit = Subreddits.hasSidebar(getSubreddit());
@@ -133,6 +141,19 @@ public class ThingMenuFragment extends Fragment {
             addSubredditItem.setVisible(hasSubreddit);
             viewSubredditItem.setVisible(hasSubreddit);
         }
+
+        refreshNewCommentItem();
+    }
+
+    private void refreshNewCommentItem() {
+        if (newCommentItem != null) {
+            newCommentItem.setVisible(showNewCommentItem());
+            newCommentItem.setEnabled(newCommentItemEnabled);
+        }
+    }
+
+    private boolean showNewCommentItem() {
+        return Flag.isEnabled(getArguments().getInt(ARG_FLAGS), FLAG_SHOW_NEW_COMMENT_ITEM);
     }
 
     @Override

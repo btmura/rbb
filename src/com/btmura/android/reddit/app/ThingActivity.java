@@ -80,10 +80,19 @@ public class ThingActivity extends GlobalMenuActivity implements
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
             ft.add(ThingMenuFragment.newInstance(ThingBundle.getSubreddit(thingBundle),
-                    ThingBundle.getAuthor(thingBundle)),
+                    ThingBundle.getAuthor(thingBundle),
+                    getThingMenuFlags(thingBundle)),
                     ThingMenuFragment.TAG);
             ft.commit();
         }
+    }
+
+    private int getThingMenuFlags(Bundle thingBundle) {
+        int mfFlags = 0;
+        if (!ThingBundle.hasNoComments(thingBundle)) {
+            mfFlags |= ThingMenuFragment.FLAG_SHOW_NEW_COMMENT_ITEM;
+        }
+        return mfFlags;
     }
 
     private void setupActionBar(Bundle savedInstanceState) {
@@ -126,8 +135,8 @@ public class ThingActivity extends GlobalMenuActivity implements
             }
 
             ThingMenuFragment mf = getThingMenuFragment();
-            mf.setMenuItems(thingHolder.isReplyable(), thingHolder.isSavable(),
-                    thingHolder.isSaved());
+            mf.setNewCommentItemEnabled(thingHolder.isReplyable());
+            mf.setSaveMenuItems(thingHolder.isSavable(), thingHolder.isSaved());
         }
     }
 
