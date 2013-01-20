@@ -66,6 +66,10 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "accountName: " + account.name + " syncResult: " + syncResult.toString());
         }
+
+        // Only sync one time per minute. SyncManager code seems to be using
+        // delayUntil as a timestamp even though the docs say its more of a duration.
+        syncResult.delayUntil = System.currentTimeMillis() / 1000 + 60;
     }
 
     private void doSync(Account account, Bundle extras, String authority,
