@@ -79,20 +79,8 @@ public class ThingActivity extends GlobalMenuActivity implements
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
-            ft.add(ThingMenuFragment.newInstance(ThingBundle.getSubreddit(thingBundle),
-                    ThingBundle.getAuthor(thingBundle),
-                    getThingMenuFlags(thingBundle)),
-                    ThingMenuFragment.TAG);
             ft.commit();
         }
-    }
-
-    private int getThingMenuFlags(Bundle thingBundle) {
-        int mfFlags = 0;
-        if (!ThingBundle.hasNoComments(thingBundle)) {
-            mfFlags |= ThingMenuFragment.FLAG_SHOW_NEW_COMMENT_ITEM;
-        }
-        return mfFlags;
     }
 
     private void setupActionBar(Bundle savedInstanceState) {
@@ -113,6 +101,13 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = result.getLastAccount();
+
+        if (getThingMenuFragment() == null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(ThingMenuFragment.newInstance(accountName, thingBundle), ThingMenuFragment.TAG);
+            ft.commitAllowingStateLoss();
+        }
+
         pager.setAdapter(new ThingPagerAdapter(getFragmentManager(), accountName, thingBundle));
         invalidateOptionsMenu();
     }
@@ -136,7 +131,7 @@ public class ThingActivity extends GlobalMenuActivity implements
 
             ThingMenuFragment mf = getThingMenuFragment();
             mf.setNewCommentItemEnabled(thingHolder.isReplyable());
-            mf.setSaveMenuItems(thingHolder.isSavable(), thingHolder.isSaved());
+            mf.setSaved(thingHolder.isSaved());
         }
     }
 

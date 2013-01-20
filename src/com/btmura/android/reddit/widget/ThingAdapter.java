@@ -374,6 +374,8 @@ public class ThingAdapter extends BaseLoaderAdapter {
             ThingBundle.putCommentUrl(b, Urls.perma(permaLink, null));
         }
 
+        ThingBundle.putSaved(b, isSaved(c.getPosition()));
+
         return b;
     }
 

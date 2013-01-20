@@ -19,24 +19,21 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.util.Flag;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingMenuFragment extends Fragment {
 
     public static final String TAG = "ThingMenuFragment";
 
-    public static final int FLAG_SHOW_NEW_COMMENT_ITEM = 0x1;
-
-    private static final String ARG_SUBREDDIT = "subreddit";
-    private static final String ARG_AUTHOR = "author";
-    private static final String ARG_FLAGS = "flags";
+    private static final String ARG_ACCOUNT_NAME = "accountName";
+    private static final String ARG_THING_BUNDLE = "thingBundle";
 
     interface ThingMenuEventListenerHolder {
         void setOnThingMenuEventListener(OnThingMenuEventListener listener);
@@ -60,24 +57,23 @@ public class ThingMenuFragment extends Fragment {
 
     private OnThingMenuEventListener listener;
 
-    private boolean newCommentItemEnabled;
-    private boolean showSaveItems;
+    private boolean newCommentVisible;
+    private boolean newCommentEnabled;
+    private boolean savable;
     private boolean saved;
 
     private MenuItem savedItem;
     private MenuItem unsavedItem;
     private MenuItem newCommentItem;
-    private MenuItem authorItem;
     private MenuItem subredditItem;
     private MenuItem aboutSubredditItem;
     private MenuItem addSubredditItem;
     private MenuItem viewSubredditItem;
 
-    public static ThingMenuFragment newInstance(String subreddit, String author, int flags) {
-        Bundle args = new Bundle(3);
-        args.putString(ARG_SUBREDDIT, subreddit);
-        args.putString(ARG_AUTHOR, author);
-        args.putInt(ARG_FLAGS, flags);
+    public static ThingMenuFragment newInstance(String accountName, Bundle thingBundle) {
+        Bundle args = new Bundle(2);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putBundle(ARG_THING_BUNDLE, thingBundle);
         ThingMenuFragment frag = new ThingMenuFragment();
         frag.setArguments(args);
         return frag;
@@ -94,18 +90,20 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        newCommentVisible = isNewCommentVisible();
+        savable = isSavable();
+        saved = isInitiallySaved();
         setHasOptionsMenu(true);
     }
 
     public void setNewCommentItemEnabled(boolean enabled) {
-        newCommentItemEnabled = enabled;
+        this.newCommentEnabled = enabled;
         refreshNewCommentItem();
     }
 
-    public void setSaveMenuItems(boolean showSaveItems, boolean saved) {
-        this.showSaveItems = showSaveItems;
+    public void setSaved(boolean saved) {
         this.saved = saved;
-        refreshMenuItems();
+        refreshSaveItems();
     }
 
     @Override
@@ -115,7 +113,6 @@ public class ThingMenuFragment extends Fragment {
         savedItem = menu.findItem(R.id.menu_saved);
         unsavedItem = menu.findItem(R.id.menu_unsaved);
         newCommentItem = menu.findItem(R.id.menu_new_comment);
-        authorItem = menu.findItem(R.id.menu_author);
         subredditItem = menu.findItem(R.id.menu_subreddit);
         aboutSubredditItem = menu.findItem(R.id.menu_about_thing_subreddit);
         addSubredditItem = menu.findItem(R.id.menu_add_thing_subreddit);
@@ -129,31 +126,33 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void refreshMenuItems() {
-        // If one item is found, then all the others have been found too.
-        if (savedItem != null) {
-            savedItem.setVisible(showSaveItems && saved);
-            unsavedItem.setVisible(showSaveItems && !saved);
-            authorItem.setVisible(!TextUtils.isEmpty(getAuthor()));
-
-            boolean hasSubreddit = Subreddits.hasSidebar(getSubreddit());
-            subredditItem.setVisible(hasSubreddit);
-            aboutSubredditItem.setVisible(hasSubreddit);
-            addSubredditItem.setVisible(hasSubreddit);
-            viewSubredditItem.setVisible(hasSubreddit);
-        }
-
         refreshNewCommentItem();
+        refreshSaveItems();
+        refreshSubredditItems();
     }
 
     private void refreshNewCommentItem() {
         if (newCommentItem != null) {
-            newCommentItem.setVisible(showNewCommentItem());
-            newCommentItem.setEnabled(newCommentItemEnabled);
+            newCommentItem.setVisible(newCommentVisible);
+            newCommentItem.setEnabled(newCommentEnabled);
         }
     }
 
-    private boolean showNewCommentItem() {
-        return Flag.isEnabled(getArguments().getInt(ARG_FLAGS), FLAG_SHOW_NEW_COMMENT_ITEM);
+    private void refreshSaveItems() {
+        if (savedItem != null && unsavedItem != null) {
+            savedItem.setVisible(savable && saved);
+            unsavedItem.setVisible(savable && !saved);
+        }
+    }
+
+    private void refreshSubredditItems() {
+        if (subredditItem != null) {
+            boolean visible = hasSubreddit();
+            subredditItem.setVisible(visible);
+            aboutSubredditItem.setVisible(visible);
+            addSubredditItem.setVisible(visible);
+            viewSubredditItem.setVisible(visible);
+        }
     }
 
     @Override
@@ -226,11 +225,39 @@ public class ThingMenuFragment extends Fragment {
         MenuHelper.startSubredditActivity(getActivity(), getSubreddit());
     }
 
+    private String getAccountName() {
+        return getArguments().getString(ARG_ACCOUNT_NAME);
+    }
+
+    private boolean hasAccountName() {
+        return AccountUtils.isAccount(getAccountName());
+    }
+
+    private boolean hasSubreddit() {
+        return Subreddits.hasSidebar(getSubreddit());
+    }
+
     private String getSubreddit() {
-        return getArguments().getString(ARG_SUBREDDIT);
+        return ThingBundle.getSubreddit(getThingBundle());
     }
 
     private String getAuthor() {
-        return getArguments().getString(ARG_AUTHOR);
+        return ThingBundle.getAuthor(getThingBundle());
+    }
+
+    private Bundle getThingBundle() {
+        return getArguments().getBundle(ARG_THING_BUNDLE);
+    }
+
+    private boolean isNewCommentVisible() {
+        return hasAccountName() && !ThingBundle.hasNoComments(getThingBundle());
+    }
+
+    private boolean isSavable() {
+        return hasAccountName();
+    }
+
+    private boolean isInitiallySaved() {
+        return ThingBundle.isSaved(getThingBundle());
     }
 }

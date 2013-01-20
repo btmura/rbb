@@ -209,9 +209,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         // ThingMenuFragment. Otherwise, make sure to remove the prior
         // ThingMenuFragment for some other thing.
         if (thingBundle != null) {
-            Fragment mf = ThingMenuFragment.newInstance(subreddit,
-                    ThingBundle.getAuthor(thingBundle),
-                    getThingMenuFlags(thingBundle));
+            Fragment mf = ThingMenuFragment.newInstance(accountName, thingBundle);
             ft.add(mf, ThingMenuFragment.TAG);
         } else {
             Fragment mf = getThingMenuFragment();
@@ -419,12 +417,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         int filter = getFilter();
 
         String subreddit = ThingBundle.getSubreddit(thingBundle);
-        String author = ThingBundle.getAuthor(thingBundle);
-
         Fragment cf = ControlFragment.newInstance(accountName, subreddit,
                 Subreddits.isRandom(subreddit), thingBundle, filter);
-        Fragment mf = ThingMenuFragment.newInstance(subreddit, author,
-                getThingMenuFlags(thingBundle));
+        Fragment mf = ThingMenuFragment.newInstance(accountName, thingBundle);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
@@ -433,14 +428,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commit();
 
         refreshThingPager(thingBundle);
-    }
-
-    private int getThingMenuFlags(Bundle thingBundle) {
-        int mfFlags = 0;
-        if (!ThingBundle.hasNoComments(thingBundle)) {
-            mfFlags |= ThingMenuFragment.FLAG_SHOW_NEW_COMMENT_ITEM;
-        }
-        return mfFlags;
     }
 
     public void onSubredditDiscovery(String subreddit) {
@@ -472,7 +459,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
             ThingMenuFragment mf = getThingMenuFragment();
             mf.setNewCommentItemEnabled(thingHolder.isReplyable());
-            mf.setSaveMenuItems(thingHolder.isSavable(), thingHolder.isSaved());
+            mf.setSaved(thingHolder.isSaved());
         }
     }
 

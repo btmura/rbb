@@ -55,6 +55,9 @@ public class ThingBundle extends BundleSupport {
     /** String name of the author of this thing. */
     private static final String KEY_AUTHOR = "author";
 
+    /** Boolean indicating whether the thing has been saved. */
+    private static final String KEY_SAVED = "saved";
+
     public static String getSubreddit(Bundle bundle) {
         return getString(bundle, KEY_SUBREDDIT);
     }
@@ -143,6 +146,11 @@ public class ThingBundle extends BundleSupport {
         bundle.putString(KEY_AUTHOR, author);
     }
 
-    private ThingBundle() {
+    public static boolean isSaved(Bundle bundle) {
+        return getBoolean(bundle, KEY_SAVED);
+    }
+
+    public static void putSaved(Bundle bundle, boolean saved) {
+        bundle.putBoolean(KEY_SAVED, saved);
     }
 }
