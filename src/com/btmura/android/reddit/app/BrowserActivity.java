@@ -21,7 +21,6 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -59,10 +58,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private AccountAdapter mailAdapter;
     private SharedPreferences prefs;
 
-    private MenuItem unreadItem;
+    private Menu menu;
     private MenuItem postItem;
     private MenuItem aboutItem;
-    private MenuItem profileItem;
     private MenuItem messagesItem;
 
     private LoaderCallbacks<Cursor> mailLoaderCallbacks = new LoaderCallbacks<Cursor>() {
@@ -72,7 +70,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             mailAdapter.swapCursor(cursor);
-            refreshUnreadMessagesMenuItem();
+            refreshMessagesMenuIcon();
         }
 
         public void onLoaderReset(Loader<Cursor> loader) {
@@ -246,8 +244,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             replaceThingListFragmentMultiPane();
         }
 
-        // Invalidate mail icon when switching accounts.
-        refreshUnreadMessagesMenuItem();
+        // Invalidate action bar icons when switching accounts.
+        refreshAccountMenuGroup();
+        refreshMessagesMenuIcon();
 
         return true;
     }
@@ -262,10 +261,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
-        unreadItem = menu.findItem(R.id.menu_unread_messages);
+
+        this.menu = menu;
         postItem = menu.findItem(R.id.menu_new_post);
         aboutItem = menu.findItem(R.id.menu_about_subreddit);
-        profileItem = menu.findItem(R.id.menu_profile);
         messagesItem = menu.findItem(R.id.menu_messages);
         return true;
     }
@@ -277,79 +276,101 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         }
         super.onPrepareOptionsMenu(menu);
 
-        refreshUnreadMessagesMenuItem();
-
         boolean showThingless = isSinglePane || !hasThing();
         menu.setGroupVisible(R.id.thingless, showThingless);
         if (showThingless) {
-            boolean hasAccount = adapter != null
-                    && AccountUtils.isAccount(adapter.getAccountName());
             if (postItem != null) {
-                postItem.setVisible(hasAccount);
+                postItem.setVisible(hasAccount());
             }
 
             if (aboutItem != null) {
                 boolean showAbout = Subreddits.hasSidebar(getSubredditName());
                 aboutItem.setVisible(showAbout);
             }
-
-            if (profileItem != null) {
-                profileItem.setVisible(hasAccount);
-            }
-
-            if (messagesItem != null) {
-                messagesItem.setVisible(hasAccount);
-            }
         }
 
+        refreshAccountMenuGroup();
+        refreshMessagesMenuIcon();
         return true;
     }
 
-    void refreshUnreadMessagesMenuItem() {
-        if (unreadItem != null) {
-            unreadItem.setVisible(adapter != null
-                    && mailAdapter != null
-                    && mailAdapter.hasMessages(adapter.getAccountName()));
+    private void refreshAccountMenuGroup() {
+        menu.setGroupVisible(R.id.menu_group_account, showAccountMenuGroup());
+    }
+
+    private boolean showAccountMenuGroup() {
+        return hasAccount() && (isSinglePane || !hasThing());
+    }
+
+    private boolean hasAccount() {
+        return adapter != null && AccountUtils.isAccount(adapter.getAccountName());
+    }
+
+    void refreshMessagesMenuIcon() {
+        if (messagesItem != null) {
+            messagesItem.setIcon(getMessagesIcon());
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_unread_messages:
-                return handleUnreadMessages();
-
             case R.id.menu_profile:
-                return handleProfile();
+                handleProfile();
+                return true;
 
             case R.id.menu_messages:
-                return handleMessages();
+                handleMessages();
+                return true;
+
+            case R.id.menu_saved:
+                handleSaved();
+                return true;
 
             case R.id.menu_accounts:
-                return handleAccounts();
+                handleAccounts();
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private boolean handleUnreadMessages() {
-        MenuHelper.startMessageActivity(this, getAccountName(), FilterAdapter.MESSAGE_UNREAD);
-        return true;
-    }
-
-    private boolean handleProfile() {
+    private void handleProfile() {
         MenuHelper.startSelfProfileActivity(this, getAccountName(), -1);
-        return true;
     }
 
-    private boolean handleMessages() {
-        MenuHelper.startMessageActivity(this, getAccountName(), -1);
-        return true;
+    private void handleMessages() {
+        MenuHelper.startMessageActivity(this, getAccountName(), getMessagesFilter());
     }
 
-    private boolean handleAccounts() {
-        startActivity(new Intent(this, AccountListActivity.class));
-        return true;
+    private void handleSaved() {
+        MenuHelper.startSelfProfileActivity(this, getAccountName(), FilterAdapter.PROFILE_SAVED);
+    }
+
+    private void handleAccounts() {
+        MenuHelper.startAccountListActivity(this);
+    }
+
+    private boolean hasUnreadMessages() {
+        return adapter != null
+                && mailAdapter != null
+                && mailAdapter.hasMessages(adapter.getAccountName());
+    }
+
+    private int getMessagesFilter() {
+        if (hasUnreadMessages()) {
+            return FilterAdapter.MESSAGE_UNREAD;
+        } else {
+            return FilterAdapter.MESSAGE_INBOX;
+        }
+    }
+
+    private int getMessagesIcon() {
+        if (hasUnreadMessages()) {
+            return R.drawable.ic_action_unread_messages;
+        } else {
+            return R.drawable.ic_action_messages;
+        }
     }
 }

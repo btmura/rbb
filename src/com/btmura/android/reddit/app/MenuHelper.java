@@ -51,6 +51,10 @@ public class MenuHelper {
         AddSubredditFragment.newInstance(subreddit).show(fm, AddSubredditFragment.TAG);
     }
 
+    public static void startAccountListActivity(Context context) {
+        context.startActivity(new Intent(context, AccountListActivity.class));
+    }
+
     public static void startComposeActivity(Context context, int[] types,
             String subredditDestination, String messageDestination, String title, Bundle extras,
             boolean isReply) {

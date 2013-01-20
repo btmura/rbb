@@ -16,12 +16,6 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item
-        android:id="@+id/menu_unread_messages"
-        android:icon="@drawable/ic_action_messages"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_unread_messages"/>
-
     <group android:id="@+id/thingless" >
         <item
             android:id="@+id/menu_new_post"
@@ -47,17 +41,25 @@
             android:showAsAction="never"
             android:title="@string/menu_accounts"/>
     </group>
-
-    <item
-        android:id="@+id/menu_profile"
-        android:icon="@drawable/ic_action_profile"
-        android:orderInCategory="500"
-        android:showAsAction="never"
-        android:title="@string/menu_profile"/>
-    <item
-        android:id="@+id/menu_messages"
-        android:orderInCategory="500"
-        android:showAsAction="never"
-        android:title="@string/menu_messages"/>
+    <group android:id="@+id/menu_group_account" >
+        <item
+            android:id="@+id/menu_profile"
+            android:icon="@drawable/ic_action_profile"
+            android:orderInCategory="500"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_profile"/>
+        <item
+            android:id="@+id/menu_messages"
+            android:icon="@drawable/ic_action_messages"
+            android:orderInCategory="500"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_messages"/>
+        <item
+            android:id="@+id/menu_saved"
+            android:icon="@drawable/ic_action_saved"
+            android:orderInCategory="500"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_saved"/>
+    </group>
 
 </menu>
