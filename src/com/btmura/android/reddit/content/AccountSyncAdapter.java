@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.content;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import android.accounts.Account;
 import android.accounts.AuthenticatorException;
@@ -47,6 +48,9 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = "AccountSyncAdapter";
 
+    /** Delay between sync to avoid spamming the server. */
+    private static final long SYNC_DELAY_SECONDS = TimeUnit.MINUTES.toSeconds(1);
+
     public static class Service extends android.app.Service {
         @Override
         public IBinder onBind(Intent intent) {
@@ -69,7 +73,7 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
 
         // Only sync one time per minute. SyncManager code seems to be using
         // delayUntil as a timestamp even though the docs say its more of a duration.
-        syncResult.delayUntil = System.currentTimeMillis() / 1000 + 60;
+        syncResult.delayUntil = System.currentTimeMillis() / 1000 + SYNC_DELAY_SECONDS;
     }
 
     private void doSync(Account account, Bundle extras, String authority,

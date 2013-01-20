@@ -19,6 +19,7 @@ package com.btmura.android.reddit.content;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -73,9 +74,9 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int OP_UPDATES = 1;
     private static final int OP_DELETES = 2;
 
-    private static final int EXPIRATION_PADDING = 5 * 60 * 1000; // 5 minutes
+    private static final long EXPIRATION_PADDING_MS = TimeUnit.MINUTES.toMillis(5);
 
-    private static final int POLL_FREQUENCY_SECONDS = 24 * 60 * 60; // 1 day
+    private static final long POLL_FREQUENCY_SECONDS = TimeUnit.HOURS.toSeconds(3);
 
     public SubredditSyncAdapter(Context context) {
         super(context, true);
@@ -196,7 +197,7 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
                     try {
                         boolean subscribe = state == Subreddits.STATE_INSERTING;
                         RedditApi.subscribe(name, subscribe, cookie, modhash);
-                        long newExpiration = System.currentTimeMillis() + EXPIRATION_PADDING;
+                        long newExpiration = System.currentTimeMillis() + EXPIRATION_PADDING_MS;
                         ops.add(ContentProviderOperation.newUpdate(SubredditProvider.SUBREDDITS_URI)
                                 .withSelection(SubredditProvider.ID_SELECTION, Array.of(id))
                                 .withValue(Subreddits.COLUMN_EXPIRATION, newExpiration)
