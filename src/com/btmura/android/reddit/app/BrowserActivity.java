@@ -202,17 +202,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                     + " filter:" + filter);
         }
 
-        // Quickly sync to check whether the user has new messages.
-        if (AccountUtils.isAccount(accountName)) {
-            // requestSync can trigger a strict mode warning by writing to disk.
-            AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-                public void run() {
-                    Account account = AccountUtils.getAccount(getApplicationContext(), accountName);
-                    ContentResolver.requestSync(account, AccountProvider.AUTHORITY, Bundle.EMPTY);
-                }
-            });
-        }
-
         SubredditListFragment slf = getSubredditListFragment();
         ThingListFragment tlf = getThingListFragment();
 
@@ -244,6 +233,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             replaceThingListFragmentMultiPane();
         }
 
+        // Check mail if the user is using an account.
+        checkMailIfHasAccount();
+
         // Invalidate action bar icons when switching accounts.
         refreshAccountMenuGroup();
         refreshMessagesMenuIcon();
@@ -255,6 +247,24 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public void onSubredditSelected(String subreddit) {
         super.onSubredditSelected(subreddit);
         AccountPreferences.setLastSubreddit(prefs, getAccountName(), subreddit);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkMailIfHasAccount();
+    }
+
+    private void checkMailIfHasAccount() {
+        final String accountName = getAccountName();
+        if (AccountUtils.isAccount(accountName)) {
+            AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+                public void run() {
+                    Account account = AccountUtils.getAccount(getApplicationContext(), accountName);
+                    ContentResolver.requestSync(account, AccountProvider.AUTHORITY, Bundle.EMPTY);
+                }
+            });
+        }
     }
 
     @Override
