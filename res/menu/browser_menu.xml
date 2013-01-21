@@ -41,25 +41,26 @@
             android:showAsAction="never"
             android:title="@string/menu_accounts"/>
     </group>
-    <group android:id="@+id/menu_group_account" >
-        <item
-            android:id="@+id/menu_profile"
-            android:icon="@drawable/ic_action_profile"
-            android:orderInCategory="500"
-            android:showAsAction="ifRoom"
-            android:title="@string/menu_profile"/>
-        <item
-            android:id="@+id/menu_messages"
-            android:icon="@drawable/ic_action_messages"
-            android:orderInCategory="500"
-            android:showAsAction="ifRoom"
-            android:title="@string/menu_messages"/>
-        <item
-            android:id="@+id/menu_saved"
-            android:icon="@drawable/ic_action_saved"
-            android:orderInCategory="500"
-            android:showAsAction="ifRoom"
-            android:title="@string/menu_saved"/>
-    </group>
+
+    <item
+        android:id="@+id/menu_me"
+        android:icon="@drawable/ic_action_profile"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_me">
+        <menu>
+            <item
+                android:id="@+id/menu_profile"
+                android:icon="@drawable/ic_action_profile"
+                android:title="@string/menu_profile"/>
+            <item
+                android:id="@+id/menu_profile_saved"
+                android:icon="@drawable/ic_action_saved"
+                android:title="@string/menu_saved"/>
+            <item
+                android:id="@+id/menu_messages"
+                android:icon="@drawable/ic_action_messages"
+                android:title="@string/menu_messages"/>
+        </menu>
+    </item>
 
 </menu>

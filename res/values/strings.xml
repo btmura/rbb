@@ -84,6 +84,7 @@
     <string name="menu_debug">Debug</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_link">View link</string>
+    <string name="menu_me">Me</string>
     <string name="menu_messages">Messages</string>
     <string name="menu_new_comment">New comment</string>
     <string name="menu_new_message">New message</string>
