@@ -59,7 +59,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private AccountAdapter mailAdapter;
     private SharedPreferences prefs;
 
-    private MenuItem meItem;
+    private MenuItem labelsItem;
+    private MenuItem profileItem;
     private MenuItem postItem;
     private MenuItem subredditItem;
 
@@ -70,7 +71,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             mailAdapter.swapCursor(cursor);
-            refreshMeItem();
+            refreshLabelsItem();
         }
 
         public void onLoaderReset(Loader<Cursor> loader) {
@@ -247,7 +248,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         checkMailIfHasAccount();
 
         // Invalidate action bar icons when switching accounts.
-        refreshMeItem();
+        refreshLabelsItem();
         refreshNewPostItem();
 
         return true;
@@ -281,7 +282,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
-        meItem = menu.findItem(R.id.menu_me);
+        labelsItem = menu.findItem(R.id.menu_labels);
+        profileItem = menu.findItem(R.id.menu_profile);
         postItem = menu.findItem(R.id.menu_new_post);
         subredditItem = menu.findItem(R.id.menu_subreddit);
         return true;
@@ -293,24 +295,32 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             Log.d(TAG, "onPrepareOptionsMenu");
         }
         super.onPrepareOptionsMenu(menu);
-        refreshMeItem();
+        refreshLabelsItem();
         refreshThinglessGroup(menu);
         return true;
     }
 
-    void refreshMeItem() {
-        if (meItem != null) {
-            boolean visible = hasAccount();
-            meItem.setVisible(visible);
-            if (visible) {
-                int icon = hasUnreadMessages() ?
-                        R.drawable.ic_action_messages : R.drawable.ic_action_profile;
-                meItem.setIcon(icon);
-
-                String title = getString(R.string.menu_user, getAccountName());
-                meItem.setTitle(title);
+    void refreshLabelsItem() {
+        if (labelsItem != null) {
+            labelsItem.setVisible(hasAccount());
+            if (labelsItem.isVisible()) {
+                int icon = hasUnreadMessages()
+                        ? R.drawable.ic_action_messages
+                        : R.drawable.ic_action_labels;
+                labelsItem.setIcon(icon);
+                profileItem.setTitle(MenuHelper.getUserTitle(this, getAccountName()));
             }
         }
+    }
+
+    private boolean hasAccount() {
+        return adapter != null && AccountUtils.isAccount(adapter.getAccountName());
+    }
+
+    private boolean hasUnreadMessages() {
+        return adapter != null
+                && mailAdapter != null
+                && mailAdapter.hasMessages(adapter.getAccountName());
     }
 
     void refreshThinglessGroup(Menu menu) {
@@ -324,24 +334,18 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     void refreshNewPostItem() {
         if (postItem != null) {
-            boolean visible = hasAccount();
-            postItem.setVisible(visible);
+            postItem.setVisible(hasAccount());
         }
     }
 
     void refreshSubredditItem() {
         if (subredditItem != null) {
             String subreddit = getSubredditName();
-            boolean visible = Subreddits.hasSidebar(subreddit);
-            subredditItem.setVisible(visible);
-            if (visible) {
-                subredditItem.setTitle(getString(R.string.menu_subreddit, subreddit));
+            subredditItem.setVisible(Subreddits.hasSidebar(subreddit));
+            if (subredditItem.isVisible()) {
+                subredditItem.setTitle(MenuHelper.getSubredditTitle(this, subreddit));
             }
         }
-    }
-
-    private boolean hasAccount() {
-        return adapter != null && AccountUtils.isAccount(adapter.getAccountName());
     }
 
     @Override
@@ -377,20 +381,13 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     private void handleMessages() {
-        MenuHelper.startMessageActivity(this, getAccountName(), getMessagesFilter());
+        int filter = hasUnreadMessages()
+                ? FilterAdapter.MESSAGE_UNREAD
+                : FilterAdapter.MESSAGE_INBOX;
+        MenuHelper.startMessageActivity(this, getAccountName(), filter);
     }
 
     private void handleAccounts() {
         MenuHelper.startAccountListActivity(this);
-    }
-
-    private int getMessagesFilter() {
-        return hasUnreadMessages() ? FilterAdapter.MESSAGE_UNREAD : FilterAdapter.MESSAGE_INBOX;
-    }
-
-    private boolean hasUnreadMessages() {
-        return adapter != null
-                && mailAdapter != null
-                && mailAdapter.hasMessages(adapter.getAccountName());
     }
 }

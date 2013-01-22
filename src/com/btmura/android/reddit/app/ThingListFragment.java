@@ -318,14 +318,15 @@ public class ThingListFragment extends ThingProviderListFragment implements
         MenuItem authorItem = menu.findItem(R.id.menu_author);
         authorItem.setVisible(count == 1);
         if (authorItem.isVisible()) {
-            authorItem.setTitle(getString(R.string.menu_user, adapter.getAuthor(position)));
+            authorItem.setTitle(MenuHelper.getUserTitle(getActivity(),
+                    adapter.getAuthor(position)));
         }
 
         String subreddit = adapter.getSubreddit(position);
         MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
         subredditItem.setVisible(count == 1 && Subreddits.hasSidebar(subreddit));
         if (subredditItem.isVisible()) {
-            subredditItem.setTitle(getString(R.string.menu_subreddit, subreddit));
+            subredditItem.setTitle(MenuHelper.getSubredditTitle(getActivity(), subreddit));
         }
 
         boolean saveable = false;

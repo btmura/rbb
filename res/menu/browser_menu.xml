@@ -17,10 +17,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_me"
-        android:icon="@drawable/ic_action_profile"
+        android:id="@+id/menu_labels"
+        android:icon="@drawable/ic_action_labels"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_me">
+        android:title="@string/menu_labels">
         <menu>
             <item
                 android:id="@+id/menu_profile"

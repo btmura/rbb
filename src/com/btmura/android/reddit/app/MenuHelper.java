@@ -32,6 +32,14 @@ import com.btmura.android.reddit.net.Urls;
 
 public class MenuHelper {
 
+    public static String getSubredditTitle(Context context, String subreddit) {
+        return context.getString(R.string.menu_subreddit, subreddit);
+    }
+
+    public static String getUserTitle(Context context, String user) {
+        return context.getString(R.string.menu_user, user);
+    }
+
     public static void startIntentChooser(Context context, CharSequence url) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url.toString()));

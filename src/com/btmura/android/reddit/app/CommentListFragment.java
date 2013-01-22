@@ -338,7 +338,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         MenuItem authorItem = menu.findItem(R.id.menu_author);
         authorItem.setVisible(count == 1);
         if (authorItem.isVisible()) {
-            authorItem.setTitle(getString(R.string.menu_user,
+            authorItem.setTitle(MenuHelper.getUserTitle(getActivity(),
                     adapter.getString(position, CommentAdapter.INDEX_AUTHOR)));
         }
 

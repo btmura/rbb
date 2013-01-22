@@ -196,7 +196,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
             boolean visible = Subreddits.hasSidebar(subreddit);
             subredditItem.setVisible(visible);
             if (visible) {
-                subredditItem.setTitle(getString(R.string.menu_subreddit, subreddit));
+                subredditItem.setTitle(MenuHelper.getSubredditTitle(this, subreddit));
             }
         }
     }

@@ -144,7 +144,7 @@ public class ThingMenuFragment extends Fragment {
 
     private void refreshUserItems() {
         if (userItem != null) {
-            userItem.setTitle(getString(R.string.menu_user, getUser()));
+            userItem.setTitle(MenuHelper.getUserTitle(getActivity(), getUser()));
         }
     }
 
@@ -153,7 +153,7 @@ public class ThingMenuFragment extends Fragment {
             boolean visible = hasSubreddit();
             subredditItem.setVisible(visible);
             if (visible) {
-                subredditItem.setTitle(getString(R.string.menu_subreddit, getSubreddit()));
+                subredditItem.setTitle(MenuHelper.getSubredditTitle(getActivity(), getSubreddit()));
             }
         }
     }
