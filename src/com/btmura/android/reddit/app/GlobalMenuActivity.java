@@ -19,15 +19,17 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.view.KeyEvent;
 
-
 abstract class GlobalMenuActivity extends Activity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_SEARCH:
-                getGlobalMenuFragment().handleSearch();
-                return true;
+                GlobalMenuFragment frag = getGlobalMenuFragment();
+                if (frag != null) {
+                    frag.handleSearch();
+                    return true;
+                }
 
             default:
                 return super.onKeyUp(keyCode, event);

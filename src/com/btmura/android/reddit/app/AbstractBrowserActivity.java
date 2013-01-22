@@ -116,14 +116,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract boolean skipSetup();
 
-    private void setupCommonFragments(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(),
-                    GlobalMenuFragment.TAG);
-            ft.commit();
-        }
-    }
+    protected abstract void setupCommonFragments(Bundle savedInstanceState);
 
     private void setupCommonViews() {
         if (!isSinglePane) {
