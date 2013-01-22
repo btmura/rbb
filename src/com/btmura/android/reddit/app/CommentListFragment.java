@@ -562,10 +562,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return adapter.isReplyable();
     }
 
-    public boolean isSavable() {
-        return adapter.isSavable();
-    }
-
     public boolean isSaved() {
         return adapter.isSaved();
     }

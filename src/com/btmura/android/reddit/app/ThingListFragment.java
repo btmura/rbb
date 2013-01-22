@@ -332,7 +332,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         boolean saved = false;
         boolean hasAccount = count == 1 && AccountUtils.isAccount(adapter.getAccountName());
         if (hasAccount) {
-            saveable = adapter.getKind(position) != Kinds.KIND_MESSAGE;
+            saveable = adapter.getKind(position) == Kinds.KIND_LINK;
             saved = adapter.isSaved(position);
         }
         menu.findItem(R.id.menu_saved).setVisible(saveable && saved);

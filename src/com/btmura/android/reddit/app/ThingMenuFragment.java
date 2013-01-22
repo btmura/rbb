@@ -241,7 +241,7 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private boolean isSavable() {
-        return hasAccountName();
+        return hasAccountName() && ThingBundle.isSavable(getThingBundle());
     }
 
     private boolean isInitiallySaved() {

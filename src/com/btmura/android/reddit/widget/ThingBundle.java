@@ -55,6 +55,9 @@ public class ThingBundle extends BundleSupport {
     /** String name of the author of this thing. */
     private static final String KEY_AUTHOR = "author";
 
+    /** Boolean indicating whether this thing is savable. */
+    private static final String KEY_SAVABLE = "savable";
+
     /** Boolean indicating whether the thing has been saved. */
     private static final String KEY_SAVED = "saved";
 
@@ -144,6 +147,14 @@ public class ThingBundle extends BundleSupport {
 
     public static void putAuthor(Bundle bundle, String author) {
         bundle.putString(KEY_AUTHOR, author);
+    }
+
+    public static boolean isSavable(Bundle bundle) {
+        return getBoolean(bundle, KEY_SAVABLE);
+    }
+
+    public static void putSavable(Bundle bundle, boolean savable) {
+        bundle.putBoolean(KEY_SAVABLE, savable);
     }
 
     public static boolean isSaved(Bundle bundle) {

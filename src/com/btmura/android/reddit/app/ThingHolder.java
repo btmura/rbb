@@ -26,8 +26,6 @@ interface ThingHolder {
 
     boolean isReplyable();
 
-    boolean isSavable();
-
     boolean isSaved();
 
     boolean isSelf();

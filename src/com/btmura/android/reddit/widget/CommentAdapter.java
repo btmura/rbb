@@ -211,15 +211,7 @@ public class CommentAdapter extends BaseLoaderAdapter {
         return AccountUtils.isAccount(accountName);
     }
 
-    public boolean isSavable() {
-        return AccountUtils.isAccount(accountName);
-    }
-
     public boolean isSaved() {
-        if (!isSavable()) {
-            return false;
-        }
-
         // If no local save actions are pending, then rely on server info.
         if (isNull(0, INDEX_SAVE_ACTION)) {
             return getBoolean(0, INDEX_SAVED);

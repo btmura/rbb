@@ -232,10 +232,6 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         return true;
     }
 
-    public boolean isSavable() {
-        return false;
-    }
-
     public boolean isSaved() {
         return false;
     }
