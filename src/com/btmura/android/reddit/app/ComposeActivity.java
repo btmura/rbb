@@ -77,6 +77,7 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     /** Set of types when replying in a message thread. */
     public static final int[] MESSAGE_REPLY_TYPE_SET = {
             TYPE_MESSAGE_REPLY,
+            TYPE_MESSAGE,
     };
 
     /** Array of ints specifying what types to show we can compose. */

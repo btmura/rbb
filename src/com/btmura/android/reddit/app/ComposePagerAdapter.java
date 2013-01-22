@@ -52,9 +52,9 @@ public class ComposePagerAdapter extends FragmentStateItemPagerAdapter {
                 return context.getString(R.string.compose_tab_post);
 
             case ComposeActivity.TYPE_MESSAGE:
-            case ComposeActivity.TYPE_MESSAGE_REPLY:
                 return context.getString(R.string.compose_tab_message);
 
+            case ComposeActivity.TYPE_MESSAGE_REPLY:
             case ComposeActivity.TYPE_COMMENT_REPLY:
                 return context.getString(R.string.compose_tab_comment);
 

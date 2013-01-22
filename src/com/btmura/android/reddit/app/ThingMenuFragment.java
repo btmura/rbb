@@ -237,7 +237,7 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private boolean isNewCommentVisible() {
-        return hasAccountName() && !ThingBundle.hasNoComments(getThingBundle());
+        return hasAccountName();
     }
 
     private boolean isSavable() {
