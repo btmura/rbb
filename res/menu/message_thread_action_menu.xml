@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/menu_new_comment"
-        android:icon="@drawable/ic_action_edit"
+        android:icon="@drawable/ic_action_reply"
         android:showAsAction="ifRoom"
         android:title="@string/menu_new_comment"/>
 

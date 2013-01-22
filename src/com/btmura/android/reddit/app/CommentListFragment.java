@@ -327,12 +327,21 @@ public class CommentListFragment extends ThingProviderListFragment implements
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        int position = getFirstCheckedPosition();
         int count = getListView().getCheckedItemCount();
         mode.setTitle(getResources().getQuantityString(R.plurals.comments, count, count));
 
         menu.findItem(R.id.menu_new_comment).setVisible(isReplyItemVisible());
         menu.findItem(R.id.menu_delete).setVisible(isDeleteItemVisible());
         menu.findItem(R.id.menu_copy_url).setVisible(isCopyUrlItemVisible());
+
+        MenuItem authorItem = menu.findItem(R.id.menu_author);
+        authorItem.setVisible(count == 1);
+        if (authorItem.isVisible()) {
+            authorItem.setTitle(getString(R.string.menu_user,
+                    adapter.getString(position, CommentAdapter.INDEX_AUTHOR)));
+        }
+
         return true;
     }
 
