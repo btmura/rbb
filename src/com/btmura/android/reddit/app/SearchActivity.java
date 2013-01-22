@@ -73,16 +73,6 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected void setupCommonFragments(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(),
-                    GlobalMenuFragment.TAG);
-            ft.commit();
-        }
-    }
-
-    @Override
     protected void setupViews() {
         if (!hasQuery()) {
             setQuery("android");

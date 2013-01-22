@@ -19,7 +19,6 @@ package com.btmura.android.reddit.app;
 import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
-import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
 import android.content.Loader;
@@ -118,16 +117,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         }
 
         return false;
-    }
-
-    @Override
-    protected void setupCommonFragments(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(),
-                    GlobalMenuFragment.TAG);
-            ft.commit();
-        }
     }
 
     @Override

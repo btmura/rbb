@@ -73,10 +73,6 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     }
 
     @Override
-    protected void setupCommonFragments(Bundle savedInstanceState) {
-    }
-
-    @Override
     protected void setupViews() {
     }
 

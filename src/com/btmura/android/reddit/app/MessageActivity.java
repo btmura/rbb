@@ -56,10 +56,6 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
-    protected void setupCommonFragments(Bundle savedInstanceState) {
-    }
-
-    @Override
     protected void setupViews() {
     }
 
