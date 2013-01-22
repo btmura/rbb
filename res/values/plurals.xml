@@ -24,6 +24,10 @@
         <item quantity="one">1 comment</item>
         <item quantity="other">%1$,d comments</item>
     </plurals>
+    <plurals name="messages">
+        <item quantity="one">1 message</item>
+        <item quantity="other">%1$,d messages</item>
+    </plurals>
     <plurals name="points">
         <item quantity="one">1 point</item>
         <item quantity="other">%1$,d points</item>

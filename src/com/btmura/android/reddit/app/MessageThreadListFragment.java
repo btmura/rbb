@@ -148,6 +148,7 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         int count = getListView().getCheckedItemCount();
+        mode.setTitle(getResources().getQuantityString(R.plurals.messages, count, count));
 
         boolean showNewComment = count == 1;
         if (showNewComment) {
