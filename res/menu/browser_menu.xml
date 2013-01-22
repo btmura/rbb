@@ -16,32 +16,6 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <group android:id="@+id/thingless" >
-        <item
-            android:id="@+id/menu_new_post"
-            android:orderInCategory="50"
-            android:showAsAction="never"
-            android:title="@string/menu_new_post"/>
-        <item
-            android:orderInCategory="100"
-            android:showAsAction="never"
-            android:title="@string/menu_subreddit">
-            <menu>
-                <item
-                    android:id="@+id/menu_about_subreddit"
-                    android:title="@string/menu_about"/>
-                <item
-                    android:id="@+id/menu_add_subreddit"
-                    android:title="@string/menu_add"/>
-            </menu>
-        </item>
-        <item
-            android:id="@+id/menu_accounts"
-            android:orderInCategory="1000"
-            android:showAsAction="never"
-            android:title="@string/menu_accounts"/>
-    </group>
-
     <item
         android:id="@+id/menu_me"
         android:icon="@drawable/ic_action_profile"
@@ -62,5 +36,26 @@
                 android:title="@string/menu_messages"/>
         </menu>
     </item>
+
+    <group
+        android:id="@+id/thingless"
+        android:orderInCategory="1336" >
+        <item
+            android:id="@+id/menu_new_post"
+            android:showAsAction="never"
+            android:title="@string/menu_new_post"/>
+        <item
+            android:id="@+id/menu_add_subreddit"
+            android:showAsAction="never"
+            android:title="@string/menu_add_subreddit"/>
+        <item
+            android:id="@+id/menu_subreddit"
+            android:showAsAction="never"
+            android:title="@string/menu_subreddit"/>
+        <item
+            android:id="@+id/menu_accounts"
+            android:showAsAction="never"
+            android:title="@string/menu_accounts"/>
+    </group>
 
 </menu>

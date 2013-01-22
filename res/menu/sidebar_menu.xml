@@ -20,6 +20,11 @@
         android:id="@+id/menu_add_subreddit"
         android:icon="@drawable/ic_action_add"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_add_subreddit"/>
+        android:title="@string/menu_add"/>
+    <item
+        android:id="@+id/menu_view_subreddit"
+        android:icon="@drawable/ic_action_view"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_view"/>
 
 </menu>

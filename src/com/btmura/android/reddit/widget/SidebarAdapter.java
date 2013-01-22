@@ -20,6 +20,7 @@ import android.content.Context;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
@@ -27,19 +28,32 @@ import android.widget.TextView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.net.RedditApi.SidebarResult;
 
-public class SidebarAdapter extends BaseAdapter {
+public class SidebarAdapter extends BaseAdapter implements OnClickListener {
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_DESCRIPTION = 1;
 
+    public interface OnSidebarButtonClickListener {
+        void onAddClicked();
+
+        void onViewClicked();
+    }
+
     private final Context context;
     private final LayoutInflater inflater;
+    private final boolean showHeaderButtons;
 
+    private OnSidebarButtonClickListener listener;
     private SidebarResult item;
 
-    public SidebarAdapter(Context context) {
+    public SidebarAdapter(Context context, boolean showHeaderButtons) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
+        this.showHeaderButtons = showHeaderButtons;
+    }
+
+    public void setOnSidebarButtonClickListener(OnSidebarButtonClickListener listener) {
+        this.listener = listener;
     }
 
     public void swapData(SidebarResult item) {
@@ -82,7 +96,6 @@ public class SidebarAdapter extends BaseAdapter {
 
         SidebarResult sr = getItem(position);
         setSubreddit(sr, v, position);
-
         return v;
     }
 
@@ -108,6 +121,17 @@ public class SidebarAdapter extends BaseAdapter {
                 TextView status = (TextView) v.findViewById(R.id.status);
                 status.setText(context.getResources().getQuantityString(R.plurals.subscribers,
                         sb.subscribers, sb.subscribers));
+
+                int visibility = showHeaderButtons ? View.VISIBLE : View.GONE;
+
+                View add = v.findViewById(R.id.add);
+                add.setVisibility(visibility);
+                add.setOnClickListener(this);
+
+                View view = v.findViewById(R.id.view);
+                view.setVisibility(visibility);
+                view.setOnClickListener(this);
+
                 break;
 
             case TYPE_DESCRIPTION:
@@ -118,6 +142,23 @@ public class SidebarAdapter extends BaseAdapter {
 
             default:
                 throw new IllegalArgumentException();
+        }
+    }
+
+    public void onClick(View v) {
+        if (listener != null) {
+            switch (v.getId()) {
+                case R.id.add:
+                    listener.onAddClicked();
+                    break;
+
+                case R.id.view:
+                    listener.onViewClicked();
+                    break;
+
+                default:
+                    throw new IllegalArgumentException();
+            }
         }
     }
 }

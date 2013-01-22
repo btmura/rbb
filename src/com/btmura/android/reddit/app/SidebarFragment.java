@@ -25,27 +25,31 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SidebarLoader;
 import com.btmura.android.reddit.net.RedditApi.SidebarResult;
 import com.btmura.android.reddit.widget.SidebarAdapter;
+import com.btmura.android.reddit.widget.SidebarAdapter.OnSidebarButtonClickListener;
 
-public class SidebarFragment extends ListFragment implements LoaderCallbacks<SidebarResult> {
+public class SidebarFragment extends ListFragment implements LoaderCallbacks<SidebarResult>,
+        OnSidebarButtonClickListener {
 
-    private static final String ARGS_NAME = "n";
-    private static final String ARGS_POSITION = "p";
+    private static final String ARGS_SUBREDDIT = "subreddit";
+    private static final String ARG_SHOW_HEADER_BUTTONS = "showHeaderButtons";
 
     private SidebarAdapter adapter;
 
-    public static SidebarFragment newInstance(String name, int position) {
-        SidebarFragment f = new SidebarFragment();
+    public static SidebarFragment newInstance(String subreddit, boolean showHeaderButtons) {
         Bundle b = new Bundle(2);
-        b.putString(ARGS_NAME, name);
-        b.putInt(ARGS_POSITION, position);
-        f.setArguments(b);
-        return f;
+        b.putString(ARGS_SUBREDDIT, subreddit);
+        b.putBoolean(ARG_SHOW_HEADER_BUTTONS, showHeaderButtons);
+
+        SidebarFragment frag = new SidebarFragment();
+        frag.setArguments(b);
+        return frag;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new SidebarAdapter(getActivity());
+        adapter = new SidebarAdapter(getActivity(), showHeaderButtons());
+        adapter.setOnSidebarButtonClickListener(this);
     }
 
     @Override
@@ -57,7 +61,7 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sid
     }
 
     public Loader<SidebarResult> onCreateLoader(int id, Bundle args) {
-        return new SidebarLoader(getActivity().getApplicationContext(), getName());
+        return new SidebarLoader(getActivity().getApplicationContext(), getSubreddit());
     }
 
     public void onLoadFinished(Loader<SidebarResult> loader, SidebarResult data) {
@@ -70,11 +74,19 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sid
         adapter.swapData(null);
     }
 
-    public String getName() {
-        return getArguments().getString(ARGS_NAME);
+    public void onAddClicked() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
-    public int getPosition() {
-        return getArguments().getInt(ARGS_POSITION);
+    public void onViewClicked() {
+        MenuHelper.startSubredditActivity(getActivity(), getSubreddit());
+    }
+
+    private String getSubreddit() {
+        return getArguments().getString(ARGS_SUBREDDIT);
+    }
+
+    private boolean showHeaderButtons() {
+        return getArguments().getBoolean(ARG_SHOW_HEADER_BUTTONS);
     }
 }

@@ -91,9 +91,15 @@
 
     <style name="CommentStatusText" parent="@style/SubredditStatusText" />
 
-    <style name="SidebarTitleText" parent="@style/CommentTitleText" />
+    <style name="SidebarTitleText" parent="@style/CommentTitleText">
+        <!--  <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>  -->
+    </style>
 
-    <style name="SidebarStatusText" parent="@style/CommentStatusText" />
+    <style name="SidebarStatusText" parent="@style/CommentStatusText">
+        <!-- <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>  -->
+    </style>
 
     <style name="SidebarDescriptionText" parent="@style/CommentBodyText" />
 

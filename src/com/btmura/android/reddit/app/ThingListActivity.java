@@ -63,8 +63,8 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private String accountName;
     private String subreddit;
     private SharedPreferences prefs;
-    private MenuItem postItem;
-    private MenuItem aboutItem;
+    private MenuItem newPostItem;
+    private MenuItem subredditItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +112,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         accountName = result.getLastAccount();
         adapter.addSubredditFilters(this);
         bar.setSelectedNavigationItem(result.getLastSubredditFilter());
+        refreshNewPostItem();
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
@@ -166,8 +167,8 @@ public class ThingListActivity extends GlobalMenuActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.thing_list_menu, menu);
-        postItem = menu.findItem(R.id.menu_new_post);
-        aboutItem = menu.findItem(R.id.menu_about_subreddit);
+        newPostItem = menu.findItem(R.id.menu_new_post);
+        subredditItem = menu.findItem(R.id.menu_subreddit);
         return true;
     }
 
@@ -179,12 +180,24 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     private void refreshMenuItems() {
-        if (postItem != null) {
-            postItem.setVisible(AccountUtils.isAccount(accountName));
-        }
+        refreshNewPostItem();
+        refreshSubredditItem();
+    }
 
-        if (aboutItem != null) {
-            aboutItem.setVisible(Subreddits.hasSidebar(subreddit));
+    private void refreshNewPostItem() {
+        if (newPostItem != null) {
+            boolean visible = AccountUtils.isAccount(accountName);
+            newPostItem.setVisible(visible);
+        }
+    }
+
+    private void refreshSubredditItem() {
+        if (subredditItem != null) {
+            boolean visible = Subreddits.hasSidebar(subreddit);
+            subredditItem.setVisible(visible);
+            if (visible) {
+                subredditItem.setTitle(getString(R.string.menu_subreddit, subreddit));
+            }
         }
     }
 

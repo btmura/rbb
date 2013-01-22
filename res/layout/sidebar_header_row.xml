@@ -14,23 +14,52 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="@dimen/padding" >
 
+    <Button
+        android:id="@+id/view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:drawableLeft="@drawable/ic_action_view"
+        android:drawablePadding="@dimen/element_padding"
+        android:text="@string/button_view" />
+
+    <Button
+        android:id="@+id/add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/element_padding"
+        android:layout_toLeftOf="@+id/view"
+        android:drawableLeft="@drawable/ic_action_add"
+        android:drawablePadding="@dimen/element_padding"
+        android:text="@string/button_add" />
+
     <TextView
         android:id="@+id/title"
         style="@style/SidebarTitleText"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/element_padding" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="@dimen/element_padding"
+        android:layout_marginRight="@dimen/element_padding"
+        android:layout_toLeftOf="@+id/add" />
 
     <TextView
         android:id="@+id/status"
         style="@style/SidebarStatusText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/title"
+        android:layout_marginRight="@dimen/element_padding"
+        android:layout_toLeftOf="@+id/add" />
 
-</LinearLayout>
+</RelativeLayout>

@@ -24,6 +24,8 @@
     <string name="authority_accounts">com.btmura.android.reddit.provider.accounts</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
+    <string name="button_add">Add</string>
+    <string name="button_view">View</string>
     <string name="captcha_image">Captcha image</string>
     <string name="captcha_title">Are you a robot?</string>
     <string name="compose_tab_message">Message</string>
@@ -72,7 +74,8 @@
     <string name="login_error">There was a problem: %1$s</string>
     <string name="login_importing_subreddits">Importing subreddits…</string>
     <string name="login_logging_in">Logging in…</string>
-    <string name="menu_about">About</string>
+    <string name="menu_about">About</string>    
+    <string name="menu_about_subreddit">About /r/%1$s</string>    
     <string name="menu_accounts">Accounts</string>
     <string name="menu_add">Add</string>
     <string name="menu_add_account">Add account</string>
@@ -90,15 +93,17 @@
     <string name="menu_new_message">New message</string>
     <string name="menu_new_post">New post</string>
     <string name="menu_open">Open in another app</string>
+    <string name="menu_post_to_subreddit">Post to /r/%1$s</string>
     <string name="menu_profile">Profile</string>
     <string name="menu_save">Save</string>
     <string name="menu_saved">Saved</string>
     <string name="menu_search">Search</string>
     <string name="menu_share">Share</string>
-    <string name="menu_subreddit">Subreddit</string>
+    <string name="menu_subreddit">/r/%1$s</string>
     <string name="menu_submit">Submit</string>
     <string name="menu_unread_messages">Unread messages</string>
     <string name="menu_unsave">Unsave</string>
+    <string name="menu_user">/u/%1$s</string>
     <string name="menu_view">View</string>
     <string name="nsfw">"NSFW"</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>

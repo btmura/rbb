@@ -93,8 +93,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 handleNewMessage();
                 return true;
 
-            case R.id.menu_about_subreddit:
-                handleAboutSubreddit();
+            case R.id.menu_subreddit:
+                handleSubreddit();
                 return true;
 
             case R.id.menu_add_subreddit:
@@ -124,7 +124,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 null, null, null, null,  false);
     }
 
-    private void handleAboutSubreddit() {
+    private void handleSubreddit() {
         MenuHelper.startSidebarActivity(getActivity(), subredditNameHolder.getSubredditName());
     }
 

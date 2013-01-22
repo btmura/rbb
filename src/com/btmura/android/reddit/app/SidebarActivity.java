@@ -25,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewStub;
-import android.widget.Button;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
@@ -37,9 +36,6 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
 
     private SidebarPagerAdapter adapter;
     private ViewPager pager;
-
-    private Button addSubreddit;
-    private View cancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,20 +51,15 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
         } else {
             ViewStub vs = (ViewStub) findViewById(R.id.button_bar_stub);
             View buttonBar = vs.inflate();
-
-            addSubreddit = (Button) buttonBar.findViewById(R.id.ok);
-            addSubreddit.setText(R.string.add_subreddit);
-            addSubreddit.setOnClickListener(this);
-
-            cancel = findViewById(R.id.cancel);
-            cancel.setOnClickListener(this);
+            buttonBar.findViewById(R.id.ok).setOnClickListener(this);
+            buttonBar.findViewById(R.id.cancel).setOnClickListener(this);
         }
 
         String subreddit = getSubreddit();
         setTitle(Subreddits.getTitle(this, subreddit));
 
         String[] subreddits = subreddit.split("\\+");
-        adapter = new SidebarPagerAdapter(getFragmentManager(), subreddits);
+        adapter = new SidebarPagerAdapter(getFragmentManager(), subreddits, bar == null);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
 
@@ -77,15 +68,7 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
     }
 
     public void onClick(View v) {
-        if (v == addSubreddit) {
-            handleAddSubreddit();
-        } else {
-            finish();
-        }
-    }
-
-    public String getSubredditName() {
-        return adapter.getPageTitle(pager.getCurrentItem()).toString();
+        finish();
     }
 
     @Override
@@ -106,6 +89,10 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
                 handleAddSubreddit();
                 return true;
 
+            case R.id.menu_view_subreddit:
+                handleViewSubreddit();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -115,7 +102,15 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
         MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
+    private void handleViewSubreddit() {
+        MenuHelper.startSubredditActivity(this, getSubreddit());
+    }
+
     private String getSubreddit() {
         return getIntent().getStringExtra(EXTRA_SUBREDDIT);
+    }
+
+    public String getSubredditName() {
+        return adapter.getPageTitle(pager.getCurrentItem()).toString();
     }
 }

@@ -25,10 +25,12 @@ import android.support.v13.app.FragmentPagerAdapter;
 public class SidebarPagerAdapter extends FragmentPagerAdapter {
 
     private final String[] subreddits;
+    private final boolean showHeaderButtons;
 
-    public SidebarPagerAdapter(FragmentManager fm, String[] subreddits) {
+    public SidebarPagerAdapter(FragmentManager fm, String[] subreddits, boolean showHeaderButtons) {
         super(fm);
         this.subreddits = subreddits;
+        this.showHeaderButtons = showHeaderButtons;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class SidebarPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return SidebarFragment.newInstance(subreddits[position], -1);
+        return SidebarFragment.newInstance(subreddits[position], showHeaderButtons);
     }
 
     @Override

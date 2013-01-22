@@ -65,10 +65,8 @@ public class ThingMenuFragment extends Fragment {
     private MenuItem savedItem;
     private MenuItem unsavedItem;
     private MenuItem newCommentItem;
+    private MenuItem userItem;
     private MenuItem subredditItem;
-    private MenuItem aboutSubredditItem;
-    private MenuItem addSubredditItem;
-    private MenuItem viewSubredditItem;
 
     public static ThingMenuFragment newInstance(String accountName, Bundle thingBundle) {
         Bundle args = new Bundle(2);
@@ -113,10 +111,8 @@ public class ThingMenuFragment extends Fragment {
         savedItem = menu.findItem(R.id.menu_saved);
         unsavedItem = menu.findItem(R.id.menu_unsaved);
         newCommentItem = menu.findItem(R.id.menu_new_comment);
-        subredditItem = menu.findItem(R.id.menu_subreddit);
-        aboutSubredditItem = menu.findItem(R.id.menu_about_thing_subreddit);
-        addSubredditItem = menu.findItem(R.id.menu_add_thing_subreddit);
-        viewSubredditItem = menu.findItem(R.id.menu_view_subreddit);
+        userItem = menu.findItem(R.id.menu_user);
+        subredditItem = menu.findItem(R.id.menu_thing_subreddit);
     }
 
     @Override
@@ -128,7 +124,8 @@ public class ThingMenuFragment extends Fragment {
     private void refreshMenuItems() {
         refreshNewCommentItem();
         refreshSaveItems();
-        refreshSubredditItems();
+        refreshUserItems();
+        refreshSubredditItem();
     }
 
     private void refreshNewCommentItem() {
@@ -145,13 +142,19 @@ public class ThingMenuFragment extends Fragment {
         }
     }
 
-    private void refreshSubredditItems() {
+    private void refreshUserItems() {
+        if (userItem != null) {
+            userItem.setTitle(getString(R.string.menu_user, getUser()));
+        }
+    }
+
+    private void refreshSubredditItem() {
         if (subredditItem != null) {
             boolean visible = hasSubreddit();
             subredditItem.setVisible(visible);
-            aboutSubredditItem.setVisible(visible);
-            addSubredditItem.setVisible(visible);
-            viewSubredditItem.setVisible(visible);
+            if (visible) {
+                subredditItem.setTitle(getString(R.string.menu_subreddit, getSubreddit()));
+            }
         }
     }
 
@@ -170,20 +173,12 @@ public class ThingMenuFragment extends Fragment {
                 handleNewComment();
                 return true;
 
-            case R.id.menu_author:
-                handleAuthor();
+            case R.id.menu_user:
+                handleUser();
                 return true;
 
-            case R.id.menu_about_thing_subreddit:
-                handleAboutSubreddit();
-                return true;
-
-            case R.id.menu_add_thing_subreddit:
-                handleAddSubreddit();
-                return true;
-
-            case R.id.menu_view_subreddit:
-                handleViewSubreddit();
+            case R.id.menu_thing_subreddit:
+                handleSubreddit();
                 return true;
 
             default:
@@ -209,20 +204,12 @@ public class ThingMenuFragment extends Fragment {
         }
     }
 
-    private void handleAuthor() {
-        MenuHelper.startProfileActivity(getActivity(), getAuthor(), -1);
+    private void handleUser() {
+        MenuHelper.startProfileActivity(getActivity(), getUser(), -1);
     }
 
-    private void handleAboutSubreddit() {
+    private void handleSubreddit() {
         MenuHelper.startSidebarActivity(getActivity(), getSubreddit());
-    }
-
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
-    }
-
-    private void handleViewSubreddit() {
-        MenuHelper.startSubredditActivity(getActivity(), getSubreddit());
     }
 
     private String getAccountName() {
@@ -241,7 +228,7 @@ public class ThingMenuFragment extends Fragment {
         return ThingBundle.getSubreddit(getThingBundle());
     }
 
-    private String getAuthor() {
+    private String getUser() {
         return ThingBundle.getAuthor(getThingBundle());
     }
 

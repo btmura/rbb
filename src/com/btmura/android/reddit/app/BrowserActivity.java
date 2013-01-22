@@ -60,7 +60,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     private MenuItem meItem;
     private MenuItem postItem;
-    private MenuItem aboutItem;
+    private MenuItem subredditItem;
 
     private LoaderCallbacks<Cursor> mailLoaderCallbacks = new LoaderCallbacks<Cursor>() {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -69,7 +69,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             mailAdapter.swapCursor(cursor);
-            refreshMeMenu();
+            refreshMeItem();
         }
 
         public void onLoaderReset(Loader<Cursor> loader) {
@@ -236,7 +236,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         checkMailIfHasAccount();
 
         // Invalidate action bar icons when switching accounts.
-        refreshMeMenu();
+        refreshMeItem();
+        refreshNewPostItem();
 
         return true;
     }
@@ -271,7 +272,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         getMenuInflater().inflate(R.menu.browser_menu, menu);
         meItem = menu.findItem(R.id.menu_me);
         postItem = menu.findItem(R.id.menu_new_post);
-        aboutItem = menu.findItem(R.id.menu_about_subreddit);
+        subredditItem = menu.findItem(R.id.menu_subreddit);
         return true;
     }
 
@@ -281,33 +282,55 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             Log.d(TAG, "onPrepareOptionsMenu");
         }
         super.onPrepareOptionsMenu(menu);
+        refreshMeItem();
+        refreshThinglessGroup(menu);
+        return true;
+    }
 
-        boolean showThingless = isSinglePane || !hasThing();
-        menu.setGroupVisible(R.id.thingless, showThingless);
-        if (showThingless) {
-            if (postItem != null) {
-                postItem.setVisible(hasAccount());
-            }
+    void refreshMeItem() {
+        if (meItem != null) {
+            boolean visible = hasAccount();
+            meItem.setVisible(visible);
+            if (visible) {
+                int icon = hasUnreadMessages() ?
+                        R.drawable.ic_action_messages : R.drawable.ic_action_profile;
+                meItem.setIcon(icon);
 
-            if (aboutItem != null) {
-                boolean showAbout = Subreddits.hasSidebar(getSubredditName());
-                aboutItem.setVisible(showAbout);
+                String title = getString(R.string.menu_user, getAccountName());
+                meItem.setTitle(title);
             }
         }
+    }
 
-        refreshMeMenu();
-        return true;
+    void refreshThinglessGroup(Menu menu) {
+        boolean showThingless = !hasThing();
+        menu.setGroupVisible(R.id.thingless, showThingless);
+        if (showThingless) {
+            refreshNewPostItem();
+            refreshSubredditItem();
+        }
+    }
+
+    void refreshNewPostItem() {
+        if (postItem != null) {
+            boolean visible = hasAccount();
+            postItem.setVisible(visible);
+        }
+    }
+
+    void refreshSubredditItem() {
+        if (subredditItem != null) {
+            String subreddit = getSubredditName();
+            boolean visible = Subreddits.hasSidebar(subreddit);
+            subredditItem.setVisible(visible);
+            if (visible) {
+                subredditItem.setTitle(getString(R.string.menu_subreddit, subreddit));
+            }
+        }
     }
 
     private boolean hasAccount() {
         return adapter != null && AccountUtils.isAccount(adapter.getAccountName());
-    }
-
-    void refreshMeMenu() {
-        if (meItem != null) {
-            meItem.setVisible(hasAccount());
-            meItem.setIcon(getMeIcon());
-        }
     }
 
     @Override
@@ -324,7 +347,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             case R.id.menu_messages:
                 handleMessages();
                 return true;
-
 
             case R.id.menu_accounts:
                 handleAccounts();
@@ -349,10 +371,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     private void handleAccounts() {
         MenuHelper.startAccountListActivity(this);
-    }
-
-    private int getMeIcon() {
-        return hasUnreadMessages() ? R.drawable.ic_action_messages : R.drawable.ic_action_profile;
     }
 
     private int getMessagesFilter() {
