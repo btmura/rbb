@@ -367,7 +367,7 @@ public class Urls {
             default:
                 throw new IllegalArgumentException();
         }
-        b.append(user);
+        b.append(encode(user));
 
         switch (filter) {
             case FilterAdapter.PROFILE_OVERVIEW:
