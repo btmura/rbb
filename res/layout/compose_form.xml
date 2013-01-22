@@ -19,14 +19,30 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <Spinner
-        android:id="@+id/account_spinner"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/padding"
-        android:paddingLeft="@dimen/spinner_padding" />
+        android:orientation="horizontal" >
+
+        <Spinner
+            android:id="@+id/account_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="@dimen/spinner_padding" />
+
+        <Switch
+            android:id="@+id/link_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/element_padding"
+            android:textOff="@string/compose_text"
+            android:textOn="@string/compose_link" />
+    </LinearLayout>
 
     <AutoCompleteTextView
         android:id="@+id/destination_text"
@@ -40,33 +56,16 @@
         android:inputType="textNoSuggestions"
         android:singleLine="true" />
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/title_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
-        android:layout_marginTop="@dimen/element_padding"
-        android:orientation="horizontal" >
-
-        <EditText
-            android:id="@+id/title_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:imeOptions="flagNoFullscreen"
-            android:inputType="textCapSentences|textAutoCorrect"
-            android:singleLine="true" />
-
-        <Switch
-            android:id="@+id/link_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/element_padding"
-            android:textOff="@string/compose_text"
-            android:textOn="@string/compose_link" />
-    </LinearLayout>
+        android:imeOptions="flagNoFullscreen"
+        android:inputType="textCapSentences|textAutoCorrect"
+        android:singleLine="true" />
 
     <EditText
         android:id="@+id/text_text"
