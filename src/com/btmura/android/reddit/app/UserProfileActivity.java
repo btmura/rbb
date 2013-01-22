@@ -24,6 +24,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
@@ -146,6 +148,38 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
             setProfileThingListNavigation(requestedUser);
         }
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.profile_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        boolean showThingless = isSinglePane || !hasThing();
+        menu.setGroupVisible(R.id.thingless, showThingless);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_new_message:
+                handleNewMessage();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void handleNewMessage() {
+        MenuHelper.startComposeActivity(this, ComposeActivity.MESSAGE_TYPE_SET,
+                null, requestedUser, null, null, false);
     }
 
     @Override
