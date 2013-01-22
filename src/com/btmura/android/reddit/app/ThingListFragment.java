@@ -314,14 +314,19 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
         mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
         menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
-        menu.findItem(R.id.menu_author).setVisible(count == 1);
 
-        boolean hasSubreddit = count == 1
-                && Subreddits.hasSidebar(adapter.getSubreddit(position));
-        menu.findItem(R.id.menu_subreddit).setVisible(hasSubreddit);
-        menu.findItem(R.id.menu_about_subreddit).setVisible(hasSubreddit);
-        menu.findItem(R.id.menu_add_subreddit).setVisible(hasSubreddit);
-        menu.findItem(R.id.menu_view_subreddit).setVisible(hasSubreddit);
+        MenuItem authorItem = menu.findItem(R.id.menu_author);
+        authorItem.setVisible(count == 1);
+        if (authorItem.isVisible()) {
+            authorItem.setTitle(getString(R.string.menu_user, adapter.getAuthor(position)));
+        }
+
+        String subreddit = adapter.getSubreddit(position);
+        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
+        subredditItem.setVisible(count == 1 && Subreddits.hasSidebar(subreddit));
+        if (subredditItem.isVisible()) {
+            subredditItem.setTitle(getString(R.string.menu_subreddit, subreddit));
+        }
 
         boolean saveable = false;
         boolean saved = false;
@@ -362,18 +367,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
                 mode.finish();
                 return true;
 
-            case R.id.menu_about_subreddit:
-                handleAboutSubreddit();
-                mode.finish();
-                return true;
-
-            case R.id.menu_add_subreddit:
-                handleAddSubreddit();
-                mode.finish();
-                return true;
-
-            case R.id.menu_view_subreddit:
-                handleViewSubreddit();
+            case R.id.menu_subreddit:
+                handleSubreddit();
                 mode.finish();
                 return true;
 
@@ -402,19 +397,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
         MenuHelper.startProfileActivity(getActivity(), user, -1);
     }
 
-    private void handleAboutSubreddit() {
+    private void handleSubreddit() {
         String subreddit = adapter.getSubreddit(getFirstCheckedPosition());
         MenuHelper.startSidebarActivity(getActivity(), subreddit);
-    }
-
-    private void handleAddSubreddit() {
-        String subreddit = adapter.getSubreddit(getFirstCheckedPosition());
-        MenuHelper.showAddSubredditDialog(getFragmentManager(), subreddit);
-    }
-
-    private void handleViewSubreddit() {
-        String subreddit = adapter.getSubreddit(getFirstCheckedPosition());
-        MenuHelper.startSubredditActivity(getActivity(), subreddit);
     }
 
     public void onDestroyActionMode(ActionMode mode) {

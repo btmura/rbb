@@ -27,6 +27,10 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_save"/>
     <item
+        android:id="@+id/menu_copy_url"
+        android:showAsAction="never"
+        android:title="@string/menu_copy_url"/>
+    <item
         android:id="@+id/menu_author"
         android:icon="@drawable/ic_action_profile"
         android:showAsAction="ifRoom"
@@ -34,22 +38,6 @@
     <item
         android:id="@+id/menu_subreddit"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_subreddit">
-        <menu>
-            <item
-                android:id="@+id/menu_about_subreddit"
-                android:title="@string/menu_about"/>
-            <item
-                android:id="@+id/menu_add_subreddit"
-                android:title="@string/menu_add"/>
-            <item
-                android:id="@+id/menu_view_subreddit"
-                android:title="@string/menu_view"/>
-        </menu>
-    </item>
-    <item
-        android:id="@+id/menu_copy_url"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_copy_url"/>
+        android:title="@string/menu_subreddit"/>
 
 </menu>
