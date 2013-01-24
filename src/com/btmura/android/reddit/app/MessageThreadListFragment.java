@@ -220,6 +220,10 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         return adapter.getThingId();
     }
 
+    public String getAuthor() {
+        return adapter.getUser(0);
+    }
+
     public String getTitle() {
         return adapter.getSubject();
     }

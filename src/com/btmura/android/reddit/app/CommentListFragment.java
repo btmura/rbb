@@ -550,6 +550,10 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return adapter.getThingId();
     }
 
+    public String getAuthor() {
+        return adapter.getString(0, CommentAdapter.INDEX_AUTHOR);
+    }
+
     public String getTitle() {
         return adapter.getTitle();
     }

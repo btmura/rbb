@@ -131,7 +131,9 @@ public class ThingActivity extends GlobalMenuActivity implements
 
             ThingMenuFragment mf = getThingMenuFragment();
             mf.setNewCommentItemEnabled(thingHolder.isReplyable());
-            mf.setSaved(thingHolder.isSaved());
+            ThingBundle.putAuthor(thingBundle, thingHolder.getAuthor());
+            ThingBundle.putSaved(thingBundle, thingHolder.isSaved());
+            mf.setThingBundle(thingBundle);
         }
     }
 

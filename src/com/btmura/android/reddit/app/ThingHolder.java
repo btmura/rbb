@@ -20,6 +20,8 @@ interface ThingHolder {
 
     String getThingId();
 
+    String getAuthor();
+
     String getTitle();
 
     String getUrl();

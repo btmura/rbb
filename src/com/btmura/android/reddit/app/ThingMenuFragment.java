@@ -35,6 +35,8 @@ public class ThingMenuFragment extends Fragment {
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_BUNDLE = "thingBundle";
 
+    private static final String STATE_THING_BUNDLE = ARG_THING_BUNDLE;
+
     interface ThingMenuEventListenerHolder {
         void setOnThingMenuEventListener(OnThingMenuEventListener listener);
     }
@@ -57,10 +59,9 @@ public class ThingMenuFragment extends Fragment {
 
     private OnThingMenuEventListener listener;
 
+    private Bundle thingBundle;
     private boolean newCommentVisible;
     private boolean newCommentEnabled;
-    private boolean savable;
-    private boolean saved;
 
     private MenuItem savedItem;
     private MenuItem unsavedItem;
@@ -88,20 +89,23 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            thingBundle = getArguments().getBundle(ARG_THING_BUNDLE);
+        } else {
+            thingBundle = savedInstanceState.getBundle(STATE_THING_BUNDLE);
+        }
         newCommentVisible = isNewCommentVisible();
-        savable = isSavable();
-        saved = isInitiallySaved();
         setHasOptionsMenu(true);
+    }
+
+    public void setThingBundle(Bundle thingBundle) {
+        this.thingBundle = thingBundle;
+        refreshMenuItems();
     }
 
     public void setNewCommentItemEnabled(boolean enabled) {
         this.newCommentEnabled = enabled;
         refreshNewCommentItem();
-    }
-
-    public void setSaved(boolean saved) {
-        this.saved = saved;
-        refreshSaveItems();
     }
 
     @Override
@@ -137,6 +141,8 @@ public class ThingMenuFragment extends Fragment {
 
     private void refreshSaveItems() {
         if (savedItem != null && unsavedItem != null) {
+            boolean savable = hasAccountName() && ThingBundle.isSavable(thingBundle);
+            boolean saved = ThingBundle.isSaved(thingBundle);
             savedItem.setVisible(savable && saved);
             unsavedItem.setVisible(savable && !saved);
         }
@@ -225,26 +231,20 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private String getSubreddit() {
-        return ThingBundle.getSubreddit(getThingBundle());
+        return ThingBundle.getSubreddit(thingBundle);
     }
 
     private String getUser() {
-        return ThingBundle.getAuthor(getThingBundle());
-    }
-
-    private Bundle getThingBundle() {
-        return getArguments().getBundle(ARG_THING_BUNDLE);
+        return ThingBundle.getAuthor(thingBundle);
     }
 
     private boolean isNewCommentVisible() {
         return hasAccountName();
     }
 
-    private boolean isSavable() {
-        return hasAccountName() && ThingBundle.isSavable(getThingBundle());
-    }
-
-    private boolean isInitiallySaved() {
-        return ThingBundle.isSaved(getThingBundle());
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBundle(STATE_THING_BUNDLE, thingBundle);
     }
 }
