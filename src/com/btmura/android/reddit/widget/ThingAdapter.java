@@ -38,6 +38,7 @@ import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Objects;
+import com.btmura.android.reddit.util.StringUtils;
 
 // TODO: Split this into an interface and 2 adapters.
 public class ThingAdapter extends BaseLoaderAdapter {
@@ -356,7 +357,9 @@ public class ThingAdapter extends BaseLoaderAdapter {
 
         String title = c.getString(THING_TITLE);
         String body = c.getString(THING_BODY);
-        ThingBundle.putTitle(b, !TextUtils.isEmpty(title) ? title : body);
+        ThingBundle.putTitle(b, !TextUtils.isEmpty(title)
+                ? format(context, title)
+                : format(context, body));
 
         String thingId = c.getString(THING_THING_ID);
         ThingBundle.putThingId(b, thingId);
@@ -378,6 +381,10 @@ public class ThingAdapter extends BaseLoaderAdapter {
         ThingBundle.putSaved(b, isSaved(c.getPosition()));
 
         return b;
+    }
+
+    private String format(Context context, String text) {
+        return StringUtils.toString(formatter.formatAll(context, text));
     }
 
     public void save(Context context, int position) {

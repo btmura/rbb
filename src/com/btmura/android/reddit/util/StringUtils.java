@@ -25,4 +25,8 @@ public class StringUtils {
 
         return text.substring(0, maxLength) + "…";
     }
+
+    public static String toString(CharSequence cs) {
+        return cs != null ? cs.toString() : null;
+    }
 }

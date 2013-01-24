@@ -40,24 +40,33 @@ public class Formatter {
     private final StringBuilder builder = new StringBuilder();
 
     public CharSequence formatNoSpans(Context context, CharSequence c) {
-        c = Escaped.format(matcher, c);
-        return Disapproval.format(context, matcher, c);
+        if (c != null) {
+            c = Escaped.format(matcher, c);
+            return Disapproval.format(context, matcher, c);
+        }
+        return null;
     }
 
     public CharSequence formatSpans(Context context, CharSequence c) {
-        c = Styles.format(matcher, c, Styles.STYLE_BOLD);
-        c = Styles.format(matcher, c, Styles.STYLE_ITALIC);
-        c = Styles.format(matcher, c, Styles.STYLE_STRIKETHROUGH);
-        c = Heading.format(matcher, c);
-        c = Bullets.format(matcher, c);
-        c = NamedLinks.format(c, builder);
-        c = RawLinks.format(matcher, c);
-        return RelativeLinks.format(matcher, c);
+        if (c != null) {
+            c = Styles.format(matcher, c, Styles.STYLE_BOLD);
+            c = Styles.format(matcher, c, Styles.STYLE_ITALIC);
+            c = Styles.format(matcher, c, Styles.STYLE_STRIKETHROUGH);
+            c = Heading.format(matcher, c);
+            c = Bullets.format(matcher, c);
+            c = NamedLinks.format(c, builder);
+            c = RawLinks.format(matcher, c);
+            return RelativeLinks.format(matcher, c);
+        }
+        return null;
     }
 
     public CharSequence formatAll(Context context, CharSequence c) {
-        c = formatNoSpans(context, c);
-        return formatSpans(context, c);
+        if (c != null) {
+            c = formatNoSpans(context, c);
+            return formatSpans(context, c);
+        }
+        return null;
     }
 
     static class Escaped {
