@@ -63,6 +63,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textCapSentences|textAutoCorrect"
         android:singleLine="true" />
