@@ -356,10 +356,9 @@ public class ThingAdapter extends BaseLoaderAdapter {
         ThingBundle.putKind(b, c.getInt(THING_KIND));
 
         String title = c.getString(THING_TITLE);
-        String body = c.getString(THING_BODY);
         ThingBundle.putTitle(b, !TextUtils.isEmpty(title)
                 ? format(context, title)
-                : format(context, body));
+                : format(context, c.getString(THING_LINK_TITLE)));
 
         String thingId = c.getString(THING_THING_ID);
         ThingBundle.putThingId(b, thingId);
