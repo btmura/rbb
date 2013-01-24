@@ -84,7 +84,6 @@
     <string name="menu_copy_url">Copy URL</string>
     <string name="menu_debug">Debug</string>
     <string name="menu_delete">Delete</string>
-    <string name="menu_labels">Labels</string>
     <string name="menu_link">View link</string>    
     <string name="menu_messages">Messages</string>
     <string name="menu_new_comment">New comment</string>

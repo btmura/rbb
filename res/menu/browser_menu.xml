@@ -16,30 +16,9 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item
-        android:id="@+id/menu_labels"
-        android:icon="@drawable/ic_action_labels"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_labels">
-        <menu>
-            <item
-                android:id="@+id/menu_profile"
-                android:icon="@drawable/ic_action_profile"
-                android:title="@string/menu_profile"/>
-            <item
-                android:id="@+id/menu_profile_saved"
-                android:icon="@drawable/ic_action_saved"
-                android:title="@string/menu_saved"/>
-            <item
-                android:id="@+id/menu_messages"
-                android:icon="@drawable/ic_action_messages"
-                android:title="@string/menu_messages"/>
-        </menu>
-    </item>
-
     <group
         android:id="@+id/thingless"
-        android:orderInCategory="1336" >
+        android:orderInCategory="1000" >
         <item
             android:id="@+id/menu_new_post"
             android:showAsAction="never"
@@ -52,6 +31,24 @@
             android:id="@+id/menu_subreddit"
             android:showAsAction="never"
             android:title="@string/menu_subreddit"/>
+        <item
+            android:id="@+id/menu_profile"
+            android:icon="@drawable/ic_action_profile"
+            android:orderInCategory="1000"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_profile"/>
+        <item
+            android:id="@+id/menu_profile_saved"
+            android:icon="@drawable/ic_action_saved"
+            android:orderInCategory="1000"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_saved"/>
+        <item
+            android:id="@+id/menu_messages"
+            android:icon="@drawable/ic_action_messages"
+            android:orderInCategory="1000"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_messages"/>
         <item
             android:id="@+id/menu_accounts"
             android:showAsAction="never"

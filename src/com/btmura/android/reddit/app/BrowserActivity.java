@@ -58,11 +58,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private AccountAdapter mailAdapter;
     private SharedPreferences prefs;
 
-    private MenuItem labelsItem;
-    private MenuItem profileItem;
-    private MenuItem postItem;
-    private MenuItem subredditItem;
-
     private LoaderCallbacks<Cursor> mailLoaderCallbacks = new LoaderCallbacks<Cursor>() {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             return AccountAdapter.getLoader(BrowserActivity.this);
@@ -70,13 +65,15 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             mailAdapter.swapCursor(cursor);
-            refreshLabelsItem();
+            refreshMessagesIcon();
         }
 
         public void onLoaderReset(Loader<Cursor> loader) {
             mailAdapter.swapCursor(null);
         }
     };
+
+    private MenuItem messagesItem;
 
     @Override
     protected void setContentView() {
@@ -237,8 +234,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         checkMailIfHasAccount();
 
         // Invalidate action bar icons when switching accounts.
-        refreshLabelsItem();
-        refreshNewPostItem();
+        invalidateOptionsMenu();
 
         return true;
     }
@@ -271,10 +267,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
-        labelsItem = menu.findItem(R.id.menu_labels);
-        profileItem = menu.findItem(R.id.menu_profile);
-        postItem = menu.findItem(R.id.menu_new_post);
-        subredditItem = menu.findItem(R.id.menu_subreddit);
+        messagesItem = menu.findItem(R.id.menu_messages);
         return true;
     }
 
@@ -284,26 +277,42 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             Log.d(TAG, "onPrepareOptionsMenu");
         }
         super.onPrepareOptionsMenu(menu);
-        refreshLabelsItem();
-        refreshThinglessGroup(menu);
+
+        boolean groupVisible = !hasThing();
+        menu.setGroupVisible(R.id.thingless, groupVisible);
+
+        if (groupVisible) {
+            refreshAccountItems(menu);
+            refreshSubredditItem(menu);
+            refreshMessagesIcon();
+        }
+
         return true;
     }
 
-    void refreshLabelsItem() {
-        if (labelsItem != null) {
-            labelsItem.setVisible(hasAccount());
-            if (labelsItem.isVisible()) {
-                int icon = hasUnreadMessages()
-                        ? R.drawable.ic_action_messages
-                        : R.drawable.ic_action_labels;
-                labelsItem.setIcon(icon);
-                profileItem.setTitle(MenuHelper.getUserTitle(this, getAccountName()));
-            }
-        }
+    private void refreshAccountItems(Menu menu) {
+        boolean hasAccount = hasAccount();
+        menu.findItem(R.id.menu_new_post).setVisible(hasAccount);
+        menu.findItem(R.id.menu_profile).setVisible(hasAccount);
+        menu.findItem(R.id.menu_profile_saved).setVisible(hasAccount);
+        menu.findItem(R.id.menu_messages).setVisible(hasAccount);
     }
 
     private boolean hasAccount() {
         return adapter != null && AccountUtils.isAccount(adapter.getAccountName());
+    }
+
+    private void refreshMessagesIcon() {
+        if (messagesItem != null) {
+            int icon = hasUnreadMessages()
+                    ? R.drawable.ic_unread_messages
+                    : R.drawable.ic_action_messages;
+            messagesItem.setIcon(icon);
+        }
+    }
+
+    private int getMessagesFilter() {
+        return hasUnreadMessages() ? FilterAdapter.MESSAGE_UNREAD : FilterAdapter.MESSAGE_INBOX;
     }
 
     private boolean hasUnreadMessages() {
@@ -312,28 +321,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 && mailAdapter.hasMessages(adapter.getAccountName());
     }
 
-    void refreshThinglessGroup(Menu menu) {
-        boolean showThingless = !hasThing();
-        menu.setGroupVisible(R.id.thingless, showThingless);
-        if (showThingless) {
-            refreshNewPostItem();
-            refreshSubredditItem();
-        }
-    }
-
-    void refreshNewPostItem() {
-        if (postItem != null) {
-            postItem.setVisible(hasAccount());
-        }
-    }
-
-    void refreshSubredditItem() {
-        if (subredditItem != null) {
-            String subreddit = getSubredditName();
-            subredditItem.setVisible(Subreddits.hasSidebar(subreddit));
-            if (subredditItem.isVisible()) {
-                subredditItem.setTitle(MenuHelper.getSubredditTitle(this, subreddit));
-            }
+    private void refreshSubredditItem(Menu menu) {
+        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
+        String subreddit = getSubredditName();
+        subredditItem.setVisible(Subreddits.hasSidebar(subreddit));
+        if (subredditItem.isVisible()) {
+            subredditItem.setTitle(MenuHelper.getSubredditTitle(this, subreddit));
         }
     }
 
@@ -370,10 +363,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     private void handleMessages() {
-        int filter = hasUnreadMessages()
-                ? FilterAdapter.MESSAGE_UNREAD
-                : FilterAdapter.MESSAGE_INBOX;
-        MenuHelper.startMessageActivity(this, getAccountName(), filter);
+        MenuHelper.startMessageActivity(this, getAccountName(), getMessagesFilter());
     }
 
     private void handleAccounts() {
