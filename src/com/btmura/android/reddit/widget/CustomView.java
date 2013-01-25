@@ -39,6 +39,7 @@ abstract class CustomView extends View {
     static int ELEMENT_PADDING;
     static int MIN_DETAILS_WIDTH;
     static int MAX_DETAILS_WIDTH;
+    static int DETAILS_CELL_WIDTH;
 
     static final int NUM_TEXT_PAINTS = 10;
     static final int SUBREDDIT_TITLE = 0;
@@ -82,6 +83,7 @@ abstract class CustomView extends View {
             ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
             MIN_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.min_details_width);
             MAX_DETAILS_WIDTH = r.getDimensionPixelSize(R.dimen.max_details_width);
+            DETAILS_CELL_WIDTH = r.getDimensionPixelSize(R.dimen.details_cell_width);
 
             // We only need these when scale changes so don't make them static.
             int[] styles = new int[] {

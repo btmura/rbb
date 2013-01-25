@@ -190,6 +190,11 @@ class MessageListing extends JsonParser implements Listing {
     }
 
     @Override
+    public void onDestination(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Messages.COLUMN_DESTINATION, reader.nextString());
+    }
+
+    @Override
     public void onKind(JsonReader reader, int index) throws IOException {
         values.get(index).put(Messages.COLUMN_KIND, Kinds.parseKind(reader.nextString()));
     }

@@ -29,6 +29,7 @@ public class Messages implements BaseColumns {
     public static final String COLUMN_BODY = "body";
     public static final String COLUMN_CONTEXT = "context";
     public static final String COLUMN_CREATED_UTC = "createdUtc";
+    public static final String COLUMN_DESTINATION = "destination";
     public static final String COLUMN_KIND = "kind";
     public static final String COLUMN_MESSAGE_ACTION_ID = "messageActionId";
     public static final String COLUMN_NEW = "new";
@@ -52,6 +53,7 @@ public class Messages implements BaseColumns {
                 + COLUMN_BODY + " TEXT,"
                 + COLUMN_CONTEXT + " TEXT,"
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
+                + COLUMN_DESTINATION + " TEXT,"
                 + COLUMN_KIND + " INTEGER NOT NULL,"
                 + COLUMN_MESSAGE_ACTION_ID + " INTEGER,"
                 + COLUMN_NEW + " INTEGER DEFAULT 0,"

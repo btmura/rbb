@@ -89,7 +89,7 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_MESSAGE_THREAD_LIST);
         tv.setBody(body, false, formatter);
-        tv.setData(getAccountName(), author, createdUtc, null, 0, true, kind, 0,
+        tv.setData(getAccountName(), author, createdUtc, null, null, 0, true, kind, 0,
                 null, 0, System.currentTimeMillis(), 0, false, null, 0, null,
                 0, null, null, title, 0);
     }

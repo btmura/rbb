@@ -14,6 +14,7 @@ import android.text.Layout.Alignment;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.style.ClickableSpan;
@@ -45,17 +46,52 @@ public class ThingView extends CustomView implements OnGestureListener {
     /** Type of ThingView used when listing the messages in one thread. */
     public static final int TYPE_MESSAGE_THREAD_LIST = 2;
 
+    /** Detail for showing the number of up votes like "5 ups". */
+    public static final int DETAIL_UP_VOTES = 0;
+
+    /** Detail for showing the number of down votes like "5 downs". */
+    public static final int DETAIL_DOWN_VOTES = 1;
+
+    /** Detail for showing the domain like "i.imgur.com". */
+    public static final int DETAIL_DOMAIN = 2;
+
+    /** Detail for showing the subreddit like "AskReddit". */
+    public static final int DETAIL_SUBREDDIT = 3;
+
+    /** Detail for showing th. author like "btmura". */
+    public static final int DETAIL_AUTHOR = 4;
+
+    /** Detail for showing the timestamp like "4 days ago." */
+    public static final int DETAIL_TIMESTAMP = 5;
+
+    /** Detail for showing the destination like "rbbtest2". */
+    public static final int DETAIL_DESTINATION = 6;
+
+    /** Maximum number of details to allocate space for internally. */
+    private static final int MAX_INTERNAL_DETAILS = 3;
+
+    /** Maximum width of the content inside a details cell. */
+    private static int DETAILS_INNER_CELL_WIDTH;
+
     private final GestureDetector detector;
     private OnVoteListener listener;
 
+    private String author;
+    private long createdUtc;
+    private String destination;
+    private String domain;
+    private int downs;
     private boolean expanded;
     private int kind;
     private int likes;
     private int nesting;
+    private long nowTimeMs;
     private String linkTitle;
+    private String subreddit;
     private int thingBodyWidth;
     private String thumbnailUrl;
     private String title;
+    private int ups;
 
     private Bitmap bitmap;
     private boolean drawVotingArrows;
@@ -66,8 +102,6 @@ public class ThingView extends CustomView implements OnGestureListener {
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
     private StyleSpan italicSpan;
-    private final SpannableStringBuilder longDetailsText = new SpannableStringBuilder();
-    private String shortDetailsText;
 
     private int linkTitlePaint;
     private int titlePaint;
@@ -78,12 +112,23 @@ public class ThingView extends CustomView implements OnGestureListener {
     private Layout titleLayout;
     private Layout bodyLayout;
     private Layout statusLayout;
-    private Layout detailsLayout;
 
     private Rect scoreBounds;
     private RectF bodyBounds;
     private int rightHeight;
     private int minHeight;
+
+    /** Array of details types to be rendered in the extra space. */
+    private int[] details;
+
+    /** Number of details that we measured will fit in the extra space. */
+    private int numFittingDetails;
+
+    /** Array of reusable metrics corresponding to each cell. */
+    private BoringLayout.Metrics[] detailMetrics;
+
+    /** Array of reusable layouts corresponding to each cell. */
+    private BoringLayout[] detailLayouts;
 
     public ThingView(Context context) {
         this(context, null);
@@ -103,6 +148,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         VotingArrows.init(context);
         Thumbnail.init(context);
         setType(TYPE_THING_LIST);
+        DETAILS_INNER_CELL_WIDTH = DETAILS_CELL_WIDTH - ELEMENT_PADDING * 2;
     }
 
     public void setOnVoteListener(OnVoteListener listener) {
@@ -151,6 +197,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     public void setData(String accountName,
             String author,
             long createdUtc,
+            String destination,
             String domain,
             int downs,
             boolean expanded,
@@ -169,14 +216,25 @@ public class ThingView extends CustomView implements OnGestureListener {
             String thumbnailUrl,
             String title,
             int ups) {
+
+        // Save the attributes needed by onMeasure or may be used to construct
+        // details if we discover extra space while measuring.
+        this.author = author;
+        this.createdUtc = createdUtc;
+        this.destination = destination;
+        this.domain = domain;
+        this.downs = downs;
         this.expanded = expanded;
         this.kind = kind;
         this.nesting = nesting;
+        this.nowTimeMs = nowTimeMs;
         this.likes = likes;
         this.linkTitle = linkTitle;
+        this.subreddit = subreddit;
         this.thingBodyWidth = thingBodyWidth;
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
+        this.ups = ups;
 
         drawVotingArrows = AccountUtils.isAccount(accountName) && kind != Kinds.KIND_MESSAGE;
         isVotable = drawVotingArrows && !TextUtils.isEmpty(thingId) && expanded;
@@ -195,9 +253,6 @@ public class ThingView extends CustomView implements OnGestureListener {
         boolean showNumComments = kind == Kinds.KIND_LINK;
         setStatusText(over18, showSubreddit, showPoints, showNumComments,
                 author, createdUtc, nowTimeMs, numComments, score, subreddit);
-
-        boolean showUpsDowns = kind == Kinds.KIND_LINK || kind == Kinds.KIND_COMMENT;
-        setDetailsText(showUpsDowns, domain, downs, ups);
 
         requestLayout();
     }
@@ -243,23 +298,14 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
     }
 
-    private void setDetailsText(boolean showUpsDowns, String domain, int downs, int ups) {
-        Resources r = getResources();
-
-        longDetailsText.clear();
-        if (showUpsDowns) {
-            longDetailsText.append(r.getQuantityString(R.plurals.votes_up, ups, ups))
-                    .append("  ");
-            longDetailsText.append(r.getQuantityString(R.plurals.votes_down, downs, downs))
-                    .append("  ");
-        }
-
-        if (!TextUtils.isEmpty(domain)) {
-            longDetailsText.append(domain);
-            shortDetailsText = domain;
-        } else {
-            shortDetailsText = "";
-        }
+    /**
+     * Sets the type of details to be rendered in the extra space from left to
+     * right. Callers should use other setters to set the fields necessary for
+     * the details to render.
+     */
+    public void setDetails(int[] details) {
+        this.details = details;
+        requestLayout();
     }
 
     @Override
@@ -280,31 +326,40 @@ public class ThingView extends CustomView implements OnGestureListener {
                 break;
         }
 
+        // Total outer padding of left and right sides.
+        // Also includes additional padding for nested comments.
+        int outerPadding = PADDING * (2 + nesting);
+
+        // Width to fit our content inside of without padding.
+        int contentWidth = measuredWidth - outerPadding;
+
+        // Total width of all the extra details put together.
+        int totalDetailsWidth = 0;
+
         int linkTitleWidth;
         int titleWidth;
-        int detailsWidth;
-        CharSequence detailsText;
-
-        int totalPadding = PADDING * (2 + nesting);
-        int contentWidth = measuredWidth - totalPadding;
 
         if (thingBodyWidth > 0) {
-            linkTitleWidth = titleWidth = Math.min(measuredWidth, thingBodyWidth) - totalPadding;
-            int remainingWidth = measuredWidth - thingBodyWidth - totalPadding;
-            if (remainingWidth > MAX_DETAILS_WIDTH) {
-                detailsWidth = MAX_DETAILS_WIDTH;
-                detailsText = longDetailsText;
-            } else if (remainingWidth > MIN_DETAILS_WIDTH) {
-                detailsWidth = MIN_DETAILS_WIDTH;
-                detailsText = shortDetailsText;
-            } else {
-                detailsWidth = 0;
-                detailsText = "";
+            linkTitleWidth = titleWidth = Math.min(measuredWidth, thingBodyWidth) - outerPadding;
+
+            // Calculate and setup the details we can fit in the extra space.
+            numFittingDetails = 0;
+            int remainingWidth = measuredWidth - thingBodyWidth - outerPadding;
+            int maxDetails = details.length;
+            for (int i = 0; i < maxDetails; i++) {
+                if (remainingWidth < DETAILS_CELL_WIDTH) {
+                    break;
+                }
+                remainingWidth -= DETAILS_CELL_WIDTH;
+                totalDetailsWidth += DETAILS_CELL_WIDTH;
+                numFittingDetails++;
+                makeDetails(i);
             }
         } else {
             linkTitleWidth = titleWidth = contentWidth;
-            detailsWidth = 0;
-            detailsText = "";
+
+            // No thing body width means no details will be shown.
+            numFittingDetails = 0;
         }
 
         int leftGadgetWidth = 0;
@@ -320,14 +375,14 @@ public class ThingView extends CustomView implements OnGestureListener {
         titleWidth -= leftGadgetWidth;
 
         int statusWidth = contentWidth - leftGadgetWidth;
-        if (detailsWidth > 0) {
-            statusWidth -= detailsWidth + PADDING;
+        if (totalDetailsWidth > 0) {
+            statusWidth -= totalDetailsWidth + PADDING;
         }
 
         linkTitleWidth = Math.max(0, linkTitleWidth);
         titleWidth = Math.max(0, titleWidth);
         statusWidth = Math.max(0, statusWidth);
-        detailsWidth = Math.max(0, detailsWidth);
+        totalDetailsWidth = Math.max(0, totalDetailsWidth);
 
         int leftHeight = 0;
         if (drawVotingArrows && expanded) {
@@ -360,12 +415,6 @@ public class ThingView extends CustomView implements OnGestureListener {
         if (!TextUtils.isEmpty(statusText)) {
             statusLayout = createStatusLayout(statusWidth);
             rightHeight += statusLayout.getHeight();
-        }
-
-        detailsLayout = null;
-        if (detailsWidth > 0) {
-            detailsLayout = makeBoringLayout(THING_STATUS, detailsText, detailsWidth,
-                    Alignment.ALIGN_OPPOSITE);
         }
 
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
@@ -453,14 +502,82 @@ public class ThingView extends CustomView implements OnGestureListener {
                 TruncateAt.END, width);
     }
 
+    private void makeDetails(int index) {
+        Resources r = getResources();
+        switch (details[index]) {
+            case DETAIL_UP_VOTES:
+                makeDetailsLayout(index, r.getQuantityString(R.plurals.votes_up, ups, ups));
+                break;
+
+            case DETAIL_DOWN_VOTES:
+                makeDetailsLayout(index, r.getQuantityString(R.plurals.votes_down, downs, downs));
+                break;
+
+            case DETAIL_DOMAIN:
+                makeDetailsLayout(index, domain);
+                break;
+
+            case DETAIL_SUBREDDIT:
+                makeDetailsLayout(index, subreddit);
+                break;
+
+            case DETAIL_AUTHOR:
+                makeDetailsLayout(index, author);
+                break;
+
+            case DETAIL_TIMESTAMP:
+                makeDetailsLayout(index, RelativeTime.format(getContext(), nowTimeMs, createdUtc));
+                break;
+
+            case DETAIL_DESTINATION:
+                makeDetailsLayout(index, destination);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private void makeDetailsLayout(int i, CharSequence text) {
+        // Allocate internal storage for the metrics and layouts, since we now
+        // know we will need them.
+        if (detailMetrics == null) {
+            detailMetrics = new BoringLayout.Metrics[MAX_INTERNAL_DETAILS];
+        }
+        if (detailLayouts == null) {
+            detailLayouts = new BoringLayout[MAX_INTERNAL_DETAILS];
+        }
+
+        // Calculate the metrics and try to reuse the existing instance.
+        TextPaint paint = TEXT_PAINTS[statusPaint];
+        detailMetrics[i] = BoringLayout.isBoring(text, paint, detailMetrics[i]);
+
+        // Create the layout and try to reuse the existing layout.
+        if (detailLayouts[i] != null) {
+            detailLayouts[i].replaceOrMake(text, paint, DETAILS_INNER_CELL_WIDTH,
+                    Alignment.ALIGN_CENTER, 1, 0, detailMetrics[i], true, TruncateAt.END,
+                    DETAILS_INNER_CELL_WIDTH);
+        } else {
+            detailLayouts[i] = BoringLayout.make(text, paint, DETAILS_INNER_CELL_WIDTH,
+                    Alignment.ALIGN_CENTER, 1, 0, detailMetrics[i], true, TruncateAt.END,
+                    DETAILS_INNER_CELL_WIDTH);
+        }
+    }
+
     @Override
     protected void onDraw(Canvas c) {
-        if (detailsLayout != null) {
-            int dx = c.getWidth() - PADDING - detailsLayout.getWidth();
-            int dy = (c.getHeight() - detailsLayout.getHeight()) / 2;
-            c.translate(dx, dy);
-            detailsLayout.draw(c);
-            c.translate(-dx, -dy);
+        // Draw details on the right if we can fit some.
+        if (numFittingDetails > 0) {
+            // Translate to the first details cell from the right edge.
+            int dx = c.getWidth() - PADDING - numFittingDetails * DETAILS_CELL_WIDTH;
+            c.translate(dx, 0);
+
+            // Draw a detail, move right, and repeat...
+            for (int i = 0; i < numFittingDetails; i++) {
+                drawDetails(c, i);
+                c.translate(DETAILS_CELL_WIDTH, 0);
+            }
+            c.translate(-dx - DETAILS_CELL_WIDTH * numFittingDetails, 0);
         }
 
         c.translate(PADDING * (1 + nesting), PADDING);
@@ -547,6 +664,15 @@ public class ThingView extends CustomView implements OnGestureListener {
             }
         }
         return false;
+    }
+
+    private void drawDetails(Canvas c, int index) {
+        BoringLayout layout = detailLayouts[index];
+        int dx = ELEMENT_PADDING;
+        int dy = (c.getHeight() - layout.getHeight()) / 2;
+        c.translate(dx, dy);
+        layout.draw(c);
+        c.translate(-dx, -dy);
     }
 
     public boolean onDown(MotionEvent e) {

@@ -106,6 +106,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
             Messages.COLUMN_BODY,
             Messages.COLUMN_CONTEXT,
             Messages.COLUMN_CREATED_UTC,
+            Messages.COLUMN_DESTINATION,
             Messages.COLUMN_KIND,
             Messages.COLUMN_NEW,
             Messages.COLUMN_SUBJECT,
@@ -121,13 +122,32 @@ public class ThingAdapter extends BaseLoaderAdapter {
     private static final int MESSAGE_BODY = 2;
     private static final int MESSAGE_CONTEXT = 3;
     private static final int MESSAGE_CREATED_UTC = 4;
-    private static final int MESSAGE_KIND = 5;
-    private static final int MESSAGE_NEW = 6;
-    private static final int MESSAGE_SUBJECT = 7;
-    private static final int MESSAGE_SUBREDDIT = 8;
-    private static final int MESSAGE_THING_ID = 9;
-    private static final int MESSAGE_WAS_COMMENT = 10;
-    private static final int MESSAGE_ACTION = 11;
+    private static final int MESSAGE_DESTINATION = 5;
+    private static final int MESSAGE_KIND = 6;
+    private static final int MESSAGE_NEW = 7;
+    private static final int MESSAGE_SUBJECT = 8;
+    private static final int MESSAGE_SUBREDDIT = 9;
+    private static final int MESSAGE_THING_ID = 10;
+    private static final int MESSAGE_WAS_COMMENT = 11;
+    private static final int MESSAGE_ACTION = 12;
+
+    private static final int[] LINK_DETAILS = {
+            ThingView.DETAIL_UP_VOTES,
+            ThingView.DETAIL_DOWN_VOTES,
+            ThingView.DETAIL_DOMAIN,
+    };
+
+    private static final int[] COMMENT_DETAILS = {
+            ThingView.DETAIL_UP_VOTES,
+            ThingView.DETAIL_DOWN_VOTES,
+            ThingView.DETAIL_SUBREDDIT,
+    };
+
+    private static final int[] MESSAGE_DETAILS = {
+            ThingView.DETAIL_TIMESTAMP,
+            ThingView.DETAIL_AUTHOR,
+            ThingView.DETAIL_DESTINATION,
+    };
 
     private long sessionId = -1;
     private String accountName;
@@ -245,6 +265,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
         String author = cursor.getString(MESSAGE_AUTHOR);
         String body = cursor.getString(MESSAGE_BODY);
         long createdUtc = cursor.getLong(MESSAGE_CREATED_UTC);
+        String destination = cursor.getString(MESSAGE_DESTINATION);
         int kind = cursor.getInt(MESSAGE_KIND);
         boolean isNew = isNew(cursor.getPosition());
         String subject = cursor.getString(MESSAGE_SUBJECT);
@@ -253,10 +274,31 @@ public class ThingAdapter extends BaseLoaderAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setBody(body, isNew, formatter);
-        tv.setData(accountName, author, createdUtc, null, 0, true, kind, 0, subject, 0, nowTimeMs,
-                0, false, parentSubreddit, 0, subreddit, thingBodyWidth, thingId, null, null, 0);
+        tv.setData(accountName,
+                author,
+                createdUtc,
+                destination,
+                null, // domain
+                0, // downs
+                true, // expanded
+                kind,
+                0, // likes
+                subject, // actually linkTitle
+                0, // nesting
+                nowTimeMs,
+                0, // numComments
+                false, // over18
+                parentSubreddit,
+                0, // score
+                subreddit,
+                thingBodyWidth,
+                thingId,
+                null, // thumbnailUrl
+                null, // title
+                0); // ups
         tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
         tv.setOnVoteListener(listener);
+        setDetails(tv, kind);
     }
 
     private void bindThingView(View view, Context context, Cursor cursor) {
@@ -295,15 +337,53 @@ public class ThingAdapter extends BaseLoaderAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setBody(body, false, formatter);
-        tv.setData(accountName, author, createdUtc, domain, downs, true, kind, likes, linkTitle, 0,
-                nowTimeMs, numComments, over18, parentSubreddit, score, subreddit, thingBodyWidth,
-                thingId, thumbnailUrl, title, ups);
+        tv.setData(accountName,
+                author,
+                createdUtc,
+                null, // destination - used for messages
+                domain,
+                downs,
+                true, // expanded - used for comment listings by another adapter
+                kind,
+                likes,
+                linkTitle,
+                0, // nesting - used for comment listings by another adapter
+                nowTimeMs,
+                numComments,
+                over18,
+                parentSubreddit,
+                score,
+                subreddit,
+                thingBodyWidth,
+                thingId,
+                thumbnailUrl,
+                title,
+                ups);
         tv.setChosen(singleChoice
                 && Objects.equals(selectedThingId, thingId)
                 && Objects.equals(selectedLinkId, linkId));
         tv.setOnVoteListener(listener);
+        setDetails(tv, kind);
         thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
+    }
 
+    private void setDetails(ThingView tv, int kind) {
+        switch (kind) {
+            case Kinds.KIND_LINK:
+                tv.setDetails(LINK_DETAILS);
+                break;
+
+            case Kinds.KIND_COMMENT:
+                tv.setDetails(COMMENT_DETAILS);
+                break;
+
+            case Kinds.KIND_MESSAGE:
+                tv.setDetails(MESSAGE_DETAILS);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public Bundle getThingBundle(Context context, int position) {
