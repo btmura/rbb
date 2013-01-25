@@ -33,7 +33,7 @@
     <item
         android:id="@+id/menu_author"
         android:icon="@drawable/ic_action_profile"
-        android:showAsAction="ifRoom"
+        android:showAsAction="ifRoom|withText"
         android:title="@string/menu_author"/>
     <item
         android:id="@+id/menu_subreddit"
