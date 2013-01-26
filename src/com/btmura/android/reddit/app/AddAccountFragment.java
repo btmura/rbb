@@ -29,6 +29,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TransformationMethod;
 import android.util.Log;
@@ -59,6 +60,8 @@ public class AddAccountFragment extends Fragment implements
 
     public static final String TAG = "AddAccountFragment";
 
+    private static final String ARG_LOGIN = "login";
+
     public interface OnAccountAddedListener {
         void onAccountAdded(Bundle result);
 
@@ -72,8 +75,13 @@ public class AddAccountFragment extends Fragment implements
     private Button ok;
     private Button cancel;
 
-    public static AddAccountFragment newInstance() {
-        return new AddAccountFragment();
+    public static AddAccountFragment newInstance(String login) {
+        Bundle args = new Bundle(1);
+        args.putString(ARG_LOGIN, login);
+
+        AddAccountFragment frag = new AddAccountFragment();
+        frag.setArguments(args);
+        return frag;
     }
 
     @Override
@@ -103,8 +111,12 @@ public class AddAccountFragment extends Fragment implements
 
         login = (EditText) v.findViewById(R.id.login);
         login.setFilters(InputFilters.NO_SPACE_FILTERS);
+        login.setText(getArguments().getString(ARG_LOGIN));
 
         password = (EditText) v.findViewById(R.id.password);
+        if (!TextUtils.isEmpty(login.getText())) {
+            password.requestFocus();
+        }
 
         CheckBox showPassword = (CheckBox) v.findViewById(R.id.show_password);
         showPassword.setOnCheckedChangeListener(this);

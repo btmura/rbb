@@ -86,7 +86,15 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "getAuthToken");
         }
-        return null;
+
+        Intent intent = new Intent(context, AccountAuthenticatorActivity.class);
+        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+        intent.putExtra(com.btmura.android.reddit.accounts.AccountAuthenticatorActivity.EXTRA_LOGIN,
+                account.name);
+
+        Bundle result = new Bundle(1);
+        result.putParcelable(AccountManager.KEY_INTENT, intent);
+        return result;
     }
 
     @Override

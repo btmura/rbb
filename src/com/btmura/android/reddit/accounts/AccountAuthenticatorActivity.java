@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.accounts;
 
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 
@@ -28,14 +29,17 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
 
     public static final String TAG = "AccountAuthenticatorActivity";
 
+    public static final String EXTRA_LOGIN = "login";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account_authenticator);
 
         if (savedInstanceState == null) {
+            Fragment frag = AddAccountFragment.newInstance(getIntent().getStringExtra(EXTRA_LOGIN));
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.account_authenticator_container, AddAccountFragment.newInstance());
+            ft.replace(R.id.account_authenticator_container, frag);
             ft.commit();
         }
     }
