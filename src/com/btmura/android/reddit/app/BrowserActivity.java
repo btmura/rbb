@@ -312,7 +312,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     private int getMessagesFilter() {
-        return hasUnreadMessages() ? FilterAdapter.MESSAGE_UNREAD : FilterAdapter.MESSAGE_INBOX;
+        return hasUnreadMessages() ? FilterAdapter.MESSAGE_UNREAD : -1;
     }
 
     private boolean hasUnreadMessages() {

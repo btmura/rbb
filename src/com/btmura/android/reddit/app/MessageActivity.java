@@ -21,6 +21,7 @@ import android.app.ActionBar.OnNavigationListener;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -40,7 +41,14 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     /** Optional int specifying the filter to start using. */
     public static final String EXTRA_FILTER = "filter";
 
-    private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
+    private static final String STATE_USER = EXTRA_USER;
+    private static final String STATE_FILTER = EXTRA_FILTER;
+
+    /** Requested user we should initially view from the intent. */
+    private String requestedUser;
+
+    /** Requested filter we should initially use from the intent. */
+    private int requestedFilter;
 
     private AccountFilterAdapter adapter;
     private SharedPreferences prefs;
@@ -61,6 +69,14 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            requestedUser = getIntent().getStringExtra(EXTRA_USER);
+            requestedFilter = getIntent().getIntExtra(EXTRA_FILTER, -1);
+        } else {
+            requestedUser = savedInstanceState.getString(STATE_USER);
+            requestedFilter = savedInstanceState.getInt(EXTRA_FILTER);
+        }
+
         adapter = new AccountFilterAdapter(this);
         adapter.addMessageFilters(this);
 
@@ -68,9 +84,6 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         bar.setListNavigationCallbacks(adapter, this);
-        if (savedInstanceState != null) {
-            bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_NAVIGATION_INDEX));
-        }
     }
 
     @Override
@@ -83,15 +96,20 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
         prefs = result.prefs;
         adapter.setAccountNames(result.accountNames);
 
-        String accountName = result.getLastAccount();
-        if (getIntent().hasExtra(EXTRA_USER)) {
-            accountName = getIntent().getStringExtra(EXTRA_USER);
+        String accountName;
+        if (!TextUtils.isEmpty(requestedUser)) {
+            accountName = requestedUser;
+        } else {
+            accountName = result.getLastAccount();
         }
         adapter.setAccountName(accountName);
 
-        int filter = result.getLastMessageFilter();
-        if (getIntent().hasExtra(EXTRA_FILTER)) {
-            filter = getIntent().getIntExtra(EXTRA_FILTER, FilterAdapter.MESSAGE_INBOX);
+        int filter;
+        if (requestedFilter != -1) {
+            filter = requestedFilter;
+        } else {
+            filter = AccountPreferences.getLastSelfProfileFilter(prefs,
+                    FilterAdapter.PROFILE_OVERVIEW);
         }
         adapter.setFilter(filter);
 
@@ -111,13 +129,13 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
         adapter.updateState(itemPosition);
 
         String accountName = adapter.getAccountName();
-        if (getIntent().hasExtra(EXTRA_USER)) {
-            getIntent().removeExtra(EXTRA_USER);
+        if (!TextUtils.isEmpty(requestedUser)) {
+            requestedUser = null;
         }
 
         int filter = adapter.getFilter();
-        if (getIntent().hasExtra(EXTRA_FILTER)) {
-            getIntent().removeExtra(EXTRA_FILTER);
+        if (requestedFilter != -1) {
+            requestedFilter = -1;
         } else {
             AccountPreferences.setLastMessageFilter(prefs, filter);
         }
@@ -188,6 +206,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_NAVIGATION_INDEX, bar.getSelectedNavigationIndex());
+        outState.putString(STATE_USER, adapter.getAccountName());
+        outState.putInt(STATE_FILTER, adapter.getFilter());
     }
 }
