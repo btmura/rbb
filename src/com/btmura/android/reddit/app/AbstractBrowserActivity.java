@@ -226,8 +226,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         // account causing new fragment transactions to occur.
         ft.commitAllowingStateLoss();
 
-        refreshSubredditListVisibility();
         refreshActionBar(subreddit, thingBundle);
+        refreshThingBodyWidthMeasurement();
         refreshViews(thingBundle);
         refreshThingPager(thingBundle);
     }
@@ -309,8 +309,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
 
-        refreshSubredditListVisibility();
         refreshActionBar(subreddit, null);
+        refreshThingBodyWidthMeasurement();
         refreshViews(null);
     }
 
@@ -537,6 +537,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void refreshViews(Bundle thingBundle) {
         boolean hasThing = thingBundle != null;
+        int nextThingPagerVisibility = hasThing ?
+                View.VISIBLE : View.GONE;
+        int nextSubredditListVisiblility = hasSubredditList() && !hasThing ?
+                View.VISIBLE : View.GONE;
+
         if (navContainer != null) {
             int currVisibility = navContainer.getVisibility();
             int nextVisibility = !hasThing ? View.VISIBLE : View.GONE;
@@ -547,12 +552,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                     startAnimation(ANIMATION_CLOSE_NAV);
                 }
             }
+
+            if (subredditListContainer != null) {
+                subredditListContainer.setVisibility(nextSubredditListVisiblility);
+            }
         } else {
             if (hasSubredditList() && subredditListContainer != null) {
                 int currVisibility = subredditListContainer.getVisibility();
-                int nextVisibility = hasThing ? View.GONE : View.VISIBLE;
-                if (currVisibility != nextVisibility) {
-                    if (nextVisibility == View.VISIBLE) {
+                if (currVisibility != nextSubredditListVisiblility) {
+                    if (nextSubredditListVisiblility == View.VISIBLE) {
                         startAnimation(ANIMATION_OPEN_SUBREDDIT_LIST);
                     } else {
                         startAnimation(ANIMATION_CLOSE_SUBREDDIT_LIST);
@@ -561,10 +569,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                     // There may be no change in visibility if we are just
                     // starting, but we should set the correct visibility, since
                     // some activities change modes.
-                    thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
+                    thingPager.setVisibility(nextThingPagerVisibility);
                 }
             } else {
-                thingPager.setVisibility(hasThing ? View.VISIBLE : View.GONE);
+                if (subredditListContainer != null) {
+                    subredditListContainer.setVisibility(nextSubredditListVisiblility);
+                }
+                thingPager.setVisibility(nextThingPagerVisibility);
             }
             if (!hasThing) {
                 // Avoid nested executePendingTransactions that would occur by
