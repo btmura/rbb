@@ -24,6 +24,7 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -69,7 +70,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "confirmCredentials");
         }
-        return null;
+        return createIntentResult(response, account.name);
     }
 
     @Override
@@ -77,7 +78,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "editProperties");
         }
-        return null;
+        return createIntentResult(response, null);
     }
 
     @Override
@@ -86,15 +87,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "getAuthToken");
         }
-
-        Intent intent = new Intent(context, AccountAuthenticatorActivity.class);
-        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-        intent.putExtra(com.btmura.android.reddit.accounts.AccountAuthenticatorActivity.EXTRA_LOGIN,
-                account.name);
-
-        Bundle result = new Bundle(1);
-        result.putParcelable(AccountManager.KEY_INTENT, intent);
-        return result;
+        return createIntentResult(response, account.name);
     }
 
     @Override
@@ -102,7 +95,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "getAuthTokenLabel");
         }
-        return null;
+        return null; // OK to return null according to docs.
     }
 
     @Override
@@ -111,7 +104,10 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "hasFeatures");
         }
-        return null;
+
+        Bundle result = new Bundle(1);
+        result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, true);
+        return result;
     }
 
     @Override
@@ -120,6 +116,19 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "updateCredentials");
         }
-        return null;
+        return createIntentResult(response, account.name);
+    }
+
+    private Bundle createIntentResult(AccountAuthenticatorResponse response, String login) {
+        Intent intent = new Intent(context, AccountAuthenticatorActivity.class);
+        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+        if (!TextUtils.isEmpty(login)) {
+            intent.putExtra(com.btmura.android.reddit.accounts.AccountAuthenticatorActivity.
+                    EXTRA_LOGIN, login);
+        }
+
+        Bundle result = new Bundle(1);
+        result.putParcelable(AccountManager.KEY_INTENT, intent);
+        return result;
     }
 }
