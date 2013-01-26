@@ -19,9 +19,12 @@ package com.btmura.android.reddit.widget;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Shader.TileMode;
 import android.graphics.RectF;
 
 import com.btmura.android.reddit.R;
@@ -49,10 +52,27 @@ class Thumbnail {
         }
     }
 
-    static void draw(Canvas c, Bitmap thumb) {
-        if (thumb != null) {
-            int tdy = (THUMB_HEIGHT - thumb.getHeight()) / 2;
-            c.drawBitmap(thumb, 0, tdy, THUMB_PAINT);
+    static BitmapShader newBitmapShader(Bitmap thumb, RectF destRect, Matrix destMatrix) {
+        float newWidth = THUMB_WIDTH;
+        float newHeight = newWidth * thumb.getHeight() / thumb.getWidth();
+        destRect.set(0, 0, newWidth, newHeight);
+
+        float scaleX = newWidth / thumb.getHeight();
+        float scaleY = newHeight / thumb.getHeight();
+        destMatrix.setScale(scaleX, scaleY);
+
+        BitmapShader shader = new BitmapShader(thumb, TileMode.CLAMP, TileMode.CLAMP);
+        shader.setLocalMatrix(destMatrix);
+        return shader;
+    }
+
+    static void draw(Canvas c, BitmapShader thumbShader, RectF thumbRect) {
+        if (thumbShader != null) {
+            THUMB_PAINT.setShader(thumbShader);
+            float dy = (float) (THUMB_HEIGHT - thumbRect.height()) / 2;
+            c.translate(0, dy);
+            c.drawRoundRect(thumbRect, RADIUS, RADIUS, THUMB_PAINT);
+            c.translate(0, -dy);
         } else {
             c.drawRoundRect(THUMB_OUTLINE_RECT, RADIUS, RADIUS, THUMB_OUTLINE_PAINT);
         }

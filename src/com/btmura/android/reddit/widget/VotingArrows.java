@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -141,7 +140,7 @@ class VotingArrows {
         }
     }
 
-    static void draw(Canvas c, Bitmap thumb, String scoreText, Rect scoreBounds, int likes,
+    static void draw(Canvas c, String scoreText, Rect scoreBounds, int likes,
             boolean drawScore, boolean isVotable) {
         int upPaintIndex = NEUTRAL;
         int scorePaintIndex = NEUTRAL;

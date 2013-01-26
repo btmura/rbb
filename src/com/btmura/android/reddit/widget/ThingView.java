@@ -3,8 +3,10 @@ package com.btmura.android.reddit.widget;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -93,7 +95,10 @@ public class ThingView extends CustomView implements OnGestureListener {
     private String title;
     private int ups;
 
-    private Bitmap bitmap;
+    private BitmapShader thumbShader;
+    private Matrix thumbMatrix;
+    private RectF thumbRect;
+
     private boolean drawVotingArrows;
     private boolean drawScore;
     private boolean isVotable;
@@ -156,7 +161,17 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public void setThumbnailBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
+        if (bitmap != null) {
+            if (thumbRect == null) {
+                thumbRect = new RectF();
+            }
+            if (thumbMatrix == null) {
+                thumbMatrix = new Matrix();
+            }
+            thumbShader = Thumbnail.newBitmapShader(bitmap, thumbRect, thumbMatrix);
+        } else {
+            thumbShader = null;
+        }
         invalidate();
     }
 
@@ -589,13 +604,13 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         if (drawVotingArrows) {
             if (expanded) {
-                VotingArrows.draw(c, bitmap, scoreText, scoreBounds, likes, drawScore, isVotable);
+                VotingArrows.draw(c, scoreText, scoreBounds, likes, drawScore, isVotable);
             }
             c.translate(VotingArrows.getWidth(drawVotingArrows) + PADDING, 0);
         }
 
         if (!TextUtils.isEmpty(thumbnailUrl)) {
-            Thumbnail.draw(c, bitmap);
+            Thumbnail.draw(c, thumbShader, thumbRect);
             c.translate(Thumbnail.getWidth() + PADDING, 0);
         }
 
