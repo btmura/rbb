@@ -29,6 +29,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
@@ -78,12 +79,10 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
         }
 
         adapter = new AccountFilterAdapter(this);
-        adapter.addMessageFilters(this);
-
+        bar.setListNavigationCallbacks(adapter, this);
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        bar.setListNavigationCallbacks(adapter, this);
     }
 
     @Override
@@ -93,7 +92,13 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        if (Array.isEmpty(result.accountNames)) {
+            finish();
+            return;
+        }
+
         prefs = result.prefs;
+        adapter.addMessageFilters(this);
         adapter.setAccountNames(result.accountNames);
 
         String accountName;

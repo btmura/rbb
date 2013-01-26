@@ -43,6 +43,7 @@ abstract class BaseFilterAdapter extends BaseAdapter {
     public static final int SUBREDDIT_NEW = 3;
 
     public void addMessageFilters(Context context) {
+        clear();
         add(context, R.string.filter_message_inbox, MESSAGE_INBOX);
         add(context, R.string.filter_message_unread, MESSAGE_UNREAD);
         add(context, R.string.filter_message_sent, MESSAGE_SENT);
@@ -50,6 +51,7 @@ abstract class BaseFilterAdapter extends BaseAdapter {
     }
 
     public void addProfileFilters(Context context, boolean hasAccount) {
+        clear();
         add(context, R.string.filter_profile_overview, PROFILE_OVERVIEW);
         add(context, R.string.filter_profile_comments, PROFILE_COMMENTS);
         add(context, R.string.filter_profile_submitted, PROFILE_SUBMITTED);
@@ -62,12 +64,15 @@ abstract class BaseFilterAdapter extends BaseAdapter {
     }
 
     public void addSubredditFilters(Context context) {
+        clear();
         add(context, R.string.filter_subreddit_hot, SUBREDDIT_HOT);
         add(context, R.string.filter_subreddit_top, SUBREDDIT_TOP);
         add(context, R.string.filter_subreddit_controversial, SUBREDDIT_CONTROVERSIAL);
         add(context, R.string.filter_subreddit_new, SUBREDDIT_NEW);
         notifyDataSetChanged();
     }
+
+    protected abstract void clear();
 
     protected abstract void add(Context context, int resId, int value);
 }

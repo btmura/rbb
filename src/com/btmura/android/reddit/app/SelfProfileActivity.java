@@ -16,8 +16,8 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.ActionBar.OnNavigationListener;
 import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -28,6 +28,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
@@ -78,14 +79,11 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
             requestedUser = savedInstanceState.getString(STATE_USER);
             requestedFilter = savedInstanceState.getInt(EXTRA_FILTER);
         }
-
         adapter = new AccountFilterAdapter(this);
-        adapter.addProfileFilters(this, true);
-
+        bar.setListNavigationCallbacks(adapter, this);
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        bar.setListNavigationCallbacks(adapter, this);
     }
 
     @Override
@@ -95,7 +93,13 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        if (Array.isEmpty(result.accountNames)) {
+            finish();
+            return;
+        }
+
         prefs = result.prefs;
+        adapter.addProfileFilters(this, true);
         adapter.setAccountNames(result.accountNames);
 
         String accountName;

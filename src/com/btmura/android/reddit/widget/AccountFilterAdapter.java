@@ -61,6 +61,13 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
     }
 
     @Override
+    protected void clear() {
+        if (filters != null) {
+            filters.clear();
+        }
+    }
+
+    @Override
     protected void add(Context context, int resId, int value) {
         if (filters == null) {
             filters = new ArrayList<Item>(6);

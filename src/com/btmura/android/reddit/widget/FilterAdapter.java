@@ -36,6 +36,12 @@ public class FilterAdapter extends BaseFilterAdapter {
         inflater = LayoutInflater.from(context);
     }
 
+    @Override
+    protected void clear() {
+        names.clear();
+    }
+
+    @Override
     protected void add(Context context, int resId, int value) {
         names.add(context.getString(resId));
     }

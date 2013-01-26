@@ -51,12 +51,13 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
         public String getLastAccount() {
             String accountName = AccountPreferences.getLastAccount(prefs, Subreddits.ACCOUNT_NONE);
-            for (int i = 0; i < accountNames.length; i++) {
+            int numAccounts = accountNames.length;
+            for (int i = 0; i < numAccounts; i++) {
                 if (accountNames[i].equals(accountName)) {
                     return accountName;
                 }
             }
-            return accountNames[0];
+            return numAccounts > 0 ? accountNames[0] : null;
         }
 
         // TODO: Get rid of these methods since they are just wrappers.

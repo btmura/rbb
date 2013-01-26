@@ -123,9 +123,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         adapter = new AccountFilterAdapter(this);
-        if (!isSinglePane) {
-            adapter.addSubredditFilters(this);
-        }
         mailAdapter = new AccountAdapter(this);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -141,6 +138,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         prefs = result.prefs;
+        if (!isSinglePane) {
+            adapter.addSubredditFilters(this);
+        }
         adapter.setAccountNames(result.accountNames);
 
         String accountName = result.getLastAccount();
