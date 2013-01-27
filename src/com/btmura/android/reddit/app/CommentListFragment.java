@@ -313,7 +313,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
     }
 
     public void onNewItemSelected() {
-        handleNewComment(0);
+        handleReply(0);
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -360,7 +360,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
             authorVisible = MenuHelper.isUserItemVisible(author);
         }
 
-        menu.findItem(R.id.menu_new_comment).setVisible(replyVisible);
+        menu.findItem(R.id.menu_reply).setVisible(replyVisible);
         menu.findItem(R.id.menu_delete).setVisible(deleteVisible);
         menu.findItem(R.id.menu_copy_url).setVisible(copyUrlVisible);
 
@@ -414,8 +414,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_new_comment:
-                handleNewComment(getFirstCheckedPosition());
+            case R.id.menu_reply:
+                handleReply(getFirstCheckedPosition());
                 mode.finish();
                 return true;
 
@@ -439,7 +439,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
     }
 
-    private void handleNewComment(int position) {
+    private void handleReply(int position) {
         long parentId = adapter.getLong(0, CommentAdapter.INDEX_ID);
         int parentNumComments = adapter.getInt(0, CommentAdapter.INDEX_NUM_COMMENTS);
         String parentThingId = adapter.getThingId();

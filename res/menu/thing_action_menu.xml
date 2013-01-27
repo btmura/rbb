@@ -27,10 +27,6 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_save"/>
     <item
-        android:id="@+id/menu_copy_url"
-        android:showAsAction="never"
-        android:title="@string/menu_copy_url"/>
-    <item
         android:id="@+id/menu_author"
         android:icon="@drawable/ic_action_profile"
         android:showAsAction="ifRoom|withText"
@@ -39,5 +35,9 @@
         android:id="@+id/menu_subreddit"
         android:showAsAction="ifRoom"
         android:title="@string/menu_subreddit"/>
+    <item
+        android:id="@+id/menu_copy_url"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_copy_url"/>
 
 </menu>
