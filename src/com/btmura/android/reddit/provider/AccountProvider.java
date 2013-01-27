@@ -41,7 +41,6 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.util.Array;
-import com.btmura.android.reddit.util.Objects;
 
 public class AccountProvider extends BaseProvider {
 
