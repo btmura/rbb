@@ -327,17 +327,45 @@ public class CommentListFragment extends ThingProviderListFragment implements
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        int position = getFirstCheckedPosition();
         int count = getListView().getCheckedItemCount();
         mode.setTitle(getResources().getQuantityString(R.plurals.comments, count, count));
 
-        menu.findItem(R.id.menu_new_comment).setVisible(isReplyItemVisible());
-        menu.findItem(R.id.menu_delete).setVisible(isDeleteItemVisible());
-        menu.findItem(R.id.menu_copy_url).setVisible(isCopyUrlItemVisible());
+        boolean replyVisible = true;
+        boolean deleteVisible = true;
+        boolean authorVisible = true;
+        boolean copyUrlVisible = true;
+
+        boolean singleChecked = count == 1;
+        replyVisible = singleChecked;
+        authorVisible = singleChecked;
+        copyUrlVisible = singleChecked;
+
+        if (replyVisible || deleteVisible) {
+            boolean hasAccount = AccountUtils.isAccount(adapter.getAccountName());
+            replyVisible &= hasAccount;
+            deleteVisible &= hasAccount;
+        }
+
+        int position = getFirstCheckedPosition();
+        if (replyVisible) {
+            replyVisible = isReplyable(position);
+        }
+
+        if (deleteVisible) {
+            deleteVisible = isAllDeletable();
+        }
+
+        String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
+        if (authorVisible) {
+            authorVisible = MenuHelper.isUserItemVisible(author);
+        }
+
+        menu.findItem(R.id.menu_new_comment).setVisible(replyVisible);
+        menu.findItem(R.id.menu_delete).setVisible(deleteVisible);
+        menu.findItem(R.id.menu_copy_url).setVisible(copyUrlVisible);
 
         MenuItem authorItem = menu.findItem(R.id.menu_author);
-        String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
-        authorItem.setVisible(count == 1 && MenuHelper.isUserItemVisible(author));
+        authorItem.setVisible(authorVisible);
         if (authorItem.isVisible()) {
             authorItem.setTitle(MenuHelper.getUserTitle(getActivity(), author));
         }
@@ -345,19 +373,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return true;
     }
 
-    private boolean isReplyItemVisible() {
-        // You need an account to reply to some comment.
-        if (!AccountUtils.isAccount(adapter.getAccountName())) {
-            return false;
-        }
-
-        // You can only reply to one comment at a time.
-        if (getListView().getCheckedItemCount() != 1) {
-            return false;
-        }
-
-        // The single comment must have a valid id and not be deleted.
-        int position = getFirstCheckedPosition();
+    private boolean isReplyable(int position) {
         String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
         if (TextUtils.isEmpty(thingId)) {
             return false;
@@ -371,22 +387,11 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return true;
     }
 
-    private boolean isDeleteItemVisible() {
-        // You need an account to delete items.
-        if (!AccountUtils.isAccount(adapter.getAccountName())) {
-            return false;
-        }
-
-        // We can delete as many items we want.
-        if (getListView().getCheckedItemCount() == 0) {
-            return false;
-        }
-
+    private boolean isAllDeletable() {
         SparseBooleanArray checked = getListView().getCheckedItemPositions();
         int count = adapter.getCount();
         for (int i = 0; i < count; i++) {
             if (checked.get(i)) {
-
                 // All items must be authored by the current account.
                 String author = adapter.getString(i, CommentAdapter.INDEX_AUTHOR);
                 if (!author.equals(adapter.getAccountName())) {
@@ -401,10 +406,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
             }
         }
         return true;
-    }
-
-    private boolean isCopyUrlItemVisible() {
-        return getListView().getCheckedItemCount() == 1;
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
