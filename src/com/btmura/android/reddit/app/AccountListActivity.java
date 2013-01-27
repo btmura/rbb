@@ -27,10 +27,8 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,16 +42,11 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.app.AccountListFragment.OnAccountEventListener;
 import com.btmura.android.reddit.content.SelectAccountBroadcast;
-import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class AccountListActivity extends Activity implements OnAccountEventListener,
         OnClickListener {
 
     public static final String TAG = "AccountListActivity";
-
-    private static final String[] AUTHORITIES = {
-            SubredditProvider.AUTHORITY,
-    };
 
     private Button addAccount;
     private View cancel;
@@ -162,8 +155,6 @@ public class AccountListActivity extends Activity implements OnAccountEventListe
     }
 
     private void handleAddAccount() {
-        Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
-        intent.putExtra(Settings.EXTRA_AUTHORITIES, AUTHORITIES);
-        startActivity(intent);
+        MenuHelper.startAddAccountActivity(this);
     }
 }

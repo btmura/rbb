@@ -23,14 +23,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.MenuItem;
 import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.provider.SubredditProvider;
 
 public class MenuHelper {
+
+    private static final String[] AUTHORITIES = {
+            SubredditProvider.AUTHORITY,
+    };
 
     public static String getSubredditTitle(Context context, String subreddit) {
         return context.getString(R.string.menu_subreddit, subreddit);
@@ -38,6 +44,12 @@ public class MenuHelper {
 
     public static String getUserTitle(Context context, String user) {
         return context.getString(R.string.menu_user, user);
+    }
+
+    public static void startAddAccountActivity(Context context) {
+        Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
+        intent.putExtra(Settings.EXTRA_AUTHORITIES, AUTHORITIES);
+        context.startActivity(intent);
     }
 
     public static void startIntentChooser(Context context, CharSequence url) {

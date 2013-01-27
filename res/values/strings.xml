@@ -28,6 +28,7 @@
     <string name="button_view">View</string>
     <string name="captcha_image">Captcha image</string>
     <string name="captcha_title">Are you a robot?</string>
+    <string name="compose_add_account">Add account</string>
     <string name="compose_tab_message">Message</string>
     <string name="compose_tab_post">Post</string>
     <string name="compose_tab_comment">Comment</string>
@@ -42,7 +43,8 @@
     <string name="empty_accounts">You have no accounts.</string>
     <string name="empty_list">Nothing to see here…</string>
     <string name="error">Something went wrong…</string>
-    <string name="error_blank_field">This field cannot be blank.</string>
+    <string name="error_account_required">You need an account to do this…</string>
+    <string name="error_blank_field">This field cannot be blank…</string>
     <string name="filter_category">Filters</string>
     <string name="filter_message_inbox">inbox</string>
     <string name="filter_message_unread">unread</string>
@@ -84,7 +86,7 @@
     <string name="menu_copy_url">Copy URL</string>
     <string name="menu_debug">Debug</string>
     <string name="menu_delete">Delete</string>
-    <string name="menu_link">View link</string>    
+    <string name="menu_link">View link</string>
     <string name="menu_messages">Messages</string>
     <string name="menu_new_comment">New comment</string>
     <string name="menu_new_message">New message</string>

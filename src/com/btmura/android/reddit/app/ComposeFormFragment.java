@@ -32,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -55,6 +56,7 @@ import com.btmura.android.reddit.widget.SubredditAdapter;
  * {@link Fragment} that displays a form for composing submissions and messages.
  */
 public class ComposeFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
+        OnClickListener,
         OnItemSelectedListener,
         OnItemClickListener,
         OnComposeActivityListener,
@@ -104,6 +106,18 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
     /** Flag for initially setting account spinner once. */
     private boolean restoringState;
+
+    /** One of the three main layouts. This one shows a loading symbol. */
+    private View progressView;
+
+    /** ONe of the three main layouts. This one shows an error and button. */
+    private View noAccountView;
+
+    /** One of the three main layouts. This shows the full form. */
+    private View accountView;
+
+    /** {@link Button} that launches an add account activity. */
+    private View addAccountButton;
 
     /** Adapter of account names to select who will be composing. */
     private AccountNameAdapter adapter;
@@ -160,10 +174,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         restoringState = savedInstanceState != null;
-
-        // Fill the adapter with loading to avoid jank.
         adapter = new AccountNameAdapter(getActivity(), R.layout.account_name_row);
-        adapter.add(getString(R.string.loading));
     }
 
     @Override
@@ -171,8 +182,14 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.compose_form, container, false);
 
+        progressView = v.findViewById(R.id.progress);
+        noAccountView = v.findViewById(R.id.no_account);
+        accountView = v.findViewById(R.id.has_account);
+
+        addAccountButton = v.findViewById(R.id.add_account_button);
+        addAccountButton.setOnClickListener(this);
+
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
-        accountSpinner.setEnabled(false);
         accountSpinner.setAdapter(adapter);
         accountSpinner.setOnItemSelectedListener(this);
 
@@ -290,6 +307,10 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         boolean hasAccounts = result.accountNames.length > 0;
+        progressView.setVisibility(View.GONE);
+        noAccountView.setVisibility(hasAccounts ? View.GONE : View.VISIBLE);
+        accountView.setVisibility(hasAccounts ? View.VISIBLE : View.GONE);
+
         adapter.clear();
         if (hasAccounts) {
             adapter.addAll(result.accountNames);
@@ -299,15 +320,18 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
             if (!restoringState) {
                 accountSpinner.setSelection(adapter.findAccountName(result.getLastAccount()));
             }
-        } else {
-            adapter.add(getString(R.string.empty_accounts));
         }
 
-        accountSpinner.setEnabled(hasAccounts);
         getActivity().invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
+    }
+
+    public void onClick(View v) {
+        if (v == addAccountButton) {
+            MenuHelper.startAddAccountActivity(getActivity());
+        }
     }
 
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
@@ -356,6 +380,13 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     }
 
     private boolean handleSubmit() {
+        // Required an account to submit anything.
+        if (adapter.isEmpty()) {
+            // The UI should be showing a big error message, so it's ok not to
+            // do anything here.
+            return true;
+        }
+
         // CommentActions don't have a choice of destination or title.
         int composition = getArguments().getInt(ARG_TYPE);
         if (composition == ComposeActivity.TYPE_POST
