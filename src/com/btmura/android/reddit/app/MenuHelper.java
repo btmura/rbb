@@ -88,13 +88,14 @@ public class MenuHelper {
     }
 
     public static void startComposeActivity(Context context, int[] types,
-            String subredditDestination, String messageDestination, String title, Bundle extras,
-            boolean isReply) {
+            String subredditDestination, String messageDestination, String title, String text,
+            Bundle extras, boolean isReply) {
         Intent intent = new Intent(context, ComposeActivity.class);
         intent.putExtra(ComposeActivity.EXTRA_TYPES, types);
         intent.putExtra(ComposeActivity.EXTRA_SUBREDDIT_DESTINATION, subredditDestination);
         intent.putExtra(ComposeActivity.EXTRA_MESSAGE_DESTINATION, messageDestination);
         intent.putExtra(ComposeActivity.EXTRA_TITLE, title);
+        intent.putExtra(ComposeActivity.EXTRA_TEXT, text);
         intent.putExtra(ComposeActivity.EXTRA_IS_REPLY, isReply);
         intent.putExtra(ComposeActivity.EXTRA_EXTRAS, extras);
         context.startActivity(intent);

@@ -62,6 +62,9 @@ public class CommentActions implements BaseColumns {
     /** Action meaning the user has deleted one of their own comments. */
     public static final int ACTION_DELETE = 1;
 
+    /** Action meaning teh user has edited a self post or comment. */
+    public static final int ACTION_EDIT = 2;
+
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "

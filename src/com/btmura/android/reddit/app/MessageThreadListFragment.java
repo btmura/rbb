@@ -188,7 +188,7 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         extras.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, adapter.getThingId(position));
 
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_REPLY_TYPE_SET,
-                null, user, null, extras, false);
+                null, user, null, null, extras, false);
     }
 
     public void onDestroyActionMode(ActionMode mode) {

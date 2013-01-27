@@ -67,7 +67,7 @@ public class ComposeFragment extends Fragment {
 
     public static Bundle newExtras(String accountName, String destination, String title,
             String text, boolean isLink) {
-        Bundle extras = new Bundle(5);
+        Bundle extras = new Bundle(6);
         extras.putString(EXTRA_ACCOUNT_NAME, accountName);
         extras.putString(EXTRA_DESTINATION, destination);
         extras.putString(EXTRA_TITLE, title);

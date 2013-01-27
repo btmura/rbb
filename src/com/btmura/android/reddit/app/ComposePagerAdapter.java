@@ -49,6 +49,7 @@ public class ComposePagerAdapter extends FragmentStateItemPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (types[position]) {
             case ComposeActivity.TYPE_POST:
+            case ComposeActivity.TYPE_EDIT_POST:
                 return context.getString(R.string.compose_tab_post);
 
             case ComposeActivity.TYPE_MESSAGE:
@@ -56,6 +57,7 @@ public class ComposePagerAdapter extends FragmentStateItemPagerAdapter {
 
             case ComposeActivity.TYPE_MESSAGE_REPLY:
             case ComposeActivity.TYPE_COMMENT_REPLY:
+            case ComposeActivity.TYPE_EDIT_COMMENT:
                 return context.getString(R.string.compose_tab_comment);
 
             default:

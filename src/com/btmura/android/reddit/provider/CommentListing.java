@@ -316,6 +316,10 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                         }
                         break;
 
+                    case CommentActions.ACTION_EDIT:
+                        // TODO!
+                        break;
+
                     default:
                         throw new IllegalStateException();
                 }

@@ -57,6 +57,12 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     /** Type of composition when replying to some message. */
     public static final int TYPE_MESSAGE_REPLY = 3;
 
+    /** Type to use when editing a self post. */
+    public static final int TYPE_EDIT_POST = 4;
+
+    /** Type to use when editing a comment. */
+    public static final int TYPE_EDIT_COMMENT = 5;
+
     /** Default set of types supported when sharing something to the app. */
     public static final int[] DEFAULT_TYPE_SET = {
             TYPE_POST,
@@ -78,6 +84,16 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     public static final int[] MESSAGE_REPLY_TYPE_SET = {
             TYPE_MESSAGE_REPLY,
             TYPE_MESSAGE,
+    };
+
+    /** Set of types when editing a self post. */
+    public static final int[] EDIT_POST_TYPE_SET = {
+            TYPE_EDIT_POST,
+    };
+
+    /** Set of types when editing a comment. */
+    public static final int[] EDIT_COMMENT_TYPE_SET = {
+            TYPE_EDIT_COMMENT,
     };
 
     /** Array of ints specifying what types to show we can compose. */
@@ -117,6 +133,12 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     public static final String EXTRA_MESSAGE_PARENT_THING_ID = "parentThingId";
     public static final String EXTRA_MESSAGE_SESSION_ID = "sessionId";
     public static final String EXTRA_MESSAGE_THING_ID = "thingId";
+
+    // The following extras should be passed for EDIT.
+
+    public static final String EXTRA_EDIT_PARENT_THING_ID = "parentThingId";
+    public static final String EXTRA_EDIT_SESSION_ID = "sessionId";
+    public static final String EXTRA_EDIT_THING_ID = "thingId";
 
     interface OnComposeActivityListener {
         void onOkClicked(int id);
@@ -200,6 +222,12 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
                 return getString(R.string.compose_title_reply,
                         getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION));
 
+            case ComposeActivity.TYPE_EDIT_POST:
+                return getString(R.string.compose_title_edit_post);
+
+            case ComposeActivity.TYPE_EDIT_COMMENT:
+                return getString(R.string.compose_title_edit_comment);
+
             default:
                 throw new IllegalArgumentException();
         }
@@ -229,7 +257,7 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     // TODO: Use bundle for onComposeForm.
     public void onComposeForm(String accountName, String destination, String title, String text,
             boolean isLink) {
-        // TODO: Don't reply on the current page.
+        // TODO: Don't rely on the current page.
         int type = getCurrentType();
         switch (type) {
             case TYPE_POST:
@@ -248,6 +276,11 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
 
             case TYPE_MESSAGE_REPLY:
                 handleMessageReply(accountName, text);
+                break;
+
+            case TYPE_EDIT_POST:
+            case TYPE_EDIT_COMMENT:
+                handleEdit(accountName, text);
                 break;
         }
     }
@@ -319,7 +352,16 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
         String parentThingId = extras.getString(EXTRA_MESSAGE_PARENT_THING_ID);
         long sessionId = extras.getLong(EXTRA_MESSAGE_SESSION_ID);
         String thingId = extras.getString(EXTRA_MESSAGE_THING_ID);
-        Provider.insertMessageReplyAsync(this, accountName, body, parentThingId, sessionId, thingId);
+        Provider.messageReplyAsync(this, accountName, body, parentThingId, sessionId, thingId);
+        finish();
+    }
+
+    private void handleEdit(String accountName, String body) {
+        Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
+        String parentThingId = extras.getString(EXTRA_EDIT_PARENT_THING_ID);
+        long sessionId = extras.getLong(EXTRA_EDIT_SESSION_ID);
+        String thingId = extras.getString(EXTRA_EDIT_THING_ID);
+        Provider.editAsync(this, accountName, parentThingId, thingId, body, sessionId);
         finish();
     }
 

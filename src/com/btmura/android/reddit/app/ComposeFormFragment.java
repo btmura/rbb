@@ -218,6 +218,8 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
             case ComposeActivity.TYPE_COMMENT_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
+            case ComposeActivity.TYPE_EDIT_POST:
+            case ComposeActivity.TYPE_EDIT_COMMENT:
                 titleText.setVisibility(View.GONE);
                 break;
 
@@ -250,6 +252,8 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
             case ComposeActivity.TYPE_COMMENT_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
+            case ComposeActivity.TYPE_EDIT_POST:
+            case ComposeActivity.TYPE_EDIT_COMMENT:
                 destinationText.setVisibility(View.GONE);
                 break;
 
@@ -277,6 +281,8 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
             case ComposeActivity.TYPE_COMMENT_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
+            case ComposeActivity.TYPE_EDIT_POST:
+            case ComposeActivity.TYPE_EDIT_COMMENT:
                 textText.setHint(R.string.hint_comment);
                 linkSwitch.setVisibility(View.GONE);
                 break;

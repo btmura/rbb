@@ -205,7 +205,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     private void handleNewMessage() {
         MenuHelper.startComposeActivity(this, ComposeActivity.MESSAGE_TYPE_SET,
-                null, null, null, null, false);
+                null, null, null, null, null, false);
     }
 
     @Override

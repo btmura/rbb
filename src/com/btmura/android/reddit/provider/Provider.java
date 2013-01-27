@@ -268,6 +268,38 @@ public class Provider {
         });
     }
 
+    public static void editAsync(Context context,
+            final String accountName,
+            final String parentThingId,
+            final String thingId,
+            final String text,
+            final long sessionId) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+           public void run() {
+               ArrayList<ContentProviderOperation> ops =
+                       new ArrayList<ContentProviderOperation>(2);
+
+               ops.add(ContentProviderOperation.newInsert(ThingProvider.COMMENT_ACTIONS_SYNC_URI)
+                       .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
+                       .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_EDIT)
+                       .withValue(CommentActions.COLUMN_TEXT, text)
+                       .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentThingId)
+                       .withValue(CommentActions.COLUMN_THING_ID, thingId)
+                       .build());
+
+               ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
+                       .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
+                               Array.of(accountName, thingId))
+                       .withValue(Things.COLUMN_BODY, text)
+                       .withValueBackReference(Things.COLUMN_COMMENT_ACTION_ID, 1)
+                       .build());
+
+               applyOps(appContext, ThingProvider.AUTHORITY, ops);
+           }
+        });
+    }
+
     public static void expandCommentAsync(Context context, final long sessionId, final long id) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
@@ -351,7 +383,7 @@ public class Provider {
         });
     }
 
-    public static void insertMessageReplyAsync(Context context,
+    public static void messageReplyAsync(Context context,
             final String accountName,
             final String body,
             final String parentThingId,

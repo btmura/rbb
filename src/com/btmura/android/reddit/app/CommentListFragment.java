@@ -434,6 +434,11 @@ public class CommentListFragment extends ThingProviderListFragment implements
                 mode.finish();
                 return true;
 
+            case R.id.menu_edit:
+                handleEdit(getFirstCheckedPosition());
+                mode.finish();
+                return true;
+
             case R.id.menu_delete:
                 handleDelete();
                 mode.finish();
@@ -477,7 +482,26 @@ public class CommentListFragment extends ThingProviderListFragment implements
         args.putLong(ComposeActivity.EXTRA_COMMENT_SESSION_ID, sessionId);
 
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.COMMENT_REPLY_TYPE_SET,
-                null, author, getLabel(position), args, true);
+                null, author, getLabel(position), null, args, true);
+    }
+
+    private void handleEdit(int position) {
+        int[] typeSet = position == 0
+                ? ComposeActivity.EDIT_POST_TYPE_SET
+                : ComposeActivity.EDIT_COMMENT_TYPE_SET;
+
+        String parentThingId = adapter.getThingId();
+        String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
+        long sessionId = adapter.getSessionId();
+
+        Bundle args = new Bundle(3);
+        args.putString(ComposeActivity.EXTRA_EDIT_PARENT_THING_ID, parentThingId);
+        args.putString(ComposeActivity.EXTRA_EDIT_THING_ID, thingId);
+        args.putLong(ComposeActivity.EXTRA_EDIT_SESSION_ID, sessionId);
+
+        String text = adapter.getString(position, CommentAdapter.INDEX_BODY);
+        MenuHelper.startComposeActivity(getActivity(), typeSet,
+                null, null, getLabel(position), text, args, false);
     }
 
     private int getFirstCheckedPosition() {

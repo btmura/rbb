@@ -40,6 +40,7 @@ public class Urls {
     private static final String API_COMMENTS_URL = BASE_URL + "/api/comment";
     private static final String API_COMPOSE_URL = BASE_URL + "/api/compose";
     private static final String API_DELETE_URL = BASE_URL + "/api/del";
+    private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
     private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
     private static final String API_ME_URL = BASE_URL + "/api/me";
     private static final String API_NEW_CAPTCHA_URL = BASE_URL + "/api/new_captcha";
@@ -71,21 +72,33 @@ public class Urls {
         }
     }
 
+    public static CharSequence captcha(String id) {
+        return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
+    }
+
     public static CharSequence comments() {
         return API_COMMENTS_URL;
     }
 
     public static String commentsQuery(String thingId, String text, String modhash) {
+        return thingTextQuery(thingId, text, modhash);
+    }
+
+    public static CharSequence edit() {
+        return API_EDIT_URL;
+    }
+
+    public static String editQuery(String thingId, String text, String modhash) {
+        return thingTextQuery(thingId, text, modhash);
+    }
+
+    private static String thingTextQuery(String thingId, String text, String modhash) {
         StringBuilder b = new StringBuilder();
         b.append("thing_id=").append(encode(thingId));
         b.append("&text=").append(encode(text));
         b.append("&uh=").append(encode(modhash));
         b.append("&api_type=json");
         return b.toString();
-    }
-
-    public static CharSequence captcha(String id) {
-        return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
     }
 
     public static CharSequence commentListing(String id, String linkId, int apiType) {

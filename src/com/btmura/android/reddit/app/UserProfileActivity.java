@@ -178,7 +178,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     private void handleNewMessage() {
         MenuHelper.startComposeActivity(this, ComposeActivity.MESSAGE_TYPE_SET,
-                null, requestedUser, null, null, false);
+                null, requestedUser, null, null, null, false);
     }
 
     @Override

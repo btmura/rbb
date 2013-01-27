@@ -32,6 +32,8 @@
     <string name="compose_tab_message">Message</string>
     <string name="compose_tab_post">Post</string>
     <string name="compose_tab_comment">Comment</string>
+    <string name="compose_title_edit_comment">Edit comment</string>
+    <string name="compose_title_edit_post">Edit post</string>
     <string name="compose_title_message">New message</string>
     <string name="compose_title_post">New post</string>
     <string name="compose_title_reply">Reply to %s</string>
