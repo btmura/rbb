@@ -22,9 +22,14 @@
         android:showAsAction="ifRoom|withText"
         android:title="@string/menu_reply"/>
     <item
+        android:id="@+id/menu_edit"
+        android:icon="@drawable/ic_action_edit"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/menu_edit"/>
+    <item
         android:id="@+id/menu_delete"
         android:icon="@drawable/ic_action_delete"
-        android:showAsAction="ifRoom"
+        android:showAsAction="ifRoom|withText"
         android:title="@string/menu_delete"/>
     <item
         android:id="@+id/menu_author"

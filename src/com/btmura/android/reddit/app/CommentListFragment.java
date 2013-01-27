@@ -331,24 +331,31 @@ public class CommentListFragment extends ThingProviderListFragment implements
         mode.setTitle(getResources().getQuantityString(R.plurals.comments, count, count));
 
         boolean replyVisible = true;
+        boolean editVisible = true;
         boolean deleteVisible = true;
         boolean authorVisible = true;
         boolean copyUrlVisible = true;
 
         boolean singleChecked = count == 1;
         replyVisible = singleChecked;
+        editVisible = singleChecked;
         authorVisible = singleChecked;
         copyUrlVisible = singleChecked;
 
-        if (replyVisible || deleteVisible) {
+        if (replyVisible || editVisible || deleteVisible) {
             boolean hasAccount = AccountUtils.isAccount(adapter.getAccountName());
             replyVisible &= hasAccount;
+            editVisible &= hasAccount;
             deleteVisible &= hasAccount;
         }
 
         int position = getFirstCheckedPosition();
         if (replyVisible) {
             replyVisible = isReplyable(position);
+        }
+
+        if (editVisible) {
+            editVisible = isEditable(position);
         }
 
         if (deleteVisible) {
@@ -361,6 +368,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
 
         menu.findItem(R.id.menu_reply).setVisible(replyVisible);
+        menu.findItem(R.id.menu_edit).setVisible(editVisible);
         menu.findItem(R.id.menu_delete).setVisible(deleteVisible);
         menu.findItem(R.id.menu_copy_url).setVisible(copyUrlVisible);
 
@@ -387,25 +395,32 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return true;
     }
 
+    private boolean isEditable(int position) {
+        return isAuthor(position) && hasThingId(position)
+                && (position != 0 || adapter.getBoolean(0, CommentAdapter.INDEX_SELF));
+    }
+
     private boolean isAllDeletable() {
         SparseBooleanArray checked = getListView().getCheckedItemPositions();
         int count = adapter.getCount();
         for (int i = 0; i < count; i++) {
             if (checked.get(i)) {
-                // All items must be authored by the current account.
-                String author = adapter.getString(i, CommentAdapter.INDEX_AUTHOR);
-                if (!author.equals(adapter.getAccountName())) {
-                    return false;
-                }
-
-                // All items must have a valid id.
-                String thingId = adapter.getString(i, CommentAdapter.INDEX_THING_ID);
-                if (TextUtils.isEmpty(thingId)) {
+                if (!isAuthor(i) || !hasThingId(i)) {
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    private boolean isAuthor(int position) {
+        String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
+        return author.equals(adapter.getAccountName());
+    }
+
+    private boolean hasThingId(int position) {
+        String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
+        return !TextUtils.isEmpty(thingId);
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
