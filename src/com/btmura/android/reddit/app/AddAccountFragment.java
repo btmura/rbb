@@ -24,11 +24,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TransformationMethod;
@@ -46,7 +44,6 @@ import android.widget.EditText;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.accounts.AccountPreferences;
-import com.btmura.android.reddit.content.SubredditSyncAdapter;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.LoginResult;
 import com.btmura.android.reddit.provider.AccountProvider;
@@ -192,8 +189,16 @@ public class AddAccountFragment extends Fragment implements
                     return errorBundle(R.string.reddit_error, result.error);
                 }
 
-                publishProgress(R.string.login_importing_subreddits);
-                SubredditSyncAdapter.initializeAccount(context, login, result.cookie);
+                publishProgress(R.string.login_importing);
+
+                // Initialize database data for the account. If somehow we fail
+                // to add the account later to the AccountManager, then this
+                // data will just sit there in the db. If there is an existing
+                // account, then they will still see their subreddits but any
+                // pending actions will be erased...
+                if (!AccountProvider.initializeAccount(context, login, result.cookie)) {
+                    return errorBundle(R.string.login_importing_error);
+                }
 
                 publishProgress(R.string.login_adding_account);
 
@@ -223,12 +228,6 @@ public class AddAccountFragment extends Fragment implements
                 return b;
 
             } catch (IOException e) {
-                Log.e(TAG, e.getMessage(), e);
-                return errorBundle(R.string.login_error, e.getMessage());
-            } catch (RemoteException e) {
-                Log.e(TAG, e.getMessage(), e);
-                return errorBundle(R.string.login_error, e.getMessage());
-            } catch (OperationApplicationException e) {
                 Log.e(TAG, e.getMessage(), e);
                 return errorBundle(R.string.login_error, e.getMessage());
             }

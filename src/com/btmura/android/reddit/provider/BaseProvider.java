@@ -55,6 +55,8 @@ abstract class BaseProvider extends ContentProvider {
      */
     public static final String PARAM_NOTIFY = "notify";
 
+
+    /** Returns a URI that tickles the sync adapter to activate after. */
     protected static Uri makeSyncUri(Uri uri) {
         return uri.buildUpon().appendQueryParameter(PARAM_SYNC, TRUE).build();
     }

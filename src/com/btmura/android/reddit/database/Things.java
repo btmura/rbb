@@ -66,8 +66,10 @@ public class Things implements BaseColumns {
     /** Deleted comments have an author and body with this string. */
     public static final String DELETED = "[deleted]";
 
+    public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
+
     public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
-            COLUMN_ACCOUNT + "=? AND " + COLUMN_THING_ID + "=?";
+            SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + "=?";
 
     public static final String SELECT_BY_COMMENT_ACTION_ID =
             COLUMN_COMMENT_ACTION_ID + "=?";

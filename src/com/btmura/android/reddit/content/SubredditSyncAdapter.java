@@ -252,24 +252,4 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         }
         return null;
     }
-
-    public static void initializeAccount(Context context, String login, String cookie)
-            throws RemoteException, OperationApplicationException, IOException {
-        ArrayList<String> subreddits = RedditApi.getSubreddits(cookie);
-        int count = subreddits.size();
-
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(count + 2);
-        ops.add(ContentProviderOperation.newDelete(SubredditProvider.SUBREDDITS_URI)
-                .withSelection(Subreddits.SELECT_BY_ACCOUNT, Array.of(login))
-                .build());
-        for (int i = 0; i < count; i++) {
-            ops.add(ContentProviderOperation.newInsert(SubredditProvider.SUBREDDITS_URI)
-                    .withValue(Subreddits.COLUMN_ACCOUNT, login)
-                    .withValue(Subreddits.COLUMN_NAME, subreddits.get(i))
-                    .withValue(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL)
-                    .build());
-        }
-        ContentResolver cr = context.getContentResolver();
-        cr.applyBatch(SubredditProvider.AUTHORITY, ops);
-    }
 }
