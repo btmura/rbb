@@ -220,7 +220,8 @@ public class Provider {
 
                 int numDeletes = 0;
                 for (int i = 0; i < count; i++) {
-                    ops.add(ContentProviderOperation.newInsert(ThingProvider.COMMENT_ACTIONS_URI)
+                    ops.add(ContentProviderOperation.newInsert(
+                            ThingProvider.COMMENT_ACTIONS_SYNC_URI)
                             .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE)
                             .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
                             .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentId)
@@ -255,7 +256,7 @@ public class Provider {
 
                 // Update the header comment by how comments were truly deleted.
                 if (numDeletes > 0) {
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_SYNC_URI)
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
                             .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
                                     Array.of(accountName, parentId))
                             .withValue(Things.COLUMN_NUM_COMMENTS, headerNumComments - numDeletes)

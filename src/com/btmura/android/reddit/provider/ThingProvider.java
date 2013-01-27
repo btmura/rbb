@@ -86,6 +86,7 @@ public class ThingProvider extends SessionProvider {
 
     public static final Uri THINGS_SYNC_URI = makeSyncUri(THINGS_URI);
     public static final Uri MESSAGES_SYNC_URI = makeSyncUri(MESSAGES_URI);
+    public static final Uri COMMENT_ACTIONS_SYNC_URI = makeSyncUri(COMMENT_ACTIONS_URI);
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;
