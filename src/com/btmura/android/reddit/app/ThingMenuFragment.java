@@ -150,7 +150,10 @@ public class ThingMenuFragment extends Fragment {
 
     private void refreshUserItems() {
         if (userItem != null) {
-            userItem.setTitle(MenuHelper.getUserTitle(getActivity(), getUser()));
+            userItem.setVisible(MenuHelper.isUserItemVisible(getUser()));
+            if (userItem.isVisible()) {
+                userItem.setTitle(MenuHelper.getUserTitle(getActivity(), getUser()));
+            }
         }
     }
 

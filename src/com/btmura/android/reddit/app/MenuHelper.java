@@ -29,6 +29,7 @@ import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.SubredditProvider;
 
@@ -44,6 +45,10 @@ public class MenuHelper {
 
     public static String getUserTitle(Context context, String user) {
         return context.getString(R.string.menu_user, user);
+    }
+
+    public static boolean isUserItemVisible(String user) {
+        return !Things.DELETED.equals(user);
     }
 
     /**

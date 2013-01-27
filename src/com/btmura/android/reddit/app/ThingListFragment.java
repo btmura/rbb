@@ -316,10 +316,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
         menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
 
         MenuItem authorItem = menu.findItem(R.id.menu_author);
-        authorItem.setVisible(count == 1);
+        String author = adapter.getAuthor(position);
+        authorItem.setVisible(count == 1 && MenuHelper.isUserItemVisible(author));
         if (authorItem.isVisible()) {
-            authorItem.setTitle(MenuHelper.getUserTitle(getActivity(),
-                    adapter.getAuthor(position)));
+            authorItem.setTitle(MenuHelper.getUserTitle(getActivity(), author));
         }
 
         String subreddit = adapter.getSubreddit(position);

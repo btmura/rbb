@@ -88,7 +88,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     public static CommentListFragment newInstance(String accountName, String thingId,
             String linkId, String title, CharSequence url, int flags) {
-        Bundle args = new Bundle(4);
+        Bundle args = new Bundle(6);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_THING_ID, thingId);
         args.putString(ARG_LINK_ID, linkId);
@@ -336,10 +336,10 @@ public class CommentListFragment extends ThingProviderListFragment implements
         menu.findItem(R.id.menu_copy_url).setVisible(isCopyUrlItemVisible());
 
         MenuItem authorItem = menu.findItem(R.id.menu_author);
-        authorItem.setVisible(count == 1);
+        String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
+        authorItem.setVisible(count == 1 && MenuHelper.isUserItemVisible(author));
         if (authorItem.isVisible()) {
-            authorItem.setTitle(MenuHelper.getUserTitle(getActivity(),
-                    adapter.getString(position, CommentAdapter.INDEX_AUTHOR)));
+            authorItem.setTitle(MenuHelper.getUserTitle(getActivity(), author));
         }
 
         return true;
