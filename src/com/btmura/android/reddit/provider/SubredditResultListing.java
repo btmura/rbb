@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.JsonReader;
@@ -43,7 +42,7 @@ class SubredditResultListing extends JsonParser implements Listing {
     private final String query;
     private final String cookie;
 
-    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(25);
+    private final ArrayList<PoolableContentValues> values = new ArrayList<PoolableContentValues>(25);
     private long networkTimeMs;
     private long parseTimeMs;
 
@@ -57,7 +56,7 @@ class SubredditResultListing extends JsonParser implements Listing {
         this.cookie = cookie;
     }
 
-    public ArrayList<ContentValues> getValues() throws IOException {
+    public ArrayList<PoolableContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         CharSequence url = Urls.subredditSearch(query, null);
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
@@ -102,7 +101,7 @@ class SubredditResultListing extends JsonParser implements Listing {
 
     @Override
     public void onEntityStart(int index) {
-        ContentValues v = new ContentValues(5);
+        PoolableContentValues v = PoolableContentValues.acquire();
         v.put(Things.COLUMN_ACCOUNT, accountName);
         values.add(v);
     }

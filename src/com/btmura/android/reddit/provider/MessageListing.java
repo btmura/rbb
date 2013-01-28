@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -67,7 +66,7 @@ class MessageListing extends JsonParser implements Listing {
     private final boolean mark;
     private final String cookie;
     private final SQLiteOpenHelper dbHelper;
-    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
+    private final ArrayList<PoolableContentValues> values = new ArrayList<PoolableContentValues>(30);
 
     private long networkTimeMs;
     private long parseTimeMs;
@@ -100,7 +99,7 @@ class MessageListing extends JsonParser implements Listing {
         this.cookie = cookie;
     }
 
-    public ArrayList<ContentValues> getValues() throws IOException {
+    public ArrayList<PoolableContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, true, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
@@ -160,11 +159,11 @@ class MessageListing extends JsonParser implements Listing {
 
     @Override
     public void onEntityStart(int index) {
-        values.add(newContentValues(11));
+        values.add(newContentValues());
     }
 
-    private ContentValues newContentValues(int capacity) {
-        ContentValues values = new ContentValues(capacity + 1);
+    private PoolableContentValues newContentValues() {
+        PoolableContentValues values = PoolableContentValues.acquire();
         values.put(Messages.COLUMN_ACCOUNT, accountName);
         return values;
     }
@@ -241,7 +240,7 @@ class MessageListing extends JsonParser implements Listing {
         }
 
         if (!TextUtils.isEmpty(moreThingId)) {
-            ContentValues v = new ContentValues(3 + 1); // 1 for session id.
+            PoolableContentValues v = PoolableContentValues.acquire();
             v.put(Messages.COLUMN_ACCOUNT, accountName);
             v.put(Messages.COLUMN_KIND, Kinds.KIND_MORE);
             v.put(Messages.COLUMN_THING_ID, moreThingId);
@@ -277,7 +276,7 @@ class MessageListing extends JsonParser implements Listing {
     }
 
     private void insertMessage(Cursor c) {
-        ContentValues v = new ContentValues(5 + 1); // +1 for session id.
+        PoolableContentValues v = PoolableContentValues.acquire();
         v.put(Messages.COLUMN_ACCOUNT, accountName);
         v.put(Messages.COLUMN_AUTHOR, accountName);
         v.put(Messages.COLUMN_BODY, c.getString(MERGE_TEXT));

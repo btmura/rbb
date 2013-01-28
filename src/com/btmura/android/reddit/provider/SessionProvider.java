@@ -61,7 +61,7 @@ abstract class SessionProvider extends BaseProvider {
         }
 
         // Fetch values to insert from the network.
-        ArrayList<ContentValues> values = listing.getValues();
+        ArrayList<PoolableContentValues> values = listing.getValues();
 
         // Insert new db values.
         db.beginTransaction();
@@ -99,7 +99,7 @@ abstract class SessionProvider extends BaseProvider {
             // Insert the rows into the database.
             InsertHelper helper = new InsertHelper(db, listing.getTargetTable());
             for (int i = 0; i < count; i++) {
-                helper.insert(values.get(i));
+                helper.insert(values.get(i).getContentValues());
             }
 
             db.setTransactionSuccessful();
@@ -111,6 +111,12 @@ abstract class SessionProvider extends BaseProvider {
             return sessionId;
         } finally {
             db.endTransaction();
+            if (values != null) {
+                int valueCount = values.size();
+                for (int i = 0; i < valueCount; i++) {
+                    values.get(i).release();
+                }
+            }
         }
     }
 }

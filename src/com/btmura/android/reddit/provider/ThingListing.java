@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -143,7 +142,7 @@ class ThingListing extends JsonParser implements Listing {
     /** Whether to prune more things from the listing. */
     private final boolean ignoreMoreThings;
 
-    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
+    private final ArrayList<PoolableContentValues> values = new ArrayList<PoolableContentValues>(30);
     private long networkTimeMs;
     private long parseTimeMs;
 
@@ -183,7 +182,7 @@ class ThingListing extends JsonParser implements Listing {
         this.ignoreMoreThings = ignoreMoreThings;
     }
 
-    public ArrayList<ContentValues> getValues() throws IOException {
+    public ArrayList<PoolableContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
 
         // Always follow redirects unless we are going to /r/random. We need to
@@ -269,7 +268,7 @@ class ThingListing extends JsonParser implements Listing {
     @Override
     public void onEntityStart(int index) {
         // Pass -1 and null since we don't know those until later
-        values.add(newContentValues(-1, null, 18));
+        values.add(newContentValues(-1, null));
     }
 
     @Override
@@ -414,12 +413,12 @@ class ThingListing extends JsonParser implements Listing {
         }
 
         if (!ignoreMoreThings && !TextUtils.isEmpty(moreThingId)) {
-            values.add(newContentValues(Kinds.KIND_MORE, moreThingId, 1));
+            values.add(newContentValues(Kinds.KIND_MORE, moreThingId));
         }
     }
 
-    private ContentValues newContentValues(int kind, String thingId, int extraCapacity) {
-        ContentValues v = new ContentValues(3 + extraCapacity);
+    private PoolableContentValues newContentValues(int kind, String thingId) {
+        PoolableContentValues v = PoolableContentValues.acquire();
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_KIND, kind);
         v.put(Things.COLUMN_THING_ID, thingId);
@@ -495,7 +494,7 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     private void addSave(Cursor c) {
-        ContentValues v = new ContentValues(15);
+        PoolableContentValues v = PoolableContentValues.acquire();
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_AUTHOR, c.getString(SAVE_AUTHOR));
         v.put(Things.COLUMN_CREATED_UTC, c.getLong(SAVE_CREATED_UTC));
@@ -518,7 +517,7 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     private void addVote(Cursor c) {
-        ContentValues v = new ContentValues(15);
+        PoolableContentValues v = PoolableContentValues.acquire();
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_AUTHOR, c.getString(VOTE_AUTHOR));
         v.put(Things.COLUMN_CREATED_UTC, c.getLong(VOTE_CREATED_UTC));

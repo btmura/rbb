@@ -19,7 +19,6 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -38,7 +37,7 @@ interface Listing {
     static final int TYPE_REDDIT_SEARCH_LISTING = 6;
 
     /** Get the values for this listing possibly using the network. */
-    ArrayList<ContentValues> getValues() throws IOException;
+    ArrayList<PoolableContentValues> getValues() throws IOException;
 
     /** Called after the insertion transaction to perform additional ops. */
     void performExtraWork(Context context);
