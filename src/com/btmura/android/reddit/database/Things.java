@@ -71,10 +71,12 @@ public class Things implements BaseColumns {
     public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
             SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + "=?";
 
-    public static final String SELECT_BY_ACCOUNT_AND_COMMENT_ACTION_ID =
-            SELECT_BY_ACCOUNT + " AND " + COLUMN_COMMENT_ACTION_ID + "=?";
+    public static final String SELECT_BY_COMMENT_ACTION_ID = COLUMN_COMMENT_ACTION_ID + "=?";
 
     public static final String SELECT_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID;
+
+    public static final String SELECT_BY_SESSION_ID_AND_THING_ID =
+            SELECT_BY_SESSION_ID + " AND " + COLUMN_THING_ID + "=?";
 
     // TODO: Do we need an index for sessionId and more?
     public static final String SELECT_BY_SESSION_ID_AND_MORE =

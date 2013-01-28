@@ -276,27 +276,27 @@ public class Provider {
             final long sessionId) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-           public void run() {
-               ArrayList<ContentProviderOperation> ops =
-                       new ArrayList<ContentProviderOperation>(2);
+            public void run() {
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(2);
 
-               ops.add(ContentProviderOperation.newInsert(ThingProvider.COMMENT_ACTIONS_SYNC_URI)
-                       .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
-                       .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_EDIT)
-                       .withValue(CommentActions.COLUMN_TEXT, text)
-                       .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentThingId)
-                       .withValue(CommentActions.COLUMN_THING_ID, thingId)
-                       .build());
+                ops.add(ContentProviderOperation.newInsert(ThingProvider.COMMENT_ACTIONS_SYNC_URI)
+                        .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
+                        .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_EDIT)
+                        .withValue(CommentActions.COLUMN_TEXT, text)
+                        .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentThingId)
+                        .withValue(CommentActions.COLUMN_THING_ID, thingId)
+                        .build());
 
-               ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                       .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
-                               Array.of(accountName, thingId))
-                       .withValue(Things.COLUMN_BODY, text)
-                       .withValueBackReference(Things.COLUMN_COMMENT_ACTION_ID, 1)
-                       .build());
+                ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
+                        .withSelection(Things.SELECT_BY_SESSION_ID_AND_THING_ID,
+                                Array.of(Long.toString(sessionId), thingId))
+                        .withValue(Things.COLUMN_BODY, text)
+                        .withValueBackReference(Things.COLUMN_COMMENT_ACTION_ID, 0)
+                        .build());
 
-               applyOps(appContext, ThingProvider.AUTHORITY, ops);
-           }
+                applyOps(appContext, ThingProvider.AUTHORITY, ops);
+            }
         });
     }
 
