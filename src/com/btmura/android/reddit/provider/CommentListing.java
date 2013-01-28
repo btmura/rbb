@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -63,10 +64,12 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private static final int INDEX_THING_ID = 3;
     private static final int INDEX_TEXT = 4;
 
+    // TODO: Pass estimate of size to CommentListing rather than doing this.
     public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
     public long networkTimeMs;
     public long parseTimeMs;
 
+    private final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
     private final Formatter formatter = new Formatter();
     private final Context context;
     private final SQLiteOpenHelper dbHelper;
@@ -198,7 +201,9 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     @Override
     public void onName(JsonReader reader, int index) throws IOException {
         String id = readTrimmedString(reader, "");
-        values.get(index).put(Things.COLUMN_THING_ID, id);
+        ContentValues v = values.get(index);
+        v.put(Things.COLUMN_THING_ID, id);
+        valueMap.put(id, v);
     }
 
     @Override
@@ -305,7 +310,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 String actionThingId = c.getString(INDEX_THING_ID);
                 switch (action) {
                     case CommentActions.ACTION_INSERT:
-                        if (insertThing(actionId, actionAccountName, text, actionThingId)) {
+                        if (insertThing(actionId, actionAccountName, actionThingId, text)) {
                             delta++;
                         }
                         break;
@@ -317,7 +322,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                         break;
 
                     case CommentActions.ACTION_EDIT:
-                        // TODO!
+                        editThing(actionId, actionThingId, text);
                         break;
 
                     default:
@@ -335,8 +340,8 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         }
     }
 
-    private boolean insertThing(long actionId, String actionAccountName, String body,
-            String actionThingId) {
+    private boolean insertThing(long actionId, String actionAccountName, String actionThingId,
+            String body) {
         int size = values.size();
         for (int i = 0; i < size; i++) {
             ContentValues v = values.get(i);
@@ -348,7 +353,8 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             }
 
             if (id.equals(actionThingId)) {
-                ContentValues p = new ContentValues(7 + 1); // +1 for session id.
+                ContentValues p = new ContentValues(7 + 1); // +1 for session
+                                                            // id.
                 p.put(Things.COLUMN_ACCOUNT, actionAccountName);
                 p.put(Things.COLUMN_AUTHOR, actionAccountName);
                 p.put(Things.COLUMN_BODY, body);
@@ -366,12 +372,12 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         return false;
     }
 
-    private boolean deleteThing(String deleteId) {
+    private boolean deleteThing(String actionThingId) {
         int size = values.size();
         for (int i = 0; i < size; i++) {
             ContentValues v = values.get(i);
             String id = v.getAsString(Things.COLUMN_THING_ID);
-            if (deleteId.equals(id)) {
+            if (actionThingId.equals(id)) {
                 // Mark the header comment or comment with children as
                 // [deleted] instead of completely removing it.
                 if (i == 0) {
@@ -389,6 +395,14 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             }
         }
         return false;
+    }
+
+    private void editThing(long actionId, String actionThingId, String text) {
+        ContentValues v = valueMap.get(actionThingId);
+        if (v != null) {
+            v.put(Things.COLUMN_BODY, text);
+            v.put(Things.COLUMN_COMMENT_ACTION_ID, actionId);
+        }
     }
 
     public int getCommentCount() {
