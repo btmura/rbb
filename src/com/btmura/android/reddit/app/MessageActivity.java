@@ -113,8 +113,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
         if (requestedFilter != -1) {
             filter = requestedFilter;
         } else {
-            filter = AccountPreferences.getLastSelfProfileFilter(prefs,
-                    FilterAdapter.PROFILE_OVERVIEW);
+            filter = AccountPreferences.getLastMessageFilter(prefs, FilterAdapter.MESSAGE_INBOX);
         }
         adapter.setFilter(filter);
 
