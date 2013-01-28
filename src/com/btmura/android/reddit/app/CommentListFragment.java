@@ -350,8 +350,15 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
 
         int position = getFirstCheckedPosition();
+        if (replyVisible || copyUrlVisible) {
+            boolean hasThing = hasThingId(position);
+            replyVisible &= hasThing;
+            editVisible &= hasThing;
+            copyUrlVisible &= hasThing;
+        }
+
         if (replyVisible) {
-            replyVisible = isReplyable(position);
+            replyVisible = isNotDeleted(position);
         }
 
         if (editVisible) {
@@ -381,22 +388,13 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return true;
     }
 
-    private boolean isReplyable(int position) {
-        String thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
-        if (TextUtils.isEmpty(thingId)) {
-            return false;
-        }
-
+    private boolean isNotDeleted(int position) {
         String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
-        if (Things.DELETED.equals(author)) {
-            return false;
-        }
-
-        return true;
+        return !Things.DELETED.equals(author);
     }
 
     private boolean isEditable(int position) {
-        return isAuthor(position) && hasThingId(position)
+        return isAuthor(position)
                 && (position != 0 || adapter.getBoolean(0, CommentAdapter.INDEX_SELF));
     }
 
