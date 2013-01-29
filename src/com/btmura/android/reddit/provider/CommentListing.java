@@ -24,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -34,9 +35,9 @@ import android.util.JsonReader;
 import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
+import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
@@ -64,13 +65,11 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private static final int INDEX_TEXT = 4;
 
     // TODO: Pass estimate of size to CommentListing rather than doing this.
-    public final ArrayList<PoolableContentValues> values =
-            new ArrayList<PoolableContentValues>(360);
+    public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
     public long networkTimeMs;
     public long parseTimeMs;
 
-    private final HashMap<String, PoolableContentValues> valueMap =
-            new HashMap<String, PoolableContentValues>();
+    private final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
     private final Formatter formatter = new Formatter();
     private final Context context;
     private final SQLiteOpenHelper dbHelper;
@@ -94,7 +93,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         this.cookie = cookie;
     }
 
-    public ArrayList<PoolableContentValues> getValues() throws IOException {
+    public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         CharSequence url = Urls.commentListing(thingId, linkId, Urls.TYPE_JSON);
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
@@ -144,7 +143,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void onEntityStart(int index) {
-        PoolableContentValues v = PoolableContentValues.acquire();
+        ContentValues v = new ContentValues(19);
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_SEQUENCE, index);
         values.add(v);
@@ -183,7 +182,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void onKind(JsonReader reader, int index) throws IOException {
-        PoolableContentValues v = values.get(index);
+        ContentValues v = values.get(index);
         v.put(Things.COLUMN_NESTING, replyNesting);
         v.put(Things.COLUMN_KIND, Kinds.parseKind(reader.nextString()));
     }
@@ -202,7 +201,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     @Override
     public void onName(JsonReader reader, int index) throws IOException {
         String id = readTrimmedString(reader, "");
-        PoolableContentValues v = values.get(index);
+        ContentValues v = values.get(index);
         v.put(Things.COLUMN_THING_ID, id);
         valueMap.put(id, v);
     }
@@ -281,7 +280,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private void removeMoreComments() {
         int size = values.size();
         for (int i = 0; i < size;) {
-            PoolableContentValues v = values.get(i);
+            ContentValues v = values.get(i);
             Integer type = (Integer) v.get(Things.COLUMN_KIND);
             if (type.intValue() == Kinds.KIND_MORE) {
                 values.remove(i);
@@ -345,7 +344,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             String body) {
         int size = values.size();
         for (int i = 0; i < size; i++) {
-            PoolableContentValues v = values.get(i);
+            ContentValues v = values.get(i);
             String id = v.getAsString(Things.COLUMN_THING_ID);
 
             // This thing could be a placeholder we previously inserted.
@@ -354,7 +353,8 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             }
 
             if (id.equals(actionThingId)) {
-                PoolableContentValues p = PoolableContentValues.acquire();
+                ContentValues p = new ContentValues(7 + 1); // +1 for session
+                                                            // id.
                 p.put(Things.COLUMN_ACCOUNT, actionAccountName);
                 p.put(Things.COLUMN_AUTHOR, actionAccountName);
                 p.put(Things.COLUMN_BODY, body);
@@ -375,7 +375,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private boolean deleteThing(String actionThingId) {
         int size = values.size();
         for (int i = 0; i < size; i++) {
-            PoolableContentValues v = values.get(i);
+            ContentValues v = values.get(i);
             String id = v.getAsString(Things.COLUMN_THING_ID);
             if (actionThingId.equals(id)) {
                 // Mark the header comment or comment with children as
@@ -388,7 +388,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                     v.put(Things.COLUMN_BODY, Things.DELETED);
                     return false;
                 } else {
-                    values.remove(i).release();
+                    values.remove(i);
                     size--;
                     return true;
                 }
@@ -398,7 +398,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     }
 
     private void editThing(long actionId, String actionThingId, String text) {
-        PoolableContentValues v = valueMap.get(actionThingId);
+        ContentValues v = valueMap.get(actionThingId);
         if (v != null) {
             v.put(Things.COLUMN_BODY, text);
             v.put(Things.COLUMN_COMMENT_ACTION_ID, actionId);
