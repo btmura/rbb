@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.app;
+package com.btmura.android.reddit.net;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ import android.content.UriMatcher;
 import android.net.Uri;
 import android.os.Bundle;
 
-class UriHelper {
+public class UriHelper {
 
     private static final String[] AUTHORITIES = {
             "www.reddit.com",

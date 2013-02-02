@@ -39,6 +39,7 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;

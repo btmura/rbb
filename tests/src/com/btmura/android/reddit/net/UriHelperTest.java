@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.btmura.android.reddit.app;
+package com.btmura.android.reddit.net;
 
+import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.ThingBundle;
 
