@@ -89,14 +89,13 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
         if (savedInstanceState == null) {
             thingBundle = getArguments().getBundle(ARG_THING_BUNDLE);
         } else {
             thingBundle = savedInstanceState.getBundle(STATE_THING_BUNDLE);
         }
         newCommentVisible = isNewCommentVisible();
+        setHasOptionsMenu(true);
     }
 
     public void setThingBundle(Bundle thingBundle) {

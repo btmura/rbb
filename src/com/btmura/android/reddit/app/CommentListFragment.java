@@ -115,7 +115,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
 
         String accountName = getArguments().getString(ARG_ACCOUNT_NAME);
         String thingId = getArguments().getString(ARG_THING_ID);
@@ -133,6 +132,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
 
         flags = getArguments().getInt(ARG_FLAGS);
+        setHasOptionsMenu(true);
     }
 
     @Override

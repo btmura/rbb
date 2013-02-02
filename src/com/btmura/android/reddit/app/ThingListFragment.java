@@ -157,7 +157,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
 
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
@@ -185,6 +184,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
             emptyText = savedInstanceState.getInt(STATE_EMPTY_TEXT);
         }
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -245,6 +246,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
+        getActivity().invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {

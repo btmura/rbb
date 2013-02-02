@@ -172,9 +172,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         restoringState = savedInstanceState != null;
         adapter = new AccountNameAdapter(getActivity(), R.layout.account_name_row);
+        setHasOptionsMenu(true);
     }
 
     @Override
