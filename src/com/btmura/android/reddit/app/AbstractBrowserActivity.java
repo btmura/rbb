@@ -58,6 +58,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         OnBackStackChangedListener,
         AccountNameHolder,
         SubredditNameHolder,
+        ThingBundleHolder,
         ThingMenuEventListenerHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
@@ -645,6 +646,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 return subreddit;
             }
             return ThingBundle.getSubreddit(cf.getThingBundle());
+        }
+        return null;
+    }
+
+    public Bundle getThingBundle() {
+        ControlFragment cf = getControlFragment();
+        if (cf != null) {
+            return cf.getThingBundle();
         }
         return null;
     }

@@ -96,6 +96,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     private OnThingSelectedListener listener;
     private OnSubredditEventListener eventListener;
+    private ThingBundleHolder thingBundleHolder;
     private ThingAdapter adapter;
     private int emptyText;
     private boolean scrollLoading;
@@ -148,11 +149,15 @@ public class ThingListFragment extends ThingProviderListFragment implements
         if (activity instanceof OnSubredditEventListener) {
             eventListener = (OnSubredditEventListener) activity;
         }
+        if (activity instanceof ThingBundleHolder) {
+            thingBundleHolder = (ThingBundleHolder) activity;
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
@@ -299,6 +304,36 @@ public class ThingListFragment extends ThingProviderListFragment implements
         if (!TextUtils.isEmpty(adapter.getAccountName())) {
             int position = getListView().getPositionForView(view);
             adapter.vote(getActivity(), position, action);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.thing_list_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        String subreddit = getSubreddit();
+
+        boolean hasAccount = AccountUtils.isAccount(getAccountName());
+        boolean hasSubreddit = subreddit != null;
+        boolean hasThing = thingBundleHolder != null && thingBundleHolder.getThingBundle() != null;
+
+        boolean showNewPost = hasAccount && hasSubreddit && !hasThing;
+        boolean showAddSubreddit = hasSubreddit && !hasThing;
+        boolean showSubreddit = hasSubreddit && !hasThing && Subreddits.hasSidebar(subreddit);
+
+        menu.findItem(R.id.menu_new_post).setVisible(showNewPost);
+        menu.findItem(R.id.menu_add_subreddit).setVisible(showAddSubreddit);
+
+        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
+        subredditItem.setVisible(showSubreddit);
+        if (showSubreddit) {
+            subredditItem.setTitle(MenuHelper.getSubredditTitle(getActivity(), subreddit));
         }
     }
 

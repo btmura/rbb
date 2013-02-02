@@ -284,7 +284,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         if (groupVisible) {
             refreshAccountItems(menu);
-            refreshSubredditItem(menu);
             refreshMessagesIcon();
         }
 
@@ -293,7 +292,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     private void refreshAccountItems(Menu menu) {
         boolean hasAccount = hasAccount();
-        menu.findItem(R.id.menu_new_post).setVisible(hasAccount);
         menu.findItem(R.id.menu_profile).setVisible(hasAccount);
         menu.findItem(R.id.menu_profile_saved).setVisible(hasAccount);
         menu.findItem(R.id.menu_messages).setVisible(hasAccount);
@@ -320,15 +318,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         return adapter != null
                 && mailAdapter != null
                 && mailAdapter.hasMessages(adapter.getAccountName());
-    }
-
-    private void refreshSubredditItem(Menu menu) {
-        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
-        String subreddit = getSubredditName();
-        subredditItem.setVisible(Subreddits.hasSidebar(subreddit));
-        if (subredditItem.isVisible()) {
-            subredditItem.setTitle(MenuHelper.getSubredditTitle(this, subreddit));
-        }
     }
 
     @Override

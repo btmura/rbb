@@ -25,13 +25,11 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
-import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -63,8 +61,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private String accountName;
     private String subreddit;
     private SharedPreferences prefs;
-    private MenuItem newPostItem;
-    private MenuItem subredditItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +108,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         accountName = result.getLastAccount();
         adapter.addSubredditFilters(this);
         bar.setSelectedNavigationItem(result.getLastSubredditFilter());
-        refreshNewPostItem();
+        invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
@@ -139,9 +135,11 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public void onSubredditDiscovery(String subreddit) {
-        this.subreddit = subreddit;
-        adapter.setTitle(subreddit);
-        refreshMenuItems();
+        if (!Objects.equals(this.subreddit, subreddit)) {
+            this.subreddit = subreddit;
+            adapter.setTitle(subreddit);
+            invalidateOptionsMenu();
+        }
     }
 
     public void onThingSelected(Bundle thingBundle) {
@@ -161,44 +159,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     public String getSubredditName() {
         return subreddit;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.thing_list_menu, menu);
-        newPostItem = menu.findItem(R.id.menu_new_post);
-        subredditItem = menu.findItem(R.id.menu_subreddit);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        refreshMenuItems();
-        return true;
-    }
-
-    private void refreshMenuItems() {
-        refreshNewPostItem();
-        refreshSubredditItem();
-    }
-
-    private void refreshNewPostItem() {
-        if (newPostItem != null) {
-            boolean visible = AccountUtils.isAccount(accountName);
-            newPostItem.setVisible(visible);
-        }
-    }
-
-    private void refreshSubredditItem() {
-        if (subredditItem != null) {
-            boolean visible = Subreddits.hasSidebar(subreddit);
-            subredditItem.setVisible(visible);
-            if (visible) {
-                subredditItem.setTitle(MenuHelper.getSubredditTitle(this, subreddit));
-            }
-        }
     }
 
     @Override
