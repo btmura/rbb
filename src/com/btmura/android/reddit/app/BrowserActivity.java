@@ -279,14 +279,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         }
         super.onPrepareOptionsMenu(menu);
 
-        boolean groupVisible = !hasThing();
-        menu.setGroupVisible(R.id.thingless, groupVisible);
-
-        if (groupVisible) {
-            refreshAccountItems(menu);
-            refreshMessagesIcon();
-        }
-
+        boolean hasThing = hasThing();
+        menu.setGroupVisible(R.id.menu_group_accounts, !hasThing);
+        refreshAccountItems(menu);
+        refreshMessagesIcon();
         return true;
     }
 
