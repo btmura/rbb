@@ -28,6 +28,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.JsonReader;
@@ -41,6 +42,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Array;
@@ -209,15 +211,8 @@ class ThingListing extends JsonParser implements Listing {
         // Handle the redirect if the request was for /r/random to use JSON.
         if (!followRedirects && conn.getResponseCode() == 302) {
             String location = conn.getHeaderField("Location");
-            if (location.startsWith("/r/")) {
-                location = location.substring(3);
-            }
-            if (location.length() > 1 && location.endsWith("/")) {
-                location = location.substring(0, location.length() - 1);
-            }
-
-            url = Urls.subreddit(location, filter, more, Urls.TYPE_JSON);
-            resolvedSubreddit = location;
+            resolvedSubreddit = UriHelper.getSubreddit(Uri.parse(location));
+            url = Urls.subreddit(resolvedSubreddit, filter, more, Urls.TYPE_JSON);
 
             // Disconnect and reconnect to the proper URL.
             conn.disconnect();
