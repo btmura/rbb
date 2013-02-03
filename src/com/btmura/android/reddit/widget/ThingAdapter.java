@@ -430,7 +430,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     private Bundle makeThingBundle(Context context, Cursor c) {
-        Bundle b = new Bundle(10);
+        Bundle b = new Bundle(8);
         ThingBundle.putAuthor(b, c.getString(THING_AUTHOR));
         ThingBundle.putSubreddit(b, c.getString(THING_SUBREDDIT));
         ThingBundle.putKind(b, c.getInt(THING_KIND));
@@ -455,9 +455,6 @@ public class ThingAdapter extends BaseLoaderAdapter {
         if (!TextUtils.isEmpty(permaLink)) {
             ThingBundle.putCommentUrl(b, Urls.perma(permaLink, null));
         }
-
-        ThingBundle.putSavable(b, c.getInt(THING_KIND) == Kinds.KIND_LINK);
-        ThingBundle.putSaved(b, isSaved(c.getPosition()));
 
         return b;
     }

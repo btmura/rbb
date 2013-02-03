@@ -136,7 +136,6 @@ public class ThingActivity extends GlobalMenuActivity implements
 
             ThingMenuFragment mf = getThingMenuFragment();
             ThingBundle.putAuthor(thingBundle, thingHolder.getAuthor());
-            ThingBundle.putSaved(thingBundle, thingHolder.isSaved());
             mf.setThingBundle(thingBundle);
         }
     }
