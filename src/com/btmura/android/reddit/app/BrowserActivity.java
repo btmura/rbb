@@ -76,6 +76,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     private MenuItem messagesItem;
 
+    private MenuItem newPostItem;
+
+    private MenuItem profileItem;
+
+    private MenuItem profileSavedItem;
+
     @Override
     protected void setContentView() {
         setContentView(R.layout.browser);
@@ -268,6 +274,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
+        newPostItem = menu.findItem(R.id.menu_browser_new_post);
+        profileItem = menu.findItem(R.id.menu_profile);
+        profileSavedItem = menu.findItem(R.id.menu_profile_saved);
         messagesItem = menu.findItem(R.id.menu_messages);
         return true;
     }
@@ -278,19 +287,20 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             Log.d(TAG, "onPrepareOptionsMenu");
         }
         super.onPrepareOptionsMenu(menu);
+        if (newPostItem == null) {
+            return true; // Check that onCreateOptionsMenu was called.
+        }
 
-        boolean hasThing = hasThing();
-        menu.setGroupVisible(R.id.menu_group_accounts, !hasThing);
-        refreshAccountItems(menu);
+        menu.setGroupVisible(R.id.menu_group_accounts, !hasThing());
+
+        boolean hasAccount = hasAccount();
+        newPostItem.setVisible(isSinglePane && hasAccount);
+        profileItem.setVisible(hasAccount);
+        profileSavedItem.setVisible(hasAccount);
+        messagesItem.setVisible(hasAccount);
+
         refreshMessagesIcon();
         return true;
-    }
-
-    private void refreshAccountItems(Menu menu) {
-        boolean hasAccount = hasAccount();
-        menu.findItem(R.id.menu_profile).setVisible(hasAccount);
-        menu.findItem(R.id.menu_profile_saved).setVisible(hasAccount);
-        menu.findItem(R.id.menu_messages).setVisible(hasAccount);
     }
 
     private boolean hasAccount() {

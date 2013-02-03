@@ -85,6 +85,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         // convenience. Some other items have complicated visibility logic, so
         // they aren't inflated in this fragment.
         switch (item.getItemId()) {
+            case R.id.menu_browser_new_post:
             case R.id.menu_new_post:
                 handleNewPost();
                 return true;
