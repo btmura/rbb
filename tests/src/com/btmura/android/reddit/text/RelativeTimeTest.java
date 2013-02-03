@@ -1,5 +1,8 @@
 package com.btmura.android.reddit.text;
 
+import java.util.Formatter;
+
+import android.content.res.Resources;
 import android.test.AndroidTestCase;
 
 public class RelativeTimeTest extends AndroidTestCase {
@@ -12,53 +15,55 @@ public class RelativeTimeTest extends AndroidTestCase {
     private static final long NOW = YEAR_SECONDS * 3;
     private static final long NOW_MS = NOW * 1000;
 
+    private Resources resources;
+    private StringBuilder formatterData;
+    private Formatter formatter;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        resources = mContext.getResources();
+        formatterData = new StringBuilder();
+        formatter = new Formatter(formatterData);
+    }
+
     public void testFormat_seconds() {
-        assertEquals("0 seconds ago",
-                RelativeTime.format(mContext, NOW_MS, NOW));
-        assertEquals("1 second ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - 1));
-        assertEquals("20 seconds ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - 20));
-        assertEquals("59 seconds ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - 59));
+        assertFormat("0 seconds ago", NOW_MS, NOW);
+        assertFormat("1 second ago", NOW_MS, NOW - 1);
+        assertFormat("20 seconds ago", NOW_MS, NOW - 20);
+        assertFormat("59 seconds ago", NOW_MS, NOW - 59);
     }
 
     public void testFormat_minutes() {
-        assertEquals("1 minute ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - MINUTE_SECONDS));
-        assertEquals("20 minutes ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - MINUTE_SECONDS * 20));
-        assertEquals("59 minutes ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - MINUTE_SECONDS * 59));
-        assertEquals("59 minutes ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - MINUTE_SECONDS * 59 - 30));
+        assertFormat("1 minute ago", NOW_MS, NOW - MINUTE_SECONDS);
+        assertFormat("20 minutes ago", NOW_MS, NOW - MINUTE_SECONDS * 20);
+        assertFormat("59 minutes ago", NOW_MS, NOW - MINUTE_SECONDS * 59);
+        assertFormat("59 minutes ago", NOW_MS, NOW - MINUTE_SECONDS * 59 - 30);
     }
 
     public void testFormat_hours() {
-        assertEquals("1 hour ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - HOUR_SECONDS));
-        assertEquals("23 hours ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - HOUR_SECONDS * 23));
+        assertFormat("1 hour ago", NOW_MS, NOW - HOUR_SECONDS);
+        assertFormat("23 hours ago", NOW_MS, NOW - HOUR_SECONDS * 23);
     }
 
     public void testFormat_days() {
-        assertEquals("1 day ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - DAY_SECONDS));
-        assertEquals("29 days ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - DAY_SECONDS * 29));
+        assertFormat("1 day ago", NOW_MS, NOW - DAY_SECONDS);
+        assertFormat("29 days ago", NOW_MS, NOW - DAY_SECONDS * 29);
     }
 
     public void testFormat_months() {
-        assertEquals("1 month ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - MONTH_SECONDS));
-        assertEquals("11 months ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - MONTH_SECONDS * 11));
+        assertFormat("1 month ago", NOW_MS, NOW - MONTH_SECONDS);
+        assertFormat("11 months ago", NOW_MS, NOW - MONTH_SECONDS * 11);
     }
 
     public void testFormat_years() {
-        assertEquals("1 year ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - YEAR_SECONDS));
-        assertEquals("2 years ago",
-                RelativeTime.format(mContext, NOW_MS, NOW - YEAR_SECONDS * 2));
+        assertFormat("1 year ago", NOW_MS, NOW - YEAR_SECONDS);
+        assertFormat("2 years ago", NOW_MS, NOW - YEAR_SECONDS * 2);
+    }
+
+    private void assertFormat(String expected, long nowMs, long timeSec) {
+        formatterData.delete(0, formatterData.length());
+        assertEquals(expected, RelativeTime.format(resources, formatter, nowMs, timeSec)
+                .toString());
     }
 }

@@ -116,9 +116,11 @@ public class ThingView extends CustomView implements OnGestureListener {
     private Layout linkTitleLayout;
     private Layout titleLayout;
     private Layout bodyLayout;
-
     private BoringLayout.Metrics statusMetrics;
     private BoringLayout statusLayout;
+
+    private StringBuilder formatterData;
+    private java.util.Formatter formatter;
 
     private Rect scoreBounds;
     private RectF bodyBounds;
@@ -296,15 +298,15 @@ public class ThingView extends CustomView implements OnGestureListener {
         statusText.append(author).append("  ");
 
         if (showPoints) {
-            statusText.append(r.getQuantityString(R.plurals.points, score, score)).append("  ");
+            statusText.append(getQuantityString(r, R.plurals.points, score)).append("  ");
         }
 
         if (createdUtc != 0) {
-            statusText.append(RelativeTime.format(c, nowTimeMs, createdUtc)).append("  ");
+            statusText.append(getRelativeTime(r, nowTimeMs, createdUtc)).append("  ");
         }
 
         if (showNumComments) {
-            statusText.append(r.getQuantityString(R.plurals.comments, numComments, numComments));
+            statusText.append(getQuantityString(r, R.plurals.comments, numComments));
         }
 
         if (!expanded) {
@@ -313,6 +315,27 @@ public class ThingView extends CustomView implements OnGestureListener {
             }
             statusText.setSpan(italicSpan, 0, statusText.length(), 0);
         }
+    }
+
+    private CharSequence getQuantityString(Resources resources, int resId, int quantity) {
+        resetFormatter();
+        String format = resources.getQuantityText(resId, quantity).toString();
+        formatter.format(resources.getConfiguration().locale, format, quantity);
+        return formatterData;
+    }
+
+    private CharSequence getRelativeTime(Resources resources, long nowTimeMs, long createdUtc) {
+        resetFormatter();
+        RelativeTime.format(resources, formatter, nowTimeMs, createdUtc);
+        return formatterData;
+    }
+
+    private void resetFormatter() {
+        if (formatter == null) {
+            formatterData = new StringBuilder(50);
+            formatter = new java.util.Formatter(formatterData);
+        }
+        formatterData.delete(0, formatterData.length());
     }
 
     /**
@@ -525,11 +548,11 @@ public class ThingView extends CustomView implements OnGestureListener {
         Resources r = getResources();
         switch (details[index]) {
             case DETAIL_UP_VOTES:
-                makeDetailsLayout(index, r.getQuantityString(R.plurals.votes_up, ups, ups));
+                makeDetailsLayout(index, getQuantityString(r, R.plurals.votes_up, ups));
                 break;
 
             case DETAIL_DOWN_VOTES:
-                makeDetailsLayout(index, r.getQuantityString(R.plurals.votes_down, downs, downs));
+                makeDetailsLayout(index, getQuantityString(r, R.plurals.votes_down, downs));
                 break;
 
             case DETAIL_DOMAIN:
@@ -545,7 +568,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                 break;
 
             case DETAIL_TIMESTAMP:
-                makeDetailsLayout(index, RelativeTime.format(getContext(), nowTimeMs, createdUtc));
+                makeDetailsLayout(index, getRelativeTime(r, nowTimeMs, createdUtc));
                 break;
 
             case DETAIL_DESTINATION:

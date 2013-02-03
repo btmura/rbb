@@ -16,7 +16,10 @@
 
 package com.btmura.android.reddit.text;
 
-import android.content.Context;
+import java.util.Formatter;
+import java.util.Locale;
+
+import android.content.res.Resources;
 
 import com.btmura.android.reddit.R;
 
@@ -28,7 +31,7 @@ public class RelativeTime {
     private static final int MONTH_SECONDS = DAY_SECONDS * 30;
     private static final int YEAR_SECONDS = MONTH_SECONDS * 12;
 
-    public static String format(Context context, long nowMs, long timeSec) {
+    public static Formatter format(Resources resources, Formatter formatter, long nowMs, long timeSec) {
         long diff = nowMs / 1000 - timeSec;
         int resId;
         double value;
@@ -46,7 +49,10 @@ public class RelativeTime {
             resId = R.plurals.time_seconds;
             value = Math.max(0, diff);
         }
+
+        Locale locale = resources.getConfiguration().locale;
         int quantity = (int) Math.round(value);
-        return context.getResources().getQuantityString(resId, quantity, quantity);
+        String format = resources.getQuantityText(resId, quantity).toString();
+        return formatter.format(locale, format, quantity);
     }
 }
