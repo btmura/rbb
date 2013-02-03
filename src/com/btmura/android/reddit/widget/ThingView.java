@@ -116,7 +116,9 @@ public class ThingView extends CustomView implements OnGestureListener {
     private Layout linkTitleLayout;
     private Layout titleLayout;
     private Layout bodyLayout;
-    private Layout statusLayout;
+
+    private BoringLayout.Metrics statusMetrics;
+    private BoringLayout statusLayout;
 
     private Rect scoreBounds;
     private RectF bodyBounds;
@@ -501,20 +503,22 @@ public class ThingView extends CustomView implements OnGestureListener {
         return makeStaticLayout(bodyPaint, bodyText, width);
     }
 
-    private Layout createStatusLayout(int width) {
-        return makeBoringLayout(statusPaint, statusText, width, Alignment.ALIGN_NORMAL);
-    }
-
     private static Layout makeStaticLayout(int paint, CharSequence text, int width) {
         return new StaticLayout(text, TEXT_PAINTS[paint], width,
                 Alignment.ALIGN_NORMAL, 1f, 0f, true);
     }
 
-    private static Layout makeBoringLayout(int paint, CharSequence text, int width,
-            Alignment alignment) {
-        BoringLayout.Metrics m = BoringLayout.isBoring(text, TEXT_PAINTS[paint]);
-        return BoringLayout.make(text, TEXT_PAINTS[paint], width, alignment, 1f, 0f, m, true,
-                TruncateAt.END, width);
+    private BoringLayout createStatusLayout(int width) {
+        TextPaint paint = TEXT_PAINTS[statusPaint];
+        statusMetrics = BoringLayout.isBoring(statusText, paint, statusMetrics);
+        if (statusLayout != null) {
+            statusLayout = statusLayout.replaceOrMake(statusText, paint, width,
+                    Alignment.ALIGN_NORMAL, 1f, 0f, statusMetrics, true, TruncateAt.END, width);
+        } else {
+            statusLayout = BoringLayout.make(statusText, paint, width,
+                    Alignment.ALIGN_NORMAL, 1f, 0f, statusMetrics, true, TruncateAt.END, width);
+        }
+        return statusLayout;
     }
 
     private void makeDetails(int index) {
@@ -569,7 +573,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         // Create the layout and try to reuse the existing layout.
         if (detailLayouts[i] != null) {
-            detailLayouts[i].replaceOrMake(text, paint, DETAILS_INNER_CELL_WIDTH,
+            detailLayouts[i] = detailLayouts[i].replaceOrMake(text, paint, DETAILS_INNER_CELL_WIDTH,
                     Alignment.ALIGN_CENTER, 1, 0, detailMetrics[i], true, TruncateAt.END,
                     DETAILS_INNER_CELL_WIDTH);
         } else {
@@ -617,7 +621,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         c.translate(0, -PADDING + (minHeight - rightHeight) / 2);
 
         // Render the status at the top for comments.
-        if (isTopStatus() && statusLayout != null) {
+        if (isTopStatus() && !TextUtils.isEmpty(statusText)) {
             statusLayout.draw(c);
             c.translate(0, statusLayout.getHeight() + ELEMENT_PADDING);
         }
@@ -633,7 +637,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         // Render the status at the bottom for non-comments.
-        if (!isTopStatus() && statusLayout != null) {
+        if (!isTopStatus() && !TextUtils.isEmpty(statusText)) {
             statusLayout.draw(c);
         }
     }
