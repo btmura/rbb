@@ -53,7 +53,10 @@ public class LinkFragment extends Fragment implements ThingMenuListener {
 
     private WebView webView;
     private ProgressBar progress;
+
     private MenuItem shareItem;
+    private MenuItem openItem;
+    private MenuItem copyUrlItem;
 
     public static LinkFragment newInstance(String title, CharSequence url) {
         Bundle b = new Bundle(2);
@@ -170,10 +173,20 @@ public class LinkFragment extends Fragment implements ThingMenuListener {
 
     public void onCreateThingOptionsMenu(Menu menu) {
         shareItem = menu.findItem(R.id.menu_share);
+        openItem = menu.findItem(R.id.menu_open);
+        copyUrlItem = menu.findItem(R.id.menu_copy_url);
     }
 
     public void onPrepareThingOptionsMenu(Menu menu, int pageType) {
         if (pageType == ThingPagerAdapter.TYPE_LINK) {
+            if (openItem != null) {
+                openItem.setVisible(true);
+            }
+
+            if (copyUrlItem != null) {
+                copyUrlItem.setVisible(true);
+            }
+
             if (shareItem != null) {
                 shareItem.setVisible(true);
                 MenuHelper.setShareProvider(shareItem, getArguments().getString(ARG_TITLE),
