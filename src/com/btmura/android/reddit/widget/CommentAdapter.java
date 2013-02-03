@@ -208,7 +208,7 @@ public class CommentAdapter extends BaseLoaderAdapter {
     }
 
     public boolean isReplyable() {
-        return AccountUtils.isAccount(accountName);
+        return AccountUtils.isAccount(accountName) && getCursor() != null;
     }
 
     public boolean isSaved() {

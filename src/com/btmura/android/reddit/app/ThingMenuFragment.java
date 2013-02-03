@@ -40,6 +40,7 @@ public class ThingMenuFragment extends Fragment {
 
     interface ThingMenuListenerHolder {
         void addThingMenuListener(ThingMenuListener listener);
+
         void removeThingMenuListener(ThingMenuListener listener);
     }
 
@@ -60,12 +61,8 @@ public class ThingMenuFragment extends Fragment {
     private ThingPagerHolder thingPagerHolder;
 
     private Bundle thingBundle;
-    private boolean newCommentVisible;
-    private boolean newCommentEnabled;
-
     private MenuItem savedItem;
     private MenuItem unsavedItem;
-    private MenuItem newCommentItem;
     private MenuItem addSubredditItem;
     private MenuItem userItem;
     private MenuItem subredditItem;
@@ -98,7 +95,6 @@ public class ThingMenuFragment extends Fragment {
         } else {
             thingBundle = savedInstanceState.getBundle(STATE_THING_BUNDLE);
         }
-        newCommentVisible = isNewCommentVisible();
         setHasOptionsMenu(true);
     }
 
@@ -107,18 +103,12 @@ public class ThingMenuFragment extends Fragment {
         refreshMenuItems();
     }
 
-    public void setNewCommentItemEnabled(boolean enabled) {
-        this.newCommentEnabled = enabled;
-        refreshNewCommentItem();
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_menu_menu, menu);
         savedItem = menu.findItem(R.id.menu_saved);
         unsavedItem = menu.findItem(R.id.menu_unsaved);
-        newCommentItem = menu.findItem(R.id.menu_new_comment);
         addSubredditItem = menu.findItem(R.id.menu_thing_add_subreddit);
         userItem = menu.findItem(R.id.menu_user);
         subredditItem = menu.findItem(R.id.menu_thing_subreddit);
@@ -141,17 +131,9 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void refreshMenuItems() {
-        refreshNewCommentItem();
         refreshSaveItems();
         refreshUserItems();
         refreshSubredditItem();
-    }
-
-    private void refreshNewCommentItem() {
-        if (newCommentItem != null) {
-            newCommentItem.setVisible(newCommentVisible);
-            newCommentItem.setEnabled(newCommentEnabled);
-        }
     }
 
     private void refreshSaveItems() {
@@ -246,10 +228,6 @@ public class ThingMenuFragment extends Fragment {
 
     private String getUser() {
         return ThingBundle.getAuthor(thingBundle);
-    }
-
-    private boolean isNewCommentVisible() {
-        return hasAccountName();
     }
 
     @Override

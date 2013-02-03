@@ -83,6 +83,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     private MenuItem shareItem;
     private MenuItem linkItem;
+    private MenuItem newCommentItem;
     private MenuItem openItem;
     private MenuItem copyUrlItem;
 
@@ -243,6 +244,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
     public void onCreateThingOptionsMenu(Menu menu) {
         shareItem = menu.findItem(R.id.menu_share);
         linkItem = menu.findItem(R.id.menu_link);
+        newCommentItem = menu.findItem(R.id.menu_new_comment);
         openItem = menu.findItem(R.id.menu_open);
         copyUrlItem = menu.findItem(R.id.menu_copy_url);
     }
@@ -262,6 +264,10 @@ public class CommentListFragment extends ThingProviderListFragment implements
                 linkItem.setVisible(Flag.isEnabled(flags, FLAG_SHOW_LINK_MENU_ITEM)
                         || (adapter.getCursor() != null
                         && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF)));
+            }
+
+            if (newCommentItem != null) {
+                newCommentItem.setVisible(adapter.isReplyable());
             }
 
             if (openItem != null) {
