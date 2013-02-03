@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
@@ -209,6 +210,10 @@ public class CommentAdapter extends BaseLoaderAdapter {
 
     public boolean isReplyable() {
         return AccountUtils.isAccount(accountName) && getCursor() != null;
+    }
+
+    public boolean isSavable() {
+        return AccountUtils.isAccount(accountName) && getInt(0, INDEX_KIND) == Kinds.KIND_LINK;
     }
 
     public boolean isSaved() {

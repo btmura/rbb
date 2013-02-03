@@ -86,6 +86,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
     private MenuItem newCommentItem;
     private MenuItem openItem;
     private MenuItem copyUrlItem;
+    private MenuItem savedItem;
+    private MenuItem unsavedItem;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
             String linkId, String title, CharSequence url, int flags) {
@@ -247,6 +249,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
         newCommentItem = menu.findItem(R.id.menu_new_comment);
         openItem = menu.findItem(R.id.menu_open);
         copyUrlItem = menu.findItem(R.id.menu_copy_url);
+        savedItem = menu.findItem(R.id.menu_saved);
+        unsavedItem = menu.findItem(R.id.menu_unsaved);
     }
 
     public void onPrepareThingOptionsMenu(Menu menu, int pageType) {
@@ -266,10 +270,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
                         && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF)));
             }
 
-            if (newCommentItem != null) {
-                newCommentItem.setVisible(adapter.isReplyable());
-            }
-
             if (openItem != null) {
                 openItem.setVisible(linkReady);
             }
@@ -277,6 +277,19 @@ public class CommentListFragment extends ThingProviderListFragment implements
             if (copyUrlItem != null) {
                 copyUrlItem.setVisible(linkReady);
             }
+        }
+
+        // CommentListFragment handles some menu items for ThingMenuFragment.
+
+        if (newCommentItem != null) {
+            newCommentItem.setVisible(adapter.isReplyable());
+        }
+
+        if (savedItem != null && unsavedItem != null) {
+            boolean savable = adapter.isSavable();
+            boolean saved = adapter.isSaved();
+            savedItem.setVisible(savable && saved);
+            unsavedItem.setVisible(savable && !saved);
         }
     }
 

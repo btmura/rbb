@@ -25,7 +25,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.ThingBundle;
 
@@ -61,8 +60,6 @@ public class ThingMenuFragment extends Fragment {
     private ThingPagerHolder thingPagerHolder;
 
     private Bundle thingBundle;
-    private MenuItem savedItem;
-    private MenuItem unsavedItem;
     private MenuItem addSubredditItem;
     private MenuItem userItem;
     private MenuItem subredditItem;
@@ -107,8 +104,6 @@ public class ThingMenuFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_menu_menu, menu);
-        savedItem = menu.findItem(R.id.menu_saved);
-        unsavedItem = menu.findItem(R.id.menu_unsaved);
         addSubredditItem = menu.findItem(R.id.menu_thing_add_subreddit);
         userItem = menu.findItem(R.id.menu_user);
         subredditItem = menu.findItem(R.id.menu_thing_subreddit);
@@ -131,18 +126,8 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void refreshMenuItems() {
-        refreshSaveItems();
         refreshUserItems();
         refreshSubredditItem();
-    }
-
-    private void refreshSaveItems() {
-        if (savedItem != null && unsavedItem != null) {
-            boolean savable = hasAccountName() && ThingBundle.isSavable(thingBundle);
-            boolean saved = ThingBundle.isSaved(thingBundle);
-            savedItem.setVisible(savable && saved);
-            unsavedItem.setVisible(savable && !saved);
-        }
     }
 
     private void refreshUserItems() {
@@ -208,14 +193,6 @@ public class ThingMenuFragment extends Fragment {
 
     private void handleSubreddit() {
         MenuHelper.startSidebarActivity(getActivity(), getSubreddit());
-    }
-
-    private String getAccountName() {
-        return getArguments().getString(ARG_ACCOUNT_NAME);
-    }
-
-    private boolean hasAccountName() {
-        return AccountUtils.isAccount(getAccountName());
     }
 
     private boolean hasSubreddit() {
