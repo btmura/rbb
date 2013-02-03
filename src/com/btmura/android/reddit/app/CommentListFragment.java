@@ -34,8 +34,8 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.app.ThingMenuFragment.OnThingMenuEventListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuEventListenerHolder;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
 import com.btmura.android.reddit.database.CommentLogic;
 import com.btmura.android.reddit.database.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.Kinds;
@@ -48,7 +48,7 @@ import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ThingProviderListFragment implements
         MultiChoiceModeListener,
-        OnThingMenuEventListener,
+        ThingMenuListener,
         OnVoteListener,
         ThingHolder,
         CommentList {
@@ -81,10 +81,10 @@ public class CommentListFragment extends ThingProviderListFragment implements
     private CharSequence url;
     private int flags;
 
+    private MenuItem shareItem;
+    private MenuItem linkItem;
     private MenuItem openItem;
     private MenuItem copyUrlItem;
-    private MenuItem linkItem;
-    private MenuItem shareItem;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
             String linkId, String title, CharSequence url, int flags) {
@@ -107,8 +107,8 @@ public class CommentListFragment extends ThingProviderListFragment implements
         if (activity instanceof OnThingEventListener) {
             listener = (OnThingEventListener) activity;
         }
-        if (activity instanceof ThingMenuEventListenerHolder) {
-            ((ThingMenuEventListenerHolder) activity).setOnThingMenuEventListener(this);
+        if (activity instanceof ThingMenuListenerHolder) {
+            ((ThingMenuListenerHolder) activity).addThingMenuListener(this);
         }
     }
 
@@ -183,7 +183,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
                 listener.onThingLoaded(this);
             }
 
-            refreshMenuItems();
+            getActivity().invalidateOptionsMenu();
         }
     }
 
@@ -219,100 +219,106 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
+        outState.putString(STATE_TITLE, title);
+        outState.putCharSequence(STATE_URL, url);
+    }
+
+    @Override
+    public void onDetach() {
+        if (getActivity() instanceof ThingMenuListenerHolder) {
+            ((ThingMenuListenerHolder) getActivity()).removeThingMenuListener(this);
+        }
+        super.onDetach();
+    }
+
     public void onVote(View view, int action) {
         int position = getListView().getPositionForView(view);
         adapter.vote(getActivity(), action, position);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.comment_menu, menu);
-        shareItem = menu.findItem(R.id.menu_comment_share);
-        openItem = menu.findItem(R.id.menu_comment_open);
-        copyUrlItem = menu.findItem(R.id.menu_comment_copy_url);
+    public void onCreateThingOptionsMenu(Menu menu) {
+        shareItem = menu.findItem(R.id.menu_share);
         linkItem = menu.findItem(R.id.menu_link);
+        openItem = menu.findItem(R.id.menu_open);
+        copyUrlItem = menu.findItem(R.id.menu_copy_url);
     }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        refreshMenuItems();
-    }
+    public void onPrepareThingOptionsMenu(Menu menu, int pageType) {
+        if (pageType == ThingPagerAdapter.TYPE_COMMENTS) {
+            boolean linkReady = !TextUtils.isEmpty(title) && !TextUtils.isEmpty(url);
 
-    private void refreshMenuItems() {
-        boolean linkReady = !TextUtils.isEmpty(title) && !TextUtils.isEmpty(url);
+            if (shareItem != null) {
+                shareItem.setVisible(linkReady);
+                if (linkReady) {
+                    MenuHelper.setShareProvider(shareItem, title, url);
+                }
+            }
 
-        if (openItem != null) {
-            openItem.setVisible(linkReady);
-        }
+            if (linkItem != null) {
+                linkItem.setVisible(Flag.isEnabled(flags, FLAG_SHOW_LINK_MENU_ITEM)
+                        || (adapter.getCursor() != null
+                        && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF)));
+            }
 
-        if (copyUrlItem != null) {
-            copyUrlItem.setVisible(linkReady);
-        }
+            if (openItem != null) {
+                openItem.setVisible(linkReady);
+            }
 
-        if (shareItem != null) {
-            shareItem.setVisible(linkReady);
-            if (linkReady) {
-                MenuHelper.setShareProvider(shareItem, title, url);
+            if (copyUrlItem != null) {
+                copyUrlItem.setVisible(linkReady);
             }
         }
-
-        if (linkItem != null) {
-            boolean linkConfirmed = Flag.isEnabled(flags, FLAG_SHOW_LINK_MENU_ITEM);
-            boolean showLink = linkConfirmed || (adapter.getCursor() != null
-                    && !adapter.getBoolean(0, CommentAdapter.INDEX_SELF));
-            linkItem.setVisible(showLink);
-        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public void onThingOptionsItemSelected(MenuItem item, int pageType) {
         switch (item.getItemId()) {
-            case R.id.menu_link:
-                handleLink();
-                return true;
+            case R.id.menu_open:
+                handleOpen(pageType);
+                break;
 
-            case R.id.menu_comment_open:
-                handleOpen();
-                return true;
+            case R.id.menu_copy_url:
+                handleCopyUrl(pageType);
+                break;
 
-            case R.id.menu_comment_copy_url:
-                handleCopyUrlItem();
-                return true;
+            case R.id.menu_saved:
+                handleSaved();
+                break;
 
-            default:
-                return super.onOptionsItemSelected(item);
+            case R.id.menu_unsaved:
+                handleUnsaved();
+                break;
+
+            case R.id.menu_new_comment:
+                handleNewComment();
+                break;
         }
     }
 
-    private boolean handleLink() {
-        if (listener != null) {
-            listener.onLinkMenuItemClick();
+    private void handleOpen(int pageType) {
+        if (pageType == ThingPagerAdapter.TYPE_COMMENTS) {
+            MenuHelper.startIntentChooser(getActivity(), url);
         }
-        return true;
     }
 
-    private boolean handleOpen() {
-        MenuHelper.startIntentChooser(getActivity(), url);
-        return true;
+    private void handleCopyUrl(int pageType) {
+        if (pageType == ThingPagerAdapter.TYPE_COMMENTS) {
+            MenuHelper.setClipAndToast(getActivity(), title, url);
+        }
     }
 
-    // TODO: Figure out why we need handleCopyUrl duplicate.
-    private boolean handleCopyUrlItem() {
-        MenuHelper.setClipAndToast(getActivity(), title, url);
-        return true;
-    }
-
-    public void onSavedItemSelected() {
+    private void handleSaved() {
         adapter.unsave(getActivity());
     }
 
-    public void onUnsavedItemSelected() {
+    private void handleUnsaved() {
         adapter.save(getActivity());
     }
 
-    public void onNewItemSelected() {
+    private void handleNewComment() {
         handleReply(0);
     }
 
@@ -572,14 +578,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
     }
 
     public void onDestroyActionMode(ActionMode mode) {
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
-        outState.putString(STATE_TITLE, title);
-        outState.putCharSequence(STATE_URL, url);
     }
 
     // ThingHolder interface implementation.

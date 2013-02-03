@@ -16,12 +16,10 @@
 
 package com.btmura.android.reddit.app;
 
-/**
- * Interface used to tell other parts of the app about the thing that is
- * currently being viewed as well as when links or comments are selected.
- */
-interface OnThingEventListener {
+import android.support.v4.view.ViewPager;
 
-    void onThingLoaded(ThingHolder thingHolder);
+interface ThingPagerHolder {
+
+    ViewPager getThingPager();
 
 }

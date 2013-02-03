@@ -33,8 +33,8 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.ThingMenuFragment.OnThingMenuEventListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuEventListenerHolder;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
 import com.btmura.android.reddit.widget.MessageThreadAdapter;
 
 /**
@@ -42,7 +42,7 @@ import com.btmura.android.reddit.widget.MessageThreadAdapter;
  */
 public class MessageThreadListFragment extends ThingProviderListFragment implements
         MultiChoiceModeListener,
-        OnThingMenuEventListener,
+        ThingMenuListener,
         ThingHolder {
 
     public static final String TAG = "MessageThreadListFragment";
@@ -71,8 +71,8 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         if (activity instanceof OnThingEventListener) {
             listener = (OnThingEventListener) activity;
         }
-        if (activity instanceof ThingMenuEventListenerHolder) {
-            ((ThingMenuEventListenerHolder) activity).setOnThingMenuEventListener(this);
+        if (activity instanceof ThingMenuListenerHolder) {
+            ((ThingMenuListenerHolder) activity).addThingMenuListener(this);
         }
     }
 
@@ -200,18 +200,20 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
     }
 
-    // OnThingMenuEventListener implementation
+    // ThingMenuListener implementation
 
-    public void onSavedItemSelected() {
-        throw new UnsupportedOperationException();
+    public void onCreateThingOptionsMenu(Menu menu) {
     }
 
-    public void onUnsavedItemSelected() {
-        throw new UnsupportedOperationException();
+    public void onPrepareThingOptionsMenu(Menu menu, int pageType) {
     }
 
-    public void onNewItemSelected() {
-        handleNewComment(0);
+    public void onThingOptionsItemSelected(MenuItem item, int pageType) {
+        switch (item.getItemId()) {
+            case R.id.menu_new_comment:
+                handleNewComment(0);
+                break;
+        }
     }
 
     // ThingHolder implementation

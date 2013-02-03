@@ -43,8 +43,8 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
     public static final int PAGE_COMMENTS = TYPE_COMMENTS;
     public static final int PAGE_MESSAGES = 0;
 
-    private final ArrayList<Integer> pages = new ArrayList<Integer>(2);
-    private final ArrayList<Integer> oldPages = new ArrayList<Integer>(2);
+    private final ArrayList<Integer> pageTypes = new ArrayList<Integer>(2);
+    private final ArrayList<Integer> oldPageTypes = new ArrayList<Integer>(2);
 
     private final String accountName;
     private final Bundle thingBundle;
@@ -78,14 +78,18 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
     }
 
     public void addPage(int type) {
-        addPage(pages.size(), type);
+        addPage(pageTypes.size(), type);
     }
 
     public void addPage(int index, int type) {
-        oldPages.clear();
-        oldPages.addAll(pages);
-        pages.add(index, type);
+        oldPageTypes.clear();
+        oldPageTypes.addAll(pageTypes);
+        pageTypes.add(index, type);
         notifyDataSetChanged();
+    }
+
+    public int getPageType(int position) {
+        return pageTypes.get(position);
     }
 
     @Override
@@ -93,16 +97,16 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
         int type = object instanceof LinkFragment ? TYPE_LINK : TYPE_COMMENTS;
 
         int oldPosition = -1;
-        for (int i = 0; i < oldPages.size(); i++) {
-            if (type == oldPages.get(i)) {
+        for (int i = 0; i < oldPageTypes.size(); i++) {
+            if (type == oldPageTypes.get(i)) {
                 oldPosition = i;
                 break;
             }
         }
 
         int newPosition = -1;
-        for (int i = 0; i < pages.size(); i++) {
-            if (type == pages.get(i)) {
+        for (int i = 0; i < pageTypes.size(); i++) {
+            if (type == pageTypes.get(i)) {
                 newPosition = i;
                 break;
             }
@@ -110,40 +114,43 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
         if (newPosition == -1) {
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "getItemPosition: " + oldPages + " -> " + pages + " = NONE");
+                Log.d(TAG, "getItemPosition: " + oldPageTypes
+                        + " -> " + pageTypes + " = NONE");
             }
             return POSITION_NONE;
         }
 
         if (oldPosition == newPosition) {
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "getItemPosition: " + oldPages + " -> " + pages + " = UNCHANGED");
+                Log.d(TAG, "getItemPosition: " + oldPageTypes
+                        + " -> " + pageTypes + " = UNCHANGED");
             }
             return POSITION_UNCHANGED;
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "getItemPosition: " + oldPages + " -> " + pages + " = " + newPosition);
+            Log.d(TAG, "getItemPosition: " + oldPageTypes
+                    + " -> " + pageTypes + " = " + newPosition);
         }
         return newPosition;
     }
 
     @Override
     public long getItemId(int position) {
-        return pages.get(position);
+        return pageTypes.get(position);
     }
 
     @Override
     public int getCount() {
-        return pages.size();
+        return pageTypes.size();
     }
 
     @Override
     public Fragment getItem(int position) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "getItem: " + position + " -> " + pages.get(position));
+            Log.d(TAG, "getItem: " + position + " -> " + pageTypes.get(position));
         }
-        switch (pages.get(position)) {
+        switch (pageTypes.get(position)) {
             case TYPE_LINK:
                 return LinkFragment.newInstance(ThingBundle.getTitle(thingBundle),
                         ThingBundle.getLinkUrl(thingBundle));

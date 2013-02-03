@@ -34,6 +34,7 @@ import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -41,8 +42,8 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.OnThingMenuEventListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuEventListenerHolder;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
@@ -54,12 +55,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         OnSubredditEventListener,
         OnThingSelectedListener,
         OnThingEventListener,
-        OnThingMenuEventListener,
+        ThingMenuListener,
         OnBackStackChangedListener,
         AccountNameHolder,
         SubredditNameHolder,
         ThingBundleHolder,
-        ThingMenuEventListenerHolder {
+        ThingPagerHolder,
+        ThingMenuListenerHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
 
@@ -89,7 +91,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private AnimatorSet openSubredditListAnimator;
     private AnimatorSet closeSubredditListAnimator;
 
-    private OnThingMenuEventListener thingMenuEventListener;
+    private ThingMenuListenerCollection thingMenuListenerCollection =
+            new ThingMenuListenerCollection();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +140,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             subredditListContainer = findViewById(R.id.subreddit_list_container);
             thingListContainer = findViewById(R.id.thing_list_container);
             thingPager = (ViewPager) findViewById(R.id.thing_pager);
+            thingMenuListenerCollection.setThingPager(thingPager);
 
             Resources r = getResources();
             subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
@@ -466,34 +470,28 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public void onLinkMenuItemClick() {
-        thingPager.setCurrentItem(ThingPagerAdapter.PAGE_LINK);
+    public ViewPager getThingPager() {
+        return thingPager;
     }
 
-    public void onCommentMenuItemClick() {
-        thingPager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
+    public void addThingMenuListener(ThingMenuListener listener) {
+        thingMenuListenerCollection.add(listener);
     }
 
-    public void setOnThingMenuEventListener(OnThingMenuEventListener listener) {
-        this.thingMenuEventListener = listener;
+    public void removeThingMenuListener(ThingMenuListener listener) {
+        thingMenuListenerCollection.remove(listener);
     }
 
-    public void onSavedItemSelected() {
-        if (thingMenuEventListener != null) {
-            thingMenuEventListener.onSavedItemSelected();
-        }
+    public void onCreateThingOptionsMenu(Menu menu) {
+        thingMenuListenerCollection.onCreateThingOptionsMenu(menu);
     }
 
-    public void onUnsavedItemSelected() {
-        if (thingMenuEventListener != null) {
-            thingMenuEventListener.onUnsavedItemSelected();
-        }
+    public void onPrepareThingOptionsMenu(Menu menu, int pageType) {
+        thingMenuListenerCollection.onPrepareThingOptionsMenu(menu, pageType);
     }
 
-    public void onNewItemSelected() {
-        if (thingMenuEventListener != null) {
-            thingMenuEventListener.onNewItemSelected();
-        }
+    public void onThingOptionsItemSelected(MenuItem item, int pageType) {
+        thingMenuListenerCollection.onThingOptionsItemSelected(item, pageType);
     }
 
     private void safePopBackStackImmediate() {

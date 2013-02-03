@@ -18,7 +18,7 @@
 
     <group
         android:id="@+id/menu_group_account_items"
-        android:orderInCategory="1000" >
+        android:orderInCategory="@integer/menu_order_account" >
         <item
             android:id="@+id/menu_profile"
             android:icon="@drawable/ic_action_profile"
@@ -37,7 +37,7 @@
     </group>
     <group
         android:id="@+id/menu_group_accounts"
-        android:orderInCategory="1000" >
+        android:orderInCategory="@integer/menu_order_global" >
         <item
             android:id="@+id/menu_accounts"
             android:showAsAction="never"

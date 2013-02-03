@@ -14,19 +14,10 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<resources>
 
-    <item
-        android:id="@+id/menu_search"
-        android:actionViewClass="android.widget.SearchView"
-        android:icon="@drawable/ic_action_search"
-        android:orderInCategory="@integer/menu_order_global"
-        android:showAsAction="ifRoom|collapseActionView"
-        android:title="@string/menu_search"/>
-    <item
-        android:id="@+id/menu_debug"
-        android:orderInCategory="@integer/menu_order_global"
-        android:showAsAction="never"
-        android:title="@string/menu_debug"/>
+    <integer name="menu_order_thing">100</integer>
+    <integer name="menu_order_account">1000</integer>
+    <integer name="menu_order_global">2000</integer>
 
-</menu>
+</resources>

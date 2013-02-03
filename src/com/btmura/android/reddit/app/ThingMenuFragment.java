@@ -19,6 +19,7 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,27 +38,26 @@ public class ThingMenuFragment extends Fragment {
 
     private static final String STATE_THING_BUNDLE = ARG_THING_BUNDLE;
 
-    interface ThingMenuEventListenerHolder {
-        void setOnThingMenuEventListener(OnThingMenuEventListener listener);
+    interface ThingMenuListenerHolder {
+        void addThingMenuListener(ThingMenuListener listener);
+        void removeThingMenuListener(ThingMenuListener listener);
     }
 
     /**
      * Interface that activities should implement to be aware of when the user
      * selects menu items that ThingMenuFragment cannot handle on its own.
      */
-    interface OnThingMenuEventListener {
+    interface ThingMenuListener {
 
-        /** Listener method fired when the user clicks the new item. */
-        void onNewItemSelected();
+        void onCreateThingOptionsMenu(Menu menu);
 
-        /** Listener method fired when the user clicks the saved item. */
-        void onSavedItemSelected();
+        void onPrepareThingOptionsMenu(Menu menu, int pageType);
 
-        /** Listener method fired when the user clicks the unsaved item. */
-        void onUnsavedItemSelected();
+        void onThingOptionsItemSelected(MenuItem item, int pageType);
     }
 
-    private OnThingMenuEventListener listener;
+    private ThingMenuListener listener;
+    private ThingPagerHolder thingPagerHolder;
 
     private Bundle thingBundle;
     private boolean newCommentVisible;
@@ -66,6 +66,7 @@ public class ThingMenuFragment extends Fragment {
     private MenuItem savedItem;
     private MenuItem unsavedItem;
     private MenuItem newCommentItem;
+    private MenuItem addSubredditItem;
     private MenuItem userItem;
     private MenuItem subredditItem;
 
@@ -81,8 +82,11 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof OnThingMenuEventListener) {
-            listener = (OnThingMenuEventListener) activity;
+        if (activity instanceof ThingMenuListener) {
+            listener = (ThingMenuListener) activity;
+        }
+        if (activity instanceof ThingPagerHolder) {
+            thingPagerHolder = (ThingPagerHolder) activity;
         }
     }
 
@@ -115,13 +119,24 @@ public class ThingMenuFragment extends Fragment {
         savedItem = menu.findItem(R.id.menu_saved);
         unsavedItem = menu.findItem(R.id.menu_unsaved);
         newCommentItem = menu.findItem(R.id.menu_new_comment);
+        addSubredditItem = menu.findItem(R.id.menu_thing_add_subreddit);
         userItem = menu.findItem(R.id.menu_user);
         subredditItem = menu.findItem(R.id.menu_thing_subreddit);
+
+        if (listener != null) {
+            listener.onCreateThingOptionsMenu(menu);
+        }
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        if (listener != null) {
+            int pageType = getCurrentPageType();
+            if (pageType != -1) {
+                listener.onPrepareThingOptionsMenu(menu, getCurrentPageType());
+            }
+        }
         refreshMenuItems();
     }
 
@@ -158,6 +173,10 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void refreshSubredditItem() {
+        if (addSubredditItem != null) {
+            addSubredditItem.setVisible(getSubreddit() != null);
+        }
+
         if (subredditItem != null) {
             boolean visible = hasSubreddit();
             subredditItem.setVisible(visible);
@@ -170,16 +189,18 @@ public class ThingMenuFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_link:
+            case R.id.menu_comments:
             case R.id.menu_saved:
-                handleSaved();
-                return true;
-
             case R.id.menu_unsaved:
-                handleUnsaved();
+            case R.id.menu_new_comment:
+            case R.id.menu_open:
+            case R.id.menu_copy_url:
+                listener.onThingOptionsItemSelected(item, getCurrentPageType());
                 return true;
 
-            case R.id.menu_new_comment:
-                handleNewComment();
+            case R.id.menu_thing_add_subreddit:
+                handleAddSubreddit();
                 return true;
 
             case R.id.menu_user:
@@ -195,22 +216,8 @@ public class ThingMenuFragment extends Fragment {
         }
     }
 
-    private void handleSaved() {
-        if (listener != null) {
-            listener.onSavedItemSelected();
-        }
-    }
-
-    private void handleUnsaved() {
-        if (listener != null) {
-            listener.onUnsavedItemSelected();
-        }
-    }
-
-    private void handleNewComment() {
-        if (listener != null) {
-            listener.onNewItemSelected();
-        }
+    private void handleAddSubreddit() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
     private void handleUser() {
@@ -249,5 +256,16 @@ public class ThingMenuFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBundle(STATE_THING_BUNDLE, thingBundle);
+    }
+
+    private int getCurrentPageType() {
+        if (thingPagerHolder != null) {
+            ViewPager pager = thingPagerHolder.getThingPager();
+            ThingPagerAdapter adapter = (ThingPagerAdapter) pager.getAdapter();
+            if (adapter != null) {
+                return adapter.getPageType(pager.getCurrentItem());
+            }
+        }
+        return -1;
     }
 }

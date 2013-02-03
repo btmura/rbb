@@ -89,12 +89,12 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 handleNewPost();
                 return true;
 
-            case R.id.menu_subreddit:
-                handleSubreddit();
-                return true;
-
             case R.id.menu_add_subreddit:
                 handleAddSubreddit();
+                return true;
+
+            case R.id.menu_subreddit:
+                handleSubreddit();
                 return true;
 
             case R.id.menu_search:
@@ -115,13 +115,13 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 subredditNameHolder.getSubredditName(), null, null, null, null, false);
     }
 
-    private void handleSubreddit() {
-        MenuHelper.startSidebarActivity(getActivity(), subredditNameHolder.getSubredditName());
-    }
-
     private void handleAddSubreddit() {
         MenuHelper.showAddSubredditDialog(getFragmentManager(),
                 subredditNameHolder.getSubredditName());
+    }
+
+    private void handleSubreddit() {
+        MenuHelper.startSidebarActivity(getActivity(), subredditNameHolder.getSubredditName());
     }
 
     public void handleSearch() {

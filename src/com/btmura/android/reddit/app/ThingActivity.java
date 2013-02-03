@@ -23,11 +23,12 @@ import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.ThingMenuFragment.OnThingMenuEventListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuEventListenerHolder;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
+import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.util.Flag;
@@ -37,10 +38,11 @@ import com.btmura.android.reddit.widget.ThingBundle;
 public class ThingActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnThingEventListener,
-        OnThingMenuEventListener,
+        ThingMenuListener,
         AccountNameHolder,
         SubredditNameHolder,
-        ThingMenuEventListenerHolder {
+        ThingPagerHolder,
+        ThingMenuListenerHolder {
 
     public static final String TAG = "ThingActivity";
 
@@ -54,7 +56,9 @@ public class ThingActivity extends GlobalMenuActivity implements
     private ViewPager pager;
     private Bundle thingBundle;
     private String accountName;
-    private OnThingMenuEventListener thingMenuEventListener;
+
+    private ThingMenuListenerCollection thingMenuListenerCollection =
+            new ThingMenuListenerCollection();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,7 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     private void setupPrereqs(Bundle savedInstanceState) {
         pager = (ViewPager) findViewById(R.id.pager);
+        thingMenuListenerCollection.setThingPager(pager);
         if (savedInstanceState == null) {
             thingBundle = getIntent().getBundleExtra(EXTRA_THING_BUNDLE);
         } else {
@@ -137,30 +142,24 @@ public class ThingActivity extends GlobalMenuActivity implements
         }
     }
 
-    public void onLinkMenuItemClick() {
-        pager.setCurrentItem(ThingPagerAdapter.PAGE_LINK);
+    public void addThingMenuListener(ThingMenuListener listener) {
+        thingMenuListenerCollection.add(listener);
     }
 
-    public void onCommentMenuItemClick() {
-        pager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
+    public void removeThingMenuListener(ThingMenuListener listener) {
+        thingMenuListenerCollection.remove(listener);
     }
 
-    public void onSavedItemSelected() {
-        if (thingMenuEventListener != null) {
-            thingMenuEventListener.onSavedItemSelected();
-        }
+    public void onCreateThingOptionsMenu(Menu menu) {
+        thingMenuListenerCollection.onCreateThingOptionsMenu(menu);
     }
 
-    public void onUnsavedItemSelected() {
-        if (thingMenuEventListener != null) {
-            thingMenuEventListener.onUnsavedItemSelected();
-        }
+    public void onPrepareThingOptionsMenu(Menu menu, int pageType) {
+        thingMenuListenerCollection.onPrepareThingOptionsMenu(menu, pageType);
     }
 
-    public void onNewItemSelected() {
-        if (thingMenuEventListener != null) {
-            thingMenuEventListener.onNewItemSelected();
-        }
+    public void onThingOptionsItemSelected(MenuItem item, int pageType) {
+        thingMenuListenerCollection.onThingOptionsItemSelected(item, pageType);
     }
 
     public String getAccountName() {
@@ -171,8 +170,8 @@ public class ThingActivity extends GlobalMenuActivity implements
         return ThingBundle.getSubreddit(thingBundle);
     }
 
-    public void setOnThingMenuEventListener(OnThingMenuEventListener listener) {
-        thingMenuEventListener = listener;
+    public ViewPager getThingPager() {
+        return pager;
     }
 
     @Override
