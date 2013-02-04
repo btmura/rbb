@@ -35,6 +35,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.MessageThreadAdapter;
 
 /**
@@ -150,12 +151,14 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         int count = getListView().getCheckedItemCount();
         mode.setTitle(getResources().getQuantityString(R.plurals.messages, count, count));
 
-        boolean showNewComment = count == 1;
-        if (showNewComment) {
-            showNewComment &= !TextUtils.isEmpty(adapter.getThingId(getFirstCheckedPosition()));
+        boolean showReply = count == 1;
+        if (showReply) {
+            int checked = getFirstCheckedPosition();
+            showReply &= !Objects.equals(adapter.getAccountName(), adapter.getUser(checked));
+            showReply &= !TextUtils.isEmpty(adapter.getThingId(checked));
         }
 
-        menu.findItem(R.id.menu_new_comment).setVisible(showNewComment);
+        menu.findItem(R.id.menu_new_comment).setVisible(showReply);
         return true;
     }
 
