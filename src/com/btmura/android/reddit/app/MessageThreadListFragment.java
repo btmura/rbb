@@ -142,6 +142,10 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        if (adapter.getCursor() == null) {
+            getListView().clearChoices();
+            return false;
+        }
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.message_thread_action_menu, menu);
         return true;
@@ -149,17 +153,29 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         int count = getListView().getCheckedItemCount();
+        int position = getFirstCheckedPosition();
+
         mode.setTitle(getResources().getQuantityString(R.plurals.messages, count, count));
-
-        boolean showReply = count == 1;
-        if (showReply) {
-            int checked = getFirstCheckedPosition();
-            showReply &= !Objects.equals(adapter.getAccountName(), adapter.getUser(checked));
-            showReply &= !TextUtils.isEmpty(adapter.getThingId(checked));
-        }
-
-        menu.findItem(R.id.menu_new_comment).setVisible(showReply);
+        prepareReplyActionItem(menu, count, position);
+        prepareAuthorActionItem(menu, count, position);
         return true;
+    }
+
+    private void prepareReplyActionItem(Menu menu, int checkedCount, int position) {
+        boolean show = checkedCount == 1
+                && !Objects.equals(adapter.getAccountName(), adapter.getUser(position))
+                && !TextUtils.isEmpty(adapter.getThingId(position));
+        menu.findItem(R.id.menu_new_comment).setVisible(show);
+    }
+
+    private void prepareAuthorActionItem(Menu menu, int checkedCount, int position) {
+        String author = adapter.getUser(position);
+        boolean show = checkedCount == 1 && MenuHelper.isUserItemVisible(author);
+        MenuItem item = menu.findItem(R.id.menu_author);
+        item.setVisible(show);
+        if (item.isVisible()) {
+            item.setTitle(MenuHelper.getUserTitle(getActivity(), author));
+        }
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {

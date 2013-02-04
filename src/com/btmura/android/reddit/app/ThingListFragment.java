@@ -340,6 +340,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        if (adapter.getCursor() == null) {
+            getListView().clearChoices();
+            return false;
+        }
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.thing_action_menu, menu);
         return true;

@@ -222,6 +222,11 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        if (adapter.getCursor() == null) {
+            getListView().clearChoices();
+            return false;
+        }
+
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.subreddit_cab, null, false);
         mode.setCustomView(v);
 
