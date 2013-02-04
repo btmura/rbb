@@ -212,11 +212,6 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
     }
 
     public void onThingOptionsItemSelected(MenuItem item, int pageType) {
-        switch (item.getItemId()) {
-            case R.id.menu_new_comment:
-                handleNewComment(0);
-                break;
-        }
     }
 
     // ThingHolder implementation
