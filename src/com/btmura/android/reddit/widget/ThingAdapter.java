@@ -21,10 +21,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
@@ -364,6 +366,10 @@ public class ThingAdapter extends BaseLoaderAdapter {
                 && Objects.equals(selectedLinkId, linkId));
         tv.setOnVoteListener(listener);
         setDetails(tv, kind);
+
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "bindThingView tv: " + tv.hashCode() + " url: " + thumbnailUrl);
+        }
         thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
     }
 
