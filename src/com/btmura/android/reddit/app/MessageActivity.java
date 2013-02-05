@@ -87,7 +87,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, false);
+        return new AccountLoader(this, false, true);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
         prefs = result.prefs;
         adapter.addMessageFilters(this);
-        adapter.setAccountNames(result.accountNames);
+        adapter.setAccountInfo(result.accountNames, result.karmaCounts);
 
         String accountName;
         if (!TextUtils.isEmpty(requestedUser)) {

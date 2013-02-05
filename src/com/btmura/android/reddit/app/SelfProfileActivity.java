@@ -88,7 +88,7 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, false);
+        return new AccountLoader(this, false, true);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
 
         prefs = result.prefs;
         adapter.addProfileFilters(this, true);
-        adapter.setAccountNames(result.accountNames);
+        adapter.setAccountInfo(result.accountNames, result.karmaCounts);
 
         String accountName;
         if (!TextUtils.isEmpty(requestedUser)) {

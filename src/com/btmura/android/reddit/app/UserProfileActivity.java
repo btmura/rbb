@@ -93,7 +93,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true);
+        return new AccountLoader(this, true, false);
     }
 
     @Override

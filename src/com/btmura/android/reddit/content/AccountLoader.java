@@ -42,10 +42,13 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     public static class AccountResult {
         public String[] accountNames;
+        public String[] karmaCounts;
         public SharedPreferences prefs;
 
-        private AccountResult(String[] accountNames, SharedPreferences prefs) {
+        private AccountResult(String[] accountNames, String[] karmaCounts,
+                SharedPreferences prefs) {
             this.accountNames = accountNames;
+            this.karmaCounts = karmaCounts;
             this.prefs = prefs;
         }
 
@@ -89,14 +92,16 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
     private SharedPreferences prefs;
     private AccountManager manager;
     private boolean includeNoAccount;
+    private boolean includeKarmaCounts;
     private boolean listening;
     private AccountResult result;
 
-    public AccountLoader(Context context, boolean includeNoAccount) {
+    public AccountLoader(Context context, boolean includeNoAccount, boolean includeKarmaCounts) {
         super(context);
         this.prefs = AccountPreferences.getPreferences(context);
         this.manager = AccountManager.get(getContext());
         this.includeNoAccount = includeNoAccount;
+        this.includeKarmaCounts = includeKarmaCounts;
     }
 
     @Override
@@ -113,24 +118,31 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         Arrays.sort(accounts, ACCOUNT_COMPARATOR);
 
         // Convert to strings and prepend the no account at the top.
-        int start = 0;
-        int length = accounts.length;
-        if (includeNoAccount) {
-            start++;
-            length++;
-        }
+        int offset = includeNoAccount ? 1 : 0;
+        int length = includeNoAccount ? accounts.length + 1 : accounts.length;
         String[] accountNames = new String[length];
         if (includeNoAccount) {
             accountNames[0] = Subreddits.ACCOUNT_NONE;
         }
         for (int i = 0; i < accounts.length; i++) {
-            accountNames[start++] = accounts[i].name;
+            accountNames[i + offset] = accounts[i].name;
+        }
+
+        String[] karmaCounts = null;
+        if (includeKarmaCounts) {
+            karmaCounts = new String[length];
+            if (includeNoAccount) {
+                karmaCounts[0] = null;
+            }
+            for (int i = 0; i < accounts.length; i++) {
+                karmaCounts[i + offset] = "1337";
+            }
         }
 
         // Get a preference to make sure the loading thread is done.
         AccountPreferences.getLastAccount(prefs, null);
 
-        return new AccountResult(accountNames, prefs);
+        return new AccountResult(accountNames, karmaCounts, prefs);
     }
 
     @Override

@@ -19,6 +19,7 @@ package com.btmura.android.reddit.widget;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,12 +38,14 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         static final int TYPE_FILTER = 2;
 
         private final int type;
-        private final String text;
+        private final String text1;
+        private final String text2;
         private final int value;
 
-        Item(int type, String text, int value) {
+        Item(int type, String text1, String text2, int value) {
             this.type = type;
-            this.text = text;
+            this.text1 = text1;
+            this.text2 = text2;
             this.value = value;
         }
     }
@@ -72,33 +75,34 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         if (filters == null) {
             filters = new ArrayList<Item>(6);
         }
-        filters.add(new Item(Item.TYPE_FILTER, context.getString(resId), value));
+        filters.add(new Item(Item.TYPE_FILTER, context.getString(resId), null, value));
     }
 
-    public void setAccountNames(String[] accountNames) {
+    public void setAccountInfo(String[] accountNames, String[] karmaCounts) {
         items.clear();
         if (accountNames != null) {
             int count = accountNames.length;
             for (int i = 0; i < count; i++) {
-                items.add(new Item(Item.TYPE_ACCOUNT_NAME, accountNames[i], -1));
+                String karmaText = karmaCounts != null ? karmaCounts[i] : null;
+                addItem(Item.TYPE_ACCOUNT_NAME, accountNames[i], karmaText, -1);
             }
         }
         if (filters != null) {
-            addItem(Item.TYPE_CATEGORY, R.string.filter_category, -1);
+            addItem(Item.TYPE_CATEGORY, context.getString(R.string.filter_category), null, -1);
             items.addAll(filters);
         }
         notifyDataSetChanged();
     }
 
-    private void addItem(int type, int textId, int value) {
-        items.add(new Item(type, context.getString(textId), value));
+    private void addItem(int type, String text1, String text2, int value) {
+        items.add(new Item(type, text1, text2, value));
     }
 
     public void updateState(int position) {
         Item item = getItem(position);
         switch (item.type) {
             case Item.TYPE_ACCOUNT_NAME:
-                accountName = item.text;
+                accountName = item.text1;
                 break;
 
             case Item.TYPE_FILTER:
@@ -120,7 +124,7 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         int count = items.size();
         for (int i = 0; i < count; i++) {
             Item item = getItem(i);
-            if (item.type == Item.TYPE_ACCOUNT_NAME && accountName.equals(item.text)) {
+            if (item.type == Item.TYPE_ACCOUNT_NAME && accountName.equals(item.text1)) {
                 return i;
             }
         }
@@ -188,7 +192,7 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         }
 
         if (filters != null) {
-            h.filter.setText(filters.get(filter).text);
+            h.filter.setText(filters.get(filter).text1);
             h.filter.setVisibility(View.VISIBLE);
             h.divider.setVisibility(View.VISIBLE);
         } else {
@@ -218,21 +222,33 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        TextView tv = (TextView) convertView;
+        View v = convertView;
 
         // Tag each widget with the layout. Check the layout each time to make
         // sure it's the one we want, since a change in the number of accounts
         // can cause prior views to be the wrong type for the new slots. The
         // adapter isn't smart enough to give us the correct views.
         int layout = getDropDownLayout(position);
-        if (tv == null || layout != ((Integer) tv.getTag())) {
-            tv = (TextView) inflater.inflate(layout, parent, false);
-            tv.setTag(Integer.valueOf(layout));
+        if (v == null || layout != ((Integer) v.getTag())) {
+            v = inflater.inflate(layout, parent, false);
+            v.setTag(Integer.valueOf(layout));
         }
 
         Item item = getItem(position);
-        tv.setText(getTitle(item.text, true));
-        return tv;
+
+        // TODO: Use more elaborate ViewHolder to avoid finds.
+
+        TextView tv1 = (TextView) v.findViewById(R.id.text1);
+        tv1.setText(getTitle(item.text1, true));
+
+        // Only non-category rows have a second textview.
+        TextView tv2 = (TextView) v.findViewById(R.id.text2);
+        if (tv2 != null) {
+            tv2.setText(item.text2);
+            tv2.setVisibility(!TextUtils.isEmpty(item.text2) ? View.VISIBLE : View.GONE);
+        }
+
+        return v;
     }
 
     private int getDropDownLayout(int position) {

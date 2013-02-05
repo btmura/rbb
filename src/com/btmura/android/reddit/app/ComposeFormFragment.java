@@ -308,7 +308,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
         // Create loader that doesn't show the app storage account.
-        return new AccountLoader(getActivity(), false);
+        return new AccountLoader(getActivity(), false, false);
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {

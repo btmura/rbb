@@ -105,7 +105,7 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(getActivity(), true);
+        return new AccountLoader(getActivity(), true, false);
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {

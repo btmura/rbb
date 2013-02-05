@@ -139,7 +139,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true);
+        return new AccountLoader(this, true, true);
     }
 
     @Override
@@ -148,7 +148,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         if (!isSinglePane) {
             adapter.addSubredditFilters(this);
         }
-        adapter.setAccountNames(result.accountNames);
+        adapter.setAccountInfo(result.accountNames, result.karmaCounts);
 
         String accountName = result.getLastAccount();
         adapter.setAccountName(accountName);

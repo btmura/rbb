@@ -98,7 +98,7 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(getActivity(), false);
+        return new AccountLoader(getActivity(), false, false);
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
