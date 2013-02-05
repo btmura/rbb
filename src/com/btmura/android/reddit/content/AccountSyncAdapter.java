@@ -28,6 +28,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -39,6 +40,7 @@ import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.AccountResult;
 import com.btmura.android.reddit.provider.AccountProvider;
+import com.btmura.android.reddit.util.Array;
 
 /**
  * {@link AbstractThreadedSyncAdapter} for periodically syncing account
@@ -72,9 +74,21 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
         }
 
         // Only sync one time per minute. SyncManager code seems to be using
-        // delayUntil as a timestamp even though the docs say its more of a duration.
+        // delayUntil as a timestamp even though the docs say its more of a
+        // duration.
         syncResult.delayUntil = System.currentTimeMillis() / 1000 + SYNC_DELAY_SECONDS;
     }
+
+    private static final String[] PROJECTION = {
+            Accounts._ID,
+            Accounts.COLUMN_LINK_KARMA,
+            Accounts.COLUMN_COMMENT_KARMA,
+            Accounts.COLUMN_HAS_MAIL,
+    };
+
+    private static final int INDEX_LINK_KARMA = 1;
+    private static final int INDEX_COMMENT_KARMA = 2;
+    private static final int INDEX_HAS_MAIL = 3;
 
     private void doSync(Account account, Bundle extras, String authority,
             ContentProviderClient provider, SyncResult syncResult) {
@@ -89,15 +103,28 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             // Get the account information.
             AccountResult result = RedditApi.me(cookie);
 
-            // Insert or replace the existing row and notify any loaders.
-            ContentValues values = new ContentValues(4);
-            values.put(Accounts.COLUMN_ACCOUNT, account.name);
-            values.put(Accounts.COLUMN_LINK_KARMA, result.linkKarma);
-            values.put(Accounts.COLUMN_COMMENT_KARMA, result.commentKarma);
-            values.put(Accounts.COLUMN_HAS_MAIL, result.hasMail);
-            provider.insert(AccountProvider.ACCOUNTS_URI, values);
-
-            syncResult.stats.numInserts++;
+            // Only update the database if it's missing or different.
+            Cursor c = provider.query(AccountProvider.ACCOUNTS_URI, PROJECTION,
+                    Accounts.SELECT_BY_ACCOUNT, Array.of(account.name), null);
+            try {
+                if (!c.moveToNext()
+                        || result.linkKarma != c.getInt(INDEX_LINK_KARMA)
+                        || result.commentKarma != c.getInt(INDEX_COMMENT_KARMA)
+                        || result.hasMail != (c.getInt(INDEX_HAS_MAIL) != 0)) {
+                    // Insert or replace the existing row and notify loaders.
+                    ContentValues values = new ContentValues(4);
+                    values.put(Accounts.COLUMN_ACCOUNT, account.name);
+                    values.put(Accounts.COLUMN_LINK_KARMA, result.linkKarma);
+                    values.put(Accounts.COLUMN_COMMENT_KARMA, result.commentKarma);
+                    values.put(Accounts.COLUMN_HAS_MAIL, result.hasMail);
+                    provider.insert(AccountProvider.ACCOUNTS_URI, values);
+                    syncResult.stats.numInserts++;
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
 
         } catch (OperationCanceledException e) {
             Log.e(TAG, e.getMessage(), e);
