@@ -68,10 +68,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
             return numAccounts > 0 ? accountNames[0] : null;
         }
 
-        public int getLastMessageFilter() {
-            return AccountPreferences.getLastMessageFilter(prefs, 0);
-        }
-
         public int getLastSubredditFilter() {
             return AccountPreferences.getLastSubredditFilter(prefs, 0);
         }

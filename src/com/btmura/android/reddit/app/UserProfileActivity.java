@@ -20,7 +20,6 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -28,7 +27,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.net.UriHelper;
@@ -40,14 +38,12 @@ import com.btmura.android.reddit.widget.FilterAdapter;
  */
 public class UserProfileActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
-    private static final String STATE_NAVIGATION_INDEX = "navigationIndex";
+    private static final String STATE_FILTER = "filter";
 
-    private String requestedUser;
-    private int requestedFilter = -1;
-
+    private String currentUser;
+    private int currentFilter = -1;
     private FilterAdapter adapter;
     private String accountName;
-    private SharedPreferences prefs;
 
     @Override
     protected void setContentView() {
@@ -59,12 +55,12 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         // Get the user from the intent data or extra.
         Uri data = getIntent().getData();
         if (data != null) {
-            requestedUser = UriHelper.getUser(data);
-            requestedFilter = UriHelper.getUserFilter(data);
+            currentUser = UriHelper.getUser(data);
+            currentFilter = UriHelper.getUserFilter(data);
         }
 
         // Quit if there is no profile to view.
-        if (TextUtils.isEmpty(requestedUser)) {
+        if (TextUtils.isEmpty(currentUser)) {
             finish();
             return true;
         }
@@ -79,16 +75,17 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
-        adapter = new FilterAdapter(this);
-        adapter.setTitle(requestedUser);
+        if (savedInstanceState != null) {
+            currentFilter = savedInstanceState.getInt(STATE_FILTER);
+        }
 
+        adapter = new FilterAdapter(this);
+        adapter.setTitle(currentUser);
+
+        bar.setListNavigationCallbacks(adapter, this);
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        bar.setListNavigationCallbacks(adapter, this);
-        if (savedInstanceState != null) {
-            bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_NAVIGATION_INDEX));
-        }
     }
 
     @Override
@@ -98,19 +95,26 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        prefs = result.prefs;
         accountName = result.getLastAccount();
-        adapter.addProfileFilters(this, Objects.equals(accountName, requestedUser));
+        adapter.addProfileFilters(this, Objects.equals(accountName, currentUser));
 
-        int filter;
-        if (requestedFilter != -1) {
-            filter = requestedFilter;
-        } else {
-            filter = AccountPreferences.getLastProfileFilter(prefs,
-                    FilterAdapter.PROFILE_OVERVIEW);
+        if (currentFilter == -1) {
+            currentFilter = FilterAdapter.PROFILE_OVERVIEW;
         }
-        bar.setSelectedNavigationItem(filter);
+        bar.setSelectedNavigationItem(currentFilter);
     }
+
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        currentFilter = getFilter();
+
+        ThingListFragment frag = getThingListFragment();
+        if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
+                || frag.getFilter() != currentFilter) {
+            setProfileThingListNavigation(currentUser);
+        }
+        return true;
+    }
+
 
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
@@ -132,22 +136,6 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     protected void refreshActionBar(String subreddit, Bundle thingBundle) {
-    }
-
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        int filter = getFilter();
-        if (requestedFilter != -1) {
-            requestedFilter = -1;
-        } else {
-            AccountPreferences.setLastProfileFilter(prefs, filter);
-        }
-
-        ThingListFragment frag = getThingListFragment();
-        if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
-                || frag.getFilter() != filter) {
-            setProfileThingListNavigation(requestedUser);
-        }
-        return true;
     }
 
     @Override
@@ -179,12 +167,12 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     private void handleNewMessage() {
         MenuHelper.startComposeActivity(this, ComposeActivity.MESSAGE_TYPE_SET,
-                null, requestedUser, null, null, null, false);
+                null, currentUser, null, null, null, false);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_NAVIGATION_INDEX, bar.getSelectedNavigationIndex());
+        outState.putInt(STATE_FILTER, currentFilter);
     }
 }

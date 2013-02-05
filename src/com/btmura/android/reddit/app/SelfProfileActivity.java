@@ -20,12 +20,9 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.util.Array;
@@ -47,14 +44,9 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
     private static final String STATE_USER = EXTRA_USER;
     private static final String STATE_FILTER = EXTRA_FILTER;
 
-    /** Requested user we should initially view from the intent. */
-    private String requestedUser;
-
-    /** Requested filter we should initially use from the intent. */
-    private int requestedFilter;
-
+    private String currentUser;
+    private int currentFilter = -1;
     private AccountFilterAdapter adapter;
-    private SharedPreferences prefs;
 
     @Override
     protected void setContentView() {
@@ -73,11 +65,11 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            requestedUser = getIntent().getStringExtra(EXTRA_USER);
-            requestedFilter = getIntent().getIntExtra(EXTRA_FILTER, -1);
+            currentUser = getIntent().getStringExtra(EXTRA_USER);
+            currentFilter = getIntent().getIntExtra(EXTRA_FILTER, -1);
         } else {
-            requestedUser = savedInstanceState.getString(STATE_USER);
-            requestedFilter = savedInstanceState.getInt(EXTRA_FILTER);
+            currentUser = savedInstanceState.getString(STATE_USER);
+            currentFilter = savedInstanceState.getInt(EXTRA_FILTER);
         }
         adapter = new AccountFilterAdapter(this);
         bar.setListNavigationCallbacks(adapter, this);
@@ -98,28 +90,20 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
             return;
         }
 
-        prefs = result.prefs;
         adapter.addProfileFilters(this, true);
         adapter.setAccountInfo(result.accountNames, result.karmaCounts);
 
-        String accountName;
-        if (!TextUtils.isEmpty(requestedUser)) {
-            accountName = requestedUser;
-        } else {
-            accountName = result.getLastAccount();
+        if (currentUser == null) {
+            currentUser = result.getLastAccount();
         }
-        adapter.setAccountName(accountName);
+        adapter.setAccountName(currentUser);
 
-        int filter;
-        if (requestedFilter != -1) {
-            filter = requestedFilter;
-        } else {
-            filter = AccountPreferences.getLastSelfProfileFilter(prefs,
-                    FilterAdapter.PROFILE_OVERVIEW);
+        if (currentFilter == -1) {
+            currentFilter = FilterAdapter.PROFILE_OVERVIEW;
         }
-        adapter.setFilter(filter);
+        adapter.setFilter(currentFilter);
 
-        int index = adapter.findAccountName(accountName);
+        int index = adapter.findAccountName(currentUser);
 
         // If the selected navigation index is the same, then the action bar
         // won't fire onNavigationItemSelected. Resetting the adapter and then
@@ -133,23 +117,13 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         adapter.updateState(itemPosition);
-
-        String accountName = adapter.getAccountName();
-        if (!TextUtils.isEmpty(requestedUser)) {
-            requestedUser = null;
-        }
-
-        int filter = adapter.getFilter();
-        if (requestedFilter != -1) {
-            requestedFilter = -1;
-        } else {
-            AccountPreferences.setLastSelfProfileFilter(prefs, filter);
-        }
+        currentUser = adapter.getAccountName();
+        currentFilter = adapter.getFilter();
 
         ThingListFragment frag = getThingListFragment();
-        if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
-                || frag.getFilter() != filter) {
-            setProfileThingListNavigation(accountName);
+        if (frag == null || !Objects.equals(frag.getAccountName(), currentUser)
+                || frag.getFilter() != currentFilter) {
+            setProfileThingListNavigation(currentUser);
         }
         return true;
     }
@@ -180,7 +154,7 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_USER, adapter.getAccountName());
-        outState.putInt(STATE_FILTER, adapter.getFilter());
+        outState.putString(STATE_USER, currentUser);
+        outState.putInt(STATE_FILTER, currentFilter);
     }
 }

@@ -19,14 +19,11 @@ package com.btmura.android.reddit.app;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.util.Array;
@@ -45,14 +42,9 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     private static final String STATE_USER = EXTRA_USER;
     private static final String STATE_FILTER = EXTRA_FILTER;
 
-    /** Requested user we should initially view from the intent. */
-    private String requestedUser;
-
-    /** Requested filter we should initially use from the intent. */
-    private int requestedFilter;
-
+    private String currentUser;
+    private int currentFilter = -1;
     private AccountFilterAdapter adapter;
-    private SharedPreferences prefs;
 
     @Override
     protected void setContentView() {
@@ -71,11 +63,11 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            requestedUser = getIntent().getStringExtra(EXTRA_USER);
-            requestedFilter = getIntent().getIntExtra(EXTRA_FILTER, -1);
+            currentUser = getIntent().getStringExtra(EXTRA_USER);
+            currentFilter = getIntent().getIntExtra(EXTRA_FILTER, -1);
         } else {
-            requestedUser = savedInstanceState.getString(STATE_USER);
-            requestedFilter = savedInstanceState.getInt(EXTRA_FILTER);
+            currentUser = savedInstanceState.getString(STATE_USER);
+            currentFilter = savedInstanceState.getInt(EXTRA_FILTER);
         }
 
         adapter = new AccountFilterAdapter(this);
@@ -97,27 +89,20 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
             return;
         }
 
-        prefs = result.prefs;
         adapter.addMessageFilters(this);
         adapter.setAccountInfo(result.accountNames, result.karmaCounts);
 
-        String accountName;
-        if (!TextUtils.isEmpty(requestedUser)) {
-            accountName = requestedUser;
-        } else {
-            accountName = result.getLastAccount();
+        if (currentUser == null) {
+            currentUser = result.getLastAccount();
         }
-        adapter.setAccountName(accountName);
+        adapter.setAccountName(currentUser);
 
-        int filter;
-        if (requestedFilter != -1) {
-            filter = requestedFilter;
-        } else {
-            filter = AccountPreferences.getLastMessageFilter(prefs, FilterAdapter.MESSAGE_INBOX);
+        if (currentFilter == -1) {
+            currentFilter = FilterAdapter.MESSAGE_INBOX;
         }
-        adapter.setFilter(filter);
+        adapter.setFilter(currentFilter);
 
-        int index = adapter.findAccountName(accountName);
+        int index = adapter.findAccountName(currentUser);
 
         // If the selected navigation index is the same, then the action bar
         // won't fire onNavigationItemSelected. Resetting the adapter and then
@@ -131,23 +116,13 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         adapter.updateState(itemPosition);
-
-        String accountName = adapter.getAccountName();
-        if (!TextUtils.isEmpty(requestedUser)) {
-            requestedUser = null;
-        }
-
-        int filter = adapter.getFilter();
-        if (requestedFilter != -1) {
-            requestedFilter = -1;
-        } else {
-            AccountPreferences.setLastMessageFilter(prefs, filter);
-        }
+        currentUser = adapter.getAccountName();
+        currentFilter = adapter.getFilter();
 
         ThingListFragment frag = getThingListFragment();
-        if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
-                || frag.getFilter() != filter) {
-            setMessageThingListNavigation(accountName);
+        if (frag == null || !Objects.equals(frag.getAccountName(), currentUser)
+                || frag.getFilter() != currentFilter) {
+            setMessageThingListNavigation(currentUser);
         }
         return true;
     }
@@ -210,7 +185,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_USER, adapter.getAccountName());
-        outState.putInt(STATE_FILTER, adapter.getFilter());
+        outState.putString(STATE_USER, currentUser);
+        outState.putInt(STATE_FILTER, currentFilter);
     }
 }
