@@ -39,10 +39,6 @@
             android:icon="@drawable/ic_action_messages"
             android:showAsAction="ifRoom"
             android:title="@string/menu_messages"/>
-    </group>
-    <group
-        android:id="@+id/menu_group_accounts"
-        android:orderInCategory="@integer/menu_order_global" >
         <item
             android:id="@+id/menu_accounts"
             android:showAsAction="never"

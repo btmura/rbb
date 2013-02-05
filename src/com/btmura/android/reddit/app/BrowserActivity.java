@@ -291,13 +291,14 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             return true; // Check that onCreateOptionsMenu was called.
         }
 
-        menu.setGroupVisible(R.id.menu_group_accounts, !hasThing());
+        boolean showAccountItems = !hasThing();
+        menu.setGroupVisible(R.id.menu_group_account_items, showAccountItems);
 
         boolean hasAccount = hasAccount();
         newPostItem.setVisible(isSinglePane && hasAccount);
-        profileItem.setVisible(hasAccount);
-        profileSavedItem.setVisible(hasAccount);
-        messagesItem.setVisible(hasAccount);
+        profileItem.setVisible(showAccountItems && hasAccount);
+        profileSavedItem.setVisible(showAccountItems && hasAccount);
+        messagesItem.setVisible(showAccountItems && hasAccount);
 
         refreshMessagesIcon();
         return true;
