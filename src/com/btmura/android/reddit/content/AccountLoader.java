@@ -28,6 +28,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -43,15 +44,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         OnAccountsUpdateListener {
 
     public static final String TAG = "AccountLoader";
-
-    private static final String[] PROJECTION = {
-            Accounts._ID,
-            Accounts.COLUMN_ACCOUNT,
-            Accounts.COLUMN_LINK_KARMA,
-    };
-
-    private static final int INDEX_ACCOUNT = 1;
-    private static final int INDEX_LINK_KARMA = 2;
 
     public static class AccountResult {
         public String[] accountNames;
@@ -76,8 +68,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
             return numAccounts > 0 ? accountNames[0] : null;
         }
 
-        // TODO: Get rid of these methods since they are just wrappers.
-
         public int getLastMessageFilter() {
             return AccountPreferences.getLastMessageFilter(prefs, 0);
         }
@@ -93,7 +83,22 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
     };
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
+    private static final String[] PROJECTION = {
+            Accounts._ID,
+            Accounts.COLUMN_ACCOUNT,
+            Accounts.COLUMN_LINK_KARMA,
+    };
+
+    private static final int INDEX_ACCOUNT = 1;
+    private static final int INDEX_LINK_KARMA = 2;
+
+    private final SharedPreferences prefs;
+    private final AccountManager manager;
+    private final boolean includeNoAccount;
+    private final boolean includeKarmaCounts;
+    private final ContentObserver observer;
+
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String accountName = intent.getStringExtra(SelectAccountBroadcast.EXTRA_ACCOUNT);
@@ -102,12 +107,8 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
     };
 
-    private SharedPreferences prefs;
-    private AccountManager manager;
-    private boolean includeNoAccount;
-    private boolean includeKarmaCounts;
-    private boolean listening;
     private AccountResult result;
+    private boolean listening;
 
     public AccountLoader(Context context, boolean includeNoAccount, boolean includeKarmaCounts) {
         super(context);
@@ -115,6 +116,12 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         this.manager = AccountManager.get(getContext());
         this.includeNoAccount = includeNoAccount;
         this.includeKarmaCounts = includeKarmaCounts;
+        this.observer = !includeKarmaCounts ? null : new ContentObserver(null) {
+            @Override
+            public void onChange(boolean selfChange) {
+                onContentChanged();
+            }
+        };
     }
 
     @Override
@@ -151,7 +158,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
             }
             for (int i = 0; i < accounts.length; i++) {
                 String accountName = accountNames[i + offset];
-                for (c.moveToPosition(-1); c.moveToNext(); ) {
+                for (c.moveToPosition(-1); c.moveToNext();) {
                     if (accountName.equals(c.getString(INDEX_ACCOUNT))) {
                         karmaCounts[i + offset] = c.getString(INDEX_LINK_KARMA);
                         break;
@@ -186,8 +193,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
             deliverResult(result);
         }
         if (!listening) {
-            manager.addOnAccountsUpdatedListener(this, null, false);
-            SelectAccountBroadcast.registerReceiver(getContext(), receiver);
+            startListening();
             listening = true;
         }
         if (takeContentChanged() || result == null) {
@@ -201,9 +207,25 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         onStopLoading();
         result = null;
         if (listening) {
-            manager.removeOnAccountsUpdatedListener(this);
-            SelectAccountBroadcast.unregisterReceiver(getContext(), receiver);
+            stopListening();
             listening = false;
+        }
+    }
+
+    private void startListening() {
+        manager.addOnAccountsUpdatedListener(this, null, false);
+        SelectAccountBroadcast.registerReceiver(getContext(), receiver);
+        if (includeKarmaCounts) {
+            getContext().getContentResolver().registerContentObserver(AccountProvider.ACCOUNTS_URI,
+                    true, observer);
+        }
+    }
+
+    private void stopListening() {
+        manager.removeOnAccountsUpdatedListener(this);
+        SelectAccountBroadcast.unregisterReceiver(getContext(), receiver);
+        if (includeKarmaCounts) {
+            getContext().getContentResolver().unregisterContentObserver(observer);
         }
     }
 
