@@ -24,21 +24,34 @@ import android.accounts.AccountManager;
 import android.accounts.OnAccountsUpdateListener;
 import android.content.AsyncTaskLoader;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.provider.AccountProvider;
 
 public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         OnAccountsUpdateListener {
 
     public static final String TAG = "AccountLoader";
+
+    private static final String[] PROJECTION = {
+            Accounts._ID,
+            Accounts.COLUMN_ACCOUNT,
+            Accounts.COLUMN_LINK_KARMA,
+    };
+
+    private static final int INDEX_ACCOUNT = 1;
+    private static final int INDEX_LINK_KARMA = 2;
 
     public static class AccountResult {
         public String[] accountNames;
@@ -130,13 +143,22 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
         String[] karmaCounts = null;
         if (includeKarmaCounts) {
+            ContentResolver cr = getContext().getContentResolver();
+            Cursor c = cr.query(AccountProvider.ACCOUNTS_URI, PROJECTION, null, null, null);
             karmaCounts = new String[length];
             if (includeNoAccount) {
                 karmaCounts[0] = null;
             }
             for (int i = 0; i < accounts.length; i++) {
-                karmaCounts[i + offset] = "1337";
+                String accountName = accountNames[i + offset];
+                for (c.moveToPosition(-1); c.moveToNext(); ) {
+                    if (accountName.equals(c.getString(INDEX_ACCOUNT))) {
+                        karmaCounts[i + offset] = Integer.toString(c.getInt(INDEX_LINK_KARMA));
+                        break;
+                    }
+                }
             }
+            c.close();
         }
 
         // Get a preference to make sure the loading thread is done.
