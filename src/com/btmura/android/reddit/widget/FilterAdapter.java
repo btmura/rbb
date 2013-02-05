@@ -67,6 +67,11 @@ public class FilterAdapter extends BaseFilterAdapter {
         notifyDataSetChanged();
     }
 
+    static class ViewHolder {
+        TextView text1;
+        TextView text2;
+    }
+
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
@@ -88,18 +93,14 @@ public class FilterAdapter extends BaseFilterAdapter {
         return v;
     }
 
-    static class ViewHolder {
-        TextView text1;
-        TextView text2;
-    }
-
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        TextView tv = (TextView) convertView;
-        if (tv == null) {
-            tv = (TextView) inflater.inflate(R.layout.account_filter_dropdown_row, parent, false);
+        View v = convertView;
+        if (v == null) {
+            v = inflater.inflate(R.layout.account_filter_dropdown_row, parent, false);
         }
+        TextView tv = (TextView) v.findViewById(R.id.text1);
         tv.setText(getItem(position));
-        return tv;
+        return v;
     }
 }
