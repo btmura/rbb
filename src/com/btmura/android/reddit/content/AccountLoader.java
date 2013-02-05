@@ -153,7 +153,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
                 String accountName = accountNames[i + offset];
                 for (c.moveToPosition(-1); c.moveToNext(); ) {
                     if (accountName.equals(c.getString(INDEX_ACCOUNT))) {
-                        karmaCounts[i + offset] = Integer.toString(c.getInt(INDEX_LINK_KARMA));
+                        karmaCounts[i + offset] = c.getString(INDEX_LINK_KARMA);
                         break;
                     }
                 }
