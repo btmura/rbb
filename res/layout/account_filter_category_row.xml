@@ -15,9 +15,10 @@
      limitations under the License.
 -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="?android:attr/listSeparatorTextViewStyle"
     android:id="@+id/text1"
+    style="?android:attr/listSeparatorTextViewStyle"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_vertical"
     android:padding="@dimen/padding"
     android:textColor="@android:color/darker_gray" />

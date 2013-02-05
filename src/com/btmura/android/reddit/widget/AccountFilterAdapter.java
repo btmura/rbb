@@ -202,6 +202,13 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         return v;
     }
 
+    static class ViewHolder {
+        TextView accountName;
+        TextView subreddit;
+        TextView filter;
+        View divider;
+    }
+
     private View makeView(ViewGroup parent) {
         View v = inflater.inflate(R.layout.account_filter_row, parent, false);
         ViewHolder h = new ViewHolder();
@@ -213,11 +220,10 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         return v;
     }
 
-    static class ViewHolder {
-        TextView accountName;
-        TextView subreddit;
-        TextView filter;
-        View divider;
+    static class DropDownViewHolder {
+        TextView text1;
+        TextView text2;
+        int layout;
     }
 
     @Override
@@ -228,26 +234,23 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         // sure it's the one we want, since a change in the number of accounts
         // can cause prior views to be the wrong type for the new slots. The
         // adapter isn't smart enough to give us the correct views.
+        DropDownViewHolder vh = v != null ? (DropDownViewHolder) v.getTag() : null;
         int layout = getDropDownLayout(position);
-        if (v == null || layout != ((Integer) v.getTag())) {
+        if (v == null || layout != vh.layout) {
             v = inflater.inflate(layout, parent, false);
-            v.setTag(Integer.valueOf(layout));
+            vh = new DropDownViewHolder();
+            vh.text1 = (TextView) v.findViewById(R.id.text1);
+            vh.text2 = (TextView) v.findViewById(R.id.text2);
+            vh.layout = layout;
+            v.setTag(vh);
         }
 
         Item item = getItem(position);
-
-        // TODO: Use more elaborate ViewHolder to avoid finds.
-
-        TextView tv1 = (TextView) v.findViewById(R.id.text1);
-        tv1.setText(getTitle(item.text1, true));
-
-        // Only non-category rows have a second textview.
-        TextView tv2 = (TextView) v.findViewById(R.id.text2);
-        if (tv2 != null) {
-            tv2.setText(item.text2);
-            tv2.setVisibility(!TextUtils.isEmpty(item.text2) ? View.VISIBLE : View.GONE);
+        vh.text1.setText(getTitle(item.text1, true));
+        if (vh.text2 != null) {
+            vh.text2.setText(item.text2);
+            vh.text2.setVisibility(!TextUtils.isEmpty(item.text2) ? View.VISIBLE : View.GONE);
         }
-
         return v;
     }
 
