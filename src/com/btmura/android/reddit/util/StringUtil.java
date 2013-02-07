@@ -16,7 +16,7 @@
 
 package com.btmura.android.reddit.util;
 
-public class StringUtils {
+public class StringUtil {
 
     public static String ellipsize(String text, int maxLength) {
         if (text == null || text.length() <= maxLength) {
@@ -26,7 +26,7 @@ public class StringUtils {
         return text.substring(0, maxLength) + "…";
     }
 
-    public static String safeString(CharSequence cs) {
-        return cs != null ? cs.toString() : null;
+    public static String safeString(Object object) {
+        return object != null ? object.toString() : null;
     }
 }

@@ -40,7 +40,7 @@ import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.util.StringUtils;
+import com.btmura.android.reddit.util.StringUtil;
 
 // TODO: Split this into an interface and 2 adapters.
 public class ThingAdapter extends BaseLoaderAdapter {
@@ -466,7 +466,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     private String format(Context context, String text) {
-        return StringUtils.safeString(formatter.formatAll(context, text));
+        return StringUtil.safeString(formatter.formatAll(context, text));
     }
 
     public void save(Context context, int position) {

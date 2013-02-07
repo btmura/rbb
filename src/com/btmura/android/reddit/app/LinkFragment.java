@@ -39,7 +39,7 @@ import android.widget.ProgressBar;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
-import com.btmura.android.reddit.util.StringUtils;
+import com.btmura.android.reddit.util.StringUtil;
 
 public class LinkFragment extends Fragment implements ThingMenuListener {
 
@@ -145,7 +145,7 @@ public class LinkFragment extends Fragment implements ThingMenuListener {
     }
 
     private String getUrlArgument() {
-        return StringUtils.safeString(getArguments().getCharSequence(ARG_URL));
+        return StringUtil.safeString(getArguments().getCharSequence(ARG_URL));
     }
 
     @Override

@@ -15,16 +15,16 @@
  */
 package com.btmura.android.reddit.util;
 
-import com.btmura.android.reddit.util.StringUtils;
+import com.btmura.android.reddit.util.StringUtil;
 
 import junit.framework.TestCase;
 
 public class StringUtilsTest extends TestCase {
 
     public void testEllipsize() throws Exception {
-        assertEquals("bri…", StringUtils.ellipsize("brian", 3));
-        assertEquals("brian", StringUtils.ellipsize("brian", 5));
-        assertEquals("", StringUtils.ellipsize("", 5));
-        assertEquals(null, StringUtils.ellipsize(null, 7));
+        assertEquals("bri…", StringUtil.ellipsize("brian", 3));
+        assertEquals("brian", StringUtil.ellipsize("brian", 5));
+        assertEquals("", StringUtil.ellipsize("", 5));
+        assertEquals(null, StringUtil.ellipsize(null, 7));
     }
 }
