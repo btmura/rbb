@@ -466,7 +466,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     private String format(Context context, String text) {
-        return StringUtils.toString(formatter.formatAll(context, text));
+        return StringUtils.safeString(formatter.formatAll(context, text));
     }
 
     public void save(Context context, int position) {

@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +39,7 @@ import android.widget.ProgressBar;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
+import com.btmura.android.reddit.util.StringUtils;
 
 public class LinkFragment extends Fragment implements ThingMenuListener {
 
@@ -132,7 +134,7 @@ public class LinkFragment extends Fragment implements ThingMenuListener {
         if (savedInstanceState != null) {
             url = savedInstanceState.getString(STATE_URL);
         } else {
-            url = getArguments().getCharSequence(ARG_URL).toString();
+            url = getUrlArgument();
         }
         if (PATTERN_IMAGE.matcher(url).matches()) {
             String img = String.format("<img src=\"%s\" width=\"100%%\" />", url);
@@ -140,6 +142,10 @@ public class LinkFragment extends Fragment implements ThingMenuListener {
         } else {
             webView.loadUrl(url);
         }
+    }
+
+    private String getUrlArgument() {
+        return StringUtils.safeString(getArguments().getCharSequence(ARG_URL));
     }
 
     @Override
@@ -157,7 +163,11 @@ public class LinkFragment extends Fragment implements ThingMenuListener {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_URL, webView.getUrl());
+        outState.putString(STATE_URL, getCurrentUrl());
+    }
+
+    private String getCurrentUrl() {
+        return !TextUtils.isEmpty(webView.getUrl()) ? webView.getUrl() : getUrlArgument();
     }
 
     @Override

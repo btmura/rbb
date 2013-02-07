@@ -26,7 +26,7 @@ public class StringUtils {
         return text.substring(0, maxLength) + "…";
     }
 
-    public static String toString(CharSequence cs) {
+    public static String safeString(CharSequence cs) {
         return cs != null ? cs.toString() : null;
     }
 }
