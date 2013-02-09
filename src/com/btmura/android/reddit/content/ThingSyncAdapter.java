@@ -40,7 +40,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.net.RedditApi.Result;
+import com.btmura.android.reddit.net.Result;
 
 public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 

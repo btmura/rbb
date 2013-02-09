@@ -22,7 +22,6 @@ import java.io.InputStream;
 
 import android.test.AndroidTestCase;
 
-import com.btmura.android.reddit.net.RedditApi.Result;
 
 public class ResponseParserTest extends AndroidTestCase {
 

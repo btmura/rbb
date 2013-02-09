@@ -27,7 +27,7 @@ import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.RemoteException;
 
-import com.btmura.android.reddit.net.RedditApi.Result;
+import com.btmura.android.reddit.net.Result;
 
 /**
  * {@link Syncer} is an internal interface to extract the behavioral pattern of

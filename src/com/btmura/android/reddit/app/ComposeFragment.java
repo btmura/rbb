@@ -32,7 +32,7 @@ import android.util.Log;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.net.RedditApi.Result;
+import com.btmura.android.reddit.net.Result;
 
 /**
  * A head-less {@link Fragment} that composes submissions and messages.

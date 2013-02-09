@@ -37,8 +37,6 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.util.Array;
 
 public class RedditApi {
 
@@ -50,96 +48,6 @@ public class RedditApi {
     static final String USER_AGENT = "reddit by brian v2.0 by /u/btmura";
 
     private static final boolean LOG_RESPONSES = BuildConfig.DEBUG && !true;
-
-    public static class Result {
-
-        /** Error for missing or incorrect captcha guess. */
-        private static final String ERROR_BAD_CAPTCHA = "BAD_CAPTCHA";
-
-        /** Error for too much user activity. */
-        private static final String ERROR_RATELIMIT = "RATELIMIT";
-
-        public double rateLimit;
-
-        /**
-         * Example: [[BAD_CAPTCHA, care to try these again?, captcha], [RATELIMIT, you are doing
-         * that too much. try again in 6 minutes., ratelimit]]
-         */
-        public String[][] errors;
-
-        /** Example: D5GggaXa0GWshObkjzzEPzzrK8zpQfeB */
-        public String captcha;
-
-        /** Captcha id returned when asking for a new captcha. */
-        public String iden;
-
-        /** Example: http://www.reddit.com/r/rbb/comments/w5mhh/test/ */
-        public String url;
-
-        /** Example: t3_w5mhh */
-        public String name;
-
-        public CharSequence getErrorMessage(Context context) {
-            if (Array.isEmpty(errors)) {
-                return "";
-            }
-            StringBuilder b = new StringBuilder();
-
-            // Append a newline if there are multiple errors.
-            if (errors.length > 1) {
-                b.append("\n");
-            }
-
-            for (int i = 0; i < errors.length; i++) {
-                b.append(context.getString(R.string.reddit_error_line,
-                        errors[i][0], errors[i][1]));
-                if (i + 1 < errors.length) {
-                    b.append("\n");
-                }
-            }
-
-            return context.getString(R.string.reddit_error, b);
-        }
-
-        public boolean hasErrors() {
-            return !Array.isEmpty(errors);
-        }
-
-        public boolean hasRateLimitError() {
-            return hasError(ERROR_RATELIMIT);
-        }
-
-        public boolean hasBadCaptchaError() {
-            return hasError(ERROR_BAD_CAPTCHA);
-        }
-
-        private boolean hasError(String errorCode) {
-            if (!Array.isEmpty(errors)) {
-                for (int i = 0; i < errors.length; i++) {
-                    if (errorCode.equals(errors[i][0])) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        public void logAnyErrors(String tag) {
-            if (!Array.isEmpty(errors)) {
-                StringBuilder line = new StringBuilder();
-                for (int i = 0; i < errors.length; i++) {
-                    line.delete(0, line.length());
-                    for (int j = 0; j < errors[i].length; j++) {
-                        line.append(errors[i][j]);
-                        if (j + 1 < errors[i].length) {
-                            line.append(" ");
-                        }
-                    }
-                    Log.d(tag, line.toString());
-                }
-            }
-        }
-    }
 
     public static AccountInfoResult aboutMe(String cookie) throws IOException {
         return getAccountResult(Urls.aboutMe(), cookie);
@@ -290,7 +198,7 @@ public class RedditApi {
             if (LOG_RESPONSES) {
                 in = logResponse(in);
             }
-            return ResponseParser.parseResponse(in);
+            return Result.fromJsonReader(new JsonReader(new InputStreamReader(in)));
         } finally {
             close(in, conn);
         }

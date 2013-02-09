@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Brian Muramatsu
+ * Copyright (C) 2013 Brian Muramatsu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,107 @@
 
 package com.btmura.android.reddit.net;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
+import android.content.Context;
 import android.util.JsonReader;
 import android.util.JsonToken;
+import android.util.Log;
 
-import com.btmura.android.reddit.net.RedditApi.Result;
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.util.Array;
 
-class ResponseParser {
+public class Result {
 
-    static Result parseResponse(InputStream in) throws IOException {
+    /** Error for missing or incorrect captcha guess. */
+    private static final String ERROR_BAD_CAPTCHA = "BAD_CAPTCHA";
+
+    /** Error for too much user activity. */
+    private static final String ERROR_RATELIMIT = "RATELIMIT";
+
+    public double rateLimit;
+
+    /**
+     * Example: [[BAD_CAPTCHA, care to try these again?, captcha], [RATELIMIT, you are doing
+     * that too much. try again in 6 minutes., ratelimit]]
+     */
+    public String[][] errors;
+
+    /** Example: D5GggaXa0GWshObkjzzEPzzrK8zpQfeB */
+    public String captcha;
+
+    /** Captcha id returned when asking for a new captcha. */
+    public String iden;
+
+    /** Example: http://www.reddit.com/r/rbb/comments/w5mhh/test/ */
+    public String url;
+
+    /** Example: t3_w5mhh */
+    public String name;
+
+    public CharSequence getErrorMessage(Context context) {
+        if (Array.isEmpty(errors)) {
+            return "";
+        }
+        StringBuilder b = new StringBuilder();
+
+        // Append a newline if there are multiple errors.
+        if (errors.length > 1) {
+            b.append("\n");
+        }
+
+        for (int i = 0; i < errors.length; i++) {
+            b.append(context.getString(R.string.reddit_error_line,
+                    errors[i][0], errors[i][1]));
+            if (i + 1 < errors.length) {
+                b.append("\n");
+            }
+        }
+
+        return context.getString(R.string.reddit_error, b);
+    }
+
+    public boolean hasErrors() {
+        return !Array.isEmpty(errors);
+    }
+
+    public boolean hasRateLimitError() {
+        return hasError(ERROR_RATELIMIT);
+    }
+
+    public boolean hasBadCaptchaError() {
+        return hasError(ERROR_BAD_CAPTCHA);
+    }
+
+    private boolean hasError(String errorCode) {
+        if (!Array.isEmpty(errors)) {
+            for (int i = 0; i < errors.length; i++) {
+                if (errorCode.equals(errors[i][0])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void logAnyErrors(String tag) {
+        if (!Array.isEmpty(errors)) {
+            StringBuilder line = new StringBuilder();
+            for (int i = 0; i < errors.length; i++) {
+                line.delete(0, line.length());
+                for (int j = 0; j < errors[i].length; j++) {
+                    line.append(errors[i][j]);
+                    if (j + 1 < errors[i].length) {
+                        line.append(" ");
+                    }
+                }
+                Log.d(tag, line.toString());
+            }
+        }
+    }
+
+    static Result fromJsonReader(JsonReader reader) throws IOException {
         Result result = new Result();
-        JsonReader reader = new JsonReader(new InputStreamReader(new BufferedInputStream(in)));
         try {
             reader.beginObject();
             while (reader.hasNext()) {
