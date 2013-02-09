@@ -33,7 +33,7 @@ public class SidebarLoader extends AsyncTaskLoader<SidebarResult> {
     public static final String TAG = "SidebarLoader";
 
     private final String subreddit;
-    private SidebarResult results;
+    private SidebarResult result;
 
     public SidebarLoader(Context context, String subreddit) {
         super(context.getApplicationContext());
@@ -43,8 +43,8 @@ public class SidebarLoader extends AsyncTaskLoader<SidebarResult> {
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
-        if (results != null) {
-            deliverResult(results);
+        if (result != null) {
+            deliverResult(result);
         } else {
             forceLoad();
         }
