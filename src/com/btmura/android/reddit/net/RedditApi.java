@@ -142,14 +142,14 @@ public class RedditApi {
         }
     }
 
-    // TODO: Merge with Result.
+    // TODO: Follow the pattern of AccountResult.
     public static class LoginResult {
         public String cookie;
         public String modhash;
         public String error;
     }
 
-    // TODO: Merge with Result.
+    // TODO: Follow the pattern of AccountResult.
     public static class SidebarResult {
         public String subreddit;
         public CharSequence title;
@@ -161,6 +161,8 @@ public class RedditApi {
      * {@link AccountResult} is the result of calling the {@link RedditApi#aboutMe(String)} method.
      */
     public static class AccountResult extends JsonParser {
+
+        // TODO: Split this apart into a separate class.
 
         /** Amount of link karma. */
         public int linkKarma;
