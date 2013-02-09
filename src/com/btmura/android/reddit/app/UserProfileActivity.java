@@ -80,7 +80,20 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         if (savedInstanceState != null) {
             currentFilter = savedInstanceState.getInt(STATE_FILTER);
         }
+
         adapter = new AccountFilterAdapter(this);
+
+        // Don't show additional account-only profile filters.
+        adapter.addProfileFilters(this, false);
+
+        // Set the only account option to the user we are viewing not us.
+        adapter.setAccountInfo(Array.of(currentUser), null);
+
+        if (currentFilter == -1) {
+            currentFilter = FilterAdapter.PROFILE_OVERVIEW;
+        }
+        adapter.setFilter(currentFilter);
+
         bar.setListNavigationCallbacks(adapter, this);
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
@@ -95,17 +108,6 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = result.getLastAccount();
-
-        // Don't show additional account-only profile filters.
-        adapter.addProfileFilters(this, false);
-
-        // Set the only account option to the user we are viewing not us.
-        adapter.setAccountInfo(Array.of(currentUser), null);
-
-        if (currentFilter == -1) {
-            currentFilter = FilterAdapter.PROFILE_OVERVIEW;
-        }
-        adapter.setFilter(currentFilter);
 
         // Reset the adapter to trigger a selection callback since there is only 1 account.
         bar.setListNavigationCallbacks(adapter, this);
