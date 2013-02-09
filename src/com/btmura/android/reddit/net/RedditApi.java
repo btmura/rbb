@@ -148,14 +148,6 @@ public class RedditApi {
         public String error;
     }
 
-    // TODO: Follow the pattern of AccountInfoResult.
-    public static class SidebarResult {
-        public String subreddit;
-        public CharSequence title;
-        public int subscribers;
-        public CharSequence description;
-    }
-
     public static AccountInfoResult aboutMe(String cookie) throws IOException {
         return getAccountResult(Urls.aboutMe(), cookie);
     }
@@ -214,10 +206,7 @@ public class RedditApi {
         try {
             conn = connect(Urls.sidebar(subreddit), cookie, true, false);
             in = conn.getInputStream();
-            JsonReader reader = new JsonReader(new InputStreamReader(in));
-            SidebarParser parser = new SidebarParser(context);
-            parser.parseEntity(reader);
-            return parser.results;
+            return SidebarResult.fromJsonReader(context, new JsonReader(new InputStreamReader(in)));
         } finally {
             close(in, conn);
         }

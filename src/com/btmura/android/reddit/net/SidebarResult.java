@@ -21,38 +21,52 @@ import java.io.IOException;
 import android.content.Context;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.net.RedditApi.SidebarResult;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.JsonParser;
 
-class SidebarParser extends JsonParser {
+/**
+ * {@link SidebarResult} is the result of calling the
+ * {@link RedditApi#getSidebar(Context, String, String)} method. It contains information about the
+ * subreddit itself.
+ */
+public class SidebarResult extends JsonParser {
 
-    final SidebarResult results = new SidebarResult();
+    public String subreddit;
+    public CharSequence title;
+    public CharSequence description;
+    public int subscribers;
 
     private final Formatter formatter = new Formatter();
     private final Context context;
 
-    SidebarParser(Context context) {
-        this.context = context;
+    public static SidebarResult fromJsonReader(Context context, JsonReader reader)
+            throws IOException {
+        SidebarResult result = new SidebarResult(context);
+        result.parseEntity(reader);
+        return result;
+    }
+
+    private SidebarResult(Context context) {
+        this.context = context.getApplicationContext();
     }
 
     @Override
     public void onDisplayName(JsonReader reader, int index) throws IOException {
-        results.subreddit = reader.nextString();
+        subreddit = reader.nextString();
     }
 
     @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
-        results.title = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
-    }
-
-    @Override
-    public void onSubscribers(JsonReader reader, int index) throws IOException {
-        results.subscribers = reader.nextInt();
+        title = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
     }
 
     @Override
     public void onDescription(JsonReader reader, int index) throws IOException {
-        results.description = formatter.formatAll(context, readTrimmedString(reader, ""));
+        description = formatter.formatAll(context, readTrimmedString(reader, ""));
+    }
+
+    @Override
+    public void onSubscribers(JsonReader reader, int index) throws IOException {
+        subscribers = reader.nextInt();
     }
 }

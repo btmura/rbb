@@ -23,7 +23,7 @@ import android.os.Bundle;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SidebarLoader;
-import com.btmura.android.reddit.net.RedditApi.SidebarResult;
+import com.btmura.android.reddit.net.SidebarResult;
 import com.btmura.android.reddit.widget.SidebarAdapter;
 import com.btmura.android.reddit.widget.SidebarAdapter.OnSidebarButtonClickListener;
 

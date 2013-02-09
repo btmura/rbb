@@ -23,7 +23,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.net.RedditApi.SidebarResult;
+import com.btmura.android.reddit.net.SidebarResult;
 
 /**
  * {@link AsyncTaskLoader} that loads the sidebar of a subreddit.

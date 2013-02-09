@@ -26,7 +26,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.net.RedditApi.SidebarResult;
+import com.btmura.android.reddit.net.SidebarResult;
 
 public class SidebarAdapter extends BaseAdapter implements OnClickListener {
 
