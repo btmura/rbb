@@ -19,7 +19,6 @@ package com.btmura.android.reddit.widget;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -221,50 +220,56 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
     }
 
     static class DropDownViewHolder {
-        TextView text1;
-        TextView text2;
-        int layout;
+        TextView accountFilter;
+        TextView linkKarma;
+        TextView category;
     }
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
-
-        // Tag each widget with the layout. Check the layout each time to make
-        // sure it's the one we want, since a change in the number of accounts
-        // can cause prior views to be the wrong type for the new slots. The
-        // adapter isn't smart enough to give us the correct views.
-        DropDownViewHolder vh = v != null ? (DropDownViewHolder) v.getTag() : null;
-        int layout = getDropDownLayout(position);
-        if (v == null || layout != vh.layout) {
-            v = inflater.inflate(layout, parent, false);
-            vh = new DropDownViewHolder();
-            vh.text1 = (TextView) v.findViewById(R.id.text1);
-            vh.text2 = (TextView) v.findViewById(R.id.text2);
-            vh.layout = layout;
+        if (v == null) {
+            v = inflater.inflate(R.layout.account_filter_dropdown_row, parent, false);
+            DropDownViewHolder vh = new DropDownViewHolder();
+            vh.accountFilter = (TextView) v.findViewById(R.id.account_filter);
+            vh.linkKarma = (TextView) v.findViewById(R.id.link_karma);
+            vh.category = (TextView) v.findViewById(R.id.category);
             v.setTag(vh);
         }
-
-        Item item = getItem(position);
-        vh.text1.setText(getTitle(item.text1, true));
-        if (vh.text2 != null) {
-            vh.text2.setText(item.text2);
-            vh.text2.setVisibility(!TextUtils.isEmpty(item.text2) ? View.VISIBLE : View.GONE);
-        }
+        setDropdownView(v, position);
         return v;
     }
 
-    private int getDropDownLayout(int position) {
-        switch (getItemViewType(position)) {
+    private void setDropdownView(View view, int position) {
+        DropDownViewHolder vh = (DropDownViewHolder) view.getTag();
+        Item item = getItem(position);
+        switch (item.type) {
             case Item.TYPE_ACCOUNT_NAME:
+                vh.accountFilter.setText(getTitle(item.text1, true));
+                vh.accountFilter.setVisibility(View.VISIBLE);
+                vh.linkKarma.setText(item.text2);
+                vh.linkKarma.setVisibility(View.VISIBLE);
+                vh.category.setVisibility(View.GONE);
+                break;
+
             case Item.TYPE_FILTER:
-                return R.layout.account_filter_dropdown_row;
+                vh.accountFilter.setText(item.text1);
+                vh.accountFilter.setVisibility(View.VISIBLE);
+                vh.linkKarma.setText(null);
+                vh.linkKarma.setVisibility(View.VISIBLE);
+                vh.category.setVisibility(View.GONE);
+                break;
 
             case Item.TYPE_CATEGORY:
-                return R.layout.account_filter_category_row;
+                vh.accountFilter.setVisibility(View.GONE);
+                vh.linkKarma.setVisibility(View.GONE);
+                vh.category.setText(item.text1);
+                vh.category.setVisibility(View.VISIBLE);
+                break;
 
             default:
                 throw new IllegalArgumentException();
+
         }
     }
 

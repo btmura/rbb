@@ -14,23 +14,41 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/padding" >
+    android:layout_height="match_parent" >
 
     <TextView
-        android:id="@+id/text1"
+        android:id="@+id/account_filter"
         style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:gravity="center_vertical" />
+        android:gravity="center_vertical"
+        android:paddingBottom="@dimen/padding"
+        android:paddingLeft="@dimen/padding"
+        android:paddingRight="@dimen/element_padding"
+        android:paddingTop="@dimen/padding" />
 
     <TextView
-        android:id="@+id/text2"
+        android:id="@+id/link_karma"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:gravity="center_vertical|right" />
+        android:gravity="center_vertical|right"
+        android:paddingBottom="@dimen/padding"
+        android:paddingRight="@dimen/padding"
+        android:paddingTop="@dimen/padding" />
+
+    <TextView
+        android:id="@+id/category"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:padding="@dimen/padding"
+        android:textColor="@android:color/darker_gray"
+        android:visibility="gone" />
 
 </LinearLayout>

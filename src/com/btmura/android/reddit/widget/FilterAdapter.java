@@ -93,13 +93,14 @@ public class FilterAdapter extends BaseFilterAdapter {
         return v;
     }
 
+    // TODO: Remove code duplication with AccountFilterAdapter.
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
             v = inflater.inflate(R.layout.account_filter_dropdown_row, parent, false);
         }
-        TextView tv = (TextView) v.findViewById(R.id.text1);
+        TextView tv = (TextView) v.findViewById(R.id.account_filter);
         tv.setText(getItem(position));
         return v;
     }
