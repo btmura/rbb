@@ -18,8 +18,8 @@ package com.btmura.android.reddit.content;
 
 import java.io.IOException;
 
+import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.net.RedditApi.AccountResult;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
@@ -28,12 +28,12 @@ import android.util.Log;
 /**
  * {@link AsyncTaskLoader} that loads a user's account info.
  */
-public class UserInfoLoader extends AsyncTaskLoader<AccountResult> {
+public class UserInfoLoader extends AsyncTaskLoader<AccountInfoResult> {
 
     public static final String TAG = "UserInfoLoader";
 
     private final String user;
-    private AccountResult result;
+    private AccountInfoResult result;
 
     public UserInfoLoader(Context context, String user) {
         super(context.getApplicationContext());
@@ -51,7 +51,7 @@ public class UserInfoLoader extends AsyncTaskLoader<AccountResult> {
     }
 
     @Override
-    public AccountResult loadInBackground() {
+    public AccountInfoResult loadInBackground() {
         try {
             return RedditApi.aboutUser(user, null);
         } catch (IOException e) {

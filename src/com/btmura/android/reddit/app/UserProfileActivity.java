@@ -31,7 +31,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.UserInfoLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
@@ -50,21 +50,21 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     private AccountFilterAdapter adapter;
     private String accountName;
 
-    private LoaderCallbacks<RedditApi.AccountResult> karmaLoaderCallbacks =
-            new LoaderCallbacks<RedditApi.AccountResult>() {
-        public Loader<RedditApi.AccountResult> onCreateLoader(int id, Bundle args) {
+    private LoaderCallbacks<AccountInfoResult> karmaLoaderCallbacks =
+            new LoaderCallbacks<AccountInfoResult>() {
+        public Loader<AccountInfoResult> onCreateLoader(int id, Bundle args) {
             return new UserInfoLoader(getApplicationContext(), currentUser);
         }
 
-        public void onLoadFinished(Loader<RedditApi.AccountResult> loader,
-                RedditApi.AccountResult result) {
+        public void onLoadFinished(Loader<AccountInfoResult> loader,
+                AccountInfoResult result) {
             String[] karmaCounts = result != null
                     ? Array.of(Integer.toString(result.linkKarma))
                     : null;
             adapter.setAccountInfo(Array.of(currentUser), karmaCounts);
         }
 
-        public void onLoaderReset(Loader<RedditApi.AccountResult> loader) {
+        public void onLoaderReset(Loader<AccountInfoResult> loader) {
         }
     };
 

@@ -37,8 +37,8 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Accounts;
+import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.net.RedditApi.AccountResult;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Array;
 
@@ -101,7 +101,7 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             // Get the account information.
-            AccountResult result = RedditApi.aboutMe(cookie);
+            AccountInfoResult result = RedditApi.aboutMe(cookie);
 
             // Only update the database if it's missing or different.
             Cursor c = provider.query(AccountProvider.ACCOUNTS_URI, PROJECTION,

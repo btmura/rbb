@@ -34,13 +34,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.JsonReader;
-import android.util.JsonToken;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.util.Array;
-import com.btmura.android.reddit.util.JsonParser;
 
 public class RedditApi {
 
@@ -143,14 +141,14 @@ public class RedditApi {
         }
     }
 
-    // TODO: Follow the pattern of AccountResult.
+    // TODO: Follow the pattern of AccountInfoResult.
     public static class LoginResult {
         public String cookie;
         public String modhash;
         public String error;
     }
 
-    // TODO: Follow the pattern of AccountResult.
+    // TODO: Follow the pattern of AccountInfoResult.
     public static class SidebarResult {
         public String subreddit;
         public CharSequence title;
@@ -158,66 +156,22 @@ public class RedditApi {
         public CharSequence description;
     }
 
-    /**
-     * {@link AccountResult} is the result of calling the {@link RedditApi#aboutMe(String)} method.
-     */
-    public static class AccountResult extends JsonParser {
-
-        // TODO: Split this apart into a separate class.
-
-        /** Amount of link karma. */
-        public int linkKarma;
-
-        /** Amount of comment karma. */
-        public int commentKarma;
-
-        /** True if the account has mail. False otherwise. */
-        public boolean hasMail;
-
-        /** Return a new {@link AccountResult} from a {@link JsonReader}. */
-        public static AccountResult fromJsonReader(JsonReader reader) throws IOException {
-            AccountResult result = new AccountResult();
-            result.parseEntity(reader);
-            return result;
-        }
-
-        private AccountResult() {
-            // Use the fromJsonReader method.
-        }
-
-        @Override
-        public void onLinkKarma(JsonReader reader, int index) throws IOException {
-            linkKarma = reader.nextInt();
-        }
-
-        @Override
-        public void onCommentKarma(JsonReader reader, int index) throws IOException {
-            commentKarma = reader.nextInt();
-        }
-
-        @Override
-        public void onHasMail(JsonReader reader, int index) throws IOException {
-            // hasMail is null when we are viewing somebody else's account info.
-            hasMail = reader.peek() != JsonToken.NULL && reader.nextBoolean();
-        }
-    }
-
-    public static AccountResult aboutMe(String cookie) throws IOException {
+    public static AccountInfoResult aboutMe(String cookie) throws IOException {
         return getAccountResult(Urls.aboutMe(), cookie);
     }
 
-    public static AccountResult aboutUser(String user, String cookie) throws IOException {
+    public static AccountInfoResult aboutUser(String user, String cookie) throws IOException {
         return getAccountResult(Urls.aboutUser(user), cookie);
     }
 
-    private static AccountResult getAccountResult(CharSequence url, String cookie)
+    private static AccountInfoResult getAccountResult(CharSequence url, String cookie)
             throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
             conn = connect(url, cookie, true, false);
             in = new BufferedInputStream(conn.getInputStream());
-            return AccountResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
+            return AccountInfoResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
         } finally {
             close(in, conn);
         }
