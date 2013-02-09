@@ -63,9 +63,8 @@ public class RedditApi {
         public double rateLimit;
 
         /**
-         * Example:
-         * [[BAD_CAPTCHA, care to try these again?, captcha],
-         *  [RATELIMIT, you are doing that too much. try again in 6 minutes., ratelimit]]
+         * Example: [[BAD_CAPTCHA, care to try these again?, captcha], [RATELIMIT, you are doing
+         * that too much. try again in 6 minutes., ratelimit]]
          */
         public String[][] errors;
 
@@ -159,8 +158,7 @@ public class RedditApi {
     }
 
     /**
-     * {@link AccountResult} is the result of calling the
-     * {@link RedditApi#aboutMe(String)} method.
+     * {@link AccountResult} is the result of calling the {@link RedditApi#aboutMe(String)} method.
      */
     public static class AccountResult extends JsonParser {
 
@@ -201,10 +199,19 @@ public class RedditApi {
     }
 
     public static AccountResult aboutMe(String cookie) throws IOException {
+        return getAccountResult(Urls.aboutMe(), cookie);
+    }
+
+    public static AccountResult aboutUser(String user, String cookie) throws IOException {
+        return getAccountResult(Urls.aboutUser(user), cookie);
+    }
+
+    private static AccountResult getAccountResult(CharSequence url, String cookie)
+            throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.aboutMe(), cookie, true, false);
+            conn = connect(url, cookie, true, false);
             in = new BufferedInputStream(conn.getInputStream());
             return AccountResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
         } finally {
@@ -388,9 +395,8 @@ public class RedditApi {
     }
 
     /**
-     * Logs entire response and returns a fresh InputStream as if nothing
-     * happened. Make sure to delete all usages of this method, since it is only
-     * for debugging.
+     * Logs entire response and returns a fresh InputStream as if nothing happened. Make sure to
+     * delete all usages of this method, since it is only for debugging.
      */
     private static InputStream logResponse(InputStream in) throws IOException {
         // Make a copy of the InputStream.

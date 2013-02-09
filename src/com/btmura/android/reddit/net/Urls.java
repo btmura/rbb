@@ -76,6 +76,10 @@ public class Urls {
         return new StringBuilder(API_ME_URL).append(".json");
     }
 
+    public static CharSequence aboutUser(String user) {
+        return new StringBuilder(BASE_USER_JSON_URL).append(user).append("/about.json");
+    }
+
     public static CharSequence captcha(String id) {
         return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
     }
