@@ -25,13 +25,15 @@ import android.util.Log;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.RedditApi.SidebarResult;
 
+/**
+ * {@link AsyncTaskLoader} that loads the sidebar of a subreddit.
+ */
 public class SidebarLoader extends AsyncTaskLoader<SidebarResult> {
 
     public static final String TAG = "SidebarLoader";
 
+    private final String subreddit;
     private SidebarResult results;
-
-    private String subreddit;
 
     public SidebarLoader(Context context, String subreddit) {
         super(context.getApplicationContext());
@@ -53,7 +55,7 @@ public class SidebarLoader extends AsyncTaskLoader<SidebarResult> {
         try {
             return RedditApi.getSidebar(getContext(), subreddit, null);
         } catch (IOException e) {
-            Log.e(TAG, "loadInBackground", e);
+            Log.e(TAG, e.getMessage(), e);
         }
         return null;
     }
