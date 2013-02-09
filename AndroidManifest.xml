@@ -92,7 +92,9 @@
         <activity
             android:name=".app.SidebarActivity"
             android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
-        <activity android:name=".app.ThingActivity" />
+        <activity
+            android:name=".app.ThingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity android:name=".app.ThingListActivity" />
         <activity
             android:name=".app.UserProfileActivity"
