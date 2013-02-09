@@ -30,7 +30,9 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.net.UriHelper;
+import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
+import com.btmura.android.reddit.widget.AccountFilterAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
@@ -42,7 +44,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     private String currentUser;
     private int currentFilter = -1;
-    private FilterAdapter adapter;
+    private AccountFilterAdapter adapter;
     private String accountName;
 
     @Override
@@ -78,10 +80,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         if (savedInstanceState != null) {
             currentFilter = savedInstanceState.getInt(STATE_FILTER);
         }
-
-        adapter = new FilterAdapter(this);
-        adapter.setTitle(currentUser);
-
+        adapter = new AccountFilterAdapter(this);
         bar.setListNavigationCallbacks(adapter, this);
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
@@ -96,16 +95,26 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = result.getLastAccount();
-        adapter.addProfileFilters(this, Objects.equals(accountName, currentUser));
+
+        // Don't show additional account-only profile filters.
+        adapter.addProfileFilters(this, false);
+
+        // Set the only account option to the user we are viewing not us.
+        adapter.setAccountInfo(Array.of(currentUser), null);
 
         if (currentFilter == -1) {
             currentFilter = FilterAdapter.PROFILE_OVERVIEW;
         }
-        bar.setSelectedNavigationItem(currentFilter);
+        adapter.setFilter(currentFilter);
+
+        // Reset the adapter to trigger a selection callback since there is only 1 account.
+        bar.setListNavigationCallbacks(adapter, this);
+        bar.setSelectedNavigationItem(0);
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        currentFilter = getFilter();
+        adapter.updateState(itemPosition);
+        currentFilter = adapter.getFilter();
 
         ThingListFragment frag = getThingListFragment();
         if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
@@ -114,7 +123,6 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         }
         return true;
     }
-
 
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
@@ -126,7 +134,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     protected int getFilter() {
-        return adapter.getFilter(bar.getSelectedNavigationIndex());
+        return adapter.getFilter();
     }
 
     @Override
