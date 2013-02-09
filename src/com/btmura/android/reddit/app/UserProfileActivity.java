@@ -19,6 +19,7 @@ package com.btmura.android.reddit.app;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,7 +29,9 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.UserInfoLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
@@ -46,6 +49,24 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
     private int currentFilter = -1;
     private AccountFilterAdapter adapter;
     private String accountName;
+
+    private LoaderCallbacks<RedditApi.AccountResult> karmaLoaderCallbacks =
+            new LoaderCallbacks<RedditApi.AccountResult>() {
+        public Loader<RedditApi.AccountResult> onCreateLoader(int id, Bundle args) {
+            return new UserInfoLoader(getApplicationContext(), currentUser);
+        }
+
+        public void onLoadFinished(Loader<RedditApi.AccountResult> loader,
+                RedditApi.AccountResult result) {
+            String[] karmaCounts = result != null
+                    ? Array.of(Integer.toString(result.linkKarma))
+                    : null;
+            adapter.setAccountInfo(Array.of(currentUser), karmaCounts);
+        }
+
+        public void onLoaderReset(Loader<RedditApi.AccountResult> loader) {
+        }
+    };
 
     @Override
     protected void setContentView() {
@@ -93,6 +114,9 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
             currentFilter = FilterAdapter.PROFILE_OVERVIEW;
         }
         adapter.setFilter(currentFilter);
+
+        // Start loading the user's karma count.
+        getLoaderManager().initLoader(1, null, karmaLoaderCallbacks);
 
         bar.setListNavigationCallbacks(adapter, this);
         bar.setDisplayHomeAsUpEnabled(true);

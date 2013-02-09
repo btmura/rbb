@@ -34,6 +34,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.JsonReader;
+import android.util.JsonToken;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -196,7 +197,8 @@ public class RedditApi {
 
         @Override
         public void onHasMail(JsonReader reader, int index) throws IOException {
-            hasMail = reader.nextBoolean();
+            // hasMail is null when we are viewing somebody else's account info.
+            hasMail = reader.peek() != JsonToken.NULL && reader.nextBoolean();
         }
     }
 
