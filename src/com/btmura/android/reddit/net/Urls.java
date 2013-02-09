@@ -72,6 +72,10 @@ public class Urls {
         }
     }
 
+    public static CharSequence aboutMe() {
+        return new StringBuilder(API_ME_URL).append(".json");
+    }
+
     public static CharSequence captcha(String id) {
         return new StringBuilder(BASE_CAPTCHA_URL).append(id).append(".png");
     }
@@ -167,10 +171,6 @@ public class Urls {
         b.append("&passwd=").append(encode(password));
         b.append("&api_type=json");
         return b;
-    }
-
-    public static CharSequence me() {
-        return new StringBuilder(API_ME_URL).append(".json");
     }
 
     public static CharSequence messageThread(String thingId, int apiType) {

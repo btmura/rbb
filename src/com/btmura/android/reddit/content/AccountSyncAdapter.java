@@ -101,7 +101,7 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             // Get the account information.
-            AccountResult result = RedditApi.me(cookie);
+            AccountResult result = RedditApi.aboutMe(cookie);
 
             // Only update the database if it's missing or different.
             Cursor c = provider.query(AccountProvider.ACCOUNTS_URI, PROJECTION,

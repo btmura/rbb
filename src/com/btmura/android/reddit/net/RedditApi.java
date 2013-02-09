@@ -160,7 +160,7 @@ public class RedditApi {
 
     /**
      * {@link AccountResult} is the result of calling the
-     * {@link RedditApi#me(String)} method.
+     * {@link RedditApi#aboutMe(String)} method.
      */
     public static class AccountResult extends JsonParser {
 
@@ -197,6 +197,18 @@ public class RedditApi {
         @Override
         public void onHasMail(JsonReader reader, int index) throws IOException {
             hasMail = reader.nextBoolean();
+        }
+    }
+
+    public static AccountResult aboutMe(String cookie) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            conn = connect(Urls.aboutMe(), cookie, true, false);
+            in = new BufferedInputStream(conn.getInputStream());
+            return AccountResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
+        } finally {
+            close(in, conn);
         }
     }
 
@@ -275,18 +287,6 @@ public class RedditApi {
             writeFormData(conn, Urls.loginQuery(login, password));
             in = conn.getInputStream();
             return LoginParser.parseResponse(in);
-        } finally {
-            close(in, conn);
-        }
-    }
-
-    public static AccountResult me(String cookie) throws IOException {
-        HttpURLConnection conn = null;
-        InputStream in = null;
-        try {
-            conn = connect(Urls.me(), cookie, true, false);
-            in = new BufferedInputStream(conn.getInputStream());
-            return AccountResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
         } finally {
             close(in, conn);
         }
