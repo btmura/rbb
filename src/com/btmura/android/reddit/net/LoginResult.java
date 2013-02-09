@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Brian Muramatsu
+ * Copyright (C) 2013 Brian Muramatsu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,21 @@
 package com.btmura.android.reddit.net;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.net.RedditApi.LoginResult;
+/**
+ * {@link LoginResult} is the result of calling the
+ * {@link RedditApi#login(android.content.Context, String, String)} method.
+ */
+public class LoginResult {
 
-class LoginParser {
+    public String cookie;
+    public String modhash;
+    public String error;
 
-    static LoginResult parseResponse(InputStream in) throws IOException {
+    public static LoginResult fromJsonReader(JsonReader reader) throws IOException {
         LoginResult result = new LoginResult();
-        JsonReader reader = new JsonReader(new InputStreamReader(in));
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();

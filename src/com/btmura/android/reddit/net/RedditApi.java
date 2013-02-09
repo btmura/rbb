@@ -141,13 +141,6 @@ public class RedditApi {
         }
     }
 
-    // TODO: Follow the pattern of AccountInfoResult.
-    public static class LoginResult {
-        public String cookie;
-        public String modhash;
-        public String error;
-    }
-
     public static AccountInfoResult aboutMe(String cookie) throws IOException {
         return getAccountResult(Urls.aboutMe(), cookie);
     }
@@ -240,7 +233,7 @@ public class RedditApi {
 
             writeFormData(conn, Urls.loginQuery(login, password));
             in = conn.getInputStream();
-            return LoginParser.parseResponse(in);
+            return LoginResult.fromJsonReader(new JsonReader(new InputStreamReader(in)));
         } finally {
             close(in, conn);
         }
