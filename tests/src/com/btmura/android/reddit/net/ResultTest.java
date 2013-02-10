@@ -19,11 +19,12 @@ package com.btmura.android.reddit.net;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import android.test.AndroidTestCase;
+import android.util.JsonReader;
 
-
-public class ResponseParserTest extends AndroidTestCase {
+public class ResultTest extends AndroidTestCase {
 
     public void testErrors_empty() throws IOException {
         Result result = parse("{\"json\": {\"errors\": []}}");
@@ -40,7 +41,7 @@ public class ResponseParserTest extends AndroidTestCase {
     private Result parse(String json) throws IOException {
         InputStream in = new ByteArrayInputStream(json.getBytes());
         try {
-            return ResponseParser.parseResponse(in);
+            return Result.fromJsonReader(new JsonReader(new InputStreamReader(in)));
         } finally {
             in.close();
         }
