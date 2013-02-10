@@ -64,12 +64,18 @@ public class UriHelper {
 
             // http://www.reddit.com/u/btmura
             MATCHER.addURI(AUTHORITIES[i], "u/*", MATCH_USER);
+            MATCHER.addURI(AUTHORITIES[i], "user/*", MATCH_USER);
 
             // Various filters of users.
             MATCHER.addURI(AUTHORITIES[i], "u/*/overview", MATCH_USER_OVERVIEW);
             MATCHER.addURI(AUTHORITIES[i], "u/*/comments", MATCH_USER_COMMENTS);
             MATCHER.addURI(AUTHORITIES[i], "u/*/submitted", MATCH_USER_SUBMITTED);
             MATCHER.addURI(AUTHORITIES[i], "u/*/saved", MATCH_USER_SAVED);
+
+            MATCHER.addURI(AUTHORITIES[i], "user/*/overview", MATCH_USER_OVERVIEW);
+            MATCHER.addURI(AUTHORITIES[i], "user/*/comments", MATCH_USER_COMMENTS);
+            MATCHER.addURI(AUTHORITIES[i], "user/*/submitted", MATCH_USER_SUBMITTED);
+            MATCHER.addURI(AUTHORITIES[i], "user/*/saved", MATCH_USER_SAVED);
         }
     }
 
