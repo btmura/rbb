@@ -39,11 +39,12 @@ public class UriHelper {
     private static final int MATCH_SUBREDDIT_CONTROVERSIAL = 4;
     private static final int MATCH_SUBREDDIT_TOP = 5;
     private static final int MATCH_COMMENTS = 6;
-    private static final int MATCH_USER = 7;
-    private static final int MATCH_USER_OVERVIEW = 8;
-    private static final int MATCH_USER_COMMENTS = 9;
-    private static final int MATCH_USER_SUBMITTED = 10;
-    private static final int MATCH_USER_SAVED = 11;
+    private static final int MATCH_COMMENTS_CONTEXT = 7;
+    private static final int MATCH_USER = 8;
+    private static final int MATCH_USER_OVERVIEW = 9;
+    private static final int MATCH_USER_COMMENTS = 10;
+    private static final int MATCH_USER_SUBMITTED = 11;
+    private static final int MATCH_USER_SAVED = 12;
 
     static {
         for (int i = 0; i < AUTHORITIES.length; i++) {
@@ -61,6 +62,9 @@ public class UriHelper {
 
             // http://www.reddit.com/r/rbb/comments/12zl0q/test_1
             MATCHER.addURI(AUTHORITIES[i], "r/*/comments/*/*", MATCH_COMMENTS);
+
+            // http://www.reddit.com/r/rbb/comments/12zl0q/test_1/c8c9uvt
+            MATCHER.addURI(AUTHORITIES[i], "r/*/comments/*/*/*", MATCH_COMMENTS_CONTEXT);
 
             // http://www.reddit.com/u/btmura
             MATCHER.addURI(AUTHORITIES[i], "u/*", MATCH_USER);
@@ -88,6 +92,7 @@ public class UriHelper {
                 case MATCH_SUBREDDIT_CONTROVERSIAL:
                 case MATCH_SUBREDDIT_TOP:
                 case MATCH_COMMENTS:
+                case MATCH_COMMENTS_CONTEXT:
                     return true;
             }
         }
@@ -117,6 +122,7 @@ public class UriHelper {
                 case MATCH_SUBREDDIT_CONTROVERSIAL:
                 case MATCH_SUBREDDIT_TOP:
                 case MATCH_COMMENTS:
+                case MATCH_COMMENTS_CONTEXT:
                     return uri.getPathSegments().get(1);
             }
         }
@@ -149,6 +155,14 @@ public class UriHelper {
                 Bundle b = new Bundle(2);
                 ThingBundle.putSubreddit(b, segments.get(1));
                 ThingBundle.putThingId(b, segments.get(3));
+                return b;
+
+            case MATCH_COMMENTS_CONTEXT:
+                segments = data.getPathSegments();
+                b = new Bundle(3);
+                ThingBundle.putSubreddit(b, segments.get(1));
+                ThingBundle.putLinkId(b, segments.get(3));
+                ThingBundle.putThingId(b, segments.get(5));
                 return b;
 
             default:
