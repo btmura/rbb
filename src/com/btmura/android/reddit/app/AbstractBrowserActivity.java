@@ -421,7 +421,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String accountName = getAccountName();
         int filter = getFilter();
 
-        String subreddit = ThingBundle.getSubreddit(thingBundle);
+        String subreddit = getControlFragment().getSubreddit();
         Fragment cf = ControlFragment.newInstance(accountName, subreddit,
                 Subreddits.isRandom(subreddit), thingBundle, filter);
         Fragment mf = ThingMenuFragment.newInstance(accountName, thingBundle);
