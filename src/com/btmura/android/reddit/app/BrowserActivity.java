@@ -98,8 +98,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         // TODO: Do more sanity checks on the url data.
 
-        // TODO: The line below hides the subreddit list but there is still one.
-        // Fix this to not actually build the subreddit list.
+        // TODO: The line below hides the subreddit list but there is still one. Fix this to not
+        // actually build the subreddit list.
 
         // Hide the subreddit list when previewing another subreddit or link.
         hasSubredditList = TextUtils.isEmpty(requestedSubreddit);

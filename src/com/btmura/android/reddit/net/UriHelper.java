@@ -73,38 +73,67 @@ public class UriHelper {
         }
     }
 
-    public static String getSubreddit(Uri data) {
-        switch (MATCHER.match(data)) {
-            case MATCH_SUBREDDIT:
-            case MATCH_SUBREDDIT_HOT:
-            case MATCH_SUBREDDIT_NEW:
-            case MATCH_SUBREDDIT_CONTROVERSIAL:
-            case MATCH_SUBREDDIT_TOP:
-            case MATCH_COMMENTS:
-                return data.getPathSegments().get(1);
-
-            default:
-                return null;
+    public static boolean hasSubreddit(Uri uri) {
+        if (uri != null) {
+            switch (MATCHER.match(uri)) {
+                case MATCH_SUBREDDIT:
+                case MATCH_SUBREDDIT_HOT:
+                case MATCH_SUBREDDIT_NEW:
+                case MATCH_SUBREDDIT_CONTROVERSIAL:
+                case MATCH_SUBREDDIT_TOP:
+                case MATCH_COMMENTS:
+                    return true;
+            }
         }
+        return false;
     }
 
-    public static int getSubredditFilter(Uri data) {
-        switch (MATCHER.match(data)) {
-            case MATCH_SUBREDDIT_HOT:
-                return FilterAdapter.SUBREDDIT_HOT;
-
-            case MATCH_SUBREDDIT_NEW:
-                return FilterAdapter.SUBREDDIT_NEW;
-
-            case MATCH_SUBREDDIT_CONTROVERSIAL:
-                return FilterAdapter.SUBREDDIT_CONTROVERSIAL;
-
-            case MATCH_SUBREDDIT_TOP:
-                return FilterAdapter.SUBREDDIT_TOP;
-
-            default:
-                return -1;
+    public static boolean hasUser(Uri uri) {
+        if (uri != null) {
+            switch (MATCHER.match(uri)) {
+                case MATCH_USER:
+                case MATCH_USER_OVERVIEW:
+                case MATCH_USER_COMMENTS:
+                case MATCH_USER_SUBMITTED:
+                case MATCH_USER_SAVED:
+                    return true;
+            }
         }
+        return false;
+    }
+
+    public static String getSubreddit(Uri uri) {
+        if (uri != null) {
+            switch (MATCHER.match(uri)) {
+                case MATCH_SUBREDDIT:
+                case MATCH_SUBREDDIT_HOT:
+                case MATCH_SUBREDDIT_NEW:
+                case MATCH_SUBREDDIT_CONTROVERSIAL:
+                case MATCH_SUBREDDIT_TOP:
+                case MATCH_COMMENTS:
+                    return uri.getPathSegments().get(1);
+            }
+        }
+        return null;
+    }
+
+    public static int getSubredditFilter(Uri uri) {
+        if (uri != null) {
+            switch (MATCHER.match(uri)) {
+                case MATCH_SUBREDDIT_HOT:
+                    return FilterAdapter.SUBREDDIT_HOT;
+
+                case MATCH_SUBREDDIT_NEW:
+                    return FilterAdapter.SUBREDDIT_NEW;
+
+                case MATCH_SUBREDDIT_CONTROVERSIAL:
+                    return FilterAdapter.SUBREDDIT_CONTROVERSIAL;
+
+                case MATCH_SUBREDDIT_TOP:
+                    return FilterAdapter.SUBREDDIT_TOP;
+            }
+        }
+        return -1;
     }
 
     public static Bundle getThingBundle(Uri data) {

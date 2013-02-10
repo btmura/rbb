@@ -24,6 +24,10 @@ import android.provider.Browser;
 import android.text.style.ClickableSpan;
 import android.view.View;
 
+import com.btmura.android.reddit.app.BrowserActivity;
+import com.btmura.android.reddit.app.UserProfileActivity;
+import com.btmura.android.reddit.net.UriHelper;
+
 /**
  * Span that fires a {@link Intent#ACTION_VIEW} intent with a URI.
  */
@@ -45,12 +49,32 @@ public class URLSpan extends ClickableSpan {
 
     @Override
     public void onClick(View widget) {
-        Uri uri = Uri.parse(url);
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-
         Context context = widget.getContext();
-        intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
+        Uri uri = Uri.parse(url);
+        if (UriHelper.hasSubreddit(uri)) {
+            startSubredditActivity(context, uri);
+        } else if (UriHelper.hasUser(uri)) {
+            startUserActivity(context, uri);
+        } else {
+            startBrowserActivity(context, uri);
+        }
+    }
 
+    private void startSubredditActivity(Context context, Uri uri) {
+        Intent intent = new Intent(context, BrowserActivity.class);
+        intent.setData(uri);
+        startActivity(context, intent);
+    }
+
+    private void startUserActivity(Context context, Uri uri) {
+        Intent intent = new Intent(context, UserProfileActivity.class);
+        intent.setData(uri);
+        startActivity(context, intent);
+    }
+
+    private void startBrowserActivity(Context context, Uri uri) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
         if (!startActivity(context, intent)) {
             // There was no activity found so try adding an http scheme if it
             // was missing and some authority is present.
