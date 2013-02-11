@@ -146,7 +146,7 @@ public class Provider {
     }
 
     private static void showChangeToast(Context context, boolean added, int count) {
-        int resId = added ? R.plurals.subreddits_added : R.plurals.subreddits_deleted;
+        int resId = added ? R.plurals.added : R.plurals.deleted;
         CharSequence text = context.getResources().getQuantityString(resId, count, count);
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
