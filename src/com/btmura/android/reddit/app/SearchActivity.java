@@ -95,7 +95,8 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
         if (hasValidIntentSubreddit()) {
             subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
-            tabInSubreddit = bar.newTab().setText(subreddit).setTabListener(this);
+            String tabTitle = MenuHelper.getSubredditTitle(this, subreddit);
+            tabInSubreddit = bar.newTab().setText(tabTitle).setTabListener(this);
             bar.addTab(tabInSubreddit);
         }
 
