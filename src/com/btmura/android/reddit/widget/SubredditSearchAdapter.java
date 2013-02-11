@@ -84,9 +84,4 @@ class SubredditSearchAdapter extends SubredditAdapter {
     public String getQuery() {
         return query;
     }
-
-    @Override
-    public boolean isDeletable(int position) {
-        return false;
-    }
 }

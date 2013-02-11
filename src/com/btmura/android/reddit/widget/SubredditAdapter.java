@@ -109,5 +109,7 @@ public abstract class SubredditAdapter extends BaseLoaderAdapter {
 
     public abstract String getName(int position);
 
-    public abstract boolean isDeletable(int position);
+    public boolean isDeletable(int position) {
+        return true;
+    }
 }
