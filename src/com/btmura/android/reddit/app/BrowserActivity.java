@@ -74,13 +74,11 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         }
     };
 
-    private MenuItem messagesItem;
-
     private MenuItem newPostItem;
-
+    private MenuItem addSubredditItem;
     private MenuItem profileItem;
-
     private MenuItem profileSavedItem;
+    private MenuItem messagesItem;
 
     @Override
     protected void setContentView() {
@@ -275,6 +273,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
         newPostItem = menu.findItem(R.id.menu_browser_new_post);
+        addSubredditItem = menu.findItem(R.id.menu_browser_add_subreddit);
         profileItem = menu.findItem(R.id.menu_profile);
         profileSavedItem = menu.findItem(R.id.menu_profile_saved);
         messagesItem = menu.findItem(R.id.menu_messages);
@@ -296,6 +295,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         boolean hasAccount = hasAccount();
         newPostItem.setVisible(isSinglePane && hasAccount);
+        addSubredditItem.setVisible(isSinglePane);
         profileItem.setVisible(showAccountItems && hasAccount);
         profileSavedItem.setVisible(showAccountItems && hasAccount);
         messagesItem.setVisible(showAccountItems && hasAccount);

@@ -90,6 +90,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 handleNewPost();
                 return true;
 
+            case R.id.menu_browser_add_subreddit:
             case R.id.menu_add_subreddit:
                 handleAddSubreddit();
                 return true;
