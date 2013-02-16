@@ -18,6 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
@@ -66,30 +67,38 @@ public class ThingListActivity extends GlobalMenuActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.thing_list);
-        setInitialFragments(savedInstanceState);
-        setActionBar(savedInstanceState);
+        setupPrereqs(savedInstanceState);
+        setupFragments(savedInstanceState);
+        setupActionBar(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
     }
 
-    private void setInitialFragments(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
-            ft.commit();
-        }
-    }
-
-    private void setActionBar(Bundle savedInstanceState) {
-        bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
-        bar.setDisplayShowTitleEnabled(false);
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
+    private void setupPrereqs(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             subreddit = savedInstanceState.getString(STATE_SUBREDDIT);
         } else {
             subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
         }
+    }
+
+    private void setupFragments(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
+
+            // Add fragment early to avoid janky menu adjustments.
+            Fragment frag = ThingListFragment.newSubredditInstance(null, subreddit, 0, 0);
+            ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
+
+            ft.commit();
+        }
+    }
+
+    private void setupActionBar(Bundle savedInstanceState) {
+        bar = getActionBar();
+        bar.setDisplayHomeAsUpEnabled(true);
+        bar.setDisplayShowTitleEnabled(false);
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         adapter = new FilterAdapter(this);
         adapter.setTitle(Subreddits.getTitle(this, subreddit));
