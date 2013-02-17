@@ -68,6 +68,7 @@ public class Subreddits implements BaseColumns {
         return NAME_RANDOM.equalsIgnoreCase(subreddit);
     }
 
+    // TODO: Remove duplicate logic with hasSidebar.
     public static boolean isSyncable(String subreddit) {
         return !isFrontPage(subreddit)
                 && !NAME_ALL.equalsIgnoreCase(subreddit)
@@ -153,9 +154,12 @@ public class Subreddits implements BaseColumns {
                 null, null, null, null, null);
         ArrayList<ContentValues> rows = new ArrayList<ContentValues>(c.getCount());
         while (c.moveToNext()) {
-            ContentValues values = new ContentValues(1);
-            values.put(COLUMN_NAME, c.getString(0));
-            rows.add(values);
+            String subreddit = c.getString(0);
+            if (Subreddits.isSyncable(subreddit)) {
+                ContentValues values = new ContentValues(1);
+                values.put(COLUMN_NAME, subreddit);
+                rows.add(values);
+            }
         }
         c.close();
         return rows;
