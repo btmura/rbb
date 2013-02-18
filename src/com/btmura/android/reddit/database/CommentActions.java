@@ -20,8 +20,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
- * Table for storing pending actions like adding or deleting comments. The
- * actions will be processed one by one in the background.
+ * Table for storing pending actions like adding or deleting comments. The actions will be processed
+ * one by one in the background.
  */
 public class CommentActions implements BaseColumns {
 
@@ -34,9 +34,9 @@ public class CommentActions implements BaseColumns {
     public static final String COLUMN_ACTION = "action";
 
     /**
-     * ID of the thing that is the parent of the thing we are commenting on. It
-     * could be the same as the thing we are replying to. This is used to merge
-     * pending replies with the current comments.
+     * ID of the thing that is the parent of the thing we are commenting on. It could be the same as
+     * the thing we are replying to. This is used to merge pending replies with the current
+     * comments.
      */
     public static final String COLUMN_PARENT_THING_ID = "parentThingId";
 
@@ -51,8 +51,7 @@ public class CommentActions implements BaseColumns {
 
     public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
 
-    public static final String SELECT_BY_ACCOUNT_AND_PARENT_THING_ID = COLUMN_ACCOUNT + "=? AND "
-            + COLUMN_PARENT_THING_ID + " = ?";
+    public static final String SELECT_BY_PARENT_THING_ID = COLUMN_PARENT_THING_ID + " = ?";
 
     public static final String SORT_BY_ID = _ID + " ASC";
 

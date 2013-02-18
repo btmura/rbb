@@ -297,9 +297,10 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
+        // Select by parent ID to see changes by all accounts, since the user can pick what account
+        // to use when making a comment. Do the same for edits and deletes to be consistent.
         Cursor c = db.query(CommentActions.TABLE_NAME, PROJECTION,
-                CommentActions.SELECT_BY_ACCOUNT_AND_PARENT_THING_ID,
-                Array.of(accountName, thingId),
+                CommentActions.SELECT_BY_PARENT_THING_ID, Array.of(thingId),
                 null, null, CommentActions.SORT_BY_ID);
         try {
             while (c.moveToNext()) {
