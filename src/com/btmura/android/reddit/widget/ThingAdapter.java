@@ -152,6 +152,12 @@ public class ThingAdapter extends BaseLoaderAdapter {
             ThingView.DETAIL_DESTINATION,
     };
 
+    private static final int[] MESSAGE_COMMENT_DETAILS = {
+            ThingView.DETAIL_TIMESTAMP,
+            ThingView.DETAIL_AUTHOR,
+            ThingView.DETAIL_SUBREDDIT,
+    };
+
     private long sessionId = -1;
     private String accountName;
     private String parentSubreddit;
@@ -211,7 +217,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
 
     @Override
     protected String[] getProjection() {
-        return isMessage() ? MESSAGE_PROJECTION : THING_PROJECTION;
+        return isMessageActivity() ? MESSAGE_PROJECTION : THING_PROJECTION;
     }
 
     @Override
@@ -256,7 +262,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         if (view instanceof ThingView) {
-            if (isMessage()) {
+            if (isMessageActivity()) {
                 bindMessageThingView(view, context, cursor);
             } else {
                 bindThingView(view, context, cursor);
@@ -285,7 +291,9 @@ public class ThingAdapter extends BaseLoaderAdapter {
         final String thumbnailUrl = null; // No thumbnail URLs for messages.
         final String title = null; // No title for messages.
         final int ups = 0; // No upvotes for messages.
+
         final boolean drawVotingArrows = false; // No arrows for messages.
+        final boolean showStatusPoints = false; // No points for messages.
 
         ThingView tv = (ThingView) view;
         tv.setBody(body, isNew, formatter);
@@ -311,10 +319,11 @@ public class ThingAdapter extends BaseLoaderAdapter {
                 thumbnailUrl,
                 title,
                 ups,
-                drawVotingArrows);
+                drawVotingArrows,
+                showStatusPoints);
         tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
         tv.setOnVoteListener(listener);
-        setDetails(tv, kind);
+        setThingDetails(tv, kind);
     }
 
     private void bindThingView(View view, Context context, Cursor cursor) {
@@ -354,8 +363,10 @@ public class ThingAdapter extends BaseLoaderAdapter {
             score = Math.max(0, score + likes);
         }
 
-        boolean drawVotingArrows = AccountUtils.isAccount(accountName)
+        final boolean drawVotingArrows = AccountUtils.isAccount(accountName)
                 && kind != Kinds.KIND_MESSAGE;
+        final boolean showStatusPoints = !AccountUtils.isAccount(accountName)
+                || kind == Kinds.KIND_COMMENT;
 
         ThingView tv = (ThingView) view;
         tv.setBody(body, false, formatter);
@@ -381,12 +392,13 @@ public class ThingAdapter extends BaseLoaderAdapter {
                 thumbnailUrl,
                 title,
                 ups,
-                drawVotingArrows);
+                drawVotingArrows,
+                showStatusPoints);
         tv.setChosen(singleChoice
                 && Objects.equals(selectedThingId, thingId)
                 && Objects.equals(selectedLinkId, linkId));
         tv.setOnVoteListener(listener);
-        setDetails(tv, kind);
+        setThingDetails(tv, kind);
 
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "bindThingView tv: " + tv.hashCode() + " url: " + thumbnailUrl);
@@ -394,14 +406,14 @@ public class ThingAdapter extends BaseLoaderAdapter {
         thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
     }
 
-    private void setDetails(ThingView tv, int kind) {
+    private void setThingDetails(ThingView tv, int kind) {
         switch (kind) {
             case Kinds.KIND_LINK:
                 tv.setDetails(LINK_DETAILS);
                 break;
 
             case Kinds.KIND_COMMENT:
-                tv.setDetails(COMMENT_DETAILS);
+                tv.setDetails(isMessageActivity() ? MESSAGE_COMMENT_DETAILS : COMMENT_DETAILS);
                 break;
 
             case Kinds.KIND_MESSAGE:
@@ -416,7 +428,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     public Bundle getThingBundle(Context context, int position) {
         Cursor c = getCursor();
         if (c != null && c.moveToPosition(position)) {
-            if (isMessage()) {
+            if (isMessageActivity()) {
                 return makeMessageThingBundle(context, c);
             } else {
                 return makeThingBundle(context, c);
@@ -491,7 +503,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     public void save(Context context, int position) {
-        if (isMessage()) {
+        if (isMessageActivity()) {
             throw new IllegalStateException();
         }
 
@@ -514,7 +526,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     public void unsave(Context context, int position) {
-        if (isMessage()) {
+        if (isMessageActivity()) {
             throw new IllegalStateException();
         }
 
@@ -522,7 +534,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     public void vote(Context context, int position, int action) {
-        if (isMessage()) {
+        if (isMessageActivity()) {
             throw new IllegalStateException();
         }
 
@@ -562,7 +574,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     public String getLinkId(int position) {
-        if (isMessage()) {
+        if (isMessageActivity()) {
             return null; // Messages don't have link ids.
         } else {
             return getString(position, THING_LINK_ID);
@@ -585,7 +597,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
 
     public boolean isNew(int position) {
         // Only messages can't be marked as new.
-        if (!isMessage()) {
+        if (!isMessageActivity()) {
             return false;
         }
 
@@ -600,12 +612,12 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     public int getNumComments(int position) {
-        return isMessage() ? -1 : getInt(position, THING_NUM_COMMENTS);
+        return isMessageActivity() ? -1 : getInt(position, THING_NUM_COMMENTS);
     }
 
     public boolean isSaved(int position) {
         // Messages can't be saved.
-        if (isMessage()) {
+        if (isMessageActivity()) {
             return false;
         }
 
@@ -623,7 +635,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     public String getTitle(int position) {
-        if (isMessage()) {
+        if (isMessageActivity()) {
             return getString(position, MESSAGE_SUBJECT);
         } else {
             // Link and comment posts have a title.
@@ -638,7 +650,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     public CharSequence getUrl(int position) {
-        if (isMessage()) {
+        if (isMessageActivity()) {
             return getMessageUrl(position);
         } else {
             return getThingUrl(position);
@@ -670,19 +682,19 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     private int getAuthorIndex() {
-        return isMessage() ? MESSAGE_AUTHOR : THING_AUTHOR;
+        return isMessageActivity() ? MESSAGE_AUTHOR : THING_AUTHOR;
     }
 
     private int getKindIndex() {
-        return isMessage() ? MESSAGE_KIND : THING_KIND;
+        return isMessageActivity() ? MESSAGE_KIND : THING_KIND;
     }
 
     private int getSubredditIndex() {
-        return isMessage() ? MESSAGE_SUBREDDIT : THING_SUBREDDIT;
+        return isMessageActivity() ? MESSAGE_SUBREDDIT : THING_SUBREDDIT;
     }
 
     private int getThingIdIndex() {
-        return isMessage() ? MESSAGE_THING_ID : THING_THING_ID;
+        return isMessageActivity() ? MESSAGE_THING_ID : THING_THING_ID;
     }
 
     public String getSelectedThingId() {
@@ -754,7 +766,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
         this.more = more;
     }
 
-    private boolean isMessage() {
+    private boolean isMessageActivity() {
         return !TextUtils.isEmpty(messageUser);
     }
 

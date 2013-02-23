@@ -243,7 +243,8 @@ public class ThingView extends CustomView implements OnGestureListener {
             String thumbnailUrl,
             String title,
             int ups,
-            boolean drawVotingArrows) {
+            boolean drawVotingArrows,
+            boolean showStatusPoints) {
 
         // Save the attributes needed by onMeasure or may be used to construct
         // details if we discover extra space while measuring.
@@ -276,10 +277,9 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         boolean showSubreddit = !TextUtils.isEmpty(subreddit)
                 && !subreddit.equalsIgnoreCase(parentSubreddit);
-        boolean showPoints = !drawScore && kind != Kinds.KIND_MESSAGE;
 
         boolean showNumComments = kind == Kinds.KIND_LINK;
-        setStatusText(over18, showSubreddit, showPoints, showNumComments,
+        setStatusText(over18, showSubreddit, showStatusPoints, showNumComments,
                 author, createdUtc, nowTimeMs, numComments, score, subreddit);
 
         requestLayout();

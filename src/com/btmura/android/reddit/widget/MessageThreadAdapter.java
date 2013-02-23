@@ -106,9 +106,10 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
         final int ups = 0;
 
         // Only show the subject on the header message.
-        String title = cursor.getPosition() == 0 ? cursor.getString(INDEX_SUBJECT) : null;
+        final String title = cursor.getPosition() == 0 ? cursor.getString(INDEX_SUBJECT) : null;
 
-        boolean drawVotingArrows = false;
+        final boolean drawVotingArrows = false;
+        final boolean showStatusPoints = false;
 
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_MESSAGE_THREAD_LIST);
@@ -135,7 +136,8 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
                 thumbnailUrl,
                 title,
                 ups,
-                drawVotingArrows);
+                drawVotingArrows,
+                showStatusPoints);
     }
 
     public long getSessionId() {

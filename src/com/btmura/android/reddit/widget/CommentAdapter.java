@@ -182,6 +182,8 @@ public class CommentAdapter extends BaseLoaderAdapter {
         }
 
         final boolean drawVotingArrows = AccountUtils.isAccount(accountName);
+        final boolean showStatusPoints = !AccountUtils.isAccount(accountName)
+                || cursor.getPosition() != 0;
 
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_COMMENT_LIST);
@@ -208,7 +210,8 @@ public class CommentAdapter extends BaseLoaderAdapter {
                 thumbnailUrl,
                 title,
                 ups,
-                drawVotingArrows);
+                drawVotingArrows,
+                showStatusPoints);
         tv.setOnVoteListener(listener);
     }
 
