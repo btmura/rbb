@@ -112,7 +112,7 @@ public class CommentLogic {
             int count = list.getCommentCount();
             for (int i = position + 1; i < count; i++) {
                 int nextNesting = list.getCommentNesting(i);
-                if (nesting + 1 == nextNesting) {
+                if (nextNesting > nesting) {
                     position = i;
                 } else {
                     break;
