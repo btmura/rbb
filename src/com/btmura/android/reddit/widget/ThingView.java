@@ -74,6 +74,12 @@ public class ThingView extends CustomView implements OnGestureListener {
     /** Maximum width of the content inside a details cell. */
     private static int DETAILS_INNER_CELL_WIDTH;
 
+    /** Number of formatters to build quantity strings. First three correspond to details. */
+    private static final int NUM_FORMATTERS = 4;
+
+    /** Formatter for building quantities for the status line. */
+    private static final int FORMATTER_STATUS = 3;
+
     private final GestureDetector detector;
     private OnVoteListener listener;
 
@@ -118,13 +124,16 @@ public class ThingView extends CustomView implements OnGestureListener {
     private BoringLayout.Metrics statusMetrics;
     private BoringLayout statusLayout;
 
-    private StringBuilder formatterData;
-    private java.util.Formatter formatter;
-
     private Rect scoreBounds;
     private RectF bodyBounds;
     private int rightHeight;
     private int minHeight;
+
+    /** Array of Formatters used for making quantity strings and relative times. */
+    private java.util.Formatter[] formatters;
+
+    /** Array of StringBuilder objects backing the array of Formatters. */
+    private StringBuilder[] formatterData;
 
     /** Array of details types to be rendered in the extra space. */
     private int[] details;
@@ -298,15 +307,18 @@ public class ThingView extends CustomView implements OnGestureListener {
         statusText.append(author).append("  ");
 
         if (showPoints) {
-            statusText.append(getQuantityString(r, R.plurals.points, score)).append("  ");
+            statusText.append(getQuantityString(r, R.plurals.points, score,
+                    FORMATTER_STATUS)).append("  ");
         }
 
         if (createdUtc != 0) {
-            statusText.append(getRelativeTime(r, nowTimeMs, createdUtc)).append("  ");
+            statusText.append(getRelativeTime(r, nowTimeMs, createdUtc,
+                    FORMATTER_STATUS)).append("  ");
         }
 
         if (showNumComments) {
-            statusText.append(getQuantityString(r, R.plurals.comments, numComments));
+            statusText.append(getQuantityString(r, R.plurals.comments, numComments,
+                    FORMATTER_STATUS));
         }
 
         if (!expanded) {
@@ -317,25 +329,32 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
     }
 
-    private CharSequence getQuantityString(Resources resources, int resId, int quantity) {
-        resetFormatter();
+    private CharSequence getQuantityString(Resources resources, int resId, int quantity,
+            int formatterIndex) {
+        java.util.Formatter formatter = resetFormatter(formatterIndex, 20);
         String format = resources.getQuantityText(resId, quantity).toString();
         formatter.format(resources.getConfiguration().locale, format, quantity);
-        return formatterData;
+        return formatterData[formatterIndex];
     }
 
-    private CharSequence getRelativeTime(Resources resources, long nowTimeMs, long createdUtc) {
-        resetFormatter();
+    private CharSequence getRelativeTime(Resources resources, long nowTimeMs, long createdUtc,
+            int formatterIndex) {
+        java.util.Formatter formatter = resetFormatter(formatterIndex, 15);
         RelativeTime.format(resources, formatter, nowTimeMs, createdUtc);
-        return formatterData;
+        return formatterData[formatterIndex];
     }
 
-    private void resetFormatter() {
-        if (formatter == null) {
-            formatterData = new StringBuilder(50);
-            formatter = new java.util.Formatter(formatterData);
+    private java.util.Formatter resetFormatter(int index, int expectedSize) {
+        if (formatters == null) {
+            formatterData = new StringBuilder[NUM_FORMATTERS];
+            formatters = new java.util.Formatter[NUM_FORMATTERS];
         }
-        formatterData.delete(0, formatterData.length());
+        if (formatters[index] == null) {
+            formatterData[index] = new StringBuilder(expectedSize);
+            formatters[index] = new java.util.Formatter(formatterData[index]);
+        }
+        formatterData[index].delete(0, formatterData[index].length());
+        return formatters[index];
     }
 
     /**
@@ -548,11 +567,11 @@ public class ThingView extends CustomView implements OnGestureListener {
         Resources r = getResources();
         switch (details[index]) {
             case DETAIL_UP_VOTES:
-                makeDetailsLayout(index, getQuantityString(r, R.plurals.votes_up, ups));
+                makeDetailsLayout(index, getQuantityString(r, R.plurals.votes_up, ups, index));
                 break;
 
             case DETAIL_DOWN_VOTES:
-                makeDetailsLayout(index, getQuantityString(r, R.plurals.votes_down, downs));
+                makeDetailsLayout(index, getQuantityString(r, R.plurals.votes_down, downs, index));
                 break;
 
             case DETAIL_DOMAIN:
@@ -568,7 +587,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                 break;
 
             case DETAIL_TIMESTAMP:
-                makeDetailsLayout(index, getRelativeTime(r, nowTimeMs, createdUtc));
+                makeDetailsLayout(index, getRelativeTime(r, nowTimeMs, createdUtc, index));
                 break;
 
             case DETAIL_DESTINATION:
