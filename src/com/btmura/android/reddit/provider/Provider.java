@@ -33,10 +33,10 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.CommentLogic;
+import com.btmura.android.reddit.app.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentActions;
-import com.btmura.android.reddit.database.CommentLogic;
-import com.btmura.android.reddit.database.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;

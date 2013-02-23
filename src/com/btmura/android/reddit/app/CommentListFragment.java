@@ -34,10 +34,9 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.CommentLogic.CommentList;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
-import com.btmura.android.reddit.database.CommentLogic;
-import com.btmura.android.reddit.database.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.database;
+package com.btmura.android.reddit.app;
 
 import android.database.Cursor;
 import android.database.CursorWrapper;

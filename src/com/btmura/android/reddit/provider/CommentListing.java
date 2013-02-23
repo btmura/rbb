@@ -35,8 +35,8 @@ import android.util.JsonReader;
 import android.util.JsonToken;
 
 import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.CommentLogic;
-import com.btmura.android.reddit.database.CommentLogic.CommentList;
+import com.btmura.android.reddit.app.CommentLogic;
+import com.btmura.android.reddit.app.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
