@@ -30,7 +30,6 @@ import android.view.MotionEvent;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
@@ -234,7 +233,8 @@ public class ThingView extends CustomView implements OnGestureListener {
             String thingId,
             String thumbnailUrl,
             String title,
-            int ups) {
+            int ups,
+            boolean drawVotingArrows) {
 
         // Save the attributes needed by onMeasure or may be used to construct
         // details if we discover extra space while measuring.
@@ -255,7 +255,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.title = title;
         this.ups = ups;
 
-        drawVotingArrows = AccountUtils.isAccount(accountName) && kind != Kinds.KIND_MESSAGE;
+        this.drawVotingArrows = drawVotingArrows;
         isVotable = drawVotingArrows && !TextUtils.isEmpty(thingId) && expanded;
         drawScore = drawVotingArrows && kind == Kinds.KIND_LINK;
         if (drawScore) {

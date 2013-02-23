@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
@@ -264,15 +265,27 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     private void bindMessageThingView(View view, Context context, Cursor cursor) {
-        String author = cursor.getString(MESSAGE_AUTHOR);
-        String body = cursor.getString(MESSAGE_BODY);
-        long createdUtc = cursor.getLong(MESSAGE_CREATED_UTC);
-        String destination = cursor.getString(MESSAGE_DESTINATION);
-        int kind = cursor.getInt(MESSAGE_KIND);
-        boolean isNew = isNew(cursor.getPosition());
-        String subject = cursor.getString(MESSAGE_SUBJECT);
-        String subreddit = cursor.getString(MESSAGE_SUBREDDIT);
-        String thingId = cursor.getString(MESSAGE_THING_ID);
+        final String author = cursor.getString(MESSAGE_AUTHOR);
+        final String body = cursor.getString(MESSAGE_BODY);
+        final long createdUtc = cursor.getLong(MESSAGE_CREATED_UTC);
+        final String destination = cursor.getString(MESSAGE_DESTINATION);
+        final String domain = null; // No domain for messages.
+        final int downs = 0; // No downs for messages.
+        final boolean expanded = true; // Messages are always expanded.
+        final int kind = cursor.getInt(MESSAGE_KIND);
+        final int likes = 0; // No likes for messages.
+        final boolean isNew = isNew(cursor.getPosition());
+        final int nesting = 0; // No nesting for messages.
+        final int numComments = 0; // No comments for messages.
+        final boolean over18 = false; // No over18 for messages.
+        final int score = 0; // No score for messages.
+        final String subject = cursor.getString(MESSAGE_SUBJECT);
+        final String subreddit = cursor.getString(MESSAGE_SUBREDDIT);
+        final String thingId = cursor.getString(MESSAGE_THING_ID);
+        final String thumbnailUrl = null; // No thumbnail URLs for messages.
+        final String title = null; // No title for messages.
+        final int ups = 0; // No upvotes for messages.
+        final boolean drawVotingArrows = false; // No arrows for messages.
 
         ThingView tv = (ThingView) view;
         tv.setBody(body, isNew, formatter);
@@ -280,48 +293,52 @@ public class ThingAdapter extends BaseLoaderAdapter {
                 author,
                 createdUtc,
                 destination,
-                null, // domain
-                0, // downs
-                true, // expanded
+                domain,
+                downs,
+                expanded,
                 kind,
-                0, // likes
+                likes,
                 subject, // actually linkTitle
-                0, // nesting
+                nesting,
                 nowTimeMs,
-                0, // numComments
-                false, // over18
+                numComments,
+                over18,
                 parentSubreddit,
-                0, // score
+                score,
                 subreddit,
                 thingBodyWidth,
                 thingId,
-                null, // thumbnailUrl
-                null, // title
-                0); // ups
+                thumbnailUrl,
+                title,
+                ups,
+                drawVotingArrows);
         tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
         tv.setOnVoteListener(listener);
         setDetails(tv, kind);
     }
 
     private void bindThingView(View view, Context context, Cursor cursor) {
-        String author = cursor.getString(THING_AUTHOR);
-        String body = cursor.getString(THING_BODY);
-        long createdUtc = cursor.getLong(THING_CREATED_UTC);
-        String domain = cursor.getString(THING_DOMAIN);
-        int downs = cursor.getInt(THING_DOWNS);
-        int kind = cursor.getInt(THING_KIND);
-        String linkId = cursor.getString(THING_LINK_ID);
-        String linkTitle = cursor.getString(THING_LINK_TITLE);
-        int numComments = cursor.getInt(THING_NUM_COMMENTS);
-        boolean over18 = cursor.getInt(THING_OVER_18) == 1;
-        int score = cursor.getInt(THING_SCORE);
-        String subreddit = cursor.getString(THING_SUBREDDIT);
-        String thingId = cursor.getString(THING_THING_ID);
-        String thumbnailUrl = cursor.getString(THING_THUMBNAIL_URL);
-        String title = cursor.getString(THING_TITLE);
-        int ups = cursor.getInt(THING_UPS);
+        final String author = cursor.getString(THING_AUTHOR);
+        final String body = cursor.getString(THING_BODY);
+        final long createdUtc = cursor.getLong(THING_CREATED_UTC);
+        final String destination = null; // Only messages have destinations.
+        final String domain = cursor.getString(THING_DOMAIN);
+        final int downs = cursor.getInt(THING_DOWNS);
+        final boolean expanded = true; // Expanded only for comments handled by different adapter.
+        final int kind = cursor.getInt(THING_KIND);
+        final String linkId = cursor.getString(THING_LINK_ID);
+        final String linkTitle = cursor.getString(THING_LINK_TITLE);
+        final int nesting = 0; // Nesting only for comments handled by different adapter.
+        final int numComments = cursor.getInt(THING_NUM_COMMENTS);
+        final boolean over18 = cursor.getInt(THING_OVER_18) == 1;
+        final String subreddit = cursor.getString(THING_SUBREDDIT);
+        final String thingId = cursor.getString(THING_THING_ID);
+        final String thumbnailUrl = cursor.getString(THING_THUMBNAIL_URL);
+        final String title = cursor.getString(THING_TITLE);
+        final int ups = cursor.getInt(THING_UPS);
 
         // Comments don't have a score so calculate our own.
+        int score = cursor.getInt(THING_SCORE);
         if (kind == Kinds.KIND_COMMENT) {
             score = ups - downs;
         }
@@ -337,19 +354,22 @@ public class ThingAdapter extends BaseLoaderAdapter {
             score = Math.max(0, score + likes);
         }
 
+        boolean drawVotingArrows = AccountUtils.isAccount(accountName)
+                && kind != Kinds.KIND_MESSAGE;
+
         ThingView tv = (ThingView) view;
         tv.setBody(body, false, formatter);
         tv.setData(accountName,
                 author,
                 createdUtc,
-                null, // destination - used for messages
+                destination,
                 domain,
                 downs,
-                true, // expanded - used for comment listings by another adapter
+                expanded,
                 kind,
                 likes,
                 linkTitle,
-                0, // nesting - used for comment listings by another adapter
+                nesting,
                 nowTimeMs,
                 numComments,
                 over18,
@@ -360,7 +380,8 @@ public class ThingAdapter extends BaseLoaderAdapter {
                 thingId,
                 thumbnailUrl,
                 title,
-                ups);
+                ups,
+                drawVotingArrows);
         tv.setChosen(singleChoice
                 && Objects.equals(selectedThingId, thingId)
                 && Objects.equals(selectedLinkId, linkId));

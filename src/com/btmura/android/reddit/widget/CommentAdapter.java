@@ -148,18 +148,25 @@ public class CommentAdapter extends BaseLoaderAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        String author = cursor.getString(INDEX_AUTHOR);
-        String body = cursor.getString(INDEX_BODY);
-        long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
-        int downs = cursor.getInt(INDEX_DOWNS);
-        boolean expanded = cursor.getInt(INDEX_EXPANDED) == 1;
-        int kind = cursor.getInt(INDEX_KIND);
-        int nesting = cursor.getInt(INDEX_NESTING);
-        int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
-        boolean over18 = cursor.getInt(INDEX_OVER_18) != 0;
-        String title = cursor.getString(INDEX_TITLE);
-        String thingId = cursor.getString(INDEX_THING_ID);
-        int ups = cursor.getInt(INDEX_UPS);
+        final String author = cursor.getString(INDEX_AUTHOR);
+        final String body = cursor.getString(INDEX_BODY);
+        final long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
+        final String destination = null; // Only messages have destinations.
+        final String domain = null; // Only posts have domains.
+        final int downs = cursor.getInt(INDEX_DOWNS);
+        final boolean expanded = cursor.getInt(INDEX_EXPANDED) == 1;
+        final int kind = cursor.getInt(INDEX_KIND);
+        final String linkTitle = null; // Only post replies have link titles.
+        final int nesting = cursor.getInt(INDEX_NESTING);
+        final int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
+        final boolean over18 = cursor.getInt(INDEX_OVER_18) != 0;
+        final String parentSubreddit = null; // Comments don't have parent subreddits.
+        final String subreddit = null; // Comments don't have subreddits.
+        final String title = cursor.getString(INDEX_TITLE);
+        final int thingBodyWidth = 0; // Use the full width all the time.
+        final String thumbnailUrl = null; // Comments don't have thumbnails.
+        final String thingId = cursor.getString(INDEX_THING_ID);
+        final int ups = cursor.getInt(INDEX_UPS);
 
         // CommentActions don't have a score so calculate our own.
         int score = ups - downs;
@@ -174,13 +181,34 @@ public class CommentAdapter extends BaseLoaderAdapter {
             score += likes;
         }
 
+        final boolean drawVotingArrows = AccountUtils.isAccount(accountName);
+
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_COMMENT_LIST);
         tv.setBody(body, false, formatter);
-        tv.setData(accountName, author, createdUtc, null, null, downs, expanded, kind, likes, null,
-                nesting, nowTimeMs, numComments, over18, null, score, null, 0, thingId, null,
+        tv.setData(accountName,
+                author,
+                createdUtc,
+                destination,
+                domain,
+                downs,
+                expanded,
+                kind,
+                likes,
+                linkTitle,
+                nesting,
+                nowTimeMs,
+                numComments,
+                over18,
+                parentSubreddit,
+                score,
+                subreddit,
+                thingBodyWidth,
+                thingId,
+                thumbnailUrl,
                 title,
-                ups);
+                ups,
+                drawVotingArrows);
         tv.setOnVoteListener(listener);
     }
 

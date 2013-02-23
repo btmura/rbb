@@ -47,11 +47,12 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
     private static final int INDEX_SUBJECT = 6;
     private static final int INDEX_THING_ID = 7;
 
-    private final Formatter formatter = new Formatter();
-
     private long sessionId = -1;
     private String accountName;
     private String thingId;
+
+    private final Formatter formatter = new Formatter();
+    private long nowTimeMs;
 
     public MessageThreadAdapter(Context context) {
         super(context, null, 0);
@@ -72,26 +73,69 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
     }
 
     @Override
+    public Cursor swapCursor(Cursor newCursor) {
+        nowTimeMs = System.currentTimeMillis();
+        return super.swapCursor(newCursor);
+    }
+
+    @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return new ThingView(context);
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        String author = cursor.getString(INDEX_AUTHOR);
-        String body = cursor.getString(INDEX_BODY);
-        long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
-        int kind = cursor.getInt(INDEX_KIND);
+        final String author = cursor.getString(INDEX_AUTHOR);
+        final String body = cursor.getString(INDEX_BODY);
+        final long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
+        final String destination = null;
+        final String domain = null;
+        final int downs = 0;
+        final boolean expanded = true;
+        final int kind = cursor.getInt(INDEX_KIND);
+        final int likes = 0;
+        final String linkTitle = null;
+        final int nesting = 0;
+        final int numComments = 0;
+        final boolean over18 = false;
+        final String parentSubreddit = null;
+        final int score = 0;
+        final String subreddit = null;
+        final int thingBodyWidth = 0;
+        final String thumbnailUrl = null;
+        final int ups = 0;
 
         // Only show the subject on the header message.
         String title = cursor.getPosition() == 0 ? cursor.getString(INDEX_SUBJECT) : null;
 
+        boolean drawVotingArrows = false;
+
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_MESSAGE_THREAD_LIST);
         tv.setBody(body, false, formatter);
-        tv.setData(getAccountName(), author, createdUtc, null, null, 0, true, kind, 0,
-                null, 0, System.currentTimeMillis(), 0, false, null, 0, null,
-                0, null, null, title, 0);
+        tv.setData(getAccountName(),
+                author,
+                createdUtc,
+                destination,
+                domain,
+                downs,
+                expanded,
+                kind,
+                likes,
+                linkTitle,
+                nesting,
+                nowTimeMs,
+                numComments,
+                over18,
+                parentSubreddit,
+                score,
+                subreddit,
+                thingBodyWidth,
+                thingId,
+                thumbnailUrl,
+                title,
+                ups,
+                drawVotingArrows);
     }
 
     public long getSessionId() {
