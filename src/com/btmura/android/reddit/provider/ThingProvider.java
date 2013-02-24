@@ -20,10 +20,13 @@ import java.io.IOException;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -32,6 +35,7 @@ import android.util.Log;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.CursorExtrasWrapper;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.ReadActions;
@@ -40,6 +44,7 @@ import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
+import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
@@ -155,6 +160,23 @@ public class ThingProvider extends SessionProvider {
             + " FROM " + ReadActions.TABLE_NAME + ") USING ("
             + ReadActions.COLUMN_ACCOUNT + ", "
             + SharedColumns.COLUMN_THING_ID + ")";
+
+    /** Method to insert a pending comment in a listing. */
+    static final String METHOD_INSERT_COMMENT = "insertComment";
+
+    static final String CALL_EXTRA_ACCOUNT = "account";
+    static final String CALL_EXTRA_BODY = "body";
+    static final String CALL_EXTRA_NESTING = "nesting";
+    static final String CALL_EXTRA_PARENT_ID = "parentId";
+    static final String CALL_EXTRA_PARENT_NUM_COMMENTS = "parentNumComments";
+    static final String CALL_EXTRA_PARENT_THING_ID = "parentThingId";
+    static final String CALL_EXTRA_SEQUENCE = "sequence";
+    static final String CALL_EXTRA_SESSION_ID = "sessionId";
+    static final String CALL_EXTRA_THING_ID = "thingId";
+
+    private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Things.TABLE_NAME
+            + " SET " + Things.COLUMN_SEQUENCE + "=" + Things.COLUMN_SEQUENCE + "+1"
+            + " WHERE " + Things.COLUMN_SESSION_ID + "=? AND " + Things.COLUMN_SEQUENCE + ">=?";
 
     public static final Uri subredditUri(long sessionId, String accountName, String subreddit,
             int filter, String more) {
@@ -402,6 +424,81 @@ public class ThingProvider extends SessionProvider {
             Log.e(TAG, e.getMessage(), e);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
+        }
+        return null;
+    }
+
+    @Override
+    public Bundle call(String method, String arg, Bundle extras) {
+        if (METHOD_INSERT_COMMENT.equals(method)) {
+            return insertComment(extras);
+        }
+        return null;
+    }
+
+    private Bundle insertComment(Bundle extras) {
+        String accountName = extras.getString(CALL_EXTRA_ACCOUNT);
+        String body = extras.getString(CALL_EXTRA_BODY);
+        int nesting = extras.getInt(CALL_EXTRA_NESTING);
+        long parentId = extras.getLong(CALL_EXTRA_PARENT_ID);
+        int parentNumComments = extras.getInt(CALL_EXTRA_PARENT_NUM_COMMENTS);
+        String parentThingId = extras.getString(CALL_EXTRA_PARENT_THING_ID);
+        int sequence = extras.getInt(CALL_EXTRA_SEQUENCE);
+        long sessionId = extras.getLong(CALL_EXTRA_SESSION_ID);
+        String thingId = extras.getString(CALL_EXTRA_THING_ID);
+
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            // Update the number of comments in the header comment.
+            ContentValues values = new ContentValues(8);
+            values.put(Things.COLUMN_NUM_COMMENTS, parentNumComments);
+            int count = db.update(Things.TABLE_NAME, values, ID_SELECTION, Array.of(parentId));
+            if (count != 1) {
+                return null;
+            }
+
+            // Queue an action to sync back the comment to the server.
+            values.clear();
+            values.put(CommentActions.COLUMN_ACCOUNT, accountName);
+            values.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
+            values.put(CommentActions.COLUMN_TEXT, body);
+            values.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
+            values.put(CommentActions.COLUMN_THING_ID, thingId);
+            long commentActionId = db.insert(CommentActions.TABLE_NAME, null, values);
+            if (commentActionId == -1) {
+                return null;
+            }
+
+            // Increment the sequence numbers to make room for our comment.
+            SQLiteStatement sql = db.compileStatement(UPDATE_SEQUENCE_STATEMENT);
+            sql.bindLong(1, sessionId);
+            sql.bindLong(2, sequence);
+            sql.executeUpdateDelete();
+
+            // Insert the placeholder comment with the proper sequence number.
+            values.clear();
+            values.put(Things.COLUMN_ACCOUNT, accountName);
+            values.put(Things.COLUMN_AUTHOR, accountName);
+            values.put(Things.COLUMN_BODY, body);
+            values.put(Things.COLUMN_COMMENT_ACTION_ID, commentActionId);
+            values.put(Things.COLUMN_KIND, Kinds.KIND_COMMENT);
+            values.put(Things.COLUMN_NESTING, nesting);
+            values.put(Things.COLUMN_SEQUENCE, sequence);
+            values.put(Things.COLUMN_SESSION_ID, sessionId);
+            long commentId = db.insert(Things.TABLE_NAME, null, values);
+            if (commentId == -1) {
+                return null;
+            }
+
+            db.setTransactionSuccessful();
+
+            // Update observers and schedule a sync.
+            ContentResolver cr = getContext().getContentResolver();
+            cr.notifyChange(ThingProvider.THINGS_URI, null, true);
+
+        } finally {
+            db.endTransaction();
         }
         return null;
     }

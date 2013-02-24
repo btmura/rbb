@@ -73,6 +73,7 @@ public class AccountProvider extends BaseProvider {
      * success.
      */
     public static boolean initializeAccount(Context context, String login, String cookie) {
+        // TODO: Move to Provider class.
         Bundle args = new Bundle(1);
         args.putString(EXTRA_COOKIE, cookie);
         ContentResolver cr = context.getContentResolver();

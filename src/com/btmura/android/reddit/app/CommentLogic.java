@@ -96,7 +96,7 @@ public class CommentLogic {
      */
     public static int getInsertSequence(CommentList list, int position) {
         int insertPosition = getInsertPosition(list, position);
-        return list.getCommentSequence(insertPosition - 1);
+        return list.getCommentSequence(insertPosition - 1) + 1;
     }
 
     /**

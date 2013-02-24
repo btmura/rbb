@@ -145,7 +145,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     public void onEntityStart(int index) {
         ContentValues v = new ContentValues(19);
         v.put(Things.COLUMN_ACCOUNT, accountName);
-        v.put(Things.COLUMN_SEQUENCE, index);
         values.add(v);
     }
 
@@ -275,6 +274,9 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
         // Merge local inserts and deletes that haven't been synced yet.
         mergeActions();
+
+        // Tag each row with a sequence number for later insertions.
+        writeSequenceNumbers();
     }
 
     private void removeMoreComments() {
@@ -334,10 +336,17 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             c.close();
         }
 
-        // Update the header comment count with our fake inserts and deletes.
-        if (!values.isEmpty()) {
+        if (!values.isEmpty() && delta != 0) {
+            // Update the header comment count with our fake inserts and deletes.
             Integer numComments = (Integer) values.get(0).get(Things.COLUMN_NUM_COMMENTS);
             values.get(0).put(Things.COLUMN_NUM_COMMENTS, numComments.intValue() + delta);
+        }
+    }
+
+    private void writeSequenceNumbers() {
+        int count = values.size();
+        for (int i = 0; i < count; i++) {
+            values.get(i).put(Things.COLUMN_SEQUENCE, i);
         }
     }
 
@@ -354,15 +363,13 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             }
 
             if (id.equals(actionThingId)) {
-                ContentValues p = new ContentValues(7 + 1); // +1 for session
-                                                            // id.
+                ContentValues p = new ContentValues(7 + 1); // +1 for session id.
                 p.put(Things.COLUMN_ACCOUNT, actionAccountName);
                 p.put(Things.COLUMN_AUTHOR, actionAccountName);
                 p.put(Things.COLUMN_BODY, body);
                 p.put(Things.COLUMN_COMMENT_ACTION_ID, actionId);
                 p.put(Things.COLUMN_KIND, Kinds.KIND_COMMENT);
                 p.put(Things.COLUMN_NESTING, CommentLogic.getInsertNesting(this, i));
-                p.put(Things.COLUMN_SEQUENCE, CommentLogic.getInsertSequence(this, i));
 
                 values.add(CommentLogic.getInsertPosition(this, i), p);
                 size++;

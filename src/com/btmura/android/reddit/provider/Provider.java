@@ -27,6 +27,7 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
@@ -49,8 +50,8 @@ import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
 /**
- * Provider is a collection of static methods that do user actions which
- * correspond to multiple content provider operations.
+ * Provider is a collection of static methods that do user actions which correspond to multiple
+ * content provider operations.
  */
 public class Provider {
 
@@ -171,34 +172,20 @@ public class Provider {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(3);
+                Bundle extras = new Bundle(9);
+                extras.putString(ThingProvider.CALL_EXTRA_ACCOUNT, accountName);
+                extras.putString(ThingProvider.CALL_EXTRA_BODY, body);
+                extras.putInt(ThingProvider.CALL_EXTRA_NESTING, nesting);
+                extras.putLong(ThingProvider.CALL_EXTRA_PARENT_ID, parentId);
+                extras.putInt(ThingProvider.CALL_EXTRA_PARENT_NUM_COMMENTS, parentNumComments);
+                extras.putString(ThingProvider.CALL_EXTRA_PARENT_THING_ID, parentThingId);
+                extras.putInt(ThingProvider.CALL_EXTRA_SEQUENCE, sequence);
+                extras.putLong(ThingProvider.CALL_EXTRA_SESSION_ID, sessionId);
+                extras.putString(ThingProvider.CALL_EXTRA_THING_ID, thingId);
 
-                ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                        .withSelection(BaseProvider.ID_SELECTION, Array.of(parentId))
-                        .withValue(Things.COLUMN_NUM_COMMENTS, parentNumComments + 1)
-                        .build());
-
-                ops.add(ContentProviderOperation.newInsert(ThingProvider.COMMENT_ACTIONS_URI)
-                        .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
-                        .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT)
-                        .withValue(CommentActions.COLUMN_TEXT, body)
-                        .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentThingId)
-                        .withValue(CommentActions.COLUMN_THING_ID, thingId)
-                        .build());
-
-                ops.add(ContentProviderOperation.newInsert(ThingProvider.THINGS_SYNC_URI)
-                        .withValue(Things.COLUMN_ACCOUNT, accountName)
-                        .withValue(Things.COLUMN_AUTHOR, accountName)
-                        .withValue(Things.COLUMN_BODY, body)
-                        .withValue(Things.COLUMN_KIND, Kinds.KIND_COMMENT)
-                        .withValue(Things.COLUMN_NESTING, nesting)
-                        .withValue(Things.COLUMN_SEQUENCE, sequence)
-                        .withValue(Things.COLUMN_SESSION_ID, sessionId)
-                        .withValueBackReference(Things.COLUMN_COMMENT_ACTION_ID, 1)
-                        .build());
-
-                applyOps(appContext, ThingProvider.AUTHORITY, ops);
+                ContentResolver cr = appContext.getContentResolver();
+                cr.call(ThingProvider.THINGS_URI, ThingProvider.METHOD_INSERT_COMMENT,
+                        null, extras);
             }
         });
     }
@@ -528,8 +515,8 @@ public class Provider {
     }
 
     /**
-     * Vote on something but don't make it visible in the liked/disliked listing
-     * while the vote is still pending.
+     * Vote on something but don't make it visible in the liked/disliked listing while the vote is
+     * still pending.
      */
     public static void voteAsync(Context context,
             final String accountName,
@@ -551,8 +538,8 @@ public class Provider {
     }
 
     /**
-     * Vote on something and store additional information to make it visible in
-     * the liked/disliked listing while the vote is still pending.
+     * Vote on something and store additional information to make it visible in the liked/disliked
+     * listing while the vote is still pending.
      */
     public static void voteAsync(Context context,
             final String accountName,

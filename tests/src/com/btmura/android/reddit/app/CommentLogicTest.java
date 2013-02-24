@@ -42,10 +42,10 @@ public class CommentLogicTest extends TestCase {
         assertEquals(4, CommentLogic.getInsertPosition(mcl, 2));
         assertEquals(4, CommentLogic.getInsertPosition(mcl, 3));
 
-        assertEquals(4, CommentLogic.getInsertSequence(mcl, 0));
-        assertEquals(4, CommentLogic.getInsertSequence(mcl, 1));
-        assertEquals(3, CommentLogic.getInsertSequence(mcl, 2));
-        assertEquals(3, CommentLogic.getInsertSequence(mcl, 3));
+        assertEquals(5, CommentLogic.getInsertSequence(mcl, 0));
+        assertEquals(5, CommentLogic.getInsertSequence(mcl, 1));
+        assertEquals(4, CommentLogic.getInsertSequence(mcl, 2));
+        assertEquals(4, CommentLogic.getInsertSequence(mcl, 3));
 
         assertEquals(0, CommentLogic.getInsertNesting(mcl, 0));
         assertEquals(1, CommentLogic.getInsertNesting(mcl, 1));
