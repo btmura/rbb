@@ -359,7 +359,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void selectSubredditSinglePane(String subreddit, int flags) {
         Intent intent = new Intent(this, ThingListActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
         intent.putExtra(ThingListActivity.EXTRA_FLAGS, flags);
         startActivity(intent);
@@ -409,7 +408,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void selectThingSinglePane(Bundle thingBundle, int flags) {
         Intent intent = new Intent(this, ThingActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         intent.putExtra(ThingActivity.EXTRA_FLAGS, flags);
         startActivity(intent);
