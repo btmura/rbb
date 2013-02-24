@@ -90,7 +90,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
         }
 
         adapter.addMessageFilters(this);
-        adapter.setAccountInfo(result.accountNames, result.karmaCounts);
+        adapter.setAccountInfo(result.accountNames, result.linkKarma, result.hasMail);
 
         if (currentUser == null) {
             currentUser = result.getLastAccount();

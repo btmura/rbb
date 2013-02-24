@@ -77,13 +77,15 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         filters.add(new Item(Item.TYPE_FILTER, context.getString(resId), null, value));
     }
 
-    public void setAccountInfo(String[] accountNames, String[] karmaCounts) {
+    public void setAccountInfo(String[] accountNames, int[] linkKarma, boolean[] hasMail) {
         items.clear();
         if (accountNames != null) {
             int count = accountNames.length;
             for (int i = 0; i < count; i++) {
-                String karmaText = karmaCounts != null ? karmaCounts[i] : null;
-                addItem(Item.TYPE_ACCOUNT_NAME, accountNames[i], karmaText, -1);
+                String text2 = linkKarma != null && linkKarma[i] != -1 ?
+                        Integer.toString(linkKarma[i]) : null;
+                int value = hasMail != null && hasMail[i] ? 1 : 0;
+                addItem(Item.TYPE_ACCOUNT_NAME, accountNames[i], text2, value);
             }
         }
         if (filters != null) {
@@ -249,14 +251,15 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
                 vh.accountFilter.setVisibility(View.VISIBLE);
                 vh.linkKarma.setText(item.text2);
                 vh.linkKarma.setVisibility(View.VISIBLE);
+                int resId = item.value == 1 ? R.drawable.ic_unread_messages : 0;
+                vh.linkKarma.setCompoundDrawablesWithIntrinsicBounds(resId, 0, 0, 0);
                 vh.category.setVisibility(View.GONE);
                 break;
 
             case Item.TYPE_FILTER:
                 vh.accountFilter.setText(item.text1);
                 vh.accountFilter.setVisibility(View.VISIBLE);
-                vh.linkKarma.setText(null);
-                vh.linkKarma.setVisibility(View.VISIBLE);
+                vh.linkKarma.setVisibility(View.GONE);
                 vh.category.setVisibility(View.GONE);
                 break;
 

@@ -91,7 +91,7 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
         }
 
         adapter.addProfileFilters(this, true);
-        adapter.setAccountInfo(result.accountNames, result.karmaCounts);
+        adapter.setAccountInfo(result.accountNames, result.linkKarma, result.hasMail);
 
         if (currentUser == null) {
             currentUser = result.getLastAccount();
