@@ -123,7 +123,7 @@ public class SubredditView extends CustomView {
                 break;
 
             case MeasureSpec.UNSPECIFIED:
-                measuredHeight = getMinimumHeight();
+                measuredHeight = getMinimumViewHeight();
                 break;
         }
 
@@ -164,7 +164,7 @@ public class SubredditView extends CustomView {
         }
     }
 
-    private int getMinimumHeight() {
+    private int getMinimumViewHeight() {
         int height = PADDING + titleLayout.getHeight();
         if (statusText != null) {
             height += ELEMENT_PADDING + statusLayout.getHeight();
