@@ -251,7 +251,7 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
                 vh.accountFilter.setVisibility(View.VISIBLE);
                 vh.linkKarma.setText(item.text2);
                 vh.linkKarma.setVisibility(View.VISIBLE);
-                int resId = item.value == 1 ? R.drawable.ic_unread_messages : 0;
+                int resId = item.value == 1 ? R.drawable.ic_action_messages : 0;
                 vh.linkKarma.setCompoundDrawablesWithIntrinsicBounds(resId, 0, 0, 0);
                 vh.category.setVisibility(View.GONE);
                 break;
