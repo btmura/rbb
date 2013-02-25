@@ -370,6 +370,14 @@ public class ThingListFragment extends ThingProviderListFragment implements
             subredditItem.setTitle(MenuHelper.getSubredditTitle(getActivity(), subreddit));
         }
 
+        MenuItem shareItem = menu.findItem(R.id.menu_share_thing);
+        shareItem.setVisible(count == 1);
+        if (shareItem.isVisible()) {
+            String label = adapter.getTitle(position);
+            CharSequence text = adapter.getUrl(position);
+            MenuHelper.setShareProvider(menu.findItem(R.id.menu_share_thing), label, text);
+        }
+
         boolean saveable = false;
         boolean saved = false;
         boolean hasAccount = count == 1 && AccountUtils.isAccount(adapter.getAccountName());
