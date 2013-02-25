@@ -37,6 +37,11 @@
         android:showAsAction="ifRoom|withText"
         android:title="@string/menu_author"/>
     <item
+        android:id="@+id/menu_share_comment"
+        android:actionProviderClass="android.widget.ShareActionProvider"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_share"/>
+    <item
         android:id="@+id/menu_copy_url"
         android:showAsAction="ifRoom"
         android:title="@string/menu_copy_url"/>

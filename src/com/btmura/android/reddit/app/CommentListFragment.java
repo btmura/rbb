@@ -42,6 +42,7 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
+import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
@@ -358,12 +359,14 @@ public class CommentListFragment extends ThingProviderListFragment implements
         boolean editVisible = true;
         boolean deleteVisible = true;
         boolean authorVisible = true;
+        boolean shareVisible = true;
         boolean copyUrlVisible = true;
 
         boolean singleChecked = count == 1;
         replyVisible = singleChecked;
         editVisible = singleChecked;
         authorVisible = singleChecked;
+        shareVisible = singleChecked;
         copyUrlVisible = singleChecked;
 
         if (replyVisible || editVisible || deleteVisible) {
@@ -374,10 +377,11 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
 
         int position = getFirstCheckedPosition();
-        if (replyVisible || copyUrlVisible) {
+        if (replyVisible || shareVisible || copyUrlVisible) {
             boolean hasThing = hasThingId(position);
             replyVisible &= hasThing;
             editVisible &= hasThing;
+            shareVisible &= hasThing;
             copyUrlVisible &= hasThing;
         }
 
@@ -407,6 +411,14 @@ public class CommentListFragment extends ThingProviderListFragment implements
         authorItem.setVisible(authorVisible);
         if (authorItem.isVisible()) {
             authorItem.setTitle(MenuHelper.getUserTitle(getActivity(), author));
+        }
+
+        MenuItem shareItem = menu.findItem(R.id.menu_share_comment);
+        shareItem.setVisible(shareVisible);
+        if (shareItem.isVisible()) {
+            String label = getLabel(position);
+            CharSequence text = getUrl(position);
+            MenuHelper.setShareProvider(menu.findItem(R.id.menu_share_comment), label, text);
         }
 
         return true;
@@ -574,6 +586,23 @@ public class CommentListFragment extends ThingProviderListFragment implements
         String label = getLabel(position);
 
         // Determine the text to copy to the clipboard.
+        CharSequence text = getUrl(position);
+
+        // Copy to the clipboard and present a toast.
+        MenuHelper.setClipAndToast(getActivity(), label, text);
+    }
+
+    private String getLabel(int position) {
+        String text;
+        if (position != 0) {
+            text = adapter.getString(position, CommentAdapter.INDEX_BODY);
+        } else {
+            text = adapter.getString(0, CommentAdapter.INDEX_TITLE);
+        }
+        return StringUtil.ellipsize(text, 50);
+    }
+
+    private CharSequence getUrl(int position) {
         String thingId;
         if (position != 0) {
             thingId = adapter.getString(position, CommentAdapter.INDEX_THING_ID);
@@ -581,18 +610,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
             thingId = null; // Don't append anything to the permalink.
         }
         String permaLink = adapter.getString(0, CommentAdapter.INDEX_PERMA_LINK);
-        CharSequence text = Urls.perma(permaLink, thingId);
-
-        // Copy to the clipboard and present a toast.
-        MenuHelper.setClipAndToast(getActivity(), label, text);
-    }
-
-    private String getLabel(int position) {
-        if (position != 0) {
-            return adapter.getString(position, CommentAdapter.INDEX_BODY);
-        } else {
-            return adapter.getString(0, CommentAdapter.INDEX_TITLE);
-        }
+        return Urls.perma(permaLink, thingId);
     }
 
     public void onDestroyActionMode(ActionMode mode) {
