@@ -41,7 +41,9 @@ public class ThumbnailLoader {
         if (!TextUtils.isEmpty(url)) {
             Bitmap b = BITMAP_CACHE.get(url);
             v.setThumbnailBitmap(b);
-            if (b == null) {
+            if (b != null) {
+                clearLoadThumbnailTask(v);
+            } else {
                 LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
                 if (task == null || !url.equals(task.url)) {
                     if (task != null) {
@@ -50,15 +52,19 @@ public class ThumbnailLoader {
                     task = new LoadThumbnailTask(v, url);
                     v.setTag(task);
                     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
+                };
             }
         } else {
-            LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
-            if (task != null) {
-                task.cancel(true);
-                v.setTag(null);
-            }
             v.setThumbnailBitmap(null);
+            clearLoadThumbnailTask(v);
+        }
+    }
+
+    private void clearLoadThumbnailTask(ThingView v) {
+        LoadThumbnailTask task = (LoadThumbnailTask) v.getTag();
+        if (task != null) {
+            task.cancel(true);
+            v.setTag(null);
         }
     }
 
