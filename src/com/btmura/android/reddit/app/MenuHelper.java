@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.widget.ShareActionProvider;
 import android.widget.Toast;
@@ -48,7 +49,7 @@ public class MenuHelper {
     }
 
     public static boolean isUserItemVisible(String user) {
-        return !Things.DELETED.equals(user);
+        return !TextUtils.isEmpty(user) && !Things.DELETED.equals(user);
     }
 
     /**
