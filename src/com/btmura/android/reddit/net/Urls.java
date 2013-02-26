@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import android.text.TextUtils;
 
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.util.ThingIds;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class Urls {
@@ -110,10 +111,10 @@ public class Urls {
     }
 
     public static CharSequence commentListing(String id, String linkId, int apiType) {
-        id = removeTag(id);
+        id = ThingIds.removeTag(id);
         StringBuilder b = new StringBuilder(BASE_COMMENTS_URL);
         if (!TextUtils.isEmpty(linkId)) {
-            b.append(removeTag(linkId));
+            b.append(ThingIds.removeTag(linkId));
         } else {
             b.append(id);
         }
@@ -179,7 +180,7 @@ public class Urls {
 
     public static CharSequence messageThread(String thingId, int apiType) {
         StringBuilder b = new StringBuilder(BASE_MESSAGE_THREAD_URL);
-        b.append(removeTag(thingId));
+        b.append(ThingIds.removeTag(thingId));
         if (apiType == TYPE_JSON) {
             b.append(".json");
         }
@@ -258,7 +259,7 @@ public class Urls {
     public static CharSequence perma(String permaLink, String thingId) {
         StringBuilder b = new StringBuilder(BASE_URL).append(permaLink);
         if (!TextUtils.isEmpty(thingId)) {
-            b.append(removeTag(thingId));
+            b.append(ThingIds.removeTag(thingId));
         }
         return b;
     }
@@ -451,13 +452,5 @@ public class Urls {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static String removeTag(String id) {
-        int sepIndex = id.indexOf('_');
-        if (sepIndex != -1) {
-            return id.substring(sepIndex + 1);
-        }
-        return id;
     }
 }

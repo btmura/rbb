@@ -17,8 +17,8 @@
 package com.btmura.android.reddit.database;
 
 /**
- * {@link Kinds} contains definitions of column names and values for tables that
- * have a kind column and some methods to handle parsing them JSON.
+ * {@link Kinds} contains definitions of column names and values for tables that have a kind column
+ * and some methods to handle parsing them JSON.
  */
 public final class Kinds {
 
@@ -50,6 +50,28 @@ public final class Kinds {
             return KIND_MORE;
         } else {
             throw new IllegalArgumentException("kind: " + kind);
+        }
+    }
+
+    public static String getTag(int kind) {
+        switch (kind) {
+            case KIND_COMMENT:
+                return "t1";
+
+            case KIND_ACCOUNT:
+                return "t2";
+
+            case KIND_LINK:
+                return "t3";
+
+            case KIND_MESSAGE:
+                return "t4";
+
+            case KIND_SUBREDDIT:
+                return "t5";
+
+            default:
+                throw new IllegalArgumentException("kind: " + kind);
         }
     }
 }

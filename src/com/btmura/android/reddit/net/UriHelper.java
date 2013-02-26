@@ -18,12 +18,14 @@ package com.btmura.android.reddit.net;
 
 import java.util.List;
 
-import com.btmura.android.reddit.widget.FilterAdapter;
-import com.btmura.android.reddit.widget.ThingBundle;
-
 import android.content.UriMatcher;
 import android.net.Uri;
 import android.os.Bundle;
+
+import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.util.ThingIds;
+import com.btmura.android.reddit.widget.FilterAdapter;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public class UriHelper {
 
@@ -154,15 +156,18 @@ public class UriHelper {
                 List<String> segments = data.getPathSegments();
                 Bundle b = new Bundle(2);
                 ThingBundle.putSubreddit(b, segments.get(1));
-                ThingBundle.putThingId(b, segments.get(3));
+                ThingBundle.putThingId(b, ThingIds.addTag(segments.get(3),
+                        Kinds.getTag(Kinds.KIND_LINK)));
                 return b;
 
             case MATCH_COMMENTS_CONTEXT:
                 segments = data.getPathSegments();
                 b = new Bundle(3);
                 ThingBundle.putSubreddit(b, segments.get(1));
-                ThingBundle.putLinkId(b, segments.get(3));
-                ThingBundle.putThingId(b, segments.get(5));
+                ThingBundle.putLinkId(b, ThingIds.addTag(segments.get(3),
+                        Kinds.getTag(Kinds.KIND_LINK)));
+                ThingBundle.putThingId(b, ThingIds.addTag(segments.get(5),
+                        Kinds.getTag(Kinds.KIND_COMMENT)));
                 return b;
 
             default:

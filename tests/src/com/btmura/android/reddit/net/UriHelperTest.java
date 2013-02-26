@@ -44,8 +44,13 @@ public class UriHelperTest extends TestCase {
     }
 
     public void testGetThingBundle() {
-        assertThingBundle("rbb", "12zl0q", "http://reddit.com/r/rbb/comments/12zl0q/");
-        assertThingBundle("rbb", "12zl0q", "http://www.reddit.com/r/rbb/comments/12zl0q/test_1");
+        assertThingBundle("rbb", "t3_12zl0q", null,
+                "http://reddit.com/r/rbb/comments/12zl0q/");
+        assertThingBundle("rbb", "t3_12zl0q", null,
+                "http://www.reddit.com/r/rbb/comments/12zl0q/test_1");
+        assertThingBundle("rbb", "t1_1976x5", "t3_12zl0q",
+                "http://www.reddit.com/r/rbb/comments/12zl0q/test_1/1976x5");
+
         assertNullThingBundle("http://www.reddit.com/r/pics");
     }
 
@@ -68,10 +73,12 @@ public class UriHelperTest extends TestCase {
         assertEquals(expectedFilter, UriHelper.getSubredditFilter(Uri.parse(url)));
     }
 
-    private void assertThingBundle(String expectedSubreddit, String expectedThingId, String url) {
+    private void assertThingBundle(String expectedSubreddit, String expectedThingId,
+            String expectedLinkId, String url) {
         Bundle b = UriHelper.getThingBundle(Uri.parse(url));
         assertEquals(expectedSubreddit, ThingBundle.getSubreddit(b));
         assertEquals(expectedThingId, ThingBundle.getThingId(b));
+        assertEquals(expectedLinkId, ThingBundle.getLinkId(b));
     }
 
     private void assertNullThingBundle(String url) {
