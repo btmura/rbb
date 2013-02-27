@@ -315,6 +315,10 @@ public class Urls {
         // Only add the filter for non random subreddits.
         if (!Subreddits.isRandom(subreddit)) {
             switch (filter) {
+                case FilterAdapter.SUBREDDIT_CONTROVERSIAL:
+                    b.append("/controversial");
+                    break;
+
                 case FilterAdapter.SUBREDDIT_HOT:
                     b.append("/hot");
                     break;
@@ -323,8 +327,8 @@ public class Urls {
                     b.append("/new");
                     break;
 
-                case FilterAdapter.SUBREDDIT_CONTROVERSIAL:
-                    b.append("/controversial");
+                case FilterAdapter.SUBREDDIT_RISING:
+                    b.append("/rising");
                     break;
 
                 case FilterAdapter.SUBREDDIT_TOP:
@@ -337,12 +341,8 @@ public class Urls {
             b.append("/.json");
         }
 
-        boolean hasSort = filter == FilterAdapter.SUBREDDIT_NEW;
-        if (hasSort) {
-            b.append("?sort=new");
-        }
         if (more != null) {
-            b.append(hasSort ? "&" : "?").append("count=25&after=").append(encode(more));
+            b.append("?count=25&after=").append(encode(more));
         }
         return b;
     }

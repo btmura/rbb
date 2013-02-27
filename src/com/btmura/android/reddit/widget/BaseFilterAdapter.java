@@ -41,6 +41,7 @@ abstract class BaseFilterAdapter extends BaseAdapter {
     public static final int SUBREDDIT_TOP = 1;
     public static final int SUBREDDIT_CONTROVERSIAL = 2;
     public static final int SUBREDDIT_NEW = 3;
+    public static final int SUBREDDIT_RISING = 4;
 
     public void addMessageFilters(Context context) {
         clear();
@@ -69,6 +70,7 @@ abstract class BaseFilterAdapter extends BaseAdapter {
         add(context, R.string.filter_subreddit_top, SUBREDDIT_TOP);
         add(context, R.string.filter_subreddit_controversial, SUBREDDIT_CONTROVERSIAL);
         add(context, R.string.filter_subreddit_new, SUBREDDIT_NEW);
+        add(context, R.string.filter_subreddit_rising, SUBREDDIT_RISING);
         notifyDataSetChanged();
     }
 
