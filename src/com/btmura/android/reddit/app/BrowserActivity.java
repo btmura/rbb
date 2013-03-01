@@ -20,7 +20,6 @@ import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.app.backup.RestoreObserver;
 import android.content.ContentResolver;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -374,9 +373,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     private void handleSwitchTheme() {
-        int theme = Preferences.getTheme(this) == Preferences.THEME_LIGHT ?
-                Preferences.THEME_DARK : Preferences.THEME_LIGHT;
-        Preferences.setTheme(this, theme);
+        Preferences.switchTheme(this);
         recreate();
     }
 }

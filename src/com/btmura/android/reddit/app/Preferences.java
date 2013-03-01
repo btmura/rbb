@@ -21,22 +21,21 @@ import android.content.SharedPreferences;
 
 class Preferences {
 
-    static final int THEME_LIGHT = android.R.style.Theme_Holo_Light;
-
-    static final int THEME_DARK = android.R.style.Theme_Holo;
-
     private static final String PREFS_NAME = "preferences";
 
-    private static final String GLOBAL_THEME = "theme";
+    private static final String PREF_THEME = "theme";
+    private static final int THEME_LIGHT = android.R.style.Theme_Holo_Light;
+    private static final int THEME_DARK = android.R.style.Theme_Holo;
 
     private static SharedPreferences PREFS_INSTANCE;
 
     public static final int getTheme(Context context) {
-        return getPrefsInstance(context).getInt(GLOBAL_THEME, THEME_LIGHT);
+        return getPrefsInstance(context).getInt(PREF_THEME, THEME_LIGHT);
     }
 
-    public static final void setTheme(Context context, int theme) {
-        getPrefsInstance(context).edit().putInt(GLOBAL_THEME, theme).apply();
+    public static final void switchTheme(Context context) {
+        int otherTheme = getTheme(context) == THEME_LIGHT ? THEME_DARK : THEME_LIGHT;
+        getPrefsInstance(context).edit().putInt(PREF_THEME, otherTheme).apply();
     }
 
     private synchronized static SharedPreferences getPrefsInstance(Context context) {
