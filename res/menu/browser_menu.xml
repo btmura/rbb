@@ -30,17 +30,17 @@
         android:orderInCategory="@integer/menu_order_account" >
         <item
             android:id="@+id/menu_profile"
-            android:icon="@drawable/ic_action_profile"
+            android:icon="?attr/menu_profile_icon"
             android:showAsAction="ifRoom"
             android:title="@string/menu_profile"/>
         <item
             android:id="@+id/menu_profile_saved"
-            android:icon="@drawable/ic_action_saved"
+            android:icon="?attr/menu_profile_saved_icon"
             android:showAsAction="ifRoom"
             android:title="@string/menu_saved"/>
         <item
             android:id="@+id/menu_messages"
-            android:icon="@drawable/ic_action_messages"
+            android:icon="?attr/menu_messages_icon"
             android:showAsAction="ifRoom"
             android:title="@string/menu_messages"/>
         <item

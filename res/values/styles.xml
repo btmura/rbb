@@ -15,13 +15,19 @@
      limitations under the License.
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    
-    <style name="Theme.Light" parent="@android:style/Theme.Holo.Light">        
+
+    <style name="Theme.Light" parent="@android:style/Theme.Holo.Light">
+        <item name="menu_profile_icon">@drawable/ic_action_profile</item>
+        <item name="menu_profile_saved_icon">@drawable/ic_action_saved</item>
+        <item name="menu_messages_icon">@drawable/ic_action_messages</item>
     </style>
-    
-    <style name="Theme.Dark" parent="@android:style/Theme.Holo">        
+
+    <style name="Theme.Dark" parent="@android:style/Theme.Holo">
+        <item name="menu_profile_icon">@drawable/ic_action_profile</item>
+        <item name="menu_profile_saved_icon">@drawable/ic_action_saved</item>
+        <item name="menu_messages_icon">@drawable/ic_action_messages</item>
     </style>
-    
+
     <style name="AccountNameText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title" />
 
     <style name="AccountNameDropdownText" parent="@style/AccountNameText">
@@ -98,13 +104,17 @@
     <style name="CommentStatusText" parent="@style/SubredditStatusText" />
 
     <style name="SidebarTitleText" parent="@style/CommentTitleText">
-        <!--  <item name="android:singleLine">true</item>
-        <item name="android:ellipsize">end</item>  -->
+        <!--
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        -->
     </style>
 
     <style name="SidebarStatusText" parent="@style/CommentStatusText">
-        <!-- <item name="android:singleLine">true</item>
-        <item name="android:ellipsize">end</item>  -->
+        <!--
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        -->
     </style>
 
     <style name="SidebarDescriptionText" parent="@style/CommentBodyText" />
