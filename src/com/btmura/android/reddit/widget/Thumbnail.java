@@ -46,6 +46,7 @@ class Thumbnail {
             THUMB_OUTLINE_RECT = new RectF(0, 0, THUMB_WIDTH, THUMB_HEIGHT);
 
             THUMB_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
+            THUMB_PAINT.setFilterBitmap(true);
             THUMB_OUTLINE_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
             THUMB_OUTLINE_PAINT.setStyle(Style.STROKE);
             THUMB_OUTLINE_PAINT.setColor(r.getColor(R.color.thumb_outline));
