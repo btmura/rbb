@@ -105,6 +105,7 @@
     <string name="menu_share">Share</string>
     <string name="menu_subreddit">/r/%1$s</string>
     <string name="menu_submit">Submit</string>
+    <string name="menu_switch_theme">Switch theme</string>
     <string name="menu_unsave">Unsave</string>
     <string name="menu_user">/u/%1$s</string>
     <string name="menu_view">View</string>

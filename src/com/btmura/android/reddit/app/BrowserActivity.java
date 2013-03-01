@@ -20,6 +20,7 @@ import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.app.backup.RestoreObserver;
 import android.content.ContentResolver;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -347,6 +348,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 handleAccounts();
                 return true;
 
+            case R.id.menu_switch_theme:
+                handleSwitchTheme();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -366,5 +371,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     private void handleAccounts() {
         MenuHelper.startAccountListActivity(this);
+    }
+
+    private void handleSwitchTheme() {
+        int theme = Preferences.getTheme(this) == Preferences.THEME_LIGHT ?
+                Preferences.THEME_DARK : Preferences.THEME_LIGHT;
+        Preferences.setTheme(this, theme);
+        recreate();
     }
 }

@@ -36,7 +36,7 @@ class Preferences {
     }
 
     public static final void setTheme(Context context, int theme) {
-        getPrefsInstance(context).edit().putInt(GLOBAL_THEME, theme);
+        getPrefsInstance(context).edit().putInt(GLOBAL_THEME, theme).apply();
     }
 
     private synchronized static SharedPreferences getPrefsInstance(Context context) {
