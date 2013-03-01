@@ -82,6 +82,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void setContentView() {
+        setTheme(Preferences.getTheme(this));
         setContentView(R.layout.browser);
     }
 
