@@ -15,7 +15,13 @@
      limitations under the License.
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-
+    
+    <style name="Theme.Light" parent="@android:style/Theme.Holo.Light">        
+    </style>
+    
+    <style name="Theme.Dark" parent="@android:style/Theme.Holo">        
+    </style>
+    
     <style name="AccountNameText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title" />
 
     <style name="AccountNameDropdownText" parent="@style/AccountNameText">

@@ -34,6 +34,7 @@ import com.btmura.android.reddit.R;
  */
 abstract class CustomView extends View {
 
+    static int THEME = -1;
     static float FONT_SCALE = -1;
     static int PADDING;
     static int ELEMENT_PADDING;
@@ -76,6 +77,7 @@ abstract class CustomView extends View {
         Resources r = context.getResources();
 
         // Reinitialize everything when the font scale changes via Settings.
+        Theme t = context.getTheme();
         float fontScale = r.getConfiguration().fontScale;
         if (FONT_SCALE != fontScale) {
             FONT_SCALE = fontScale;
@@ -104,7 +106,6 @@ abstract class CustomView extends View {
                     android.R.attr.textColorLink,
             };
 
-            Theme t = context.getTheme();
             for (int i = 0; i < NUM_TEXT_PAINTS; i++) {
                 TypedArray a = t.obtainStyledAttributes(styles[i], attrs);
                 TEXT_PAINTS[i] = new TextPaint(Paint.ANTI_ALIAS_FLAG);

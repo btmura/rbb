@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.app;
 
+import com.btmura.android.reddit.R;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -24,8 +26,8 @@ class Preferences {
     private static final String PREFS_NAME = "preferences";
 
     private static final String PREF_THEME = "theme";
-    private static final int THEME_LIGHT = android.R.style.Theme_Holo_Light;
-    private static final int THEME_DARK = android.R.style.Theme_Holo;
+    private static final int THEME_LIGHT = R.style.Theme_Light;
+    private static final int THEME_DARK = R.style.Theme_Dark;
 
     private static SharedPreferences PREFS_INSTANCE;
 
