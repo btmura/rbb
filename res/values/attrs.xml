@@ -17,7 +17,6 @@
 <resources>
 
     <declare-styleable name="Theme">
-        <attr name="button_bar_style" format="reference" />
         <attr name="button_bar_button_style" format="reference" />
         <attr name="menu_add_icon" format="reference" />
         <attr name="menu_comments_icon" format="reference" />

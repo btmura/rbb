@@ -17,8 +17,6 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Theme.Light" parent="@android:style/Theme.Holo.Light">
-        <item name="button_bar_style">@style/ButtonBar.Light</item>
-        <item name="button_bar_button_style">@style/ButtonBarButton.Light</item>
         <item name="menu_add_icon">@drawable/ic_action_add_light</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_light</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_light</item>
@@ -36,8 +34,6 @@
     </style>
 
     <style name="Theme.Light.Dialog" parent="@android:style/Theme.Holo.Light.Dialog">
-        <item name="button_bar_style">@style/ButtonBar.Light</item>
-        <item name="button_bar_button_style">@style/ButtonBarButton.Light</item>
         <item name="menu_add_icon">@drawable/ic_action_add_light</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_light</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_light</item>
@@ -55,8 +51,6 @@
     </style>
 
     <style name="Theme.Light.DialogWhenLarge" parent="@android:style/Theme.Holo.Light.DialogWhenLarge">
-        <item name="button_bar_style">@style/ButtonBar.Light</item>
-        <item name="button_bar_button_style">@style/ButtonBarButton.Light</item>
         <item name="menu_add_icon">@drawable/ic_action_add_light</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_light</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_light</item>
@@ -74,8 +68,6 @@
     </style>
 
     <style name="Theme.Dark" parent="@android:style/Theme.Holo">
-        <item name="button_bar_style">@style/ButtonBar.Dark</item>
-        <item name="button_bar_button_style">@style/ButtonBarButton.Dark</item>
         <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
@@ -93,8 +85,6 @@
     </style>
 
     <style name="Theme.Dark.Dialog" parent="@android:style/Theme.Holo.Dialog">
-        <item name="button_bar_style">@style/ButtonBar.Dark</item>
-        <item name="button_bar_button_style">@style/ButtonBarButton.Dark</item>
         <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
@@ -112,8 +102,6 @@
     </style>
 
     <style name="Theme.Dark.DialogWhenLarge" parent="@android:style/Theme.Holo.DialogWhenLarge">
-        <item name="button_bar_style">@style/ButtonBar.Dark</item>
-        <item name="button_bar_button_style">@style/ButtonBarButton.Dark</item>
         <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
@@ -136,15 +124,10 @@
         <item name="android:padding">@dimen/padding</item>
     </style>
 
-    <style name="ButtonBar.Light" parent="@android:style/Holo.Light.ButtonBar.AlertDialog" />
+    <style name="ButtonBar" parent="@android:style/Holo.ButtonBar.AlertDialog" />
 
-    <style name="ButtonBar.Dark" parent="@android:style/Holo.ButtonBar.AlertDialog" />
-
-    <style name="ButtonBarButton.Light" parent="@android:style/Widget.Holo.Light.Button.Borderless.Small">
-        <item name="android:textAllCaps">true</item>
-    </style>
-
-    <style name="ButtonBarButton.Dark" parent="@android:style/Widget.Holo.Button.Borderless.Small">
+    <style name="ButtonBarButton" parent="@android:style/Widget.Holo.Button.Borderless.Small">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
