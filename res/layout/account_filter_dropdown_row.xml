@@ -17,7 +17,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent" xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
         android:id="@+id/account_filter"
@@ -30,7 +30,7 @@
         android:paddingLeft="@dimen/padding"
         android:paddingRight="@dimen/element_padding"
         android:paddingTop="@dimen/padding"
-        android:textIsSelectable="true" />
+        tools:ignore="SelectableText" />
 
     <TextView
         android:id="@+id/link_karma"
@@ -41,7 +41,7 @@
         android:paddingBottom="@dimen/padding"
         android:paddingRight="@dimen/padding"
         android:paddingTop="@dimen/padding"
-        android:textIsSelectable="true" />
+        tools:ignore="SelectableText" />
 
     <TextView
         android:id="@+id/category"
