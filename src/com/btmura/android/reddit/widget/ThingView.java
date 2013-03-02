@@ -173,6 +173,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public void setThumbnailBitmap(Bitmap bitmap) {
+        BitmapShader currentShader = thumbShader;
         if (bitmap != null) {
             if (thumbRect == null) {
                 thumbRect = new RectF();
@@ -184,7 +185,9 @@ public class ThingView extends CustomView implements OnGestureListener {
         } else {
             thumbShader = null;
         }
-        invalidate();
+        if (currentShader != thumbShader) {
+            invalidate();
+        }
     }
 
     public void setType(int type) {
