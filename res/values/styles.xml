@@ -175,7 +175,7 @@
     <style name="ThingStatusText" parent="@style/SubredditStatusText" />
 
     <style name="ThingNeutralScoreText" parent="@style/SubredditStatusText">
-        <item name="android:textColor">@color/score_text_neutral</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
     <style name="ThingUpScoreText" parent="@style/SubredditStatusText">
