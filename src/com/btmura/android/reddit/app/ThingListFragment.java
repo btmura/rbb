@@ -302,8 +302,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private void click(int position, int pageType) {
         adapter.setSelectedPosition(position);
         if (listener != null) {
-            listener.onThingSelected(adapter.getThingBundle(getActivity(), position),
-                    ThingPagerAdapter.TYPE_COMMENTS);
+            listener.onThingSelected(adapter.getThingBundle(getActivity(), position), pageType);
         }
         if (adapter.isNew(position)) {
             Provider.readMessageAsync(getActivity(), adapter.getAccountName(),

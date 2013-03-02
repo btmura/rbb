@@ -153,6 +153,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     public void onThingSelected(Bundle thingBundle, int pageType) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
+        intent.putExtra(ThingActivity.EXTRA_PAGE_TYPE, pageType);
         startActivity(intent);
     }
 

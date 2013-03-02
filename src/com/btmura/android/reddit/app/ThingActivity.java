@@ -48,6 +48,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     public static final String TAG = "ThingActivity";
 
     public static final String EXTRA_THING_BUNDLE = "thingBundle";
+    public static final String EXTRA_PAGE_TYPE = "pageType";
     public static final String EXTRA_FLAGS = "flags";
 
     public static final int FLAG_INSERT_HOME = 0x1;
@@ -115,7 +116,13 @@ public class ThingActivity extends GlobalMenuActivity implements
             ft.commitAllowingStateLoss();
         }
 
-        pager.setAdapter(new ThingPagerAdapter(getFragmentManager(), accountName, thingBundle));
+        ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(), accountName,
+                thingBundle);
+        pager.setAdapter(adapter);
+
+        int pageType = getIntent().getIntExtra(EXTRA_PAGE_TYPE, ThingPagerAdapter.TYPE_LINK);
+        pager.setCurrentItem(adapter.findPageType(pageType));
+
         invalidateOptionsMenu();
     }
 
@@ -133,7 +140,7 @@ public class ThingActivity extends GlobalMenuActivity implements
                 ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
                 ThingPagerAdapter adapter = (ThingPagerAdapter) pager.getAdapter();
                 adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
-                pager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
+                pager.setCurrentItem(adapter.findPageType(ThingPagerAdapter.TYPE_COMMENTS));
             }
 
             ThingMenuFragment mf = getThingMenuFragment();

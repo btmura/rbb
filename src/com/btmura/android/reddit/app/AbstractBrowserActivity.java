@@ -234,7 +234,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshActionBar(subreddit, thingBundle);
         refreshThingBodyWidthMeasurement();
         refreshViews(thingBundle);
-        refreshThingPager(thingBundle);
+        refreshThingPager(thingBundle, -1);
     }
 
     protected void setQueryThingListNavigation(String subreddit, String query) {
@@ -395,25 +395,26 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     public void onThingSelected(Bundle thingBundle, int pageType) {
-        selectThing(thingBundle, 0);
+        selectThing(thingBundle, 0, pageType);
     }
 
-    protected void selectThing(Bundle thingBundle, int flags) {
+    protected void selectThing(Bundle thingBundle, int flags, int pageType) {
         if (isSinglePane) {
-            selectThingSinglePane(thingBundle, 0);
+            selectThingSinglePane(thingBundle, 0, pageType);
         } else {
-            selectThingMultiPane(thingBundle);
+            selectThingMultiPane(thingBundle, pageType);
         }
     }
 
-    private void selectThingSinglePane(Bundle thingBundle, int flags) {
+    private void selectThingSinglePane(Bundle thingBundle, int flags, int pageType) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
+        intent.putExtra(ThingActivity.EXTRA_PAGE_TYPE, pageType);
         intent.putExtra(ThingActivity.EXTRA_FLAGS, flags);
         startActivity(intent);
     }
 
-    private void selectThingMultiPane(Bundle thingBundle) {
+    private void selectThingMultiPane(Bundle thingBundle, int pageType) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
@@ -430,7 +431,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.addToBackStack(null);
         ft.commit();
 
-        refreshThingPager(thingBundle);
+        refreshThingPager(thingBundle, pageType);
     }
 
     public void onSubredditDiscovery(String subreddit) {
@@ -522,7 +523,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             if (cf != null) {
                 String subreddit = cf.getSubreddit();
                 Bundle thingBundle = cf.getThingBundle();
-                refreshThingPager(thingBundle);
+                refreshThingPager(thingBundle, -1);
                 refreshActionBar(subreddit, thingBundle);
                 refreshViews(thingBundle);
                 refreshCheckedItems();
@@ -578,7 +579,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 // adapter issues with the ViewPager after orientation changes.
                 thingPager.post(new Runnable() {
                     public void run() {
-                        refreshThingPager(null);
+                        refreshThingPager(null, -1);
                     }
                 });
             }
@@ -602,11 +603,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    private void refreshThingPager(Bundle thingBundle) {
+    private void refreshThingPager(Bundle thingBundle, int pageType) {
         if (thingBundle != null) {
             ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(),
                     getAccountName(), thingBundle);
             thingPager.setAdapter(adapter);
+            if (pageType != -1) {
+                thingPager.setCurrentItem(adapter.findPageType(pageType));
+            }
         } else {
             thingPager.setAdapter(null);
         }
@@ -754,7 +758,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingPager.setVisibility(View.GONE);
-                refreshThingPager(null);
+                refreshThingPager(null, -1);
             }
         });
         return as;

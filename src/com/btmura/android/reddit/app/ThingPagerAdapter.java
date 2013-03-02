@@ -92,6 +92,16 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
         return pageTypes.get(position);
     }
 
+    public int findPageType(int type) {
+        int count = pageTypes.size();
+        for (int i = 0; i < count; i++) {
+            if (pageTypes.get(i) == type) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
     @Override
     public int getItemPosition(Object object) {
         int type = object instanceof LinkFragment ? TYPE_LINK : TYPE_COMMENTS;
