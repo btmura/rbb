@@ -25,13 +25,13 @@
             android:visible="false"/>
         <item
             android:id="@+id/menu_link"
-            android:icon="@drawable/ic_action_link"
+            android:icon="?attr/menu_link_icon"
             android:showAsAction="ifRoom"
             android:title="@string/menu_link"
             android:visible="false"/>
         <item
             android:id="@+id/menu_comments"
-            android:icon="@drawable/ic_action_comments"
+            android:icon="?attr/menu_comments_icon"
             android:showAsAction="ifRoom"
             android:title="@string/menu_comments"
             android:visible="false"/>
