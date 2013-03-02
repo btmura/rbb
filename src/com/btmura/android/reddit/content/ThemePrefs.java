@@ -16,20 +16,15 @@
 
 package com.btmura.android.reddit.content;
 
+import android.content.Context;
+
 import com.btmura.android.reddit.R;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
-public class ThemePrefs {
-
-    private static final String PREFS_NAME = "preferences";
+public class ThemePrefs extends Prefs {
 
     private static final String PREF_THEME = "theme";
     private static final int THEME_LIGHT = 0;
     private static final int THEME_DARK = 1;
-
-    private static SharedPreferences PREFS_INSTANCE;
 
     public static final int getTheme(Context context) {
         return pick(context, R.style.Theme_Light, R.style.Theme_Dark);
@@ -64,12 +59,5 @@ public class ThemePrefs {
     private static final int pick(Context context, int lightValue, int darkValue) {
         return getPrefsInstance(context).getInt(PREF_THEME, THEME_LIGHT) == THEME_LIGHT ?
                 lightValue : darkValue;
-    }
-
-    private synchronized static SharedPreferences getPrefsInstance(Context context) {
-        if (PREFS_INSTANCE == null) {
-            PREFS_INSTANCE = context.getApplicationContext().getSharedPreferences(PREFS_NAME, 0);
-        }
-        return PREFS_INSTANCE;
     }
 }
