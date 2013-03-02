@@ -40,7 +40,7 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Preferences.getDialogWhenLargeTheme(this));
+        setTheme(Prefs.getDialogWhenLargeTheme(this));
         setContentView(R.layout.sidebar);
         setupViews();
     }

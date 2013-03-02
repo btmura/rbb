@@ -82,7 +82,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void setContentView() {
-        setTheme(Preferences.getTheme(this));
+        setTheme(Prefs.getTheme(this));
         setContentView(R.layout.browser);
     }
 
@@ -373,7 +373,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     private void handleSwitchTheme() {
-        Preferences.switchTheme(this);
+        Prefs.switchTheme(this);
         recreate();
     }
 }

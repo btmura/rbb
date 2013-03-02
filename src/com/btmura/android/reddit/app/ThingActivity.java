@@ -63,7 +63,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Preferences.getTheme(this));
+        setTheme(Prefs.getTheme(this));
         setContentView(R.layout.thing);
         setupPrereqs(savedInstanceState);
         setupFragments(savedInstanceState);

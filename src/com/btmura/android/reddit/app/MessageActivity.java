@@ -48,7 +48,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void setContentView() {
-        setTheme(Preferences.getTheme(this));
+        setTheme(Prefs.getTheme(this));
         setContentView(R.layout.message);
     }
 

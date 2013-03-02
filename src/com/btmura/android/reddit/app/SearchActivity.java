@@ -64,7 +64,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void setContentView() {
-        setTheme(Preferences.getTheme(this));
+        setTheme(Prefs.getTheme(this));
         setContentView(R.layout.search);
     }
 

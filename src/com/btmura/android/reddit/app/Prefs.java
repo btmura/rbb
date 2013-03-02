@@ -21,7 +21,7 @@ import com.btmura.android.reddit.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class Preferences {
+public class Prefs {
 
     private static final String PREFS_NAME = "preferences";
 
