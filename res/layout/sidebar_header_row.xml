@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:drawableLeft="@drawable/ic_action_view"
+        android:drawableLeft="?attr/menu_view_icon"
         android:drawablePadding="@dimen/element_padding"
         android:text="@string/button_view" />
 

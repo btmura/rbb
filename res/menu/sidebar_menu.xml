@@ -23,7 +23,7 @@
         android:title="@string/menu_add"/>
     <item
         android:id="@+id/menu_view_subreddit"
-        android:icon="@drawable/ic_action_view"
+        android:icon="?attr/menu_view_icon"
         android:showAsAction="ifRoom"
         android:title="@string/menu_view"/>
 
