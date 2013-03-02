@@ -238,6 +238,10 @@ public class CommentListFragment extends ThingProviderListFragment implements
         super.onDetach();
     }
 
+    public void onThumbnailClick() {
+        // Comments don't have thumbnails, so this shouldn't happen.
+    }
+
     public void onVote(View view, int action) {
         int position = getListView().getPositionForView(view);
         adapter.vote(getActivity(), action, position);

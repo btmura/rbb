@@ -179,22 +179,23 @@ public class ThingView extends CustomView implements OnGestureListener {
                 thumbMatrix = new Matrix();
             }
             thumbShader = Thumbnail.newBitmapShader(bitmap, thumbMatrix);
-
-            int newLeft = PADDING;
-            if (drawVotingArrows) {
-                newLeft += VotingArrows.getWidth(drawVotingArrows) + PADDING;
-            }
-            if (thumbRect == null) {
-                thumbRect = new Rect();
-            }
-            Thumbnail.setBounds(thumbRect, newLeft, PADDING);
-
-            if (currentShader != thumbShader) {
-                invalidate(thumbRect);
-            }
         } else {
             thumbShader = null;
-            if (currentShader != thumbShader) {
+        }
+
+        int newLeft = PADDING;
+        if (drawVotingArrows) {
+            newLeft += VotingArrows.getWidth(drawVotingArrows) + PADDING;
+        }
+        if (thumbRect == null) {
+            thumbRect = new Rect();
+        }
+        Thumbnail.setBounds(thumbRect, newLeft, PADDING);
+
+        if (currentShader != thumbShader) {
+            if (showThumbnail) {
+                invalidate(thumbRect);
+            } else {
                 invalidate();
             }
         }
@@ -701,7 +702,17 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        return detector.onTouchEvent(e) || onBodyTouchEvent(e) || super.onTouchEvent(e);
+        return detector.onTouchEvent(e)
+                || onThumbnailTouchEvent(e)
+                || onBodyTouchEvent(e)
+                || super.onTouchEvent(e);
+    }
+
+    private boolean onThumbnailTouchEvent(MotionEvent e) {
+        int action = e.getAction();
+        return showThumbnail
+                && (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
+                && thumbRect.contains((int) e.getX(), (int) e.getY());
     }
 
     private boolean onBodyTouchEvent(MotionEvent e) {
@@ -752,13 +763,15 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, getTopOffset(), getLeftOffset(),
-                drawVotingArrows, drawScore, isVotable);
+        return Thumbnail.onDown(e, thumbRect, showThumbnail)
+                || VotingArrows.onDown(e, getTopOffset(), getLeftOffset(), drawVotingArrows,
+                        drawScore, isVotable);
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, getTopOffset(), getLeftOffset(),
-                drawVotingArrows, drawScore, isVotable, listener, this, likes);
+        return Thumbnail.onSingleTapUp(e, thumbRect, showThumbnail, listener)
+                || VotingArrows.onSingleTapUp(e, getTopOffset(), getLeftOffset(), drawVotingArrows,
+                        drawScore, isVotable, listener, this, likes);
     }
 
     private float getTopOffset() {

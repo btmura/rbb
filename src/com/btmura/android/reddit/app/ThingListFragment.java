@@ -302,6 +302,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
+    public void onThumbnailClick() {
+    }
+
     public void onVote(View view, int action) {
         if (!TextUtils.isEmpty(adapter.getAccountName())) {
             int position = getListView().getPositionForView(view);

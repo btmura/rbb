@@ -27,10 +27,14 @@ import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
+import android.view.MotionEvent;
 
 import com.btmura.android.reddit.R;
 
 class Thumbnail {
+
+    private static final int EVENT_NONE = 0;
+    private static final int EVENT_CLICK = 1;
 
     private static int RADIUS;
     private static int THUMB_WIDTH;
@@ -83,5 +87,29 @@ class Thumbnail {
 
     static int getHeight() {
         return THUMB_HEIGHT;
+    }
+
+    static boolean onDown(MotionEvent e, Rect bounds, boolean hasThumbnail) {
+        return getEvent(e, bounds, hasThumbnail) != EVENT_NONE;
+    }
+
+    static boolean onSingleTapUp(MotionEvent e, Rect bounds, boolean hasThumbnail,
+            OnVoteListener listener) {
+        if (listener != null) {
+            int event = getEvent(e, bounds, hasThumbnail);
+            switch (event) {
+                case EVENT_CLICK:
+                    listener.onThumbnailClick();
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private static int getEvent(MotionEvent e, Rect bounds, boolean hasThumbnail) {
+        if (hasThumbnail && bounds.contains((int) e.getX(), (int) e.getY())) {
+            return EVENT_CLICK;
+        }
+        return EVENT_NONE;
     }
 }

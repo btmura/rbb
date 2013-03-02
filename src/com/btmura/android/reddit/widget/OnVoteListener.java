@@ -18,6 +18,8 @@ package com.btmura.android.reddit.widget;
 
 import android.view.View;
 
+// TODO: Rename this class since it handles more than voting.
 public interface OnVoteListener {
+    void onThumbnailClick();
     void onVote(View view, int action);
 }
