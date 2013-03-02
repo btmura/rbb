@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 
 public class AccountFilterAdapter extends BaseFilterAdapter {
@@ -251,7 +252,7 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
                 vh.accountFilter.setVisibility(View.VISIBLE);
                 vh.linkKarma.setText(item.text2);
                 vh.linkKarma.setVisibility(View.VISIBLE);
-                int resId = item.value == 1 ? R.drawable.ic_action_messages_dark : 0;
+                int resId = item.value == 1 ? ThemePrefs.getMessagesIcon(view.getContext()) : 0;
                 vh.linkKarma.setCompoundDrawablesWithIntrinsicBounds(resId, 0, 0, 0);
                 vh.category.setVisibility(View.GONE);
                 break;

@@ -44,6 +44,18 @@ public class ThemePrefs {
                 R.style.Theme_Dark_DialogWhenLarge);
     }
 
+    public static final int getUnreadMessagesIcon(Context context) {
+        // The proper way is to check the current theme, but we take this lazy good enough approach.
+        return pick(context, R.drawable.ic_action_unread_messages_light,
+                R.drawable.ic_action_unread_messages_dark);
+    }
+
+    public static final int getMessagesIcon(Context context) {
+        // The proper way is to check the current theme, but we take this lazy good enough approach.
+        return pick(context, R.drawable.ic_action_messages_light,
+                R.drawable.ic_action_messages_dark);
+    }
+
     public static final void switchTheme(Context context) {
         int otherTheme = pick(context, THEME_DARK, THEME_LIGHT);
         getPrefsInstance(context).edit().putInt(PREF_THEME, otherTheme).apply();

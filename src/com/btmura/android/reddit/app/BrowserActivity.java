@@ -313,8 +313,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private void refreshMessagesIcon() {
         if (messagesItem != null) {
             int icon = hasUnreadMessages()
-                    ? R.drawable.ic_action_unread_messages
-                    : R.drawable.ic_action_messages_light;
+                    ? ThemePrefs.getUnreadMessagesIcon(this)
+                    : ThemePrefs.getMessagesIcon(this);
             messagesItem.setIcon(icon);
         }
     }
