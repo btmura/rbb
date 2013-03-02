@@ -26,7 +26,8 @@
         android:ellipsize="end"
         android:gravity="center_vertical"
         android:paddingRight="@dimen/padding"
-        android:singleLine="true" />
+        android:singleLine="true"
+        android:textIsSelectable="true" />
 
     <View
         android:id="@+id/divider"
