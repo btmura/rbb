@@ -43,7 +43,7 @@ class VotingArrows {
     private static final int EVENT_UPVOTE = 1;
     private static final int EVENT_DOWNVOTE = 2;
 
-    private static int STYLE = -1;
+    private static int THEME;
     private static float FONT_SCALE = -1;
     private static int PADDING;
     private static int ELEMENT_PADDING;
@@ -67,10 +67,10 @@ class VotingArrows {
 
     static void init(Context context) {
         Resources r = context.getResources();
-        int style = ThemePrefs.pick(context, 0, 1);
+        int theme = ThemePrefs.getTheme(context);
         float fontScale = r.getConfiguration().fontScale;
-        if (STYLE != style || FONT_SCALE != fontScale) {
-            STYLE = style;
+        if (THEME != theme || FONT_SCALE != fontScale) {
+            THEME = theme;
             FONT_SCALE = fontScale;
             PADDING = r.getDimensionPixelSize(R.dimen.padding);
             ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);

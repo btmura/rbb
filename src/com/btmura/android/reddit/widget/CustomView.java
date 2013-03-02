@@ -35,7 +35,7 @@ import com.btmura.android.reddit.content.ThemePrefs;
  */
 abstract class CustomView extends View {
 
-    static int STYLE = -1;
+    static int THEME;
     static float FONT_SCALE = -1;
     static int PADDING;
     static int ELEMENT_PADDING;
@@ -76,12 +76,10 @@ abstract class CustomView extends View {
 
     private static void init(Context context) {
         Resources r = context.getResources();
-
-        // Reinitialize everything when the font scale changes via Settings.
-        int style = ThemePrefs.pick(context, 0, 1);
+        int theme = ThemePrefs.getTheme(context);
         float fontScale = r.getConfiguration().fontScale;
-        if (STYLE != style || FONT_SCALE != fontScale) {
-            STYLE = style;
+        if (THEME != theme || FONT_SCALE != fontScale) {
+            THEME = theme;
             FONT_SCALE = fontScale;
             PADDING = r.getDimensionPixelSize(R.dimen.padding);
             ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
