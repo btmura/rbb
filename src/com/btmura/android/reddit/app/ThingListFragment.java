@@ -89,7 +89,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private static final String STATE_EMPTY_TEXT = "emptyText";
 
     public interface OnThingSelectedListener {
-        void onThingSelected(Bundle thingBundle);
+        void onThingSelected(Bundle thingBundle, int pageType);
 
         int onMeasureThingBody();
     }
@@ -267,18 +267,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        adapter.setSelectedPosition(position);
-        if (listener != null) {
-            listener.onThingSelected(adapter.getThingBundle(getActivity(), position));
-        }
-        if (adapter.isNew(position)) {
-            Provider.readMessageAsync(getActivity(), adapter.getAccountName(),
-                    adapter.getThingId(position), true);
-        }
-    }
-
     public void onScrollStateChanged(AbsListView view, int scrollState) {
     }
 
@@ -302,7 +290,25 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
-    public void onThumbnailClick() {
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        click(position, ThingPagerAdapter.TYPE_COMMENTS);
+    }
+
+    public void onThumbnailClick(View v) {
+        click(getListView().getPositionForView(v), ThingPagerAdapter.TYPE_LINK);
+    }
+
+    private void click(int position, int pageType) {
+        adapter.setSelectedPosition(position);
+        if (listener != null) {
+            listener.onThingSelected(adapter.getThingBundle(getActivity(), position),
+                    ThingPagerAdapter.TYPE_COMMENTS);
+        }
+        if (adapter.isNew(position)) {
+            Provider.readMessageAsync(getActivity(), adapter.getAccountName(),
+                    adapter.getThingId(position), true);
+        }
     }
 
     public void onVote(View view, int action) {

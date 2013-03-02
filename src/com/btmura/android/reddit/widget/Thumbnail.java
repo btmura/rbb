@@ -28,6 +28,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.btmura.android.reddit.R;
 
@@ -94,12 +95,12 @@ class Thumbnail {
     }
 
     static boolean onSingleTapUp(MotionEvent e, Rect bounds, boolean hasThumbnail,
-            OnVoteListener listener) {
+            OnVoteListener listener, View view) {
         if (listener != null) {
             int event = getEvent(e, bounds, hasThumbnail);
             switch (event) {
                 case EVENT_CLICK:
-                    listener.onThumbnailClick();
+                    listener.onThumbnailClick(view);
                     return true;
             }
         }

@@ -238,7 +238,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         super.onDetach();
     }
 
-    public void onThumbnailClick() {
+    public void onThumbnailClick(View view) {
         // Comments don't have thumbnails, so this shouldn't happen.
     }
 

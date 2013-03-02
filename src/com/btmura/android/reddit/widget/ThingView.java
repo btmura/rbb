@@ -769,7 +769,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return Thumbnail.onSingleTapUp(e, thumbRect, showThumbnail, listener)
+        return Thumbnail.onSingleTapUp(e, thumbRect, showThumbnail, listener, this)
                 || VotingArrows.onSingleTapUp(e, getTopOffset(), getLeftOffset(), drawVotingArrows,
                         drawScore, isVotable, listener, this, likes);
     }

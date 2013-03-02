@@ -394,7 +394,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         selectSubredditMultiPane(cf.getSubreddit(), cf.isRandom());
     }
 
-    public void onThingSelected(Bundle thingBundle) {
+    public void onThingSelected(Bundle thingBundle, int pageType) {
         selectThing(thingBundle, 0);
     }
 
