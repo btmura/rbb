@@ -54,6 +54,7 @@ public class AccountListActivity extends Activity implements OnAccountEventListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(Preferences.getDialogWhenLargeTheme(this));
         setContentView(R.layout.account_list);
         setupViews(savedInstanceState);
     }

@@ -23,6 +23,7 @@ import android.os.Bundle;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
 import com.btmura.android.reddit.app.AddAccountFragment.OnAccountAddedListener;
+import com.btmura.android.reddit.app.Preferences;
 
 public class AccountAuthenticatorActivity extends android.accounts.AccountAuthenticatorActivity
         implements OnAccountAddedListener {
@@ -34,6 +35,7 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(Preferences.getDialogTheme(this));
         setContentView(R.layout.account_authenticator);
 
         if (savedInstanceState == null) {

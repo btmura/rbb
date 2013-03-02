@@ -68,6 +68,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     protected void setContentView() {
+        setTheme(Preferences.getTheme(this));
         setContentView(R.layout.profile);
     }
 

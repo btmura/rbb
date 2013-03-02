@@ -21,23 +21,37 @@ import com.btmura.android.reddit.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-class Preferences {
+public class Preferences {
 
     private static final String PREFS_NAME = "preferences";
 
     private static final String PREF_THEME = "theme";
-    private static final int THEME_LIGHT = R.style.Theme_Light;
-    private static final int THEME_DARK = R.style.Theme_Dark;
+    private static final int THEME_LIGHT = 0;
+    private static final int THEME_DARK = 1;
 
     private static SharedPreferences PREFS_INSTANCE;
 
     public static final int getTheme(Context context) {
-        return getPrefsInstance(context).getInt(PREF_THEME, THEME_LIGHT);
+        return pick(context, R.style.Theme_Light, R.style.Theme_Dark);
+    }
+
+    public static final int getDialogTheme(Context context) {
+        return pick(context, R.style.Theme_Light_Dialog, R.style.Theme_Dark_Dialog);
+    }
+
+    public static final int getDialogWhenLargeTheme(Context context) {
+        return pick(context, R.style.Theme_Light_DialogWhenLarge,
+                R.style.Theme_Dark_DialogWhenLarge);
     }
 
     public static final void switchTheme(Context context) {
-        int otherTheme = getTheme(context) == THEME_LIGHT ? THEME_DARK : THEME_LIGHT;
+        int otherTheme = pick(context, THEME_DARK, THEME_LIGHT);
         getPrefsInstance(context).edit().putInt(PREF_THEME, otherTheme).apply();
+    }
+
+    private static final int pick(Context context, int lightValue, int darkValue) {
+        return getPrefsInstance(context).getInt(PREF_THEME, THEME_LIGHT) == THEME_LIGHT ?
+                lightValue : darkValue;
     }
 
     private synchronized static SharedPreferences getPrefsInstance(Context context) {

@@ -163,6 +163,7 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(Preferences.getDialogWhenLargeTheme(this));
         setContentView(R.layout.compose);
         setupViews();
     }

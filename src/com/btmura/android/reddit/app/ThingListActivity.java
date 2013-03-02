@@ -66,6 +66,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(Preferences.getTheme(this));
         setContentView(R.layout.thing_list);
         setupPrereqs(savedInstanceState);
         setupFragments(savedInstanceState);
