@@ -33,6 +33,7 @@ public class ContentBrowserActivity extends Activity implements OnUriClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(Preferences.getTheme(this));
         setContentView(R.layout.content_browser);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 

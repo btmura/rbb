@@ -18,9 +18,7 @@ package com.btmura.android.reddit.widget;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +59,6 @@ public class ContentAdapter extends BaseCursorAdapter {
         for (int i = 0; i < columnCount; i++) {
             // Append the column name and make it bold.
             row.append(String.format("%16s: ", cursor.getColumnName(i)));
-            row.setSpan(new ForegroundColorSpan(Color.WHITE), row.length() - 18, row.length(), 0);
 
             // Append the column value and add a newline if it's not the last
             // one.
