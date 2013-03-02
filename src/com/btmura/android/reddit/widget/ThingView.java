@@ -102,7 +102,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     private BitmapShader thumbShader;
     private Matrix thumbMatrix;
-    private RectF thumbRect;
+    private Rect thumbRect;
 
     private boolean drawVotingArrows;
     private boolean drawScore;
@@ -175,18 +175,28 @@ public class ThingView extends CustomView implements OnGestureListener {
     public void setThumbnailBitmap(Bitmap bitmap) {
         BitmapShader currentShader = thumbShader;
         if (bitmap != null) {
-            if (thumbRect == null) {
-                thumbRect = new RectF();
-            }
             if (thumbMatrix == null) {
                 thumbMatrix = new Matrix();
             }
-            thumbShader = Thumbnail.newBitmapShader(bitmap, thumbRect, thumbMatrix);
+            thumbShader = Thumbnail.newBitmapShader(bitmap, thumbMatrix);
+
+            int newLeft = PADDING;
+            if (drawVotingArrows) {
+                newLeft += VotingArrows.getWidth(drawVotingArrows) + PADDING;
+            }
+            if (thumbRect == null) {
+                thumbRect = new Rect();
+            }
+            Thumbnail.setBounds(thumbRect, newLeft, PADDING);
+
+            if (currentShader != thumbShader) {
+                invalidate(thumbRect);
+            }
         } else {
             thumbShader = null;
-        }
-        if (currentShader != thumbShader) {
-            invalidate();
+            if (currentShader != thumbShader) {
+                invalidate();
+            }
         }
     }
 
@@ -361,9 +371,8 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     /**
-     * Sets the type of details to be rendered in the extra space from left to
-     * right. Callers should use other setters to set the fields necessary for
-     * the details to render.
+     * Sets the type of details to be rendered in the extra space from left to right. Callers should
+     * use other setters to set the fields necessary for the details to render.
      */
     public void setDetails(int[] details) {
         this.details = details;
@@ -618,7 +627,8 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         // Create the layout and try to reuse the existing layout.
         if (detailLayouts[i] != null) {
-            detailLayouts[i] = detailLayouts[i].replaceOrMake(text, paint, DETAILS_INNER_CELL_WIDTH,
+            detailLayouts[i] = detailLayouts[i].replaceOrMake(text, paint,
+                    DETAILS_INNER_CELL_WIDTH,
                     Alignment.ALIGN_CENTER, 1, 0, detailMetrics[i], true, TruncateAt.END,
                     DETAILS_INNER_CELL_WIDTH);
         } else {
@@ -659,7 +669,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         if (!TextUtils.isEmpty(thumbnailUrl)) {
-            Thumbnail.draw(c, thumbShader, thumbRect);
+            Thumbnail.draw(c, thumbShader);
             c.translate(Thumbnail.getWidth() + PADDING, 0);
         }
 

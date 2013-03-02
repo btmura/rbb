@@ -24,8 +24,9 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.Shader.TileMode;
+import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader.TileMode;
 
 import com.btmura.android.reddit.R;
 
@@ -34,7 +35,7 @@ class Thumbnail {
     private static int RADIUS;
     private static int THUMB_WIDTH;
     private static int THUMB_HEIGHT;
-    private static RectF THUMB_OUTLINE_RECT;
+    private static RectF THUMB_RECT;
     private static Paint THUMB_OUTLINE_PAINT;
     private static Paint THUMB_PAINT;
 
@@ -43,7 +44,7 @@ class Thumbnail {
             Resources r = context.getResources();
             RADIUS = r.getDimensionPixelSize(R.dimen.radius);
             THUMB_WIDTH = THUMB_HEIGHT = r.getDimensionPixelSize(R.dimen.thumb_width);
-            THUMB_OUTLINE_RECT = new RectF(0, 0, THUMB_WIDTH, THUMB_HEIGHT);
+            THUMB_RECT = new RectF(0, 0, THUMB_WIDTH, THUMB_HEIGHT);
 
             THUMB_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
             THUMB_PAINT.setFilterBitmap(true);
@@ -53,13 +54,9 @@ class Thumbnail {
         }
     }
 
-    static BitmapShader newBitmapShader(Bitmap thumb, RectF destRect, Matrix destMatrix) {
-        float newWidth = THUMB_WIDTH;
-        float newHeight = newWidth * thumb.getHeight() / thumb.getWidth();
-        destRect.set(0, 0, newWidth, newHeight);
-
-        float scaleX = newWidth / thumb.getHeight();
-        float scaleY = newHeight / thumb.getHeight();
+    static BitmapShader newBitmapShader(Bitmap thumb, Matrix destMatrix) {
+        float scaleX = (float) THUMB_WIDTH / thumb.getWidth();
+        float scaleY = (float) THUMB_HEIGHT / thumb.getHeight();
         destMatrix.setScale(scaleX, scaleY);
 
         BitmapShader shader = new BitmapShader(thumb, TileMode.CLAMP, TileMode.CLAMP);
@@ -67,16 +64,17 @@ class Thumbnail {
         return shader;
     }
 
-    static void draw(Canvas c, BitmapShader thumbShader, RectF thumbRect) {
+    static void setBounds(Rect bounds, int offsetLeft, int offsetTop) {
+        bounds.set(0, 0, THUMB_WIDTH, THUMB_HEIGHT);
+        bounds.offsetTo(offsetLeft, offsetTop);
+    }
+
+    static void draw(Canvas c, BitmapShader thumbShader) {
         if (thumbShader != null) {
             THUMB_PAINT.setShader(thumbShader);
-            float dy = (float) (THUMB_HEIGHT - thumbRect.height()) / 2;
-            c.translate(0, dy);
-            c.drawRoundRect(thumbRect, RADIUS, RADIUS, THUMB_PAINT);
-            c.translate(0, -dy);
-        } else {
-            c.drawRoundRect(THUMB_OUTLINE_RECT, RADIUS, RADIUS, THUMB_OUTLINE_PAINT);
         }
+        Paint thumbPaint = thumbShader != null ? THUMB_PAINT : THUMB_OUTLINE_PAINT;
+        c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, thumbPaint);
     }
 
     static int getWidth() {
