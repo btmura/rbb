@@ -25,7 +25,8 @@
         android:layout_height="match_parent"
         android:layout_marginRight="@dimen/element_padding"
         android:gravity="center_vertical"
-        android:singleLine="true" />
+        android:singleLine="true"
+        android:textIsSelectable="true" />
 
     <TextView
         android:id="@+id/text2"
@@ -36,6 +37,7 @@
         android:ellipsize="end"
         android:gravity="center_vertical"
         android:singleLine="true"
-        android:textColor="@android:color/darker_gray" />
+        android:textColor="?android:attr/textColorSecondary"
+        android:textIsSelectable="true" />
 
 </RelativeLayout>
