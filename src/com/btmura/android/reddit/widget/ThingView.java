@@ -158,11 +158,11 @@ public class ThingView extends CustomView implements OnGestureListener {
     public ThingView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         detector = new GestureDetector(context, this);
-        init(context, defStyle);
+        init(context);
     }
 
-    private void init(Context context, int style) {
-        VotingArrows.init(context, style);
+    private void init(Context context) {
+        VotingArrows.init(context);
         Thumbnail.init(context);
         setType(TYPE_THING_LIST);
         DETAILS_INNER_CELL_WIDTH = DETAILS_CELL_WIDTH - ELEMENT_PADDING * 2;

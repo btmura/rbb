@@ -49,7 +49,7 @@ public class Prefs {
         getPrefsInstance(context).edit().putInt(PREF_THEME, otherTheme).apply();
     }
 
-    private static final int pick(Context context, int lightValue, int darkValue) {
+    public static final int pick(Context context, int lightValue, int darkValue) {
         return getPrefsInstance(context).getInt(PREF_THEME, THEME_LIGHT) == THEME_LIGHT ?
                 lightValue : darkValue;
     }

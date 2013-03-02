@@ -32,6 +32,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.Prefs;
 import com.btmura.android.reddit.database.VoteActions;
 
 class VotingArrows {
@@ -43,7 +44,7 @@ class VotingArrows {
     private static final int EVENT_DOWNVOTE = 2;
 
     private static int STYLE = -1;
-    private static float FONT_SCALE;
+    private static float FONT_SCALE = -1;
     private static int PADDING;
     private static int ELEMENT_PADDING;
 
@@ -64,10 +65,12 @@ class VotingArrows {
     private static Path PATH_UPVOTE;
     private static Path PATH_DOWNVOTE;
 
-    static void init(Context context, int style) {
+    static void init(Context context) {
         Resources r = context.getResources();
+        int style = Prefs.pick(context, 0, 1);
         float fontScale = r.getConfiguration().fontScale;
         if (STYLE != style || FONT_SCALE != fontScale) {
+            STYLE = style;
             FONT_SCALE = fontScale;
             PADDING = r.getDimensionPixelSize(R.dimen.padding);
             ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);

@@ -26,6 +26,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.Prefs;
 
 /**
  * {@link View} that performs shared initialization of resources and adds an
@@ -70,15 +71,17 @@ abstract class CustomView extends View {
     CustomView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         setBackgroundResource(R.drawable.selector);
-        init(context, defStyle);
+        init(context);
     }
 
-    private static void init(Context context, int style) {
+    private static void init(Context context) {
         Resources r = context.getResources();
 
         // Reinitialize everything when the font scale changes via Settings.
+        int style = Prefs.pick(context, 0, 1);
         float fontScale = r.getConfiguration().fontScale;
         if (STYLE != style || FONT_SCALE != fontScale) {
+            STYLE = style;
             FONT_SCALE = fontScale;
             PADDING = r.getDimensionPixelSize(R.dimen.padding);
             ELEMENT_PADDING = r.getDimensionPixelSize(R.dimen.element_padding);
