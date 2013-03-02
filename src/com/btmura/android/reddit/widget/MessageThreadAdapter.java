@@ -109,6 +109,7 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
         final String title = cursor.getPosition() == 0 ? cursor.getString(INDEX_SUBJECT) : null;
 
         final boolean drawVotingArrows = false;
+        final boolean showThumbnail = false;
         final boolean showStatusPoints = false;
 
         ThingView tv = (ThingView) view;
@@ -137,6 +138,7 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
                 title,
                 ups,
                 drawVotingArrows,
+                showThumbnail,
                 showStatusPoints);
     }
 

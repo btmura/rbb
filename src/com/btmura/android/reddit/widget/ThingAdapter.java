@@ -293,6 +293,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
         final int ups = 0; // No upvotes for messages.
 
         final boolean drawVotingArrows = false; // No arrows for messages.
+        final boolean showThumbnail = false; // No arrows for messages.
         final boolean showStatusPoints = false; // No points for messages.
 
         ThingView tv = (ThingView) view;
@@ -320,6 +321,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
                 title,
                 ups,
                 drawVotingArrows,
+                showThumbnail,
                 showStatusPoints);
         tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
         tv.setOnVoteListener(listener);
@@ -340,6 +342,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
         final int nesting = 0; // Nesting only for comments handled by different adapter.
         final int numComments = cursor.getInt(THING_NUM_COMMENTS);
         final boolean over18 = cursor.getInt(THING_OVER_18) == 1;
+        final boolean self = cursor.getInt(THING_SELF) == 1;
         final String subreddit = cursor.getString(THING_SUBREDDIT);
         final String thingId = cursor.getString(THING_THING_ID);
         final String thumbnailUrl = cursor.getString(THING_THUMBNAIL_URL);
@@ -365,6 +368,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
 
         final boolean drawVotingArrows = AccountUtils.isAccount(accountName)
                 && kind != Kinds.KIND_MESSAGE;
+        final boolean showThumbnail = !self;
         final boolean showStatusPoints = !AccountUtils.isAccount(accountName)
                 || kind == Kinds.KIND_COMMENT;
 
@@ -393,6 +397,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
                 title,
                 ups,
                 drawVotingArrows,
+                showThumbnail,
                 showStatusPoints);
         tv.setChosen(singleChoice
                 && Objects.equals(selectedThingId, thingId)

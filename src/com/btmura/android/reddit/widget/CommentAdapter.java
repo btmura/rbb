@@ -182,6 +182,7 @@ public class CommentAdapter extends BaseLoaderAdapter {
         }
 
         final boolean drawVotingArrows = AccountUtils.isAccount(accountName);
+        final boolean showThumbnail = false;
         final boolean showStatusPoints = !AccountUtils.isAccount(accountName)
                 || cursor.getPosition() != 0;
 
@@ -211,6 +212,7 @@ public class CommentAdapter extends BaseLoaderAdapter {
                 title,
                 ups,
                 drawVotingArrows,
+                showThumbnail,
                 showStatusPoints);
         tv.setOnVoteListener(listener);
     }

@@ -96,10 +96,10 @@ public class ThingView extends CustomView implements OnGestureListener {
     private String linkTitle;
     private String subreddit;
     private int thingBodyWidth;
-    private String thumbnailUrl;
     private String title;
     private int ups;
 
+    private boolean showThumbnail;
     private BitmapShader thumbShader;
     private Matrix thumbMatrix;
     private Rect thumbRect;
@@ -257,6 +257,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             String title,
             int ups,
             boolean drawVotingArrows,
+            boolean showThumbnail,
             boolean showStatusPoints) {
 
         // Save the attributes needed by onMeasure or may be used to construct
@@ -274,7 +275,6 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.linkTitle = linkTitle;
         this.subreddit = subreddit;
         this.thingBodyWidth = thingBodyWidth;
-        this.thumbnailUrl = thumbnailUrl;
         this.title = title;
         this.ups = ups;
 
@@ -287,6 +287,8 @@ public class ThingView extends CustomView implements OnGestureListener {
             }
             scoreText = VotingArrows.getScoreText(score);
         }
+
+        this.showThumbnail = showThumbnail;
 
         boolean showSubreddit = !TextUtils.isEmpty(subreddit)
                 && !subreddit.equalsIgnoreCase(parentSubreddit);
@@ -440,7 +442,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                 VotingArrows.measureScoreText(scoreText, scoreBounds);
             }
         }
-        if (!TextUtils.isEmpty(thumbnailUrl)) {
+        if (showThumbnail) {
             leftGadgetWidth += Thumbnail.getWidth() + PADDING;
         }
         titleWidth -= leftGadgetWidth;
@@ -668,7 +670,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             c.translate(VotingArrows.getWidth(drawVotingArrows) + PADDING, 0);
         }
 
-        if (!TextUtils.isEmpty(thumbnailUrl)) {
+        if (showThumbnail) {
             Thumbnail.draw(c, thumbShader);
             c.translate(Thumbnail.getWidth() + PADDING, 0);
         }
