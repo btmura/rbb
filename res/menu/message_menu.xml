@@ -19,8 +19,8 @@
     <group android:id="@+id/thingless" >
         <item
             android:id="@+id/menu_new_message"
-            android:icon="@drawable/ic_action_new_message"
-            android:showAsAction="never"
+            android:icon="?attr/menu_new_message_icon"
+            android:showAsAction="ifRoom"
             android:title="@string/menu_new_message"/>
     </group>
 
