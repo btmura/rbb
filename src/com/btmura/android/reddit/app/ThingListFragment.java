@@ -310,9 +310,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
-    public void onVote(View view, int action) {
+    public void onVote(View v, int action) {
         if (!TextUtils.isEmpty(adapter.getAccountName())) {
-            int position = getListView().getPositionForView(view);
+            int position = getListView().getPositionForView(v);
             adapter.vote(getActivity(), position, action);
         }
     }

@@ -29,6 +29,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
@@ -214,11 +215,13 @@ class VotingArrows {
             int event = getEvent(e, top, left, drawArrows, drawScore, isVotable);
             switch (event) {
                 case EVENT_UPVOTE:
+                    view.playSoundEffect(SoundEffectConstants.CLICK);
                     listener.onVote(view, likes != VoteActions.ACTION_VOTE_UP ?
                             VoteActions.ACTION_VOTE_UP : VoteActions.ACTION_VOTE_NEUTRAL);
                     return true;
 
                 case EVENT_DOWNVOTE:
+                    view.playSoundEffect(SoundEffectConstants.CLICK);
                     listener.onVote(view, likes != VoteActions.ACTION_VOTE_DOWN ?
                             VoteActions.ACTION_VOTE_DOWN : VoteActions.ACTION_VOTE_NEUTRAL);
                     return true;

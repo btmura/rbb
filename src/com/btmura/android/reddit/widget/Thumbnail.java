@@ -28,6 +28,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
@@ -100,6 +101,7 @@ class Thumbnail {
             int event = getEvent(e, bounds, hasThumbnail);
             switch (event) {
                 case EVENT_CLICK:
+                    view.playSoundEffect(SoundEffectConstants.CLICK);
                     listener.onThumbnailClick(view);
                     return true;
             }
