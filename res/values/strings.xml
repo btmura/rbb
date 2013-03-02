@@ -118,7 +118,7 @@
     <string name="reddit_error_line">%1$s - %2$s</string>
     <string name="show_password">Show password</string>
     <string name="submit_link_submitting">Submitting…</string>
-    <string name="tab_posts">All</string>
+    <string name="tab_posts">Posts</string>
     <string name="tab_subreddits">Subreddits</string>
 
 </resources>

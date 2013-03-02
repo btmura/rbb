@@ -31,8 +31,8 @@ public class SearchPagerAdapter extends FragmentStatePagerAdapter {
     private static final int TYPE_SUBREDDITS = 2;
 
     private static final int[] PAGES_ALL = {
-            TYPE_ALL_POSTS,
             TYPE_SUBREDDIT_POSTS,
+            TYPE_ALL_POSTS,
             TYPE_SUBREDDITS,
     };
 

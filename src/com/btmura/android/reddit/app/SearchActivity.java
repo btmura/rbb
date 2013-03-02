@@ -92,15 +92,15 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
         // TODO: Remove code logic duplication with SearchPagerAdapter for tabs.
 
-        tabPosts = bar.newTab().setText(R.string.tab_posts).setTabListener(this);
-        bar.addTab(tabPosts);
-
         if (hasValidIntentSubreddit()) {
             subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
             String tabTitle = MenuHelper.getSubredditTitle(this, subreddit);
             tabInSubreddit = bar.newTab().setText(tabTitle).setTabListener(this);
             bar.addTab(tabInSubreddit);
         }
+
+        tabPosts = bar.newTab().setText(R.string.tab_posts).setTabListener(this);
+        bar.addTab(tabPosts);
 
         tabSubreddits = bar.newTab().setText(R.string.tab_subreddits).setTabListener(this);
         bar.addTab(tabSubreddits);
