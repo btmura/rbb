@@ -131,7 +131,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountResult = result;
-        accountName = result.getLastAccount();
+        accountName = result.getLastAccount(this);
         if (isSinglePane) {
             submitSearchQuerySinglePane(getQuery());
         } else {

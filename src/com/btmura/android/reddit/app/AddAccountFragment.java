@@ -24,7 +24,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -43,7 +42,7 @@ import android.widget.EditText;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.accounts.AccountPreferences;
+import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.net.LoginResult;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.AccountProvider;
@@ -206,8 +205,7 @@ public class AddAccountFragment extends Fragment implements
                 // the new account after the user returns to the app. If somehow
                 // we crash before the account is added, that is ok, because the
                 // AccountLoader will fall back to the app storage account.
-                SharedPreferences prefs = AccountPreferences.getPreferences(context);
-                AccountPreferences.setLastAccount(prefs, login);
+                AccountPrefs.setLastAccount(context, login);
 
                 String accountType = AccountAuthenticator.getAccountType(context);
                 Account account = new Account(login, accountType);

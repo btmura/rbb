@@ -107,7 +107,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        accountName = result.getLastAccount();
+        accountName = result.getLastAccount(this);
 
         if (getThingMenuFragment() == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();

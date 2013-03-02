@@ -27,14 +27,12 @@ import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
-import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Subreddits;
@@ -49,18 +47,15 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         public String[] accountNames;
         public int[] linkKarma;
         public boolean[] hasMail;
-        public SharedPreferences prefs;
 
-        private AccountResult(String[] accountNames, int[] linkKarma, boolean[] hasMail,
-                SharedPreferences prefs) {
+        private AccountResult(String[] accountNames, int[] linkKarma, boolean[] hasMail) {
             this.accountNames = accountNames;
             this.linkKarma = linkKarma;
             this.hasMail = hasMail;
-            this.prefs = prefs;
         }
 
-        public String getLastAccount() {
-            String accountName = AccountPreferences.getLastAccount(prefs, Subreddits.ACCOUNT_NONE);
+        public String getLastAccount(Context context) {
+            String accountName = AccountPrefs.getLastAccount(context, Subreddits.ACCOUNT_NONE);
             int numAccounts = accountNames.length;
             for (int i = 0; i < numAccounts; i++) {
                 if (accountNames[i].equals(accountName)) {
@@ -70,8 +65,8 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
             return numAccounts > 0 ? accountNames[0] : null;
         }
 
-        public int getLastSubredditFilter() {
-            return AccountPreferences.getLastSubredditFilter(prefs, 0);
+        public int getLastSubredditFilter(Context context) {
+            return AccountPrefs.getLastSubredditFilter(context, 0);
         }
     }
 
@@ -92,7 +87,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
     private static final int INDEX_LINK_KARMA = 2;
     private static final int INDEX_HAS_MAIL = 3;
 
-    private final SharedPreferences prefs;
     private final AccountManager manager;
     private final boolean includeNoAccount;
     private final boolean includeAccountInfo;
@@ -102,7 +96,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         @Override
         public void onReceive(Context context, Intent intent) {
             String accountName = intent.getStringExtra(SelectAccountBroadcast.EXTRA_ACCOUNT);
-            AccountPreferences.setLastAccount(prefs, accountName);
+            AccountPrefs.setLastAccount(context, accountName);
             onContentChanged();
         }
     };
@@ -112,7 +106,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
 
     public AccountLoader(Context context, boolean includeNoAccount, boolean includeAccountInfo) {
         super(context);
-        this.prefs = AccountPreferences.getPreferences(context);
         this.manager = AccountManager.get(getContext());
         this.includeNoAccount = includeNoAccount;
         this.includeAccountInfo = includeAccountInfo;
@@ -172,10 +165,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
             c.close();
         }
 
-        // Get a preference to make sure the loading thread is done.
-        AccountPreferences.getLastAccount(prefs, null);
-
-        return new AccountResult(accountNames, linkKarma, hasMail, prefs);
+        return new AccountResult(accountNames, linkKarma, hasMail);
     }
 
     @Override

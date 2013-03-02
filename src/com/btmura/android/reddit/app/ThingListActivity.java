@@ -23,18 +23,17 @@ import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
-import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.AccountPrefs;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
@@ -62,7 +61,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
     private FilterAdapter adapter;
     private String accountName;
     private String subreddit;
-    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,10 +113,9 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        prefs = result.prefs;
-        accountName = result.getLastAccount();
+        accountName = result.getLastAccount(this);
         adapter.addSubredditFilters(this);
-        bar.setSelectedNavigationItem(result.getLastSubredditFilter());
+        bar.setSelectedNavigationItem(result.getLastSubredditFilter(this));
         invalidateOptionsMenu();
     }
 
@@ -132,7 +129,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         }
 
         int filter = adapter.getFilter(itemPosition);
-        AccountPreferences.setLastSubredditFilter(prefs, filter);
+        AccountPrefs.setLastSubredditFilter(this, filter);
 
         ThingListFragment frag = getThingListFragment();
         if (frag == null || !Objects.equals(frag.getAccountName(), accountName)

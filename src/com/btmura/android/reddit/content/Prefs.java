@@ -21,7 +21,8 @@ import android.content.SharedPreferences;
 
 class Prefs {
 
-    private static final String PREFS_NAME = "preferences";
+    // The first preferences were stored in "accountPreferences" so keep this even if it's wrong.
+    private static final String PREFS_NAME = "accountPreferences";
 
     private static SharedPreferences PREFS_INSTANCE;
 

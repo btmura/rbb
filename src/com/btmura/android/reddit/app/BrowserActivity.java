@@ -22,7 +22,6 @@ import android.app.ActionBar.OnNavigationListener;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,11 +33,11 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader;
-import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.AccountPrefs;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
@@ -58,7 +57,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     private AccountFilterAdapter adapter;
     private AccountAdapter mailAdapter;
-    private SharedPreferences prefs;
 
     private LoaderCallbacks<Cursor> mailLoaderCallbacks = new LoaderCallbacks<Cursor>() {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -144,15 +142,14 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        prefs = result.prefs;
         if (!isSinglePane) {
             adapter.addSubredditFilters(this);
         }
         adapter.setAccountInfo(result.accountNames, result.linkKarma, result.hasMail);
 
-        String accountName = result.getLastAccount();
+        String accountName = result.getLastAccount(this);
         adapter.setAccountName(accountName);
-        adapter.setFilter(result.getLastSubredditFilter());
+        adapter.setFilter(result.getLastSubredditFilter(this));
 
         int index = adapter.findAccountName(accountName);
 
@@ -195,10 +192,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         adapter.updateState(itemPosition);
 
         final String accountName = adapter.getAccountName();
-        AccountPreferences.setLastAccount(prefs, accountName);
+        AccountPrefs.setLastAccount(this, accountName);
 
         int filter = adapter.getFilter();
-        AccountPreferences.setLastSubredditFilter(prefs, filter);
+        AccountPrefs.setLastSubredditFilter(this, filter);
 
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onNavigationItemSelected itemPosition:" + itemPosition
@@ -211,7 +208,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         if (slf == null || !slf.getAccountName().equals(accountName)) {
             // Set the subreddit to be the account's last visited subreddit.
-            String subreddit = AccountPreferences.getLastSubreddit(prefs, accountName);
+            String subreddit = AccountPrefs.getLastSubreddit(this, accountName);
 
             // Reference to thingBundle that will often be null.
             Bundle thingBundle = null;
@@ -249,7 +246,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     public void onSubredditSelected(String subreddit) {
         super.onSubredditSelected(subreddit);
-        AccountPreferences.setLastSubreddit(prefs, getAccountName(), subreddit);
+        AccountPrefs.setLastSubreddit(this, getAccountName(), subreddit);
     }
 
     @Override

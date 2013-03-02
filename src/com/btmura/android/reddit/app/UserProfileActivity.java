@@ -131,7 +131,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        accountName = result.getLastAccount();
+        accountName = result.getLastAccount(this);
 
         // Reset the adapter to trigger a selection callback since there is only 1 account.
         bar.setListNavigationCallbacks(adapter, this);

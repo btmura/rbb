@@ -95,7 +95,7 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
         adapter.setAccountInfo(result.accountNames, result.linkKarma, result.hasMail);
 
         if (currentUser == null) {
-            currentUser = result.getLastAccount();
+            currentUser = result.getLastAccount(this);
         }
         adapter.setAccountName(currentUser);
 

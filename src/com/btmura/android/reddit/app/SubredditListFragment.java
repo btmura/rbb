@@ -271,7 +271,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
             // available, since there is only one choice.
             if (result.accountNames.length > 0) {
                 if (selectedActionAccount == null) {
-                    selectedActionAccount = result.getLastAccount();
+                    selectedActionAccount = result.getLastAccount(getActivity());
                 }
                 int position = accountNameAdapter.findAccountName(selectedActionAccount);
                 accountSpinner.setSelection(position);

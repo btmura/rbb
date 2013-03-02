@@ -116,7 +116,8 @@ public class AddSubredditFragment extends DialogFragment implements LoaderCallba
         adapter.clear();
         adapter.addAll(result.accountNames);
         if (!restoringState) {
-            accountSpinner.setSelection(adapter.findAccountName(result.getLastAccount()));
+            int index = adapter.findAccountName(result.getLastAccount(getActivity()));
+            accountSpinner.setSelection(index);
         }
     }
 

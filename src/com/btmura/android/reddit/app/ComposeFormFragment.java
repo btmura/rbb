@@ -324,7 +324,8 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
             // Only setup spinner when not changing configs. Widget will handle
             // selecting the last account on config changes on its own.
             if (!restoringState) {
-                accountSpinner.setSelection(adapter.findAccountName(result.getLastAccount()));
+                int index = adapter.findAccountName(result.getLastAccount(getActivity()));
+                accountSpinner.setSelection(index);
             }
         }
 
