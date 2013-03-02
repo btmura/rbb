@@ -17,15 +17,17 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Theme.Light" parent="@android:style/Theme.Holo.Light">
-        <item name="menu_profile_icon">@drawable/ic_action_profile</item>
-        <item name="menu_profile_saved_icon">@drawable/ic_action_saved</item>
-        <item name="menu_messages_icon">@drawable/ic_action_messages</item>
+        <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
+        <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
+        <item name="menu_profile_saved_icon">@drawable/ic_action_saved_light</item>
+        <item name="menu_search_icon">@drawable/ic_action_search_light</item>
     </style>
 
     <style name="Theme.Dark" parent="@android:style/Theme.Holo">
-        <item name="menu_profile_icon">@drawable/ic_action_profile</item>
-        <item name="menu_profile_saved_icon">@drawable/ic_action_saved</item>
-        <item name="menu_messages_icon">@drawable/ic_action_messages</item>
+        <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
+        <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
+        <item name="menu_profile_saved_icon">@drawable/ic_action_saved_dark</item>
+        <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
     </style>
 
     <style name="AccountNameText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title" />

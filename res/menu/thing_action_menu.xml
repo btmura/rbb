@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/menu_saved"
-        android:icon="@drawable/ic_action_saved"
+        android:icon="@drawable/ic_action_saved_dark"
         android:showAsAction="ifRoom"
         android:title="@string/menu_unsave"/>
     <item
@@ -28,7 +28,7 @@
         android:title="@string/menu_save"/>
     <item
         android:id="@+id/menu_author"
-        android:icon="@drawable/ic_action_profile"
+        android:icon="@drawable/ic_action_profile_dark"
         android:showAsAction="ifRoom|withText"
         android:title="@string/menu_author"/>
     <item
