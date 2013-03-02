@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/menu_submit"
-        android:icon="@drawable/ic_action_send"
+        android:icon="?attr/menu_send_icon"
         android:showAsAction="ifRoom"
         android:title="@string/menu_submit"/>
 

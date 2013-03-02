@@ -27,6 +27,7 @@
         <item name="menu_reply_icon">@drawable/ic_action_reply_light</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_light</item>
         <item name="menu_search_icon">@drawable/ic_action_search_light</item>
+        <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
     </style>
 
@@ -41,6 +42,7 @@
         <item name="menu_reply_icon">@drawable/ic_action_reply_light</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_light</item>
         <item name="menu_search_icon">@drawable/ic_action_search_light</item>
+        <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
     </style>
 
@@ -55,6 +57,7 @@
         <item name="menu_reply_icon">@drawable/ic_action_reply_light</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_light</item>
         <item name="menu_search_icon">@drawable/ic_action_search_light</item>
+        <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
     </style>
 
@@ -69,6 +72,7 @@
         <item name="menu_reply_icon">@drawable/ic_action_reply_dark</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
         <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
+        <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
     </style>
 
@@ -83,6 +87,7 @@
         <item name="menu_reply_icon">@drawable/ic_action_reply_dark</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
         <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
+        <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
     </style>
 
@@ -97,6 +102,7 @@
         <item name="menu_reply_icon">@drawable/ic_action_reply_dark</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
         <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
+        <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
     </style>
 

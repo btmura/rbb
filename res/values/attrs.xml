@@ -27,6 +27,7 @@
         <attr name="menu_reply_icon" format="reference" />
         <attr name="menu_saved_icon" format="reference" />
         <attr name="menu_search_icon" format="reference" />
+        <attr name="menu_send_icon" format="reference" />
         <attr name="menu_unsaved_icon" format="reference" />
     </declare-styleable>
     <declare-styleable name="CustomViewStates">
