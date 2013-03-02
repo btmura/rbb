@@ -29,6 +29,7 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.content.UserInfoLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.net.AccountInfoResult;
@@ -68,7 +69,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     @Override
     protected void setContentView() {
-        setTheme(Prefs.getTheme(this));
+        setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.profile);
     }
 

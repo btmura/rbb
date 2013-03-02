@@ -37,6 +37,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountPreferences;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
@@ -82,7 +83,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void setContentView() {
-        setTheme(Prefs.getTheme(this));
+        setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.browser);
     }
 
@@ -373,7 +374,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     private void handleSwitchTheme() {
-        Prefs.switchTheme(this);
+        ThemePrefs.switchTheme(this);
         recreate();
     }
 }

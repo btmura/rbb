@@ -37,6 +37,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.app.ComposeFormFragment.OnComposeFormListener;
 import com.btmura.android.reddit.app.ComposeFragment.OnComposeListener;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.provider.Provider;
 
 public class ComposeActivity extends Activity implements OnPageChangeListener,
@@ -163,7 +164,7 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Prefs.getDialogWhenLargeTheme(this));
+        setTheme(ThemePrefs.getDialogWhenLargeTheme(this));
         setContentView(R.layout.compose);
         setupViews();
     }

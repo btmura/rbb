@@ -42,6 +42,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
 import com.btmura.android.reddit.app.AccountListFragment.OnAccountEventListener;
 import com.btmura.android.reddit.content.SelectAccountBroadcast;
+import com.btmura.android.reddit.content.ThemePrefs;
 
 public class AccountListActivity extends Activity implements OnAccountEventListener,
         OnClickListener {
@@ -54,7 +55,7 @@ public class AccountListActivity extends Activity implements OnAccountEventListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Prefs.getDialogWhenLargeTheme(this));
+        setTheme(ThemePrefs.getDialogWhenLargeTheme(this));
         setContentView(R.layout.account_list);
         setupViews(savedInstanceState);
     }

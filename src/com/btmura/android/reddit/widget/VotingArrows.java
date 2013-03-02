@@ -32,7 +32,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.Prefs;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.VoteActions;
 
 class VotingArrows {
@@ -67,7 +67,7 @@ class VotingArrows {
 
     static void init(Context context) {
         Resources r = context.getResources();
-        int style = Prefs.pick(context, 0, 1);
+        int style = ThemePrefs.pick(context, 0, 1);
         float fontScale = r.getConfiguration().fontScale;
         if (STYLE != style || FONT_SCALE != fontScale) {
             STYLE = style;

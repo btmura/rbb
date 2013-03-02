@@ -27,13 +27,14 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ContentUriListFragment.OnUriClickListener;
+import com.btmura.android.reddit.content.ThemePrefs;
 
 public class ContentBrowserActivity extends Activity implements OnUriClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Prefs.getTheme(this));
+        setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.content_browser);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 

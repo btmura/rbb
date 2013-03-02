@@ -26,7 +26,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.Prefs;
+import com.btmura.android.reddit.content.ThemePrefs;
 
 /**
  * {@link View} that performs shared initialization of resources and adds an
@@ -78,7 +78,7 @@ abstract class CustomView extends View {
         Resources r = context.getResources();
 
         // Reinitialize everything when the font scale changes via Settings.
-        int style = Prefs.pick(context, 0, 1);
+        int style = ThemePrefs.pick(context, 0, 1);
         float fontScale = r.getConfiguration().fontScale;
         if (STYLE != style || FONT_SCALE != fontScale) {
             STYLE = style;

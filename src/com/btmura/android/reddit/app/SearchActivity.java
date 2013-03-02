@@ -31,6 +31,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.GlobalMenuFragment.OnSearchQuerySubmittedListener;
 import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
@@ -64,7 +65,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void setContentView() {
-        setTheme(Prefs.getTheme(this));
+        setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.search);
     }
 

@@ -30,6 +30,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
@@ -63,7 +64,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Prefs.getTheme(this));
+        setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.thing);
         setupPrereqs(savedInstanceState);
         setupFragments(savedInstanceState);

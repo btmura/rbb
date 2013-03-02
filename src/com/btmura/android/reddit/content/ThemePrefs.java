@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.app;
+package com.btmura.android.reddit.content;
 
 import com.btmura.android.reddit.R;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class Prefs {
+public class ThemePrefs {
 
     private static final String PREFS_NAME = "preferences";
 

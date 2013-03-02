@@ -27,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewStub;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.SidebarPagerAdapter;
 
@@ -40,7 +41,7 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(Prefs.getDialogWhenLargeTheme(this));
+        setTheme(ThemePrefs.getDialogWhenLargeTheme(this));
         setContentView(R.layout.sidebar);
         setupViews();
     }
