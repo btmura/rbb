@@ -161,7 +161,7 @@
     </style>
 
     <style name="ThingLinkTitleText" parent="@style/SubredditStatusText">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">?android:attr/textColorTertiary</item>
     </style>
 
     <style name="ThingTitleText" parent="@style/SubredditTitleText" />
