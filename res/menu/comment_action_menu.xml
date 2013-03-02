@@ -23,7 +23,7 @@
         android:title="@string/menu_reply"/>
     <item
         android:id="@+id/menu_edit"
-        android:icon="@drawable/ic_action_edit"
+        android:icon="?attr/menu_edit_icon"
         android:showAsAction="ifRoom|withText"
         android:title="@string/menu_edit"/>
     <item

@@ -20,6 +20,7 @@
         <item name="menu_add_icon">@drawable/ic_action_add_light</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_light</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_light</item>
+        <item name="menu_edit_icon">@drawable/ic_action_edit_light</item>
         <item name="menu_link_icon">@drawable/ic_action_link_light</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
@@ -28,22 +29,11 @@
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
     </style>
 
-    <style name="Theme.Dark" parent="@android:style/Theme.Holo">
-        <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
-        <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
-        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
-        <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
-        <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
-        <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
-        <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
-        <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
-        <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
-    </style>
-
     <style name="Theme.Light.Dialog" parent="@android:style/Theme.Holo.Light.Dialog">
         <item name="menu_add_icon">@drawable/ic_action_add_light</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_light</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_light</item>
+        <item name="menu_edit_icon">@drawable/ic_action_edit_light</item>
         <item name="menu_link_icon">@drawable/ic_action_link_light</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
@@ -56,6 +46,7 @@
         <item name="menu_add_icon">@drawable/ic_action_add_light</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_light</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_light</item>
+        <item name="menu_edit_icon">@drawable/ic_action_edit_light</item>
         <item name="menu_link_icon">@drawable/ic_action_link_light</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
@@ -64,10 +55,24 @@
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
     </style>
 
+    <style name="Theme.Dark" parent="@android:style/Theme.Holo">
+        <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
+        <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
+        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
+        <item name="menu_edit_icon">@drawable/ic_action_edit_dark</item>
+        <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
+        <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
+        <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
+        <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
+        <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
+        <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
+    </style>
+
     <style name="Theme.Dark.Dialog" parent="@android:style/Theme.Holo.Dialog">
         <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
+        <item name="menu_edit_icon">@drawable/ic_action_edit_dark</item>
         <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
@@ -80,6 +85,7 @@
         <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
         <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
+        <item name="menu_edit_icon">@drawable/ic_action_edit_dark</item>
         <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
