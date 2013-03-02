@@ -16,8 +16,9 @@
 -->
 <resources>
 
-    <integer name="menu_order_thing">100</integer>
-    <integer name="menu_order_account">1000</integer>
-    <integer name="menu_order_global">2000</integer>
+    <integer name="menu_order_thing">1000</integer>
+    <integer name="menu_order_account">2000</integer>
+    <integer name="menu_order_search">3000</integer>    
+    <integer name="menu_order_last">4000</integer>
 
 </resources>

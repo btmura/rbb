@@ -20,12 +20,12 @@
         android:id="@+id/menu_search"
         android:actionViewClass="android.widget.SearchView"
         android:icon="?attr/menu_search_icon"
-        android:orderInCategory="@integer/menu_order_global"
+        android:orderInCategory="@integer/menu_order_search"
         android:showAsAction="ifRoom|collapseActionView"
         android:title="@string/menu_search"/>
     <item
         android:id="@+id/menu_debug"
-        android:orderInCategory="@integer/menu_order_global"
+        android:orderInCategory="@integer/menu_order_last"
         android:showAsAction="never"
         android:title="@string/menu_debug"/>
 
