@@ -18,12 +18,12 @@
 
     <item
         android:id="@+id/menu_saved"
-        android:icon="@drawable/ic_action_saved_dark"
+        android:icon="?attr/menu_saved_icon"
         android:showAsAction="ifRoom"
         android:title="@string/menu_unsave"/>
     <item
         android:id="@+id/menu_unsaved"
-        android:icon="@drawable/ic_action_unsaved"
+        android:icon="?attr/menu_unsaved_icon"
         android:showAsAction="ifRoom"
         android:title="@string/menu_save"/>
     <item

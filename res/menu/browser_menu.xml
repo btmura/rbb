@@ -35,7 +35,7 @@
             android:title="@string/menu_profile"/>
         <item
             android:id="@+id/menu_profile_saved"
-            android:icon="?attr/menu_profile_saved_icon"
+            android:icon="?attr/menu_saved_icon"
             android:showAsAction="ifRoom"
             android:title="@string/menu_saved"/>
         <item
