@@ -39,7 +39,7 @@ public class AccountNameAdapter extends BaseAdapter {
     private final int layout;
 
     public AccountNameAdapter(Context context, int layout) {
-        this.inflater = LayoutInflater.from(context.getApplicationContext());
+        this.inflater = LayoutInflater.from(context);
         this.layout = layout;
     }
 
