@@ -28,7 +28,7 @@
         android:title="@string/menu_save"/>
     <item
         android:id="@+id/menu_author"
-        android:icon="@drawable/ic_action_profile_dark"
+        android:icon="?attr/menu_profile_icon"
         android:showAsAction="ifRoom|withText"
         android:title="@string/menu_author"/>
     <item

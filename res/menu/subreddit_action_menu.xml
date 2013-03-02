@@ -23,7 +23,7 @@
         android:title="@string/menu_add"/>
     <item
         android:id="@+id/menu_delete"
-        android:icon="@drawable/ic_action_delete"
+        android:icon="?attr/menu_delete_icon"
         android:showAsAction="ifRoom"
         android:title="@string/menu_delete"/>
 

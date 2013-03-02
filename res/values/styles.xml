@@ -19,6 +19,7 @@
     <style name="Theme.Light" parent="@android:style/Theme.Holo.Light">
         <item name="menu_add_icon">@drawable/ic_action_add_light</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_light</item>
+        <item name="menu_delete_icon">@drawable/ic_action_delete_light</item>
         <item name="menu_link_icon">@drawable/ic_action_link_light</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
@@ -29,6 +30,7 @@
     <style name="Theme.Dark" parent="@android:style/Theme.Holo">
         <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
+        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
         <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
@@ -39,6 +41,7 @@
     <style name="Theme.Light.Dialog" parent="@android:style/Theme.Holo.Light.Dialog">
         <item name="menu_add_icon">@drawable/ic_action_add_light</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_light</item>
+        <item name="menu_delete_icon">@drawable/ic_action_delete_light</item>
         <item name="menu_link_icon">@drawable/ic_action_link_light</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
@@ -49,6 +52,7 @@
     <style name="Theme.Light.DialogWhenLarge" parent="@android:style/Theme.Holo.Light.DialogWhenLarge">
         <item name="menu_add_icon">@drawable/ic_action_add_light</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_light</item>
+        <item name="menu_delete_icon">@drawable/ic_action_delete_light</item>
         <item name="menu_link_icon">@drawable/ic_action_link_light</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
@@ -59,6 +63,7 @@
     <style name="Theme.Dark.Dialog" parent="@android:style/Theme.Holo.Dialog">
         <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
+        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
         <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
@@ -69,6 +74,7 @@
     <style name="Theme.Dark.DialogWhenLarge" parent="@android:style/Theme.Holo.DialogWhenLarge">
         <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
         <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
+        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
         <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
