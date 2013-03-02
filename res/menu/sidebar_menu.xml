@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/menu_add_subreddit"
-        android:icon="@drawable/ic_action_add"
+        android:icon="?attr/menu_add_icon"
         android:showAsAction="ifRoom"
         android:title="@string/menu_add"/>
     <item

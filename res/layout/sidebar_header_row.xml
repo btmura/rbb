@@ -37,7 +37,7 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="@dimen/element_padding"
         android:layout_toLeftOf="@+id/view"
-        android:drawableLeft="@drawable/ic_action_add"
+        android:drawableLeft="?attr/menu_add_icon"
         android:drawablePadding="@dimen/element_padding"
         android:text="@string/button_add" />
 
