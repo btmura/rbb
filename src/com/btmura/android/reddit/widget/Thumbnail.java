@@ -73,12 +73,19 @@ class Thumbnail {
         bounds.offsetTo(offsetLeft, offsetTop);
     }
 
-    static void draw(Canvas c, BitmapShader thumbShader) {
+    static void draw(Canvas c, BitmapShader thumbShader, int alpha) {
+        // Fade out the outline while fading in the thumbnail.
+        int outlineAlpha = thumbShader != null ? 255 - alpha : 255;
+        if (outlineAlpha > 0) {
+            THUMB_OUTLINE_PAINT.setAlpha(outlineAlpha);
+            c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, THUMB_OUTLINE_PAINT);
+        }
+
         if (thumbShader != null) {
             THUMB_PAINT.setShader(thumbShader);
+            THUMB_PAINT.setAlpha(alpha);
+            c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, THUMB_PAINT);
         }
-        Paint paint = thumbShader != null ? THUMB_PAINT : THUMB_OUTLINE_PAINT;
-        c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, paint);
     }
 
     static int getWidth() {

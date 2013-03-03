@@ -1,5 +1,6 @@
 package com.btmura.android.reddit.widget;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -33,6 +34,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
+import com.btmura.android.reddit.util.Objects;
 
 public class ThingView extends CustomView implements OnGestureListener {
 
@@ -100,14 +102,18 @@ public class ThingView extends CustomView implements OnGestureListener {
     private int ups;
 
     private boolean showThumbnail;
+    private Bitmap thumbBitmap;
     private BitmapShader thumbShader;
     private Matrix thumbMatrix;
     private Rect thumbRect;
+    private ObjectAnimator thumbAlphaAnimator;
+    private int thumbnailAlpha;
 
     private boolean drawVotingArrows;
     private boolean drawScore;
     private boolean isVotable;
 
+    private String body;
     private CharSequence bodyText;
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
@@ -172,35 +178,6 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.listener = listener;
     }
 
-    public void setThumbnailBitmap(Bitmap bitmap) {
-        BitmapShader currentShader = thumbShader;
-        if (bitmap != null) {
-            if (thumbMatrix == null) {
-                thumbMatrix = new Matrix();
-            }
-            thumbShader = Thumbnail.newBitmapShader(bitmap, thumbMatrix);
-        } else {
-            thumbShader = null;
-        }
-
-        int newLeft = PADDING;
-        if (drawVotingArrows) {
-            newLeft += VotingArrows.getWidth(drawVotingArrows) + PADDING;
-        }
-        if (thumbRect == null) {
-            thumbRect = new Rect();
-        }
-        Thumbnail.setBounds(thumbRect, newLeft, PADDING);
-
-        if (currentShader != thumbShader) {
-            if (showThumbnail) {
-                invalidate(thumbRect);
-            } else {
-                invalidate();
-            }
-        }
-    }
-
     public void setType(int type) {
         // TODO: Clean up styles for the different types.
         switch (type) {
@@ -222,17 +199,19 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public void setBody(String body, boolean isNew, Formatter formatter) {
-        if (!TextUtils.isEmpty(body)) {
-            bodyText = formatter.formatSpans(getContext(), body);
-            if (bodyBounds == null) {
-                bodyBounds = new RectF();
+        if (!Objects.equals(this.body, body)) {
+            if (!TextUtils.isEmpty(body)) {
+                bodyText = formatter.formatSpans(getContext(), body);
+                if (bodyBounds == null) {
+                    bodyBounds = new RectF();
+                }
+            } else {
+                bodyText = null;
             }
-        } else {
-            bodyText = null;
-        }
 
-        bodyPaint = isNew ? THING_NEW_BODY : THING_BODY;
-        requestLayout();
+            bodyPaint = isNew ? THING_NEW_BODY : THING_BODY;
+            requestLayout();
+        }
     }
 
     public void setData(String accountName,
@@ -289,6 +268,20 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         this.showThumbnail = showThumbnail;
+        if (showThumbnail) {
+            // Allocate these now rather then during scrolling or animating.
+            if (thumbMatrix == null) {
+                thumbMatrix = new Matrix();
+            }
+            if (thumbAlphaAnimator == null) {
+                thumbAlphaAnimator = ObjectAnimator.ofInt(this, "thumbnailAlpha", 0, 255);
+                thumbAlphaAnimator.setDuration(getResources()
+                        .getInteger(android.R.integer.config_shortAnimTime));
+            }
+            if (thumbRect == null) {
+                thumbRect = new Rect();
+            }
+        }
 
         boolean showSubreddit = !TextUtils.isEmpty(subreddit)
                 && !subreddit.equalsIgnoreCase(parentSubreddit);
@@ -298,6 +291,13 @@ public class ThingView extends CustomView implements OnGestureListener {
                 author, createdUtc, nowTimeMs, numComments, score, subreddit);
 
         requestLayout();
+    }
+
+    /** Sets the thumbnail alpha. Called by the thumbnail alpha ObjectAnimator. */
+    void setThumbnailAlpha(int thumbnailAlpha) {
+        // Set the alpha and invalidate only the thumbnail bounds.
+        this.thumbnailAlpha = thumbnailAlpha;
+        invalidate(thumbRect);
     }
 
     private void setStatusText(boolean showNsfw, boolean showSubreddit, boolean showPoints,
@@ -370,6 +370,46 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
         formatterData[index].delete(0, formatterData[index].length());
         return formatters[index];
+    }
+
+    public void setThumbnailBitmap(Bitmap bitmap) {
+        BitmapShader currentShader = thumbShader;
+        if (bitmap != null) {
+            // Only update the shader and animation if the bitmap changes. For example, a view may
+            // get refreshed when the adapter swaps cursors after getting more data.
+            if (bitmap != thumbBitmap) {
+                thumbBitmap = bitmap;
+                thumbShader = Thumbnail.newBitmapShader(bitmap, thumbMatrix);
+                thumbAlphaAnimator.start();
+            }
+        } else {
+            thumbShader = null;
+            thumbBitmap = null;
+        }
+
+        if (showThumbnail) {
+            Thumbnail.setBounds(thumbRect, getThumbnailLeft(), getThumbnailTop());
+        }
+
+        if (currentShader != thumbShader) {
+            if (showThumbnail) {
+                invalidate(thumbRect);
+            } else {
+                invalidate();
+            }
+        }
+    }
+
+    private int getThumbnailLeft() {
+        int left = PADDING;
+        if (drawVotingArrows) {
+            left += VotingArrows.getWidth(drawVotingArrows) + PADDING;
+        }
+        return left;
+    }
+
+    private int getThumbnailTop() {
+        return PADDING;
     }
 
     /**
@@ -671,7 +711,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         if (showThumbnail) {
-            Thumbnail.draw(c, thumbShader);
+            Thumbnail.draw(c, thumbShader, thumbnailAlpha);
             c.translate(Thumbnail.getWidth() + PADDING, 0);
         }
 
