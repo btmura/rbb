@@ -164,7 +164,6 @@ public class CommentAdapter extends BaseLoaderAdapter {
         final String subreddit = null; // Comments don't have subreddits.
         final String title = cursor.getString(INDEX_TITLE);
         final int thingBodyWidth = 0; // Use the full width all the time.
-        final String thumbnailUrl = null; // Comments don't have thumbnails.
         final String thingId = cursor.getString(INDEX_THING_ID);
         final int ups = cursor.getInt(INDEX_UPS);
 
@@ -208,7 +207,6 @@ public class CommentAdapter extends BaseLoaderAdapter {
                 subreddit,
                 thingBodyWidth,
                 thingId,
-                thumbnailUrl,
                 title,
                 ups,
                 drawVotingArrows,

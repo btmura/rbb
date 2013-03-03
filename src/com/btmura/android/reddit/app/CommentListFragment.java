@@ -19,7 +19,6 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
@@ -237,10 +236,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
             ((ThingMenuListenerHolder) getActivity()).removeThingMenuListener(this);
         }
         super.onDetach();
-    }
-
-    public void onThumbnailClick(View view, Bitmap bitmap, int startX, int startY) {
-        // Comments don't have thumbnails, so this shouldn't happen.
     }
 
     public void onVote(View view, int action) {

@@ -102,7 +102,6 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
         final int score = 0;
         final String subreddit = null;
         final int thingBodyWidth = 0;
-        final String thumbnailUrl = null;
         final int ups = 0;
 
         // Only show the subject on the header message.
@@ -134,7 +133,6 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
                 subreddit,
                 thingBodyWidth,
                 thingId,
-                thumbnailUrl,
                 title,
                 ups,
                 drawVotingArrows,

@@ -19,7 +19,6 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
@@ -90,8 +89,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private static final String STATE_EMPTY_TEXT = "emptyText";
 
     public interface OnThingSelectedListener {
-        void onThingSelected(Bundle thingBundle, View view, Bitmap bitmap, int startX, int startY,
-                int pageType);
+        void onThingSelected(Bundle thingBundle, int pageType);
 
         int onMeasureThingBody();
     }
@@ -294,20 +292,13 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        click(position, v, null, 0, 0, ThingPagerAdapter.TYPE_COMMENTS);
+        selectThing(position, ThingPagerAdapter.TYPE_LINK);
     }
 
-    public void onThumbnailClick(View v, Bitmap bitmap, int startX, int startY) {
-        click(getListView().getPositionForView(v), v, bitmap, startX, startY,
-                ThingPagerAdapter.TYPE_LINK);
-    }
-
-    private void click(int position, View view, Bitmap bitmap, int startX, int startY,
-            int pageType) {
+    private void selectThing(int position, int pageType) {
         adapter.setSelectedPosition(position);
         if (listener != null) {
-            listener.onThingSelected(adapter.getThingBundle(getActivity(), position),
-                    view, bitmap, startX, startY, pageType);
+            listener.onThingSelected(adapter.getThingBundle(getActivity(), position), pageType);
         }
         if (adapter.isNew(position)) {
             Provider.readMessageAsync(getActivity(), adapter.getAccountName(),
@@ -457,7 +448,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     private void handleComments() {
-        click(getFirstCheckedPosition(), null, null, 0, 0, ThingPagerAdapter.TYPE_COMMENTS);
+        selectThing(getFirstCheckedPosition(), ThingPagerAdapter.TYPE_COMMENTS);
     }
 
     private void handleCopyUrl() {

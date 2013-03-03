@@ -288,7 +288,6 @@ public class ThingAdapter extends BaseLoaderAdapter {
         final String subject = cursor.getString(MESSAGE_SUBJECT);
         final String subreddit = cursor.getString(MESSAGE_SUBREDDIT);
         final String thingId = cursor.getString(MESSAGE_THING_ID);
-        final String thumbnailUrl = null; // No thumbnail URLs for messages.
         final String title = null; // No title for messages.
         final int ups = 0; // No upvotes for messages.
 
@@ -317,7 +316,6 @@ public class ThingAdapter extends BaseLoaderAdapter {
                 subreddit,
                 thingBodyWidth,
                 thingId,
-                thumbnailUrl,
                 title,
                 ups,
                 drawVotingArrows,
@@ -342,7 +340,6 @@ public class ThingAdapter extends BaseLoaderAdapter {
         final int nesting = 0; // Nesting only for comments handled by different adapter.
         final int numComments = cursor.getInt(THING_NUM_COMMENTS);
         final boolean over18 = cursor.getInt(THING_OVER_18) == 1;
-        final boolean self = cursor.getInt(THING_SELF) == 1;
         final String subreddit = cursor.getString(THING_SUBREDDIT);
         final String thingId = cursor.getString(THING_THING_ID);
         final String thumbnailUrl = cursor.getString(THING_THUMBNAIL_URL);
@@ -368,7 +365,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
 
         final boolean drawVotingArrows = AccountUtils.isAccount(accountName)
                 && kind != Kinds.KIND_MESSAGE;
-        final boolean showThumbnail = !self;
+        final boolean showThumbnail = !TextUtils.isEmpty(thumbnailUrl);
         final boolean showStatusPoints = !AccountUtils.isAccount(accountName)
                 || kind == Kinds.KIND_COMMENT;
 
@@ -393,7 +390,6 @@ public class ThingAdapter extends BaseLoaderAdapter {
                 subreddit,
                 thingBodyWidth,
                 thingId,
-                thumbnailUrl,
                 title,
                 ups,
                 drawVotingArrows,
