@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2012 Brian Muramatsu
+     Copyright (C) 2013 Brian Muramatsu
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <color name="arrow_down">@android:color/holo_purple</color>
-    <color name="arrow_neutral">#ccc</color>
-    <color name="arrow_up">@android:color/holo_orange_dark</color>
-    <color name="score_text_down">@android:color/holo_purple</color>
-    <color name="score_text_up">@android:color/holo_orange_dark</color>
-    <color name="thumb_outline">@android:color/darker_gray</color>
+    <item>
+        <bitmap
+            android:filter="true"
+            android:src="@drawable/ic_action_link_dark" />
+    </item>
 
-</resources>
+</layer-list>

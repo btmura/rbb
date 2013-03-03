@@ -21,6 +21,8 @@
     <dimen name="arrow_total_width">14dp</dimen>
     <dimen name="arrow_total_height">18dp</dimen>
     <dimen name="captcha_min_height">100dp</dimen>
+    <!-- Width of a cell containing some details about a thing. Padding not included. -->
+    <dimen name="details_cell_width">100dp</dimen>
     <dimen name="dialog_min_height">250dp</dimen>
     <dimen name="score_total_height">34dp</dimen>
     <dimen name="scoreless_total_height">14dp</dimen>
@@ -30,10 +32,8 @@
     <dimen name="min_details_width">100dp</dimen>
     <dimen name="padding">16dp</dimen>
     <dimen name="subreddit_list_width">175dp</dimen>
+    <dimen name="thumb_height">70dp</dimen>
     <dimen name="thumb_width">70dp</dimen>
     <dimen name="radius">6dp</dimen>
-
-    <!-- Width of a cell containing some details about a thing. Padding not included. -->
-    <dimen name="details_cell_width">100dp</dimen>
 
 </resources>

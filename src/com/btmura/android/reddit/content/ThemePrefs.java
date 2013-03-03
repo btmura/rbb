@@ -51,6 +51,11 @@ public class ThemePrefs extends Prefs {
                 R.drawable.ic_action_messages_dark);
     }
 
+    public static final int getThumbnailDrawableId(Context context) {
+        // The proper way is to check the current theme, but we take this lazy good enough approach.
+        return pick(context, R.drawable.thumbnail_light, R.drawable.thumbnail_dark);
+    }
+
     public static final void switchTheme(Context context) {
         int otherTheme = pick(context, THEME_DARK, THEME_LIGHT);
         getPrefsInstance(context).edit().putInt(PREF_THEME, otherTheme).apply();

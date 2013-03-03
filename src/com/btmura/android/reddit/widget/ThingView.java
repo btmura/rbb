@@ -100,6 +100,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private int ups;
 
     private boolean showThumbnail;
+    private boolean hasThumbnailUrl;
     private BitmapShader thumbShader;
     private Matrix thumbMatrix;
     private Rect thumbRect;
@@ -290,6 +291,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         this.showThumbnail = showThumbnail;
+        this.hasThumbnailUrl = !TextUtils.isEmpty(thumbnailUrl);
 
         boolean showSubreddit = !TextUtils.isEmpty(subreddit)
                 && !subreddit.equalsIgnoreCase(parentSubreddit);
@@ -672,7 +674,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         if (showThumbnail) {
-            Thumbnail.draw(c, thumbShader);
+            Thumbnail.draw(c, thumbShader, hasThumbnailUrl);
             c.translate(Thumbnail.getWidth() + PADDING, 0);
         }
 

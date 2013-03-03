@@ -27,26 +27,32 @@ import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
+import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.ThemePrefs;
 
 class Thumbnail {
 
     private static final int EVENT_NONE = 0;
     private static final int EVENT_CLICK = 1;
 
+    private static int THEME;
     private static int RADIUS;
     private static int THUMB_WIDTH;
     private static int THUMB_HEIGHT;
     private static RectF THUMB_RECT;
     private static Paint THUMB_OUTLINE_PAINT;
     private static Paint THUMB_PAINT;
+    private static Drawable THUMBNAIL_BITMAP;
 
     static void init(Context context) {
-        if (THUMB_PAINT == null) {
+        int theme = ThemePrefs.getTheme(context);
+        if (THEME != theme || THUMB_PAINT == null) {
+            THEME = theme;
             Resources r = context.getResources();
             RADIUS = r.getDimensionPixelSize(R.dimen.radius);
             THUMB_WIDTH = THUMB_HEIGHT = r.getDimensionPixelSize(R.dimen.thumb_width);
@@ -57,6 +63,9 @@ class Thumbnail {
             THUMB_OUTLINE_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
             THUMB_OUTLINE_PAINT.setStyle(Style.STROKE);
             THUMB_OUTLINE_PAINT.setColor(r.getColor(R.color.thumb_outline));
+
+            THUMBNAIL_BITMAP = r.getDrawable(ThemePrefs.getThumbnailDrawableId(context));
+            THUMBNAIL_BITMAP.setBounds(0, 0, THUMB_WIDTH, THUMB_HEIGHT);
         }
     }
 
@@ -75,12 +84,15 @@ class Thumbnail {
         bounds.offsetTo(offsetLeft, offsetTop);
     }
 
-    static void draw(Canvas c, BitmapShader thumbShader) {
+    static void draw(Canvas c, BitmapShader thumbShader, boolean hasThumbnailUrl) {
         if (thumbShader != null) {
             THUMB_PAINT.setShader(thumbShader);
+            c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, THUMB_PAINT);
+        } else if (hasThumbnailUrl) {
+            c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, THUMB_OUTLINE_PAINT);
+        } else {
+            THUMBNAIL_BITMAP.draw(c);
         }
-        Paint thumbPaint = thumbShader != null ? THUMB_PAINT : THUMB_OUTLINE_PAINT;
-        c.drawRoundRect(THUMB_RECT, RADIUS, RADIUS, thumbPaint);
     }
 
     static int getWidth() {
