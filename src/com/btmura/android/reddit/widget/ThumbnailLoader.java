@@ -28,6 +28,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 
@@ -49,7 +50,7 @@ public class ThumbnailLoader {
                     if (task != null) {
                         task.cancel(true);
                     }
-                    task = new LoadThumbnailTask(v, url);
+                    task = new LoadThumbnailTask(context.getApplicationContext(), v, url);
                     v.setTag(task);
                     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 };
@@ -81,10 +82,12 @@ public class ThumbnailLoader {
 
     class LoadThumbnailTask extends AsyncTask<Void, Void, Bitmap> {
 
+        private final Context context;
         private final WeakReference<ThingView> ref;
         private final String url;
 
-        LoadThumbnailTask(ThingView v, String url) {
+        LoadThumbnailTask(Context context, ThingView v, String url) {
+            this.context = context;
             this.ref = new WeakReference<ThingView>(v);
             this.url = url;
         }
@@ -104,7 +107,11 @@ public class ThumbnailLoader {
                     return null;
                 }
 
-                return BitmapFactory.decodeStream(is);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inScaled = true;
+                options.inDensity = DisplayMetrics.DENSITY_MEDIUM;
+                options.inTargetDensity = context.getResources().getDisplayMetrics().densityDpi;
+                return BitmapFactory.decodeStream(is, null, options);
 
             } catch (MalformedURLException e) {
                 Log.e(TAG, e.getMessage(), e);
