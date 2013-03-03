@@ -64,7 +64,7 @@ class Thumbnail {
             THUMB_OUTLINE_PAINT.setStyle(Style.STROKE);
             THUMB_OUTLINE_PAINT.setColor(r.getColor(R.color.thumb_outline));
 
-            THUMBNAIL_BITMAP = r.getDrawable(ThemePrefs.getThumbnailDrawableId(context));
+            THUMBNAIL_BITMAP = r.getDrawable(ThemePrefs.getThumbnailLinkIcon(context));
             THUMBNAIL_BITMAP.setBounds(0, 0, THUMB_WIDTH, THUMB_HEIGHT);
         }
     }

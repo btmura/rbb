@@ -51,9 +51,9 @@ public class ThemePrefs extends Prefs {
                 R.drawable.ic_action_messages_dark);
     }
 
-    public static final int getThumbnailDrawableId(Context context) {
+    public static final int getThumbnailLinkIcon(Context context) {
         // The proper way is to check the current theme, but we take this lazy good enough approach.
-        return pick(context, R.drawable.thumbnail_light, R.drawable.thumbnail_dark);
+        return pick(context, R.drawable.ic_thumbnail_link_light, R.drawable.ic_thumbnail_link_dark);
     }
 
     public static final void switchTheme(Context context) {
