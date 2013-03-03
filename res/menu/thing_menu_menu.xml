@@ -41,16 +41,6 @@
             android:title="@string/menu_new_comment"
             android:visible="false"/>
         <item
-            android:id="@+id/menu_open"
-            android:showAsAction="never"
-            android:title="@string/menu_open"
-            android:visible="false"/>
-        <item
-            android:id="@+id/menu_copy_url"
-            android:showAsAction="never"
-            android:title="@string/menu_copy_url"
-            android:visible="false"/>
-        <item
             android:id="@+id/menu_saved"
             android:showAsAction="never"
             android:title="@string/menu_unsave"
@@ -59,6 +49,16 @@
             android:id="@+id/menu_unsaved"
             android:showAsAction="never"
             android:title="@string/menu_save"
+            android:visible="false"/>
+        <item
+            android:id="@+id/menu_open"
+            android:showAsAction="never"
+            android:title="@string/menu_open"
+            android:visible="false"/>
+        <item
+            android:id="@+id/menu_copy_url"
+            android:showAsAction="never"
+            android:title="@string/menu_copy_url"
             android:visible="false"/>
         <item
             android:id="@+id/menu_thing_add_subreddit"

@@ -391,6 +391,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
             MenuHelper.setShareProvider(menu.findItem(R.id.menu_share_thing), label, text);
         }
 
+        MenuItem commentsItem = menu.findItem(R.id.menu_comments);
+        commentsItem.setVisible(count == 1);
+
         boolean saveable = false;
         boolean saved = false;
         boolean hasAccount = count == 1 && AccountUtils.isAccount(adapter.getAccountName());
@@ -420,6 +423,11 @@ public class ThingListFragment extends ThingProviderListFragment implements
                 mode.finish();
                 return true;
 
+            case R.id.menu_comments:
+                handleComments();
+                mode.finish();
+                return true;
+
             case R.id.menu_copy_url:
                 handleCopyUrl();
                 mode.finish();
@@ -446,6 +454,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     private void handleUnsaved() {
         adapter.save(getActivity(), getFirstCheckedPosition());
+    }
+
+    private void handleComments() {
+        click(getFirstCheckedPosition(), null, null, 0, 0, ThingPagerAdapter.TYPE_COMMENTS);
     }
 
     private void handleCopyUrl() {
