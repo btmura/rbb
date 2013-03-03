@@ -78,6 +78,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private MenuItem profileItem;
     private MenuItem profileSavedItem;
     private MenuItem messagesItem;
+    private MenuItem switchThemesItem;
 
     @Override
     protected void setContentView() {
@@ -277,6 +278,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         profileItem = menu.findItem(R.id.menu_profile);
         profileSavedItem = menu.findItem(R.id.menu_profile_saved);
         messagesItem = menu.findItem(R.id.menu_messages);
+        switchThemesItem = menu.findItem(R.id.menu_switch_themes);
         return true;
     }
 
@@ -290,7 +292,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             return true; // Check that onCreateOptionsMenu was called.
         }
 
-        boolean showAccountItems = !hasThing();
+        boolean showAccountItems = hasSubredditList && !hasThing();
         menu.setGroupVisible(R.id.menu_group_account_items, showAccountItems);
 
         boolean hasAccount = hasAccount();
@@ -299,6 +301,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         profileItem.setVisible(showAccountItems && hasAccount);
         profileSavedItem.setVisible(showAccountItems && hasAccount);
         messagesItem.setVisible(showAccountItems && hasAccount);
+        switchThemesItem.setVisible(showAccountItems);
 
         refreshMessagesIcon();
         return true;
@@ -346,8 +349,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 handleAccounts();
                 return true;
 
-            case R.id.menu_switch_theme:
-                handleSwitchTheme();
+            case R.id.menu_switch_themes:
+                handleSwitchThemes();
                 return true;
 
             default:
@@ -371,7 +374,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         MenuHelper.startAccountListActivity(this);
     }
 
-    private void handleSwitchTheme() {
+    private void handleSwitchThemes() {
         ThemePrefs.switchTheme(this);
         recreate();
     }
