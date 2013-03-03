@@ -108,13 +108,13 @@ class Thumbnail {
     }
 
     static boolean onSingleTapUp(MotionEvent e, Rect bounds, boolean hasThumbnail,
-            OnVoteListener listener, View view) {
+            OnVoteListener listener, View view, Bitmap bitmap) {
         if (listener != null) {
             int event = getEvent(e, bounds, hasThumbnail);
             switch (event) {
                 case EVENT_CLICK:
                     view.playSoundEffect(SoundEffectConstants.CLICK);
-                    listener.onThumbnailClick(view);
+                    listener.onThumbnailClick(view, bitmap, bounds.left, bounds.top);
                     return true;
             }
         }

@@ -16,16 +16,21 @@
 
 package com.btmura.android.reddit.app;
 
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
+import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
@@ -150,11 +155,20 @@ public class ThingListActivity extends GlobalMenuActivity implements
         }
     }
 
-    public void onThingSelected(Bundle thingBundle, int pageType) {
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public void onThingSelected(Bundle thingBundle, View view, Bitmap bitmap, int startX,
+            int startY, int pageType) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         intent.putExtra(ThingActivity.EXTRA_PAGE_TYPE, pageType);
-        startActivity(intent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                && view != null && bitmap != null) {
+            startActivity(intent, ActivityOptions.makeThumbnailScaleUpAnimation(
+                    view, bitmap, startX, startY).toBundle());
+        } else {
+            startActivity(intent);
+        }
     }
 
     public int onMeasureThingBody() {

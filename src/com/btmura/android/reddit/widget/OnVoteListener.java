@@ -16,10 +16,13 @@
 
 package com.btmura.android.reddit.widget;
 
+import android.graphics.Bitmap;
 import android.view.View;
 
 // TODO: Rename this class since it handles more than voting.
 public interface OnVoteListener {
-    void onThumbnailClick(View view);
+
+    void onThumbnailClick(View view, Bitmap bitmap, int startX, int startY);
+
     void onVote(View view, int action);
 }

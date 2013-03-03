@@ -107,7 +107,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         if (isSinglePane) {
             if (requestedThingBundle != null) {
                 selectThing(requestedThingBundle, ThingActivity.FLAG_INSERT_HOME,
-                        ThingPagerAdapter.TYPE_LINK);
+                        null, null, 0, 0, ThingPagerAdapter.TYPE_LINK);
                 finish();
                 return true;
             } else if (!TextUtils.isEmpty(requestedSubreddit)) {

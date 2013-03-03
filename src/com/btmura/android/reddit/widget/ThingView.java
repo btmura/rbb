@@ -101,6 +101,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     private boolean showThumbnail;
     private boolean hasThumbnailUrl;
+    private Bitmap thumbBitmap;
     private BitmapShader thumbShader;
     private Matrix thumbMatrix;
     private Rect thumbRect;
@@ -179,8 +180,10 @@ public class ThingView extends CustomView implements OnGestureListener {
             if (thumbMatrix == null) {
                 thumbMatrix = new Matrix();
             }
+            thumbBitmap = bitmap;
             thumbShader = Thumbnail.newBitmapShader(bitmap, thumbMatrix);
         } else {
+            thumbBitmap = null;
             thumbShader = null;
         }
 
@@ -771,7 +774,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        return Thumbnail.onSingleTapUp(e, thumbRect, showThumbnail, listener, this)
+        return Thumbnail.onSingleTapUp(e, thumbRect, showThumbnail, listener, this, thumbBitmap)
                 || VotingArrows.onSingleTapUp(e, getTopOffset(), getLeftOffset(), drawVotingArrows,
                         drawScore, isVotable, listener, this, likes);
     }

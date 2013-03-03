@@ -20,7 +20,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
@@ -29,6 +31,8 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
@@ -394,24 +398,34 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         selectSubredditMultiPane(cf.getSubreddit(), cf.isRandom());
     }
 
-    public void onThingSelected(Bundle thingBundle, int pageType) {
-        selectThing(thingBundle, 0, pageType);
+    public void onThingSelected(Bundle thingBundle, View view, Bitmap bitmap, int startX,
+            int startY, int pageType) {
+        selectThing(thingBundle, 0, view, bitmap, startX, startY, pageType);
     }
 
-    protected void selectThing(Bundle thingBundle, int flags, int pageType) {
+    protected void selectThing(Bundle thingBundle, int flags, View view, Bitmap bitmap, int startX,
+            int startY, int pageType) {
         if (isSinglePane) {
-            selectThingSinglePane(thingBundle, 0, pageType);
+            selectThingSinglePane(thingBundle, 0, view, bitmap, startX, startY, pageType);
         } else {
             selectThingMultiPane(thingBundle, pageType);
         }
     }
 
-    private void selectThingSinglePane(Bundle thingBundle, int flags, int pageType) {
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private void selectThingSinglePane(Bundle thingBundle, int flags, View view, Bitmap bitmap,
+            int startX, int startY, int pageType) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         intent.putExtra(ThingActivity.EXTRA_PAGE_TYPE, pageType);
-        intent.putExtra(ThingActivity.EXTRA_FLAGS, flags);
-        startActivity(intent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                && view != null && bitmap != null) {
+            startActivity(intent, ActivityOptions.makeThumbnailScaleUpAnimation(
+                    view, bitmap, startX, startY).toBundle());
+        } else {
+            startActivity(intent);
+        }
     }
 
     private void selectThingMultiPane(Bundle thingBundle, int pageType) {
