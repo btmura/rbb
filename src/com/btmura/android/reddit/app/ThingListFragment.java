@@ -382,14 +382,15 @@ public class ThingListFragment extends ThingProviderListFragment implements
             MenuHelper.setShareProvider(menu.findItem(R.id.menu_share_thing), label, text);
         }
 
+        boolean isLink = adapter.getKind(position) == Kinds.KIND_LINK;
         MenuItem commentsItem = menu.findItem(R.id.menu_comments);
-        commentsItem.setVisible(count == 1);
+        commentsItem.setVisible(count == 1 && isLink);
 
         boolean saveable = false;
         boolean saved = false;
         boolean hasAccount = count == 1 && AccountUtils.isAccount(adapter.getAccountName());
         if (hasAccount) {
-            saveable = adapter.getKind(position) == Kinds.KIND_LINK;
+            saveable = isLink;
             saved = adapter.isSaved(position);
         }
         menu.findItem(R.id.menu_saved).setVisible(saveable && saved);
