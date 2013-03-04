@@ -79,7 +79,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private MenuItem profileItem;
     private MenuItem profileSavedItem;
     private MenuItem messagesItem;
-    private MenuItem switchThemesItem;
+    private MenuItem accountsItem;
+    private MenuItem changeThemesItem;
 
     @Override
     protected void setContentView() {
@@ -280,7 +281,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         profileItem = menu.findItem(R.id.menu_profile);
         profileSavedItem = menu.findItem(R.id.menu_profile_saved);
         messagesItem = menu.findItem(R.id.menu_messages);
-        switchThemesItem = menu.findItem(R.id.menu_switch_themes);
+        accountsItem = menu.findItem(R.id.menu_accounts);
+        changeThemesItem = menu.findItem(R.id.menu_change_themes);
         return true;
     }
 
@@ -303,7 +305,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         profileItem.setVisible(showAccountItems && hasAccount);
         profileSavedItem.setVisible(showAccountItems && hasAccount);
         messagesItem.setVisible(showAccountItems && hasAccount);
-        switchThemesItem.setVisible(showAccountItems);
+        accountsItem.setVisible(showAccountItems);
+        changeThemesItem.setVisible(showAccountItems);
 
         refreshMessagesIcon();
         return true;
@@ -351,8 +354,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 handleAccounts();
                 return true;
 
-            case R.id.menu_switch_themes:
-                handleSwitchThemes();
+            case R.id.menu_change_themes:
+                handleChangeThemes();
                 return true;
 
             default:
@@ -376,7 +379,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         MenuHelper.startAccountListActivity(this);
     }
 
-    private void handleSwitchThemes() {
+    private void handleChangeThemes() {
         ThemePrefs.switchTheme(this);
         recreate();
     }

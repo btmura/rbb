@@ -43,16 +43,17 @@
             android:icon="?attr/menu_messages_icon"
             android:showAsAction="ifRoom"
             android:title="@string/menu_messages"/>
-        <item
-            android:id="@+id/menu_accounts"
-            android:showAsAction="never"
-            android:title="@string/menu_accounts"/>
     </group>
 
     <item
-        android:id="@+id/menu_switch_themes"
+        android:id="@+id/menu_accounts"
         android:orderInCategory="@integer/menu_order_last"
         android:showAsAction="never"
-        android:title="@string/menu_switch_themes"/>
+        android:title="@string/menu_accounts"/>
+    <item
+        android:id="@+id/menu_change_themes"
+        android:orderInCategory="@integer/menu_order_last"
+        android:showAsAction="never"
+        android:title="@string/menu_change_themes"/>
 
 </menu>

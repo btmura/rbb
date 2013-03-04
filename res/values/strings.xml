@@ -86,6 +86,7 @@
     <string name="menu_add_subreddit">Add subreddit</string>
     <string name="menu_app_info">App info</string>
     <string name="menu_author">Author</string>
+    <string name="menu_change_themes">Change themes</string>
     <string name="menu_comments">View comments</string>
     <string name="menu_copy_url">Copy URL</string>
     <string name="menu_debug">Debug</string>
@@ -106,7 +107,6 @@
     <string name="menu_share">Share</string>
     <string name="menu_subreddit">/r/%1$s</string>
     <string name="menu_submit">Submit</string>
-    <string name="menu_switch_themes">Switch themes</string>
     <string name="menu_unsave">Unsave</string>
     <string name="menu_user">/u/%1$s</string>
     <string name="menu_view">View</string>
