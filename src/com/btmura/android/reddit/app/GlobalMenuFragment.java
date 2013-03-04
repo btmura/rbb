@@ -107,6 +107,10 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 handleDebug();
                 return true;
 
+            case R.id.menu_help:
+                handleHelp();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -131,7 +135,11 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     }
 
     private void handleDebug() {
-        startActivity(new Intent(getActivity(), ContentBrowserActivity.class));
+        MenuHelper.startContentBrowserActivity(getActivity());
+    }
+
+    private void handleHelp() {
+        MenuHelper.openUrl(getActivity(), "http://btmura.github.com/rbb");
     }
 
     public void onFocusChange(View v, boolean hasFocus) {

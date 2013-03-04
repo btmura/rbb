@@ -52,6 +52,12 @@ public class MenuHelper {
         return !TextUtils.isEmpty(user) && !Things.DELETED.equals(user);
     }
 
+    public static void openUrl(Context context, CharSequence url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url.toString()));
+        context.startActivity(intent);
+    }
+
     /**
      * Sets a plain text {@link ClipData} with the provided label and text to
      * the clipboard and shows a toast with the text.
@@ -78,8 +84,7 @@ public class MenuHelper {
     }
 
     public static void startAccountListActivity(Context context) {
-        Intent intent = new Intent(context, AccountListActivity.class);
-        context.startActivity(intent);
+        context.startActivity(new Intent(context, AccountListActivity.class));
     }
 
     public static void startAddAccountActivity(Context context) {
@@ -100,6 +105,10 @@ public class MenuHelper {
         intent.putExtra(ComposeActivity.EXTRA_IS_REPLY, isReply);
         intent.putExtra(ComposeActivity.EXTRA_EXTRAS, extras);
         context.startActivity(intent);
+    }
+
+    public static void startContentBrowserActivity(Context context) {
+        context.startActivity(new Intent(context, ContentBrowserActivity.class));
     }
 
     public static void startIntentChooser(Context context, CharSequence url) {
