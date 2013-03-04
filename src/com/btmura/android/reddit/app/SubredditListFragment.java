@@ -71,7 +71,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
          */
         void onInitialSubredditSelected(String subreddit, boolean error);
 
-        void onSubredditSelected(String subreddit);
+        void onSubredditSelected(View view, String subreddit);
     }
 
     private OnSubredditSelectedListener listener;
@@ -212,7 +212,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     public void onListItemClick(ListView l, View view, int position, long id) {
         String selectedSubreddit = adapter.setSelectedPosition(position);
         if (listener != null) {
-            listener.onSubredditSelected(selectedSubreddit);
+            listener.onSubredditSelected(view, selectedSubreddit);
         }
     }
 

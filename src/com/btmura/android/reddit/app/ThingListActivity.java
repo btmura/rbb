@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Fragment;
@@ -23,9 +24,11 @@ import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
@@ -38,6 +41,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
+import com.btmura.android.reddit.widget.ThingView;
 
 public class ThingListActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
@@ -150,11 +154,17 @@ public class ThingListActivity extends GlobalMenuActivity implements
         }
     }
 
-    public void onThingSelected(Bundle thingBundle, int pageType) {
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public void onThingSelected(View view, Bundle thingBundle, int pageType) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         intent.putExtra(ThingActivity.EXTRA_PAGE_TYPE, pageType);
-        startActivity(intent);
+        Bundle options = ThingView.makeActivityOptions(view);
+        if (options != null) {
+            startActivity(intent, options);
+        } else {
+            startActivity(intent);
+        }
     }
 
     public int onMeasureThingBody() {

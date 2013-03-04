@@ -89,7 +89,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private static final String STATE_EMPTY_TEXT = "emptyText";
 
     public interface OnThingSelectedListener {
-        void onThingSelected(Bundle thingBundle, int pageType);
+        void onThingSelected(View view, Bundle thingBundle, int pageType);
 
         int onMeasureThingBody();
     }
@@ -292,13 +292,13 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        selectThing(position, ThingPagerAdapter.TYPE_LINK);
+        selectThing(v, position, ThingPagerAdapter.TYPE_LINK);
     }
 
-    private void selectThing(int position, int pageType) {
+    private void selectThing(View v, int position, int pageType) {
         adapter.setSelectedPosition(position);
         if (listener != null) {
-            listener.onThingSelected(adapter.getThingBundle(getActivity(), position), pageType);
+            listener.onThingSelected(v, adapter.getThingBundle(getActivity(), position), pageType);
         }
         if (adapter.isNew(position)) {
             Provider.readMessageAsync(getActivity(), adapter.getAccountName(),
@@ -449,7 +449,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     private void handleComments() {
-        selectThing(getFirstCheckedPosition(), ThingPagerAdapter.TYPE_COMMENTS);
+        selectThing(null, getFirstCheckedPosition(), ThingPagerAdapter.TYPE_COMMENTS);
     }
 
     private void handleCopyUrl() {

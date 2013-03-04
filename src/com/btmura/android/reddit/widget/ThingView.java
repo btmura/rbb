@@ -1,6 +1,8 @@
 package com.btmura.android.reddit.widget;
 
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -11,6 +13,8 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.os.Build;
+import android.os.Bundle;
 import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.Layout.Alignment;
@@ -28,6 +32,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
@@ -821,5 +826,20 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     public void onShowPress(MotionEvent e) {
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public static Bundle makeActivityOptions(View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && view instanceof ThingView) {
+            ThingView thingView = (ThingView) view;
+            if (thingView.showThumbnail && thingView.thumbBitmap != null) {
+                return ActivityOptions.makeThumbnailScaleUpAnimation(view, thingView.thumbBitmap,
+                        thingView.getThumbnailLeft(), thingView.getThumbnailTop()).toBundle();
+            } else {
+                return ActivityOptions.makeScaleUpAnimation(view, 0, 0,
+                        view.getWidth(), view.getHeight()).toBundle();
+            }
+        }
+        return null;
     }
 }

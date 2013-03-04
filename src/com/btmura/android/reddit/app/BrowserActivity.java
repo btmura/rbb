@@ -30,6 +30,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
@@ -107,12 +108,13 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         // and finish this one.
         if (isSinglePane) {
             if (requestedThingBundle != null) {
-                selectThing(requestedThingBundle, ThingActivity.FLAG_INSERT_HOME,
+                selectThing(null, requestedThingBundle, ThingActivity.FLAG_INSERT_HOME,
                         ThingPagerAdapter.TYPE_LINK);
                 finish();
                 return true;
             } else if (!TextUtils.isEmpty(requestedSubreddit)) {
-                selectSubreddit(requestedSubreddit,
+                selectSubreddit(null,
+                        requestedSubreddit,
                         Subreddits.isRandom(requestedSubreddit),
                         ThingListActivity.FLAG_INSERT_HOME);
                 finish();
@@ -246,8 +248,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
-    public void onSubredditSelected(String subreddit) {
-        super.onSubredditSelected(subreddit);
+    public void onSubredditSelected(View view, String subreddit) {
+        super.onSubredditSelected(view, subreddit);
         AccountPrefs.setLastSubreddit(this, getAccountName(), subreddit);
     }
 

@@ -20,7 +20,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentManager.OnBackStackChangedListener;
@@ -29,6 +31,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.view.ViewPager;
@@ -48,6 +51,7 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingBundle;
+import com.btmura.android.reddit.widget.ThingView;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
@@ -345,23 +349,29 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public void onSubredditSelected(String subreddit) {
-        selectSubreddit(subreddit, Subreddits.isRandom(subreddit), 0);
+    public void onSubredditSelected(View view, String subreddit) {
+        selectSubreddit(view, subreddit, Subreddits.isRandom(subreddit), 0);
     }
 
-    protected void selectSubreddit(String subreddit, boolean isRandom, int flags) {
+    protected void selectSubreddit(View view, String subreddit, boolean isRandom, int flags) {
         if (isSinglePane) {
-            selectSubredditSinglePane(subreddit, flags);
+            selectSubredditSinglePane(view, subreddit, flags);
         } else {
             selectSubredditMultiPane(subreddit, isRandom);
         }
     }
 
-    private void selectSubredditSinglePane(String subreddit, int flags) {
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private void selectSubredditSinglePane(View view, String subreddit, int flags) {
         Intent intent = new Intent(this, ThingListActivity.class);
         intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
         intent.putExtra(ThingListActivity.EXTRA_FLAGS, flags);
-        startActivity(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && view != null) {
+            startActivity(intent, ActivityOptions.makeScaleUpAnimation(view, 0, 0,
+                    view.getWidth(), view.getHeight()).toBundle());
+        } else {
+            startActivity(intent);
+        }
     }
 
     private void selectSubredditMultiPane(String subreddit, boolean isRandom) {
@@ -394,23 +404,29 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         selectSubredditMultiPane(cf.getSubreddit(), cf.isRandom());
     }
 
-    public void onThingSelected(Bundle thingBundle, int pageType) {
-        selectThing(thingBundle, 0, pageType);
+    public void onThingSelected(View view, Bundle thingBundle, int pageType) {
+        selectThing(view, thingBundle, 0, pageType);
     }
 
-    protected void selectThing(Bundle thingBundle, int flags, int pageType) {
+    protected void selectThing(View view, Bundle thingBundle, int flags, int pageType) {
         if (isSinglePane) {
-            selectThingSinglePane(thingBundle, 0, pageType);
+            selectThingSinglePane(view, thingBundle, pageType, 0);
         } else {
             selectThingMultiPane(thingBundle, pageType);
         }
     }
 
-    private void selectThingSinglePane(Bundle thingBundle, int flags, int pageType) {
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private void selectThingSinglePane(View view, Bundle thingBundle, int pageType, int flags) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         intent.putExtra(ThingActivity.EXTRA_PAGE_TYPE, pageType);
-        startActivity(intent);
+        Bundle options = ThingView.makeActivityOptions(view);
+        if (options != null) {
+            startActivity(intent, options);
+        } else {
+            startActivity(intent);
+        }
     }
 
     private void selectThingMultiPane(Bundle thingBundle, int pageType) {
