@@ -118,6 +118,8 @@ public class ThingView extends CustomView implements OnGestureListener {
     private boolean drawScore;
     private boolean isVotable;
 
+    private float[] nestingPoints;
+
     private String body;
     private CharSequence bodyText;
     private String scoreText;
@@ -288,6 +290,12 @@ public class ThingView extends CustomView implements OnGestureListener {
             }
         }
 
+        if (nesting > 0) {
+            if (nestingPoints == null || nestingPoints.length < nesting * 4) {
+                nestingPoints = new float[nesting * 4];
+            }
+        }
+
         boolean showSubreddit = !TextUtils.isEmpty(subreddit)
                 && !subreddit.equalsIgnoreCase(parentSubreddit);
 
@@ -444,9 +452,11 @@ public class ThingView extends CustomView implements OnGestureListener {
                 break;
         }
 
+        int nestingIndent = getNestingIndent();
+
         // Total outer padding of left and right sides.
         // Also includes additional padding for nested comments.
-        int outerPadding = PADDING * (2 + nesting);
+        int outerPadding = nestingIndent * nesting + PADDING * 2;
 
         // Width to fit our content inside of without padding.
         int contentWidth = measuredWidth - outerPadding;
@@ -538,7 +548,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         // Move from left to right one more time.
-        int x = PADDING + (PADDING * nesting);
+        int x = nestingIndent * nesting + PADDING;
         if (drawVotingArrows) {
             x += VotingArrows.getWidth(drawVotingArrows);
             x += PADDING;
@@ -584,6 +594,17 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         setMeasuredDimension(measuredWidth, measuredHeight);
+
+        for (int i = 0; i < nesting; i++) {
+            int offset = i * 4;
+            nestingPoints[offset + 0] = nestingPoints[offset + 2] = nestingIndent * (i + 1);
+            nestingPoints[offset + 1] = 0;
+            nestingPoints[offset + 3] = measuredHeight;
+        }
+    }
+
+    private int getNestingIndent() {
+        return PADDING + VotingArrows.getWidth(drawVotingArrows);
     }
 
     private boolean isTopStatus() {
@@ -687,6 +708,11 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     @Override
     protected void onDraw(Canvas c) {
+        // Draw nesting lines if the nesting is greater than zero.
+        if (nesting > 0) {
+            c.drawLines(nestingPoints, 0, nesting * 4, NESTING_LINES_PAINT);
+        }
+
         // Draw details on the right if we can fit some.
         if (numFittingDetails > 0) {
             // Translate to the first details cell from the right edge.
@@ -701,7 +727,8 @@ public class ThingView extends CustomView implements OnGestureListener {
             c.translate(-dx - DETAILS_CELL_WIDTH * numFittingDetails, 0);
         }
 
-        c.translate(PADDING * (1 + nesting), PADDING);
+        int nestingIndent = getNestingIndent();
+        c.translate(nestingIndent * nesting + PADDING, PADDING);
 
         if (linkTitleLayout != null) {
             linkTitleLayout.draw(c);
@@ -811,7 +838,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     private float getLeftOffset() {
-        return nesting * PADDING;
+        return getNestingIndent() * nesting;
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {

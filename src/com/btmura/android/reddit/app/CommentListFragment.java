@@ -145,6 +145,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         ListView l = (ListView) v.findViewById(android.R.id.list);
         l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         l.setMultiChoiceModeListener(this);
+        l.setDivider(null);
         return v;
     }
 

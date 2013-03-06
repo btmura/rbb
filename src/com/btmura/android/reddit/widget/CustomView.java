@@ -29,9 +29,8 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ThemePrefs;
 
 /**
- * {@link View} that performs shared initialization of resources and adds an
- * additional chosen state that allows views to be highlightable in multiple
- * choice modal situations.
+ * {@link View} that performs shared initialization of resources and adds an additional chosen state
+ * that allows views to be highlightable in multiple choice modal situations.
  */
 abstract class CustomView extends View {
 
@@ -56,11 +55,12 @@ abstract class CustomView extends View {
     static final int COMMENT_STATUS = 9;
     static final TextPaint[] TEXT_PAINTS = new TextPaint[NUM_TEXT_PAINTS];
 
+    static Paint NESTING_LINES_PAINT;
+
     /**
-     * An additional state set to highlight an item even in a multiple choice
-     * modal situation. The existing activated state doesn't get used in
-     * multiple choice modal, so we need an extra state to be able to highlight
-     * the item.
+     * An additional state set to highlight an item even in a multiple choice modal situation. The
+     * existing activated state doesn't get used in multiple choice modal, so we need an extra state
+     * to be able to highlight the item.
      */
     static final int[] CHOSEN_STATE_SET = {
             R.attr.state_chosen,
@@ -115,6 +115,15 @@ abstract class CustomView extends View {
                 TEXT_PAINTS[i].linkColor = a.getColor(2, -1);
                 a.recycle();
             }
+
+            attrs = new int[] {
+                    R.attr.nesting_line_color,
+            };
+
+            TypedArray a = t.obtainStyledAttributes(attrs);
+            NESTING_LINES_PAINT = new Paint(Paint.ANTI_ALIAS_FLAG);
+            NESTING_LINES_PAINT.setColor(r.getColor(a.getResourceId(0, -1)));
+            a.recycle();
         }
     }
 

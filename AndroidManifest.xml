@@ -36,7 +36,7 @@
         android:backupAgent=".app.backup.BackupAgent"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.Translucent" >
+        android:theme="@style/Theme.Translucent" >
         <activity
             android:name=".accounts.AccountAuthenticatorActivity"
             android:label="@string/add_account" />
