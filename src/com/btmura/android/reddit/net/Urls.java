@@ -29,8 +29,6 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class Urls {
 
-    public static final String HELP_URL = "http://sites.google.com/site/redditbybrian";
-
     /** Type for getting a HTML response. */
     public static final int TYPE_HTML = 0;
 

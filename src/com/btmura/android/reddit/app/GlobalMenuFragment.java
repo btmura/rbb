@@ -30,7 +30,6 @@ import android.widget.SearchView.OnQueryTextListener;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.net.Urls;
 
 public class GlobalMenuFragment extends Fragment implements OnFocusChangeListener,
         OnQueryTextListener {
@@ -108,10 +107,6 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 handleDebug();
                 return true;
 
-            case R.id.menu_help:
-                handleHelp();
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -137,10 +132,6 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
 
     private void handleDebug() {
         MenuHelper.startContentBrowserActivity(getActivity());
-    }
-
-    private void handleHelp() {
-        MenuHelper.openUrl(getActivity(), Urls.HELP_URL);
     }
 
     public void onFocusChange(View v, boolean hasFocus) {
