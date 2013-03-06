@@ -160,8 +160,6 @@ class VotingArrows {
                 break;
         }
 
-        c.save();
-
         Paint[] arrowPaints = isVotable ? PAINTS : STROKE_PAINTS;
         c.drawPath(PATH_UPVOTE, arrowPaints[upPaintIndex]);
         c.translate(0, ARROW_TOTAL_HEIGHT);
@@ -171,14 +169,18 @@ class VotingArrows {
             int sdy = (SCORE_TOTAL_HEIGHT + scoreBounds.height()) / 2;
             c.translate(sdx, sdy);
             c.drawText(scoreText, 0, 0, TEXT_PAINTS[scorePaintIndex]);
-            c.translate(-sdx, -sdy);
-            c.translate(0, SCORE_TOTAL_HEIGHT);
+            c.translate(-sdx, -sdy + SCORE_TOTAL_HEIGHT);
         } else {
             c.translate(0, SCORELESS_TOTAL_HEIGHT);
         }
 
         c.drawPath(PATH_DOWNVOTE, arrowPaints[downPaintIndex]);
-        c.restore();
+
+        if (drawScore) {
+            c.translate(0, -SCORE_TOTAL_HEIGHT - ARROW_TOTAL_HEIGHT);
+        } else {
+            c.translate(0, -SCORELESS_TOTAL_HEIGHT - ARROW_TOTAL_HEIGHT);
+        }
     }
 
     static String getScoreText(int score) {
