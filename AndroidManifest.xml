@@ -36,13 +36,15 @@
         android:backupAgent=".app.backup.BackupAgent"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Translucent" >
+        android:theme="@style/Theme.Transition" >
         <activity
             android:name=".accounts.AccountAuthenticatorActivity"
-            android:label="@string/add_account" />
+            android:label="@string/add_account"
+            android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
             android:name="com.btmura.android.reddit.app.AccountListActivity"
-            android:label="@string/label_accounts" />
+            android:label="@string/label_accounts"
+            android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.BrowserActivity"
@@ -71,6 +73,7 @@
         <!-- Ignore exported activity warning. We want to be exposed to share things. -->
         <activity
             android:name=".app.ComposeActivity"
+            android:theme="@android:style/Theme.Holo.DialogWhenLarge"
             tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

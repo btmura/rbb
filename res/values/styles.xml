@@ -17,11 +17,11 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
-    We need a translucent theme to animate from translucent to a runtime determined theme 
-    preference. The stock Translucent theme disables orientation changes on small screens, so we
-    need to create our own theme based off of a theme that has animations. 
+    We need a theme to animate from a translucent look to a runtime determined theme. The stock 
+    Translucent theme disables orientation changes on small screens, so we need to create our own 
+    theme based off of a theme that has animations. 
     -->
-    <style name="Theme.Translucent" parent="@android:style/Theme.Holo">
+    <style name="Theme.Transition" parent="@android:style/Theme.Holo">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
