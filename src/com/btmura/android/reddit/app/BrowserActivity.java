@@ -80,7 +80,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private MenuItem profileSavedItem;
     private MenuItem messagesItem;
     private MenuItem accountsItem;
-    private MenuItem changeThemesItem;
+    private MenuItem switchThemesItem;
 
     @Override
     protected void setContentView() {
@@ -282,7 +282,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         profileSavedItem = menu.findItem(R.id.menu_profile_saved);
         messagesItem = menu.findItem(R.id.menu_messages);
         accountsItem = menu.findItem(R.id.menu_accounts);
-        changeThemesItem = menu.findItem(R.id.menu_change_themes);
+        switchThemesItem = menu.findItem(R.id.menu_switch_themes);
         return true;
     }
 
@@ -306,7 +306,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         profileSavedItem.setVisible(showAccountItems && hasAccount);
         messagesItem.setVisible(showAccountItems && hasAccount);
         accountsItem.setVisible(showAccountItems);
-        changeThemesItem.setVisible(showAccountItems);
+        switchThemesItem.setVisible(showAccountItems);
 
         refreshMessagesIcon();
         return true;
@@ -354,8 +354,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 handleAccounts();
                 return true;
 
-            case R.id.menu_change_themes:
-                handleChangeThemes();
+            case R.id.menu_switch_themes:
+                handleSwitchThemes();
                 return true;
 
             default:
@@ -379,7 +379,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         MenuHelper.startAccountListActivity(this);
     }
 
-    private void handleChangeThemes() {
+    private void handleSwitchThemes() {
         ThemePrefs.switchTheme(this);
         recreate();
     }
