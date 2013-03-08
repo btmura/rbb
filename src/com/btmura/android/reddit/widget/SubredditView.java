@@ -108,10 +108,10 @@ public class SubredditView extends CustomView {
                 break;
         }
 
-        int remains = measuredWidth - PADDING * 2;
-        setTitleLayout(remains);
+        int contentWidth = Math.max(measuredWidth - PADDING * 2, 0);
+        setTitleLayout(contentWidth);
         if (statusText != null) {
-            setStatusLayout(remains);
+            setStatusLayout(contentWidth);
         }
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
