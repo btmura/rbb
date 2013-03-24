@@ -27,6 +27,7 @@ import android.text.style.BulletSpan;
 import android.text.style.ClickableSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.util.Patterns;
 
 import com.btmura.android.reddit.net.Urls;
@@ -54,6 +55,7 @@ public class Formatter {
             c = Styles.format(matcher, c, Styles.STYLE_STRIKETHROUGH);
             c = Heading.format(matcher, c);
             c = Bullets.format(matcher, c);
+            c = CodeBlock.format(matcher, c);
             c = NamedLinks.format(c, builder);
             c = RawLinks.format(matcher, c);
             return RelativeLinks.format(matcher, c);
@@ -198,6 +200,26 @@ public class Formatter {
                 String value = m.group(2);
 
                 s = Formatter.setSpan(s, start, end, new BulletSpan(20));
+                s = Formatter.replace(s, start, end, value);
+            }
+            return s;
+        }
+    }
+
+    static class CodeBlock {
+
+        static Pattern PATTERN_CODE_BLOCK = Pattern.compile("^(    |\t)(.*)$", Pattern.MULTILINE);
+
+        static CharSequence format(Matcher matcher, CharSequence text) {
+            CharSequence s = text;
+            Matcher m = matcher.usePattern(PATTERN_CODE_BLOCK).reset(text);
+            for (int deleted = 0; m.find();) {
+                int start = m.start() - deleted;
+                int end = m.end() - deleted;
+                deleted += m.group(1).length();
+                String value = m.group(2);
+
+                s = Formatter.setSpan(s, start, end, new TypefaceSpan("monospace"));
                 s = Formatter.replace(s, start, end, value);
             }
             return s;

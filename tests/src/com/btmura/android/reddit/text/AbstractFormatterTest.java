@@ -24,6 +24,7 @@ import android.text.style.BulletSpan;
 import android.text.style.ImageSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 
 import com.btmura.android.reddit.text.Formatter.Escaped;
 import com.btmura.android.reddit.text.Formatter.RawLinks;
@@ -51,12 +52,19 @@ abstract class AbstractFormatterTest extends AndroidTestCase {
     CharSequence assertStyleFormat(int style, String input, String expected) {
         CharSequence cs = Styles.format(matcher, input, style);
         String actual = cs.toString();
-        assertEquals("Expeprivate cted: " + expected + " Actual: " + actual, expected, actual);
+        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
     }
 
     CharSequence assertBulletFormat(String input, String expected) {
         CharSequence cs = Formatter.Bullets.format(matcher, input);
+        String actual = cs.toString();
+        assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
+        return cs;
+    }
+
+    CharSequence assertCodeBlockFormat(String input, String expected) {
+        CharSequence cs = Formatter.CodeBlock.format(matcher, input);
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
@@ -99,6 +107,12 @@ abstract class AbstractFormatterTest extends AndroidTestCase {
     static void assertBulletSpan(CharSequence cs, int start, int end) {
         SpannableStringBuilder b = (SpannableStringBuilder) cs;
         BulletSpan[] spans = b.getSpans(start, end, BulletSpan.class);
+        assertEquals(1, spans.length);
+    }
+
+    static void assertCodeBlockSpan(CharSequence text, int start, int end) {
+        SpannableStringBuilder b = (SpannableStringBuilder) text;
+        TypefaceSpan[] spans = b.getSpans(start, end, TypefaceSpan.class);
         assertEquals(1, spans.length);
     }
 

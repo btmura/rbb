@@ -29,12 +29,15 @@ public class FormatterTest extends AbstractFormatterTest {
     }
 
     public void testFormatAll() {
-        assertFormatAll("this is <bold> text", "this is **&amp;lt;bold&gt;** text");
-        assertFormatAll("this is >italics< and this is strikethrough",
-                "this is &gt;*italics&amp;lt;* and this is ~~strikethrough~~");
+        assertFormatAll("this is **&amp;lt;bold&gt;** text",
+                "this is <bold> text");
+        assertFormatAll("this is &gt;*italics&amp;lt;* and this is ~~strikethrough~~",
+                "this is >italics< and this is strikethrough");
+        assertFormatAll("    code line 1\nnot a code line\n\tcode line 2",
+                "code line 1\nnot a code line\ncode line 2");
     }
 
-    private void assertFormatAll(String expected, String input) {
+    private void assertFormatAll(String input, String expected) {
         CharSequence formatted = formatter.formatAll(mContext, input);
         String actual = formatted.toString();
         assertEquals("expected: " + expected + " actual: " + actual, expected, actual);
