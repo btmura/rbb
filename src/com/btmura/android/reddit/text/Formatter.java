@@ -121,6 +121,7 @@ public class Formatter {
 
     static class CodeBlock {
 
+        // TODO(btmura): Use one span for multiple lines of a code block.
         static Pattern PATTERN_CODE_BLOCK = Pattern.compile("^(    |\t)(.*)$", Pattern.MULTILINE);
 
         static CharSequence format(Matcher matcher, CharSequence text) {
