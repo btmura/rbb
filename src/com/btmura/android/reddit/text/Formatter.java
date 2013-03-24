@@ -34,6 +34,7 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.style.SubredditSpan;
 import com.btmura.android.reddit.text.style.URLSpan;
 import com.btmura.android.reddit.text.style.UserSpan;
+import com.btmura.android.reddit.util.Array;
 
 public class Formatter {
 
@@ -50,12 +51,12 @@ public class Formatter {
 
     public CharSequence formatSpans(Context context, CharSequence c) {
         if (c != null) {
+            c = CodeBlock.format(matcher, c);
             c = Styles.format(matcher, c, Styles.STYLE_BOLD);
             c = Styles.format(matcher, c, Styles.STYLE_ITALIC);
             c = Styles.format(matcher, c, Styles.STYLE_STRIKETHROUGH);
             c = Heading.format(matcher, c);
             c = Bullets.format(matcher, c);
-            c = CodeBlock.format(matcher, c);
             c = NamedLinks.format(c, builder);
             c = RawLinks.format(matcher, c);
             return RelativeLinks.format(matcher, c);
@@ -118,6 +119,38 @@ public class Formatter {
         }
     }
 
+    static class CodeBlock {
+
+        static Pattern PATTERN_CODE_BLOCK = Pattern.compile("^(    |\t)(.*)$", Pattern.MULTILINE);
+
+        static CharSequence format(Matcher matcher, CharSequence text) {
+            CharSequence s = text;
+            Matcher m = matcher.usePattern(PATTERN_CODE_BLOCK).reset(text);
+            for (int deleted = 0; m.find();) {
+                int start = m.start() - deleted;
+                int end = m.end() - deleted;
+                deleted += m.group(1).length();
+                String value = m.group(2);
+
+                s = Formatter.setSpan(s, start, end, new TypefaceSpan("monospace"));
+                s = Formatter.replace(s, start, end, value);
+            }
+            return s;
+        }
+
+        static boolean isCodeBlock(CharSequence text, int start, int end) {
+            // If we're not a SpannableStringBuilder then there are no spans at all yet.
+            if (!(text instanceof SpannableStringBuilder)) {
+                return false;
+            }
+            SpannableStringBuilder s = (SpannableStringBuilder) text;
+
+            // Assume a TypefaceSpan means a code block, since nobody applies other typefaces yet.
+            TypefaceSpan[] spans = s.getSpans(start, end, TypefaceSpan.class);
+            return !Array.isEmpty(spans);
+        }
+    }
+
     static class Styles {
 
         static final int STYLE_BOLD = 0;
@@ -157,6 +190,12 @@ public class Formatter {
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
+
+                // Don't apply formatting within code blocks.
+                if (CodeBlock.isCodeBlock(s, start, end)) {
+                    continue;
+                }
+
                 String value = m.group(1);
                 s = Formatter.replace(s, start, end, value);
                 deleted += charsDeleted;
@@ -196,30 +235,16 @@ public class Formatter {
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
+
+                // Don't apply formatting within code blocks.
+                if (CodeBlock.isCodeBlock(s, start, end)) {
+                    continue;
+                }
+
                 deleted += m.group(1).length();
                 String value = m.group(2);
 
                 s = Formatter.setSpan(s, start, end, new BulletSpan(20));
-                s = Formatter.replace(s, start, end, value);
-            }
-            return s;
-        }
-    }
-
-    static class CodeBlock {
-
-        static Pattern PATTERN_CODE_BLOCK = Pattern.compile("^(    |\t)(.*)$", Pattern.MULTILINE);
-
-        static CharSequence format(Matcher matcher, CharSequence text) {
-            CharSequence s = text;
-            Matcher m = matcher.usePattern(PATTERN_CODE_BLOCK).reset(text);
-            for (int deleted = 0; m.find();) {
-                int start = m.start() - deleted;
-                int end = m.end() - deleted;
-                deleted += m.group(1).length();
-                String value = m.group(2);
-
-                s = Formatter.setSpan(s, start, end, new TypefaceSpan("monospace"));
                 s = Formatter.replace(s, start, end, value);
             }
             return s;
@@ -266,7 +291,13 @@ public class Formatter {
 
                 int endParen = findClosingMarker(s, '(', ')', startParen + 1);
                 if (endParen == -1) {
-                    i = startParen + 1;
+                    i = startBrack + 1;
+                    continue;
+                }
+
+                // Don't apply formatting within code blocks.
+                if (CodeBlock.isCodeBlock(s, startBrack, endParen)) {
+                    i = startBrack + 1;
                     continue;
                 }
 
@@ -371,6 +402,12 @@ public class Formatter {
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
+
+                // Don't apply formatting within code blocks.
+                if (CodeBlock.isCodeBlock(s, start, end)) {
+                    continue;
+                }
+
                 deleted += m.group(1).length() + m.group(3).length();
                 String value = m.group(2);
 

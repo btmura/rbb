@@ -33,8 +33,10 @@ public class FormatterTest extends AbstractFormatterTest {
                 "this is <bold> text");
         assertFormatAll("this is &gt;*italics&amp;lt;* and this is ~~strikethrough~~",
                 "this is >italics< and this is strikethrough");
-        assertFormatAll("    code line 1\nnot a code line\n\tcode line 2",
-                "code line 1\nnot a code line\ncode line 2");
+        assertFormatAll("    code **line** 1\nnot a code line\n\tcode *line* 2",
+                "code **line** 1\nnot a code line\ncode *line* 2");
+        assertFormatAll("    **bullet1\n\t[hello](http://hello.com)\n\t### HEADING",
+                "**bullet1\n[hello](http://hello.com)\n### HEADING");
     }
 
     private void assertFormatAll(String input, String expected) {
