@@ -121,21 +121,42 @@ public class Formatter {
 
     static class CodeBlock {
 
-        // TODO(btmura): Use one span for multiple lines of a code block.
         static Pattern PATTERN_CODE_BLOCK = Pattern.compile("^(    |\t)(.*)$", Pattern.MULTILINE);
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
             Matcher m = matcher.usePattern(PATTERN_CODE_BLOCK).reset(text);
+            int totalStart = -1;
+            int totalEnd = -1;
             for (int deleted = 0; m.find();) {
+                // Remove the leading indentation on the line.
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
-                deleted += m.group(1).length();
-                String value = m.group(2);
+                s = Formatter.replace(s, start, end, m.group(2));
 
-                s = Formatter.setSpan(s, start, end, new TypefaceSpan("monospace"));
-                s = Formatter.replace(s, start, end, value);
+                // Update the end of the match and the deleted count.
+                end -= m.group(1).length();
+                deleted += m.group(1).length();
+
+                // Continuing line. Update the end but don't span since there may be more lines.
+                if (totalEnd != -1 && totalEnd + 1 == start) {
+                    totalEnd = end;
+                    continue;
+                }
+
+                // New block or 1st time. Set the span on the prior block and reset the markers.
+                if (totalStart != -1) {
+                    s = Formatter.setSpan(s, totalStart, totalEnd, new TypefaceSpan("monospace"));
+                }
+                totalStart = start;
+                totalEnd = end;
             }
+
+            // There may not have been a new match to flush out the pending block so do it here.
+            if (totalStart != -1) {
+                s = Formatter.setSpan(s, totalStart, totalEnd, new TypefaceSpan("monospace"));
+            }
+
             return s;
         }
 

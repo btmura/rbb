@@ -33,6 +33,7 @@ import com.btmura.android.reddit.text.Formatter.Styles;
 import com.btmura.android.reddit.text.style.SubredditSpan;
 import com.btmura.android.reddit.text.style.URLSpan;
 import com.btmura.android.reddit.text.style.UserSpan;
+import com.btmura.android.reddit.util.Array;
 
 abstract class AbstractFormatterTest extends AndroidTestCase {
 
@@ -96,6 +97,12 @@ abstract class AbstractFormatterTest extends AndroidTestCase {
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
+    }
+
+    static <T> void assertNoSpans(CharSequence cs, int start, int end, Class<T> spanClass) {
+        SpannableStringBuilder b = (SpannableStringBuilder) cs;
+        T[] spans = b.getSpans(start, end, spanClass);
+        assertTrue(Array.isEmpty(spans));
     }
 
     static void assertStyleSpan(CharSequence cs, int start, int end, int expectedStyle) {

@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.text;
 
+import android.text.style.TypefaceSpan;
+
 import com.btmura.android.reddit.text.Formatter.CodeBlock;
 
 public class Formatter_CodeBlockTest extends AbstractFormatterTest {
@@ -103,5 +105,16 @@ public class Formatter_CodeBlockTest extends AbstractFormatterTest {
 	public void testFormat() throws Exception {
 		CharSequence cs = assertCodeBlockFormat("    line1", "line1");
 		assertCodeBlockSpan(cs, 0, 5);
+
+        // Multiple code block lines should collapse into a single span.
+        cs = assertCodeBlockFormat("\tline1\n\tline2\n\tline3", "line1\nline2\nline3");
+        assertCodeBlockSpan(cs, 0, 17);
+
+        // Two blocks surrounding one non indented line.
+        cs = assertCodeBlockFormat("\tline1\nline2\n\tline3\n\tline4",
+                "line1\nline2\nline3\nline4");
+        assertCodeBlockSpan(cs, 0, 5);
+        assertNoSpans(cs, 6, 11, TypefaceSpan.class);
+        assertCodeBlockSpan(cs, 12, 23);
 	}
 }
