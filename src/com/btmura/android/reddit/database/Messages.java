@@ -47,7 +47,27 @@ public class Messages implements BaseColumns {
     public static final String SELECT_BY_MESSAGE_ACTION_ID =
             COLUMN_MESSAGE_ACTION_ID + "=?";
 
-    static void createTempTable(SQLiteDatabase db) {
+    static void createTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+                + _ID + " INTEGER PRIMARY KEY,"
+                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
+                + COLUMN_AUTHOR + " TEXT,"
+                + COLUMN_BODY + " TEXT,"
+                + COLUMN_CONTEXT + " TEXT,"
+                + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
+                + COLUMN_DESTINATION + " TEXT,"
+                + COLUMN_KIND + " INTEGER NOT NULL,"
+                + COLUMN_MESSAGE_ACTION_ID + " INTEGER,"
+                + COLUMN_NEW + " INTEGER DEFAULT 0,"
+                + COLUMN_SESSION_ID + " TEXT,"
+                + COLUMN_SUBJECT + " TEXT,"
+                + COLUMN_SUBREDDIT + " TEXT,"
+                + COLUMN_THING_ID + " TEXT,"
+                + COLUMN_WAS_COMMENT + " INTEGER DEFAULT 0)");
+    }
+
+    /** Creates the temporary table used in version 2. Kept for testing upgrades. */
+    static void createTempTableV2(SQLiteDatabase db) {
         db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACCOUNT + " TEXT NOT NULL,"

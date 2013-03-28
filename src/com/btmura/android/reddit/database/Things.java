@@ -58,8 +58,8 @@ public class Things implements BaseColumns {
     public static final String COLUMN_URL = "url";
 
     /**
-     * Column to indicate whether this comment is visible. A comment whose
-     * parent is collapsed will have expanded to true but visible to false.
+     * Column to indicate whether this comment is visible. A comment whose parent is collapsed will
+     * have expanded to true but visible to false.
      */
     public static final String COLUMN_VISIBLE = "visible";
 
@@ -87,7 +87,42 @@ public class Things implements BaseColumns {
     // TODO: Do we need an index for sequence and id?
     public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
 
-    static void createTempTable(SQLiteDatabase db) {
+    static void createTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+                + _ID + " INTEGER PRIMARY KEY, "
+                + COLUMN_ACCOUNT + " TEXT NOT NULL, "
+                + COLUMN_AUTHOR + " TEXT, "
+                + COLUMN_BODY + " TEXT, "
+                + COLUMN_COMMENT_ACTION_ID + " INTEGER,"
+                + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
+                + COLUMN_DOMAIN + " TEXT, "
+                + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
+                + COLUMN_EXPANDED + " INTEGER DEFAULT 1, "
+                + COLUMN_KIND + " INTEGER, "
+                + COLUMN_LIKES + " INTEGER DEFAULT 0, "
+                + COLUMN_LINK_ID + " TEXT, "
+                + COLUMN_LINK_TITLE + " TEXT, "
+                + COLUMN_NESTING + " INTEGER, "
+                + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
+                + COLUMN_OVER_18 + " INTEGER DEFAULT 0, "
+                + COLUMN_PERMA_LINK + " TEXT, "
+                + COLUMN_SAVED + " INTEGER DEFAULT 0, "
+                + COLUMN_SCORE + " INTEGER DEFAULT 0, "
+                + COLUMN_SELF + " INTEGER DEFAULT 0, "
+                + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "
+                + COLUMN_SEQUENCE + " INTEGER, "
+                + COLUMN_SESSION_ID + " TEXT NOT NULL, "
+                + COLUMN_SUBREDDIT + " TEXT, "
+                + COLUMN_THING_ID + " TEXT, "
+                + COLUMN_TITLE + " TEXT, "
+                + COLUMN_THUMBNAIL_URL + " TEXT, "
+                + COLUMN_UPS + " INTEGER DEFAULT 0, "
+                + COLUMN_URL + " TEXT,"
+                + COLUMN_VISIBLE + " INTEGER DEFAULT 1)");
+    }
+
+    /** Creates the temporary table used in version 2. Kept for testing upgrades. */
+    static void createTempTableV2(SQLiteDatabase db) {
         db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "

@@ -28,7 +28,14 @@ public class Sessions implements BaseColumns {
 
     public static final String SELECT_BY_ID = SharedColumns.SELECT_BY_ID;
 
-    static void createTempTable(SQLiteDatabase db) {
+    static void createTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+                + _ID + " INTEGER PRIMARY KEY, "
+                + COLUMN_TIMESTAMP + " INTEGER NOT NULL)");
+    }
+
+    /** Creates the temporary table used in version 2. Kept for testing upgrades. */
+    static void createTempTableV2(SQLiteDatabase db) {
         db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_TIMESTAMP + " INTEGER NOT NULL)");

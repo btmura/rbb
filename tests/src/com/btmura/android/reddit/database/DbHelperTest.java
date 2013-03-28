@@ -53,6 +53,8 @@ public class DbHelperTest extends AndroidTestCase {
             ReadActions.TABLE_NAME,
     };
 
+    private static final String[] TABLES_V3 = TABLES_V2;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -71,13 +73,23 @@ public class DbHelperTest extends AndroidTestCase {
         helper.close();
     }
 
-    public void testOnUpgrade_v1ToV2() {
+    public void testOnCreate_v3() {
+        DbHelper helper = createHelperVersion(3);
+        assertTablesExist(helper.getReadableDatabase(), TABLES_V3);
+        helper.close();
+    }
+
+    public void testOnUpgrade() {
         DbHelper helper = createHelperVersion(1);
         assertTablesExist(helper.getReadableDatabase(), TABLES_V1);
         helper.close();
 
         helper = createHelperVersion(2);
         assertTablesExist(helper.getReadableDatabase(), TABLES_V2);
+        helper.close();
+
+        helper = createHelperVersion(3);
+        assertTablesExist(helper.getReadableDatabase(), TABLES_V3);
         helper.close();
     }
 
