@@ -24,8 +24,9 @@
         android:title="@string/menu_new_post"/>
     <item
         android:id="@+id/menu_add_subreddit"
+        android:icon="?attr/menu_add_subreddit_icon"
         android:orderInCategory="@integer/menu_order_subreddit"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_add_subreddit"/>
     <item
         android:id="@+id/menu_subreddit"

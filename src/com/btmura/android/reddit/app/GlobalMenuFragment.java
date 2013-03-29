@@ -36,6 +36,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
 
     public static final String TAG = "GlobalMenuFragment";
 
+    private static final boolean SHOW_DEBUG = BuildConfig.DEBUG && !true;
+
     private static final int REQUEST_SEARCH = 0;
 
     public interface OnSearchQuerySubmittedListener {
@@ -76,7 +78,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextFocusChangeListener(this);
         searchView.setOnQueryTextListener(this);
-        menu.findItem(R.id.menu_debug).setVisible(BuildConfig.DEBUG);
+        menu.findItem(R.id.menu_debug).setVisible(SHOW_DEBUG);
     }
 
     @Override
@@ -85,7 +87,6 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         // convenience. Some other items have complicated visibility logic, so
         // they aren't inflated in this fragment.
         switch (item.getItemId()) {
-            case R.id.menu_browser_new_post:
             case R.id.menu_new_post:
                 handleNewPost();
                 return true;

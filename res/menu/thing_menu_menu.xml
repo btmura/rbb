@@ -65,7 +65,8 @@
             android:visible="false"/>
         <item
             android:id="@+id/menu_thing_add_subreddit"
-            android:showAsAction="never"
+            android:icon="?attr/menu_add_subreddit_icon"
+            android:showAsAction="ifRoom"
             android:title="@string/menu_add_subreddit"/>
         <item
             android:id="@+id/menu_user"

@@ -74,7 +74,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         }
     };
 
-    private MenuItem newPostItem;
     private MenuItem addSubredditItem;
     private MenuItem profileItem;
     private MenuItem profileSavedItem;
@@ -276,7 +275,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
-        newPostItem = menu.findItem(R.id.menu_browser_new_post);
         addSubredditItem = menu.findItem(R.id.menu_browser_add_subreddit);
         profileItem = menu.findItem(R.id.menu_profile);
         profileSavedItem = menu.findItem(R.id.menu_profile_saved);
@@ -292,7 +290,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             Log.d(TAG, "onPrepareOptionsMenu");
         }
         super.onPrepareOptionsMenu(menu);
-        if (newPostItem == null) {
+        if (addSubredditItem == null) {
             return true; // Check that onCreateOptionsMenu was called.
         }
 
@@ -300,7 +298,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         menu.setGroupVisible(R.id.menu_group_account_items, showAccountItems);
 
         boolean hasAccount = hasAccount();
-        newPostItem.setVisible(isSinglePane && hasAccount);
         addSubredditItem.setVisible(isSinglePane);
         profileItem.setVisible(showAccountItems && hasAccount);
         profileSavedItem.setVisible(showAccountItems && hasAccount);

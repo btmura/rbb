@@ -19,22 +19,22 @@
     <item
         android:id="@+id/menu_reply"
         android:icon="?attr/menu_reply_icon"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_reply"/>
     <item
         android:id="@+id/menu_edit"
         android:icon="?attr/menu_edit_icon"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_edit"/>
     <item
         android:id="@+id/menu_delete"
         android:icon="?attr/menu_delete_icon"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_delete"/>
     <item
         android:id="@+id/menu_author"
         android:icon="?attr/menu_profile_icon"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_author"/>
     <item
         android:id="@+id/menu_share_comment"
