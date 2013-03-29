@@ -56,4 +56,6 @@ public abstract class BaseLoaderAdapter extends BaseCursorAdapter {
     protected String getSortOrder() {
         return null;
     }
+
+    public abstract void deleteSessionData(Context context);
 }

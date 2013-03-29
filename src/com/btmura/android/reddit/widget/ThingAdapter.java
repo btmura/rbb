@@ -219,6 +219,12 @@ public class ThingAdapter extends BaseLoaderAdapter {
     }
 
     @Override
+    public void deleteSessionData(Context context) {
+        Uri uri = isMessageActivity() ? ThingProvider.MESSAGES_URI : ThingProvider.THINGS_URI;
+        Provider.deleteSessionAsync(context, uri, sessionId);
+    }
+
+    @Override
     public int getViewTypeCount() {
         return 2;
     }

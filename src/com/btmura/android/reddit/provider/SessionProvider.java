@@ -88,6 +88,9 @@ abstract class SessionProvider extends BaseProvider {
                 ContentValues v = new ContentValues(1);
                 v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
                 sessionId = db.insert(Sessions.TABLE_NAME, null, v);
+                if (BuildConfig.DEBUG) {
+                    Log.d(logTag, "created new session: " + sessionId);
+                }
             }
 
             // Add the session id to the data rows.
@@ -103,11 +106,6 @@ abstract class SessionProvider extends BaseProvider {
             }
 
             db.setTransactionSuccessful();
-
-            if (BuildConfig.DEBUG) {
-                Log.d(logTag, "created new session: " + sessionId);
-            }
-
             return sessionId;
         } finally {
             db.endTransaction();

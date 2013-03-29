@@ -40,6 +40,7 @@ import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
+import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
@@ -49,11 +50,12 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
  * URI MATCHING PATTERNS:
- *
+ * 
  * <pre>
  * /things
  * /messages
  * /subreddits
+ * /sessions
  * /actions/comments
  * /actions/messages
  * /actions/reads
@@ -74,6 +76,7 @@ public class ThingProvider extends SessionProvider {
     private static final String PATH_THINGS = "things";
     private static final String PATH_MESSAGES = "messages";
     private static final String PATH_SUBREDDITS = "subreddits";
+    private static final String PATH_SESSIONS = "sessions";
     private static final String PATH_COMMENT_ACTIONS = "actions/comments";
     private static final String PATH_MESSAGE_ACTIONS = "actions/messages";
     private static final String PATH_READ_ACTIONS = "actions/reads";
@@ -83,6 +86,7 @@ public class ThingProvider extends SessionProvider {
     public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
     public static final Uri MESSAGES_URI = Uri.parse(AUTHORITY_URI + PATH_MESSAGES);
     public static final Uri SUBREDDITS_URI = Uri.parse(AUTHORITY_URI + PATH_SUBREDDITS);
+    public static final Uri SESSIONS_URI = Uri.parse(AUTHORITY_URI + PATH_SESSIONS);
     public static final Uri COMMENT_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENT_ACTIONS);
     public static final Uri MESSAGE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_MESSAGE_ACTIONS);
     public static final Uri READ_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_READ_ACTIONS);
@@ -97,15 +101,17 @@ public class ThingProvider extends SessionProvider {
     private static final int MATCH_THINGS = 1;
     private static final int MATCH_MESSAGES = 2;
     private static final int MATCH_SUBREDDITS = 3;
-    private static final int MATCH_COMMENT_ACTIONS = 4;
-    private static final int MATCH_MESSAGE_ACTIONS = 5;
-    private static final int MATCH_READ_ACTIONS = 6;
-    private static final int MATCH_SAVE_ACTIONS = 7;
-    private static final int MATCH_VOTE_ACTIONS = 8;
+    private static final int MATCH_SESSIONS = 4;
+    private static final int MATCH_COMMENT_ACTIONS = 5;
+    private static final int MATCH_MESSAGE_ACTIONS = 6;
+    private static final int MATCH_READ_ACTIONS = 7;
+    private static final int MATCH_SAVE_ACTIONS = 8;
+    private static final int MATCH_VOTE_ACTIONS = 9;
     static {
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
         MATCHER.addURI(AUTHORITY, PATH_MESSAGES, MATCH_MESSAGES);
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDITS, MATCH_SUBREDDITS);
+        MATCHER.addURI(AUTHORITY, PATH_SESSIONS, MATCH_SESSIONS);
         MATCHER.addURI(AUTHORITY, PATH_COMMENT_ACTIONS, MATCH_COMMENT_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_MESSAGE_ACTIONS, MATCH_MESSAGE_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_READ_ACTIONS, MATCH_READ_ACTIONS);
@@ -315,6 +321,9 @@ public class ThingProvider extends SessionProvider {
 
             case MATCH_SUBREDDITS:
                 return SubredditResults.TABLE_NAME;
+
+            case MATCH_SESSIONS:
+                return Sessions.TABLE_NAME;
 
             case MATCH_COMMENT_ACTIONS:
                 return CommentActions.TABLE_NAME;

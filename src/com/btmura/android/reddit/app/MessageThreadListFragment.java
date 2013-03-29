@@ -129,6 +129,7 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
 
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
+        adapter.deleteSessionData(getActivity());
     }
 
     @Override

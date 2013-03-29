@@ -103,6 +103,11 @@ class SubredditListingAdapter extends SubredditAdapter {
     }
 
     @Override
+    public void deleteSessionData(Context context) {
+        // Subreddit listings don't use sessions.
+    }
+
+    @Override
     public void bindView(View view, Context context, Cursor cursor) {
         String name = cursor.getString(INDEX_NAME);
         SubredditView v = (SubredditView) view;

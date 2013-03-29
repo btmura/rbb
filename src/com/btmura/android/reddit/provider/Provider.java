@@ -43,6 +43,8 @@ import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
+import com.btmura.android.reddit.database.Sessions;
+import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
@@ -591,6 +593,28 @@ public class Provider {
 
                 // No toast needed, since the vote arrows will reflect success.
                 cr.insert(VOTE_ACTIONS_NOTIFY_SYNC_URI, v);
+            }
+        });
+    }
+
+    public static void deleteSessionAsync(Context context, final Uri uri, final long sessionId) {
+        if (sessionId == -1) {
+            return;
+        }
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                String[] selectionArgs = Array.of(sessionId);
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(2);
+                ops.add(ContentProviderOperation.newDelete(ThingProvider.SESSIONS_URI)
+                        .withSelection(Sessions.SELECT_BY_ID, selectionArgs)
+                        .build());
+                ops.add(ContentProviderOperation.newDelete(uri)
+                        .withSelection(SharedColumns.SELECT_BY_SESSION_ID, selectionArgs)
+                        .build());
+                applyOps(appContext, ThingProvider.AUTHORITY, ops);
             }
         });
     }

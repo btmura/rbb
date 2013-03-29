@@ -16,15 +16,16 @@
 
 package com.btmura.android.reddit.widget;
 
-import com.btmura.android.reddit.database.SubredditResults;
-import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.util.Objects;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
+
+import com.btmura.android.reddit.database.SubredditResults;
+import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.util.Objects;
 
 /** {@link SubredditAdapter} that handles searching for subreddits. */
 class SubredditSearchAdapter extends SubredditAdapter {
@@ -60,6 +61,11 @@ class SubredditSearchAdapter extends SubredditAdapter {
     @Override
     protected String getSortOrder() {
         return SubredditResults.SORT_BY_NAME;
+    }
+
+    @Override
+    public void deleteSessionData(Context context) {
+        Provider.deleteSessionAsync(context, ThingProvider.SUBREDDITS_URI, sessionId);
     }
 
     @Override

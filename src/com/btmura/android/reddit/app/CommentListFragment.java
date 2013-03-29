@@ -161,6 +161,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         return adapter.getLoader(getActivity());
     }
 
+    @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         // Process ThingProvider results.
         super.onLoadFinished(loader, cursor);
@@ -191,6 +192,11 @@ public class CommentListFragment extends ThingProviderListFragment implements
         }
     }
 
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
+        adapter.deleteSessionData(getActivity());
+    }
+
     @Override
     protected void onSessionIdLoaded(long sessionId) {
         adapter.setSessionId(sessionId);
@@ -199,10 +205,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
     @Override
     protected void onSubredditLoaded(String subreddit) {
         throw new IllegalStateException();
-    }
-
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
     }
 
     @Override

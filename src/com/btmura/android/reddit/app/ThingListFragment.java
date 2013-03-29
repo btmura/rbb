@@ -236,6 +236,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         return adapter.getLoader(getActivity());
     }
 
+    @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         // Process ThingProvider results.
         super.onLoadFinished(loader, cursor);
@@ -251,6 +252,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
+        adapter.deleteSessionData(getActivity());
     }
 
     @Override

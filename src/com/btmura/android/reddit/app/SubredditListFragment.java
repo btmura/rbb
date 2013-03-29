@@ -64,10 +64,9 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
     public interface OnSubredditSelectedListener {
         /**
-         * Notifies the listener of the first subreddit in the loaded list. If
-         * there are no subreddits, then subreddit is null. If there was an
-         * error, then subreddit is null but error is true. Otherwise, subreddit
-         * is non-null with error set to false.
+         * Notifies the listener of the first subreddit in the loaded list. If there are no
+         * subreddits, then subreddit is null. If there was an error, then subreddit is null but
+         * error is true. Otherwise, subreddit is non-null with error set to false.
          */
         void onInitialSubredditSelected(String subreddit, boolean error);
 
@@ -206,6 +205,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
+        adapter.deleteSessionData(getActivity());
     }
 
     @Override

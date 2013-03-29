@@ -47,6 +47,8 @@ public class Messages implements BaseColumns {
     public static final String SELECT_BY_MESSAGE_ACTION_ID =
             COLUMN_MESSAGE_ACTION_ID + "=?";
 
+    public static final String SELECT_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID;
+
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"

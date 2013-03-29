@@ -142,6 +142,11 @@ public class CommentAdapter extends BaseLoaderAdapter {
     }
 
     @Override
+    public void deleteSessionData(Context context) {
+        Provider.deleteSessionAsync(context, ThingProvider.THINGS_URI, sessionId);
+    }
+
+    @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return new ThingView(context);
     }
