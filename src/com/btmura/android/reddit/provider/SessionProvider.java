@@ -18,6 +18,7 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.ContentValues;
 import android.database.DatabaseUtils;
@@ -27,14 +28,23 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.SharedColumns;
+import com.btmura.android.reddit.database.SubredditResults;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.util.Array;
 
 /**
  * {@link BaseProvider} that has additional methods for handling sessions.
  */
 abstract class SessionProvider extends BaseProvider {
+
+    /**
+     * Flag indicating whether we have performed initial database cleaning to remove rows left if
+     * the app is terminated abruptly.
+     */
+    private static final AtomicBoolean NEED_DATABASE_CLEANING = new AtomicBoolean(true);
 
     private static final String SELECT_MORE_WITH_SESSION_ID =
             Kinds.COLUMN_KIND + "=" + Kinds.KIND_MORE
@@ -46,6 +56,24 @@ abstract class SessionProvider extends BaseProvider {
 
     /** Returns a session id pointing to the data. */
     long getListingSession(Listing listing, SQLiteDatabase db, long sessionId) throws IOException {
+        // Perform one time cleaning of the database to avoid leaving residue in the database if
+        // the app was terminated abruptly or crashed.
+        if (NEED_DATABASE_CLEANING.getAndSet(false)) {
+            db.beginTransaction();
+            try {
+                int deleted = db.delete(Things.TABLE_NAME, null, null);
+                deleted += db.delete(Messages.TABLE_NAME, null, null);
+                deleted += db.delete(SubredditResults.TABLE_NAME, null, null);
+                deleted += db.delete(Sessions.TABLE_NAME, null, null);
+                if (BuildConfig.DEBUG) {
+                    Log.d(logTag, "cleaned: " + deleted);
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+        }
+
         // Double check that the session exists if specified.
         if (sessionId != -1) {
             long count = DatabaseUtils.queryNumEntries(db, Sessions.TABLE_NAME,
