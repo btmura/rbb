@@ -49,6 +49,7 @@
         <activity
             android:name=".app.BrowserActivity"
             android:clearTaskOnLaunch="true"
+            android:uiOptions="splitActionBarWhenNarrow"
             tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -94,8 +95,11 @@
             android:theme="@android:style/Theme.Holo.DialogWhenLarge" />
         <activity
             android:name=".app.ThingActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name=".app.ThingListActivity" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:uiOptions="splitActionBarWhenNarrow" />
+        <activity
+            android:name=".app.ThingListActivity"
+            android:uiOptions="splitActionBarWhenNarrow" />
         <activity
             android:name=".app.UserProfileActivity"
             tools:ignore="ExportedActivity" >

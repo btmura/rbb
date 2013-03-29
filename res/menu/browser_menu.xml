@@ -16,15 +16,6 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item
-        android:id="@+id/menu_browser_new_post"
-        android:showAsAction="never"
-        android:title="@string/menu_new_post"/>
-    <item
-        android:id="@+id/menu_browser_add_subreddit"
-        android:showAsAction="never"
-        android:title="@string/menu_add_subreddit"/>
-
     <group
         android:id="@+id/menu_group_account_items"
         android:orderInCategory="@integer/menu_order_account" >
@@ -46,9 +37,20 @@
     </group>
 
     <item
+        android:id="@+id/menu_browser_new_post"
+        android:icon="?attr/menu_add_icon"
+        android:orderInCategory="@integer/menu_order_subreddit"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_new_post"/>
+    <item
+        android:id="@+id/menu_browser_add_subreddit"
+        android:orderInCategory="@integer/menu_order_subreddit"
+        android:showAsAction="never"
+        android:title="@string/menu_add_subreddit"/>
+    <item
         android:id="@+id/menu_accounts"
         android:orderInCategory="@integer/menu_order_last"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_accounts"/>
     <item
         android:id="@+id/menu_switch_themes"

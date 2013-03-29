@@ -18,6 +18,24 @@
 
     <group android:orderInCategory="@integer/menu_order_thing" >
         <item
+            android:id="@+id/menu_new_comment"
+            android:icon="?attr/menu_add_icon"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_new_comment"
+            android:visible="false"/>
+        <item
+            android:id="@+id/menu_saved"
+            android:icon="?attr/menu_saved_icon"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_unsave"
+            android:visible="false"/>
+        <item
+            android:id="@+id/menu_unsaved"
+            android:icon="?attr/menu_unsaved_icon"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_save"
+            android:visible="false"/>
+        <item
             android:id="@+id/menu_share"
             android:actionProviderClass="android.widget.ShareActionProvider"
             android:showAsAction="ifRoom"
@@ -36,21 +54,6 @@
             android:title="@string/menu_comments"
             android:visible="false"/>
         <item
-            android:id="@+id/menu_new_comment"
-            android:showAsAction="never"
-            android:title="@string/menu_new_comment"
-            android:visible="false"/>
-        <item
-            android:id="@+id/menu_saved"
-            android:showAsAction="never"
-            android:title="@string/menu_unsave"
-            android:visible="false"/>
-        <item
-            android:id="@+id/menu_unsaved"
-            android:showAsAction="never"
-            android:title="@string/menu_save"
-            android:visible="false"/>
-        <item
             android:id="@+id/menu_open"
             android:showAsAction="never"
             android:title="@string/menu_open"
@@ -66,11 +69,13 @@
             android:title="@string/menu_add_subreddit"/>
         <item
             android:id="@+id/menu_user"
-            android:showAsAction="never"
+            android:icon="?attr/menu_profile_icon"
+            android:showAsAction="ifRoom"
             android:title="@string/menu_user"/>
         <item
             android:id="@+id/menu_thing_subreddit"
-            android:showAsAction="never"
+            android:icon="?attr/menu_about_icon"
+            android:showAsAction="ifRoom"
             android:title="@string/menu_subreddit"/>
     </group>
 

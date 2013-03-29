@@ -38,7 +38,8 @@
         android:title="@string/menu_author"/>
     <item
         android:id="@+id/menu_subreddit"
-        android:showAsAction="ifRoom"
+        android:icon="?attr/menu_about_icon"
+        android:showAsAction="ifRoom|withText"
         android:title="@string/menu_subreddit"/>
     <item
         android:id="@+id/menu_share_thing"
