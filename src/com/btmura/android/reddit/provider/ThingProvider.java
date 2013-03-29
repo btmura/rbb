@@ -18,7 +18,6 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
@@ -188,12 +187,6 @@ public class ThingProvider extends BaseProvider {
     private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Things.TABLE_NAME
             + " SET " + Things.COLUMN_SEQUENCE + "=" + Things.COLUMN_SEQUENCE + "+1"
             + " WHERE " + Things.COLUMN_SESSION_ID + "=? AND " + Things.COLUMN_SEQUENCE + ">=?";
-
-    /**
-     * Flag indicating whether we have performed initial database cleaning to remove rows left if
-     * the app is terminated abruptly.
-     */
-    private static final AtomicBoolean NEED_DATABASE_CLEANING = new AtomicBoolean(true);
 
     private static final String SELECT_MORE_WITH_SESSION_ID = Kinds.COLUMN_KIND + "="
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
@@ -454,24 +447,6 @@ public class ThingProvider extends BaseProvider {
     /** Returns a session id pointing to the data. */
     private static long getListingSession(Listing listing, SQLiteDatabase db, long sessionId)
             throws IOException {
-        // Perform one time cleaning of the database to avoid leaving residue in the database if
-        // the app was terminated abruptly or crashed.
-        if (NEED_DATABASE_CLEANING.getAndSet(false)) {
-            db.beginTransaction();
-            try {
-                int deleted = db.delete(Things.TABLE_NAME, null, null);
-                deleted += db.delete(Messages.TABLE_NAME, null, null);
-                deleted += db.delete(SubredditResults.TABLE_NAME, null, null);
-                deleted += db.delete(Sessions.TABLE_NAME, null, null);
-                if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "cleaned: " + deleted);
-                }
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
-            }
-        }
-
         // Double check that the session exists if specified.
         if (sessionId != -1) {
             long count = DatabaseUtils.queryNumEntries(db, Sessions.TABLE_NAME,
