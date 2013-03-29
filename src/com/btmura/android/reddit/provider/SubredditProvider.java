@@ -20,7 +20,7 @@ import android.net.Uri;
 
 import com.btmura.android.reddit.database.Subreddits;
 
-public class SubredditProvider extends SessionProvider {
+public class SubredditProvider extends BaseProvider {
 
     public static final String TAG = "SubredditProvider";
 
