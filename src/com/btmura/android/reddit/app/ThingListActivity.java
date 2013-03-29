@@ -89,11 +89,6 @@ public class ThingListActivity extends GlobalMenuActivity implements
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
-
-            // Add fragment early to avoid janky menu adjustments.
-            Fragment frag = ThingListFragment.newSubredditInstance(null, subreddit, 0, 0);
-            ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
-
             ft.commit();
         }
     }
@@ -117,14 +112,24 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        int filter = result.getLastSubredditFilter(this);
         accountName = result.getLastAccount(this);
         adapter.addSubredditFilters(this);
-        bar.setSelectedNavigationItem(result.getLastSubredditFilter(this));
+
+        // Commit the fragment here to avoid some menu item jank.
+        if (getThingListFragment() == null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            Fragment frag = ThingListFragment.newSubredditInstance(accountName, subreddit,
+                    filter, 0);
+            ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
+            ft.commitAllowingStateLoss();
+        }
+
+        bar.setSelectedNavigationItem(filter);
         invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<AccountResult> loader) {
-        accountName = null;
     }
 
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {

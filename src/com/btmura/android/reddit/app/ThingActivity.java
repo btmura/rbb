@@ -110,6 +110,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = result.getLastAccount(this);
 
+        // Commit the fragment here to avoid some menu item jank.
         if (getThingMenuFragment() == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(ThingMenuFragment.newInstance(accountName, thingBundle), ThingMenuFragment.TAG);
