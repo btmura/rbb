@@ -16,7 +16,9 @@
 
 package com.btmura.android.reddit.view;
 
+import android.annotation.SuppressLint;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewConfiguration;
@@ -33,20 +35,24 @@ import android.widget.ListView;
  */
 public class SwipeTouchListener implements OnTouchListener {
 
-    private final ListView listView;
     private final int touchSlop;
+    private final int minFlingVelocity;
+    private final int maxFlingVelocity;
+    private final ListView listView;
 
     private boolean disabled;
-    private View swipeView;
     private float downX;
     private float downY;
+    private View swipeView;
     private boolean swiping;
+    private VelocityTracker velocityTracker;
 
     public SwipeTouchListener(ListView listView) {
-        this.listView = listView;
-
         ViewConfiguration vc = ViewConfiguration.get(listView.getContext());
         this.touchSlop = vc.getScaledTouchSlop();
+        this.minFlingVelocity = vc.getScaledMinimumFlingVelocity();
+        this.maxFlingVelocity = vc.getScaledMaximumFlingVelocity();
+        this.listView = listView;
     }
 
     @Override
@@ -64,24 +70,38 @@ public class SwipeTouchListener implements OnTouchListener {
         return false;
     }
 
-    private boolean handleActionDown(MotionEvent e) {
+    private boolean handleActionDown(MotionEvent event) {
+        velocityTracker = newVelocityTracker();
+        velocityTracker.addMovement(event);
+
         if (!disabled) {
-            View childView = getChildView(e);
+            View childView = getChildView(event);
             if (childView != null) {
                 // Record the view that is probably being sniped and the initial touch location,
                 // so we can translate the swiped view by the change in touch location.
                 swipeView = childView;
-                downX = e.getRawX();
-                downY = e.getRawY();
+                downX = event.getRawX();
+                downY = event.getRawY();
 
                 // Consume the touch event to indicate that we handle it. However, pass the
                 // touch event to the ListView to process as well, because we don't know whether
                 // this is just a simple touch or the beginning of a swipe.
-                listView.onTouchEvent(e);
+                listView.onTouchEvent(event);
                 return true;
             }
         }
         return false;
+    }
+
+    /** Returns a fresh {@link VelocityTracker} with no data yet. */
+    @SuppressLint("Recycle")
+    private VelocityTracker newVelocityTracker() {
+        if (velocityTracker == null) {
+            velocityTracker = VelocityTracker.obtain();
+        } else {
+            velocityTracker.clear();
+        }
+        return velocityTracker;
     }
 
     /** Gets the child corresponding to the coordinates of the {@link MotionEvent}. */
@@ -97,10 +117,12 @@ public class SwipeTouchListener implements OnTouchListener {
         return null;
     }
 
-    private boolean handleActionMove(MotionEvent e) {
+    private boolean handleActionMove(MotionEvent event) {
+        velocityTracker.addMovement(event);
+
         if (!disabled && swipeView != null) {
-            float deltaX = e.getRawX() - downX;
-            float deltaY = e.getRawY() - downY;
+            float deltaX = event.getRawX() - downX;
+            float deltaY = event.getRawY() - downY;
 
             // Consider it a swipe if the user is moving enough on the X-axis but is NOT moving
             // enough on the Y-axis. If we don't check the Y-axis movement, then the items will
@@ -113,9 +135,9 @@ public class SwipeTouchListener implements OnTouchListener {
 
                 // Send a cancel event to the parent ListView to make it cancel any select
                 // highlighting or pending long presses.
-                MotionEvent cancelEvent = MotionEvent.obtain(e);
+                MotionEvent cancelEvent = MotionEvent.obtain(event);
                 cancelEvent.setAction(MotionEvent.ACTION_CANCEL
-                        | (e.getActionIndex() << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
+                        | (event.getActionIndex() << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
                 listView.onTouchEvent(cancelEvent);
                 cancelEvent.recycle();
             }
@@ -131,10 +153,41 @@ public class SwipeTouchListener implements OnTouchListener {
         return false;
     }
 
-    private boolean handleActionUp(MotionEvent e) {
+    private boolean handleActionUp(MotionEvent event) {
+        velocityTracker.addMovement(event);
+
         if (swipeView != null) {
-            swipeView.animate().translationX(0).alpha(1).start();
+            boolean dismiss = false;
+            boolean dismissRight = false;
+
+            float deltaX = event.getRawX() - downX;
+            velocityTracker.computeCurrentVelocity(1000);
+            float vx = velocityTracker.getXVelocity();
+            float vy = velocityTracker.getYVelocity();
+
+            if (Math.abs(deltaX) > swipeView.getWidth() / 2) {
+                dismiss = true;
+                dismissRight = deltaX > 0;
+            } else if (Math.abs(vx) >= minFlingVelocity
+                    && Math.abs(vx) <= maxFlingVelocity
+                    && Math.abs(vy) < minFlingVelocity) {
+                dismiss = true;
+                dismissRight = vx > 0;
+            }
+
+            if (dismiss) {
+                swipeView.animate()
+                        .translationX(swipeView.getWidth() * (dismissRight ? 1 : -1))
+                        .alpha(0)
+                        .start();
+            } else {
+                swipeView.animate()
+                        .translationX(0)
+                        .alpha(1)
+                        .start();
+            }
         }
+
         swipeView = null;
         downX = 0;
         downY = 0;
