@@ -767,6 +767,10 @@ public class ThingAdapter extends BaseLoaderAdapter {
         this.more = more;
     }
 
+    public boolean isSingleChoice() {
+        return singleChoice;
+    }
+
     private boolean isMessageActivity() {
         return !TextUtils.isEmpty(messageUser);
     }

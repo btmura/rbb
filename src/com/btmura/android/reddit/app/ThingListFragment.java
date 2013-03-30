@@ -41,8 +41,10 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
+import com.btmura.android.reddit.view.SwipeTouchListener;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
+import com.btmura.android.reddit.widget.ThingView;
 
 public class ThingListFragment extends ThingProviderListFragment implements
         OnScrollListener, OnVoteListener, MultiChoiceModeListener {
@@ -192,11 +194,29 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        ListView l = (ListView) v.findViewById(android.R.id.list);
-        l.setVerticalScrollBarEnabled(false);
-        l.setOnScrollListener(this);
-        l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        l.setMultiChoiceModeListener(this);
+        ListView listView = (ListView) v.findViewById(android.R.id.list);
+        listView.setVerticalScrollBarEnabled(false);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(this);
+
+        SwipeTouchListener touchListener = new SwipeTouchListener(listView);
+        listView.setOnTouchListener(touchListener);
+
+        final OnScrollListener scrollListener = touchListener.makeScrollListener();
+        listView.setOnScrollListener(new OnScrollListener() {
+            @Override
+            public void onScroll(AbsListView view, int firstVisible, int visibleCount,
+                    int totalCount) {
+                scrollListener.onScroll(view, firstVisible, visibleCount, totalCount);
+                ThingListFragment.this.onScroll(view, firstVisible, visibleCount, totalCount);
+            }
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                scrollListener.onScrollStateChanged(view, scrollState);
+                ThingListFragment.this.onScrollStateChanged(view, scrollState);
+            }
+        });
         return v;
     }
 
@@ -295,10 +315,14 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         selectThing(v, position, ThingPagerAdapter.TYPE_LINK);
+        if (adapter.isSingleChoice() && v instanceof ThingView) {
+            ((ThingView) v).setChosen(true);
+        }
     }
 
     private void selectThing(View v, int position, int pageType) {
         adapter.setSelectedPosition(position);
+
         if (listener != null) {
             listener.onThingSelected(v, adapter.getThingBundle(getActivity(), position), pageType);
         }

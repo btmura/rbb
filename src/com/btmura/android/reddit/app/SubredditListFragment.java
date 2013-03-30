@@ -42,8 +42,10 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
+import com.btmura.android.reddit.view.SwipeTouchListener;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
+import com.btmura.android.reddit.widget.SubredditView;
 
 public class SubredditListFragment extends ThingProviderListFragment implements
         MultiChoiceModeListener, OnItemSelectedListener {
@@ -137,9 +139,13 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
-        ListView list = (ListView) view.findViewById(android.R.id.list);
-        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        list.setMultiChoiceModeListener(this);
+        ListView listView = (ListView) view.findViewById(android.R.id.list);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(this);
+
+        SwipeTouchListener touchListener = new SwipeTouchListener(listView);
+        listView.setOnTouchListener(touchListener);
+        listView.setOnScrollListener(touchListener.makeScrollListener());
         return view;
     }
 
@@ -211,6 +217,9 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     @Override
     public void onListItemClick(ListView l, View view, int position, long id) {
         String selectedSubreddit = adapter.setSelectedPosition(position);
+        if (singleChoice && view instanceof SubredditView) {
+            ((SubredditView) view).setChosen(true);
+        }
         if (listener != null) {
             listener.onSubredditSelected(view, selectedSubreddit);
         }

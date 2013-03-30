@@ -32,8 +32,8 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
 
 /**
- * {@link CustomView} for displaying subreddit names. It can show subscriber
- * count if the information is available.
+ * {@link CustomView} for displaying subreddit names. It can show subscriber count if the
+ * information is available.
  */
 public class SubredditView extends CustomView {
 
@@ -144,11 +144,11 @@ public class SubredditView extends CustomView {
         TextPaint titlePaint = TEXT_PAINTS[SUBREDDIT_TITLE];
         titleMetrics = BoringLayout.isBoring(title, titlePaint, titleMetrics);
         if (titleLayout == null) {
-            titleLayout = BoringLayout.make(title, titlePaint, width, Alignment.ALIGN_NORMAL,
-                    1f, 0f, titleMetrics, false, TruncateAt.END, width);
+            titleLayout = BoringLayout.make(title, titlePaint, width,
+                    Alignment.ALIGN_NORMAL, 1f, 0f, titleMetrics, false, TruncateAt.END, width);
         } else {
-            titleLayout.replaceOrMake(title, titlePaint, width, Alignment.ALIGN_NORMAL,
-                    1f, 0f, titleMetrics, false, TruncateAt.END, width);
+            titleLayout.replaceOrMake(title, titlePaint, width,
+                    Alignment.ALIGN_NORMAL, 1f, 0f, titleMetrics, false, TruncateAt.END, width);
         }
     }
 
@@ -156,11 +156,11 @@ public class SubredditView extends CustomView {
         TextPaint statusPaint = TEXT_PAINTS[SUBREDDIT_STATUS];
         statusMetrics = BoringLayout.isBoring(statusText, statusPaint, statusMetrics);
         if (statusLayout == null) {
-            statusLayout = BoringLayout.make(statusText, statusPaint, width, Alignment.ALIGN_NORMAL,
-                    1f, 0f, statusMetrics, false, TruncateAt.END, width);
+            statusLayout = BoringLayout.make(statusText, statusPaint, width,
+                    Alignment.ALIGN_NORMAL, 1f, 0f, statusMetrics, false, TruncateAt.END, width);
         } else {
-            statusLayout.replaceOrMake(statusText, statusPaint, width, Alignment.ALIGN_NORMAL,
-                    1f, 0f, statusMetrics, false, TruncateAt.END, width);
+            statusLayout.replaceOrMake(statusText, statusPaint, width,
+                    Alignment.ALIGN_NORMAL, 1f, 0f, statusMetrics, false, TruncateAt.END, width);
         }
     }
 
