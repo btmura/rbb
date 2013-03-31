@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
@@ -216,6 +217,11 @@ public class ThingAdapter extends BaseLoaderAdapter {
     @Override
     protected String[] getProjection() {
         return isMessageActivity() ? MESSAGE_PROJECTION : THING_PROJECTION;
+    }
+
+    @Override
+    protected String getSelection() {
+        return isMessageActivity() ? null : HideActions.SELECT_NOT_HIDDEN;
     }
 
     @Override
@@ -501,6 +507,14 @@ public class ThingAdapter extends BaseLoaderAdapter {
 
     private String format(Context context, String text) {
         return StringUtil.safeString(formatter.formatAll(context, text));
+    }
+
+    public void hide(Context context, int position) {
+        if (isMessageActivity()) {
+            throw new IllegalStateException();
+        }
+
+        Provider.hideAsync(context, accountName, getThingId(position));
     }
 
     public void save(Context context, int position) {

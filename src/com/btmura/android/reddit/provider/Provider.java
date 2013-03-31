@@ -38,6 +38,7 @@ import com.btmura.android.reddit.app.CommentLogic;
 import com.btmura.android.reddit.app.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
@@ -65,6 +66,12 @@ public class Provider {
             Things.COLUMN_EXPANDED,
             Things.COLUMN_NESTING,
     };
+
+    private static final Uri HIDE_ACTIONS_NOTIFY_SYNC_URI =
+            ThingProvider.HIDE_ACTIONS_URI.buildUpon()
+                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, ThingProvider.TRUE)
+                    .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
+                    .build();
 
     private static final Uri READ_ACTIONS_NOTIFY_SYNC_URI =
             ThingProvider.READ_ACTIONS_URI.buildUpon()
@@ -419,6 +426,22 @@ public class Provider {
                 v.put(ReadActions.COLUMN_THING_ID, thingId);
                 v.put(ReadActions.COLUMN_ACTION, action);
                 cr.insert(READ_ACTIONS_NOTIFY_SYNC_URI, v);
+            }
+        });
+    }
+
+    public static void hideAsync(final Context context,
+            final String accountName,
+            final String thingId) {
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                ContentValues v = new ContentValues(3);
+                v.put(HideActions.COLUMN_ACCOUNT, accountName);
+                v.put(HideActions.COLUMN_THING_ID, thingId);
+                v.put(HideActions.COLUMN_ACTION, HideActions.ACTION_HIDE);
+                cr.insert(HIDE_ACTIONS_NOTIFY_SYNC_URI, v);
             }
         });
     }

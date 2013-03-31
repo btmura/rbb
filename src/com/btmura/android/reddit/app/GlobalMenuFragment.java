@@ -36,7 +36,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
 
     public static final String TAG = "GlobalMenuFragment";
 
-    private static final boolean SHOW_DEBUG = BuildConfig.DEBUG && !true;
+    private static final boolean SHOW_DEBUG = BuildConfig.DEBUG && true;
 
     private static final int REQUEST_SEARCH = 0;
 

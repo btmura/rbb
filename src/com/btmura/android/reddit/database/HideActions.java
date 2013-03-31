@@ -41,6 +41,10 @@ public class HideActions implements BaseColumns {
     /** Action meaning the user has unhidden this thing. */
     public static final int ACTION_UNHIDE = 1;
 
+    public static final String JOINED_COLUMN_HIDE_ACTION = "hideAction";
+
+    public static final String SELECT_NOT_HIDDEN = JOINED_COLUMN_HIDE_ACTION + " IS NULL";
+
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "

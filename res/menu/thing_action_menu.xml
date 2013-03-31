@@ -32,6 +32,10 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_save"/>
     <item
+        android:id="@+id/menu_hide"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_hide"/>
+    <item
         android:id="@+id/menu_author"
         android:icon="?attr/menu_profile_icon"
         android:showAsAction="ifRoom"

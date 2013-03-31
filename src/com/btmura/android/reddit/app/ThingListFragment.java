@@ -335,8 +335,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     @Override
     public void onSwipeDismiss(ListView listView, View view, int position) {
-        // TODO Auto-generated method stub
-
     }
 
     public void onVote(View v, int action) {
@@ -421,13 +419,14 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
         boolean saveable = false;
         boolean saved = false;
-        boolean hasAccount = count == 1 && AccountUtils.isAccount(adapter.getAccountName());
-        if (hasAccount) {
+        boolean hasAccount = AccountUtils.isAccount(adapter.getAccountName());
+        if (count == 1 && hasAccount) {
             saveable = isLink;
             saved = adapter.isSaved(position);
         }
         menu.findItem(R.id.menu_saved).setVisible(saveable && saved);
         menu.findItem(R.id.menu_unsaved).setVisible(saveable && !saved);
+        menu.findItem(R.id.menu_hide).setVisible(count == 1 && hasAccount && isLink);
 
         return true;
     }
@@ -445,6 +444,11 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
             case R.id.menu_unsaved:
                 handleUnsaved();
+                mode.finish();
+                return true;
+
+            case R.id.menu_hide:
+                handleHide();
                 mode.finish();
                 return true;
 
@@ -479,6 +483,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     private void handleUnsaved() {
         adapter.save(getActivity(), getFirstCheckedPosition());
+    }
+
+    private void handleHide() {
+        adapter.hide(getActivity(), getFirstCheckedPosition());
     }
 
     private void handleComments() {
