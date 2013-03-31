@@ -43,12 +43,13 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.view.SwipeTouchListener;
+import com.btmura.android.reddit.view.SwipeTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditView;
 
 public class SubredditListFragment extends ThingProviderListFragment implements
-        MultiChoiceModeListener, OnItemSelectedListener {
+        OnSwipeDismissListener, MultiChoiceModeListener, OnItemSelectedListener {
 
     public static final String TAG = "SubredditListFragment";
 
@@ -143,7 +144,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         listView.setMultiChoiceModeListener(this);
 
-        SwipeTouchListener touchListener = new SwipeTouchListener(listView);
+        SwipeTouchListener touchListener = new SwipeTouchListener(listView, this);
         listView.setOnTouchListener(touchListener);
         listView.setOnScrollListener(touchListener.makeScrollListener());
         return view;
@@ -223,6 +224,12 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         if (listener != null) {
             listener.onSubredditSelected(view, selectedSubreddit);
         }
+    }
+
+    @Override
+    public void onSwipeDismiss(ListView listView, View view, int position) {
+        String subreddit = adapter.getName(position);
+        Provider.removeSubredditAsync(getActivity(), getAccountName(), subreddit);
     }
 
     static class ViewHolder {

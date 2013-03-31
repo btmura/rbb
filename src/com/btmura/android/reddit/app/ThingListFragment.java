@@ -42,12 +42,13 @@ import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeTouchListener;
+import com.btmura.android.reddit.view.SwipeTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingAdapter;
 import com.btmura.android.reddit.widget.ThingView;
 
 public class ThingListFragment extends ThingProviderListFragment implements
-        OnScrollListener, OnVoteListener, MultiChoiceModeListener {
+        OnScrollListener, OnSwipeDismissListener, OnVoteListener, MultiChoiceModeListener {
 
     public static final String TAG = "ThingListFragment";
 
@@ -199,7 +200,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         listView.setMultiChoiceModeListener(this);
 
-        SwipeTouchListener touchListener = new SwipeTouchListener(listView);
+        SwipeTouchListener touchListener = new SwipeTouchListener(listView, this);
         listView.setOnTouchListener(touchListener);
 
         final OnScrollListener scrollListener = touchListener.makeScrollListener();
@@ -330,6 +331,12 @@ public class ThingListFragment extends ThingProviderListFragment implements
             Provider.readMessageAsync(getActivity(), adapter.getAccountName(),
                     adapter.getThingId(position), true);
         }
+    }
+
+    @Override
+    public void onSwipeDismiss(ListView listView, View view, int position) {
+        // TODO Auto-generated method stub
+
     }
 
     public void onVote(View v, int action) {
