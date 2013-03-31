@@ -128,6 +128,11 @@ public class RedditApi {
         }
     }
 
+    public static Result hide(String thingId, boolean hide, String cookie, String modhash)
+            throws IOException {
+        return postData(Urls.hide(hide), Urls.hideQuery(thingId, modhash), cookie);
+    }
+
     public static LoginResult login(Context context, String login, String password)
             throws IOException {
         HttpsURLConnection conn = null;
