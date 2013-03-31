@@ -18,15 +18,11 @@ package com.btmura.android.reddit.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
-import android.animation.ValueAnimator.AnimatorUpdateListener;
-import android.annotation.SuppressLint;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
@@ -86,9 +82,6 @@ public class SwipeTouchListener implements OnTouchListener {
     }
 
     private boolean handleActionDown(MotionEvent event) {
-        velocityTracker = newVelocityTracker();
-        velocityTracker.addMovement(event);
-
         if (!disabled) {
             View childView = getChildView(event);
             if (childView != null) {
@@ -98,6 +91,9 @@ public class SwipeTouchListener implements OnTouchListener {
                 downY = event.getRawY();
                 downView = childView;
                 downPosition = listView.getPositionForView(childView);
+
+                velocityTracker = VelocityTracker.obtain();
+                velocityTracker.addMovement(event);
 
                 // Consume the touch event to indicate that we handle it. However, pass the
                 // touch event to the ListView to process as well, because we don't know whether
@@ -109,19 +105,9 @@ public class SwipeTouchListener implements OnTouchListener {
         return false;
     }
 
-    /** Returns a fresh {@link VelocityTracker} with no data yet. */
-    @SuppressLint("Recycle")
-    private VelocityTracker newVelocityTracker() {
-        if (velocityTracker == null) {
-            velocityTracker = VelocityTracker.obtain();
-        } else {
-            velocityTracker.clear();
-        }
-        return velocityTracker;
-    }
-
     /** Gets the child corresponding to the coordinates of the {@link MotionEvent}. */
     private View getChildView(MotionEvent e) {
+        // This approach works, because we don't shrink view heights.
         int position = listView.pointToPosition(Math.round(e.getX()), Math.round(e.getY()));
         if (position != ListView.INVALID_POSITION) {
             int firstPosition = listView.getFirstVisiblePosition();
@@ -134,9 +120,9 @@ public class SwipeTouchListener implements OnTouchListener {
     }
 
     private boolean handleActionMove(MotionEvent event) {
-        velocityTracker.addMovement(event);
-
         if (!disabled && downView != null) {
+            velocityTracker.addMovement(event);
+
             float deltaX = event.getRawX() - downX;
             float deltaY = event.getRawY() - downY;
 
@@ -170,23 +156,22 @@ public class SwipeTouchListener implements OnTouchListener {
     }
 
     private boolean handleActionUp(MotionEvent event) {
-        velocityTracker.addMovement(event);
-
-        if (downView != null) {
+        if (!disabled && swiping) {
             boolean dismiss = false;
             boolean dismissRight = false;
 
-            float deltaX = event.getRawX() - downX;
+            velocityTracker.addMovement(event);
             velocityTracker.computeCurrentVelocity(1000);
             float vx = velocityTracker.getXVelocity();
             float vy = velocityTracker.getYVelocity();
 
+            float deltaX = event.getRawX() - downX;
             if (Math.abs(deltaX) > downView.getWidth() / 2) {
                 dismiss = true;
                 dismissRight = deltaX > 0;
             } else if (Math.abs(vx) >= minFlingVelocity
                     && Math.abs(vx) <= maxFlingVelocity
-                    && Math.abs(vy) < minFlingVelocity) {
+                    && Math.abs(vy) < Math.abs(vx)) {
                 dismiss = true;
                 dismissRight = vx > 0;
             }
@@ -201,7 +186,9 @@ public class SwipeTouchListener implements OnTouchListener {
                         .setListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animation) {
-                                shrinkVertically(view, position);
+                                if (dismissListener != null) {
+                                    dismissListener.onSwipeDismiss(listView, view, position);
+                                }
                             }
                         })
                         .start();
@@ -212,47 +199,17 @@ public class SwipeTouchListener implements OnTouchListener {
                         .alpha(1)
                         .start();
             }
+
+            velocityTracker.recycle();
+            velocityTracker = null;
+            downView = null;
+            downX = 0;
+            downY = 0;
+            downPosition = ListView.INVALID_POSITION;
+            swiping = false;
         }
 
-        downView = null;
-        downX = 0;
-        downY = 0;
-        downPosition = 0;
-        swiping = false;
         return false;
-    }
-
-    void shrinkVertically(final View view, final int position) {
-        final ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        final int originalHeight = view.getHeight();
-
-        ValueAnimator animator = ValueAnimator.ofInt(originalHeight, 1).setDuration(animationTime);
-
-        animator.addUpdateListener(new AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                layoutParams.height = (Integer) animation.getAnimatedValue();
-                view.setLayoutParams(layoutParams);
-            }
-        });
-
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                view.setTranslationX(0);
-                view.setAlpha(1);
-
-                ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-                layoutParams.height = originalHeight;
-                view.setLayoutParams(layoutParams);
-
-                if (dismissListener != null) {
-                    dismissListener.onSwipeDismiss(listView, view, position);
-                }
-            }
-        });
-
-        animator.start();
     }
 
     /** Create a {@link OnScrollListener} that disables the swipe listener when scrolling. */
@@ -268,5 +225,10 @@ public class SwipeTouchListener implements OnTouchListener {
                     int totalItemCount) {
             }
         };
+    }
+
+    public static void resetState(View view) {
+        view.setTranslationX(0);
+        view.setAlpha(1);
     }
 }
