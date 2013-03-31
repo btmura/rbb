@@ -75,11 +75,12 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
 
     // Sync votes first due to loose rate limit.
     private static final Syncer[] SYNCERS = {
-        new VoteSyncer(),
-        new ReadSyncer(),
-        new SaveSyncer(),
-        new MessageSyncer(),
-        new CommentSyncer(),
+            new VoteSyncer(),
+            new HideSyncer(),
+            new ReadSyncer(),
+            new SaveSyncer(),
+            new MessageSyncer(),
+            new CommentSyncer(),
     };
 
     public ThingSyncAdapter(Context context) {
@@ -117,7 +118,6 @@ public class ThingSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             RateLimiter limiter = new RateLimiter();
-
 
             int count = SYNCERS.length;
             for (int i = 0; i < count; i++) {

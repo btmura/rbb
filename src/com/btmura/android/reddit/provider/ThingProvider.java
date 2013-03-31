@@ -39,6 +39,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.CursorExtrasWrapper;
+import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
@@ -61,6 +62,7 @@ import com.btmura.android.reddit.widget.FilterAdapter;
  * /subreddits
  * /sessions
  * /actions/comments
+ * /actions/hides
  * /actions/messages
  * /actions/reads
  * /actions/saves
@@ -82,6 +84,7 @@ public class ThingProvider extends BaseProvider {
     private static final String PATH_SUBREDDITS = "subreddits";
     private static final String PATH_SESSIONS = "sessions";
     private static final String PATH_COMMENT_ACTIONS = "actions/comments";
+    private static final String PATH_HIDE_ACTIONS = "actions/hides";
     private static final String PATH_MESSAGE_ACTIONS = "actions/messages";
     private static final String PATH_READ_ACTIONS = "actions/reads";
     private static final String PATH_SAVE_ACTIONS = "actions/saves";
@@ -92,6 +95,7 @@ public class ThingProvider extends BaseProvider {
     public static final Uri SUBREDDITS_URI = Uri.parse(AUTHORITY_URI + PATH_SUBREDDITS);
     public static final Uri SESSIONS_URI = Uri.parse(AUTHORITY_URI + PATH_SESSIONS);
     public static final Uri COMMENT_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENT_ACTIONS);
+    public static final Uri HIDE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_HIDE_ACTIONS);
     public static final Uri MESSAGE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_MESSAGE_ACTIONS);
     public static final Uri READ_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_READ_ACTIONS);
     public static final Uri SAVE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_SAVE_ACTIONS);
@@ -107,16 +111,18 @@ public class ThingProvider extends BaseProvider {
     private static final int MATCH_SUBREDDITS = 3;
     private static final int MATCH_SESSIONS = 4;
     private static final int MATCH_COMMENT_ACTIONS = 5;
-    private static final int MATCH_MESSAGE_ACTIONS = 6;
-    private static final int MATCH_READ_ACTIONS = 7;
-    private static final int MATCH_SAVE_ACTIONS = 8;
-    private static final int MATCH_VOTE_ACTIONS = 9;
+    private static final int MATCH_HIDE_ACTIONS = 6;
+    private static final int MATCH_MESSAGE_ACTIONS = 7;
+    private static final int MATCH_READ_ACTIONS = 8;
+    private static final int MATCH_SAVE_ACTIONS = 9;
+    private static final int MATCH_VOTE_ACTIONS = 10;
     static {
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
         MATCHER.addURI(AUTHORITY, PATH_MESSAGES, MATCH_MESSAGES);
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDITS, MATCH_SUBREDDITS);
         MATCHER.addURI(AUTHORITY, PATH_SESSIONS, MATCH_SESSIONS);
         MATCHER.addURI(AUTHORITY, PATH_COMMENT_ACTIONS, MATCH_COMMENT_ACTIONS);
+        MATCHER.addURI(AUTHORITY, PATH_HIDE_ACTIONS, MATCH_HIDE_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_MESSAGE_ACTIONS, MATCH_MESSAGE_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_READ_ACTIONS, MATCH_READ_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_SAVE_ACTIONS, MATCH_SAVE_ACTIONS);
@@ -153,11 +159,20 @@ public class ThingProvider extends BaseProvider {
 
             // Join with pending votes to fake that the vote happened.
             + " LEFT OUTER JOIN (SELECT "
-            + VoteActions.COLUMN_ACCOUNT + ", "
-            + VoteActions.COLUMN_THING_ID + ", "
+            + VoteActions.COLUMN_ACCOUNT + ","
+            + VoteActions.COLUMN_THING_ID + ","
             + VoteActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_VOTE
             + " FROM " + VoteActions.TABLE_NAME + ") USING ("
-            + VoteActions.COLUMN_ACCOUNT + ", "
+            + VoteActions.COLUMN_ACCOUNT + ","
+            + Things.COLUMN_THING_ID + ")"
+
+            // Join with pending hides to fake that the things were hidden.
+            + " LEFT OUTER JOIN (SELECT "
+            + HideActions.COLUMN_ACCOUNT + ","
+            + HideActions.COLUMN_THING_ID + ","
+            + HideActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_HIDDEN
+            + " FROM " + HideActions.TABLE_NAME + ") USING ("
+            + HideActions.COLUMN_ACCOUNT + ","
             + Things.COLUMN_THING_ID + ")";
 
     // TODO: Make a separate table for just read actions?
@@ -334,6 +349,9 @@ public class ThingProvider extends BaseProvider {
 
             case MATCH_COMMENT_ACTIONS:
                 return CommentActions.TABLE_NAME;
+
+            case MATCH_HIDE_ACTIONS:
+                return HideActions.TABLE_NAME;
 
             case MATCH_MESSAGE_ACTIONS:
                 return MessageActions.TABLE_NAME;
