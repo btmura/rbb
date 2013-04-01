@@ -66,7 +66,7 @@ public class SubredditView extends CustomView {
     public void setData(String name, boolean over18, int subscribers) {
         title = Subreddits.getTitle(getContext(), name);
         setStatusText(over18, subscribers);
-        SwipeTouchListener.resetState(this);
+        SwipeTouchListener.undoAnimation(this);
         requestLayout();
     }
 

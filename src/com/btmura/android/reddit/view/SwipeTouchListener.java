@@ -227,7 +227,7 @@ public class SwipeTouchListener implements OnTouchListener {
         };
     }
 
-    public static void resetState(View view) {
+    public static void undoAnimation(View view) {
         view.setTranslationX(0);
         view.setAlpha(1);
     }

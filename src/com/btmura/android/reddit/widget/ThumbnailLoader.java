@@ -41,7 +41,7 @@ public class ThumbnailLoader {
     public void setThumbnail(Context context, ThingView v, String url) {
         if (!TextUtils.isEmpty(url)) {
             Bitmap b = BITMAP_CACHE.get(url);
-            v.setThumbnailBitmap(b);
+            v.setThumbnailBitmap(b, false);
             if (b != null) {
                 clearLoadThumbnailTask(v);
             } else {
@@ -53,10 +53,10 @@ public class ThumbnailLoader {
                     task = new LoadThumbnailTask(context.getApplicationContext(), v, url);
                     v.setTag(task);
                     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                };
+                }
             }
         } else {
-            v.setThumbnailBitmap(null);
+            v.setThumbnailBitmap(null, false);
             clearLoadThumbnailTask(v);
         }
     }
@@ -133,7 +133,7 @@ public class ThumbnailLoader {
             ThingView v = ref.get();
             if (v != null && equals(v.getTag())) {
                 if (b != null) {
-                    v.setThumbnailBitmap(b);
+                    v.setThumbnailBitmap(b, true);
                 }
                 v.setTag(null);
             }

@@ -335,6 +335,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     @Override
     public void onSwipeDismiss(ListView listView, View view, int position) {
+        adapter.hide(getActivity(), position);
     }
 
     public void onVote(View v, int action) {

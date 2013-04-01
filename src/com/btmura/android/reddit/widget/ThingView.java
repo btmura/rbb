@@ -304,7 +304,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         setStatusText(over18, showSubreddit, showStatusPoints, showNumComments,
                 author, createdUtc, nowTimeMs, numComments, score, subreddit);
 
-        SwipeTouchListener.resetState(this);
+        SwipeTouchListener.undoAnimation(this);
         requestLayout();
     }
 
@@ -387,7 +387,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         return formatters[index];
     }
 
-    public void setThumbnailBitmap(Bitmap bitmap) {
+    public void setThumbnailBitmap(Bitmap bitmap, boolean animate) {
         BitmapShader currentShader = thumbShader;
         if (bitmap != null) {
             // Only update the shader and animation if the bitmap changes. For example, a view may
@@ -395,7 +395,11 @@ public class ThingView extends CustomView implements OnGestureListener {
             if (bitmap != thumbBitmap) {
                 thumbBitmap = bitmap;
                 thumbShader = Thumbnail.newBitmapShader(bitmap, thumbMatrix);
-                thumbAlphaAnimator.start();
+                if (animate) {
+                    thumbAlphaAnimator.start();
+                } else {
+                    setThumbnailAlpha(255);
+                }
             }
         } else {
             thumbShader = null;
