@@ -356,14 +356,15 @@ public class ThingListFragment extends ThingProviderListFragment implements
         super.onPrepareOptionsMenu(menu);
 
         String subreddit = getSubreddit();
-
+        boolean isQuery = isQuery();
         boolean hasAccount = AccountUtils.isAccount(getAccountName());
         boolean hasSubreddit = subreddit != null;
         boolean hasThing = thingBundleHolder != null && thingBundleHolder.getThingBundle() != null;
+        boolean hasSidebar = Subreddits.hasSidebar(subreddit);
 
-        boolean showNewPost = hasAccount && hasSubreddit && !hasThing;
-        boolean showAddSubreddit = hasSubreddit && !hasThing;
-        boolean showSubreddit = hasSubreddit && !hasThing && Subreddits.hasSidebar(subreddit);
+        boolean showNewPost = !isQuery && hasAccount && hasSubreddit && !hasThing;
+        boolean showAddSubreddit = !isQuery && hasSubreddit && !hasThing;
+        boolean showSubreddit = !isQuery && hasSubreddit && !hasThing && hasSidebar;
 
         menu.findItem(R.id.menu_new_post).setVisible(showNewPost);
         menu.findItem(R.id.menu_add_subreddit).setVisible(showAddSubreddit);
@@ -411,7 +412,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         if (shareItem.isVisible()) {
             String label = adapter.getTitle(position);
             CharSequence text = adapter.getUrl(position);
-            MenuHelper.setShareProvider(menu.findItem(R.id.menu_share_thing), label, text);
+            MenuHelper.setShareProvider(shareItem, label, text);
         }
 
         boolean isLink = adapter.getKind(position) == Kinds.KIND_LINK;
@@ -554,6 +555,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public String getQuery() {
         return adapter.getQuery();
+    }
+
+    public boolean isQuery() {
+        return !TextUtils.isEmpty(getQuery());
     }
 
     public int getFilter() {

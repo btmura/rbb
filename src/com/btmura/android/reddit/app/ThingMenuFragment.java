@@ -164,6 +164,10 @@ public class ThingMenuFragment extends Fragment {
                 handleUser();
                 return true;
 
+            case R.id.menu_thing_add_subreddit:
+                handleAddSubreddit();
+                return true;
+
             case R.id.menu_thing_subreddit:
                 handleSubreddit();
                 return true;
@@ -171,6 +175,10 @@ public class ThingMenuFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void handleAddSubreddit() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
     private void handleUser() {

@@ -421,7 +421,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
         if (shareItem.isVisible()) {
             String label = getLabel(position);
             CharSequence text = getUrl(position);
-            MenuHelper.setShareProvider(menu.findItem(R.id.menu_share_comment), label, text);
+            MenuHelper.setShareProvider(shareItem, label, text);
         }
 
         return true;
