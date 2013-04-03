@@ -55,7 +55,7 @@ public class SwipeTouchListener implements OnTouchListener {
         void onSwipeDismiss(ListView listView, View view, int position);
     }
 
-    public SwipeTouchListener(ListView listView, OnSwipeDismissListener swipeListener) {
+    public SwipeTouchListener(ListView listView, OnSwipeDismissListener dismissListener) {
         ViewConfiguration vc = ViewConfiguration.get(listView.getContext());
         this.touchSlop = vc.getScaledTouchSlop();
         this.minFlingVelocity = vc.getScaledMinimumFlingVelocity();
@@ -63,7 +63,7 @@ public class SwipeTouchListener implements OnTouchListener {
         this.animationTime = listView.getResources()
                 .getInteger(android.R.integer.config_shortAnimTime);
         this.listView = listView;
-        this.dismissListener = swipeListener;
+        this.dismissListener = dismissListener;
     }
 
     @Override
@@ -161,7 +161,7 @@ public class SwipeTouchListener implements OnTouchListener {
             boolean dismissRight = false;
 
             velocityTracker.addMovement(event);
-            velocityTracker.computeCurrentVelocity(1000);
+            velocityTracker.computeCurrentVelocity(1000, maxFlingVelocity);
             float vx = velocityTracker.getXVelocity();
             float vy = velocityTracker.getYVelocity();
 
@@ -190,25 +190,27 @@ public class SwipeTouchListener implements OnTouchListener {
                                     dismissListener.onSwipeDismiss(listView, view, position);
                                 }
                             }
-                        })
-                        .start();
+                        });
             } else {
+                // Shift the view back to its original state. We must set the listener back to null
+                // or else a previous listener on a swiped view might get fired again!
                 downView.animate()
                         .setDuration(animationTime)
                         .translationX(0)
                         .alpha(1)
-                        .start();
+                        .setListener(null);
             }
-
-            velocityTracker.recycle();
-            velocityTracker = null;
-            downView = null;
-            downX = 0;
-            downY = 0;
-            downPosition = ListView.INVALID_POSITION;
-            swiping = false;
         }
 
+        if (velocityTracker != null) {
+            velocityTracker.recycle();
+            velocityTracker = null;
+        }
+        downView = null;
+        downX = 0;
+        downY = 0;
+        downPosition = ListView.INVALID_POSITION;
+        swiping = false;
         return false;
     }
 
