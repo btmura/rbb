@@ -74,9 +74,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         }
     };
 
+    private MenuItem newPostItem;
     private MenuItem addSubredditItem;
     private MenuItem profileItem;
-    private MenuItem profileSavedItem;
+    private MenuItem savedItem;
     private MenuItem messagesItem;
     private MenuItem accountsItem;
     private MenuItem switchThemesItem;
@@ -275,9 +276,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
+        newPostItem = menu.findItem(R.id.menu_browser_new_post);
         addSubredditItem = menu.findItem(R.id.menu_browser_add_subreddit);
         profileItem = menu.findItem(R.id.menu_profile);
-        profileSavedItem = menu.findItem(R.id.menu_profile_saved);
+        savedItem = menu.findItem(R.id.menu_profile_saved);
         messagesItem = menu.findItem(R.id.menu_messages);
         accountsItem = menu.findItem(R.id.menu_accounts);
         switchThemesItem = menu.findItem(R.id.menu_switch_themes);
@@ -298,9 +300,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         menu.setGroupVisible(R.id.menu_group_account_items, showAccountItems);
 
         boolean hasAccount = hasAccount();
+        newPostItem.setVisible(isSinglePane && hasAccount);
         addSubredditItem.setVisible(isSinglePane);
         profileItem.setVisible(showAccountItems && hasAccount);
-        profileSavedItem.setVisible(showAccountItems && hasAccount);
+        savedItem.setVisible(showAccountItems && hasAccount);
         messagesItem.setVisible(showAccountItems && hasAccount);
         accountsItem.setVisible(showAccountItems);
         switchThemesItem.setVisible(showAccountItems);

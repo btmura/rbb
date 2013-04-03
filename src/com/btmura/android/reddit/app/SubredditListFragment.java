@@ -40,6 +40,7 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.view.SwipeTouchListener;
@@ -256,10 +257,11 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        int count = getListView().getCheckedItemCount();
+
         // We can set the subreddit count if the adapter is ready.
         boolean isAdapterReady = adapter.getCursor() != null;
         if (isAdapterReady) {
-            int count = getListView().getCheckedItemCount();
             String text = getResources().getQuantityString(R.plurals.subreddits, count, count);
             subredditCountText.setText(text);
             subredditCountText.setVisibility(View.VISIBLE);
@@ -303,6 +305,11 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
         menu.findItem(R.id.menu_add).setVisible(isQuery && isAdapterReady);
         menu.findItem(R.id.menu_delete).setVisible(!isQuery && isAdapterReady);
+
+        String subreddit = adapter.getName(getFirstCheckedPosition());
+        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
+        subredditItem.setVisible(isAdapterReady && count == 1 && Subreddits.hasSidebar(subreddit));
+
         return true;
     }
 
@@ -314,6 +321,9 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         switch (item.getItemId()) {
             case R.id.menu_add:
                 return handleAdd(mode);
+
+            case R.id.menu_subreddit:
+                return handleSubreddit(mode);
 
             case R.id.menu_delete:
                 return handleDelete(mode);
@@ -345,6 +355,12 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         String[] subreddits = getCheckedSubreddits();
         Provider.addSubredditAsync(getActivity(), accountName, subreddits);
         mode.finish();
+        return true;
+    }
+
+    private boolean handleSubreddit(ActionMode mode) {
+        String subreddit = adapter.getName(getFirstCheckedPosition());
+        MenuHelper.startSidebarActivity(getActivity(), subreddit);
         return true;
     }
 
@@ -403,5 +419,16 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
     public String getQuery() {
         return adapter.getQuery();
+    }
+
+    private int getFirstCheckedPosition() {
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int size = adapter.getCount();
+        for (int i = 0; i < size; i++) {
+            if (checked.get(i)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

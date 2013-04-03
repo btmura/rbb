@@ -16,6 +16,7 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <!-- Put these account items in a group so they show up together. -->
     <group
         android:id="@+id/menu_group_account_items"
         android:orderInCategory="@integer/menu_order_account" >
@@ -35,22 +36,28 @@
             android:showAsAction="ifRoom"
             android:title="@string/menu_messages"/>
     </group>
-
-    <item
-        android:id="@+id/menu_browser_add_subreddit"
-        android:icon="?attr/menu_add_subreddit_icon"
-        android:orderInCategory="@integer/menu_order_subreddit"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_add_subreddit"/>
-    <item
-        android:id="@+id/menu_accounts"
-        android:orderInCategory="@integer/menu_order_last"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_accounts"/>
-    <item
-        android:id="@+id/menu_switch_themes"
-        android:orderInCategory="@integer/menu_order_last"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_switch_themes"/>
+    <group android:orderInCategory="@integer/menu_order_subreddit" >
+        <item
+            android:id="@+id/menu_browser_new_post"
+            android:icon="?attr/menu_edit_icon"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_new_post"/>
+        <item
+            android:id="@+id/menu_browser_add_subreddit"
+            android:icon="?attr/menu_add_icon"
+            android:orderInCategory="@integer/menu_order_subreddit"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_add_subreddit"/>
+    </group>
+    <group android:orderInCategory="@integer/menu_order_last" >
+        <item
+            android:id="@+id/menu_accounts"
+            android:showAsAction="never"
+            android:title="@string/menu_accounts"/>
+        <item
+            android:id="@+id/menu_switch_themes"
+            android:showAsAction="never"
+            android:title="@string/menu_switch_themes"/>
+    </group>
 
 </menu>

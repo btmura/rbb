@@ -44,8 +44,8 @@ public class ThingMenuFragment extends Fragment {
     }
 
     /**
-     * Interface that activities should implement to be aware of when the user
-     * selects menu items that ThingMenuFragment cannot handle on its own.
+     * Interface that activities should implement to be aware of when the user selects menu items
+     * that ThingMenuFragment cannot handle on its own.
      */
     interface ThingMenuListener {
 
@@ -60,7 +60,6 @@ public class ThingMenuFragment extends Fragment {
     private ThingPagerHolder thingPagerHolder;
 
     private Bundle thingBundle;
-    private MenuItem addSubredditItem;
     private MenuItem userItem;
     private MenuItem subredditItem;
 
@@ -104,7 +103,6 @@ public class ThingMenuFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_menu_menu, menu);
-        addSubredditItem = menu.findItem(R.id.menu_thing_add_subreddit);
         userItem = menu.findItem(R.id.menu_user);
         subredditItem = menu.findItem(R.id.menu_thing_subreddit);
 
@@ -140,10 +138,6 @@ public class ThingMenuFragment extends Fragment {
     }
 
     private void refreshSubredditItem() {
-        if (addSubredditItem != null) {
-            addSubredditItem.setVisible(getSubreddit() != null);
-        }
-
         if (subredditItem != null) {
             boolean visible = hasSubreddit();
             subredditItem.setVisible(visible);
@@ -166,10 +160,6 @@ public class ThingMenuFragment extends Fragment {
                 listener.onThingOptionsItemSelected(item, getCurrentPageType());
                 return true;
 
-            case R.id.menu_thing_add_subreddit:
-                handleAddSubreddit();
-                return true;
-
             case R.id.menu_user:
                 handleUser();
                 return true;
@@ -181,10 +171,6 @@ public class ThingMenuFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
     private void handleUser() {

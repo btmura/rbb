@@ -18,13 +18,13 @@
 
     <item
         android:id="@+id/menu_new_post"
-        android:icon="?attr/menu_add_icon"
+        android:icon="?attr/menu_edit_icon"
         android:orderInCategory="@integer/menu_order_subreddit"
         android:showAsAction="ifRoom"
         android:title="@string/menu_new_post"/>
     <item
         android:id="@+id/menu_add_subreddit"
-        android:icon="?attr/menu_add_subreddit_icon"
+        android:icon="?attr/menu_add_icon"
         android:orderInCategory="@integer/menu_order_subreddit"
         android:showAsAction="ifRoom"
         android:title="@string/menu_add_subreddit"/>

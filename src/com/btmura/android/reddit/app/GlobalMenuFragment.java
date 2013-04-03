@@ -36,7 +36,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
 
     public static final String TAG = "GlobalMenuFragment";
 
-    private static final boolean SHOW_DEBUG = BuildConfig.DEBUG && true;
+    private static final boolean SHOW_DEBUG = BuildConfig.DEBUG && !true;
 
     private static final int REQUEST_SEARCH = 0;
 
@@ -87,6 +87,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         // convenience. Some other items have complicated visibility logic, so
         // they aren't inflated in this fragment.
         switch (item.getItemId()) {
+            case R.id.menu_browser_new_post:
             case R.id.menu_new_post:
                 handleNewPost();
                 return true;
