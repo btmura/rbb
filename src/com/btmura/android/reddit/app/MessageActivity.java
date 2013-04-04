@@ -25,8 +25,8 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
-import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
@@ -122,9 +122,10 @@ public class MessageActivity extends AbstractBrowserActivity implements OnNaviga
         currentFilter = adapter.getFilter();
 
         ThingListFragment frag = getThingListFragment();
-        if (frag == null || !Objects.equals(frag.getAccountName(), currentUser)
+        if (frag == null
+                || !Objects.equals(frag.getAccountName(), currentUser)
                 || frag.getFilter() != currentFilter) {
-            setMessageThingListNavigation(currentUser);
+            setMessageThingListNavigation(R.id.thing_list_container, currentUser);
         }
         return true;
     }

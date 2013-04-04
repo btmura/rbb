@@ -22,26 +22,21 @@ import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
 import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.GlobalMenuFragment.OnSearchQuerySubmittedListener;
 import com.btmura.android.reddit.content.AccountLoader;
-import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
-import com.btmura.android.reddit.widget.SearchPagerAdapter;
 
 public class SearchActivity extends AbstractBrowserActivity implements
         TabListener,
         OnSearchQuerySubmittedListener,
-        OnPageChangeListener,
         AccountResultHolder {
 
     public static final String TAG = "SearchActivity";
@@ -56,11 +51,9 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     private AccountResult accountResult;
     private String accountName;
-    private String subreddit;
     private Tab tabPosts;
     private Tab tabSubreddits;
     private Tab tabInSubreddit;
-    private ViewPager searchPager;
     private boolean tabListenerEnabled;
 
     @Override
@@ -79,10 +72,6 @@ public class SearchActivity extends AbstractBrowserActivity implements
         if (!hasQuery()) {
             setQuery("android");
         }
-        if (isSinglePane) {
-            searchPager = (ViewPager) findViewById(R.id.search_pager);
-            searchPager.setOnPageChangeListener(this);
-        }
     }
 
     @Override
@@ -90,20 +79,11 @@ public class SearchActivity extends AbstractBrowserActivity implements
         bar.setTitle(getQuery());
         bar.setDisplayHomeAsUpEnabled(true);
 
-        // TODO: Remove code logic duplication with SearchPagerAdapter for tabs.
-
-        if (hasValidIntentSubreddit()) {
-            subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
-            String tabTitle = MenuHelper.getSubredditTitle(this, subreddit);
-            tabInSubreddit = bar.newTab().setText(tabTitle).setTabListener(this);
-            bar.addTab(tabInSubreddit);
+        if (Subreddits.hasSidebar(getSubreddit())) {
+            tabInSubreddit = addTab(MenuHelper.getSubredditTitle(this, getSubreddit()));
         }
-
-        tabPosts = bar.newTab().setText(R.string.tab_posts).setTabListener(this);
-        bar.addTab(tabPosts);
-
-        tabSubreddits = bar.newTab().setText(R.string.tab_subreddits).setTabListener(this);
-        bar.addTab(tabSubreddits);
+        tabPosts = addTab(getString(R.string.tab_posts));
+        tabSubreddits = addTab(getString(R.string.tab_subreddits));
 
         // Prevent listener being called twice after a configuration change.
         tabListenerEnabled = savedInstanceState == null
@@ -115,12 +95,10 @@ public class SearchActivity extends AbstractBrowserActivity implements
         }
     }
 
-    private boolean hasValidIntentSubreddit() {
-        String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
-        return !TextUtils.isEmpty(subreddit)
-                && !Subreddits.isFrontPage(subreddit)
-                && !Subreddits.isAll(subreddit)
-                && !Subreddits.isRandom(subreddit);
+    private Tab addTab(CharSequence text) {
+        Tab tab = bar.newTab().setText(text).setTabListener(this);
+        bar.addTab(tab);
+        return tab;
     }
 
     @Override
@@ -132,26 +110,20 @@ public class SearchActivity extends AbstractBrowserActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountResult = result;
         accountName = result.getLastAccount(this);
-        if (isSinglePane) {
-            submitSearchQuerySinglePane(getQuery());
-        } else {
-            SubredditListFragment sf = getSubredditListFragment();
-            if (sf != null && sf.getAccountName() == null) {
-                sf.setAccountName(accountName);
-                sf.loadIfPossible();
-            }
-
-            ThingListFragment tf = getThingListFragment();
-            if (tf != null && tf.getAccountName() == null) {
-                tf.setAccountName(accountName);
-                tf.loadIfPossible();
-            }
+        SubredditListFragment sf = getSubredditListFragment();
+        if (sf != null && sf.getAccountName() == null) {
+            sf.setAccountName(accountName);
+            sf.loadIfPossible();
+        }
+        ThingListFragment tf = getThingListFragment();
+        if (tf != null && tf.getAccountName() == null) {
+            tf.setAccountName(accountName);
+            tf.loadIfPossible();
         }
     }
 
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
-        accountName = null;
     }
 
     public AccountResult getAccountResult() {
@@ -192,27 +164,20 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     private void selectTab(Tab tab) {
-        if (searchPager != null) {
-            searchPager.setCurrentItem(tab.getPosition());
-        } else {
-            setNavigationFragments(tab);
-        }
-    }
-
-    private void setNavigationFragments(Tab tab) {
         String query = getQuery();
         if (tab == tabSubreddits) {
             refreshSubredditList(query);
         } else if (tab == tabPosts) {
             refreshThingList(null, query);
         } else if (tab == tabInSubreddit) {
-            refreshThingList(subreddit, query);
+            refreshThingList(getSubreddit(), query);
         }
     }
 
     private void refreshSubredditList(String query) {
         if (isSubredditListDifferent(query)) {
-            setSubredditListNavigation(null, false, query, null);
+            int containerId = isSinglePane ? R.id.search_container : R.id.subreddit_list_container;
+            setSearchSubredditListNavigation(containerId, query);
         } else {
             refreshSubredditListVisibility();
         }
@@ -220,7 +185,8 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     private void refreshThingList(String subreddit, String query) {
         if (isThingListDifferent(subreddit, query)) {
-            setQueryThingListNavigation(subreddit, query);
+            int containerId = isSinglePane ? R.id.search_container : R.id.thing_list_container;
+            setSearchThingListNavigation(containerId, subreddit, query);
         } else {
             refreshSubredditListVisibility();
         }
@@ -228,12 +194,14 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     private boolean isSubredditListDifferent(String query) {
         SubredditListFragment frag = getSubredditListFragment();
-        return frag == null || !Objects.equals(query, frag.getQuery());
+        return frag == null
+                || !Objects.equals(query, frag.getQuery());
     }
 
     private boolean isThingListDifferent(String subreddit, String query) {
         ThingListFragment frag = getThingListFragment();
-        return frag == null || !Objects.equals(subreddit, frag.getSubreddit())
+        return frag == null
+                || !Objects.equals(subreddit, frag.getSubreddit())
                 || !Objects.equals(query, frag.getQuery());
     }
 
@@ -248,34 +216,8 @@ public class SearchActivity extends AbstractBrowserActivity implements
     public boolean onSearchQuerySubmitted(String query) {
         setQuery(query);
         refreshActionBar(null, null);
-        if (isSinglePane) {
-            submitSearchQuerySinglePane(query);
-        } else {
-            submitSearchQueryMultiPane(query);
-        }
+        selectTab(bar.getSelectedTab());
         return true;
-    }
-
-    private void submitSearchQuerySinglePane(String query) {
-        searchPager.setAdapter(new SearchPagerAdapter(getFragmentManager(),
-                accountName, subreddit, query));
-        searchPager.setCurrentItem(bar.getSelectedNavigationIndex());
-    }
-
-    private void submitSearchQueryMultiPane(String query) {
-        setNavigationFragments(bar.getSelectedTab());
-    }
-
-    public void onPageSelected(int position) {
-        if (isSinglePane) {
-            bar.setSelectedNavigationItem(position);
-        }
-    }
-
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    }
-
-    public void onPageScrollStateChanged(int state) {
     }
 
     @Override
@@ -284,8 +226,8 @@ public class SearchActivity extends AbstractBrowserActivity implements
         outState.putInt(STATE_SELECTED_TAB, bar.getSelectedNavigationIndex());
     }
 
-    private boolean hasQuery() {
-        return getIntent().hasExtra(EXTRA_QUERY);
+    private String getSubreddit() {
+        return getIntent().getStringExtra(EXTRA_SUBREDDIT);
     }
 
     private String getQuery() {
@@ -294,5 +236,9 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     private void setQuery(String query) {
         getIntent().putExtra(EXTRA_QUERY, query);
+    }
+
+    private boolean hasQuery() {
+        return getIntent().hasExtra(EXTRA_QUERY);
     }
 }

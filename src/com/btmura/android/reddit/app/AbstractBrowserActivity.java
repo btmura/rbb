@@ -172,26 +172,31 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract boolean hasSubredditList();
 
-    protected void setSubredditListNavigation(String subreddit, boolean isRandom, String query,
-            Bundle thingBundle) {
+    protected void setSearchSubredditListNavigation(int containerId, String query) {
+        setSubredditListNavigation(containerId, null, false, query, null);
+    }
+
+    protected void setSubredditListNavigation(int containerId, String subreddit, boolean isRandom,
+            String query, Bundle thingBundle) {
         if (isSinglePane) {
-            setSubredditListNavigationSinglePane(query);
+            setSubredditListNavigationSinglePane(containerId, query);
         } else {
-            setSubredditListNavigationMultiPane(subreddit, isRandom, query, thingBundle);
+            setSubredditListNavigationMultiPane(containerId, subreddit, isRandom,
+                    query, thingBundle);
         }
     }
 
-    private void setSubredditListNavigationSinglePane(String query) {
+    private void setSubredditListNavigationSinglePane(int containerId, String query) {
         Fragment sf = SubredditListFragment.newInstance(getAccountName(), null, query, sfFlags);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.subreddit_list_container, sf, SubredditListFragment.TAG);
+        ft.replace(containerId, sf, SubredditListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
     }
 
-    private void setSubredditListNavigationMultiPane(String subreddit, boolean isRandom,
-            String query, Bundle thingBundle) {
+    private void setSubredditListNavigationMultiPane(int containerId, String subreddit,
+            boolean isRandom, String query, Bundle thingBundle) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setSubredditListNavigation subreddit:" + subreddit
                     + " isRandom: " + isRandom
@@ -211,7 +216,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        ft.replace(R.id.subreddit_list_container, sf, SubredditListFragment.TAG);
+        ft.replace(containerId, sf, SubredditListFragment.TAG);
         ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
 
         // If a thing was specified by the thingBundle argument, then add the
@@ -241,28 +246,30 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshThingPager(thingBundle, -1);
     }
 
-    protected void setQueryThingListNavigation(String subreddit, String query) {
-        setThingListNavigation(subreddit, query, null, null);
+    protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
+        setThingListNavigation(containerId, subreddit, query, null, null);
     }
 
-    protected void setProfileThingListNavigation(String profileUser) {
-        setThingListNavigation(null, null, profileUser, null);
+    protected void setProfileThingListNavigation(int containerId, String profileUser) {
+        setThingListNavigation(containerId, null, null, profileUser, null);
     }
 
-    protected void setMessageThingListNavigation(String messageUser) {
-        setThingListNavigation(null, null, null, messageUser);
+    protected void setMessageThingListNavigation(int containerId, String messageUser) {
+        setThingListNavigation(containerId, null, null, null, messageUser);
     }
 
-    private void setThingListNavigation(String subreddit, String query, String profileUser,
-            String messageUser) {
+    private void setThingListNavigation(int containerId, String subreddit, String query,
+            String profileUser, String messageUser) {
         if (isSinglePane) {
-            setThingListNavigationSinglePane(subreddit, query, profileUser, messageUser);
+            setThingListNavigationSinglePane(containerId, subreddit, query,
+                    profileUser, messageUser);
         } else {
-            setThingListNavigationMultiPane(subreddit, query, profileUser, messageUser);
+            setThingListNavigationMultiPane(containerId, subreddit, query,
+                    profileUser, messageUser);
         }
     }
 
-    private void setThingListNavigationSinglePane(String subreddit, String query,
+    private void setThingListNavigationSinglePane(int containerId, String subreddit, String query,
             String profileUser, String messageUser) {
         String accountName = getAccountName();
         int filter = getFilter();
@@ -278,13 +285,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         Fragment tf = ThingListFragment.newInstance(accountName, subreddit, query, profileUser,
                 messageUser, filter, tfFlags);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
+        ft.replace(containerId, tf, ThingListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
     }
 
-    private void setThingListNavigationMultiPane(String subreddit, String query,
+    private void setThingListNavigationMultiPane(int containerId, String subreddit, String query,
             String profileUser, String messageUser) {
         safePopBackStackImmediate();
 
@@ -310,7 +317,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (sf != null) {
             ft.remove(sf);
         }
-        ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
+        ft.replace(containerId, tf, ThingListFragment.TAG);
         if (mf != null) {
             ft.remove(mf);
         }
@@ -632,11 +639,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void refreshSubredditListVisibility() {
-        boolean showSubreddits = hasSubredditList();
-        if (subredditListContainer != null) {
-            subredditListContainer.setVisibility(showSubreddits ? View.VISIBLE : View.GONE);
+        // Only multi pane activities have a distinct subreddit list.
+        if (!isSinglePane) {
+            boolean showSubreddits = hasSubredditList();
+            if (subredditListContainer != null) {
+                subredditListContainer.setVisibility(showSubreddits ? View.VISIBLE : View.GONE);
+            }
+            refreshThingBodyWidthMeasurement();
         }
-        refreshThingBodyWidthMeasurement();
     }
 
     private void refreshThingBodyWidthMeasurement() {

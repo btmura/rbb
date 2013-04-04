@@ -234,7 +234,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             // changing filters or on resolving the subreddit!
             boolean isRandom = Subreddits.isRandom(subreddit);
 
-            setSubredditListNavigation(subreddit, isRandom, null, thingBundle);
+            setSubredditListNavigation(R.id.subreddit_list_container, subreddit, isRandom,
+                    null, thingBundle);
         } else if (tlf != null && tlf.getFilter() != filter) {
             replaceThingListFragmentMultiPane();
         }

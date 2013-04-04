@@ -29,9 +29,9 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.content.UserInfoLoader;
-import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.util.Array;
@@ -53,19 +53,19 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
     private LoaderCallbacks<AccountInfoResult> karmaLoaderCallbacks =
             new LoaderCallbacks<AccountInfoResult>() {
-        public Loader<AccountInfoResult> onCreateLoader(int id, Bundle args) {
-            return new UserInfoLoader(getApplicationContext(), currentUser);
-        }
+                public Loader<AccountInfoResult> onCreateLoader(int id, Bundle args) {
+                    return new UserInfoLoader(getApplicationContext(), currentUser);
+                }
 
-        public void onLoadFinished(Loader<AccountInfoResult> loader,
-                AccountInfoResult result) {
-            int[] karmaCounts = result != null ? new int[result.linkKarma] : null;
-            adapter.setAccountInfo(Array.of(currentUser), karmaCounts, null);
-        }
+                public void onLoadFinished(Loader<AccountInfoResult> loader,
+                        AccountInfoResult result) {
+                    int[] karmaCounts = result != null ? new int[result.linkKarma] : null;
+                    adapter.setAccountInfo(Array.of(currentUser), karmaCounts, null);
+                }
 
-        public void onLoaderReset(Loader<AccountInfoResult> loader) {
-        }
-    };
+                public void onLoaderReset(Loader<AccountInfoResult> loader) {
+                }
+            };
 
     @Override
     protected void setContentView() {
@@ -143,9 +143,10 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         currentFilter = adapter.getFilter();
 
         ThingListFragment frag = getThingListFragment();
-        if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
+        if (frag == null
+                || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != currentFilter) {
-            setProfileThingListNavigation(currentUser);
+            setProfileThingListNavigation(R.id.thing_list_container, currentUser);
         }
         return true;
     }
