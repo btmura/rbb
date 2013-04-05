@@ -39,6 +39,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
@@ -225,6 +226,13 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         if (listener != null) {
             listener.onSubredditSelected(view, selectedSubreddit);
         }
+    }
+
+    @Override
+    public boolean isSwipeDismissable(int position) {
+        return AccountUtils.isAccount(getAccountName())
+                && !adapter.isQuery()
+                && Subreddits.hasSidebar(adapter.getName(position));
     }
 
     @Override

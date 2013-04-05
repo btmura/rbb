@@ -44,14 +44,16 @@ public class SwipeDismissTouchListener implements OnTouchListener {
     private final OnSwipeDismissListener dismissListener;
 
     private boolean disabled;
-    private float downX;
-    private float downY;
     private View downView;
     private int downPosition;
+    private float downX;
+    private float downY;
     private boolean swiping;
     private VelocityTracker velocityTracker;
 
     public interface OnSwipeDismissListener {
+        boolean isSwipeDismissable(int position);
+
         void onSwipeDismiss(ListView listView, View view, int position);
     }
 
@@ -85,13 +87,24 @@ public class SwipeDismissTouchListener implements OnTouchListener {
         if (!disabled) {
             View childView = getChildView(event);
             if (childView != null) {
+                // Break out if the view isn't dismissable.
+                int position = listView.getPositionForView(childView);
+                if (!dismissListener.isSwipeDismissable(position)) {
+                    return false;
+                }
+
                 // Record the view that is probably being sniped and the initial touch location,
                 // so we can translate the swiped view by the change in touch location.
+                downView = childView;
+                downPosition = position;
                 downX = event.getRawX();
                 downY = event.getRawY();
-                downView = childView;
-                downPosition = listView.getPositionForView(childView);
 
+                // Create a fresh velocity tracker to start tracking this potential swipe.
+                if (velocityTracker != null) {
+                    velocityTracker.recycle();
+                    velocityTracker = null;
+                }
                 velocityTracker = VelocityTracker.obtain();
                 velocityTracker.addMovement(event);
 

@@ -334,6 +334,11 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     @Override
+    public boolean isSwipeDismissable(int position) {
+        return adapter.isHidable(getActivity(), position);
+    }
+
+    @Override
     public void onSwipeDismiss(ListView listView, View view, int position) {
         adapter.hide(getActivity(), position);
     }

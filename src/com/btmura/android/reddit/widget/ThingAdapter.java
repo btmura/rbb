@@ -509,6 +509,10 @@ public class ThingAdapter extends BaseLoaderAdapter {
         return StringUtil.safeString(formatter.formatAll(context, text));
     }
 
+    public boolean isHidable(Context context, int position) {
+        return AccountUtils.isAccount(accountName) && (subreddit != null || query != null);
+    }
+
     public void hide(Context context, int position) {
         if (isMessageActivity()) {
             throw new IllegalStateException();
