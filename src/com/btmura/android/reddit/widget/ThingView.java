@@ -40,7 +40,7 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.view.SwipeTouchListener;
+import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 
 public class ThingView extends CustomView implements OnGestureListener {
 
@@ -304,7 +304,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         setStatusText(over18, showSubreddit, showStatusPoints, showNumComments,
                 author, createdUtc, nowTimeMs, numComments, score, subreddit);
 
-        SwipeTouchListener.undoAnimation(this);
+        SwipeDismissTouchListener.resetAnimation(this);
         requestLayout();
     }
 

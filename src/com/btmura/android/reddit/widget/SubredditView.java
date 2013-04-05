@@ -30,7 +30,7 @@ import android.util.AttributeSet;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.view.SwipeTouchListener;
+import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 
 /**
  * {@link CustomView} for displaying subreddit names. It can show subscriber count if the
@@ -66,7 +66,7 @@ public class SubredditView extends CustomView {
     public void setData(String name, boolean over18, int subscribers) {
         title = Subreddits.getTitle(getContext(), name);
         setStatusText(over18, subscribers);
-        SwipeTouchListener.undoAnimation(this);
+        SwipeDismissTouchListener.resetAnimation(this);
         requestLayout();
     }
 

@@ -34,7 +34,7 @@ import android.widget.ListView;
  * 
  * This code is adapted from Roman Nurik's gist: https://gist.github.com/romannurik/2980593
  */
-public class SwipeTouchListener implements OnTouchListener {
+public class SwipeDismissTouchListener implements OnTouchListener {
 
     private final int touchSlop;
     private final int minFlingVelocity;
@@ -55,7 +55,7 @@ public class SwipeTouchListener implements OnTouchListener {
         void onSwipeDismiss(ListView listView, View view, int position);
     }
 
-    public SwipeTouchListener(ListView listView, OnSwipeDismissListener dismissListener) {
+    public SwipeDismissTouchListener(ListView listView, OnSwipeDismissListener dismissListener) {
         ViewConfiguration vc = ViewConfiguration.get(listView.getContext());
         this.touchSlop = vc.getScaledTouchSlop();
         this.minFlingVelocity = vc.getScaledMinimumFlingVelocity();
@@ -229,7 +229,7 @@ public class SwipeTouchListener implements OnTouchListener {
         };
     }
 
-    public static void undoAnimation(View view) {
+    public static void resetAnimation(View view) {
         view.setTranslationX(0);
         view.setAlpha(1);
     }

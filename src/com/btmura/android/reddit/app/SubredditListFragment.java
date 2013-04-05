@@ -43,8 +43,8 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
-import com.btmura.android.reddit.view.SwipeTouchListener;
-import com.btmura.android.reddit.view.SwipeTouchListener.OnSwipeDismissListener;
+import com.btmura.android.reddit.view.SwipeDismissTouchListener;
+import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditView;
@@ -145,7 +145,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         listView.setMultiChoiceModeListener(this);
 
-        SwipeTouchListener touchListener = new SwipeTouchListener(listView, this);
+        SwipeDismissTouchListener touchListener = new SwipeDismissTouchListener(listView, this);
         listView.setOnTouchListener(touchListener);
         listView.setOnScrollListener(touchListener.makeScrollListener());
         return view;
