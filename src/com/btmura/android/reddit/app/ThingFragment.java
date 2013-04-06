@@ -45,6 +45,7 @@ public class ThingFragment extends Fragment {
     private MenuItem shareItem;
     private MenuItem openItem;
     private MenuItem copyUrlItem;
+    private MenuItem addSubredditItem;
     private MenuItem userItem;
     private MenuItem subredditItem;
 
@@ -175,11 +176,15 @@ public class ThingFragment extends Fragment {
                 handleCopyUrlItem();
                 return true;
 
+            case R.id.menu_thing_add_subreddit:
+                handleAddSubredditItem();
+                return true;
+
             case R.id.menu_user:
                 handleUserItem();
                 return true;
 
-            case R.id.menu_subreddit:
+            case R.id.menu_thing_subreddit:
                 handleSubredditItem();
                 return true;
 
@@ -202,6 +207,10 @@ public class ThingFragment extends Fragment {
 
     private void handleCopyUrlItem() {
         MenuHelper.setClipAndToast(getActivity(), getTitle(), getUrl());
+    }
+
+    private void handleAddSubredditItem() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
     private void handleUserItem() {
