@@ -42,6 +42,7 @@ public class ThingFragment extends Fragment {
 
     private MenuItem linkItem;
     private MenuItem commentsItem;
+    private MenuItem shareItem;
     private MenuItem openItem;
     private MenuItem copyUrlItem;
     private MenuItem userItem;
@@ -85,6 +86,7 @@ public class ThingFragment extends Fragment {
         inflater.inflate(R.menu.thing_frag_menu, menu);
         linkItem = menu.findItem(R.id.menu_link);
         commentsItem = menu.findItem(R.id.menu_comments);
+        shareItem = menu.findItem(R.id.menu_share);
         openItem = menu.findItem(R.id.menu_open);
         copyUrlItem = menu.findItem(R.id.menu_copy_url);
         userItem = menu.findItem(R.id.menu_user);
@@ -96,6 +98,7 @@ public class ThingFragment extends Fragment {
         super.onPrepareOptionsMenu(menu);
         prepareLinkItem();
         prepareCommentsItem();
+        prepareShareItem();
         prepareOpenItem();
         prepareCopyUrlItem();
         prepareUserItem();
@@ -113,6 +116,17 @@ public class ThingFragment extends Fragment {
         if (commentsItem != null) {
             commentsItem.setVisible(ThingBundle.hasCommentUrl(thingBundle)
                     && getCurrentPageType() != ThingPagerAdapter.TYPE_COMMENTS);
+        }
+    }
+
+    private void prepareShareItem() {
+        if (shareItem != null) {
+            String title = getTitle();
+            CharSequence url = getUrl();
+            shareItem.setVisible(title != null && url != null);
+            if (shareItem.isVisible()) {
+                MenuHelper.setShareProvider(shareItem, title, url);
+            }
         }
     }
 
@@ -198,7 +212,7 @@ public class ThingFragment extends Fragment {
         MenuHelper.startSidebarActivity(getActivity(), getSubreddit());
     }
 
-    private CharSequence getTitle() {
+    private String getTitle() {
         return ThingBundle.getTitle(thingBundle);
     }
 
