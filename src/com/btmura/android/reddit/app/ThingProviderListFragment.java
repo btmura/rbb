@@ -16,11 +16,11 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.ListFragment;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.provider.ThingProvider;
 

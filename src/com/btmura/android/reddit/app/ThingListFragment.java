@@ -17,9 +17,9 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;

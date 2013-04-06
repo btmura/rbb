@@ -20,8 +20,8 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
-import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.content.Loader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;

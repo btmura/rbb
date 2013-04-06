@@ -22,13 +22,13 @@ import java.util.Comparator;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.OnAccountsUpdateListener;
-import android.content.AsyncTaskLoader;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;

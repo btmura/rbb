@@ -16,9 +16,8 @@
 
 package com.btmura.android.reddit.accounts;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
@@ -40,9 +39,9 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
 
         if (savedInstanceState == null) {
             Fragment frag = AddAccountFragment.newInstance(getIntent().getStringExtra(EXTRA_LOGIN));
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.account_authenticator_container, frag);
-            ft.commit();
+            // FragmentTransaction ft = getFragmentManager().beginTransaction();
+            // ft.replace(R.id.account_authenticator_container, frag);
+            // ft.commit();
         }
     }
 

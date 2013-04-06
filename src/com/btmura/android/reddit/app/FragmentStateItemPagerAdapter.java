@@ -19,12 +19,11 @@ package com.btmura.android.reddit.app;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v13.app.FragmentCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;
@@ -32,10 +31,10 @@ import android.view.ViewGroup;
 
 /**
  * A version of FragmentStatePagerAdapter that supports reorderable fragments.
- *
- * Copied from the support library and merged with modifications describe from
- * the following issue to support reordering of fragments:
- *
+ * 
+ * Copied from the support library and merged with modifications describe from the following issue
+ * to support reordering of fragments:
+ * 
  * http://code.google.com/p/android/issues/detail?id=37990
  */
 public abstract class FragmentStateItemPagerAdapter extends PagerAdapter {
@@ -149,8 +148,8 @@ public abstract class FragmentStateItemPagerAdapter extends PagerAdapter {
         while (mFragments.size() <= position) {
             mFragments.add(null);
         }
-        FragmentCompat.setMenuVisibility(fragment, false);
-        FragmentCompat.setUserVisibleHint(fragment, false);
+        fragment.setMenuVisibility(false);
+        fragment.setUserVisibleHint(false);
         mFragments.set(position, fragment);
         mCurTransaction.add(container.getId(), fragment);
 
@@ -185,12 +184,12 @@ public abstract class FragmentStateItemPagerAdapter extends PagerAdapter {
         Fragment fragment = (Fragment) object;
         if (fragment != mCurrentPrimaryItem) {
             if (mCurrentPrimaryItem != null) {
-                FragmentCompat.setMenuVisibility(mCurrentPrimaryItem, false);
-                FragmentCompat.setUserVisibleHint(mCurrentPrimaryItem, false);
+                mCurrentPrimaryItem.setMenuVisibility(false);
+                mCurrentPrimaryItem.setUserVisibleHint(false);
             }
             if (fragment != null) {
-                FragmentCompat.setMenuVisibility(fragment, true);
-                FragmentCompat.setUserVisibleHint(fragment, true);
+                fragment.setMenuVisibility(true);
+                fragment.setUserVisibleHint(true);
             }
             mCurrentPrimaryItem = fragment;
         }
@@ -261,7 +260,7 @@ public abstract class FragmentStateItemPagerAdapter extends PagerAdapter {
                         while (mFragments.size() <= index) {
                             mFragments.add(null);
                         }
-                        FragmentCompat.setMenuVisibility(f, false);
+                        f.setMenuVisibility(false);
                         mFragments.set(index, f);
                     } else {
                         Log.w(TAG, "Bad fragment at key " + key);

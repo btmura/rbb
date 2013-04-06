@@ -19,11 +19,11 @@ package com.btmura.android.reddit.app;
 import java.util.ArrayList;
 
 import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -40,7 +40,7 @@ import com.btmura.android.reddit.app.ComposeFragment.OnComposeListener;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.provider.Provider;
 
-public class ComposeActivity extends Activity implements OnPageChangeListener,
+public class ComposeActivity extends FragmentActivity implements OnPageChangeListener,
         OnClickListener,
         OnComposeFormListener,
         OnCaptchaGuessListener,
@@ -181,7 +181,7 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
             types = DEFAULT_TYPE_SET;
         }
 
-        adapter = new ComposePagerAdapter(this, getFragmentManager(), types,
+        adapter = new ComposePagerAdapter(this, getSupportFragmentManager(), types,
                 getIntent().getStringExtra(EXTRA_SUBREDDIT_DESTINATION),
                 getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION),
                 getIntent().getStringExtra(EXTRA_TITLE),
@@ -267,7 +267,7 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
                 Bundle extras = ComposeFragment.newExtras(accountName, destination, title, text,
                         isLink);
                 Fragment frag = ComposeFragment.newInstance(type, extras, null, null);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.add(frag, ComposeFragment.TAG);
                 ft.commit();
                 break;
@@ -321,7 +321,7 @@ public class ComposeActivity extends Activity implements OnPageChangeListener,
             case TYPE_POST:
             case TYPE_MESSAGE:
                 Fragment frag = ComposeFragment.newInstance(type, extras, id, guess);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.add(frag, ComposeFragment.TAG);
                 ft.commit();
                 break;

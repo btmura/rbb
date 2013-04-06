@@ -16,10 +16,10 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.DialogFragment;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,8 +37,8 @@ import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
-public class AddSubredditFragment extends DialogFragment implements LoaderCallbacks<AccountResult>,
-        OnClickListener {
+public class AddSubredditFragment extends DialogFragment
+        implements LoaderCallbacks<AccountResult>, OnClickListener {
 
     public static final String TAG = "AddSubredditFragment";
 

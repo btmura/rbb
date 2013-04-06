@@ -18,18 +18,17 @@ package com.btmura.android.reddit.app;
 
 import java.util.ArrayList;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.widget.ThingBundle;
 
 /**
- * {@link FragmentStateItemPagerAdapter} for controlling what is shown in the
- * ViewPager for looking at a thing. In multipane layouts, it is responsible for
- * handling the right side of the screen.
+ * {@link FragmentStateItemPagerAdapter} for controlling what is shown in the ViewPager for looking
+ * at a thing. In multipane layouts, it is responsible for handling the right side of the screen.
  */
 public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 

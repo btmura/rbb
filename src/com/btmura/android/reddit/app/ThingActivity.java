@@ -17,11 +17,11 @@
 package com.btmura.android.reddit.app;
 
 import android.app.ActionBar;
-import android.app.FragmentTransaction;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
-import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,8 +30,8 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
 import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
 import com.btmura.android.reddit.content.AccountLoader;
-import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingBundle;
@@ -70,7 +70,7 @@ public class ThingActivity extends GlobalMenuActivity implements
         setupPrereqs(savedInstanceState);
         setupFragments(savedInstanceState);
         setupActionBar(savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     private void setupPrereqs(Bundle savedInstanceState) {
@@ -85,7 +85,7 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     private void setupFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
             ft.commit();
         }
@@ -112,12 +112,12 @@ public class ThingActivity extends GlobalMenuActivity implements
 
         // Commit the fragment here to avoid some menu item jank.
         if (getThingMenuFragment() == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(ThingMenuFragment.newInstance(accountName, thingBundle), ThingMenuFragment.TAG);
             ft.commitAllowingStateLoss();
         }
 
-        ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(), accountName,
+        ThingPagerAdapter adapter = new ThingPagerAdapter(getSupportFragmentManager(), accountName,
                 thingBundle);
         pager.setAdapter(adapter);
 
@@ -216,6 +216,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     private ThingMenuFragment getThingMenuFragment() {
-        return (ThingMenuFragment) getFragmentManager().findFragmentByTag(ThingMenuFragment.TAG);
+        return (ThingMenuFragment) getSupportFragmentManager()
+                .findFragmentByTag(ThingMenuFragment.TAG);
     }
 }

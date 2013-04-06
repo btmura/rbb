@@ -19,10 +19,10 @@ package com.btmura.android.reddit.app;
 import java.util.regex.Matcher;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -38,6 +38,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -90,7 +91,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
         /**
          * Method fired when OK is pressed and basic validations has passed.
-         *
+         * 
          * @param accountName of the account composing the message
          * @param destination whether subreddit or user name
          * @param title or subject of the composition

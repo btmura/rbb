@@ -16,11 +16,11 @@
 
 package com.btmura.android.reddit.widget;
 
-import com.btmura.android.reddit.app.SidebarFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.support.v13.app.FragmentPagerAdapter;
+import com.btmura.android.reddit.app.SidebarFragment;
 
 public class SidebarPagerAdapter extends FragmentPagerAdapter {
 

@@ -24,11 +24,11 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.ActionBar;
-import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,7 +44,7 @@ import com.btmura.android.reddit.app.AccountListFragment.OnAccountEventListener;
 import com.btmura.android.reddit.content.SelectAccountBroadcast;
 import com.btmura.android.reddit.content.ThemePrefs;
 
-public class AccountListActivity extends Activity implements OnAccountEventListener,
+public class AccountListActivity extends FragmentActivity implements OnAccountEventListener,
         OnClickListener {
 
     public static final String TAG = "AccountListActivity";
@@ -77,7 +77,7 @@ public class AccountListActivity extends Activity implements OnAccountEventListe
         }
 
         if (savedInstanceState == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.account_list_container, AccountListFragment.newInstance());
             ft.commit();
         }

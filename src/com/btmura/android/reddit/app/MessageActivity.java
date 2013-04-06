@@ -18,8 +18,8 @@ package com.btmura.android.reddit.app;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
-import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.content.Loader;
 import android.view.Menu;
 import android.view.MenuItem;
 

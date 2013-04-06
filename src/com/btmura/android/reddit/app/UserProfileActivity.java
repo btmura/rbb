@@ -19,10 +19,10 @@ package com.btmura.android.reddit.app;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -116,7 +116,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         adapter.setFilter(currentFilter);
 
         // Start loading the user's karma count.
-        getLoaderManager().initLoader(1, null, karmaLoaderCallbacks);
+        getSupportLoaderManager().initLoader(1, null, karmaLoaderCallbacks);
 
         bar.setListNavigationCallbacks(adapter, this);
         bar.setDisplayHomeAsUpEnabled(true);

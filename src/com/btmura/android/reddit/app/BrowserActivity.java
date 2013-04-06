@@ -19,13 +19,13 @@ package com.btmura.android.reddit.app;
 import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -137,7 +137,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         bar.setListNavigationCallbacks(adapter, this);
-        getLoaderManager().initLoader(1, null, mailLoaderCallbacks);
+        getSupportLoaderManager().initLoader(1, null, mailLoaderCallbacks);
     }
 
     @Override

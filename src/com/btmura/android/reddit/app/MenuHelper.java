@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.FragmentManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -24,6 +23,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.widget.ShareActionProvider;
@@ -59,8 +59,8 @@ public class MenuHelper {
     }
 
     /**
-     * Sets a plain text {@link ClipData} with the provided label and text to
-     * the clipboard and shows a toast with the text.
+     * Sets a plain text {@link ClipData} with the provided label and text to the clipboard and
+     * shows a toast with the text.
      */
     public static void setClipAndToast(Context context, CharSequence label, CharSequence text) {
         context = context.getApplicationContext();

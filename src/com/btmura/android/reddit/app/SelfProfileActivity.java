@@ -19,8 +19,8 @@ package com.btmura.android.reddit.app;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
-import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;

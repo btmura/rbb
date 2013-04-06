@@ -17,8 +17,8 @@
 package com.btmura.android.reddit.app;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,7 +31,8 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.SidebarPagerAdapter;
 
-public class SidebarActivity extends Activity implements OnClickListener, SubredditNameHolder {
+public class SidebarActivity extends FragmentActivity
+        implements OnClickListener, SubredditNameHolder {
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
 
@@ -61,7 +62,7 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
         setTitle(Subreddits.getTitle(this, subreddit));
 
         String[] subreddits = subreddit.split("\\+");
-        adapter = new SidebarPagerAdapter(getFragmentManager(), subreddits, bar == null);
+        adapter = new SidebarPagerAdapter(getSupportFragmentManager(), subreddits, bar == null);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
 
@@ -101,7 +102,7 @@ public class SidebarActivity extends Activity implements OnClickListener, Subred
     }
 
     private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
+        MenuHelper.showAddSubredditDialog(getSupportFragmentManager(), getSubreddit());
     }
 
     private void handleViewSubreddit() {

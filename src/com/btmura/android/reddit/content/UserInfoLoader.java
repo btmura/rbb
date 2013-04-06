@@ -18,12 +18,12 @@ package com.btmura.android.reddit.content;
 
 import java.io.IOException;
 
+import android.content.Context;
+import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
+
 import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.RedditApi;
-
-import android.content.AsyncTaskLoader;
-import android.content.Context;
-import android.util.Log;
 
 /**
  * {@link AsyncTaskLoader} that loads a user's account info.

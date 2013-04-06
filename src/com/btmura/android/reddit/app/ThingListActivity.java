@@ -19,13 +19,13 @@ package com.btmura.android.reddit.app;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
-import android.content.Loader;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,7 +74,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         setupPrereqs(savedInstanceState);
         setupFragments(savedInstanceState);
         setupActionBar(savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     private void setupPrereqs(Bundle savedInstanceState) {
@@ -87,7 +87,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
     private void setupFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
             ft.commit();
         }
@@ -118,7 +118,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
 
         // Commit the fragment here to avoid some menu item jank.
         if (getThingListFragment() == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             Fragment frag = ThingListFragment.newSubredditInstance(accountName, subreddit,
                     filter, 0);
             ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
@@ -144,7 +144,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != filter) {
             frag = ThingListFragment.newSubredditInstance(accountName, subreddit, filter, 0);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
             ft.commit();
         }
@@ -217,6 +217,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     private ThingListFragment getThingListFragment() {
-        return (ThingListFragment) getFragmentManager().findFragmentByTag(ThingListFragment.TAG);
+        return (ThingListFragment) getSupportFragmentManager()
+                .findFragmentByTag(ThingListFragment.TAG);
     }
 }

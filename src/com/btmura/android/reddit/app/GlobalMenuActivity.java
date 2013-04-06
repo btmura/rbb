@@ -16,10 +16,10 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.Activity;
+import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 
-abstract class GlobalMenuActivity extends Activity {
+abstract class GlobalMenuActivity extends FragmentActivity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
@@ -37,6 +37,7 @@ abstract class GlobalMenuActivity extends Activity {
     }
 
     private GlobalMenuFragment getGlobalMenuFragment() {
-        return (GlobalMenuFragment) getFragmentManager().findFragmentByTag(GlobalMenuFragment.TAG);
+        return (GlobalMenuFragment) getSupportFragmentManager()
+                .findFragmentByTag(GlobalMenuFragment.TAG);
     }
 }

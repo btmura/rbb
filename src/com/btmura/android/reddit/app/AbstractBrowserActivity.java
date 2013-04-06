@@ -23,17 +23,17 @@ import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ActivityOptions;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentManager.OnBackStackChangedListener;
-import android.app.FragmentTransaction;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -111,7 +111,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             setupCommonViews();
             setupViews();
             setupActionBar(savedInstanceState);
-            getLoaderManager().initLoader(0, null, this);
+            getSupportLoaderManager().initLoader(0, null, this);
         }
     }
 
@@ -126,16 +126,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void setupCommonFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(),
-                    GlobalMenuFragment.TAG);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
             ft.commit();
         }
     }
 
     private void setupCommonViews() {
         if (!isSinglePane) {
-            getFragmentManager().addOnBackStackChangedListener(this);
+            getSupportFragmentManager().addOnBackStackChangedListener(this);
 
             sfFlags |= SubredditListFragment.FLAG_SINGLE_CHOICE;
             tfFlags |= ThingListFragment.FLAG_SINGLE_CHOICE;
@@ -187,7 +186,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void setSubredditListNavigationSinglePane(int containerId, String query) {
         Fragment sf = SubredditListFragment.newInstance(getAccountName(), null, query, sfFlags);
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(containerId, sf, SubredditListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
@@ -213,7 +212,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         Fragment tf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
                 tfFlags);
 
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
         ft.replace(containerId, sf, SubredditListFragment.TAG);
         ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
@@ -283,7 +282,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         Fragment tf = ThingListFragment.newInstance(accountName, subreddit, query, profileUser,
                 messageUser, filter, tfFlags);
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(containerId, tf, ThingListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
@@ -311,7 +310,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 messageUser, filter, tfFlags);
         Fragment mf = getThingMenuFragment();
 
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
         if (sf != null) {
             ft.remove(sf);
@@ -391,7 +390,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 tfFlags);
         Fragment mf = getThingMenuFragment();
 
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
         ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
         if (mf != null) {
@@ -444,10 +443,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String subreddit = getControlFragment().getSubreddit();
         Fragment cf = ControlFragment.newInstance(accountName, subreddit,
                 Subreddits.isRandom(subreddit), thingBundle, filter);
+        Fragment tf = ThingFragment.newInstance(accountName, thingBundle);
 
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        ft.replace(R.id.thing_container, ThingFragment.newInstance());
+        ft.replace(R.id.thing_container, tf, ThingFragment.TAG);
         ft.addToBackStack(null);
         ft.commit();
 
@@ -476,10 +476,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
                 cf.setThingBundle(thingBundle);
             }
-
-            ThingMenuFragment mf = getThingMenuFragment();
-            ThingBundle.putAuthor(thingBundle, thingHolder.getAuthor());
-            mf.setThingBundle(thingBundle);
         }
     }
 
@@ -508,7 +504,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void safePopBackStackImmediate() {
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
         if (fm.getBackStackEntryCount() > 0) {
             fm.removeOnBackStackChangedListener(this);
             fm.popBackStackImmediate();
@@ -678,7 +674,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void handleHome() {
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
         if (fm.getBackStackEntryCount() > 0) {
             fm.popBackStack();
         } else if ((bar.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP) != 0) {
@@ -691,22 +687,22 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private ControlFragment getControlFragment() {
-        return (ControlFragment) getFragmentManager()
+        return (ControlFragment) getSupportFragmentManager()
                 .findFragmentByTag(ControlFragment.TAG);
     }
 
     protected SubredditListFragment getSubredditListFragment() {
-        return (SubredditListFragment) getFragmentManager()
+        return (SubredditListFragment) getSupportFragmentManager()
                 .findFragmentByTag(SubredditListFragment.TAG);
     }
 
     protected ThingListFragment getThingListFragment() {
-        return (ThingListFragment) getFragmentManager()
+        return (ThingListFragment) getSupportFragmentManager()
                 .findFragmentByTag(ThingListFragment.TAG);
     }
 
     private ThingMenuFragment getThingMenuFragment() {
-        return (ThingMenuFragment) getFragmentManager()
+        return (ThingMenuFragment) getSupportFragmentManager()
                 .findFragmentByTag(ThingMenuFragment.TAG);
     }
 

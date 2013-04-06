@@ -16,16 +16,16 @@
 
 package com.btmura.android.reddit.widget;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.support.v4.content.CursorLoader;
+import android.view.View;
+import android.view.ViewGroup;
+
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Objects;
-
-import android.content.Context;
-import android.content.CursorLoader;
-import android.database.Cursor;
-import android.view.View;
-import android.view.ViewGroup;
 
 public class AccountAdapter extends BaseCursorAdapter {
 
