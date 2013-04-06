@@ -18,13 +18,14 @@ package com.btmura.android.reddit.accounts;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AddAccountFragment;
 import com.btmura.android.reddit.app.AddAccountFragment.OnAccountAddedListener;
 import com.btmura.android.reddit.content.ThemePrefs;
 
-public class AccountAuthenticatorActivity extends android.accounts.AccountAuthenticatorActivity
+public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorActivity
         implements OnAccountAddedListener {
 
     public static final String TAG = "AccountAuthenticatorActivity";
@@ -39,9 +40,9 @@ public class AccountAuthenticatorActivity extends android.accounts.AccountAuthen
 
         if (savedInstanceState == null) {
             Fragment frag = AddAccountFragment.newInstance(getIntent().getStringExtra(EXTRA_LOGIN));
-            // FragmentTransaction ft = getFragmentManager().beginTransaction();
-            // ft.replace(R.id.account_authenticator_container, frag);
-            // ft.commit();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.account_authenticator_container, frag);
+            ft.commit();
         }
     }
 
