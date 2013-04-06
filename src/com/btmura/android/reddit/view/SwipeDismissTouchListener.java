@@ -198,7 +198,13 @@ public class SwipeDismissTouchListener implements OnTouchListener {
                         .alpha(0)
                         .setListener(new AnimatorListenerAdapter() {
                             @Override
+                            public void onAnimationStart(Animator animation) {
+                                view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                            }
+
+                            @Override
                             public void onAnimationEnd(Animator animation) {
+                                view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
                                 if (dismissListener != null) {
                                     dismissListener.onSwipeDismiss(listView, view, position);
                                 }
@@ -207,11 +213,22 @@ public class SwipeDismissTouchListener implements OnTouchListener {
             } else {
                 // Shift the view back to its original state. We must set the listener back to null
                 // or else a previous listener on a swiped view might get fired again!
+                final View view = downView;
                 downView.animate()
                         .setDuration(animationTime)
                         .translationX(0)
                         .alpha(1)
-                        .setListener(null);
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+                                view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                            }
+                        });
             }
         }
 
