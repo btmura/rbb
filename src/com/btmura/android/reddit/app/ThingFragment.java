@@ -22,10 +22,12 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingFragment extends Fragment {
 
@@ -37,6 +39,9 @@ public class ThingFragment extends Fragment {
     private Bundle thingBundle;
     private ThingPagerAdapter adapter;
     private ViewPager thingPager;
+
+    private MenuItem openItem;
+    private MenuItem copyUrlItem;
 
     public static ThingFragment newInstance(String accountName, Bundle thingBundle) {
         Bundle args = new Bundle(2);
@@ -74,6 +79,69 @@ public class ThingFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_frag_menu, menu);
+        openItem = menu.findItem(R.id.menu_open);
+        copyUrlItem = menu.findItem(R.id.menu_copy_url);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        prepareOpen();
+        prepareCopyUrl();
+    }
+
+    private void prepareOpen() {
+        if (openItem != null) {
+            openItem.setVisible(getUrl() != null);
+        }
+    }
+
+    private void prepareCopyUrl() {
+        if (copyUrlItem != null) {
+            copyUrlItem.setVisible(getTitle() != null && getUrl() != null);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_open:
+                handleOpen();
+                return true;
+
+            case R.id.menu_copy_url:
+                handleCopyUrl();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void handleOpen() {
+        MenuHelper.startIntentChooser(getActivity(), getUrl());
+    }
+
+    private void handleCopyUrl() {
+        MenuHelper.setClipAndToast(getActivity(), getTitle(), getUrl());
+    }
+
+    private CharSequence getTitle() {
+        return ThingBundle.getTitle(thingBundle);
+    }
+
+    private CharSequence getUrl() {
+        int pageType = adapter.getPageType(thingPager.getCurrentItem());
+        switch (pageType) {
+            case ThingPagerAdapter.TYPE_LINK:
+                return ThingBundle.getLinkUrl(thingBundle);
+
+            case ThingPagerAdapter.TYPE_COMMENTS:
+                return ThingBundle.getCommentUrl(thingBundle);
+
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     private String getAccountName() {
