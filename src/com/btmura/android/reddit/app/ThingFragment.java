@@ -20,6 +20,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -51,6 +53,7 @@ public class ThingFragment extends Fragment {
         super.onCreate(savedInstanceState);
         thingBundle = getArguments().getBundle(ARG_THING_BUNDLE);
         adapter = new ThingPagerAdapter(getChildFragmentManager(), getAccountName(), thingBundle);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -65,6 +68,12 @@ public class ThingFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.thing_frag_menu, menu);
     }
 
     private String getAccountName() {
