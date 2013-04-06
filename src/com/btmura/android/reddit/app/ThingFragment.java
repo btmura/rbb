@@ -44,6 +44,8 @@ public class ThingFragment extends Fragment {
     private MenuItem commentsItem;
     private MenuItem openItem;
     private MenuItem copyUrlItem;
+    private MenuItem userItem;
+    private MenuItem subredditItem;
 
     public static ThingFragment newInstance(String accountName, Bundle thingBundle) {
         Bundle args = new Bundle(2);
@@ -85,6 +87,8 @@ public class ThingFragment extends Fragment {
         commentsItem = menu.findItem(R.id.menu_comments);
         openItem = menu.findItem(R.id.menu_open);
         copyUrlItem = menu.findItem(R.id.menu_copy_url);
+        userItem = menu.findItem(R.id.menu_user);
+        subredditItem = menu.findItem(R.id.menu_thing_subreddit);
     }
 
     @Override
@@ -94,6 +98,8 @@ public class ThingFragment extends Fragment {
         prepareCommentsItem();
         prepareOpenItem();
         prepareCopyUrlItem();
+        prepareUserItem();
+        prepareSubredditItem();
     }
 
     private void prepareLinkItem() {
@@ -122,6 +128,20 @@ public class ThingFragment extends Fragment {
         }
     }
 
+    private void prepareUserItem() {
+        if (userItem != null) {
+            userItem.setTitle(getString(R.string.menu_user,
+                    ThingBundle.getAuthor(thingBundle)));
+        }
+    }
+
+    private void prepareSubredditItem() {
+        if (subredditItem != null) {
+            subredditItem.setTitle(getString(R.string.menu_subreddit,
+                    ThingBundle.getSubreddit(thingBundle)));
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -139,6 +159,14 @@ public class ThingFragment extends Fragment {
 
             case R.id.menu_copy_url:
                 handleCopyUrlItem();
+                return true;
+
+            case R.id.menu_user:
+                handleUserItem();
+                return true;
+
+            case R.id.menu_subreddit:
+                handleSubredditItem();
                 return true;
 
             default:
@@ -162,6 +190,14 @@ public class ThingFragment extends Fragment {
         MenuHelper.setClipAndToast(getActivity(), getTitle(), getUrl());
     }
 
+    private void handleUserItem() {
+        MenuHelper.startProfileActivity(getActivity(), getAuthor(), -1);
+    }
+
+    private void handleSubredditItem() {
+        MenuHelper.startSidebarActivity(getActivity(), getSubreddit());
+    }
+
     private CharSequence getTitle() {
         return ThingBundle.getTitle(thingBundle);
     }
@@ -177,6 +213,14 @@ public class ThingFragment extends Fragment {
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    private String getAuthor() {
+        return ThingBundle.getAuthor(thingBundle);
+    }
+
+    private String getSubreddit() {
+        return ThingBundle.getSubreddit(thingBundle);
     }
 
     private void setCurrentPageType(int pageType, boolean smoothScroll) {
