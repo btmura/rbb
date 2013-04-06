@@ -20,8 +20,8 @@
     android:paddingLeft="@dimen/element_padding"
     android:paddingRight="@dimen/element_padding" >
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/thing_pager"
+    <FrameLayout
+        android:id="@+id/thing_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingLeft="@dimen/element_padding"

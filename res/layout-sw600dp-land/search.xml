@@ -42,8 +42,8 @@
             android:layout_toRightOf="@+id/subreddit_list_container" />
     </RelativeLayout>
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/thing_pager"
+    <FrameLayout
+        android:id="@+id/thing_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1.5"
