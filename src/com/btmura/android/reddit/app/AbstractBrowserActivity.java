@@ -77,13 +77,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected ActionBar bar;
 
     protected boolean isSinglePane;
-    private ViewPager thingPager;
     private int sfFlags;
     private int tfFlags;
 
     private View navContainer;
     private View subredditListContainer;
     private View thingListContainer;
+    private View thingContainer;
     private int subredditListWidth;
     private int thingBodyWidth;
 
@@ -119,7 +119,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void setupPrereqs() {
         bar = getActionBar();
-        isSinglePane = findViewById(R.id.thing_pager) == null;
+        isSinglePane = findViewById(R.id.thing_container) == null;
     }
 
     protected abstract boolean skipSetup();
@@ -143,8 +143,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             navContainer = findViewById(R.id.nav_container);
             subredditListContainer = findViewById(R.id.subreddit_list_container);
             thingListContainer = findViewById(R.id.thing_list_container);
-            thingPager = (ViewPager) findViewById(R.id.thing_pager);
-            thingMenuListenerCollection.setThingPager(thingPager);
+            thingContainer = findViewById(R.id.thing_container);
 
             Resources r = getResources();
             subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
@@ -445,11 +444,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         String subreddit = getControlFragment().getSubreddit();
         Fragment cf = ControlFragment.newInstance(accountName, subreddit,
                 Subreddits.isRandom(subreddit), thingBundle, filter);
-        Fragment mf = ThingMenuFragment.newInstance(accountName, thingBundle);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        ft.add(mf, ThingMenuFragment.TAG);
+        ft.replace(R.id.thing_container, ThingFragment.newInstance());
         ft.addToBackStack(null);
         ft.commit();
 
@@ -477,10 +475,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             if (!thingHolder.isSelf() && !ThingBundle.hasLinkUrl(thingBundle)) {
                 ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
                 cf.setThingBundle(thingBundle);
-
-                ThingPagerAdapter adapter = (ThingPagerAdapter) thingPager.getAdapter();
-                adapter.addPage(0, ThingPagerAdapter.TYPE_LINK);
-                thingPager.setCurrentItem(ThingPagerAdapter.PAGE_COMMENTS);
             }
 
             ThingMenuFragment mf = getThingMenuFragment();
@@ -490,7 +484,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     public ViewPager getThingPager() {
-        return thingPager;
+        return null;
     }
 
     public void addThingMenuListener(ThingMenuListener listener) {
@@ -555,7 +549,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void refreshViews(Bundle thingBundle) {
         boolean hasThing = thingBundle != null;
-        int nextThingPagerVisibility = hasThing ?
+        int nextThingVisibility = hasThing ?
                 View.VISIBLE : View.GONE;
         int nextSubredditListVisiblility = hasSubredditList() && !hasThing ?
                 View.VISIBLE : View.GONE;
@@ -587,19 +581,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                     // There may be no change in visibility if we are just
                     // starting, but we should set the correct visibility, since
                     // some activities change modes.
-                    thingPager.setVisibility(nextThingPagerVisibility);
+                    thingContainer.setVisibility(nextThingVisibility);
                 }
             } else {
                 if (subredditListContainer != null) {
                     subredditListContainer.setVisibility(nextSubredditListVisiblility);
                 }
-                thingPager.setVisibility(nextThingPagerVisibility);
+                thingContainer.setVisibility(nextThingVisibility);
             }
             if (!hasThing) {
                 // Avoid nested executePendingTransactions that would occur by
                 // doing popBackStack. This is a hack to get around stale
                 // adapter issues with the ViewPager after orientation changes.
-                thingPager.post(new Runnable() {
+                thingContainer.post(new Runnable() {
                     public void run() {
                         refreshThingPager(null, -1);
                     }
@@ -626,16 +620,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void refreshThingPager(Bundle thingBundle, int pageType) {
-        if (thingBundle != null) {
-            ThingPagerAdapter adapter = new ThingPagerAdapter(getFragmentManager(),
-                    getAccountName(), thingBundle);
-            thingPager.setAdapter(adapter);
-            if (pageType != -1) {
-                thingPager.setCurrentItem(adapter.findPageType(pageType));
-            }
-        } else {
-            thingPager.setAdapter(null);
-        }
     }
 
     protected void refreshSubredditListVisibility() {
@@ -764,7 +748,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private AnimatorSet createOpenNavAnimator() {
         ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer,
                 "translationX", -fullNavWidth, 0);
-        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager,
+        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingContainer,
                 "translationX", 0, fullNavWidth);
 
         AnimatorSet as = new AnimatorSet();
@@ -774,15 +758,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             public void onAnimationStart(Animator animation) {
                 navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 navContainer.setVisibility(View.VISIBLE);
-                thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-                thingPager.setVisibility(View.VISIBLE);
+                thingContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                thingContainer.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
-                thingPager.setVisibility(View.GONE);
+                thingContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                thingContainer.setVisibility(View.GONE);
                 refreshThingPager(null, -1);
             }
         });
@@ -800,17 +784,17 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             public void onAnimationStart(Animator animation) {
                 navContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 navContainer.setVisibility(View.VISIBLE);
-                thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-                thingPager.setVisibility(View.GONE);
-                thingPager.setTranslationX(0);
+                thingContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                thingContainer.setVisibility(View.GONE);
+                thingContainer.setTranslationX(0);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
                 navContainer.setVisibility(View.GONE);
-                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
-                thingPager.setVisibility(View.VISIBLE);
+                thingContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                thingContainer.setVisibility(View.VISIBLE);
             }
         });
         return as;
@@ -831,7 +815,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 subredditListContainer.setVisibility(View.VISIBLE);
                 thingListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 thingListContainer.setVisibility(View.VISIBLE);
-                thingPager.setVisibility(View.GONE);
+                thingContainer.setVisibility(View.GONE);
             }
 
             @Override
@@ -848,7 +832,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 "translationX", 0, -subredditListWidth);
         ObjectAnimator tlTransX = ObjectAnimator.ofFloat(thingListContainer,
                 "translationX", 0, -subredditListWidth);
-        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingPager,
+        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingContainer,
                 "translationX", subredditListWidth, 0);
 
         AnimatorSet as = new AnimatorSet();
@@ -860,7 +844,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 subredditListContainer.setVisibility(View.VISIBLE);
                 thingListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 thingListContainer.setVisibility(View.VISIBLE);
-                thingPager.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                thingContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             }
 
             @Override
@@ -869,8 +853,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 subredditListContainer.setVisibility(View.GONE);
                 thingListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingListContainer.setTranslationX(0);
-                thingPager.setLayerType(View.LAYER_TYPE_NONE, null);
-                thingPager.setVisibility(View.VISIBLE);
+                thingContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                thingContainer.setVisibility(View.VISIBLE);
             }
         });
         return as;
