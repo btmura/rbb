@@ -35,8 +35,6 @@ import android.widget.ListView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.CommentLogic.CommentList;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
@@ -48,7 +46,6 @@ import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ThingProviderListFragment implements
         MultiChoiceModeListener,
-        ThingMenuListener,
         OnVoteListener,
         ThingHolder,
         CommentList {
@@ -109,9 +106,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
         super.onAttach(activity);
         if (activity instanceof OnThingEventListener) {
             listener = (OnThingEventListener) activity;
-        }
-        if (activity instanceof ThingMenuListenerHolder) {
-            ((ThingMenuListenerHolder) activity).addThingMenuListener(this);
         }
     }
 
@@ -231,14 +225,6 @@ public class CommentListFragment extends ThingProviderListFragment implements
         outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
         outState.putString(STATE_TITLE, title);
         outState.putCharSequence(STATE_URL, url);
-    }
-
-    @Override
-    public void onDetach() {
-        if (getActivity() instanceof ThingMenuListenerHolder) {
-            ((ThingMenuListenerHolder) getActivity()).removeThingMenuListener(this);
-        }
-        super.onDetach();
     }
 
     public void onVote(View view, int action) {

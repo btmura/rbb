@@ -45,7 +45,6 @@ public class ThingFragment extends Fragment {
     private MenuItem shareItem;
     private MenuItem openItem;
     private MenuItem copyUrlItem;
-    private MenuItem addSubredditItem;
     private MenuItem userItem;
     private MenuItem subredditItem;
 
@@ -97,11 +96,13 @@ public class ThingFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        String title = getTitle();
+        CharSequence url = getUrl();
         prepareLinkItem();
         prepareCommentsItem();
-        prepareShareItem();
-        prepareOpenItem();
-        prepareCopyUrlItem();
+        prepareShareItem(title, url);
+        prepareOpenItem(url);
+        prepareCopyUrlItem(title, url);
         prepareUserItem();
         prepareSubredditItem();
     }
@@ -120,10 +121,8 @@ public class ThingFragment extends Fragment {
         }
     }
 
-    private void prepareShareItem() {
+    private void prepareShareItem(String title, CharSequence url) {
         if (shareItem != null) {
-            String title = getTitle();
-            CharSequence url = getUrl();
             shareItem.setVisible(title != null && url != null);
             if (shareItem.isVisible()) {
                 MenuHelper.setShareProvider(shareItem, title, url);
@@ -131,15 +130,15 @@ public class ThingFragment extends Fragment {
         }
     }
 
-    private void prepareOpenItem() {
+    private void prepareOpenItem(CharSequence url) {
         if (openItem != null) {
-            openItem.setVisible(getUrl() != null);
+            openItem.setVisible(url != null);
         }
     }
 
-    private void prepareCopyUrlItem() {
+    private void prepareCopyUrlItem(String title, CharSequence url) {
         if (copyUrlItem != null) {
-            copyUrlItem.setVisible(getTitle() != null && getUrl() != null);
+            copyUrlItem.setVisible(title != null && url != null);
         }
     }
 
@@ -230,7 +229,7 @@ public class ThingFragment extends Fragment {
                 return ThingBundle.getCommentUrl(thingBundle);
 
             default:
-                throw new IllegalStateException();
+                return null;
         }
     }
 
@@ -240,7 +239,10 @@ public class ThingFragment extends Fragment {
     }
 
     private int getCurrentPageType() {
-        return adapter.getPageType(thingPager.getCurrentItem());
+        if (adapter != null && thingPager != null) {
+            return adapter.getPageType(thingPager.getCurrentItem());
+        }
+        return -1;
     }
 
     private String getAuthor() {

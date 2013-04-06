@@ -37,7 +37,6 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -45,8 +44,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
@@ -59,13 +56,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         OnSubredditEventListener,
         OnThingSelectedListener,
         OnThingEventListener,
-        ThingMenuListener,
         OnBackStackChangedListener,
         AccountNameHolder,
         SubredditNameHolder,
-        ThingBundleHolder,
-        ThingPagerHolder,
-        ThingMenuListenerHolder {
+        ThingBundleHolder {
 
     public static final String TAG = "AbstractBrowserActivity";
 
@@ -94,9 +88,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private AnimatorSet closeNavAnimator;
     private AnimatorSet openSubredditListAnimator;
     private AnimatorSet closeSubredditListAnimator;
-
-    private ThingMenuListenerCollection thingMenuListenerCollection =
-            new ThingMenuListenerCollection();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -481,26 +472,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     public ViewPager getThingPager() {
         return null;
-    }
-
-    public void addThingMenuListener(ThingMenuListener listener) {
-        thingMenuListenerCollection.add(listener);
-    }
-
-    public void removeThingMenuListener(ThingMenuListener listener) {
-        thingMenuListenerCollection.remove(listener);
-    }
-
-    public void onCreateThingOptionsMenu(Menu menu) {
-        thingMenuListenerCollection.onCreateThingOptionsMenu(menu);
-    }
-
-    public void onPrepareThingOptionsMenu(Menu menu, int pageType) {
-        thingMenuListenerCollection.onPrepareThingOptionsMenu(menu, pageType);
-    }
-
-    public void onThingOptionsItemSelected(MenuItem item, int pageType) {
-        thingMenuListenerCollection.onThingOptionsItemSelected(item, pageType);
     }
 
     private void safePopBackStackImmediate() {

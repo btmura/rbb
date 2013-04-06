@@ -19,14 +19,11 @@ package com.btmura.android.reddit.app;
 import java.util.regex.Pattern;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
@@ -37,11 +34,9 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
 import com.btmura.android.reddit.util.StringUtil;
 
-public class LinkFragment extends Fragment implements ThingMenuListener {
+public class LinkFragment extends Fragment {
 
     public static final String TAG = "LinkFragment";
 
@@ -56,10 +51,6 @@ public class LinkFragment extends Fragment implements ThingMenuListener {
     private WebView webView;
     private ProgressBar progress;
 
-    private MenuItem shareItem;
-    private MenuItem openItem;
-    private MenuItem copyUrlItem;
-
     public static LinkFragment newInstance(String title, CharSequence url) {
         Bundle b = new Bundle(2);
         b.putString(ARG_TITLE, title);
@@ -67,14 +58,6 @@ public class LinkFragment extends Fragment implements ThingMenuListener {
         LinkFragment frag = new LinkFragment();
         frag.setArguments(b);
         return frag;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof ThingMenuListenerHolder) {
-            ((ThingMenuListenerHolder) activity).addThingMenuListener(this);
-        }
     }
 
     @Override
@@ -172,53 +155,9 @@ public class LinkFragment extends Fragment implements ThingMenuListener {
 
     @Override
     public void onDetach() {
-        if (getActivity() instanceof ThingMenuListenerHolder) {
-            ((ThingMenuListenerHolder) getActivity()).removeThingMenuListener(this);
-        }
         webView.destroy();
         webView = null;
         progress = null;
         super.onDetach();
-    }
-
-    public void onCreateThingOptionsMenu(Menu menu) {
-        shareItem = menu.findItem(R.id.menu_share);
-        openItem = menu.findItem(R.id.menu_open);
-        copyUrlItem = menu.findItem(R.id.menu_copy_url);
-    }
-
-    public void onPrepareThingOptionsMenu(Menu menu, int pageType) {
-        if (pageType == ThingPagerAdapter.TYPE_LINK) {
-            if (openItem != null) {
-                openItem.setVisible(true);
-            }
-
-            if (copyUrlItem != null) {
-                copyUrlItem.setVisible(true);
-            }
-
-            if (shareItem != null) {
-                shareItem.setVisible(true);
-                MenuHelper.setShareProvider(shareItem, getArguments().getString(ARG_TITLE),
-                        getArguments().getString(ARG_URL));
-            }
-        }
-    }
-
-    public void onThingOptionsItemSelected(MenuItem item, int pageType) {
-        switch (item.getItemId()) {
-            case R.id.menu_open:
-                if (pageType == ThingPagerAdapter.TYPE_LINK) {
-                    MenuHelper.startIntentChooser(getActivity(), getArguments().getString(ARG_URL));
-                }
-                break;
-
-            case R.id.menu_copy_url:
-                if (pageType == ThingPagerAdapter.TYPE_LINK) {
-                    MenuHelper.setClipAndToast(getActivity(), getArguments().getString(ARG_TITLE),
-                            getArguments().getString(ARG_URL));
-                }
-                break;
-        }
     }
 }

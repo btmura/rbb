@@ -33,8 +33,6 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListener;
-import com.btmura.android.reddit.app.ThingMenuFragment.ThingMenuListenerHolder;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.MessageThreadAdapter;
 
@@ -43,7 +41,6 @@ import com.btmura.android.reddit.widget.MessageThreadAdapter;
  */
 public class MessageThreadListFragment extends ThingProviderListFragment implements
         MultiChoiceModeListener,
-        ThingMenuListener,
         ThingHolder {
 
     public static final String TAG = "MessageThreadListFragment";
@@ -71,9 +68,6 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         super.onAttach(activity);
         if (activity instanceof OnThingEventListener) {
             listener = (OnThingEventListener) activity;
-        }
-        if (activity instanceof ThingMenuListenerHolder) {
-            ((ThingMenuListenerHolder) activity).addThingMenuListener(this);
         }
     }
 
@@ -218,17 +212,6 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
-    }
-
-    // ThingMenuListener implementation
-
-    public void onCreateThingOptionsMenu(Menu menu) {
-    }
-
-    public void onPrepareThingOptionsMenu(Menu menu, int pageType) {
-    }
-
-    public void onThingOptionsItemSelected(MenuItem item, int pageType) {
     }
 
     // ThingHolder implementation
