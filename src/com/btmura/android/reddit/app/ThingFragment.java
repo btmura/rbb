@@ -40,6 +40,8 @@ public class ThingFragment extends Fragment {
     private ThingPagerAdapter adapter;
     private ViewPager thingPager;
 
+    private MenuItem linkItem;
+    private MenuItem commentsItem;
     private MenuItem openItem;
     private MenuItem copyUrlItem;
 
@@ -79,6 +81,8 @@ public class ThingFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.thing_frag_menu, menu);
+        linkItem = menu.findItem(R.id.menu_link);
+        commentsItem = menu.findItem(R.id.menu_comments);
         openItem = menu.findItem(R.id.menu_open);
         copyUrlItem = menu.findItem(R.id.menu_copy_url);
     }
@@ -86,17 +90,33 @@ public class ThingFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        prepareOpen();
-        prepareCopyUrl();
+        prepareLinkItem();
+        prepareCommentsItem();
+        prepareOpenItem();
+        prepareCopyUrlItem();
     }
 
-    private void prepareOpen() {
+    private void prepareLinkItem() {
+        if (linkItem != null) {
+            linkItem.setVisible(ThingBundle.hasLinkUrl(thingBundle)
+                    && getCurrentPageType() != ThingPagerAdapter.TYPE_LINK);
+        }
+    }
+
+    private void prepareCommentsItem() {
+        if (commentsItem != null) {
+            commentsItem.setVisible(ThingBundle.hasCommentUrl(thingBundle)
+                    && getCurrentPageType() != ThingPagerAdapter.TYPE_COMMENTS);
+        }
+    }
+
+    private void prepareOpenItem() {
         if (openItem != null) {
             openItem.setVisible(getUrl() != null);
         }
     }
 
-    private void prepareCopyUrl() {
+    private void prepareCopyUrlItem() {
         if (copyUrlItem != null) {
             copyUrlItem.setVisible(getTitle() != null && getUrl() != null);
         }
@@ -105,12 +125,20 @@ public class ThingFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_link:
+                handleLinkItem();
+                return true;
+
+            case R.id.menu_comments:
+                handleCommentsItem();
+                return true;
+
             case R.id.menu_open:
-                handleOpen();
+                handleOpenItem();
                 return true;
 
             case R.id.menu_copy_url:
-                handleCopyUrl();
+                handleCopyUrlItem();
                 return true;
 
             default:
@@ -118,11 +146,19 @@ public class ThingFragment extends Fragment {
         }
     }
 
-    private void handleOpen() {
+    private void handleLinkItem() {
+        setCurrentPageType(ThingPagerAdapter.PAGE_LINK, true);
+    }
+
+    private void handleCommentsItem() {
+        setCurrentPageType(ThingPagerAdapter.PAGE_COMMENTS, true);
+    }
+
+    private void handleOpenItem() {
         MenuHelper.startIntentChooser(getActivity(), getUrl());
     }
 
-    private void handleCopyUrl() {
+    private void handleCopyUrlItem() {
         MenuHelper.setClipAndToast(getActivity(), getTitle(), getUrl());
     }
 
@@ -131,8 +167,7 @@ public class ThingFragment extends Fragment {
     }
 
     private CharSequence getUrl() {
-        int pageType = adapter.getPageType(thingPager.getCurrentItem());
-        switch (pageType) {
+        switch (getCurrentPageType()) {
             case ThingPagerAdapter.TYPE_LINK:
                 return ThingBundle.getLinkUrl(thingBundle);
 
@@ -142,6 +177,15 @@ public class ThingFragment extends Fragment {
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    private void setCurrentPageType(int pageType, boolean smoothScroll) {
+        int position = adapter.findPageType(pageType);
+        thingPager.setCurrentItem(position, smoothScroll);
+    }
+
+    private int getCurrentPageType() {
+        return adapter.getPageType(thingPager.getCurrentItem());
     }
 
     private String getAccountName() {
