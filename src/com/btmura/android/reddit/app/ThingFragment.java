@@ -221,10 +221,6 @@ public class ThingFragment extends Fragment {
         MenuHelper.startSidebarActivity(getActivity(), getSubreddit());
     }
 
-    private String getTitle() {
-        return ThingBundle.getTitle(thingBundle);
-    }
-
     private CharSequence getUrl() {
         switch (getCurrentPageType()) {
             case ThingPagerAdapter.TYPE_LINK:
@@ -238,6 +234,15 @@ public class ThingFragment extends Fragment {
         }
     }
 
+    private void setCurrentPageType(int pageType, boolean smoothScroll) {
+        int position = adapter.findPageType(pageType);
+        thingPager.setCurrentItem(position, smoothScroll);
+    }
+
+    private int getCurrentPageType() {
+        return adapter.getPageType(thingPager.getCurrentItem());
+    }
+
     private String getAuthor() {
         return ThingBundle.getAuthor(thingBundle);
     }
@@ -246,13 +251,8 @@ public class ThingFragment extends Fragment {
         return ThingBundle.getSubreddit(thingBundle);
     }
 
-    private void setCurrentPageType(int pageType, boolean smoothScroll) {
-        int position = adapter.findPageType(pageType);
-        thingPager.setCurrentItem(position, smoothScroll);
-    }
-
-    private int getCurrentPageType() {
-        return adapter.getPageType(thingPager.getCurrentItem());
+    private String getTitle() {
+        return ThingBundle.getTitle(thingBundle);
     }
 
     private String getAccountName() {

@@ -208,25 +208,25 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, isRandom, thingBundle,
                 filter);
-        Fragment sf = SubredditListFragment.newInstance(accountName, subreddit, query, sfFlags);
-        Fragment tf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
+        Fragment slf = SubredditListFragment.newInstance(accountName, subreddit, query, sfFlags);
+        Fragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
                 tfFlags);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        ft.replace(containerId, sf, SubredditListFragment.TAG);
-        ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
+        ft.replace(containerId, slf, SubredditListFragment.TAG);
+        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
 
         // If a thing was specified by the thingBundle argument, then add the
         // ThingMenuFragment. Otherwise, make sure to remove the prior
         // ThingMenuFragment for some other thing.
         if (thingBundle != null) {
-            Fragment mf = ThingMenuFragment.newInstance(accountName, thingBundle);
-            ft.add(mf, ThingMenuFragment.TAG);
+            Fragment tf = ThingFragment.newInstance(accountName, thingBundle);
+            ft.replace(R.id.thing_container, tf, ThingFragment.TAG);
         } else {
-            Fragment mf = getThingMenuFragment();
-            if (mf != null) {
-                ft.remove(mf);
+            Fragment tf = getThingFragment();
+            if (tf != null) {
+                ft.remove(tf);
             }
         }
 
@@ -308,7 +308,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         Fragment sf = getSubredditListFragment();
         Fragment tf = ThingListFragment.newInstance(accountName, subreddit, query, profileUser,
                 messageUser, filter, tfFlags);
-        Fragment mf = getThingMenuFragment();
+        Fragment mf = getThingFragment();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
@@ -386,15 +386,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         int filter = getFilter();
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, isRandom, null, filter);
-        Fragment tf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
+        Fragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
                 tfFlags);
-        Fragment mf = getThingMenuFragment();
+        Fragment tf = getThingFragment();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        ft.replace(R.id.thing_list_container, tf, ThingListFragment.TAG);
-        if (mf != null) {
-            ft.remove(mf);
+        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+        if (tf != null) {
+            ft.remove(tf);
         }
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
@@ -683,7 +683,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected boolean hasThing() {
-        return getThingMenuFragment() != null;
+        return getThingFragment() != null;
     }
 
     private ControlFragment getControlFragment() {
@@ -701,9 +701,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 .findFragmentByTag(ThingListFragment.TAG);
     }
 
-    private ThingMenuFragment getThingMenuFragment() {
-        return (ThingMenuFragment) getSupportFragmentManager()
-                .findFragmentByTag(ThingMenuFragment.TAG);
+    private ThingFragment getThingFragment() {
+        return (ThingFragment) getSupportFragmentManager()
+                .findFragmentByTag(ThingFragment.TAG);
     }
 
     private void startAnimation(int type) {
