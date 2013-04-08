@@ -16,8 +16,11 @@
 
 package com.btmura.android.reddit.app;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,7 +32,7 @@ import android.view.ViewGroup;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.widget.ThingBundle;
 
-public class ThingFragment extends Fragment {
+public class ThingFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
     static final String TAG = "ThingFragment";
 
@@ -37,8 +40,8 @@ public class ThingFragment extends Fragment {
     private static final String ARG_THING_BUNDLE = "tb";
 
     private Bundle thingBundle;
-    private ThingPagerAdapter adapter;
-    private ViewPager thingPager;
+    private ThingPagerAdapter pagerAdapter;
+    private ViewPager pager;
 
     private MenuItem linkItem;
     private MenuItem commentsItem;
@@ -62,7 +65,8 @@ public class ThingFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         thingBundle = getArguments().getBundle(ARG_THING_BUNDLE);
-        adapter = new ThingPagerAdapter(getChildFragmentManager(), getAccountName(), thingBundle);
+        pagerAdapter = new ThingPagerAdapter(getChildFragmentManager(), getAccountName(),
+                thingBundle);
         setHasOptionsMenu(true);
     }
 
@@ -70,14 +74,27 @@ public class ThingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.thing_frag, container, false);
-        thingPager = (ViewPager) view.findViewById(R.id.thing_pager);
-        thingPager.setAdapter(adapter);
+        pager = (ViewPager) view.findViewById(R.id.thing_pager);
+        pager.setAdapter(pagerAdapter);
         return view;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 
     @Override
@@ -234,13 +251,13 @@ public class ThingFragment extends Fragment {
     }
 
     private void setCurrentPageType(int pageType, boolean smoothScroll) {
-        int position = adapter.findPageType(pageType);
-        thingPager.setCurrentItem(position, smoothScroll);
+        int position = pagerAdapter.findPageType(pageType);
+        pager.setCurrentItem(position, smoothScroll);
     }
 
     private int getCurrentPageType() {
-        if (adapter != null && thingPager != null) {
-            return adapter.getPageType(thingPager.getCurrentItem());
+        if (pagerAdapter != null && pager != null) {
+            return pagerAdapter.getPageType(pager.getCurrentItem());
         }
         return -1;
     }
