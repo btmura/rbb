@@ -44,7 +44,7 @@ import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.OnVoteListener;
-import com.btmura.android.reddit.widget.ThingAdapter;
+import com.btmura.android.reddit.widget.ThingListAdapter;
 import com.btmura.android.reddit.widget.ThingView;
 
 public class ThingListFragment extends ThingProviderListFragment implements
@@ -100,7 +100,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private OnThingSelectedListener listener;
     private OnSubredditEventListener eventListener;
     private ThingBundleHolder thingBundleHolder;
-    private ThingAdapter adapter;
+    private ThingListAdapter adapter;
     private int emptyText;
     private boolean scrollLoading;
 
@@ -164,7 +164,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
 
-        adapter = new ThingAdapter(getActivity(),
+        adapter = new ThingListAdapter(getActivity(),
                 getArguments().getString(ARG_SUBREDDIT),
                 getArguments().getString(ARG_QUERY),
                 getArguments().getString(ARG_PROFILE_USER),

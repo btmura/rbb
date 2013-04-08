@@ -35,7 +35,7 @@ public abstract class SubredditAdapter extends BaseLoaderAdapter {
 
     /** Creates an adapter for showing the user's subreddits with presets. */
     public static SubredditAdapter newSubredditsInstance(Context context, boolean singleChoice) {
-        return new SubredditListingAdapter(context, true, false, singleChoice);
+        return new SubredditListAdapter(context, true, false, singleChoice);
     }
 
     /** Creates an adapter for searching for subreddits. */
@@ -47,7 +47,7 @@ public abstract class SubredditAdapter extends BaseLoaderAdapter {
     /** Creates an adapter for use with AutoCompleteTextView. */
     public static SubredditAdapter newAutoCompleteInstance(Context context) {
         // Don't make it single choice for AutoCompleteTextView.
-        return new SubredditListingAdapter(context, false, true, false);
+        return new SubredditListAdapter(context, false, true, false);
     }
 
     protected SubredditAdapter(Context context, boolean singleChoice) {

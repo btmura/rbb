@@ -43,9 +43,9 @@ import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.StringUtil;
 
 // TODO: Split this into an interface and 2 adapters.
-public class ThingAdapter extends BaseLoaderAdapter {
+public class ThingListAdapter extends BaseLoaderAdapter {
 
-    public static final String TAG = "ThingAdapter";
+    public static final String TAG = "ThingListAdapter";
 
     private static final String[] THING_PROJECTION = {
             Things._ID,
@@ -176,7 +176,7 @@ public class ThingAdapter extends BaseLoaderAdapter {
     private String selectedLinkId;
     private long nowTimeMs;
 
-    public ThingAdapter(Context context, String subreddit, String query, String profileUser,
+    public ThingListAdapter(Context context, String subreddit, String query, String profileUser,
             String messageUser, int filter, OnVoteListener listener, boolean singleChoice) {
         super(context, null, 0);
         this.subreddit = subreddit;
