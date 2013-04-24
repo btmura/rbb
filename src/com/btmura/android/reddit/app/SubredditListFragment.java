@@ -39,7 +39,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
@@ -190,7 +189,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
             } else if (cursor.getCount() == 0) {
                 listener.onInitialSubredditSelected(null, false);
             } else {
-                listener.onInitialSubredditSelected(adapter.getName(0), false);
+                listener.onInitialSubredditSelected(getSubreddit(0), false);
             }
         }
     }
@@ -230,15 +229,12 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
     @Override
     public boolean isSwipeDismissable(int position) {
-        return AccountUtils.isAccount(getAccountName())
-                && !adapter.isQuery()
-                && Subreddits.hasSidebar(adapter.getName(position));
+        return !adapter.isQuery() && hasSidebar(position);
     }
 
     @Override
     public void onSwipeDismiss(ListView listView, View view, int position) {
-        String subreddit = adapter.getName(position);
-        Provider.removeSubredditAsync(getActivity(), getAccountName(), subreddit);
+        Provider.removeSubredditAsync(getActivity(), getAccountName(), getSubreddit(position));
     }
 
     static class ViewHolder {
@@ -314,9 +310,9 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         menu.findItem(R.id.menu_add).setVisible(isQuery && isAdapterReady);
         menu.findItem(R.id.menu_delete).setVisible(!isQuery && isAdapterReady);
 
-        String subreddit = adapter.getName(getFirstCheckedPosition());
         MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
-        subredditItem.setVisible(isAdapterReady && count == 1 && Subreddits.hasSidebar(subreddit));
+        subredditItem.setVisible(isAdapterReady && count == 1
+                && hasSidebar(getFirstCheckedPosition()));
 
         return true;
     }
@@ -367,8 +363,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     }
 
     private boolean handleSubreddit(ActionMode mode) {
-        String subreddit = adapter.getName(getFirstCheckedPosition());
-        MenuHelper.startSidebarActivity(getActivity(), subreddit);
+        MenuHelper.startSidebarActivity(getActivity(), getSubreddit(getFirstCheckedPosition()));
         return true;
     }
 
@@ -394,7 +389,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         int i = 0, j = 0, count = adapter.getCount();
         for (; i < count; i++) {
             if (checked.get(i) && adapter.isDeletable(i)) {
-                subreddits[j++] = adapter.getName(i);
+                subreddits[j++] = getSubreddit(i);
             }
         }
         return Arrays.copyOf(subreddits, j);
@@ -427,6 +422,14 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
     public String getQuery() {
         return adapter.getQuery();
+    }
+
+    private boolean hasSidebar(int position) {
+        return Subreddits.hasSidebar(getSubreddit(position));
+    }
+
+    private String getSubreddit(int position) {
+        return adapter.getName(position);
     }
 
     private int getFirstCheckedPosition() {
