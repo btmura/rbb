@@ -106,6 +106,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static void createNewTablesV3(SQLiteDatabase db) {
         Sessions.createTable(db);
         Things.createTable(db);
+        Comments.createTable(db);
         Messages.createTable(db);
         SubredditResults.createTable(db);
         HideActions.createTable(db);

@@ -58,6 +58,7 @@ public class DbHelperTest extends AndroidTestCase {
             Sessions.TABLE_NAME,
             Subreddits.TABLE_NAME,
             Things.TABLE_NAME,
+            Comments.TABLE_NAME,
             CommentActions.TABLE_NAME,
             VoteActions.TABLE_NAME,
             SaveActions.TABLE_NAME,

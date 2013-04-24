@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.database;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /** Table for holding comments on things. */
@@ -73,4 +74,26 @@ public class Comments implements BaseColumns {
 
     /** Column with the thing ID of the comment. */
     public static final String COLUMN_THING_ID = SharedColumns.COLUMN_THING_ID;
+
+    static void createTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+                + _ID + " INTEGER PRIMARY KEY, "
+                + COLUMN_ACCOUNT + " TEXT NOT NULL, "
+                + COLUMN_AUTHOR + " TEXT, "
+                + COLUMN_BODY + " TEXT, "
+                + COLUMN_COMMENT_ACTION_ID + " INTEGER,"
+                + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
+                + COLUMN_EXPANDED + " INTEGER DEFAULT 1, "
+                + COLUMN_KIND + " INTEGER, "
+                + COLUMN_LIKES + " INTEGER DEFAULT 0, "
+                + COLUMN_NESTING + " INTEGER, "
+                + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0, "
+                + COLUMN_PERMA_LINK + " TEXT, "
+                + COLUMN_SCORE + " INTEGER DEFAULT 0, "
+                + COLUMN_SELF_TEXT + " TEXT DEFAULT '', "
+                + COLUMN_SEQUENCE + " INTEGER, "
+                + COLUMN_SESSION_ID + " TEXT NOT NULL, "
+                + COLUMN_THING_ID + " TEXT, "
+                + COLUMN_TITLE + " TEXT)");
+    }
 }
