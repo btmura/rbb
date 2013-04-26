@@ -19,7 +19,12 @@ package com.btmura.android.reddit.database;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
-public class HideActions implements BaseColumns {
+/**
+ * Table describing things that have been hidden or unhidden. It implements the
+ * {@link BaseThingColumns} interface, because pending hidden items are also shown in the hidden
+ * section of a user's profile.
+ */
+public class HideActions implements BaseThingColumns, BaseColumns {
 
     public static final String TABLE_NAME = "hideActions";
 
@@ -52,6 +57,9 @@ public class HideActions implements BaseColumns {
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
                 + COLUMN_THING_ID + " TEXT NOT NULL,"
+
+                // Create the base columns needed to display pending hidden items in the listing.
+                + CREATE_THING_COLUMNS + ","
 
                 // Add constraint to make it easy to replace actions.
                 + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");

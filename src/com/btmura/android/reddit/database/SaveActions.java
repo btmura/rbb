@@ -20,8 +20,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
- * {@link SaveActions} is a table that stores pending saves and unsaves before
- * they are synced back the server.
+ * {@link SaveActions} is a table that stores pending saves and unsaves before they are synced back
+ * the server. It implements {@link BaseThingColumns}, so that pending saves can be shown in the
+ * user's saved tab.
  */
 public class SaveActions implements BaseThingColumns, BaseColumns {
 
@@ -62,8 +63,7 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
                 + COLUMN_ACTION + " INTEGER NOT NULL,"
                 + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
 
-                // Create thing columns to store enough info needed to display a
-                // fake item in certain listing.
+                // Create the base columns to display pending save items in the listing.
                 + CREATE_THING_COLUMNS + ","
 
                 // Add constraint to make it easy to replace actions.
