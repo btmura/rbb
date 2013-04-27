@@ -59,10 +59,10 @@ import com.btmura.android.reddit.widget.FilterAdapter;
  * <pre>
  * /things
  * /messages
+ * /actions/hides
  * /subreddits
  * /sessions
  * /actions/comments
- * /actions/hides
  * /actions/messages
  * /actions/reads
  * /actions/saves

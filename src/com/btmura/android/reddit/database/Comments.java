@@ -57,11 +57,23 @@ public class Comments implements BaseThingColumns, BaseColumns {
     /** Column with the thing ID of the comment. */
     public static final String COLUMN_THING_ID = SharedColumns.COLUMN_THING_ID;
 
+    /**
+     * Column to indicate whether this comment is visible. A comment whose parent is collapsed will
+     * have expanded to true but visible to false.
+     */
+    public static final String COLUMN_VISIBLE = "visible";
+
     /** String shown instead of author when a comment is deleted. */
     public static final String DELETED_AUTHOR = "[deleted]";
 
     /** String shown instead of body when a comment is deleted. */
     public static final String DELETED_BODY = DELETED_AUTHOR;
+
+    /** Select visible comments, ones that are not been hidden by being collapsed. */
+    public static final String SELECT_VISIBLE = COLUMN_VISIBLE + "=1";
+
+    // TODO: Do we need an index for sequence and id?
+    public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("

@@ -23,10 +23,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
-import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
@@ -34,30 +34,30 @@ import com.btmura.android.reddit.text.Formatter;
 public class CommentAdapter extends BaseLoaderAdapter {
 
     private static final String[] PROJECTION = {
-            Things._ID,
-            Things.COLUMN_AUTHOR,
-            Things.COLUMN_BODY,
-            Things.COLUMN_CREATED_UTC,
-            Things.COLUMN_DOMAIN,
-            Things.COLUMN_DOWNS,
-            Things.COLUMN_EXPANDED,
-            Things.COLUMN_KIND,
-            Things.COLUMN_LIKES,
-            Things.COLUMN_NESTING,
-            Things.COLUMN_NUM_COMMENTS,
-            Things.COLUMN_OVER_18,
-            Things.COLUMN_PERMA_LINK,
-            Things.COLUMN_SAVED,
-            Things.COLUMN_SCORE,
-            Things.COLUMN_SELF,
-            Things.COLUMN_SEQUENCE,
-            Things.COLUMN_SESSION_ID,
-            Things.COLUMN_SUBREDDIT,
-            Things.COLUMN_TITLE,
-            Things.TABLE_NAME + "." + Things.COLUMN_THING_ID,
-            Things.COLUMN_THUMBNAIL_URL,
-            Things.COLUMN_UPS,
-            Things.COLUMN_URL,
+            Comments._ID,
+            Comments.COLUMN_AUTHOR,
+            Comments.COLUMN_BODY,
+            Comments.COLUMN_CREATED_UTC,
+            Comments.COLUMN_DOMAIN,
+            Comments.COLUMN_DOWNS,
+            Comments.COLUMN_EXPANDED,
+            Comments.COLUMN_KIND,
+            Comments.COLUMN_LIKES,
+            Comments.COLUMN_NESTING,
+            Comments.COLUMN_NUM_COMMENTS,
+            Comments.COLUMN_OVER_18,
+            Comments.COLUMN_PERMA_LINK,
+            Comments.COLUMN_SAVED,
+            Comments.COLUMN_SCORE,
+            Comments.COLUMN_SELF,
+            Comments.COLUMN_SEQUENCE,
+            Comments.COLUMN_SESSION_ID,
+            Comments.COLUMN_SUBREDDIT,
+            Comments.COLUMN_TITLE,
+            Comments.TABLE_NAME + "." + Comments.COLUMN_THING_ID,
+            Comments.COLUMN_THUMBNAIL_URL,
+            Comments.COLUMN_UPS,
+            Comments.COLUMN_URL,
 
             // Following columns are from joined tables at the end.
             SharedColumns.COLUMN_SAVE,
@@ -128,7 +128,7 @@ public class CommentAdapter extends BaseLoaderAdapter {
 
     @Override
     protected String getSelection() {
-        return Things.SELECT_VISIBLE;
+        return Comments.SELECT_VISIBLE;
     }
 
     @Override
@@ -138,7 +138,7 @@ public class CommentAdapter extends BaseLoaderAdapter {
 
     @Override
     protected String getSortOrder() {
-        return Things.SORT_BY_SEQUENCE_AND_ID;
+        return Comments.SORT_BY_SEQUENCE_AND_ID;
     }
 
     @Override

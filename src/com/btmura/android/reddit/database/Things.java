@@ -34,13 +34,19 @@ public class Things implements BaseColumns {
     public static final String COLUMN_DOWNS = "downs";
 
     /** Column to indicate whether this comment is expanded. */
+    @Deprecated
+    // This column is not available after splitting things and comments in database V3.
     public static final String COLUMN_EXPANDED = "expanded";
 
     public static final String COLUMN_KIND = Kinds.COLUMN_KIND;
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_LINK_ID = "linkId";
     public static final String COLUMN_LINK_TITLE = "linkTitle";
+
+    @Deprecated
+    // This column is not available after splitting things and comments in database V3.
     public static final String COLUMN_NESTING = "nesting";
+
     public static final String COLUMN_NUM_COMMENTS = "numComments";
     public static final String COLUMN_OVER_18 = "over18";
     public static final String COLUMN_PERMA_LINK = "permaLink";
@@ -48,7 +54,11 @@ public class Things implements BaseColumns {
     public static final String COLUMN_SCORE = "score";
     public static final String COLUMN_SELF = "self";
     public static final String COLUMN_SELF_TEXT = "selfText";
+
+    @Deprecated
+    // This column is not available after splitting things and comments in database V3.
     public static final String COLUMN_SEQUENCE = "sequence";
+
     public static final String COLUMN_SESSION_ID = SharedColumns.COLUMN_SESSION_ID;
     public static final String COLUMN_SUBREDDIT = "subreddit";
     public static final String COLUMN_TITLE = "title";
@@ -61,6 +71,8 @@ public class Things implements BaseColumns {
      * Column to indicate whether this comment is visible. A comment whose parent is collapsed will
      * have expanded to true but visible to false.
      */
+    @Deprecated
+    // This column is not available after splitting things and comments in database V3.
     public static final String COLUMN_VISIBLE = "visible";
 
     /** Deleted comments have an author and body with this string. */
@@ -82,11 +94,6 @@ public class Things implements BaseColumns {
     public static final String SELECT_BY_SESSION_ID_AND_MORE =
             SELECT_BY_SESSION_ID + " AND " + COLUMN_KIND + " = " + Kinds.KIND_MORE;
 
-    public static final String SELECT_VISIBLE = COLUMN_VISIBLE + "=1";
-
-    // TODO: Do we need an index for sequence and id?
-    public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
-
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "
@@ -97,7 +104,6 @@ public class Things implements BaseColumns {
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
                 + COLUMN_DOMAIN + " TEXT, "
                 + COLUMN_DOWNS + " INTEGER DEFAULT 0, "
-                + COLUMN_EXPANDED + " INTEGER DEFAULT 1, "
                 + COLUMN_KIND + " INTEGER, "
                 + COLUMN_LIKES + " INTEGER DEFAULT 0, "
                 + COLUMN_LINK_ID + " TEXT, "
@@ -117,8 +123,7 @@ public class Things implements BaseColumns {
                 + COLUMN_TITLE + " TEXT, "
                 + COLUMN_THUMBNAIL_URL + " TEXT, "
                 + COLUMN_UPS + " INTEGER DEFAULT 0, "
-                + COLUMN_URL + " TEXT,"
-                + COLUMN_VISIBLE + " INTEGER DEFAULT 1)");
+                + COLUMN_URL + " TEXT)");
     }
 
     /** Creates the temporary table used in version 2. Kept for testing upgrades. */

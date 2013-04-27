@@ -38,6 +38,7 @@ import com.btmura.android.reddit.app.CommentLogic;
 import com.btmura.android.reddit.app.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
@@ -62,9 +63,9 @@ public class Provider {
 
     /** Projection used by {@link #expandInBackground(Context, long)}. */
     private static final String[] EXPAND_PROJECTION = {
-            Things._ID,
-            Things.COLUMN_EXPANDED,
-            Things.COLUMN_NESTING,
+            Comments._ID,
+            Comments.COLUMN_EXPANDED,
+            Comments.COLUMN_NESTING,
     };
 
     private static final Uri HIDE_ACTIONS_NOTIFY_SYNC_URI =
@@ -303,7 +304,7 @@ public class Provider {
                 ContentResolver cr = appContext.getContentResolver();
                 Cursor c = cr.query(ThingProvider.THINGS_URI, EXPAND_PROJECTION,
                         Things.SELECT_BY_SESSION_ID, Array.of(sessionId),
-                        Things.SORT_BY_SEQUENCE_AND_ID);
+                        Comments.SORT_BY_SEQUENCE_AND_ID);
                 try {
                     long[] childIds = null;
                     CursorCommentList cl = new CursorCommentList(c, 0, 2, -1);
