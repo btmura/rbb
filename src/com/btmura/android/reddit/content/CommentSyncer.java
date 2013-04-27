@@ -28,8 +28,8 @@ import android.database.Cursor;
 import android.os.RemoteException;
 
 import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.SharedColumns;
-import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -82,9 +82,9 @@ class CommentSyncer implements Syncer {
         ops.add(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
                 .build());
-        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                .withSelection(Things.SELECT_BY_COMMENT_ACTION_ID, Array.of(id))
-                .withValue(Things.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
+        ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                .withSelection(Comments.SELECT_BY_COMMENT_ACTION_ID, Array.of(id))
+                .withValue(Comments.COLUMN_CREATED_UTC, System.currentTimeMillis() / 1000)
                 .build());
     }
 

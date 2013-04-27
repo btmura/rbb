@@ -28,7 +28,11 @@ public class Things implements BaseColumns {
 
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_BODY = "body";
+
+    @Deprecated
+    // This column is not available after splitting things and comments in database V3.
     public static final String COLUMN_COMMENT_ACTION_ID = "commentActionId";
+
     public static final String COLUMN_CREATED_UTC = "createdUtc";
     public static final String COLUMN_DOMAIN = "domain";
     public static final String COLUMN_DOWNS = "downs";
@@ -83,8 +87,6 @@ public class Things implements BaseColumns {
     public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
             SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + "=?";
 
-    public static final String SELECT_BY_COMMENT_ACTION_ID = COLUMN_COMMENT_ACTION_ID + "=?";
-
     public static final String SELECT_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID;
 
     public static final String SELECT_BY_SESSION_ID_AND_THING_ID =
@@ -100,7 +102,6 @@ public class Things implements BaseColumns {
                 + COLUMN_ACCOUNT + " TEXT NOT NULL, "
                 + COLUMN_AUTHOR + " TEXT, "
                 + COLUMN_BODY + " TEXT, "
-                + COLUMN_COMMENT_ACTION_ID + " INTEGER,"
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0, "
                 + COLUMN_DOMAIN + " TEXT, "
                 + COLUMN_DOWNS + " INTEGER DEFAULT 0, "

@@ -69,10 +69,17 @@ public class Comments implements BaseThingColumns, BaseColumns {
     /** String shown instead of body when a comment is deleted. */
     public static final String DELETED_BODY = DELETED_AUTHOR;
 
-    /** Select visible comments, ones that are not been hidden by being collapsed. */
-    public static final String SELECT_VISIBLE = COLUMN_VISIBLE + "=1";
+    public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
+
+    public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
+            SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + "=?";
+
+    public static final String SELECT_BY_COMMENT_ACTION_ID = COLUMN_COMMENT_ACTION_ID + "=?";
 
     public static final String SELECT_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID;
+
+    /** Select visible comments, ones that are not been hidden by being collapsed. */
+    public static final String SELECT_VISIBLE = COLUMN_VISIBLE + "=1";
 
     public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
 
