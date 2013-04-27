@@ -302,8 +302,8 @@ public class Provider {
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
                 ContentResolver cr = appContext.getContentResolver();
-                Cursor c = cr.query(ThingProvider.THINGS_URI, EXPAND_PROJECTION,
-                        Things.SELECT_BY_SESSION_ID, Array.of(sessionId),
+                Cursor c = cr.query(ThingProvider.COMMENTS_URI, EXPAND_PROJECTION,
+                        Comments.SELECT_BY_SESSION_ID, Array.of(sessionId),
                         Comments.SORT_BY_SEQUENCE_AND_ID);
                 try {
                     long[] childIds = null;
@@ -319,15 +319,15 @@ public class Provider {
                     int childCount = childIds != null ? childIds.length : 0;
                     ArrayList<ContentProviderOperation> ops =
                             new ArrayList<ContentProviderOperation>(childCount + 1);
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
                             .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                            .withValue(Things.COLUMN_EXPANDED, true)
+                            .withValue(Comments.COLUMN_EXPANDED, true)
                             .build());
                     for (int i = 0; i < childCount; i++) {
-                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
+                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
                                 .withSelection(ThingProvider.ID_SELECTION, Array.of(childIds[i]))
-                                .withValue(Things.COLUMN_EXPANDED, true)
-                                .withValue(Things.COLUMN_VISIBLE, true)
+                                .withValue(Comments.COLUMN_EXPANDED, true)
+                                .withValue(Comments.COLUMN_VISIBLE, true)
                                 .build());
                     }
 
@@ -348,15 +348,15 @@ public class Provider {
                 int childCount = childIds != null ? childIds.length : 0;
                 ArrayList<ContentProviderOperation> ops =
                         new ArrayList<ContentProviderOperation>(childCount + 1);
-                ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
+                ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
                         .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                        .withValue(Things.COLUMN_EXPANDED, false)
+                        .withValue(Comments.COLUMN_EXPANDED, false)
                         .build());
                 for (int i = 0; i < childCount; i++) {
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
                             .withSelection(ThingProvider.ID_SELECTION, Array.of(childIds[i]))
-                            .withValue(Things.COLUMN_EXPANDED, true)
-                            .withValue(Things.COLUMN_VISIBLE, false)
+                            .withValue(Comments.COLUMN_EXPANDED, true)
+                            .withValue(Comments.COLUMN_VISIBLE, false)
                             .build());
                 }
 

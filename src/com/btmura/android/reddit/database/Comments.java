@@ -72,7 +72,8 @@ public class Comments implements BaseThingColumns, BaseColumns {
     /** Select visible comments, ones that are not been hidden by being collapsed. */
     public static final String SELECT_VISIBLE = COLUMN_VISIBLE + "=1";
 
-    // TODO: Do we need an index for sequence and id?
+    public static final String SELECT_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID;
+
     public static final String SORT_BY_SEQUENCE_AND_ID = COLUMN_SEQUENCE + " ASC, " + _ID + " ASC";
 
     static void createTable(SQLiteDatabase db) {
@@ -88,6 +89,7 @@ public class Comments implements BaseThingColumns, BaseColumns {
                 + COLUMN_SEQUENCE + " INTEGER,"
                 + COLUMN_SESSION_ID + " TEXT NOT NULL,"
                 + COLUMN_THING_ID + " TEXT,"
-                + CREATE_THING_COLUMNS + ")");
+                + COLUMN_VISIBLE + " INTEGER DEFAULT 1,"
+                + CREATE_THING_COLUMNS_V2 + ")");
     }
 }

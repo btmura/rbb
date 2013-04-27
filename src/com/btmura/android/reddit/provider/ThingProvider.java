@@ -38,6 +38,7 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.CursorExtrasWrapper;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
@@ -58,6 +59,7 @@ import com.btmura.android.reddit.widget.FilterAdapter;
  * 
  * <pre>
  * /things
+ * /comments
  * /messages
  * /actions/hides
  * /subreddits
@@ -80,6 +82,7 @@ public class ThingProvider extends BaseProvider {
     public static final String EXTRA_RESOLVED_SUBREDDIT = "resolvedSubreddit";
 
     private static final String PATH_THINGS = "things";
+    private static final String PATH_COMMENTS = "comments";
     private static final String PATH_MESSAGES = "messages";
     private static final String PATH_SUBREDDITS = "subreddits";
     private static final String PATH_SESSIONS = "sessions";
@@ -91,6 +94,7 @@ public class ThingProvider extends BaseProvider {
     private static final String PATH_VOTE_ACTIONS = "actions/votes";
 
     public static final Uri THINGS_URI = Uri.parse(AUTHORITY_URI + PATH_THINGS);
+    public static final Uri COMMENTS_URI = Uri.parse(AUTHORITY_URI + PATH_COMMENTS);
     public static final Uri MESSAGES_URI = Uri.parse(AUTHORITY_URI + PATH_MESSAGES);
     public static final Uri SUBREDDITS_URI = Uri.parse(AUTHORITY_URI + PATH_SUBREDDITS);
     public static final Uri SESSIONS_URI = Uri.parse(AUTHORITY_URI + PATH_SESSIONS);
@@ -107,17 +111,19 @@ public class ThingProvider extends BaseProvider {
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;
-    private static final int MATCH_MESSAGES = 2;
-    private static final int MATCH_SUBREDDITS = 3;
-    private static final int MATCH_SESSIONS = 4;
-    private static final int MATCH_COMMENT_ACTIONS = 5;
-    private static final int MATCH_HIDE_ACTIONS = 6;
-    private static final int MATCH_MESSAGE_ACTIONS = 7;
-    private static final int MATCH_READ_ACTIONS = 8;
-    private static final int MATCH_SAVE_ACTIONS = 9;
-    private static final int MATCH_VOTE_ACTIONS = 10;
+    private static final int MATCH_COMMENTS = 2;
+    private static final int MATCH_MESSAGES = 3;
+    private static final int MATCH_SUBREDDITS = 4;
+    private static final int MATCH_SESSIONS = 5;
+    private static final int MATCH_COMMENT_ACTIONS = 6;
+    private static final int MATCH_HIDE_ACTIONS = 7;
+    private static final int MATCH_MESSAGE_ACTIONS = 8;
+    private static final int MATCH_READ_ACTIONS = 9;
+    private static final int MATCH_SAVE_ACTIONS = 10;
+    private static final int MATCH_VOTE_ACTIONS = 11;
     static {
         MATCHER.addURI(AUTHORITY, PATH_THINGS, MATCH_THINGS);
+        MATCHER.addURI(AUTHORITY, PATH_COMMENTS, MATCH_COMMENTS);
         MATCHER.addURI(AUTHORITY, PATH_MESSAGES, MATCH_MESSAGES);
         MATCHER.addURI(AUTHORITY, PATH_SUBREDDITS, MATCH_SUBREDDITS);
         MATCHER.addURI(AUTHORITY, PATH_SESSIONS, MATCH_SESSIONS);
@@ -147,7 +153,7 @@ public class ThingProvider extends BaseProvider {
     static final String PARAM_NOTIFY_THINGS = "notifyThings";
     static final String PARAM_NOTIFY_MESSAGES = "notifyMessages";
 
-    private static final String JOINED_THING_TABLE = Things.TABLE_NAME
+    private static final String JOINED_TABLE = ""
             // Join with pending saves to fake that the save happened.
             + " LEFT OUTER JOIN (SELECT "
             + SaveActions.COLUMN_ACCOUNT + ","
@@ -155,7 +161,7 @@ public class ThingProvider extends BaseProvider {
             + SaveActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_SAVE
             + " FROM " + SaveActions.TABLE_NAME + ") USING ("
             + SaveActions.COLUMN_ACCOUNT + ", "
-            + Things.COLUMN_THING_ID + ")"
+            + SharedColumns.COLUMN_THING_ID + ")"
 
             // Join with pending votes to fake that the vote happened.
             + " LEFT OUTER JOIN (SELECT "
@@ -164,7 +170,7 @@ public class ThingProvider extends BaseProvider {
             + VoteActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_VOTE
             + " FROM " + VoteActions.TABLE_NAME + ") USING ("
             + VoteActions.COLUMN_ACCOUNT + ","
-            + Things.COLUMN_THING_ID + ")"
+            + SharedColumns.COLUMN_THING_ID + ")"
 
             // Join with pending hides to fake that the things were hidden.
             + " LEFT OUTER JOIN (SELECT "
@@ -173,7 +179,11 @@ public class ThingProvider extends BaseProvider {
             + HideActions.COLUMN_ACTION + " AS " + HideActions.JOINED_COLUMN_HIDE_ACTION
             + " FROM " + HideActions.TABLE_NAME + ") USING ("
             + HideActions.COLUMN_ACCOUNT + ","
-            + Things.COLUMN_THING_ID + ")";
+            + SharedColumns.COLUMN_THING_ID + ")";
+
+    private static final String JOINED_THINGS_TABLE = Things.TABLE_NAME + JOINED_TABLE;
+
+    private static final String JOINED_COMMENTS_TABLE = Comments.TABLE_NAME + JOINED_TABLE;
 
     // TODO: Make a separate table for just read actions?
     private static final String JOINED_MESSAGES_TABLE = Messages.TABLE_NAME
@@ -199,9 +209,9 @@ public class ThingProvider extends BaseProvider {
     static final String CALL_EXTRA_SESSION_ID = "sessionId";
     static final String CALL_EXTRA_THING_ID = "thingId";
 
-    private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Things.TABLE_NAME
-            + " SET " + Things.COLUMN_SEQUENCE + "=" + Things.COLUMN_SEQUENCE + "+1"
-            + " WHERE " + Things.COLUMN_SESSION_ID + "=? AND " + Things.COLUMN_SEQUENCE + ">=?";
+    private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Comments.TABLE_NAME
+            + " SET " + Comments.COLUMN_SEQUENCE + "=" + Comments.COLUMN_SEQUENCE + "+1"
+            + " WHERE " + Comments.COLUMN_SESSION_ID + "=? AND " + Comments.COLUMN_SEQUENCE + ">=?";
 
     private static final String SELECT_MORE_WITH_SESSION_ID = Kinds.COLUMN_KIND + "="
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
@@ -226,7 +236,7 @@ public class ThingProvider extends BaseProvider {
 
     public static final Uri commentsUri(long sessionId, String accountName, String thingId,
             String linkId) {
-        Uri.Builder b = THINGS_URI.buildUpon();
+        Uri.Builder b = COMMENTS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_COMMENT_LISTING));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
@@ -328,18 +338,19 @@ public class ThingProvider extends BaseProvider {
     protected String getTable(Uri uri) {
         switch (MATCHER.match(uri)) {
             case MATCH_THINGS:
-                if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
-                    return JOINED_THING_TABLE;
-                } else {
-                    return Things.TABLE_NAME;
-                }
+                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
+                        ? JOINED_THINGS_TABLE
+                        : Things.TABLE_NAME;
+
+            case MATCH_COMMENTS:
+                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
+                        ? JOINED_COMMENTS_TABLE
+                        : Comments.TABLE_NAME;
 
             case MATCH_MESSAGES:
-                if (uri.getBooleanQueryParameter(PARAM_JOIN, false)) {
-                    return JOINED_MESSAGES_TABLE;
-                } else {
-                    return Messages.TABLE_NAME;
-                }
+                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
+                        ? JOINED_MESSAGES_TABLE
+                        : Messages.TABLE_NAME;
 
             case MATCH_SUBREDDITS:
                 return SubredditResults.TABLE_NAME;
@@ -555,8 +566,8 @@ public class ThingProvider extends BaseProvider {
         try {
             // Update the number of comments in the header comment.
             ContentValues values = new ContentValues(8);
-            values.put(Things.COLUMN_NUM_COMMENTS, parentNumComments);
-            int count = db.update(Things.TABLE_NAME, values, ID_SELECTION, Array.of(parentId));
+            values.put(Comments.COLUMN_NUM_COMMENTS, parentNumComments);
+            int count = db.update(Comments.TABLE_NAME, values, ID_SELECTION, Array.of(parentId));
             if (count != 1) {
                 return null;
             }
@@ -581,15 +592,15 @@ public class ThingProvider extends BaseProvider {
 
             // Insert the placeholder comment with the proper sequence number.
             values.clear();
-            values.put(Things.COLUMN_ACCOUNT, accountName);
-            values.put(Things.COLUMN_AUTHOR, accountName);
-            values.put(Things.COLUMN_BODY, body);
-            values.put(Things.COLUMN_COMMENT_ACTION_ID, commentActionId);
-            values.put(Things.COLUMN_KIND, Kinds.KIND_COMMENT);
-            values.put(Things.COLUMN_NESTING, nesting);
-            values.put(Things.COLUMN_SEQUENCE, sequence);
-            values.put(Things.COLUMN_SESSION_ID, sessionId);
-            long commentId = db.insert(Things.TABLE_NAME, null, values);
+            values.put(Comments.COLUMN_ACCOUNT, accountName);
+            values.put(Comments.COLUMN_AUTHOR, accountName);
+            values.put(Comments.COLUMN_BODY, body);
+            values.put(Comments.COLUMN_COMMENT_ACTION_ID, commentActionId);
+            values.put(Comments.COLUMN_KIND, Kinds.KIND_COMMENT);
+            values.put(Comments.COLUMN_NESTING, nesting);
+            values.put(Comments.COLUMN_SEQUENCE, sequence);
+            values.put(Comments.COLUMN_SESSION_ID, sessionId);
+            long commentId = db.insert(Comments.TABLE_NAME, null, values);
             if (commentId == -1) {
                 return null;
             }
@@ -598,7 +609,7 @@ public class ThingProvider extends BaseProvider {
 
             // Update observers and schedule a sync.
             ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(ThingProvider.THINGS_URI, null, true);
+            cr.notifyChange(ThingProvider.COMMENTS_URI, null, true);
 
         } finally {
             db.endTransaction();
