@@ -50,6 +50,13 @@ public class HideActions implements BaseThingColumns, BaseColumns {
 
     public static final String SELECT_NOT_HIDDEN = JOINED_COLUMN_HIDE_ACTION + " IS NULL";
 
+    public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
+
+    public static final String SELECT_UNHIDDEN_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
+            + " AND " + COLUMN_ACTION + "=" + ACTION_UNHIDE;
+
+    public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
+
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY, "

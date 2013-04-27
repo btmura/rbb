@@ -446,15 +446,50 @@ public class Provider {
 
     public static void hideAsync(final Context context,
             final String accountName,
-            final String thingId) {
+            final String thingId,
+
+            // Following parameters are for faking a thing.
+            final String author,
+            final long createdUtc,
+            final String domain,
+            final int downs,
+            final int likes,
+            final int numComments,
+            final boolean over18,
+            final String permaLink,
+            final int score,
+            final boolean self,
+            final String subreddit,
+            final String title,
+            final String thumbnailUrl,
+            final int ups,
+            final String url) {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
-                ContentValues v = new ContentValues(3);
+                ContentValues v = new ContentValues(18);
                 v.put(HideActions.COLUMN_ACCOUNT, accountName);
                 v.put(HideActions.COLUMN_THING_ID, thingId);
                 v.put(HideActions.COLUMN_ACTION, HideActions.ACTION_HIDE);
+
+                // Following values are for faking a thing.
+                v.put(HideActions.COLUMN_AUTHOR, author);
+                v.put(HideActions.COLUMN_CREATED_UTC, createdUtc);
+                v.put(HideActions.COLUMN_DOMAIN, domain);
+                v.put(HideActions.COLUMN_DOWNS, downs);
+                v.put(HideActions.COLUMN_LIKES, likes);
+                v.put(HideActions.COLUMN_NUM_COMMENTS, numComments);
+                v.put(HideActions.COLUMN_OVER_18, over18);
+                v.put(HideActions.COLUMN_PERMA_LINK, permaLink);
+                v.put(HideActions.COLUMN_SELF, self);
+                v.put(HideActions.COLUMN_SCORE, score);
+                v.put(HideActions.COLUMN_SUBREDDIT, subreddit);
+                v.put(HideActions.COLUMN_TITLE, title);
+                v.put(HideActions.COLUMN_THUMBNAIL_URL, thumbnailUrl);
+                v.put(HideActions.COLUMN_UPS, ups);
+                v.put(HideActions.COLUMN_URL, url);
+
                 cr.insert(HIDE_URI, v);
             }
         });

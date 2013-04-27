@@ -36,6 +36,7 @@ import android.util.JsonToken;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
@@ -52,6 +53,45 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 class ThingListing extends JsonParser implements Listing {
 
     public static final String TAG = "ThingListing";
+
+    private static final String[] HIDE_PROJECTION = {
+            HideActions._ID,
+            HideActions.COLUMN_ACTION,
+            HideActions.COLUMN_AUTHOR,
+            HideActions.COLUMN_CREATED_UTC,
+            HideActions.COLUMN_DOMAIN,
+            HideActions.COLUMN_DOWNS,
+            HideActions.COLUMN_LIKES,
+            HideActions.COLUMN_NUM_COMMENTS,
+            HideActions.COLUMN_OVER_18,
+            HideActions.COLUMN_PERMA_LINK,
+            HideActions.COLUMN_SCORE,
+            HideActions.COLUMN_SELF,
+            HideActions.COLUMN_SUBREDDIT,
+            HideActions.COLUMN_THING_ID,
+            HideActions.COLUMN_TITLE,
+            HideActions.COLUMN_THUMBNAIL_URL,
+            HideActions.COLUMN_UPS,
+            HideActions.COLUMN_URL,
+    };
+
+    private static final int HIDE_ACTION = 1;
+    private static final int HIDE_AUTHOR = 2;
+    private static final int HIDE_CREATED_UTC = 3;
+    private static final int HIDE_DOMAIN = 4;
+    private static final int HIDE_DOWNS = 5;
+    private static final int HIDE_LIKES = 6;
+    private static final int HIDE_NUM_COMMENTS = 7;
+    private static final int HIDE_OVER_18 = 8;
+    private static final int HIDE_PERMA_LINK = 9;
+    private static final int HIDE_SCORE = 10;
+    private static final int HIDE_SELF = 11;
+    private static final int HIDE_SUBREDDIT = 12;
+    private static final int HIDE_THING_ID = 13;
+    private static final int HIDE_TITLE = 14;
+    private static final int HIDE_THUMBNAIL_URL = 15;
+    private static final int HIDE_UPS = 16;
+    private static final int HIDE_URL = 17;
 
     private static final String[] SAVE_PROJECTION = {
             SaveActions._ID,
@@ -397,6 +437,10 @@ class ThingListing extends JsonParser implements Listing {
         // network to do things in parallel.
         if (!TextUtils.isEmpty(profileUser)) {
             switch (filter) {
+                case FilterAdapter.PROFILE_HIDDEN:
+                    mergeHideAction();
+                    break;
+
                 case FilterAdapter.PROFILE_SAVED:
                     mergeSaveActions();
                     break;
@@ -421,15 +465,36 @@ class ThingListing extends JsonParser implements Listing {
         return v;
     }
 
+    private void mergeHideAction() {
+        // Select pending hidden and unhidden things to add and remove on the first page.
+        // On subsequent pages only get the unhidden things to remove items from pages.
+        String selection = TextUtils.isEmpty(more)
+                ? HideActions.SELECT_BY_ACCOUNT
+                : HideActions.SELECT_UNHIDDEN_BY_ACCOUNT;
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(HideActions.TABLE_NAME, HIDE_PROJECTION,
+                selection, Array.of(accountName), null, null, HideActions.SORT_BY_ID);
+        while (c.moveToNext()) {
+            switch (c.getInt(HIDE_ACTION)) {
+                case HideActions.ACTION_HIDE:
+                    addHide(c);
+                    break;
+
+                case HideActions.ACTION_UNHIDE:
+                    removeByThingId(c.getString(HIDE_THING_ID));
+                    break;
+            }
+        }
+        c.close();
+    }
+
     private void mergeSaveActions() {
         // We throw all the saved things on the first page, so don't merge the
         // saves that would add new items if we're just scrolling further down.
-        String selection;
-        if (TextUtils.isEmpty(more)) {
-            selection = SaveActions.SELECT_BY_ACCOUNT;
-        } else {
-            selection = SaveActions.SELECT_UNSAVED_BY_ACCOUNT;
-        }
+        String selection = TextUtils.isEmpty(more)
+                ? SaveActions.SELECT_BY_ACCOUNT
+                : SaveActions.SELECT_UNSAVED_BY_ACCOUNT;
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(SaveActions.TABLE_NAME, SAVE_PROJECTION,
@@ -487,6 +552,29 @@ class ThingListing extends JsonParser implements Listing {
             }
         }
         c.close();
+    }
+
+    private void addHide(Cursor c) {
+        ContentValues v = new ContentValues(15);
+        v.put(Things.COLUMN_ACCOUNT, accountName);
+        v.put(Things.COLUMN_AUTHOR, c.getString(HIDE_AUTHOR));
+        v.put(Things.COLUMN_CREATED_UTC, c.getLong(HIDE_CREATED_UTC));
+        v.put(Things.COLUMN_DOMAIN, c.getString(HIDE_DOMAIN));
+        v.put(Things.COLUMN_DOWNS, c.getString(HIDE_DOWNS));
+        v.put(Things.COLUMN_KIND, Kinds.KIND_LINK);
+        v.put(Things.COLUMN_LIKES, c.getInt(HIDE_LIKES));
+        v.put(Things.COLUMN_NUM_COMMENTS, c.getInt(HIDE_NUM_COMMENTS));
+        v.put(Things.COLUMN_OVER_18, c.getInt(HIDE_OVER_18) != 0);
+        v.put(Things.COLUMN_PERMA_LINK, c.getString(HIDE_PERMA_LINK));
+        v.put(Things.COLUMN_SCORE, c.getInt(HIDE_SCORE));
+        v.put(Things.COLUMN_SELF, c.getInt(HIDE_SELF));
+        v.put(Things.COLUMN_SUBREDDIT, c.getString(HIDE_SUBREDDIT));
+        v.put(Things.COLUMN_TITLE, c.getString(HIDE_TITLE));
+        v.put(Things.COLUMN_THING_ID, c.getString(HIDE_THING_ID));
+        v.put(Things.COLUMN_THUMBNAIL_URL, c.getString(HIDE_THUMBNAIL_URL));
+        v.put(Things.COLUMN_UPS, c.getInt(HIDE_UPS));
+        v.put(Things.COLUMN_URL, c.getString(HIDE_URL));
+        values.add(0, v);
     }
 
     private void addSave(Cursor c) {
