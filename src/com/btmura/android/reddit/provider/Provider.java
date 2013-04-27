@@ -238,15 +238,15 @@ public class Provider {
                                 .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
                                 .build());
                         ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                                .withValue(Things.COLUMN_AUTHOR, Things.DELETED_AUTHOR)
-                                .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
+                                .withValue(Comments.COLUMN_AUTHOR, Comments.DELETED_AUTHOR)
+                                .withSelection(Comments.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
                                 .build());
                         thingDeleted = true;
                         // TODO: Make ThingProvider also show [deleted] in thing list on refresh.
                     } else if (hasChildren[i]) {
                         ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                                .withValue(Things.COLUMN_AUTHOR, Things.DELETED_AUTHOR)
-                                .withValue(Things.COLUMN_BODY, Things.DELETED_BODY)
+                                .withValue(Comments.COLUMN_AUTHOR, Comments.DELETED_AUTHOR)
+                                .withValue(Comments.COLUMN_BODY, Comments.DELETED_BODY)
                                 .withSelection(BaseProvider.ID_SELECTION, Array.of(ids[i]))
                                 .build());
                     } else {
