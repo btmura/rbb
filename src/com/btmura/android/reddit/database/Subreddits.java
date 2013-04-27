@@ -83,7 +83,7 @@ public class Subreddits implements BaseColumns {
         return isFrontPage(subreddit) ? c.getString(R.string.front_page) : subreddit;
     }
 
-    static void createSubredditsV2(SQLiteDatabase db) {
+    static void createTableV2(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACCOUNT + " TEXT DEFAULT '',"
@@ -93,7 +93,7 @@ public class Subreddits implements BaseColumns {
                 + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_NAME + "))");
     }
 
-    static void createSubredditsV1(SQLiteDatabase db) {
+    static void createTableV1(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + "("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_NAME + " TEXT UNIQUE NOT NULL)");
@@ -141,7 +141,7 @@ public class Subreddits implements BaseColumns {
         db.execSQL("DROP TABLE " + TABLE_NAME);
 
         // 3. Create the new table and import the backed up subreddits.
-        createSubredditsV2(db);
+        createTableV2(db);
         int count = rows.size();
         for (int i = 0; i < count; i++) {
             db.insert(TABLE_NAME, null, rows.get(i));

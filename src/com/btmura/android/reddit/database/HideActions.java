@@ -59,7 +59,7 @@ public class HideActions implements BaseThingColumns, BaseColumns {
                 + COLUMN_THING_ID + " TEXT NOT NULL,"
 
                 // Create the base columns needed to display pending hidden items in the listing.
-                + CREATE_THING_COLUMNS + ","
+                + CREATE_THING_COLUMNS_V2 + ","
 
                 // Add constraint to make it easy to replace actions.
                 + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");

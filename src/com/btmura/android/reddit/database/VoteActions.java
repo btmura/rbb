@@ -20,8 +20,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 /**
- * {@link VoteActions} is a table that stores pending upvotes and downvotes
- * before they are synced back to the server.
+ * {@link VoteActions} is a table that stores pending upvotes and downvotes before they are synced
+ * back to the server.
  */
 public class VoteActions implements BaseThingColumns, BaseColumns {
 
@@ -62,8 +62,28 @@ public class VoteActions implements BaseThingColumns, BaseColumns {
 
     public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
 
-    /** Creates the voteActions table. */
-    static void createTable(SQLiteDatabase db) {
+    static void createTableV2(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
+                + _ID + " INTEGER PRIMARY KEY,"
+                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
+                + COLUMN_ACTION + " INTEGER NOT NULL,"
+                + COLUMN_EXPIRATION + " INTEGER DEFAULT 0,"
+                + COLUMN_SHOW_IN_LISTING + " INTEGER DEFAULT 0,"
+                + COLUMN_THING_ID + " TEXT NOT NULL,"
+
+                // Create thing columns to store enough info needed to display a
+                // fake item in certain listing.
+                + CREATE_THING_COLUMNS_V2 + ","
+
+                // Add constraint to make it easy to replace actions.
+                + "UNIQUE (" + COLUMN_ACCOUNT + "," + COLUMN_THING_ID + "))");
+    }
+
+    static void upgradeTableV2(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SAVED + " INTEGER DEFAULT 0");
+    }
+
+    static void createTableV1(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_ACCOUNT + " TEXT NOT NULL,"

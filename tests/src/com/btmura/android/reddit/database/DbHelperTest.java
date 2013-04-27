@@ -80,6 +80,12 @@ public class DbHelperTest extends AndroidTestCase {
         mContext.deleteDatabase(DbHelper.DATABASE_TEST);
     }
 
+    public void testOnCreate_v1() {
+        DbHelper helper = createHelperVersion(1);
+        assertTablesExist(helper.getReadableDatabase(), TABLES_V1);
+        helper.close();
+    }
+
     public void testOnCreate_v2() {
         DbHelper helper = createHelperVersion(2);
         assertTablesExist(helper.getReadableDatabase(), TABLES_V2);

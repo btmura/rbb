@@ -38,8 +38,8 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.app.CommentLogic;
 import com.btmura.android.reddit.app.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
@@ -129,7 +129,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     }
 
     public String getTargetTable() {
-        return Things.TABLE_NAME;
+        return Comments.TABLE_NAME;
     }
 
     public boolean isAppend() {
@@ -144,46 +144,46 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     @Override
     public void onEntityStart(int index) {
         ContentValues v = new ContentValues(19);
-        v.put(Things.COLUMN_ACCOUNT, accountName);
+        v.put(Comments.COLUMN_ACCOUNT, accountName);
         values.add(v);
     }
 
     @Override
     public void onAuthor(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_AUTHOR, readTrimmedString(reader, ""));
+        values.get(index).put(Comments.COLUMN_AUTHOR, readTrimmedString(reader, ""));
     }
 
     @Override
     public void onBody(JsonReader reader, int index) throws IOException {
         CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
-        values.get(index).put(Things.COLUMN_BODY, body.toString());
+        values.get(index).put(Comments.COLUMN_BODY, body.toString());
     }
 
     @Override
     public void onCreatedUtc(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_CREATED_UTC, reader.nextLong());
+        values.get(index).put(Comments.COLUMN_CREATED_UTC, reader.nextLong());
     }
 
     @Override
     public void onDomain(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_DOMAIN, reader.nextString());
+        values.get(index).put(Comments.COLUMN_DOMAIN, reader.nextString());
     }
 
     @Override
     public void onDowns(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_DOWNS, reader.nextInt());
+        values.get(index).put(Comments.COLUMN_DOWNS, reader.nextInt());
     }
 
     @Override
     public void onIsSelf(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_SELF, reader.nextBoolean());
+        values.get(index).put(Comments.COLUMN_SELF, reader.nextBoolean());
     }
 
     @Override
     public void onKind(JsonReader reader, int index) throws IOException {
         ContentValues v = values.get(index);
-        v.put(Things.COLUMN_NESTING, replyNesting);
-        v.put(Things.COLUMN_KIND, Kinds.parseKind(reader.nextString()));
+        v.put(Comments.COLUMN_NESTING, replyNesting);
+        v.put(Comments.COLUMN_KIND, Kinds.parseKind(reader.nextString()));
     }
 
     @Override
@@ -194,68 +194,68 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         } else {
             reader.skipValue();
         }
-        values.get(index).put(Things.COLUMN_LIKES, likes);
+        values.get(index).put(Comments.COLUMN_LIKES, likes);
     }
 
     @Override
     public void onName(JsonReader reader, int index) throws IOException {
         String id = readTrimmedString(reader, "");
         ContentValues v = values.get(index);
-        v.put(Things.COLUMN_THING_ID, id);
+        v.put(Comments.COLUMN_THING_ID, id);
         valueMap.put(id, v);
     }
 
     @Override
     public void onNumComments(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_NUM_COMMENTS, reader.nextInt());
+        values.get(index).put(Comments.COLUMN_NUM_COMMENTS, reader.nextInt());
     }
 
     @Override
     public void onOver18(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_OVER_18, reader.nextBoolean());
+        values.get(index).put(Comments.COLUMN_OVER_18, reader.nextBoolean());
     }
 
     @Override
     public void onPermaLink(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_PERMA_LINK, reader.nextString());
+        values.get(index).put(Comments.COLUMN_PERMA_LINK, reader.nextString());
     }
 
     @Override
     public void onSaved(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_SAVED, reader.nextBoolean());
+        values.get(index).put(Comments.COLUMN_SAVED, reader.nextBoolean());
     }
 
     @Override
     public void onScore(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_SCORE, reader.nextInt());
+        values.get(index).put(Comments.COLUMN_SCORE, reader.nextInt());
     }
 
     @Override
     public void onSelfText(JsonReader reader, int index) throws IOException {
         CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
-        values.get(index).put(Things.COLUMN_BODY, body.toString());
+        values.get(index).put(Comments.COLUMN_BODY, body.toString());
     }
 
     @Override
     public void onSubreddit(JsonReader reader, int index) throws IOException {
         // TODO: Seems like a waste since these are all in the same subreddit.
-        values.get(index).put(Things.COLUMN_SUBREDDIT, reader.nextString());
+        values.get(index).put(Comments.COLUMN_SUBREDDIT, reader.nextString());
     }
 
     @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
         CharSequence title = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
-        values.get(index).put(Things.COLUMN_TITLE, title.toString());
+        values.get(index).put(Comments.COLUMN_TITLE, title.toString());
     }
 
     @Override
     public void onUps(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_UPS, reader.nextInt());
+        values.get(index).put(Comments.COLUMN_UPS, reader.nextInt());
     }
 
     @Override
     public void onUrl(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_URL, reader.nextString());
+        values.get(index).put(Comments.COLUMN_URL, reader.nextString());
     }
 
     @Override
@@ -263,7 +263,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         // TODO: Remove code duplication with ThingListing.
         String thumbnail = readTrimmedString(reader, null);
         if (!TextUtils.isEmpty(thumbnail) && thumbnail.startsWith("http")) {
-            values.get(index).put(Things.COLUMN_THUMBNAIL_URL, thumbnail);
+            values.get(index).put(Comments.COLUMN_THUMBNAIL_URL, thumbnail);
         }
     }
 
@@ -283,7 +283,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         int size = values.size();
         for (int i = 0; i < size;) {
             ContentValues v = values.get(i);
-            Integer type = (Integer) v.get(Things.COLUMN_KIND);
+            Integer type = (Integer) v.get(Comments.COLUMN_KIND);
             if (type.intValue() == Kinds.KIND_MORE) {
                 values.remove(i);
                 size--;
@@ -338,15 +338,15 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
         if (!values.isEmpty() && delta != 0) {
             // Update the header comment count with our fake inserts and deletes.
-            Integer numComments = (Integer) values.get(0).get(Things.COLUMN_NUM_COMMENTS);
-            values.get(0).put(Things.COLUMN_NUM_COMMENTS, numComments.intValue() + delta);
+            Integer numComments = (Integer) values.get(0).get(Comments.COLUMN_NUM_COMMENTS);
+            values.get(0).put(Comments.COLUMN_NUM_COMMENTS, numComments.intValue() + delta);
         }
     }
 
     private void writeSequenceNumbers() {
         int count = values.size();
         for (int i = 0; i < count; i++) {
-            values.get(i).put(Things.COLUMN_SEQUENCE, i);
+            values.get(i).put(Comments.COLUMN_SEQUENCE, i);
         }
     }
 
@@ -355,7 +355,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         int size = values.size();
         for (int i = 0; i < size; i++) {
             ContentValues v = values.get(i);
-            String id = v.getAsString(Things.COLUMN_THING_ID);
+            String id = v.getAsString(Comments.COLUMN_THING_ID);
 
             // This thing could be a placeholder we previously inserted.
             if (TextUtils.isEmpty(id)) {
@@ -364,12 +364,12 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
             if (id.equals(actionThingId)) {
                 ContentValues p = new ContentValues(7 + 1); // +1 for session id.
-                p.put(Things.COLUMN_ACCOUNT, actionAccountName);
-                p.put(Things.COLUMN_AUTHOR, actionAccountName);
-                p.put(Things.COLUMN_BODY, body);
-                p.put(Things.COLUMN_COMMENT_ACTION_ID, actionId);
-                p.put(Things.COLUMN_KIND, Kinds.KIND_COMMENT);
-                p.put(Things.COLUMN_NESTING, CommentLogic.getInsertNesting(this, i));
+                p.put(Comments.COLUMN_ACCOUNT, actionAccountName);
+                p.put(Comments.COLUMN_AUTHOR, actionAccountName);
+                p.put(Comments.COLUMN_BODY, body);
+                p.put(Comments.COLUMN_COMMENT_ACTION_ID, actionId);
+                p.put(Comments.COLUMN_KIND, Kinds.KIND_COMMENT);
+                p.put(Comments.COLUMN_NESTING, CommentLogic.getInsertNesting(this, i));
 
                 values.add(CommentLogic.getInsertPosition(this, i), p);
                 size++;
@@ -384,16 +384,16 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         int size = values.size();
         for (int i = 0; i < size; i++) {
             ContentValues v = values.get(i);
-            String id = v.getAsString(Things.COLUMN_THING_ID);
+            String id = v.getAsString(Comments.COLUMN_THING_ID);
             if (actionThingId.equals(id)) {
                 // Mark the header comment or comment with children as
                 // [deleted] instead of completely removing it.
                 if (i == 0) {
-                    v.put(Things.COLUMN_AUTHOR, Things.DELETED);
+                    v.put(Comments.COLUMN_AUTHOR, Comments.DELETED_AUTHOR);
                     return false;
                 } else if (CommentLogic.hasChildren(this, i)) {
-                    v.put(Things.COLUMN_AUTHOR, Things.DELETED);
-                    v.put(Things.COLUMN_BODY, Things.DELETED);
+                    v.put(Comments.COLUMN_AUTHOR, Comments.DELETED_AUTHOR);
+                    v.put(Comments.COLUMN_BODY, Comments.DELETED_BODY);
                     return false;
                 } else {
                     values.remove(i);
@@ -408,8 +408,8 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private void editThing(long actionId, String actionThingId, String text) {
         ContentValues v = valueMap.get(actionThingId);
         if (v != null) {
-            v.put(Things.COLUMN_BODY, text);
-            v.put(Things.COLUMN_COMMENT_ACTION_ID, actionId);
+            v.put(Comments.COLUMN_BODY, text);
+            v.put(Comments.COLUMN_COMMENT_ACTION_ID, actionId);
         }
     }
 
@@ -419,16 +419,16 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     public long getCommentId(int position) {
         // Cast to avoid auto-boxing in the getAsLong method.
-        return ((Long) values.get(position).get(Things._ID)).longValue();
+        return ((Long) values.get(position).get(Comments._ID)).longValue();
     }
 
     public int getCommentNesting(int position) {
         // Cast to avoid auto-boxing in the getAsInteger method.
-        return ((Integer) values.get(position).get(Things.COLUMN_NESTING)).intValue();
+        return ((Integer) values.get(position).get(Comments.COLUMN_NESTING)).intValue();
     }
 
     public int getCommentSequence(int position) {
         // Cast to avoid auto-boxing in the getAsInteger method.
-        return ((Integer) values.get(position).get(Things.COLUMN_SEQUENCE)).intValue();
+        return ((Integer) values.get(position).get(Comments.COLUMN_SEQUENCE)).intValue();
     }
 }

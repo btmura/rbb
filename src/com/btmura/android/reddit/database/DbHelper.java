@@ -66,59 +66,116 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         switch (version) {
             case 3:
-                // Version 3 converts the temporary tables of V2 into permanent tables.
-                Subreddits.createSubredditsV2(db);
-                Subreddits.insertDefaultSubreddits(db);
-                createNewTablesV2(db);
-                createNewTablesV3(db);
+                createDatabaseV3(db);
                 break;
 
             case 2:
-                // Version 2 upgrades the subreddits table and creates a bunch of other tables to
-                // support accounts. It also uses temporary tables to store data that is difficult
-                // to clean up.
-                Subreddits.createSubredditsV2(db);
-                Subreddits.insertDefaultSubreddits(db);
-                createNewTablesV2(db);
+                createDatabaseV2(db);
                 break;
 
             case 1:
-                // Version 1 creates a table to support subreddits without any account support.
-                Subreddits.createSubredditsV1(db);
-                Subreddits.insertDefaultSubreddits(db);
+                createDatabaseV1(db);
                 break;
         }
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion == 1 && newVersion >= 2) {
-            Subreddits.upgradeSubredditsV2(db);
-            createNewTablesV2(db);
+        // Upgrades are applied incrementally to get up to the latest version.
+        if (needsUpgrade(oldVersion, newVersion, 2)) {
+            upgradeDatabaseV2(db);
         }
-
-        if (oldVersion >= 1 && newVersion == 3) {
-            createNewTablesV3(db);
+        if (needsUpgrade(oldVersion, newVersion, 3)) {
+            upgradeDatabaseV3(db);
         }
     }
 
-    /** Creates new tables introduced in version 3. */
+    private static boolean needsUpgrade(int oldVersion, int newVersion, int upgrade) {
+        return oldVersion < upgrade && newVersion >= upgrade;
+    }
+
+    /**
+     * Creates the tables for database version 3. It converts the temporary tables of V2 into
+     * permanent tables. It also adds new tables for comments and hiding things.
+     */
+    private static void createDatabaseV3(SQLiteDatabase db) {
+        createNewTablesV3(db);
+        createNewTablesV2(db, 2);
+        createNewTablesV1(db, 2);
+    }
+
+    /** Upgrade database to version 3 from version 2. */
+    private static void upgradeDatabaseV3(SQLiteDatabase db) {
+        createNewTablesV3(db);
+        SaveActions.upgradeTableV2(db);
+        VoteActions.upgradeTableV2(db);
+    }
+
+    /** Creates the tables introduced in database version 3. */
     private static void createNewTablesV3(SQLiteDatabase db) {
-        Sessions.createTable(db);
-        Things.createTable(db);
         Comments.createTable(db);
-        Messages.createTable(db);
-        SubredditResults.createTable(db);
         HideActions.createTable(db);
+        Messages.createTable(db);
+        Sessions.createTable(db);
+        SubredditResults.createTable(db);
+        Things.createTable(db);
     }
 
-    /** Creates new tables introduced in version 2. */
-    private static void createNewTablesV2(SQLiteDatabase db) {
+    /**
+     * Creates the tables for database version 2. It creates a bunch of new tables to support
+     * accounts and sync adapters. It also uses temporary tables to store data created in
+     * {@link #onOpen(SQLiteDatabase)}.
+     */
+    private static void createDatabaseV2(SQLiteDatabase db) {
+        createNewTablesV2(db, 1);
+        createNewTablesV1(db, 2);
+    }
+
+    /** Upgrade database to version 2 from version 1. */
+    private static void upgradeDatabaseV2(SQLiteDatabase db) {
+        createNewTablesV2(db, 1);
+        Subreddits.upgradeSubredditsV2(db);
+    }
+
+    /** Creates the tables introduced in database version 2. */
+    private static void createNewTablesV2(SQLiteDatabase db, int version) {
         Accounts.createTable(db);
         CommentActions.createTable(db);
         MessageActions.createTable(db);
         ReadActions.createTable(db);
-        SaveActions.createTable(db);
-        VoteActions.createTable(db);
+        switch (version) {
+            case 2:
+                SaveActions.createTableV2(db);
+                VoteActions.createTableV2(db);
+                break;
+
+            case 1:
+                SaveActions.createTableV1(db);
+                VoteActions.createTableV1(db);
+                break;
+        }
+    }
+
+    /** Creates the tables for database version 1. It supports storing local subreddits. */
+    private static void createDatabaseV1(SQLiteDatabase db) {
+        createNewTablesV1(db, 1);
+    }
+
+    /** Creates the tables introduced in database version 1. */
+    private static void createNewTablesV1(SQLiteDatabase db, int version) {
+        switch (version) {
+            case 2:
+                Subreddits.createTableV2(db);
+                Subreddits.insertDefaultSubreddits(db);
+                break;
+
+            case 1:
+                Subreddits.createTableV1(db);
+                Subreddits.insertDefaultSubreddits(db);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 }

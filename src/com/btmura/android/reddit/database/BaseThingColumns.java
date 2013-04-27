@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.database;
 
+
 interface BaseThingColumns {
 
     // The following columns allow us to show pending saves to the user before
@@ -45,6 +46,9 @@ interface BaseThingColumns {
     /** String URL on reddit of the thing. */
     public static final String COLUMN_PERMA_LINK = Things.COLUMN_PERMA_LINK;
 
+    /** Column indicating whether this thing has been saved. */
+    public static final String COLUMN_SAVED = "saved";
+
     /** Boolean indicating whether this is a self post or link. */
     public static final String COLUMN_SELF = "self";
 
@@ -66,22 +70,42 @@ interface BaseThingColumns {
     /** String URL of the thing. */
     public static final String COLUMN_URL = Things.COLUMN_URL;
 
-    static final String CREATE_THING_COLUMNS =
-        // The following columns are for storing enough information so
-        // we can show the user we're going to save their item.
-        COLUMN_AUTHOR + " TEXT,"
-        + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
-        + COLUMN_DOMAIN + " TEXT,"
-        + COLUMN_DOWNS + " INTEGER DEFAULT 0,"
-        + COLUMN_LIKES + " INTEGER DEFAULT 0, "
-        + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0,"
-        + COLUMN_OVER_18 + " INTEGER DEFAULT 0,"
-        + COLUMN_PERMA_LINK + " TEXT,"
-        + COLUMN_SCORE + " INTEGER DEFAULT 0,"
-        + COLUMN_SELF + " INTEGER DEFAULT 0, "
-        + COLUMN_SUBREDDIT + " TEXT,"
-        + COLUMN_TITLE + " TEXT,"
-        + COLUMN_THUMBNAIL_URL + " TEXT,"
-        + COLUMN_UPS + " INTEGER DEFAULT 0,"
-        + COLUMN_URL + " TEXT";
+    static final String CREATE_THING_COLUMNS = ""
+            // The following columns are for storing enough information so
+            // we can show the user we're going to save their item.
+            + COLUMN_AUTHOR + " TEXT,"
+            + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
+            + COLUMN_DOMAIN + " TEXT,"
+            + COLUMN_DOWNS + " INTEGER DEFAULT 0,"
+            + COLUMN_LIKES + " INTEGER DEFAULT 0, "
+            + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0,"
+            + COLUMN_OVER_18 + " INTEGER DEFAULT 0,"
+            + COLUMN_PERMA_LINK + " TEXT,"
+            + COLUMN_SCORE + " INTEGER DEFAULT 0,"
+            + COLUMN_SELF + " INTEGER DEFAULT 0, "
+            + COLUMN_SUBREDDIT + " TEXT,"
+            + COLUMN_TITLE + " TEXT,"
+            + COLUMN_THUMBNAIL_URL + " TEXT,"
+            + COLUMN_UPS + " INTEGER DEFAULT 0,"
+            + COLUMN_URL + " TEXT";
+
+    static final String CREATE_THING_COLUMNS_V2 = ""
+            // The following columns are for storing enough information so
+            // we can show the user we're going to save their item.
+            + COLUMN_AUTHOR + " TEXT,"
+            + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
+            + COLUMN_DOMAIN + " TEXT,"
+            + COLUMN_DOWNS + " INTEGER DEFAULT 0,"
+            + COLUMN_LIKES + " INTEGER DEFAULT 0, "
+            + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0,"
+            + COLUMN_OVER_18 + " INTEGER DEFAULT 0,"
+            + COLUMN_PERMA_LINK + " TEXT,"
+            + COLUMN_SAVED + " INTEGER DEFAULT 0,"
+            + COLUMN_SCORE + " INTEGER DEFAULT 0,"
+            + COLUMN_SELF + " INTEGER DEFAULT 0, "
+            + COLUMN_SUBREDDIT + " TEXT,"
+            + COLUMN_TITLE + " TEXT,"
+            + COLUMN_THUMBNAIL_URL + " TEXT,"
+            + COLUMN_UPS + " INTEGER DEFAULT 0,"
+            + COLUMN_URL + " TEXT";
 }
