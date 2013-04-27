@@ -16,10 +16,10 @@
 
 package com.btmura.android.reddit.widget;
 
-import com.btmura.android.reddit.R;
-
 import android.content.Context;
 import android.widget.BaseAdapter;
+
+import com.btmura.android.reddit.R;
 
 /**
  * {@link BaseAdapter} that defines filters used across the application.
@@ -35,7 +35,8 @@ abstract class BaseFilterAdapter extends BaseAdapter {
     public static final int PROFILE_SUBMITTED = 2;
     public static final int PROFILE_LIKED = 3;
     public static final int PROFILE_DISLIKED = 4;
-    public static final int PROFILE_SAVED = 5;
+    public static final int PROFILE_HIDDEN = 5;
+    public static final int PROFILE_SAVED = 6;
 
     public static final int SUBREDDIT_HOT = 0;
     public static final int SUBREDDIT_TOP = 1;
@@ -59,6 +60,7 @@ abstract class BaseFilterAdapter extends BaseAdapter {
         if (hasAccount) {
             add(context, R.string.filter_profile_liked, PROFILE_LIKED);
             add(context, R.string.filter_profile_disliked, PROFILE_DISLIKED);
+            add(context, R.string.filter_profile_hidden, PROFILE_HIDDEN);
             add(context, R.string.filter_profile_saved, PROFILE_SAVED);
         }
         notifyDataSetChanged();

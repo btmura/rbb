@@ -56,6 +56,7 @@
     <string name="filter_profile_submitted">submitted</string>
     <string name="filter_profile_liked">liked</string>
     <string name="filter_profile_disliked">disliked</string>
+    <string name="filter_profile_hidden">hidden</string>
     <string name="filter_profile_saved">saved</string>
     <string name="filter_subreddit_controversial">controversial</string>
     <string name="filter_subreddit_hot">what\'s hot</string>

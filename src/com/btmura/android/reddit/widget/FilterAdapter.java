@@ -29,7 +29,7 @@ import com.btmura.android.reddit.R;
 public class FilterAdapter extends BaseFilterAdapter {
 
     private final LayoutInflater inflater;
-    private final ArrayList<String> names = new ArrayList<String>(6);
+    private final ArrayList<String> names = new ArrayList<String>(7);
     private CharSequence title;
 
     public FilterAdapter(Context context) {

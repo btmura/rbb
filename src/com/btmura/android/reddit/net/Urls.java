@@ -414,6 +414,10 @@ public class Urls {
                 b.append("/disliked");
                 break;
 
+            case FilterAdapter.PROFILE_HIDDEN:
+                b.append("/hidden");
+                break;
+
             case FilterAdapter.PROFILE_SAVED:
                 b.append("/saved");
                 break;
