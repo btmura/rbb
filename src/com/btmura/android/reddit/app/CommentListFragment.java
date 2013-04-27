@@ -415,7 +415,7 @@ public class CommentListFragment extends ThingProviderListFragment implements
 
     private boolean isNotDeleted(int position) {
         String author = adapter.getString(position, CommentAdapter.INDEX_AUTHOR);
-        return !Things.DELETED.equals(author);
+        return !Things.DELETED_AUTHOR.equals(author);
     }
 
     private boolean isEditable(int position) {

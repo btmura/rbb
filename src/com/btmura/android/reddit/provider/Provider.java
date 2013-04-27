@@ -68,27 +68,29 @@ public class Provider {
             Comments.COLUMN_NESTING,
     };
 
-    private static final Uri HIDE_ACTIONS_NOTIFY_SYNC_URI =
+    private static final Uri HIDE_URI =
             ThingProvider.HIDE_ACTIONS_URI.buildUpon()
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, ThingProvider.TRUE)
                     .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
 
-    private static final Uri READ_ACTIONS_NOTIFY_SYNC_URI =
+    private static final Uri READ_URI =
             ThingProvider.READ_ACTIONS_URI.buildUpon()
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_MESSAGES, ThingProvider.TRUE)
                     .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
 
-    private static final Uri SAVE_ACTIONS_NOTIFY_SYNC_URI =
+    private static final Uri SAVE_URI =
             ThingProvider.SAVE_ACTIONS_URI.buildUpon()
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, ThingProvider.TRUE)
+                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_COMMENTS, ThingProvider.TRUE)
                     .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
 
-    private static final Uri VOTE_ACTIONS_NOTIFY_SYNC_URI =
+    private static final Uri VOTE_URI =
             ThingProvider.VOTE_ACTIONS_URI.buildUpon()
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, ThingProvider.TRUE)
+                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_COMMENTS, ThingProvider.TRUE)
                     .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
 
@@ -200,11 +202,12 @@ public class Provider {
         });
     }
 
+    // TODO: Move this to ThingProvider#call like commentReplyAsync.
     public static void deleteCommentAsync(Context context,
             final String accountName,
             final long headerId,
             final int headerNumComments,
-            final String parentId,
+            final String parentThingId,
             final long[] ids,
             final String[] thingIds,
             final boolean[] hasChildren) {
@@ -213,38 +216,41 @@ public class Provider {
             public void run() {
                 int count = ids.length;
                 ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(count * 2 + 1);
+                        new ArrayList<ContentProviderOperation>(count * 2 + 2);
 
+                boolean thingDeleted = false;
                 int numDeletes = 0;
                 for (int i = 0; i < count; i++) {
                     ops.add(ContentProviderOperation.newInsert(
                             ThingProvider.COMMENT_ACTIONS_SYNC_URI)
                             .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE)
                             .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
-                            .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentId)
+                            .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentThingId)
                             .withValue(CommentActions.COLUMN_THING_ID, thingIds[i])
                             .build());
 
-                    // Make sure to sync this logic is duplicated in
-                    // CommentListing#deleteThing.
-                    if (Objects.equals(parentId, thingIds[i])) {
-                        // Update things viewed by this account as [deleted]
-                        // even in the thing list.
-                        // TODO: Make ThingProvider also show [deleted] in thing
-                        // list on refresh.
+                    // Make sure to sync this logic is duplicated in CommentListing#deleteThing.
+                    if (Objects.equals(parentThingId, thingIds[i])) {
+                        // Update things viewed by this account as [deleted] even in the thing list.
+                        String[] selection = Array.of(accountName, parentThingId);
                         ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                                .withValue(Things.COLUMN_AUTHOR, Things.DELETED)
-                                .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
-                                        Array.of(accountName, parentId))
+                                .withValue(Things.COLUMN_AUTHOR, Things.DELETED_AUTHOR)
+                                .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
                                 .build());
+                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                                .withValue(Things.COLUMN_AUTHOR, Things.DELETED_AUTHOR)
+                                .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
+                                .build());
+                        thingDeleted = true;
+                        // TODO: Make ThingProvider also show [deleted] in thing list on refresh.
                     } else if (hasChildren[i]) {
-                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                                .withValue(Things.COLUMN_AUTHOR, Things.DELETED)
-                                .withValue(Things.COLUMN_BODY, Things.DELETED)
+                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                                .withValue(Things.COLUMN_AUTHOR, Things.DELETED_AUTHOR)
+                                .withValue(Things.COLUMN_BODY, Things.DELETED_BODY)
                                 .withSelection(BaseProvider.ID_SELECTION, Array.of(ids[i]))
                                 .build());
                     } else {
-                        ops.add(ContentProviderOperation.newDelete(ThingProvider.THINGS_URI)
+                        ops.add(ContentProviderOperation.newDelete(ThingProvider.COMMENTS_URI)
                                 .withSelection(BaseProvider.ID_SELECTION, Array.of(ids[i]))
                                 .build());
                         numDeletes++;
@@ -253,10 +259,17 @@ public class Provider {
 
                 // Update the header comment by how comments were truly deleted.
                 if (numDeletes > 0) {
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                            .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID,
-                                    Array.of(accountName, parentId))
-                            .withValue(Things.COLUMN_NUM_COMMENTS, headerNumComments - numDeletes)
+                    String[] selection = Array.of(accountName, parentThingId);
+                    int numComments = headerNumComments - numDeletes;
+                    if (!thingDeleted) {
+                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
+                                .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
+                                .withValue(Things.COLUMN_NUM_COMMENTS, numComments)
+                                .build());
+                    }
+                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                            .withSelection(Comments.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
+                            .withValue(Comments.COLUMN_NUM_COMMENTS, numComments)
                             .build());
                 }
 
@@ -426,7 +439,7 @@ public class Provider {
                 v.put(ReadActions.COLUMN_ACCOUNT, accountName);
                 v.put(ReadActions.COLUMN_THING_ID, thingId);
                 v.put(ReadActions.COLUMN_ACTION, action);
-                cr.insert(READ_ACTIONS_NOTIFY_SYNC_URI, v);
+                cr.insert(READ_URI, v);
             }
         });
     }
@@ -442,7 +455,7 @@ public class Provider {
                 v.put(HideActions.COLUMN_ACCOUNT, accountName);
                 v.put(HideActions.COLUMN_THING_ID, thingId);
                 v.put(HideActions.COLUMN_ACTION, HideActions.ACTION_HIDE);
-                cr.insert(HIDE_ACTIONS_NOTIFY_SYNC_URI, v);
+                cr.insert(HIDE_URI, v);
             }
         });
     }
@@ -495,7 +508,7 @@ public class Provider {
                 v.put(SaveActions.COLUMN_URL, url);
 
                 ContentResolver cr = appContext.getContentResolver();
-                return cr.insert(SAVE_ACTIONS_NOTIFY_SYNC_URI, v) != null;
+                return cr.insert(SAVE_URI, v) != null;
             }
 
             @Override
@@ -523,7 +536,7 @@ public class Provider {
                 v.put(SaveActions.COLUMN_ACTION, SaveActions.ACTION_UNSAVE);
 
                 ContentResolver cr = appContext.getContentResolver();
-                return cr.insert(SAVE_ACTIONS_NOTIFY_SYNC_URI, v) != null;
+                return cr.insert(SAVE_URI, v) != null;
             }
 
             @Override
@@ -558,7 +571,7 @@ public class Provider {
                 v.put(VoteActions.COLUMN_THING_ID, thingId);
 
                 // No toast needed, since the vote arrows will reflect success.
-                cr.insert(VOTE_ACTIONS_NOTIFY_SYNC_URI, v);
+                cr.insert(VOTE_URI, v);
             }
         });
     }
@@ -616,7 +629,7 @@ public class Provider {
                 v.put(VoteActions.COLUMN_URL, url);
 
                 // No toast needed, since the vote arrows will reflect success.
-                cr.insert(VOTE_ACTIONS_NOTIFY_SYNC_URI, v);
+                cr.insert(VOTE_URI, v);
             }
         });
     }

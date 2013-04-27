@@ -143,7 +143,7 @@ public class CommentAdapter extends BaseLoaderAdapter {
 
     @Override
     public void deleteSessionData(Context context) {
-        Provider.deleteSessionAsync(context, ThingProvider.THINGS_URI, sessionId);
+        Provider.deleteSessionAsync(context, ThingProvider.COMMENTS_URI, sessionId);
     }
 
     @Override

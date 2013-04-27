@@ -64,10 +64,10 @@ public class Comments implements BaseThingColumns, BaseColumns {
     public static final String COLUMN_VISIBLE = "visible";
 
     /** String shown instead of author when a comment is deleted. */
-    public static final String DELETED_AUTHOR = "[deleted]";
+    public static final String DELETED_AUTHOR = Things.DELETED_AUTHOR;
 
     /** String shown instead of body when a comment is deleted. */
-    public static final String DELETED_BODY = DELETED_AUTHOR;
+    public static final String DELETED_BODY = Things.DELETED_BODY;
 
     public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
 

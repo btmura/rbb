@@ -150,6 +150,7 @@ public class ThingProvider extends BaseProvider {
     static final String PARAM_LINK_ID = "linkId";
     static final String PARAM_JOIN = "join";
     static final String PARAM_NOTIFY_ACCOUNTS = "notifyAccounts";
+    static final String PARAM_NOTIFY_COMMENTS = "notifyComments";
     static final String PARAM_NOTIFY_THINGS = "notifyThings";
     static final String PARAM_NOTIFY_MESSAGES = "notifyMessages";
 
@@ -566,11 +567,17 @@ public class ThingProvider extends BaseProvider {
         try {
             // Update the number of comments in the header comment.
             ContentValues values = new ContentValues(8);
-            values.put(Comments.COLUMN_NUM_COMMENTS, parentNumComments);
+            values.put(Comments.COLUMN_NUM_COMMENTS, parentNumComments + 1);
             int count = db.update(Comments.TABLE_NAME, values, ID_SELECTION, Array.of(parentId));
             if (count != 1) {
                 return null;
             }
+
+            // Update the number of comments in any thing listings.
+            values.clear();
+            values.put(Things.COLUMN_NUM_COMMENTS, parentNumComments + 1);
+            db.update(Things.TABLE_NAME, values, Things.SELECT_BY_ACCOUNT_AND_THING_ID,
+                    Array.of(accountName, parentThingId));
 
             // Queue an action to sync back the comment to the server.
             values.clear();
@@ -607,8 +614,9 @@ public class ThingProvider extends BaseProvider {
 
             db.setTransactionSuccessful();
 
-            // Update observers and schedule a sync.
+            // Update observers and schedule a sync. Both URIs are backed by the same sync adapter.
             ContentResolver cr = getContext().getContentResolver();
+            cr.notifyChange(ThingProvider.THINGS_URI, null, false);
             cr.notifyChange(ThingProvider.COMMENTS_URI, null, true);
 
         } finally {
@@ -622,6 +630,9 @@ public class ThingProvider extends BaseProvider {
         super.notifyChange(uri);
         if (uri.getBooleanQueryParameter(PARAM_NOTIFY_ACCOUNTS, false)) {
             getContext().getContentResolver().notifyChange(AccountProvider.ACCOUNTS_URI, null);
+        }
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_COMMENTS, false)) {
+            getContext().getContentResolver().notifyChange(COMMENTS_URI, null);
         }
         if (uri.getBooleanQueryParameter(PARAM_NOTIFY_THINGS, false)) {
             getContext().getContentResolver().notifyChange(THINGS_URI, null);

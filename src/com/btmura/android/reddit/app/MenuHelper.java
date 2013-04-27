@@ -49,7 +49,7 @@ public class MenuHelper {
     }
 
     public static boolean isUserItemVisible(String user) {
-        return !TextUtils.isEmpty(user) && !Things.DELETED.equals(user);
+        return !TextUtils.isEmpty(user) && !Things.DELETED_AUTHOR.equals(user);
     }
 
     public static void openUrl(Context context, CharSequence url) {

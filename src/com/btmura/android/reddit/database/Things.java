@@ -80,7 +80,9 @@ public class Things implements BaseColumns {
     public static final String COLUMN_VISIBLE = "visible";
 
     /** Deleted comments have an author and body with this string. */
-    public static final String DELETED = "[deleted]";
+    public static final String DELETED_AUTHOR = "[deleted]";
+
+    public static final String DELETED_BODY = DELETED_AUTHOR;
 
     public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
 
