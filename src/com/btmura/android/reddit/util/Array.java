@@ -29,12 +29,12 @@ public class Array {
         return array == null || array.length == 0;
     }
 
-    /**
-     * Returns one element string array with the long in it. Hopefully avoids
-     * auto-boxing into a Long object.
-     */
     public static String[] of(Long oneLong) {
-        return new String[] {Long.toString(oneLong)};
+        return new String[] {oneLong.toString()};
+    }
+
+    public static String[] of(Long oneLong, String element) {
+        return new String[] {oneLong.toString(), element};
     }
 
     public static String[] of(String... elements) {

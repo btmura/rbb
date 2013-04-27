@@ -298,11 +298,11 @@ public class Provider {
                         .withValue(CommentActions.COLUMN_THING_ID, thingId)
                         .build());
 
-                ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                        .withSelection(Things.SELECT_BY_SESSION_ID_AND_THING_ID,
-                                Array.of(Long.toString(sessionId), thingId))
-                        .withValue(Things.COLUMN_BODY, text)
-                        .withValueBackReference(Things.COLUMN_COMMENT_ACTION_ID, 0)
+                ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
+                        .withSelection(Comments.SELECT_BY_SESSION_ID_AND_THING_ID,
+                                Array.of(sessionId, thingId))
+                        .withValue(Comments.COLUMN_BODY, text)
+                        .withValueBackReference(Comments.COLUMN_COMMENT_ACTION_ID, 0)
                         .build());
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);

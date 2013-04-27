@@ -78,6 +78,9 @@ public class Comments implements BaseThingColumns, BaseColumns {
 
     public static final String SELECT_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID;
 
+    public static final String SELECT_BY_SESSION_ID_AND_THING_ID =
+            SELECT_BY_SESSION_ID + " AND " + COLUMN_THING_ID + "=?";
+
     /** Select visible comments, ones that are not been hidden by being collapsed. */
     public static final String SELECT_VISIBLE = COLUMN_VISIBLE + "=1";
 
