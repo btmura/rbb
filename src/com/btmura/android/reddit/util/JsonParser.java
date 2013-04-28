@@ -131,84 +131,78 @@ public class JsonParser {
                 continue;
             }
             String name = r.nextName();
-            if ("id".equals(name)) {
-                onId(r, i);
-            } else if ("name".equals(name)) {
-                onName(r, i);
-            } else if ("title".equals(name)) {
-                onTitle(r, i);
-            } else if ("over_18".equals(name) || "over18".equals(name)) {
-                onOver18(r, i);
-            } else if ("author".equals(name)) {
+            if ("author".equals(name)) {
                 onAuthor(r, i);
-            } else if ("subreddit".equals(name)) {
-                onSubreddit(r, i);
-            } else if ("created_utc".equals(name)) {
-                onCreatedUtc(r, i);
-            } else if ("score".equals(name)) {
-                onScore(r, i);
-            } else if ("ups".equals(name)) {
-                onUps(r, i);
-            } else if ("downs".equals(name)) {
-                onDowns(r, i);
-            } else if ("likes".equals(name)) {
-                onLikes(r, i);
-            } else if ("num_comments".equals(name)) {
-                onNumComments(r, i);
-            } else if ("subreddit_id".equals(name)) {
-                onSubredditId(r, i);
-            } else if ("thumbnail".equals(name)) {
-                onThumbnail(r, i);
-            } else if ("is_self".equals(name)) {
-                onIsSelf(r, i);
-            } else if ("domain".equals(name)) {
-                onDomain(r, i);
-            } else if ("url".equals(name)) {
-                onUrl(r, i);
-            } else if ("permalink".equals(name)) {
-                onPermaLink(r, i);
-            } else if ("selftext".equals(name)) {
-                onSelfText(r, i);
             } else if ("body".equals(name)) {
                 onBody(r, i);
-            } else if ("saved".equals(name)) {
-                onSaved(r, i);
-            } else if ("link_id".equals(name)) {
-                onLinkId(r, i);
-            } else if ("link_title".equals(name)) {
-                onLinkTitle(r, i);
-            } else if ("context".equals(name)) {
-                onContext(r, i);
-            } else if ("new".equals(name)) {
-                onNew(r, i);
-            } else if ("subject".equals(name)) {
-                onSubject(r, i);
-            } else if ("dest".equals(name)) {
-                onDestination(r, i);
-            } else if ("was_comment".equals(name)) {
-                onWasComment(r, i);
-            } else if ("link_karma".equals(name)) {
-                onLinkKarma(r, i);
-            } else if ("comment_karma".equals(name)) {
-                onCommentKarma(r, i);
-            } else if ("has_mail".equals(name)) {
-                onHasMail(r, i);
-            } else if ("display_name".equals(name)) {
-                onDisplayName(r, i);
-            } else if ("description".equals(name)) {
-                onDescription(r, i);
-            } else if ("subscribers".equals(name)) {
-                onSubscribers(r, i);
             } else if ("children".equals(name)) {
                 onChildren(r, i);
+            } else if ("comment_karma".equals(name)) {
+                onCommentKarma(r, i);
+            } else if ("context".equals(name)) {
+                onContext(r, i);
+            } else if ("created_utc".equals(name)) {
+                onCreatedUtc(r, i);
+            } else if ("description".equals(name)) {
+                onDescription(r, i);
+            } else if ("dest".equals(name)) {
+                onDestination(r, i);
+            } else if ("display_name".equals(name)) {
+                onDisplayName(r, i);
+            } else if ("domain".equals(name)) {
+                onDomain(r, i);
+            } else if ("downs".equals(name)) {
+                onDowns(r, i);
+            } else if ("has_mail".equals(name)) {
+                onHasMail(r, i);
+            } else if ("id".equals(name)) {
+                onId(r, i);
+            } else if ("is_self".equals(name)) {
+                onIsSelf(r, i);
+            } else if ("likes".equals(name)) {
+                onLikes(r, i);
+            } else if ("link_id".equals(name)) {
+                onLinkId(r, i);
+            } else if ("link_karma".equals(name)) {
+                onLinkKarma(r, i);
+            } else if ("link_title".equals(name)) {
+                onLinkTitle(r, i);
+            } else if ("name".equals(name)) {
+                onName(r, i);
+            } else if ("new".equals(name)) {
+                onNew(r, i);
+            } else if ("num_comments".equals(name)) {
+                onNumComments(r, i);
+            } else if ("over_18".equals(name) || "over18".equals(name)) {
+                onOver18(r, i);
+            } else if ("permalink".equals(name)) {
+                onPermaLink(r, i);
             } else if ("replies".equals(name)) {
-                if (shouldParseReplies()) {
-                    replyNesting++;
-                    doParseListingObject(r);
-                    replyNesting--;
-                } else {
-                    r.skipValue();
-                }
+                onReplies(r, i);
+            } else if ("saved".equals(name)) {
+                onSaved(r, i);
+            } else if ("score".equals(name)) {
+                onScore(r, i);
+            } else if ("selftext".equals(name)) {
+                onSelfText(r, i);
+            } else if ("subject".equals(name)) {
+                onSubject(r, i);
+            } else if ("subreddit".equals(name)) {
+                onSubreddit(r, i);
+            } else if ("subreddit_id".equals(name)) {
+                onSubredditId(r, i);
+            } else if ("subscribers".equals(name)) {
+                onSubscribers(r, i);
+            } else if ("title".equals(name)) {
+                onTitle(r, i);
+            } else if ("thumbnail".equals(name)) {
+                onThumbnail(r, i);
+            } else if ("ups".equals(name)) {
+                onUps(r, i);
+            } else if ("url".equals(name)) {
+                onUrl(r, i);
+            } else if ("was_comment".equals(name)) {
+                onWasComment(r, i);
             } else {
                 r.skipValue();
             }
@@ -216,85 +210,13 @@ public class JsonParser {
         r.endObject();
     }
 
-    public boolean shouldParseReplies() {
-        return false;
-    }
-
     public void onParseStart() {
-    }
-
-    public void onAfter(JsonReader reader) throws IOException {
-        reader.skipValue();
     }
 
     public void onEntityStart(int index) {
     }
 
-    public void onKind(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onId(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onName(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onDisplayName(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onTitle(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onOver18(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onDescription(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onSubscribers(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onCreatedUtc(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
     public void onAuthor(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onSubreddit(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onUrl(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onSubredditId(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onThumbnail(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onPermaLink(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onIsSelf(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onSelfText(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
@@ -302,23 +224,55 @@ public class JsonParser {
         reader.skipValue();
     }
 
-    public void onSaved(JsonReader reader, int index) throws IOException {
+    public void onChildren(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
-    public void onNumComments(JsonReader reader, int index) throws IOException {
+    public void onCommentKarma(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
-    public void onScore(JsonReader reader, int index) throws IOException {
+    public void onContext(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
-    public void onUps(JsonReader reader, int index) throws IOException {
+    public void onCreatedUtc(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onDescription(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onDestination(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onDisplayName(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onDomain(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
     public void onDowns(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onKind(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onHasMail(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onId(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onIsSelf(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
@@ -330,11 +284,15 @@ public class JsonParser {
         reader.skipValue();
     }
 
+    public void onLinkKarma(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
     public void onLinkTitle(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
-    public void onContext(JsonReader reader, int index) throws IOException {
+    public void onName(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
@@ -342,11 +300,69 @@ public class JsonParser {
         reader.skipValue();
     }
 
+    public void onNumComments(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onOver18(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onPermaLink(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onReplies(JsonReader reader, int index) throws IOException {
+        if (shouldParseReplies()) {
+            replyNesting++;
+            doParseListingObject(reader);
+            replyNesting--;
+        } else {
+            reader.skipValue();
+        }
+    }
+
+    public void onSaved(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onScore(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onSelfText(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onSubscribers(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
     public void onSubject(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
-    public void onDestination(JsonReader reader, int index) throws IOException {
+    public void onSubreddit(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onSubredditId(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onTitle(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onThumbnail(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onUps(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onUrl(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
@@ -354,30 +370,19 @@ public class JsonParser {
         reader.skipValue();
     }
 
-    public void onLinkKarma(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onCommentKarma(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onHasMail(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onDomain(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
-    public void onChildren(JsonReader reader, int index) throws IOException {
-        reader.skipValue();
-    }
-
     public void onEntityEnd(int index) {
     }
 
+    public void onAfter(JsonReader reader) throws IOException {
+        reader.skipValue();
+    }
+
     public void onParseEnd() {
+    }
+
+    // TODO: Change to protected access.
+    public boolean shouldParseReplies() {
+        return false;
     }
 
     protected static String readTrimmedString(JsonReader reader, String nullValue)
