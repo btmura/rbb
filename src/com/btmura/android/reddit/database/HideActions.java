@@ -54,14 +54,14 @@ public class HideActions implements BaseThingColumns, BaseColumns {
     /** Column used by others to join with this table. */
     public static final String JOINED_COLUMN_HIDE_ACTION = "hideAction";
 
-    /** Select hidden things. Assumes things without a hide action are hidden. */
+    /** Select hidden things. */
     public static final String SELECT_HIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=1 AND ("
             + JOINED_COLUMN_HIDE_ACTION + " IS NULL OR "
             + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_HIDE
             + ")) OR (" + COLUMN_HIDDEN + "=0 AND "
             + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_HIDE + "))";
 
-    /** Select unhidden things. Assumes things without a hide action are unhidden. */
+    /** Select unhidden things. */
     public static final String SELECT_UNHIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=0 AND ("
             + JOINED_COLUMN_HIDE_ACTION + " IS NULL OR "
             + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_UNHIDE
