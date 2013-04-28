@@ -46,14 +46,21 @@ public class HideActions implements BaseThingColumns, BaseColumns {
     /** Action meaning the user has unhidden this thing. */
     public static final int ACTION_UNHIDE = 1;
 
-    public static final String JOINED_COLUMN_HIDE_ACTION = "hideAction";
-
-    public static final String SELECT_NOT_HIDDEN = JOINED_COLUMN_HIDE_ACTION + " IS NULL";
-
     public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
 
     public static final String SELECT_UNHIDDEN_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
             + " AND " + COLUMN_ACTION + "=" + ACTION_UNHIDE;
+
+    /** Column used by others to join with this table. */
+    public static final String JOINED_COLUMN_HIDE_ACTION = "hideAction";
+
+    /** Select hidden things. Assumes things without a hide action are hidden. */
+    public static final String SELECT_HIDDEN_BY_JOIN = "(" + JOINED_COLUMN_HIDE_ACTION
+            + " IS NULL OR " + JOINED_COLUMN_HIDE_ACTION + "=" + HideActions.ACTION_HIDE + ")";
+
+    /** Select unhidden things. Assumes things without a hide action are unhidden. */
+    public static final String SELECT_UNHIDDEN_BY_JOIN = "(" + JOINED_COLUMN_HIDE_ACTION
+            + " IS NULL OR " + JOINED_COLUMN_HIDE_ACTION + "=" + HideActions.ACTION_UNHIDE + ")";
 
     public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
 

@@ -200,18 +200,33 @@ public class ThingListAdapter extends BaseLoaderAdapter {
 
     @Override
     protected Uri getLoaderUri() {
-        if (!TextUtils.isEmpty(profileUser)) {
+        if (isProfileActivity()) {
             return ThingProvider.profileUri(sessionId, accountName, profileUser, filter, more);
-        } else if (!TextUtils.isEmpty(messageUser)) {
+        } else if (isMessageActivity()) {
             return ThingProvider.messageUri(sessionId, accountName, filter, more);
-        } else if (!TextUtils.isEmpty(query)) {
+        } else if (isSearchActivity()) {
             return ThingProvider.searchUri(sessionId, accountName, subreddit, query);
-        } else if (subreddit != null) {
-            // Empty but non-null subreddit means front page.
+        } else if (isBrowserActivity()) {
             return ThingProvider.subredditUri(sessionId, accountName, subreddit, filter, more);
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    private boolean isProfileActivity() {
+        return !TextUtils.isEmpty(profileUser);
+    }
+
+    private boolean isMessageActivity() {
+        return !TextUtils.isEmpty(messageUser);
+    }
+
+    private boolean isSearchActivity() {
+        return !TextUtils.isEmpty(query);
+    }
+
+    private boolean isBrowserActivity() {
+        return subreddit != null; // Empty but non-null subreddit means front page.
     }
 
     @Override
@@ -221,7 +236,13 @@ public class ThingListAdapter extends BaseLoaderAdapter {
 
     @Override
     protected String getSelection() {
-        return isMessageActivity() ? null : HideActions.SELECT_NOT_HIDDEN;
+        if (isMessageActivity()) {
+            return null;
+        } else if (isProfileActivity() && filter == FilterAdapter.PROFILE_HIDDEN) {
+            return HideActions.SELECT_HIDDEN_BY_JOIN;
+        } else {
+            return HideActions.SELECT_UNHIDDEN_BY_JOIN;
+        }
     }
 
     @Override
@@ -802,10 +823,6 @@ public class ThingListAdapter extends BaseLoaderAdapter {
 
     public boolean isSingleChoice() {
         return singleChoice;
-    }
-
-    private boolean isMessageActivity() {
-        return !TextUtils.isEmpty(messageUser);
     }
 
 }
