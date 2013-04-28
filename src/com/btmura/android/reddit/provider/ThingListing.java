@@ -334,6 +334,11 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     @Override
+    public void onHidden(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Things.COLUMN_HIDDEN, reader.nextBoolean());
+    }
+
+    @Override
     public void onKind(JsonReader reader, int index) throws IOException {
         int kindValue = Kinds.parseKind(reader.nextString());
         values.get(index).put(Things.COLUMN_KIND, kindValue);
@@ -555,12 +560,13 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     private void addHide(Cursor c) {
-        ContentValues v = new ContentValues(15);
+        ContentValues v = new ContentValues(20);
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_AUTHOR, c.getString(HIDE_AUTHOR));
         v.put(Things.COLUMN_CREATED_UTC, c.getLong(HIDE_CREATED_UTC));
         v.put(Things.COLUMN_DOMAIN, c.getString(HIDE_DOMAIN));
         v.put(Things.COLUMN_DOWNS, c.getString(HIDE_DOWNS));
+        v.put(Things.COLUMN_HIDDEN, true);
         v.put(Things.COLUMN_KIND, Kinds.KIND_LINK);
         v.put(Things.COLUMN_LIKES, c.getInt(HIDE_LIKES));
         v.put(Things.COLUMN_NUM_COMMENTS, c.getInt(HIDE_NUM_COMMENTS));
@@ -578,7 +584,7 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     private void addSave(Cursor c) {
-        ContentValues v = new ContentValues(15);
+        ContentValues v = new ContentValues(20);
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_AUTHOR, c.getString(SAVE_AUTHOR));
         v.put(Things.COLUMN_CREATED_UTC, c.getLong(SAVE_CREATED_UTC));
@@ -601,7 +607,7 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     private void addVote(Cursor c) {
-        ContentValues v = new ContentValues(15);
+        ContentValues v = new ContentValues(20);
         v.put(Things.COLUMN_ACCOUNT, accountName);
         v.put(Things.COLUMN_AUTHOR, c.getString(VOTE_AUTHOR));
         v.put(Things.COLUMN_CREATED_UTC, c.getLong(VOTE_CREATED_UTC));

@@ -534,27 +534,32 @@ public class ThingListAdapter extends BaseLoaderAdapter {
         return AccountUtils.isAccount(accountName) && (subreddit != null || query != null);
     }
 
-    public void hide(Context context, int position) {
+    public void hide(Context context, int position, boolean hide) {
         if (isMessageActivity()) {
             throw new IllegalStateException();
         }
 
-        Provider.hideAsync(context, accountName, getThingId(position),
-                getString(position, THING_AUTHOR),
-                getLong(position, THING_CREATED_UTC),
-                getString(position, THING_DOMAIN),
-                getInt(position, THING_DOWNS),
-                getInt(position, THING_LIKES),
-                getInt(position, THING_NUM_COMMENTS),
-                getBoolean(position, THING_OVER_18),
-                getString(position, THING_PERMA_LINK),
-                getInt(position, THING_SCORE),
-                getBoolean(position, THING_SELF),
-                getString(position, THING_SUBREDDIT),
-                getString(position, THING_TITLE),
-                getString(position, THING_THUMBNAIL_URL),
-                getInt(position, THING_UPS),
-                getString(position, THING_URL));
+        String thingId = getThingId(position);
+        if (hide) {
+            Provider.hideAsync(context, accountName, thingId,
+                    getString(position, THING_AUTHOR),
+                    getLong(position, THING_CREATED_UTC),
+                    getString(position, THING_DOMAIN),
+                    getInt(position, THING_DOWNS),
+                    getInt(position, THING_LIKES),
+                    getInt(position, THING_NUM_COMMENTS),
+                    getBoolean(position, THING_OVER_18),
+                    getString(position, THING_PERMA_LINK),
+                    getInt(position, THING_SCORE),
+                    getBoolean(position, THING_SELF),
+                    getString(position, THING_SUBREDDIT),
+                    getString(position, THING_TITLE),
+                    getString(position, THING_THUMBNAIL_URL),
+                    getInt(position, THING_UPS),
+                    getString(position, THING_URL));
+        } else {
+            Provider.unhideAsync(context, accountName, thingId);
+        }
     }
 
     public void save(Context context, int position) {

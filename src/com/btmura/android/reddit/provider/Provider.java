@@ -449,6 +449,7 @@ public class Provider {
             final String thingId,
 
             // Following parameters are for faking a thing.
+            // TODO: Use a bundle argument for this instead.
             final String author,
             final long createdUtc,
             final String domain,
@@ -490,6 +491,22 @@ public class Provider {
                 v.put(HideActions.COLUMN_UPS, ups);
                 v.put(HideActions.COLUMN_URL, url);
 
+                cr.insert(HIDE_URI, v);
+            }
+        });
+    }
+
+    public static void unhideAsync(final Context context,
+            final String accountName,
+            final String thingId) {
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                ContentValues v = new ContentValues(3);
+                v.put(HideActions.COLUMN_ACCOUNT, accountName);
+                v.put(HideActions.COLUMN_THING_ID, thingId);
+                v.put(HideActions.COLUMN_ACTION, HideActions.ACTION_UNHIDE);
                 cr.insert(HIDE_URI, v);
             }
         });

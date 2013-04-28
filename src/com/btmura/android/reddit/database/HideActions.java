@@ -52,21 +52,17 @@ public class HideActions implements BaseThingColumns, BaseColumns {
             + " AND " + COLUMN_ACTION + "=" + ACTION_UNHIDE;
 
     /** Column used by others to join with this table. */
-    public static final String JOINED_COLUMN_HIDE_ACTION = "hideAction";
+    public static final String JOINED_COLUMN = "hideAction";
 
     /** Select hidden things. */
-    public static final String SELECT_HIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=1 AND ("
-            + JOINED_COLUMN_HIDE_ACTION + " IS NULL OR "
-            + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_HIDE
-            + ")) OR (" + COLUMN_HIDDEN + "=0 AND "
-            + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_HIDE + "))";
+    public static final String SELECT_HIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=1 AND "
+            + "(" + JOINED_COLUMN + " IS NULL OR " + JOINED_COLUMN + "=" + ACTION_HIDE + ")"
+            + ") OR (" + COLUMN_HIDDEN + "=0 AND " + JOINED_COLUMN + "=" + ACTION_HIDE + "))";
 
     /** Select unhidden things. */
-    public static final String SELECT_UNHIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=0 AND ("
-            + JOINED_COLUMN_HIDE_ACTION + " IS NULL OR "
-            + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_UNHIDE
-            + ")) OR (" + COLUMN_HIDDEN + "=1 AND "
-            + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_UNHIDE + "))";
+    public static final String SELECT_UNHIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=0 AND "
+            + "(" + JOINED_COLUMN + " IS NULL OR " + JOINED_COLUMN + "=" + ACTION_UNHIDE + ")"
+            + ") OR (" + COLUMN_HIDDEN + "=1 AND " + JOINED_COLUMN + "=" + ACTION_UNHIDE + "))";
 
     public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
 

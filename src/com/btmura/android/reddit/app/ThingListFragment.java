@@ -340,7 +340,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     @Override
     public void onSwipeDismiss(ListView listView, View view, int position) {
-        adapter.hide(getActivity(), position);
+        adapter.hide(getActivity(), position, true);
     }
 
     public void onVote(View v, int action) {
@@ -434,6 +434,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         menu.findItem(R.id.menu_saved).setVisible(saveable && saved);
         menu.findItem(R.id.menu_unsaved).setVisible(saveable && !saved);
         menu.findItem(R.id.menu_hide).setVisible(count == 1 && hasAccount && isLink);
+        menu.findItem(R.id.menu_unhide).setVisible(count == 1 && hasAccount && isLink);
 
         return true;
     }
@@ -455,7 +456,12 @@ public class ThingListFragment extends ThingProviderListFragment implements
                 return true;
 
             case R.id.menu_hide:
-                handleHide();
+                handleHide(true);
+                mode.finish();
+                return true;
+
+            case R.id.menu_unhide:
+                handleHide(false);
                 mode.finish();
                 return true;
 
@@ -492,8 +498,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
         adapter.save(getActivity(), getFirstCheckedPosition());
     }
 
-    private void handleHide() {
-        adapter.hide(getActivity(), getFirstCheckedPosition());
+    private void handleHide(boolean hide) {
+        adapter.hide(getActivity(), getFirstCheckedPosition(), hide);
     }
 
     private void handleComments() {
