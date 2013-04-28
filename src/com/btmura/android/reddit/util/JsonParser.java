@@ -155,6 +155,8 @@ public class JsonParser {
                 onDowns(r, i);
             } else if ("has_mail".equals(name)) {
                 onHasMail(r, i);
+            } else if ("hidden".equals(name)) {
+                onHidden(r, i);
             } else if ("id".equals(name)) {
                 onId(r, i);
             } else if ("is_self".equals(name)) {
@@ -265,6 +267,10 @@ public class JsonParser {
     }
 
     public void onHasMail(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onHidden(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 

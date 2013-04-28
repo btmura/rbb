@@ -304,7 +304,7 @@ class ThingListing extends JsonParser implements Listing {
     @Override
     public void onEntityStart(int index) {
         // Pass -1 and null since we don't know those until later
-        values.add(newContentValues(-1, null, 18));
+        values.add(newContentValues(-1, null, 19));
     }
 
     @Override

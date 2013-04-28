@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.database;
 
-
 interface BaseThingColumns {
 
     // The following columns allow us to show pending saves to the user before
@@ -36,6 +35,9 @@ interface BaseThingColumns {
 
     /** Integer either -1, 0, 1 to represent if the user liked it. */
     public static final String COLUMN_LIKES = Things.COLUMN_LIKES;
+
+    /** Integer indicating whether hidden. 0 is false. 1 is true. */
+    public static final String COLUMN_HIDDEN = Things.COLUMN_HIDDEN;
 
     /** Integer number of comments. */
     public static final String COLUMN_NUM_COMMENTS = Things.COLUMN_NUM_COMMENTS;
@@ -96,13 +98,14 @@ interface BaseThingColumns {
             + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
             + COLUMN_DOMAIN + " TEXT,"
             + COLUMN_DOWNS + " INTEGER DEFAULT 0,"
-            + COLUMN_LIKES + " INTEGER DEFAULT 0, "
+            + COLUMN_LIKES + " INTEGER DEFAULT 0,"
+            + COLUMN_HIDDEN + " INTEGER DEFAULT 0,"
             + COLUMN_NUM_COMMENTS + " INTEGER DEFAULT 0,"
             + COLUMN_OVER_18 + " INTEGER DEFAULT 0,"
             + COLUMN_PERMA_LINK + " TEXT,"
             + COLUMN_SAVED + " INTEGER DEFAULT 0,"
             + COLUMN_SCORE + " INTEGER DEFAULT 0,"
-            + COLUMN_SELF + " INTEGER DEFAULT 0, "
+            + COLUMN_SELF + " INTEGER DEFAULT 0,"
             + COLUMN_SUBREDDIT + " TEXT,"
             + COLUMN_TITLE + " TEXT,"
             + COLUMN_THUMBNAIL_URL + " TEXT,"

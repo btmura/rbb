@@ -55,12 +55,18 @@ public class HideActions implements BaseThingColumns, BaseColumns {
     public static final String JOINED_COLUMN_HIDE_ACTION = "hideAction";
 
     /** Select hidden things. Assumes things without a hide action are hidden. */
-    public static final String SELECT_HIDDEN_BY_JOIN = "(" + JOINED_COLUMN_HIDE_ACTION
-            + " IS NULL OR " + JOINED_COLUMN_HIDE_ACTION + "=" + HideActions.ACTION_HIDE + ")";
+    public static final String SELECT_HIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=1 AND ("
+            + JOINED_COLUMN_HIDE_ACTION + " IS NULL OR "
+            + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_HIDE
+            + ")) OR (" + COLUMN_HIDDEN + "=0 AND "
+            + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_HIDE + "))";
 
     /** Select unhidden things. Assumes things without a hide action are unhidden. */
-    public static final String SELECT_UNHIDDEN_BY_JOIN = "(" + JOINED_COLUMN_HIDE_ACTION
-            + " IS NULL OR " + JOINED_COLUMN_HIDE_ACTION + "=" + HideActions.ACTION_UNHIDE + ")";
+    public static final String SELECT_UNHIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=0 AND ("
+            + JOINED_COLUMN_HIDE_ACTION + " IS NULL OR "
+            + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_UNHIDE
+            + ")) OR (" + COLUMN_HIDDEN + "=1 AND "
+            + JOINED_COLUMN_HIDE_ACTION + "=" + ACTION_UNHIDE + "))";
 
     public static final String SORT_BY_ID = SharedColumns.SORT_BY_ID;
 

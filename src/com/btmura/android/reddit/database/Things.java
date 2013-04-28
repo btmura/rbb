@@ -31,6 +31,7 @@ public class Things implements BaseColumns {
     public static final String COLUMN_CREATED_UTC = "createdUtc";
     public static final String COLUMN_DOMAIN = "domain";
     public static final String COLUMN_DOWNS = "downs";
+    public static final String COLUMN_HIDDEN = "hidden";
     public static final String COLUMN_KIND = Kinds.COLUMN_KIND;
     public static final String COLUMN_LIKES = "likes";
     public static final String COLUMN_LINK_ID = "linkId";
@@ -84,6 +85,7 @@ public class Things implements BaseColumns {
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
                 + COLUMN_DOMAIN + " TEXT,"
                 + COLUMN_DOWNS + " INTEGER DEFAULT 0,"
+                + COLUMN_HIDDEN + " INTEGER DEFAULT 0,"
                 + COLUMN_KIND + " INTEGER,"
                 + COLUMN_LIKES + " INTEGER DEFAULT 0,"
                 + COLUMN_LINK_ID + " TEXT,"

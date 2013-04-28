@@ -70,6 +70,7 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
     }
 
     static void upgradeTableV2(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_HIDDEN + " INTEGER DEFAULT 0");
         db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD " + COLUMN_SAVED + " INTEGER DEFAULT 0");
     }
 
