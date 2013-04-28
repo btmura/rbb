@@ -335,7 +335,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     @Override
     public boolean isSwipeDismissable(int position) {
-        return adapter.isHidable(getActivity(), position);
+        return adapter.isHidable(getActivity(), position, true);
     }
 
     @Override
@@ -433,8 +433,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
         menu.findItem(R.id.menu_saved).setVisible(saveable && saved);
         menu.findItem(R.id.menu_unsaved).setVisible(saveable && !saved);
-        menu.findItem(R.id.menu_hide).setVisible(count == 1 && hasAccount && isLink);
-        menu.findItem(R.id.menu_unhide).setVisible(count == 1 && hasAccount && isLink);
+        menu.findItem(R.id.menu_hide)
+                .setVisible(count == 1 && adapter.isHidable(getActivity(), position, true));
+        menu.findItem(R.id.menu_unhide)
+                .setVisible(count == 1 && adapter.isHidable(getActivity(), position, false));
 
         return true;
     }

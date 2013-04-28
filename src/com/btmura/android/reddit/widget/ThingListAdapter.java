@@ -54,6 +54,7 @@ public class ThingListAdapter extends BaseLoaderAdapter {
             Things.COLUMN_CREATED_UTC,
             Things.COLUMN_DOMAIN,
             Things.COLUMN_DOWNS,
+            Things.COLUMN_HIDDEN,
             Things.COLUMN_KIND,
             Things.COLUMN_LIKES,
             Things.COLUMN_LINK_ID,
@@ -74,6 +75,7 @@ public class ThingListAdapter extends BaseLoaderAdapter {
             // Following columns are from joined tables at the end.
             SharedColumns.COLUMN_SAVE,
             SharedColumns.COLUMN_VOTE,
+            SharedColumns.COLUMN_LOCAL_HIDDEN,
     };
 
     private static final int THING_AUTHOR = 1;
@@ -81,26 +83,28 @@ public class ThingListAdapter extends BaseLoaderAdapter {
     private static final int THING_CREATED_UTC = 3;
     private static final int THING_DOMAIN = 4;
     private static final int THING_DOWNS = 5;
-    private static final int THING_KIND = 6;
-    private static final int THING_LIKES = 7;
-    private static final int THING_LINK_ID = 8;
-    private static final int THING_LINK_TITLE = 9;
-    private static final int THING_NUM_COMMENTS = 10;
-    private static final int THING_OVER_18 = 11;
-    private static final int THING_PERMA_LINK = 12;
-    private static final int THING_SAVED = 13;
-    private static final int THING_SCORE = 14;
-    private static final int THING_SELF = 15;
-    private static final int THING_SUBREDDIT = 16;
-    private static final int THING_TITLE = 17;
-    private static final int THING_THING_ID = 18;
-    private static final int THING_THUMBNAIL_URL = 19;
-    private static final int THING_UPS = 20;
-    private static final int THING_URL = 21;
+    private static final int THING_HIDDEN = 6;
+    private static final int THING_KIND = 7;
+    private static final int THING_LIKES = 8;
+    private static final int THING_LINK_ID = 9;
+    private static final int THING_LINK_TITLE = 10;
+    private static final int THING_NUM_COMMENTS = 11;
+    private static final int THING_OVER_18 = 12;
+    private static final int THING_PERMA_LINK = 13;
+    private static final int THING_SAVED = 14;
+    private static final int THING_SCORE = 15;
+    private static final int THING_SELF = 16;
+    private static final int THING_SUBREDDIT = 17;
+    private static final int THING_TITLE = 18;
+    private static final int THING_THING_ID = 19;
+    private static final int THING_THUMBNAIL_URL = 20;
+    private static final int THING_UPS = 21;
+    private static final int THING_URL = 22;
 
     // Following columns are from joined tables at the end.
     private static final int THING_SAVE_ACTION = 22;
     private static final int THING_VOTE = 23;
+    private static final int THING_LOCAL_HIDDEN = 24;
 
     private static final String[] MESSAGE_PROJECTION = {
             Messages._ID,
@@ -213,22 +217,6 @@ public class ThingListAdapter extends BaseLoaderAdapter {
         }
     }
 
-    private boolean isProfileActivity() {
-        return !TextUtils.isEmpty(profileUser);
-    }
-
-    private boolean isMessageActivity() {
-        return !TextUtils.isEmpty(messageUser);
-    }
-
-    private boolean isSearchActivity() {
-        return !TextUtils.isEmpty(query);
-    }
-
-    private boolean isBrowserActivity() {
-        return subreddit != null; // Empty but non-null subreddit means front page.
-    }
-
     @Override
     protected String[] getProjection() {
         return isMessageActivity() ? MESSAGE_PROJECTION : THING_PROJECTION;
@@ -238,7 +226,7 @@ public class ThingListAdapter extends BaseLoaderAdapter {
     protected String getSelection() {
         if (isMessageActivity()) {
             return null;
-        } else if (isProfileActivity() && filter == FilterAdapter.PROFILE_HIDDEN) {
+        } else if (isProfileHiddenTab()) {
             return HideActions.SELECT_HIDDEN_BY_JOIN;
         } else {
             return HideActions.SELECT_UNHIDDEN_BY_JOIN;
@@ -530,8 +518,23 @@ public class ThingListAdapter extends BaseLoaderAdapter {
         return StringUtil.safeString(formatter.formatAll(context, text));
     }
 
-    public boolean isHidable(Context context, int position) {
-        return AccountUtils.isAccount(accountName) && (subreddit != null || query != null);
+    public boolean isHidable(Context context, int position, boolean hide) {
+        return (isBrowserActivity() || isSearchActivity() || isProfileHiddenTab())
+                && AccountUtils.isAccount(accountName)
+                && getKind(position) == Kinds.KIND_LINK
+                && (hide && isUnhidden(position) || !hide && isHidden(position));
+    }
+
+    private boolean isHidden(int position) {
+        return !isNull(position, THING_LOCAL_HIDDEN)
+                && getInt(position, THING_LOCAL_HIDDEN) == HideActions.ACTION_HIDE
+                || getBoolean(position, THING_HIDDEN);
+    }
+
+    private boolean isUnhidden(int position) {
+        return !isNull(position, THING_LOCAL_HIDDEN)
+                && getInt(position, THING_LOCAL_HIDDEN) == HideActions.ACTION_UNHIDE
+                || !getBoolean(position, THING_HIDDEN);
     }
 
     public void hide(Context context, int position, boolean hide) {
@@ -828,6 +831,26 @@ public class ThingListAdapter extends BaseLoaderAdapter {
 
     public boolean isSingleChoice() {
         return singleChoice;
+    }
+
+    private boolean isProfileActivity() {
+        return !TextUtils.isEmpty(profileUser);
+    }
+
+    private boolean isProfileHiddenTab() {
+        return isProfileActivity() && filter == FilterAdapter.PROFILE_HIDDEN;
+    }
+
+    private boolean isMessageActivity() {
+        return !TextUtils.isEmpty(messageUser);
+    }
+
+    private boolean isSearchActivity() {
+        return !TextUtils.isEmpty(query);
+    }
+
+    private boolean isBrowserActivity() {
+        return subreddit != null; // Empty but non-null subreddit means front page.
     }
 
 }

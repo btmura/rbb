@@ -52,7 +52,7 @@ public class HideActions implements BaseThingColumns, BaseColumns {
             + " AND " + COLUMN_ACTION + "=" + ACTION_UNHIDE;
 
     /** Column used by others to join with this table. */
-    public static final String JOINED_COLUMN = "hideAction";
+    private static final String JOINED_COLUMN = SharedColumns.COLUMN_LOCAL_HIDDEN;
 
     /** Select hidden things. */
     public static final String SELECT_HIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=1 AND "

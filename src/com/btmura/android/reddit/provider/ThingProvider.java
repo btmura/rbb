@@ -177,7 +177,7 @@ public class ThingProvider extends BaseProvider {
             + " LEFT OUTER JOIN (SELECT "
             + HideActions.COLUMN_ACCOUNT + ","
             + HideActions.COLUMN_THING_ID + ","
-            + HideActions.COLUMN_ACTION + " AS " + HideActions.JOINED_COLUMN
+            + HideActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_LOCAL_HIDDEN
             + " FROM " + HideActions.TABLE_NAME + ") USING ("
             + HideActions.COLUMN_ACCOUNT + ","
             + SharedColumns.COLUMN_THING_ID + ")";
