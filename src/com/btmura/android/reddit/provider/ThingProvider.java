@@ -159,7 +159,7 @@ public class ThingProvider extends BaseProvider {
             + " LEFT OUTER JOIN (SELECT "
             + SaveActions.COLUMN_ACCOUNT + ","
             + SaveActions.COLUMN_THING_ID + ","
-            + SaveActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_SAVE
+            + SaveActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_LOCAL_SAVED
             + " FROM " + SaveActions.TABLE_NAME + ") USING ("
             + SaveActions.COLUMN_ACCOUNT + ", "
             + SharedColumns.COLUMN_THING_ID + ")"
@@ -168,7 +168,7 @@ public class ThingProvider extends BaseProvider {
             + " LEFT OUTER JOIN (SELECT "
             + VoteActions.COLUMN_ACCOUNT + ","
             + VoteActions.COLUMN_THING_ID + ","
-            + VoteActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_VOTE
+            + VoteActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_LOCAL_VOTE
             + " FROM " + VoteActions.TABLE_NAME + ") USING ("
             + VoteActions.COLUMN_ACCOUNT + ","
             + SharedColumns.COLUMN_THING_ID + ")"

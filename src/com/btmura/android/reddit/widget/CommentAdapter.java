@@ -60,8 +60,8 @@ public class CommentAdapter extends BaseLoaderAdapter {
             Comments.COLUMN_URL,
 
             // Following columns are from joined tables at the end.
-            SharedColumns.COLUMN_SAVE,
-            SharedColumns.COLUMN_VOTE,
+            SharedColumns.COLUMN_LOCAL_SAVED,
+            SharedColumns.COLUMN_LOCAL_VOTE,
     };
 
     public static final int INDEX_ID = 0;

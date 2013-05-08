@@ -73,8 +73,8 @@ public class ThingListAdapter extends BaseLoaderAdapter {
             Things.COLUMN_URL,
 
             // Following columns are from joined tables at the end.
-            SharedColumns.COLUMN_SAVE,
-            SharedColumns.COLUMN_VOTE,
+            SharedColumns.COLUMN_LOCAL_SAVED,
+            SharedColumns.COLUMN_LOCAL_VOTE,
             SharedColumns.COLUMN_LOCAL_HIDDEN,
     };
 
