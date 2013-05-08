@@ -22,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingFragment extends Fragment implements LoaderCallbacks<Cursor> {
@@ -45,6 +47,9 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
     private MenuItem linkItem;
     private MenuItem commentsItem;
+    private MenuItem savedItem;
+    private MenuItem unsavedItem;
+    private MenuItem newCommentItem;
     private MenuItem shareItem;
     private MenuItem openItem;
     private MenuItem copyUrlItem;
@@ -103,7 +108,11 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Cursor> {
         inflater.inflate(R.menu.thing_frag_menu, menu);
         linkItem = menu.findItem(R.id.menu_link);
         commentsItem = menu.findItem(R.id.menu_comments);
+        newCommentItem = menu.findItem(R.id.menu_new_comment);
+        savedItem = menu.findItem(R.id.menu_saved);
+        unsavedItem = menu.findItem(R.id.menu_unsaved);
         shareItem = menu.findItem(R.id.menu_share);
+        newCommentItem = menu.findItem(R.id.menu_new_comment);
         openItem = menu.findItem(R.id.menu_open);
         copyUrlItem = menu.findItem(R.id.menu_copy_url);
         userItem = menu.findItem(R.id.menu_user);
@@ -113,64 +122,34 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Cursor> {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        if (linkItem == null) {
+            return; // Bail out if the menu hasn't been created.
+        }
+
+        linkItem.setVisible(ThingBundle.hasLinkUrl(thingBundle)
+                && getCurrentPageType() != ThingPagerAdapter.TYPE_LINK);
+        commentsItem.setVisible(ThingBundle.hasCommentUrl(thingBundle)
+                && getCurrentPageType() != ThingPagerAdapter.TYPE_COMMENTS);
+
+        boolean hasAccount = AccountUtils.isAccount(getAccountName());
+        savedItem.setVisible(hasAccount);
+        unsavedItem.setVisible(hasAccount);
+        newCommentItem.setVisible(hasAccount);
+
         String title = getTitle();
         CharSequence url = getUrl();
-        prepareLinkItem();
-        prepareCommentsItem();
-        prepareShareItem(title, url);
-        prepareOpenItem(url);
-        prepareCopyUrlItem(title, url);
-        prepareUserItem();
-        prepareSubredditItem();
-    }
-
-    private void prepareLinkItem() {
-        if (linkItem != null) {
-            linkItem.setVisible(ThingBundle.hasLinkUrl(thingBundle)
-                    && getCurrentPageType() != ThingPagerAdapter.TYPE_LINK);
+        boolean hasTitleAndUrl = !TextUtils.isEmpty(title) && !TextUtils.isEmpty(url);
+        openItem.setVisible(hasTitleAndUrl);
+        copyUrlItem.setVisible(hasTitleAndUrl);
+        shareItem.setVisible(hasTitleAndUrl);
+        if (shareItem.isVisible()) {
+            MenuHelper.setShareProvider(shareItem, title, url);
         }
-    }
 
-    private void prepareCommentsItem() {
-        if (commentsItem != null) {
-            commentsItem.setVisible(ThingBundle.hasCommentUrl(thingBundle)
-                    && getCurrentPageType() != ThingPagerAdapter.TYPE_COMMENTS);
-        }
-    }
-
-    private void prepareShareItem(String title, CharSequence url) {
-        if (shareItem != null) {
-            shareItem.setVisible(title != null && url != null);
-            if (shareItem.isVisible()) {
-                MenuHelper.setShareProvider(shareItem, title, url);
-            }
-        }
-    }
-
-    private void prepareOpenItem(CharSequence url) {
-        if (openItem != null) {
-            openItem.setVisible(url != null);
-        }
-    }
-
-    private void prepareCopyUrlItem(String title, CharSequence url) {
-        if (copyUrlItem != null) {
-            copyUrlItem.setVisible(title != null && url != null);
-        }
-    }
-
-    private void prepareUserItem() {
-        if (userItem != null) {
-            userItem.setTitle(getString(R.string.menu_user,
-                    ThingBundle.getAuthor(thingBundle)));
-        }
-    }
-
-    private void prepareSubredditItem() {
-        if (subredditItem != null) {
-            subredditItem.setTitle(getString(R.string.menu_subreddit,
-                    ThingBundle.getSubreddit(thingBundle)));
-        }
+        userItem.setTitle(getString(R.string.menu_user,
+                ThingBundle.getAuthor(thingBundle)));
+        subredditItem.setTitle(getString(R.string.menu_subreddit,
+                ThingBundle.getSubreddit(thingBundle)));
     }
 
     @Override
