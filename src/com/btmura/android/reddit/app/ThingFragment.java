@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -32,9 +31,10 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.content.ThingBundleLoader;
 import com.btmura.android.reddit.widget.ThingBundle;
 
-public class ThingFragment extends Fragment implements LoaderCallbacks<Cursor> {
+public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
 
     static final String TAG = "ThingFragment";
 
@@ -69,9 +69,6 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Cursor> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        thingBundle = getArguments().getBundle(ARG_THING_BUNDLE);
-        pagerAdapter = new ThingPagerAdapter(getChildFragmentManager(), getAccountName(),
-                thingBundle);
         setHasOptionsMenu(true);
     }
 
@@ -80,26 +77,31 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Cursor> {
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.thing_frag, container, false);
         pager = (ViewPager) view.findViewById(R.id.thing_pager);
-        pager.setAdapter(pagerAdapter);
         return view;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
+    public Loader<Bundle> onCreateLoader(int id, Bundle args) {
+        return new ThingBundleLoader(getActivity(), getArguments().getBundle(ARG_THING_BUNDLE));
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(Loader<Bundle> loader, Bundle bundle) {
+        thingBundle = bundle;
+        pagerAdapter = new ThingPagerAdapter(getChildFragmentManager(),
+                getArguments().getString(ARG_ACCOUNT_NAME),
+                thingBundle);
+        pager.setAdapter(pagerAdapter);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<Bundle> loader) {
     }
 
     @Override
@@ -122,7 +124,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Cursor> {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if (linkItem == null) {
+        if (linkItem == null || thingBundle == null) {
             return; // Bail out if the menu hasn't been created.
         }
 

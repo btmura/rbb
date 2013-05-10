@@ -28,7 +28,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -38,7 +37,7 @@ import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.AccountProvider;
 
-public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
+public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
         OnAccountsUpdateListener {
 
     public static final String TAG = "AccountLoader";
@@ -100,9 +99,6 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
             onContentChanged();
         }
     };
-
-    private AccountResult result;
-    private boolean listening;
 
     public AccountLoader(Context context, boolean includeNoAccount, boolean includeAccountInfo) {
         super(context);
@@ -169,44 +165,7 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
     }
 
     @Override
-    public void deliverResult(AccountResult newResult) {
-        if (isReset()) {
-            return;
-        }
-
-        this.result = newResult;
-
-        if (isStarted()) {
-            super.deliverResult(newResult);
-        }
-    }
-
-    @Override
-    protected void onStartLoading() {
-        if (result != null) {
-            deliverResult(result);
-        }
-        if (!listening) {
-            startListening();
-            listening = true;
-        }
-        if (takeContentChanged() || result == null) {
-            forceLoad();
-        }
-    }
-
-    @Override
-    protected void onReset() {
-        super.onReset();
-        onStopLoading();
-        result = null;
-        if (listening) {
-            stopListening();
-            listening = false;
-        }
-    }
-
-    private void startListening() {
+    protected void onStartListening() {
         manager.addOnAccountsUpdatedListener(this, null, false);
         SelectAccountBroadcast.registerReceiver(getContext(), receiver);
         if (includeAccountInfo) {
@@ -215,7 +174,8 @@ public class AccountLoader extends AsyncTaskLoader<AccountResult> implements
         }
     }
 
-    private void stopListening() {
+    @Override
+    protected void onStopListening() {
         manager.removeOnAccountsUpdatedListener(this);
         SelectAccountBroadcast.unregisterReceiver(getContext(), receiver);
         if (includeAccountInfo) {
