@@ -76,26 +76,34 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private final String accountName;
     private final String thingId;
     private final String linkId;
+    private final int numComments;
     private final String cookie;
 
     static CommentListing newInstance(Context context, SQLiteOpenHelper dbHelper,
-            String accountName, String thingId, String linkId, String cookie) {
-        return new CommentListing(context, dbHelper, accountName, thingId, linkId, cookie);
+            String accountName, String thingId, String linkId, int numComments, String cookie) {
+        return new CommentListing(context, dbHelper,
+                accountName, thingId, linkId, numComments, cookie);
     }
 
-    private CommentListing(Context context, SQLiteOpenHelper dbHelper,
-            String accountName, String thingId, String linkId, String cookie) {
+    private CommentListing(Context context,
+            SQLiteOpenHelper dbHelper,
+            String accountName,
+            String thingId,
+            String linkId,
+            int numComments,
+            String cookie) {
         this.context = context;
         this.dbHelper = dbHelper;
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;
+        this.numComments = numComments;
         this.cookie = cookie;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
-        CharSequence url = Urls.commentListing(thingId, linkId, Urls.TYPE_JSON);
+        CharSequence url = Urls.commentListing(thingId, linkId, numComments, Urls.TYPE_JSON);
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = new BufferedInputStream(conn.getInputStream());
         long t2 = System.currentTimeMillis();

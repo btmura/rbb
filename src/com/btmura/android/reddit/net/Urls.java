@@ -112,19 +112,24 @@ public class Urls {
         return b.toString();
     }
 
-    public static CharSequence commentListing(String id, String linkId, int apiType) {
+    public static CharSequence commentListing(String id, String linkId, int numComments,
+            int apiType) {
+        boolean hasLinkId = !TextUtils.isEmpty(linkId);
+        boolean hasLimit = numComments != -1;
         id = ThingIds.removeTag(id);
         StringBuilder b = new StringBuilder(BASE_COMMENTS_URL);
-        if (!TextUtils.isEmpty(linkId)) {
-            b.append(ThingIds.removeTag(linkId));
-        } else {
-            b.append(id);
-        }
+        b.append(hasLinkId ? ThingIds.removeTag(linkId) : id);
         if (apiType == TYPE_JSON) {
             b.append(".json");
         }
-        if (!TextUtils.isEmpty(linkId)) {
-            b.append("?comment=").append(id).append("&context=3");
+        if (hasLinkId || hasLimit) {
+            b.append("?");
+        }
+        if (hasLinkId) {
+            b.append("&comment=").append(id).append("&context=3");
+        }
+        if (hasLimit) {
+            b.append("&limit=").append(numComments);
         }
         return b;
     }

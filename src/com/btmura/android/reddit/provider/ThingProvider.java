@@ -148,6 +148,7 @@ public class ThingProvider extends BaseProvider {
     static final String PARAM_MARK = "mark";
     static final String PARAM_THING_ID = "thingId";
     static final String PARAM_LINK_ID = "linkId";
+    static final String PARAM_COUNT = "count";
     static final String PARAM_JOIN = "join";
     static final String PARAM_NOTIFY_ACCOUNTS = "notifyAccounts";
     static final String PARAM_NOTIFY_COMMENTS = "notifyComments";
@@ -236,7 +237,7 @@ public class ThingProvider extends BaseProvider {
     }
 
     public static final Uri commentsUri(long sessionId, String accountName, String thingId,
-            String linkId) {
+            String linkId, int numComments) {
         Uri.Builder b = COMMENTS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
         b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_COMMENT_LISTING));
@@ -248,6 +249,9 @@ public class ThingProvider extends BaseProvider {
         }
         if (!TextUtils.isEmpty(linkId)) {
             b.appendQueryParameter(PARAM_LINK_ID, linkId);
+        }
+        if (numComments != -1) {
+            b.appendQueryParameter(PARAM_COUNT, toString(numComments));
         }
         return b.build();
     }
@@ -435,8 +439,9 @@ public class ThingProvider extends BaseProvider {
 
                 case Listing.TYPE_COMMENT_LISTING:
                     String linkId = uri.getQueryParameter(PARAM_LINK_ID);
+                    int count = Integer.parseInt(uri.getQueryParameter(PARAM_COUNT));
                     listing = CommentListing.newInstance(context, helper,
-                            accountName, thingId, linkId, cookie);
+                            accountName, thingId, linkId, count, cookie);
                     break;
 
                 case Listing.TYPE_SEARCH_LISTING:

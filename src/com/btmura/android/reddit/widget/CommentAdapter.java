@@ -118,7 +118,7 @@ public class CommentAdapter extends BaseLoaderAdapter {
 
     @Override
     protected Uri getLoaderUri() {
-        return ThingProvider.commentsUri(sessionId, accountName, thingId, linkId);
+        return ThingProvider.commentsUri(sessionId, accountName, thingId, linkId, -1);
     }
 
     @Override

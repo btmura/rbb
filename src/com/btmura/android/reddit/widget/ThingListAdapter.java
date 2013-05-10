@@ -741,7 +741,7 @@ public class ThingListAdapter extends BaseLoaderAdapter {
         // Comment references just provide a thing and link id.
         String thingId = getThingId(position);
         String linkId = getLinkId(position);
-        return Urls.commentListing(thingId, linkId, Urls.TYPE_HTML);
+        return Urls.commentListing(thingId, linkId, -1, Urls.TYPE_HTML);
     }
 
     private int getAuthorIndex() {
