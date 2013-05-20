@@ -37,13 +37,13 @@ import com.btmura.android.reddit.widget.CommentAdapter;
 /**
  * Controller that handles all the logic required by {@link CommentListFragment}.
  */
-class CommentListFragmentController implements CommentList {
+class CommentListController implements CommentList {
 
     private final Context context;
     private final String accountName;
     private final CommentAdapter adapter;
 
-    CommentListFragmentController(Context context, String accountName, CommentAdapter adapter) {
+    CommentListController(Context context, String accountName, CommentAdapter adapter) {
         this.context = context;
         this.accountName = accountName;
         this.adapter = adapter;

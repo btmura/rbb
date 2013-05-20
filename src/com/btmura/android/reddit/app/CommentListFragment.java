@@ -55,7 +55,7 @@ public class CommentListFragment extends ListFragment implements
     public static final int FLAG_SHOW_LINK_MENU_ITEM = 0x1;
 
     private CommentAdapter adapter;
-    private CommentListFragmentController controller;
+    private CommentListController controller;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
             String linkId, int flags) {
@@ -73,10 +73,9 @@ public class CommentListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         String accountName = getArguments().getString(ARG_ACCOUNT_NAME);
         adapter = new CommentAdapter(getActivity(), accountName, this);
-        controller = new CommentListFragmentController(getActivity(), accountName, adapter);
+        controller = new CommentListController(getActivity(), accountName, adapter);
         setHasOptionsMenu(true);
     }
 
