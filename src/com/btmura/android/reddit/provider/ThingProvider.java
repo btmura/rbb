@@ -19,14 +19,10 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -39,7 +35,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.database.CursorExtrasWrapper;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
@@ -78,7 +73,6 @@ public class ThingProvider extends BaseProvider {
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
     static final String AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
-    public static final String EXTRA_SESSION_ID = "sessionId";
     public static final String EXTRA_RESOLVED_SUBREDDIT = "resolvedSubreddit";
 
     private static final String PATH_THINGS = "things";
@@ -138,7 +132,6 @@ public class ThingProvider extends BaseProvider {
     static final String PARAM_LISTING_GET = "getListing";
     static final String PARAM_LISTING_TYPE = "listingType";
 
-    static final String PARAM_SESSION_ID = "sessionId";
     static final String PARAM_ACCOUNT = "account";
     static final String PARAM_SUBREDDIT = "subreddit";
     static final String PARAM_QUERY = "query";
@@ -160,7 +153,7 @@ public class ThingProvider extends BaseProvider {
             + " LEFT OUTER JOIN (SELECT "
             + SaveActions.COLUMN_ACCOUNT + ","
             + SaveActions.COLUMN_THING_ID + ","
-            + SaveActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_LOCAL_SAVED
+            + SaveActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_SAVE_ACTION
             + " FROM " + SaveActions.TABLE_NAME + ") USING ("
             + SaveActions.COLUMN_ACCOUNT + ", "
             + SharedColumns.COLUMN_THING_ID + ")"
@@ -169,7 +162,7 @@ public class ThingProvider extends BaseProvider {
             + " LEFT OUTER JOIN (SELECT "
             + VoteActions.COLUMN_ACCOUNT + ","
             + VoteActions.COLUMN_THING_ID + ","
-            + VoteActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_LOCAL_VOTE
+            + VoteActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_VOTE_ACTION
             + " FROM " + VoteActions.TABLE_NAME + ") USING ("
             + VoteActions.COLUMN_ACCOUNT + ","
             + SharedColumns.COLUMN_THING_ID + ")"
@@ -198,8 +191,22 @@ public class ThingProvider extends BaseProvider {
             + ReadActions.COLUMN_ACCOUNT + ", "
             + SharedColumns.COLUMN_THING_ID + ")";
 
+    public static final String METHOD_GET_SESSION = "getSession";
+
     /** Method to insert a pending comment in a listing. */
     static final String METHOD_INSERT_COMMENT = "insertComment";
+
+    public static final String EXTRA_COUNT = "count";
+    public static final String EXTRA_FILTER = "filter";
+    public static final String EXTRA_LINK_ID = "linkId";
+    public static final String EXTRA_MARK = "mark";
+    public static final String EXTRA_MORE = "more";
+    public static final String EXTRA_QUERY = "query";
+    public static final String EXTRA_SESSION_ID = "sessionId";
+    public static final String EXTRA_SESSION_TYPE = "sessionType";
+    public static final String EXTRA_SUBREDDIT = "subreddit";
+    public static final String EXTRA_THING_ID = "thingId";
+    public static final String EXTRA_USER = "user";
 
     static final String CALL_EXTRA_ACCOUNT = "account";
     static final String CALL_EXTRA_BODY = "body";
@@ -218,101 +225,75 @@ public class ThingProvider extends BaseProvider {
     private static final String SELECT_MORE_WITH_SESSION_ID = Kinds.COLUMN_KIND + "="
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
 
-    public static final Uri subredditUri(long sessionId, String accountName, String subreddit,
-            int filter, String more) {
+    public static final Uri subredditUri(String accountName, String subreddit, int filter,
+            String more) {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_SUBREDDIT_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_SUBREDDIT));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_SUBREDDIT, subreddit);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
         b.appendQueryParameter(PARAM_JOIN, TRUE);
-        if (sessionId != -1) {
-            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
-        }
         if (!TextUtils.isEmpty(more)) {
             b.appendQueryParameter(PARAM_MORE, more);
         }
         return b.build();
     }
 
-    public static final Uri commentsUri(long sessionId, String accountName, String thingId,
-            String linkId, int numComments) {
-        Uri.Builder b = COMMENTS_URI.buildUpon();
-        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_COMMENT_LISTING));
-        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
-        b.appendQueryParameter(PARAM_THING_ID, thingId);
-        b.appendQueryParameter(PARAM_JOIN, TRUE);
-        if (sessionId != -1) {
-            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
-        }
-        if (!TextUtils.isEmpty(linkId)) {
-            b.appendQueryParameter(PARAM_LINK_ID, linkId);
-        }
-        if (numComments != -1) {
-            b.appendQueryParameter(PARAM_COUNT, toString(numComments));
-        }
-        return b.build();
+    public static final Bundle getComments(Context context, String accountName,
+            String thingId, String linkId, int numComments) {
+        Bundle extras = new Bundle(3);
+        extras.putString(EXTRA_THING_ID, thingId);
+        extras.putString(EXTRA_LINK_ID, linkId);
+        extras.putInt(EXTRA_COUNT, numComments);
+        ContentResolver cr = context.getApplicationContext().getContentResolver();
+        return cr.call(ThingProvider.COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Uri profileUri(long sessionId, String accountName, String profileUser,
-            int filter, String more) {
+    public static final Uri profileUri(String accountName, String profileUser, int filter,
+            String more) {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_USER_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_USER));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_PROFILE_USER, profileUser);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
         b.appendQueryParameter(PARAM_JOIN, TRUE);
-        if (sessionId != -1) {
-            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
-        }
         if (!TextUtils.isEmpty(more)) {
             b.appendQueryParameter(PARAM_MORE, more);
         }
         return b.build();
     }
 
-    public static final Uri searchUri(long sessionId, String accountName, String subreddit,
-            String query) {
+    public static final Uri searchUri(String accountName, String subreddit, String query) {
         Uri.Builder b = THINGS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_SEARCH_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_THING_SEARCH));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_QUERY, query);
         b.appendQueryParameter(PARAM_JOIN, TRUE);
         if (!TextUtils.isEmpty(subreddit)) {
             b.appendQueryParameter(PARAM_SUBREDDIT, subreddit);
         }
-        if (sessionId != -1) {
-            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
-        }
         return b.build();
     }
 
-    public static final Uri subredditSearchUri(long sessionId, String accountName, String query) {
+    public static final Uri subredditSearchUri(String accountName, String query) {
         Uri.Builder b = SUBREDDITS_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_REDDIT_SEARCH_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_SUBREDDIT_SEARCH));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_QUERY, query);
-        if (sessionId != -1) {
-            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
-        }
         return b.build();
     }
 
-    public static final Uri messageUri(long sessionId, String accountName, int filter, String more) {
+    public static final Uri messageUri(String accountName, int filter, String more) {
         Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGES));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_FILTER, toString(filter));
         b.appendQueryParameter(PARAM_JOIN, TRUE);
-        if (sessionId != -1) {
-            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
-        }
         if (!TextUtils.isEmpty(more)) {
             b.appendQueryParameter(PARAM_MORE, more);
         } else if (filter == FilterAdapter.MESSAGE_INBOX
@@ -323,15 +304,12 @@ public class ThingProvider extends BaseProvider {
         return b.build();
     }
 
-    public static final Uri messageThreadUri(long sessionId, String accountName, String thingId) {
+    public static final Uri messageThreadUri(String accountName, String thingId) {
         Uri.Builder b = MESSAGES_URI.buildUpon();
         b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Listing.TYPE_MESSAGE_THREAD_LISTING));
+        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_THREAD));
         b.appendQueryParameter(PARAM_ACCOUNT, accountName);
         b.appendQueryParameter(PARAM_THING_ID, thingId);
-        if (sessionId != -1) {
-            b.appendQueryParameter(PARAM_SESSION_ID, toString(sessionId));
-        }
         return b.build();
     }
 
@@ -387,173 +365,136 @@ public class ThingProvider extends BaseProvider {
     }
 
     @Override
-    protected Cursor innerQuery(Uri uri, SQLiteDatabase db, String table, String[] projection,
-            String selection, String[] selectionArgs, String sortOrder) {
-        if (uri.getBooleanQueryParameter(PARAM_LISTING_GET, false)) {
-            return handleListingGet(uri, db, table, projection, selection, selectionArgs, sortOrder);
+    public Bundle call(String method, String arg, Bundle extras) {
+        if (METHOD_GET_SESSION.equals(method)) {
+            return getSession(arg, extras);
+        } else if (METHOD_INSERT_COMMENT.equals(method)) {
+            return insertComment(extras);
         }
-        return super.innerQuery(uri, db, table, projection, selection, selectionArgs, sortOrder);
+        return null;
     }
 
-    private Cursor handleListingGet(Uri uri, SQLiteDatabase db, String table, String[] projection,
-            String selection, String[] selectionArgs, String sortOrder) {
+    private Bundle getSession(String accountName, Bundle extras) {
         try {
             Context context = getContext();
-            long sessionId = getLongParameter(uri, PARAM_SESSION_ID, -1);
-            String accountName = uri.getQueryParameter(PARAM_ACCOUNT);
-            String subreddit = uri.getQueryParameter(PARAM_SUBREDDIT);
-            String query = uri.getQueryParameter(PARAM_QUERY);
-            String thingId = uri.getQueryParameter(PARAM_THING_ID);
-            int filter = getIntParameter(uri, PARAM_FILTER, 0);
-            String more = uri.getQueryParameter(PARAM_MORE);
-
             String cookie = AccountUtils.getCookie(context, accountName);
             if (cookie == null && AccountUtils.isAccount(accountName)) {
                 return null;
             }
 
-            int listingType = Integer.parseInt(uri.getQueryParameter(PARAM_LISTING_TYPE));
+            int count = extras.getInt(EXTRA_COUNT);
+            int filter = extras.getInt(EXTRA_FILTER, -1);
+            String linkId = extras.getString(EXTRA_LINK_ID);
+            boolean mark = extras.getBoolean(EXTRA_MARK, false);
+            String more = extras.getString(EXTRA_MORE);
+            String query = extras.getString(EXTRA_QUERY);
+            long sessionId = extras.getLong(EXTRA_SESSION_ID);
+            String subreddit = extras.getString(EXTRA_SUBREDDIT);
+            String thingId = extras.getString(EXTRA_THING_ID);
+            String user = extras.getString(EXTRA_USER);
+
+            int listingType = extras.getInt(EXTRA_SESSION_TYPE, -1);
             Listing listing = null;
             switch (listingType) {
-                case Listing.TYPE_MESSAGE_THREAD_LISTING:
-                    listing = MessageListing.newThreadInstance(helper,
-                            accountName, thingId, cookie);
+                case Sessions.TYPE_MESSAGE_THREAD:
+                    listing = MessageListing.newThreadInstance(helper, accountName,
+                            thingId, cookie);
                     break;
 
-                case Listing.TYPE_MESSAGE_LISTING:
-                    boolean mark = uri.getBooleanQueryParameter(PARAM_MARK, false);
-                    listing = MessageListing.newInstance(helper,
-                            accountName, filter, more, mark, cookie);
+                case Sessions.TYPE_MESSAGES:
+                    listing = MessageListing.newInstance(helper, accountName,
+                            filter, more, mark, cookie);
                     break;
 
-                case Listing.TYPE_SUBREDDIT_LISTING:
-                    listing = ThingListing.newSubredditInstance(context, helper,
-                            accountName, subreddit, filter, more, cookie);
+                case Sessions.TYPE_SUBREDDIT:
+                    listing = ThingListing.newSubredditInstance(context, helper, accountName,
+                            subreddit, filter, more, cookie);
                     break;
 
-                case Listing.TYPE_USER_LISTING:
-                    String profileUser = uri.getQueryParameter(PARAM_PROFILE_USER);
-                    listing = ThingListing.newUserInstance(context, helper,
-                            accountName, profileUser, filter, more, cookie);
+                case Sessions.TYPE_USER:
+                    listing = ThingListing.newUserInstance(context, helper, accountName,
+                            user, filter, more, cookie);
                     break;
 
-                case Listing.TYPE_COMMENT_LISTING:
-                    String linkId = uri.getQueryParameter(PARAM_LINK_ID);
-                    int count = Integer.parseInt(uri.getQueryParameter(PARAM_COUNT));
-                    listing = CommentListing.newInstance(context, helper,
-                            accountName, thingId, linkId, count, cookie);
+                case Sessions.TYPE_COMMENTS:
+                    listing = CommentListing.newInstance(context, helper, accountName,
+                            thingId, linkId, count, cookie);
                     break;
 
-                case Listing.TYPE_SEARCH_LISTING:
-                    listing = ThingListing.newSearchInstance(context, helper,
-                            accountName, subreddit, query, cookie);
+                case Sessions.TYPE_THING_SEARCH:
+                    listing = ThingListing.newSearchInstance(context, helper, accountName,
+                            subreddit, query, cookie);
                     break;
 
-                case Listing.TYPE_REDDIT_SEARCH_LISTING:
-                    listing = SubredditResultListing.newInstance(
-                            accountName, query, cookie);
+                case Sessions.TYPE_SUBREDDIT_SEARCH:
+                    listing = SubredditResultListing.newInstance(accountName,
+                            query, cookie);
                     break;
 
                 default:
                     throw new IllegalArgumentException();
             }
 
-            sessionId = getListingSession(listing, db, sessionId);
-            selection = appendSelection(selection, SharedColumns.SELECT_BY_SESSION_ID);
-            selectionArgs = appendSelectionArg(selectionArgs, Long.toString(sessionId));
-            Cursor c = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
-
-            Bundle extras = new Bundle(2);
-            extras.putLong(EXTRA_SESSION_ID, sessionId);
-            listing.addCursorExtras(extras);
+            sessionId = getListingSession(listing, sessionId);
+            Bundle result = new Bundle(2);
+            result.putLong(EXTRA_SESSION_ID, sessionId);
+            listing.addCursorExtras(result);
             listing.performExtraWork(getContext());
-            return new CursorExtrasWrapper(c, extras);
-
-        } catch (OperationCanceledException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (AuthenticatorException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (IOException e) {
+            return result;
+        } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
         return null;
     }
 
-    /** Returns a session id pointing to the data. */
-    private static long getListingSession(Listing listing, SQLiteDatabase db, long sessionId)
-            throws IOException {
-        // Double check that the session exists if specified.
-        if (sessionId != -1) {
-            long count = DatabaseUtils.queryNumEntries(db, Sessions.TABLE_NAME,
-                    Sessions.SELECT_BY_ID, Array.of(sessionId));
-            if (count == 0) {
-                sessionId = -1;
-            }
-        }
+    long getListingSession(Listing listing, long sessionId) throws IOException {
+        SQLiteDatabase db = helper.getWritableDatabase();
 
-        // Return existing session if it exists and we're not appending more.
-        if (sessionId != -1 && !listing.isAppend()) {
-            return sessionId;
-        }
-
-        // Fetch values to insert from the network.
+        // Get new values over the network.
         ArrayList<ContentValues> values = listing.getValues();
 
-        // Insert new db values.
-        db.beginTransaction();
-        try {
-            // Delete any existing "Loading..." signs if appending.
-            if (listing.isAppend()) {
-                // Appending requires an existing session to append the data.
-                if (sessionId == -1) {
-                    throw new IllegalStateException();
-                }
-
-                // Delete the row for this append. If there is no such row, then
-                // this might be a duplicate append that got triggered, so just
-                // return the existing session id and hope for the best.
-                int count = db.delete(listing.getTargetTable(),
-                        SELECT_MORE_WITH_SESSION_ID, Array.of(sessionId));
-                if (count == 0) {
-                    return sessionId;
-                }
-            }
-
-            // Create a new session if there is no id.
+        // Delete any existing "Loading..." signs if appending.
+        if (listing.isAppend()) {
+            // Appending requires an existing session to append the data.
             if (sessionId == -1) {
-                ContentValues v = new ContentValues(1);
-                v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
-                sessionId = db.insert(Sessions.TABLE_NAME, null, v);
-                if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "created session: " + sessionId);
-                }
+                throw new IllegalStateException();
             }
 
-            // Add the session id to the data rows.
-            int count = values.size();
-            for (int i = 0; i < count; i++) {
-                values.get(i).put(SharedColumns.COLUMN_SESSION_ID, sessionId);
+            // Delete the row for this append. If there is no such row, then
+            // this might be a duplicate append that got triggered, so just
+            // return the existing session id and hope for the best.
+            int count = db.delete(listing.getTargetTable(),
+                    SELECT_MORE_WITH_SESSION_ID, Array.of(sessionId));
+            if (count == 0) {
+                return sessionId;
             }
-
-            // Insert the rows into the database.
-            InsertHelper helper = new InsertHelper(db, listing.getTargetTable());
-            for (int i = 0; i < count; i++) {
-                helper.insert(values.get(i));
-            }
-
-            db.setTransactionSuccessful();
-            return sessionId;
-        } finally {
-            db.endTransaction();
         }
-    }
 
-    @Override
-    public Bundle call(String method, String arg, Bundle extras) {
-        if (METHOD_INSERT_COMMENT.equals(method)) {
-            return insertComment(extras);
+        // Create a new session if there is no id.
+        if (sessionId == -1) {
+            ContentValues v = new ContentValues(3);
+            v.put(Sessions.COLUMN_TYPE, listing.getSessionType());
+            v.put(Sessions.COLUMN_TAG, listing.getSessionTag());
+            v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
+            sessionId = db.insert(Sessions.TABLE_NAME, null, v);
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "created session: " + sessionId);
+            }
         }
-        return null;
+
+        // Add the session id to the data rows.
+        int count = values.size();
+        for (int i = 0; i < count; i++) {
+            values.get(i).put(SharedColumns.COLUMN_SESSION_ID, sessionId);
+        }
+
+        // Insert the rows into the database.
+        InsertHelper helper = new InsertHelper(db, listing.getTargetTable());
+        for (int i = 0; i < count; i++) {
+            helper.insert(values.get(i));
+        }
+
+        return sessionId;
     }
 
     private Bundle insertComment(Bundle extras) {

@@ -39,6 +39,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
+import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
@@ -181,6 +182,8 @@ class ThingListing extends JsonParser implements Listing {
     private final int filter;
     private final String more;
     private final String cookie;
+    private final int sessionType;
+    private final String sessionTag;
 
     /** Whether to prune more things from the listing. */
     private final boolean ignoreMoreThings;
@@ -194,25 +197,28 @@ class ThingListing extends JsonParser implements Listing {
 
     static ThingListing newSearchInstance(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String subreddit, String query, String cookie) {
+        String sessionTag = accountName + "-" + subreddit + "-" + query;
         return new ThingListing(context, dbHelper, accountName, subreddit, query, null, 0,
-                null, cookie, true);
+                null, cookie, Sessions.TYPE_THING_SEARCH, sessionTag, true);
     }
 
     static ThingListing newSubredditInstance(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String subreddit, int filter, String more, String cookie) {
+        String sessionTag = accountName + "-" + subreddit + "-" + filter;
         return new ThingListing(context, dbHelper, accountName, subreddit, null, null, filter,
-                more, cookie, false);
+                more, cookie, Sessions.TYPE_SUBREDDIT, sessionTag, false);
     }
 
     static ThingListing newUserInstance(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String profileUser, int filter, String more, String cookie) {
+        String sessionTag = accountName + "-" + profileUser + "-" + filter;
         return new ThingListing(context, dbHelper, accountName, null, null, profileUser, filter,
-                more, cookie, false);
+                more, cookie, Sessions.TYPE_USER, sessionTag, false);
     }
 
     private ThingListing(Context context, SQLiteOpenHelper dbHelper, String accountName,
             String subreddit, String query, String profileUser, int filter, String more,
-            String cookie, boolean ignoreMoreThings) {
+            String cookie, int sessionType, String sessionTag, boolean ignoreMoreThings) {
         this.context = context;
         this.dbHelper = dbHelper;
         this.accountName = accountName;
@@ -222,7 +228,19 @@ class ThingListing extends JsonParser implements Listing {
         this.filter = filter;
         this.more = more;
         this.cookie = cookie;
+        this.sessionType = sessionType;
+        this.sessionTag = sessionTag;
         this.ignoreMoreThings = ignoreMoreThings;
+    }
+
+    @Override
+    public String getSessionTag() {
+        return sessionTag;
+    }
+
+    @Override
+    public int getSessionType() {
+        return sessionType;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

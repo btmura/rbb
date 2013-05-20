@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
 
@@ -65,7 +64,7 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
 
     @Override
     public Uri getLoaderUri() {
-        return ThingProvider.messageThreadUri(sessionId, accountName, thingId);
+        return ThingProvider.messageThreadUri(accountName, thingId);
     }
 
     @Override
@@ -77,11 +76,6 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
     public Cursor swapCursor(Cursor newCursor) {
         nowTimeMs = System.currentTimeMillis();
         return super.swapCursor(newCursor);
-    }
-
-    @Override
-    public void deleteSessionData(Context context) {
-        Provider.deleteSessionAsync(context, ThingProvider.MESSAGES_URI, sessionId);
     }
 
     @Override

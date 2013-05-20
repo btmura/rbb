@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
@@ -42,6 +43,7 @@ class SubredditResultListing extends JsonParser implements Listing {
     private final String accountName;
     private final String query;
     private final String cookie;
+    private final String sessionTag;
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(25);
     private long networkTimeMs;
@@ -55,6 +57,17 @@ class SubredditResultListing extends JsonParser implements Listing {
         this.accountName = accountName;
         this.query = query;
         this.cookie = cookie;
+        this.sessionTag = accountName + "-" + query;
+    }
+
+    @Override
+    public String getSessionTag() {
+        return sessionTag;
+    }
+
+    @Override
+    public int getSessionType() {
+        return Sessions.TYPE_SUBREDDIT_SEARCH;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

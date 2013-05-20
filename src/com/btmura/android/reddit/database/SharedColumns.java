@@ -25,7 +25,7 @@ public class SharedColumns {
 
     public static final String COLUMN_LOCAL_HIDDEN = "localHidden";
 
-    public static final String COLUMN_LOCAL_SAVED = "save";
+    public static final String COLUMN_SAVE_ACTION = "save";
 
     /** Long session id referring to the primary key in the sessions table. */
     public static final String COLUMN_SESSION_ID = "sessionId";
@@ -33,7 +33,7 @@ public class SharedColumns {
     /** Full string name of some thing with the kind tag attached. */
     public static final String COLUMN_THING_ID = "thingId";
 
-    public static final String COLUMN_LOCAL_VOTE = "vote";
+    public static final String COLUMN_VOTE_ACTION = "vote";
 
     public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "=?";
 

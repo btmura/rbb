@@ -175,7 +175,6 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         // Process ThingProvider results.
         super.onLoadFinished(loader, cursor);
 
-        adapter.updateLoaderUri(getActivity(), loader);
         adapter.swapCursor(cursor);
         setEmptyText(getEmptyText(cursor == null));
         setListShown(true);
@@ -202,18 +201,12 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     }
 
     @Override
-    protected void onSessionIdLoaded(long sessionId) {
-        adapter.setSessionId(sessionId);
-    }
-
-    @Override
     protected void onSubredditLoaded(String subreddit) {
         throw new IllegalStateException();
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
-        adapter.deleteSessionData(getActivity());
     }
 
     @Override

@@ -264,7 +264,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
         scrollLoading = false;
         adapter.setMore(null);
-        adapter.updateLoaderUri(getActivity(), loader);
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
@@ -273,12 +272,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
-        adapter.deleteSessionData(getActivity());
-    }
-
-    @Override
-    protected void onSessionIdLoaded(long sessionId) {
-        adapter.setSessionId(sessionId);
     }
 
     @Override

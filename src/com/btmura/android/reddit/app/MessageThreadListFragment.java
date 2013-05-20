@@ -111,7 +111,6 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         // Process ThingProvider results.
         super.onLoadFinished(loader, cursor);
 
-        adapter.updateLoaderUri(getActivity(), loader);
         adapter.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
@@ -123,12 +122,6 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
 
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
-        adapter.deleteSessionData(getActivity());
-    }
-
-    @Override
-    protected void onSessionIdLoaded(long sessionId) {
-        adapter.setSessionId(sessionId);
     }
 
     @Override

@@ -35,10 +35,6 @@ public abstract class BaseLoaderAdapter extends BaseCursorAdapter {
                 getSelectionArgs(), getSortOrder());
     }
 
-    public void updateLoaderUri(Context context, Loader<Cursor> loader) {
-        ((CursorLoader) loader).setUri(getLoaderUri());
-    }
-
     protected abstract Uri getLoaderUri();
 
     protected String[] getProjection() {
@@ -56,6 +52,4 @@ public abstract class BaseLoaderAdapter extends BaseCursorAdapter {
     protected String getSortOrder() {
         return null;
     }
-
-    public abstract void deleteSessionData(Context context);
 }

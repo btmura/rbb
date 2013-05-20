@@ -73,8 +73,8 @@ public class ThingListAdapter extends BaseLoaderAdapter {
             Things.COLUMN_URL,
 
             // Following columns are from joined tables at the end.
-            SharedColumns.COLUMN_LOCAL_SAVED,
-            SharedColumns.COLUMN_LOCAL_VOTE,
+            SharedColumns.COLUMN_SAVE_ACTION,
+            SharedColumns.COLUMN_VOTE_ACTION,
             SharedColumns.COLUMN_LOCAL_HIDDEN,
     };
 
@@ -205,13 +205,13 @@ public class ThingListAdapter extends BaseLoaderAdapter {
     @Override
     protected Uri getLoaderUri() {
         if (isProfileActivity()) {
-            return ThingProvider.profileUri(sessionId, accountName, profileUser, filter, more);
+            return ThingProvider.profileUri(accountName, profileUser, filter, more);
         } else if (isMessageActivity()) {
-            return ThingProvider.messageUri(sessionId, accountName, filter, more);
+            return ThingProvider.messageUri(accountName, filter, more);
         } else if (isSearchActivity()) {
-            return ThingProvider.searchUri(sessionId, accountName, subreddit, query);
+            return ThingProvider.searchUri(accountName, subreddit, query);
         } else if (isBrowserActivity()) {
-            return ThingProvider.subredditUri(sessionId, accountName, subreddit, filter, more);
+            return ThingProvider.subredditUri(accountName, subreddit, filter, more);
         } else {
             throw new IllegalArgumentException();
         }
@@ -231,12 +231,6 @@ public class ThingListAdapter extends BaseLoaderAdapter {
         } else {
             return HideActions.SELECT_UNHIDDEN_BY_JOIN;
         }
-    }
-
-    @Override
-    public void deleteSessionData(Context context) {
-        Uri uri = isMessageActivity() ? ThingProvider.MESSAGES_URI : ThingProvider.THINGS_URI;
-        Provider.deleteSessionAsync(context, uri, sessionId);
     }
 
     @Override
@@ -570,8 +564,7 @@ public class ThingListAdapter extends BaseLoaderAdapter {
             throw new IllegalStateException();
         }
 
-        Provider.saveAsync(context, accountName, getThingId(position),
-                getString(position, THING_AUTHOR),
+        Provider.saveAsync(context, accountName, getString(position, THING_AUTHOR),
                 getLong(position, THING_CREATED_UTC),
                 getString(position, THING_DOMAIN),
                 getInt(position, THING_DOWNS),
@@ -582,8 +575,9 @@ public class ThingListAdapter extends BaseLoaderAdapter {
                 getInt(position, THING_SCORE),
                 getBoolean(position, THING_SELF),
                 getString(position, THING_SUBREDDIT),
-                getString(position, THING_TITLE),
+                getThingId(position),
                 getString(position, THING_THUMBNAIL_URL),
+                getString(position, THING_TITLE),
                 getInt(position, THING_UPS),
                 getString(position, THING_URL));
     }
@@ -614,8 +608,8 @@ public class ThingListAdapter extends BaseLoaderAdapter {
                 getBoolean(position, THING_SELF),
                 getString(position, THING_SUBREDDIT),
                 getThingId(position),
-                getString(position, THING_TITLE),
                 getString(position, THING_THUMBNAIL_URL),
+                getString(position, THING_TITLE),
                 getInt(position, THING_UPS),
                 getString(position, THING_URL));
     }

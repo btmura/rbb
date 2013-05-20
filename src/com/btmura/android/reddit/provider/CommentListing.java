@@ -40,6 +40,7 @@ import com.btmura.android.reddit.app.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.Kinds;
+import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
@@ -79,10 +80,12 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private final int numComments;
     private final String cookie;
 
+    private final String sessionTag;
+
     static CommentListing newInstance(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String thingId, String linkId, int numComments, String cookie) {
-        return new CommentListing(context, dbHelper,
-                accountName, thingId, linkId, numComments, cookie);
+        return new CommentListing(context, dbHelper, accountName, thingId, linkId, numComments,
+                cookie);
     }
 
     private CommentListing(Context context,
@@ -99,6 +102,25 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         this.linkId = linkId;
         this.numComments = numComments;
         this.cookie = cookie;
+        this.sessionTag = makeSessionTag();
+    }
+
+    private String makeSessionTag() {
+        StringBuilder tag = new StringBuilder(accountName).append("-").append(thingId);
+        if (!TextUtils.isEmpty(linkId)) {
+            tag.append("-").append(linkId);
+        }
+        return tag.toString();
+    }
+
+    @Override
+    public String getSessionTag() {
+        return sessionTag;
+    }
+
+    @Override
+    public int getSessionType() {
+        return Sessions.TYPE_COMMENTS;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {

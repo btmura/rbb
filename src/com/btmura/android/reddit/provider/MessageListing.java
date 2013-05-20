@@ -36,6 +36,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
+import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
@@ -59,13 +60,14 @@ class MessageListing extends JsonParser implements Listing {
     private static final String MERGE_SELECTION = MessageActions.COLUMN_ACCOUNT + "=? AND "
             + MessageActions.COLUMN_PARENT_THING_ID + "=?";
 
-    private final int listingType;
+    private final int sessionType;
     private final String accountName;
     private final String thingId;
     private final int filter;
     private final String more;
     private final boolean mark;
     private final String cookie;
+    private final String sessionTag;
     private final SQLiteOpenHelper dbHelper;
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
 
@@ -77,27 +79,38 @@ class MessageListing extends JsonParser implements Listing {
     /** Returns a listing of messages for inbox or sent. */
     static MessageListing newInstance(SQLiteOpenHelper dbHelper, String accountName, int filter,
             String more, boolean mark, String cookie) {
-        return new MessageListing(dbHelper, Listing.TYPE_MESSAGE_LISTING, accountName,
+        return new MessageListing(dbHelper, Sessions.TYPE_MESSAGES, accountName,
                 null, filter, more, mark, cookie);
     }
 
     /** Returns an instance for a message thread. */
     static MessageListing newThreadInstance(SQLiteOpenHelper dbHelper, String accountName,
             String thingId, String cookie) {
-        return new MessageListing(dbHelper, Listing.TYPE_MESSAGE_THREAD_LISTING, accountName,
+        return new MessageListing(dbHelper, Sessions.TYPE_MESSAGE_THREAD, accountName,
                 thingId, 0, null, false, cookie);
     }
 
-    private MessageListing(SQLiteOpenHelper dbHelper, int listingType, String accountName,
+    private MessageListing(SQLiteOpenHelper dbHelper, int sessionType, String accountName,
             String thingId, int filter, String more, boolean mark, String cookie) {
         this.dbHelper = dbHelper;
-        this.listingType = listingType;
         this.accountName = accountName;
         this.thingId = thingId;
         this.filter = filter;
         this.more = more;
         this.mark = mark;
         this.cookie = cookie;
+        this.sessionTag = accountName + "-" + thingId + "-" + filter;
+        this.sessionType = sessionType;
+    }
+
+    @Override
+    public String getSessionTag() {
+        return sessionTag;
+    }
+
+    @Override
+    public int getSessionType() {
+        return sessionType;
     }
 
     public ArrayList<ContentValues> getValues() throws IOException {
@@ -121,11 +134,11 @@ class MessageListing extends JsonParser implements Listing {
     }
 
     private CharSequence getUrl() {
-        switch (listingType) {
-            case Listing.TYPE_MESSAGE_LISTING:
+        switch (sessionType) {
+            case Sessions.TYPE_MESSAGES:
                 return Urls.message(filter, more, mark);
 
-            case Listing.TYPE_MESSAGE_THREAD_LISTING:
+            case Sessions.TYPE_MESSAGE_THREAD:
                 return Urls.messageThread(thingId, Urls.TYPE_JSON);
 
             default:
@@ -236,7 +249,7 @@ class MessageListing extends JsonParser implements Listing {
 
     @Override
     public void onParseEnd() {
-        if (listingType == Listing.TYPE_MESSAGE_THREAD_LISTING) {
+        if (sessionType == Sessions.TYPE_MESSAGE_THREAD) {
             mergeThreadActions();
         }
 

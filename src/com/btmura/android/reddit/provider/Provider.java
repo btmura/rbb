@@ -45,8 +45,6 @@ import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
-import com.btmura.android.reddit.database.Sessions;
-import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
@@ -514,10 +512,9 @@ public class Provider {
 
     public static void saveAsync(final Context context,
             final String accountName,
-            final String thingId,
-
             // Following parameters are for faking a thing.
             final String author,
+
             final long createdUtc,
             final String domain,
             final int downs,
@@ -528,8 +525,9 @@ public class Provider {
             final int score,
             final boolean self,
             final String subreddit,
-            final String title,
+            final String thingId,
             final String thumbnailUrl,
+            final String title,
             final int ups,
             final String url) {
 
@@ -649,8 +647,8 @@ public class Provider {
             final boolean self,
             final String subreddit,
             final String thingId,
-            final String title,
             final String thumbnailUrl,
+            final String title,
             final int ups,
             final String url) {
 
@@ -682,28 +680,6 @@ public class Provider {
 
                 // No toast needed, since the vote arrows will reflect success.
                 cr.insert(VOTE_URI, v);
-            }
-        });
-    }
-
-    public static void deleteSessionAsync(Context context, final Uri uri, final long sessionId) {
-        if (sessionId == -1) {
-            return;
-        }
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                String[] selectionArgs = Array.of(sessionId);
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(2);
-                ops.add(ContentProviderOperation.newDelete(ThingProvider.SESSIONS_URI)
-                        .withSelection(Sessions.SELECT_BY_ID, selectionArgs)
-                        .build());
-                ops.add(ContentProviderOperation.newDelete(uri)
-                        .withSelection(SharedColumns.SELECT_BY_SESSION_ID, selectionArgs)
-                        .build());
-                applyOps(appContext, ThingProvider.AUTHORITY, ops);
             }
         });
     }

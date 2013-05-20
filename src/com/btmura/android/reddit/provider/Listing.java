@@ -24,18 +24,16 @@ import android.content.Context;
 import android.os.Bundle;
 
 /**
- * {@link Listing} is an internal interface to enforce some uniformity on
- * grabbing values to present to the user.
+ * {@link Listing} is an internal interface to enforce some uniformity on grabbing values to present
+ * to the user.
  */
 interface Listing {
 
-    static final int TYPE_MESSAGE_THREAD_LISTING = 0;
-    static final int TYPE_MESSAGE_LISTING = 1;
-    static final int TYPE_SUBREDDIT_LISTING = 2;
-    static final int TYPE_USER_LISTING = 3;
-    static final int TYPE_COMMENT_LISTING = 4;
-    static final int TYPE_SEARCH_LISTING = 5;
-    static final int TYPE_REDDIT_SEARCH_LISTING = 6;
+    /** Returns the type of session this listing creates. */
+    int getSessionType();
+
+    /** Returns the tag that can be used to identify an existing session. */
+    String getSessionTag();
 
     /** Get the values for this listing possibly using the network. */
     ArrayList<ContentValues> getValues() throws IOException;
