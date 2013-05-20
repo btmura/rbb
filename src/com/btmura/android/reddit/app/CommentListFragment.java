@@ -48,34 +48,21 @@ public class CommentListFragment extends ListFragment implements
     private static final String ARG_THING_ID = "thingId";
     private static final String ARG_LINK_ID = "linkId";
 
-    /** Optional string that has a title for the thing. */
-    private static final String ARG_TITLE = "title";
-
-    /** Optional string that is a complete url to the comments. */
-    private static final String ARG_URL = "permaLink";
-
     /** Optional bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
 
     /** Flag to immediately show link button if thing definitely has a link. */
     public static final int FLAG_SHOW_LINK_MENU_ITEM = 0x1;
 
-    private static final String STATE_TITLE = ARG_TITLE;
-    private static final String STATE_URL = ARG_URL;
-
     private CommentAdapter adapter;
     private CommentListFragmentController controller;
-    private String title;
-    private CharSequence url;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
-            String linkId, String title, CharSequence url, int flags) {
-        Bundle args = new Bundle(6);
+            String linkId, int flags) {
+        Bundle args = new Bundle(4);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_THING_ID, thingId);
         args.putString(ARG_LINK_ID, linkId);
-        args.putString(ARG_TITLE, title);
-        args.putCharSequence(ARG_URL, url);
         args.putInt(ARG_FLAGS, flags);
 
         CommentListFragment frag = new CommentListFragment();
@@ -90,16 +77,6 @@ public class CommentListFragment extends ListFragment implements
         String accountName = getArguments().getString(ARG_ACCOUNT_NAME);
         adapter = new CommentAdapter(getActivity(), accountName, this);
         controller = new CommentListFragmentController(getActivity(), accountName, adapter);
-
-        // Don't create a new session if changing configuration.
-        if (savedInstanceState != null) {
-            title = savedInstanceState.getString(STATE_TITLE);
-            url = savedInstanceState.getCharSequence(STATE_URL);
-        } else {
-            title = getArguments().getString(ARG_TITLE);
-            url = getArguments().getCharSequence(ARG_URL);
-        }
-
         setHasOptionsMenu(true);
     }
 
@@ -142,13 +119,6 @@ public class CommentListFragment extends ListFragment implements
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         controller.expandOrCollapse(position, id);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(STATE_TITLE, title);
-        outState.putCharSequence(STATE_URL, url);
     }
 
     public void onVote(View view, int action) {

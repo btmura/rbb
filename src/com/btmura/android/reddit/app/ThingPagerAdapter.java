@@ -168,8 +168,6 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
                 return CommentListFragment.newInstance(accountName,
                         ThingBundle.getThingId(thingBundle),
                         ThingBundle.getLinkId(thingBundle),
-                        ThingBundle.getTitle(thingBundle),
-                        ThingBundle.getCommentUrl(thingBundle),
                         clfFlags);
 
             case TYPE_MESSAGES:
