@@ -23,7 +23,6 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.btmura.android.reddit.database.SubredditResults;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Objects;
 
 /** {@link SubredditAdapter} that handles searching for subreddits. */
@@ -49,7 +48,7 @@ class SubredditSearchAdapter extends SubredditAdapter {
 
     @Override
     protected Uri getLoaderUri() {
-        return ThingProvider.subredditSearchUri(accountName, query);
+        return null; // ThingProvider.subredditSearchUri(accountName, query);
     }
 
     @Override

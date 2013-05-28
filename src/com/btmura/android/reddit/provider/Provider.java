@@ -444,11 +444,10 @@ public class Provider {
 
     public static void hideAsync(final Context context,
             final String accountName,
-            final String thingId,
-
             // Following parameters are for faking a thing.
             // TODO: Use a bundle argument for this instead.
             final String author,
+
             final long createdUtc,
             final String domain,
             final int downs,
@@ -459,8 +458,9 @@ public class Provider {
             final int score,
             final boolean self,
             final String subreddit,
-            final String title,
+            final String thingId,
             final String thumbnailUrl,
+            final String title,
             final int ups,
             final String url) {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();

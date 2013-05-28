@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.database.Messages;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
 
 public class MessageThreadAdapter extends BaseLoaderAdapter {
@@ -64,7 +63,7 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
 
     @Override
     public Uri getLoaderUri() {
-        return ThingProvider.messageThreadUri(accountName, thingId);
+        return null; // ThingProvider.messageThreadUri(accountName, thingId);
     }
 
     @Override

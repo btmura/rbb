@@ -55,12 +55,14 @@ public class HideActions implements BaseThingColumns, BaseColumns {
     private static final String JOINED_COLUMN = SharedColumns.COLUMN_LOCAL_HIDDEN;
 
     /** Select hidden things. */
-    public static final String SELECT_HIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=1 AND "
+    public static final String SELECT_HIDDEN_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID
+            + " AND ((" + COLUMN_HIDDEN + "=1 AND "
             + "(" + JOINED_COLUMN + " IS NULL OR " + JOINED_COLUMN + "=" + ACTION_HIDE + ")"
             + ") OR (" + COLUMN_HIDDEN + "=0 AND " + JOINED_COLUMN + "=" + ACTION_HIDE + "))";
 
     /** Select unhidden things. */
-    public static final String SELECT_UNHIDDEN_BY_JOIN = "((" + COLUMN_HIDDEN + "=0 AND "
+    public static final String SELECT_UNHIDDEN_BY_SESSION_ID = SharedColumns.SELECT_BY_SESSION_ID
+            + " AND ((" + COLUMN_HIDDEN + "=0 AND "
             + "(" + JOINED_COLUMN + " IS NULL OR " + JOINED_COLUMN + "=" + ACTION_UNHIDE + ")"
             + ") OR (" + COLUMN_HIDDEN + "=1 AND " + JOINED_COLUMN + "=" + ACTION_UNHIDE + "))";
 

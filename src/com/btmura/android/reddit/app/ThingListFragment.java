@@ -36,9 +36,7 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
@@ -101,6 +99,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private OnSubredditEventListener eventListener;
     private ThingBundleHolder thingBundleHolder;
     private ThingListAdapter adapter;
+    private ThingListController controller;
     private int emptyText;
     private boolean scrollLoading;
 
@@ -188,6 +187,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
             emptyText = savedInstanceState.getInt(STATE_EMPTY_TEXT);
         }
 
+        controller = createController();
+
         setHasOptionsMenu(true);
     }
 
@@ -235,7 +236,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public void loadIfPossible() {
-        if (adapter.isLoadable()) {
+        if (controller.isLoadable()) {
             getLoaderManager().initLoader(0, null, this);
         }
     }
@@ -252,9 +253,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (args != null) {
-            adapter.setMore(args.getString(ARG_MORE));
+            controller.setMore(args.getString(ARG_MORE));
         }
-        return adapter.getLoader(getActivity());
+        return controller.createLoader();
     }
 
     @Override
@@ -294,7 +295,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         if (firstVisibleItem + visibleItemCount * 2 >= totalItemCount) {
             if (getLoaderManager().getLoader(0) != null) {
                 if (!adapter.isEmpty()) {
-                    String more = adapter.getNextMore();
+                    String more = controller.getNextMore();
                     if (!TextUtils.isEmpty(more)) {
                         scrollLoading = true;
                         Bundle b = new Bundle(1);
@@ -316,30 +317,26 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     private void selectThing(View v, int position, int pageType) {
         adapter.setSelectedPosition(position);
-
         if (listener != null) {
-            listener.onThingSelected(v, adapter.getThingBundle(getActivity(), position), pageType);
+            listener.onThingSelected(v, controller.getThingBundle(position), pageType);
         }
-        if (adapter.isNew(position)) {
-            Provider.readMessageAsync(getActivity(), adapter.getAccountName(),
-                    adapter.getThingId(position), true);
-        }
+        controller.select(position);
     }
 
     @Override
     public boolean isSwipeDismissable(int position) {
-        return adapter.isHidable(getActivity(), position, true);
+        return controller.isSwipeDismissable(position);
     }
 
     @Override
     public void onSwipeDismiss(ListView listView, View view, int position) {
-        adapter.hide(getActivity(), position, true);
+        controller.hide(position, true);
     }
 
     public void onVote(View v, int action) {
         if (!TextUtils.isEmpty(adapter.getAccountName())) {
             int position = getListView().getPositionForView(v);
-            adapter.vote(getActivity(), position, action);
+            controller.vote(position, action);
         }
     }
 
@@ -385,52 +382,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        int position = getFirstCheckedPosition();
         int count = getListView().getCheckedItemCount();
-
         mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
-        menu.findItem(R.id.menu_copy_url).setVisible(count == 1);
-
-        MenuItem authorItem = menu.findItem(R.id.menu_author);
-        String author = adapter.getAuthor(position);
-        authorItem.setVisible(count == 1 && MenuHelper.isUserItemVisible(author));
-        if (authorItem.isVisible()) {
-            authorItem.setTitle(MenuHelper.getUserTitle(getActivity(), author));
-        }
-
-        String subreddit = adapter.getSubreddit(position);
-        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
-        subredditItem.setVisible(count == 1 && Subreddits.hasSidebar(subreddit));
-        if (subredditItem.isVisible()) {
-            subredditItem.setTitle(MenuHelper.getSubredditTitle(getActivity(), subreddit));
-        }
-
-        MenuItem shareItem = menu.findItem(R.id.menu_share_thing);
-        shareItem.setVisible(count == 1);
-        if (shareItem.isVisible()) {
-            String label = adapter.getTitle(position);
-            CharSequence text = adapter.getUrl(position);
-            MenuHelper.setShareProvider(shareItem, label, text);
-        }
-
-        boolean isLink = adapter.getKind(position) == Kinds.KIND_LINK;
-        MenuItem commentsItem = menu.findItem(R.id.menu_comments);
-        commentsItem.setVisible(count == 1 && isLink);
-
-        boolean saveable = false;
-        boolean saved = false;
-        boolean hasAccount = AccountUtils.isAccount(adapter.getAccountName());
-        if (count == 1 && hasAccount) {
-            saveable = isLink;
-            saved = adapter.isSaved(position);
-        }
-        menu.findItem(R.id.menu_saved).setVisible(saveable && saved);
-        menu.findItem(R.id.menu_unsaved).setVisible(saveable && !saved);
-        menu.findItem(R.id.menu_hide)
-                .setVisible(count == 1 && adapter.isHidable(getActivity(), position, true));
-        menu.findItem(R.id.menu_unhide)
-                .setVisible(count == 1 && adapter.isHidable(getActivity(), position, false));
-
+        controller.prepareActionMenu(menu, getListView(), getFirstCheckedPosition());
         return true;
     }
 
@@ -441,22 +395,22 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_saved:
-                handleSaved();
+                controller.save(getFirstCheckedPosition(), false);
                 mode.finish();
                 return true;
 
             case R.id.menu_unsaved:
-                handleUnsaved();
+                controller.save(getFirstCheckedPosition(), true);
                 mode.finish();
                 return true;
 
             case R.id.menu_hide:
-                handleHide(true);
+                controller.hide(getFirstCheckedPosition(), true);
                 mode.finish();
                 return true;
 
             case R.id.menu_unhide:
-                handleHide(false);
+                controller.hide(getFirstCheckedPosition(), false);
                 mode.finish();
                 return true;
 
@@ -466,17 +420,17 @@ public class ThingListFragment extends ThingProviderListFragment implements
                 return true;
 
             case R.id.menu_copy_url:
-                handleCopyUrl();
+                controller.copyUrl(getFirstCheckedPosition());
                 mode.finish();
                 return true;
 
             case R.id.menu_author:
-                handleAuthor();
+                controller.author(getFirstCheckedPosition());
                 mode.finish();
                 return true;
 
             case R.id.menu_subreddit:
-                handleSubreddit();
+                controller.subreddit(getFirstCheckedPosition());
                 mode.finish();
                 return true;
 
@@ -485,37 +439,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
     }
 
-    private void handleSaved() {
-        adapter.unsave(getActivity(), getFirstCheckedPosition());
-    }
-
-    private void handleUnsaved() {
-        adapter.save(getActivity(), getFirstCheckedPosition());
-    }
-
-    private void handleHide(boolean hide) {
-        adapter.hide(getActivity(), getFirstCheckedPosition(), hide);
-    }
-
     private void handleComments() {
         selectThing(null, getFirstCheckedPosition(), ThingPagerAdapter.TYPE_COMMENTS);
-    }
-
-    private void handleCopyUrl() {
-        int position = getFirstCheckedPosition();
-        String title = adapter.getTitle(position);
-        CharSequence url = adapter.getUrl(position);
-        MenuHelper.setClipAndToast(getActivity(), title, url);
-    }
-
-    private void handleAuthor() {
-        String user = adapter.getAuthor(getFirstCheckedPosition());
-        MenuHelper.startProfileActivity(getActivity(), user, -1);
-    }
-
-    private void handleSubreddit() {
-        String subreddit = adapter.getSubreddit(getFirstCheckedPosition());
-        MenuHelper.startSidebarActivity(getActivity(), subreddit);
     }
 
     public void onDestroyActionMode(ActionMode mode) {
@@ -580,5 +505,83 @@ public class ThingListFragment extends ThingProviderListFragment implements
             }
         }
         return -1;
+    }
+
+    // Methods for creating the correct controller based upon the fragment arguments.
+    private ThingListController createController() {
+        if (isProfileActivity()) {
+            return new ProfileThingListController(getActivity(),
+                    getAccountNameArgument(),
+                    getProfileUserArgument(),
+                    getFilterArgument(),
+                    null,
+                    adapter);
+        } else if (isMessageActivity()) {
+            return new MessageThingListController(getActivity(),
+                    getAccountNameArgument(),
+                    getMessageUserArgument(),
+                    getFilterArgument(),
+                    null,
+                    adapter);
+        } else if (isSearchActivity()) {
+            return new SearchThingListController(getActivity(),
+                    getAccountNameArgument(),
+                    adapter);
+        } else if (isBrowserActivity()) {
+            return new SubredditThingListController(getActivity(),
+                    getAccountNameArgument(),
+                    getSubredditArgument(),
+                    getFilterArgument(),
+                    null,
+                    adapter);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private boolean isProfileActivity() {
+        return !TextUtils.isEmpty(getProfileUserArgument());
+    }
+
+    private boolean isMessageActivity() {
+        return !TextUtils.isEmpty(getMessageUserArgument());
+    }
+
+    private boolean isSearchActivity() {
+        return !TextUtils.isEmpty(getQueryArgument());
+    }
+
+    private boolean isBrowserActivity() {
+        return getSubredditArgument() != null; // Empty but non-null subreddit means front page.
+    }
+
+    // Getters for fragment arguments.
+
+    private String getAccountNameArgument() {
+        return getArguments().getString(ARG_ACCOUNT_NAME);
+    }
+
+    private String getSubredditArgument() {
+        return getArguments().getString(ARG_SUBREDDIT);
+    }
+
+    private String getQueryArgument() {
+        return getArguments().getString(ARG_QUERY);
+    }
+
+    private String getProfileUserArgument() {
+        return getArguments().getString(ARG_PROFILE_USER);
+    }
+
+    private String getMessageUserArgument() {
+        return getArguments().getString(ARG_MESSAGE_USER);
+    }
+
+    private int getFilterArgument() {
+        return getArguments().getInt(ARG_FILTER);
+    }
+
+    private int getFlags() {
+        return getArguments().getInt(ARG_FLAGS);
     }
 }

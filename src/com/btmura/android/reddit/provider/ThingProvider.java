@@ -28,7 +28,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -47,7 +46,6 @@ import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
  * URI MATCHING PATTERNS:
@@ -225,92 +223,88 @@ public class ThingProvider extends BaseProvider {
     private static final String SELECT_MORE_WITH_SESSION_ID = Kinds.COLUMN_KIND + "="
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
 
-    public static final Uri subredditUri(String accountName, String subreddit, int filter,
-            String more) {
-        Uri.Builder b = THINGS_URI.buildUpon();
-        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_SUBREDDIT));
-        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
-        b.appendQueryParameter(PARAM_SUBREDDIT, subreddit);
-        b.appendQueryParameter(PARAM_FILTER, toString(filter));
-        b.appendQueryParameter(PARAM_JOIN, TRUE);
-        if (!TextUtils.isEmpty(more)) {
-            b.appendQueryParameter(PARAM_MORE, more);
-        }
-        return b.build();
+    public static final Bundle getSubredditSession(Context context, String accountName,
+            String subreddit, int filter, String more) {
+        Bundle extras = new Bundle(4);
+        extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_SUBREDDIT);
+        extras.putString(EXTRA_SUBREDDIT, subreddit);
+        extras.putInt(EXTRA_FILTER, filter);
+        extras.putString(EXTRA_MORE, more);
+        return call(context, ThingProvider.SUBREDDITS_URI, METHOD_GET_SESSION,
+                accountName, extras);
     }
 
-    public static final Bundle getComments(Context context, String accountName,
+    public static final Bundle getProfileSession(Context context, String accountName,
+            String profileUser, int filter, String more) {
+        Bundle extras = new Bundle(4);
+        extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_USER);
+        extras.putString(EXTRA_USER, profileUser);
+        extras.putInt(EXTRA_FILTER, filter);
+        extras.putString(EXTRA_MORE, more);
+        return call(context, ThingProvider.THINGS_URI, METHOD_GET_SESSION,
+                accountName, extras);
+    }
+
+    public static final Bundle getCommentsSession(Context context, String accountName,
             String thingId, String linkId, int numComments) {
-        Bundle extras = new Bundle(3);
+        Bundle extras = new Bundle(4);
+        extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_COMMENTS);
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putString(EXTRA_LINK_ID, linkId);
         extras.putInt(EXTRA_COUNT, numComments);
-        ContentResolver cr = context.getApplicationContext().getContentResolver();
-        return cr.call(ThingProvider.COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
+        return call(context, ThingProvider.COMMENTS_URI, METHOD_GET_SESSION,
+                accountName, extras);
     }
 
-    public static final Uri profileUri(String accountName, String profileUser, int filter,
-            String more) {
-        Uri.Builder b = THINGS_URI.buildUpon();
-        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_USER));
-        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
-        b.appendQueryParameter(PARAM_PROFILE_USER, profileUser);
-        b.appendQueryParameter(PARAM_FILTER, toString(filter));
-        b.appendQueryParameter(PARAM_JOIN, TRUE);
-        if (!TextUtils.isEmpty(more)) {
-            b.appendQueryParameter(PARAM_MORE, more);
-        }
-        return b.build();
+    public static final Bundle getSearchSession(Context context, String accountName,
+            String subreddit, String query) {
+        Bundle extras = new Bundle(3);
+        extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_THING_SEARCH);
+        extras.putString(EXTRA_SUBREDDIT, subreddit);
+        extras.putString(EXTRA_QUERY, query);
+        return call(context, ThingProvider.THINGS_URI, METHOD_GET_SESSION,
+                accountName, extras);
     }
 
-    public static final Uri searchUri(String accountName, String subreddit, String query) {
-        Uri.Builder b = THINGS_URI.buildUpon();
-        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_THING_SEARCH));
-        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
-        b.appendQueryParameter(PARAM_QUERY, query);
-        b.appendQueryParameter(PARAM_JOIN, TRUE);
-        if (!TextUtils.isEmpty(subreddit)) {
-            b.appendQueryParameter(PARAM_SUBREDDIT, subreddit);
-        }
-        return b.build();
+    public static final Bundle getSubredditSearchSession(Context context, String accountName,
+            String query) {
+        Bundle extras = new Bundle(2);
+        extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_SUBREDDIT_SEARCH);
+        extras.putString(EXTRA_QUERY, query);
+        return call(context, ThingProvider.SUBREDDITS_URI, METHOD_GET_SESSION,
+                accountName, extras);
     }
 
-    public static final Uri subredditSearchUri(String accountName, String query) {
-        Uri.Builder b = SUBREDDITS_URI.buildUpon();
-        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_SUBREDDIT_SEARCH));
-        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
-        b.appendQueryParameter(PARAM_QUERY, query);
-        return b.build();
+    public static final Bundle getMessageSession(Context context, String accountName,
+            int filter, String more) {
+        Bundle extras = new Bundle(4);
+        extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGES);
+        extras.putInt(EXTRA_FILTER, filter);
+        extras.putString(EXTRA_MORE, more);
+        return call(context, ThingProvider.MESSAGES_URI, METHOD_GET_SESSION,
+                accountName, extras);
+        // if (!TextUtils.isEmpty(more)) {
+        // b.appendQueryParameter(PARAM_MORE, more);
+        // } else if (filter == FilterAdapter.MESSAGE_INBOX
+        // || filter == FilterAdapter.MESSAGE_UNREAD) {
+        // b.appendQueryParameter(PARAM_MARK, TRUE);
+        // b.appendQueryParameter(PARAM_NOTIFY_ACCOUNTS, TRUE);
+        // }
     }
 
-    public static final Uri messageUri(String accountName, int filter, String more) {
-        Uri.Builder b = MESSAGES_URI.buildUpon();
-        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGES));
-        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
-        b.appendQueryParameter(PARAM_FILTER, toString(filter));
-        b.appendQueryParameter(PARAM_JOIN, TRUE);
-        if (!TextUtils.isEmpty(more)) {
-            b.appendQueryParameter(PARAM_MORE, more);
-        } else if (filter == FilterAdapter.MESSAGE_INBOX
-                || filter == FilterAdapter.MESSAGE_UNREAD) {
-            b.appendQueryParameter(PARAM_MARK, TRUE);
-            b.appendQueryParameter(PARAM_NOTIFY_ACCOUNTS, TRUE);
-        }
-        return b.build();
+    public static final Bundle getMessageThreadSession(Context context, String accountName,
+            String thingId) {
+        Bundle extras = new Bundle(2);
+        extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGE_THREAD);
+        extras.putString(EXTRA_THING_ID, thingId);
+        return call(context, ThingProvider.MESSAGES_URI, METHOD_GET_SESSION,
+                accountName, extras);
     }
 
-    public static final Uri messageThreadUri(String accountName, String thingId) {
-        Uri.Builder b = MESSAGES_URI.buildUpon();
-        b.appendQueryParameter(PARAM_LISTING_GET, TRUE);
-        b.appendQueryParameter(PARAM_LISTING_TYPE, toString(Sessions.TYPE_MESSAGE_THREAD));
-        b.appendQueryParameter(PARAM_ACCOUNT, accountName);
-        b.appendQueryParameter(PARAM_THING_ID, thingId);
-        return b.build();
+    private static Bundle call(Context context, Uri uri, String method,
+            String arg, Bundle extras) {
+        return context.getApplicationContext().getContentResolver().call(uri, method,
+                arg, extras);
     }
 
     public ThingProvider() {

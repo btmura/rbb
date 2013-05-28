@@ -110,7 +110,7 @@ public class CommentLoader extends CursorLoader {
             Log.d(TAG, "loadInBackground");
         }
 
-        Bundle result = ThingProvider.getComments(getContext(), accountName, thingId, linkId, -1);
+        Bundle result = ThingProvider.getCommentsSession(getContext(), accountName, thingId, linkId, -1);
         long sessionId = result.getLong(ThingProvider.EXTRA_SESSION_ID);
 
         setUri(ThingProvider.COMMENTS_URI);
