@@ -27,7 +27,6 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
@@ -182,19 +181,8 @@ public class Provider {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                Bundle extras = new Bundle(8);
-                extras.putString(ThingProvider.EXTRA_BODY, body);
-                extras.putInt(ThingProvider.EXTRA_NESTING, nesting);
-                extras.putLong(ThingProvider.EXTRA_PARENT_ID, parentId);
-                extras.putInt(ThingProvider.EXTRA_PARENT_NUM_COMMENTS, parentNumComments);
-                extras.putString(ThingProvider.EXTRA_PARENT_THING_ID, parentThingId);
-                extras.putInt(ThingProvider.EXTRA_SEQUENCE, sequence);
-                extras.putLong(ThingProvider.EXTRA_SESSION_ID, sessionId);
-                extras.putString(ThingProvider.EXTRA_THING_ID, thingId);
-
-                ContentResolver cr = appContext.getContentResolver();
-                cr.call(ThingProvider.THINGS_URI, ThingProvider.METHOD_INSERT_COMMENT,
-                        accountName, extras);
+                ThingProvider.insertComment(appContext, accountName, body, nesting, parentId,
+                        parentNumComments, parentThingId, sequence, sessionId, thingId);
             }
         });
     }

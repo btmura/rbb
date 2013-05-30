@@ -182,10 +182,10 @@ public class ThingProvider extends BaseProvider {
             + SharedColumns.COLUMN_THING_ID + ")";
 
     /** Method to create a listing session of some kind. */
-    static final String METHOD_GET_SESSION = "getSession";
+    private static final String METHOD_GET_SESSION = "getSession";
 
     /** Method to insert a pending comment in a listing. */
-    static final String METHOD_INSERT_COMMENT = "insertComment";
+    private static final String METHOD_INSERT_COMMENT = "insertComment";
 
     // List of extras used throughout the provider code.
 
@@ -222,8 +222,7 @@ public class ThingProvider extends BaseProvider {
         extras.putString(EXTRA_SUBREDDIT, subreddit);
         extras.putInt(EXTRA_FILTER, filter);
         extras.putString(EXTRA_MORE, more);
-        return call(context, ThingProvider.SUBREDDITS_URI, METHOD_GET_SESSION,
-                accountName, extras);
+        return call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getProfileSession(Context context, String accountName,
@@ -233,8 +232,7 @@ public class ThingProvider extends BaseProvider {
         extras.putString(EXTRA_USER, profileUser);
         extras.putInt(EXTRA_FILTER, filter);
         extras.putString(EXTRA_MORE, more);
-        return call(context, ThingProvider.THINGS_URI, METHOD_GET_SESSION,
-                accountName, extras);
+        return call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getCommentsSession(Context context, String accountName,
@@ -244,8 +242,7 @@ public class ThingProvider extends BaseProvider {
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putString(EXTRA_LINK_ID, linkId);
         extras.putInt(EXTRA_COUNT, numComments);
-        return call(context, ThingProvider.COMMENTS_URI, METHOD_GET_SESSION,
-                accountName, extras);
+        return call(context, COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getSearchSession(Context context, String accountName,
@@ -254,8 +251,7 @@ public class ThingProvider extends BaseProvider {
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_THING_SEARCH);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
         extras.putString(EXTRA_QUERY, query);
-        return call(context, ThingProvider.THINGS_URI, METHOD_GET_SESSION,
-                accountName, extras);
+        return call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getSubredditSearchSession(Context context, String accountName,
@@ -263,8 +259,7 @@ public class ThingProvider extends BaseProvider {
         Bundle extras = new Bundle(2);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_SUBREDDIT_SEARCH);
         extras.putString(EXTRA_QUERY, query);
-        return call(context, ThingProvider.SUBREDDITS_URI, METHOD_GET_SESSION,
-                accountName, extras);
+        return call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getMessageSession(Context context, String accountName,
@@ -273,8 +268,7 @@ public class ThingProvider extends BaseProvider {
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGES);
         extras.putInt(EXTRA_FILTER, filter);
         extras.putString(EXTRA_MORE, more);
-        return call(context, ThingProvider.MESSAGES_URI, METHOD_GET_SESSION,
-                accountName, extras);
+        return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
         // if (!TextUtils.isEmpty(more)) {
         // b.appendQueryParameter(PARAM_MORE, more);
         // } else if (filter == FilterAdapter.MESSAGE_INBOX
@@ -289,8 +283,22 @@ public class ThingProvider extends BaseProvider {
         Bundle extras = new Bundle(2);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGE_THREAD);
         extras.putString(EXTRA_THING_ID, thingId);
-        return call(context, ThingProvider.MESSAGES_URI, METHOD_GET_SESSION,
-                accountName, extras);
+        return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
+    }
+
+    public static final Bundle insertComment(Context context, String accountName, String body,
+            int nesting, long parentId, int parentNumComments, String parentThingId, int sequence,
+            long sessionId, String thingId) {
+        Bundle extras = new Bundle(8);
+        extras.putString(EXTRA_BODY, body);
+        extras.putInt(EXTRA_NESTING, nesting);
+        extras.putLong(EXTRA_PARENT_ID, parentId);
+        extras.putInt(EXTRA_PARENT_NUM_COMMENTS, parentNumComments);
+        extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
+        extras.putInt(EXTRA_SEQUENCE, sequence);
+        extras.putLong(EXTRA_SESSION_ID, sessionId);
+        extras.putString(EXTRA_THING_ID, thingId);
+        return call(context, THINGS_URI, METHOD_INSERT_COMMENT, accountName, extras);
     }
 
     private static Bundle call(Context context, Uri uri, String method,
@@ -547,8 +555,8 @@ public class ThingProvider extends BaseProvider {
 
             // Update observers and schedule a sync. Both URIs are backed by the same sync adapter.
             ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(ThingProvider.THINGS_URI, null, false);
-            cr.notifyChange(ThingProvider.COMMENTS_URI, null, true);
+            cr.notifyChange(THINGS_URI, null, false);
+            cr.notifyChange(COMMENTS_URI, null, true);
 
         } finally {
             db.endTransaction();
