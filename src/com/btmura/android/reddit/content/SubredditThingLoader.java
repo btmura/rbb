@@ -47,7 +47,7 @@ public class SubredditThingLoader extends AbstractThingLoader {
         this.filter = filter;
         this.more = more;
 
-        setUri(ThingProvider.getSubredditUri(true));
+        setUri(ThingProvider.THINGS_WITH_ACTIONS_URI);
         setProjection(PROJECTION);
         setSelection(HideActions.SELECT_UNHIDDEN_BY_SESSION_ID);
     }

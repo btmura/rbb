@@ -106,7 +106,7 @@ public class CommentLoader extends CursorLoader {
         this.thingId = thingId;
         this.linkId = linkId;
 
-        setUri(ThingProvider.getCommentsUri(true));
+        setUri(ThingProvider.COMMENTS_WITH_ACTIONS_URI);
         setProjection(PROJECTION);
         setSelection(Comments.SELECT_VISIBLE_BY_SESSION_ID);
         setSortOrder(Comments.SORT_BY_SEQUENCE_AND_ID);

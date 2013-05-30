@@ -101,6 +101,16 @@ public class ThingProvider extends BaseProvider {
     public static final Uri MESSAGES_SYNC_URI = makeSyncUri(MESSAGES_URI);
     public static final Uri COMMENT_ACTIONS_SYNC_URI = makeSyncUri(COMMENT_ACTIONS_URI);
 
+    static final String PARAM_JOIN = "join";
+
+    public static final Uri THINGS_WITH_ACTIONS_URI = THINGS_URI.buildUpon()
+            .appendQueryParameter(PARAM_JOIN, TRUE)
+            .build();
+
+    public static final Uri COMMENTS_WITH_ACTIONS_URI = COMMENTS_URI.buildUpon()
+            .appendQueryParameter(PARAM_JOIN, TRUE)
+            .build();
+
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;
     private static final int MATCH_COMMENTS = 2;
@@ -140,7 +150,6 @@ public class ThingProvider extends BaseProvider {
     static final String PARAM_THING_ID = "thingId";
     static final String PARAM_LINK_ID = "linkId";
     static final String PARAM_COUNT = "count";
-    static final String PARAM_JOIN = "join";
     static final String PARAM_NOTIFY_ACCOUNTS = "notifyAccounts";
     static final String PARAM_NOTIFY_COMMENTS = "notifyComments";
     static final String PARAM_NOTIFY_THINGS = "notifyThings";
@@ -234,12 +243,6 @@ public class ThingProvider extends BaseProvider {
                 accountName, extras);
     }
 
-    public static final Uri getSubredditUri(boolean includeActions) {
-        return THINGS_URI.buildUpon()
-                .appendQueryParameter(PARAM_JOIN, TRUE)
-                .build();
-    }
-
     public static final Bundle getProfileSession(Context context, String accountName,
             String profileUser, int filter, String more) {
         Bundle extras = new Bundle(4);
@@ -260,12 +263,6 @@ public class ThingProvider extends BaseProvider {
         extras.putInt(EXTRA_COUNT, numComments);
         return call(context, ThingProvider.COMMENTS_URI, METHOD_GET_SESSION,
                 accountName, extras);
-    }
-
-    public static final Uri getCommentsUri(boolean includeActions) {
-        return COMMENTS_URI.buildUpon()
-                .appendQueryParameter(PARAM_JOIN, TRUE)
-                .build();
     }
 
     public static final Bundle getSearchSession(Context context, String accountName,
