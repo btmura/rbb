@@ -54,13 +54,12 @@ public class SubredditThingLoader extends AbstractThingLoader {
 
     @Override
     public Cursor loadInBackground() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground");
-        }
-
         Bundle result = ThingProvider.getSubredditSession(getContext(), accountName, subreddit,
                 filter, more);
         long sessionId = result.getLong(ThingProvider.EXTRA_SESSION_ID);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "loadInBackground sessionId: " + sessionId);
+        }
         setSelectionArgs(Array.of(sessionId));
         return new CursorExtrasWrapper(super.loadInBackground(), result);
     }

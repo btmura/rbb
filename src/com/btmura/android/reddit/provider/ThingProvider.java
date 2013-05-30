@@ -394,7 +394,7 @@ public class ThingProvider extends BaseProvider {
             boolean mark = extras.getBoolean(EXTRA_MARK, false);
             String more = extras.getString(EXTRA_MORE);
             String query = extras.getString(EXTRA_QUERY);
-            long sessionId = extras.getLong(EXTRA_SESSION_ID);
+            long sessionId = extras.getLong(EXTRA_SESSION_ID, -1);
             String subreddit = extras.getString(EXTRA_SUBREDDIT);
             String thingId = extras.getString(EXTRA_THING_ID);
             String user = extras.getString(EXTRA_USER);

@@ -114,13 +114,12 @@ public class CommentLoader extends CursorLoader {
 
     @Override
     public Cursor loadInBackground() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground");
-        }
-
         Bundle result = ThingProvider.getCommentsSession(getContext(), accountName, thingId,
                 linkId, -1);
         long sessionId = result.getLong(ThingProvider.EXTRA_SESSION_ID);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "loadInBackground sessionId: " + sessionId);
+        }
         setSelectionArgs(Array.of(sessionId));
         return new CursorExtrasWrapper(super.loadInBackground(), result);
     }
