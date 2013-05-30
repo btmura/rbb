@@ -137,19 +137,6 @@ public class ThingProvider extends BaseProvider {
         MATCHER.addURI(AUTHORITY, PATH_VOTE_ACTIONS, MATCH_VOTE_ACTIONS);
     }
 
-    static final String PARAM_LISTING_GET = "getListing";
-    static final String PARAM_LISTING_TYPE = "listingType";
-
-    static final String PARAM_ACCOUNT = "account";
-    static final String PARAM_SUBREDDIT = "subreddit";
-    static final String PARAM_QUERY = "query";
-    static final String PARAM_PROFILE_USER = "profileUser";
-    static final String PARAM_FILTER = "filter";
-    static final String PARAM_MORE = "more";
-    static final String PARAM_MARK = "mark";
-    static final String PARAM_THING_ID = "thingId";
-    static final String PARAM_LINK_ID = "linkId";
-    static final String PARAM_COUNT = "count";
     static final String PARAM_NOTIFY_ACCOUNTS = "notifyAccounts";
     static final String PARAM_NOTIFY_COMMENTS = "notifyComments";
     static final String PARAM_NOTIFY_THINGS = "notifyThings";
