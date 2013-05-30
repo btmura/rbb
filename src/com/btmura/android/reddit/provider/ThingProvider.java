@@ -447,48 +447,55 @@ public class ThingProvider extends BaseProvider {
         // Get new values over the network.
         ArrayList<ContentValues> values = listing.getValues();
 
-        // Delete any existing "Loading..." signs if appending.
-        if (listing.isAppend()) {
-            // Appending requires an existing session to append the data.
+        db.beginTransaction();
+        try {
+            // Delete any existing "Loading..." signs if appending.
+            if (listing.isAppend()) {
+                // Appending requires an existing session to append the data.
+                if (sessionId == 0) {
+                    throw new IllegalStateException();
+                }
+
+                // Delete the row for this append. If there is no such row, then
+                // this might be a duplicate append that got triggered, so just
+                // return the existing session id and hope for the best.
+                int count = db.delete(listing.getTargetTable(),
+                        SELECT_MORE_WITH_SESSION_ID, Array.of(sessionId));
+                if (count == 0) {
+                    return sessionId;
+                }
+            }
+
+            // Create a new session if there is no id.
             if (sessionId == 0) {
-                throw new IllegalStateException();
+                ContentValues v = new ContentValues(3);
+                v.put(Sessions.COLUMN_TYPE, listing.getSessionType());
+                v.put(Sessions.COLUMN_TAG, listing.getSessionTag());
+                v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
+                sessionId = db.insert(Sessions.TABLE_NAME, null, v);
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "created session: " + sessionId);
+                }
             }
 
-            // Delete the row for this append. If there is no such row, then
-            // this might be a duplicate append that got triggered, so just
-            // return the existing session id and hope for the best.
-            int count = db.delete(listing.getTargetTable(),
-                    SELECT_MORE_WITH_SESSION_ID, Array.of(sessionId));
-            if (count == 0) {
-                return sessionId;
+            // Add the session id to the data rows.
+            int count = values.size();
+            for (int i = 0; i < count; i++) {
+                values.get(i).put(SharedColumns.COLUMN_SESSION_ID, sessionId);
             }
-        }
 
-        // Create a new session if there is no id.
-        if (sessionId == 0) {
-            ContentValues v = new ContentValues(3);
-            v.put(Sessions.COLUMN_TYPE, listing.getSessionType());
-            v.put(Sessions.COLUMN_TAG, listing.getSessionTag());
-            v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
-            sessionId = db.insert(Sessions.TABLE_NAME, null, v);
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "created session: " + sessionId);
+            // Insert the rows into the database.
+            InsertHelper helper = new InsertHelper(db, listing.getTargetTable());
+            for (int i = 0; i < count; i++) {
+                helper.insert(values.get(i));
             }
-        }
 
-        // Add the session id to the data rows.
-        int count = values.size();
-        for (int i = 0; i < count; i++) {
-            values.get(i).put(SharedColumns.COLUMN_SESSION_ID, sessionId);
-        }
+            db.setTransactionSuccessful();
 
-        // Insert the rows into the database.
-        InsertHelper helper = new InsertHelper(db, listing.getTargetTable());
-        for (int i = 0; i < count; i++) {
-            helper.insert(values.get(i));
+            return sessionId;
+        } finally {
+            db.endTransaction();
         }
-
-        return sessionId;
     }
 
     private Bundle insertComment(String accountName, Bundle extras) {
