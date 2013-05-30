@@ -396,7 +396,7 @@ public class ThingProvider extends BaseProvider {
             String thingId = extras.getString(EXTRA_THING_ID);
             String user = extras.getString(EXTRA_USER);
 
-            int listingType = extras.getInt(EXTRA_SESSION_TYPE, -1);
+            int listingType = extras.getInt(EXTRA_SESSION_TYPE);
             Listing listing = null;
             switch (listingType) {
                 case Sessions.TYPE_MESSAGE_THREAD:
@@ -459,7 +459,7 @@ public class ThingProvider extends BaseProvider {
         // Delete any existing "Loading..." signs if appending.
         if (listing.isAppend()) {
             // Appending requires an existing session to append the data.
-            if (sessionId == -1) {
+            if (sessionId == 0) {
                 throw new IllegalStateException();
             }
 
@@ -474,7 +474,7 @@ public class ThingProvider extends BaseProvider {
         }
 
         // Create a new session if there is no id.
-        if (sessionId == -1) {
+        if (sessionId == 0) {
             ContentValues v = new ContentValues(3);
             v.put(Sessions.COLUMN_TYPE, listing.getSessionType());
             v.put(Sessions.COLUMN_TAG, listing.getSessionTag());
