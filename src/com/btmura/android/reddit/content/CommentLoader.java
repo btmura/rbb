@@ -99,6 +99,7 @@ public class CommentLoader extends CursorLoader {
     private final String accountName;
     private final String thingId;
     private final String linkId;
+    private Bundle session;
 
     public CommentLoader(Context context, String accountName, String thingId, String linkId) {
         super(context);
@@ -114,13 +115,15 @@ public class CommentLoader extends CursorLoader {
 
     @Override
     public Cursor loadInBackground() {
-        Bundle result = ThingProvider.getCommentsSession(getContext(), accountName, thingId,
-                linkId, -1);
-        long sessionId = result.getLong(ThingProvider.EXTRA_SESSION_ID);
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground sessionId: " + sessionId);
+            Log.d(TAG, "loadInBackground");
         }
-        setSelectionArgs(Array.of(sessionId));
-        return new CursorExtrasWrapper(super.loadInBackground(), result);
+        if (session == null) {
+            session = ThingProvider.getCommentsSession(getContext(),
+                    accountName, thingId, linkId, -1);
+            long sessionId = session.getLong(ThingProvider.EXTRA_SESSION_ID);
+            setSelectionArgs(Array.of(sessionId));
+        }
+        return new CursorExtrasWrapper(super.loadInBackground(), session);
     }
 }
