@@ -182,20 +182,19 @@ public class Provider {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                Bundle extras = new Bundle(9);
-                extras.putString(ThingProvider.CALL_EXTRA_ACCOUNT, accountName);
-                extras.putString(ThingProvider.CALL_EXTRA_BODY, body);
-                extras.putInt(ThingProvider.CALL_EXTRA_NESTING, nesting);
-                extras.putLong(ThingProvider.CALL_EXTRA_PARENT_ID, parentId);
-                extras.putInt(ThingProvider.CALL_EXTRA_PARENT_NUM_COMMENTS, parentNumComments);
-                extras.putString(ThingProvider.CALL_EXTRA_PARENT_THING_ID, parentThingId);
-                extras.putInt(ThingProvider.CALL_EXTRA_SEQUENCE, sequence);
-                extras.putLong(ThingProvider.CALL_EXTRA_SESSION_ID, sessionId);
-                extras.putString(ThingProvider.CALL_EXTRA_THING_ID, thingId);
+                Bundle extras = new Bundle(8);
+                extras.putString(ThingProvider.EXTRA_BODY, body);
+                extras.putInt(ThingProvider.EXTRA_NESTING, nesting);
+                extras.putLong(ThingProvider.EXTRA_PARENT_ID, parentId);
+                extras.putInt(ThingProvider.EXTRA_PARENT_NUM_COMMENTS, parentNumComments);
+                extras.putString(ThingProvider.EXTRA_PARENT_THING_ID, parentThingId);
+                extras.putInt(ThingProvider.EXTRA_SEQUENCE, sequence);
+                extras.putLong(ThingProvider.EXTRA_SESSION_ID, sessionId);
+                extras.putString(ThingProvider.EXTRA_THING_ID, thingId);
 
                 ContentResolver cr = appContext.getContentResolver();
                 cr.call(ThingProvider.THINGS_URI, ThingProvider.METHOD_INSERT_COMMENT,
-                        null, extras);
+                        accountName, extras);
             }
         });
     }

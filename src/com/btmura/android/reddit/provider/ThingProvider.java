@@ -71,8 +71,6 @@ public class ThingProvider extends BaseProvider {
     public static final String AUTHORITY = "com.btmura.android.reddit.provider.things";
     static final String AUTHORITY_URI = "content://" + AUTHORITY + "/";
 
-    public static final String EXTRA_RESOLVED_SUBREDDIT = "resolvedSubreddit";
-
     private static final String PATH_THINGS = "things";
     private static final String PATH_COMMENTS = "comments";
     private static final String PATH_MESSAGES = "messages";
@@ -101,15 +99,8 @@ public class ThingProvider extends BaseProvider {
     public static final Uri MESSAGES_SYNC_URI = makeSyncUri(MESSAGES_URI);
     public static final Uri COMMENT_ACTIONS_SYNC_URI = makeSyncUri(COMMENT_ACTIONS_URI);
 
-    static final String PARAM_JOIN = "join";
-
-    public static final Uri THINGS_WITH_ACTIONS_URI = THINGS_URI.buildUpon()
-            .appendQueryParameter(PARAM_JOIN, TRUE)
-            .build();
-
-    public static final Uri COMMENTS_WITH_ACTIONS_URI = COMMENTS_URI.buildUpon()
-            .appendQueryParameter(PARAM_JOIN, TRUE)
-            .build();
+    public static final Uri THINGS_WITH_ACTIONS_URI = makeJoinUri(THINGS_URI);
+    public static final Uri COMMENTS_WITH_ACTIONS_URI = makeJoinUri(COMMENTS_URI);
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;
@@ -141,6 +132,12 @@ public class ThingProvider extends BaseProvider {
     static final String PARAM_NOTIFY_COMMENTS = "notifyComments";
     static final String PARAM_NOTIFY_THINGS = "notifyThings";
     static final String PARAM_NOTIFY_MESSAGES = "notifyMessages";
+
+    private static final String PARAM_JOIN = "join";
+
+    private static final Uri makeJoinUri(Uri uri) {
+        return uri.buildUpon().appendQueryParameter(PARAM_JOIN, TRUE).build();
+    }
 
     private static final String JOINED_TABLE = ""
             // Join with pending hides to fake that the things were hidden.
@@ -174,7 +171,6 @@ public class ThingProvider extends BaseProvider {
 
     private static final String JOINED_COMMENTS_TABLE = Comments.TABLE_NAME + JOINED_TABLE;
 
-    // TODO: Make a separate table for just read actions?
     private static final String JOINED_MESSAGES_TABLE = Messages.TABLE_NAME
             // Join with pending actions to decide if need to mark as read.
             + " LEFT OUTER JOIN (SELECT "
@@ -185,32 +181,32 @@ public class ThingProvider extends BaseProvider {
             + ReadActions.COLUMN_ACCOUNT + ", "
             + SharedColumns.COLUMN_THING_ID + ")";
 
-    public static final String METHOD_GET_SESSION = "getSession";
+    /** Method to create a listing session of some kind. */
+    static final String METHOD_GET_SESSION = "getSession";
 
     /** Method to insert a pending comment in a listing. */
     static final String METHOD_INSERT_COMMENT = "insertComment";
 
+    // List of extras used throughout the provider code.
+
+    public static final String EXTRA_BODY = "body";
     public static final String EXTRA_COUNT = "count";
     public static final String EXTRA_FILTER = "filter";
     public static final String EXTRA_LINK_ID = "linkId";
     public static final String EXTRA_MARK = "mark";
     public static final String EXTRA_MORE = "more";
+    public static final String EXTRA_NESTING = "nesting";
+    public static final String EXTRA_PARENT_ID = "parentId";
+    public static final String EXTRA_PARENT_NUM_COMMENTS = "parentNumComments";
+    public static final String EXTRA_PARENT_THING_ID = "parentThingId";
     public static final String EXTRA_QUERY = "query";
+    public static final String EXTRA_RESOLVED_SUBREDDIT = "resolvedSubreddit";
+    public static final String EXTRA_SEQUENCE = "sequence";
     public static final String EXTRA_SESSION_ID = "sessionId";
     public static final String EXTRA_SESSION_TYPE = "sessionType";
     public static final String EXTRA_SUBREDDIT = "subreddit";
     public static final String EXTRA_THING_ID = "thingId";
     public static final String EXTRA_USER = "user";
-
-    static final String CALL_EXTRA_ACCOUNT = "account";
-    static final String CALL_EXTRA_BODY = "body";
-    static final String CALL_EXTRA_NESTING = "nesting";
-    static final String CALL_EXTRA_PARENT_ID = "parentId";
-    static final String CALL_EXTRA_PARENT_NUM_COMMENTS = "parentNumComments";
-    static final String CALL_EXTRA_PARENT_THING_ID = "parentThingId";
-    static final String CALL_EXTRA_SEQUENCE = "sequence";
-    static final String CALL_EXTRA_SESSION_ID = "sessionId";
-    static final String CALL_EXTRA_THING_ID = "thingId";
 
     private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Comments.TABLE_NAME
             + " SET " + Comments.COLUMN_SEQUENCE + "=" + Comments.COLUMN_SEQUENCE + "+1"
@@ -359,7 +355,7 @@ public class ThingProvider extends BaseProvider {
         if (METHOD_GET_SESSION.equals(method)) {
             return getSession(arg, extras);
         } else if (METHOD_INSERT_COMMENT.equals(method)) {
-            return insertComment(extras);
+            return insertComment(arg, extras);
         }
         return null;
     }
@@ -437,7 +433,7 @@ public class ThingProvider extends BaseProvider {
         return null;
     }
 
-    long getListingSession(Listing listing, long sessionId) throws IOException {
+    private long getListingSession(Listing listing, long sessionId) throws IOException {
         SQLiteDatabase db = helper.getWritableDatabase();
 
         // Get new values over the network.
@@ -487,16 +483,15 @@ public class ThingProvider extends BaseProvider {
         return sessionId;
     }
 
-    private Bundle insertComment(Bundle extras) {
-        String accountName = extras.getString(CALL_EXTRA_ACCOUNT);
-        String body = extras.getString(CALL_EXTRA_BODY);
-        int nesting = extras.getInt(CALL_EXTRA_NESTING);
-        long parentId = extras.getLong(CALL_EXTRA_PARENT_ID);
-        int parentNumComments = extras.getInt(CALL_EXTRA_PARENT_NUM_COMMENTS);
-        String parentThingId = extras.getString(CALL_EXTRA_PARENT_THING_ID);
-        int sequence = extras.getInt(CALL_EXTRA_SEQUENCE);
-        long sessionId = extras.getLong(CALL_EXTRA_SESSION_ID);
-        String thingId = extras.getString(CALL_EXTRA_THING_ID);
+    private Bundle insertComment(String accountName, Bundle extras) {
+        String body = extras.getString(EXTRA_BODY);
+        int nesting = extras.getInt(EXTRA_NESTING);
+        long parentId = extras.getLong(EXTRA_PARENT_ID);
+        int parentNumComments = extras.getInt(EXTRA_PARENT_NUM_COMMENTS);
+        String parentThingId = extras.getString(EXTRA_PARENT_THING_ID);
+        int sequence = extras.getInt(EXTRA_SEQUENCE);
+        long sessionId = extras.getLong(EXTRA_SESSION_ID);
+        String thingId = extras.getString(EXTRA_THING_ID);
 
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
