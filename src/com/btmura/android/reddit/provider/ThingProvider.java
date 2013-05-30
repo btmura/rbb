@@ -234,6 +234,12 @@ public class ThingProvider extends BaseProvider {
                 accountName, extras);
     }
 
+    public static final Uri getSubredditUri(boolean includeActions) {
+        return THINGS_URI.buildUpon()
+                .appendQueryParameter(PARAM_JOIN, TRUE)
+                .build();
+    }
+
     public static final Bundle getProfileSession(Context context, String accountName,
             String profileUser, int filter, String more) {
         Bundle extras = new Bundle(4);
