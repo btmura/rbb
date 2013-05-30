@@ -143,6 +143,15 @@ public class ThingProvider extends BaseProvider {
     static final String PARAM_NOTIFY_MESSAGES = "notifyMessages";
 
     private static final String JOINED_TABLE = ""
+            // Join with pending hides to fake that the things were hidden.
+            + " LEFT OUTER JOIN (SELECT "
+            + HideActions.COLUMN_ACCOUNT + ","
+            + HideActions.COLUMN_THING_ID + ","
+            + HideActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_HIDE_ACTION
+            + " FROM " + HideActions.TABLE_NAME + ") USING ("
+            + HideActions.COLUMN_ACCOUNT + ","
+            + SharedColumns.COLUMN_THING_ID + ")"
+
             // Join with pending saves to fake that the save happened.
             + " LEFT OUTER JOIN (SELECT "
             + SaveActions.COLUMN_ACCOUNT + ","
@@ -159,15 +168,6 @@ public class ThingProvider extends BaseProvider {
             + VoteActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_VOTE_ACTION
             + " FROM " + VoteActions.TABLE_NAME + ") USING ("
             + VoteActions.COLUMN_ACCOUNT + ","
-            + SharedColumns.COLUMN_THING_ID + ")"
-
-            // Join with pending hides to fake that the things were hidden.
-            + " LEFT OUTER JOIN (SELECT "
-            + HideActions.COLUMN_ACCOUNT + ","
-            + HideActions.COLUMN_THING_ID + ","
-            + HideActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_LOCAL_HIDDEN
-            + " FROM " + HideActions.TABLE_NAME + ") USING ("
-            + HideActions.COLUMN_ACCOUNT + ","
             + SharedColumns.COLUMN_THING_ID + ")";
 
     private static final String JOINED_THINGS_TABLE = Things.TABLE_NAME + JOINED_TABLE;

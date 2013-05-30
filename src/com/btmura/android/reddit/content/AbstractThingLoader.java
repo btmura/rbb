@@ -50,9 +50,9 @@ public abstract class AbstractThingLoader extends CursorLoader {
             Things.COLUMN_URL,
 
             // Following columns are from joined tables at the end.
+            SharedColumns.COLUMN_HIDE_ACTION,
             SharedColumns.COLUMN_SAVE_ACTION,
             SharedColumns.COLUMN_VOTE_ACTION,
-            SharedColumns.COLUMN_LOCAL_HIDDEN,
     };
 
     public static final int THING_AUTHOR = 1;
