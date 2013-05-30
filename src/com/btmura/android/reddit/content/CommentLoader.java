@@ -29,6 +29,9 @@ import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Array;
 
+/**
+ * {@link CursorLoader} for viewing a thing's comments.
+ */
 public class CommentLoader extends CursorLoader {
 
     private static final String TAG = "CommentLoader";
@@ -102,6 +105,11 @@ public class CommentLoader extends CursorLoader {
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;
+
+        setUri(ThingProvider.getCommentsUri(true));
+        setProjection(PROJECTION);
+        setSelection(Comments.SELECT_VISIBLE_BY_SESSION_ID);
+        setSortOrder(Comments.SORT_BY_SEQUENCE_AND_ID);
     }
 
     @Override
@@ -110,15 +118,10 @@ public class CommentLoader extends CursorLoader {
             Log.d(TAG, "loadInBackground");
         }
 
-        Bundle result = ThingProvider.getCommentsSession(getContext(), accountName, thingId, linkId, -1);
+        Bundle result = ThingProvider.getCommentsSession(getContext(), accountName, thingId,
+                linkId, -1);
         long sessionId = result.getLong(ThingProvider.EXTRA_SESSION_ID);
-
-        setUri(ThingProvider.COMMENTS_URI);
-        setProjection(PROJECTION);
-        setSelection(Comments.SELECT_VISIBLE_BY_SESSION_ID);
         setSelectionArgs(Array.of(sessionId));
-        setSortOrder(Comments.SORT_BY_SEQUENCE_AND_ID);
-
         return new CursorExtrasWrapper(super.loadInBackground(), result);
     }
 }

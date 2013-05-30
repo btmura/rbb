@@ -262,6 +262,12 @@ public class ThingProvider extends BaseProvider {
                 accountName, extras);
     }
 
+    public static final Uri getCommentsUri(boolean includeActions) {
+        return COMMENTS_URI.buildUpon()
+                .appendQueryParameter(PARAM_JOIN, TRUE)
+                .build();
+    }
+
     public static final Bundle getSearchSession(Context context, String accountName,
             String subreddit, String query) {
         Bundle extras = new Bundle(3);
