@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.util;
 
+import android.os.Bundle;
+
 /**
  * Utility class for handling {@link Object}s and other types.
  */
@@ -39,5 +41,9 @@ public class Objects {
             return s2.equalsIgnoreCase(s1);
         }
         return true;
+    }
+
+    public static Bundle nullToEmpty(Bundle bundle) {
+        return bundle != null ? bundle : Bundle.EMPTY;
     }
 }

@@ -162,8 +162,13 @@ class MessageThingListController implements ThingListController {
     }
 
     @Override
-    public String getNextMore() {
+    public String getNextMoreId() {
         return null;
+    }
+
+    @Override
+    public boolean hasNextMoreId() {
+        return false;
     }
 
     private boolean isNew(int position) {
@@ -181,13 +186,29 @@ class MessageThingListController implements ThingListController {
         return false;
     }
 
+    // Simple getters.
+
+    @Override
+    public String getMoreId() {
+        return null;
+    }
+
+    @Override
+    public long getSessionId() {
+        return 0;
+    }
+
     // Simple setters.
 
     @Override
-    public void setMore(String more) {
+    public void setMoreId(String moreId) {
     }
 
-    // Simple getters.
+    @Override
+    public void setSessionId(long sessionId) {
+    }
+
+    // Simple adapter getters.
 
     private String getContext(int position) {
         return adapter.getString(position, MessageThingLoader.MESSAGE_CONTEXT);

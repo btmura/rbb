@@ -29,16 +29,14 @@ class SubredditThingListController extends AbstractThingListController {
     private String accountName;
     private String subreddit;
     private final int filter;
-    private String more;
 
     SubredditThingListController(Context context, String accountName, String subreddit, int filter,
-            String more, ThingListAdapter adapter) {
+            ThingListAdapter adapter) {
         super(context, accountName, adapter);
         this.context = context.getApplicationContext();
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.filter = filter;
-        this.more = more;
     }
 
     @Override
@@ -48,11 +46,7 @@ class SubredditThingListController extends AbstractThingListController {
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new SubredditThingLoader(context, accountName, subreddit, filter, more);
-    }
-
-    @Override
-    public void setMore(String more) {
-        this.more = more;
+        return new SubredditThingLoader(context, accountName, subreddit, filter,
+                moreId, sessionId);
     }
 }

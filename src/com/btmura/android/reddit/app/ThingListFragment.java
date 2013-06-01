@@ -37,6 +37,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
@@ -69,7 +70,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private static final String ARG_FILTER = "filter";
 
     /** String argument that is used to paginate things. */
-    private static final String ARG_MORE = "more";
+    private static final String LOADER_MORE_ID = "moreId";
 
     /** Optional bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
@@ -252,9 +253,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (args != null) {
-            controller.setMore(args.getString(ARG_MORE));
-        }
+        args = Objects.nullToEmpty(args);
+        controller.setMoreId(args.getString(LOADER_MORE_ID));
         return controller.createLoader();
     }
 
@@ -264,8 +264,12 @@ public class ThingListFragment extends ThingProviderListFragment implements
         super.onLoadFinished(loader, cursor);
 
         scrollLoading = false;
-        adapter.setMore(null);
+        controller.setMoreId(null);
         adapter.swapCursor(cursor);
+
+        Bundle extras = Objects.nullToEmpty(cursor.getExtras());
+        controller.setSessionId(extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
         getActivity().invalidateOptionsMenu();
@@ -292,18 +296,13 @@ public class ThingListFragment extends ThingProviderListFragment implements
         if (visibleItemCount <= 0 || scrollLoading) {
             return;
         }
-        if (firstVisibleItem + visibleItemCount * 2 >= totalItemCount) {
-            if (getLoaderManager().getLoader(0) != null) {
-                if (!adapter.isEmpty()) {
-                    String more = controller.getNextMore();
-                    if (!TextUtils.isEmpty(more)) {
-                        scrollLoading = true;
-                        Bundle b = new Bundle(1);
-                        b.putString(ARG_MORE, more);
-                        getLoaderManager().restartLoader(0, b, this);
-                    }
-                }
-            }
+        if (firstVisibleItem + visibleItemCount * 2 >= totalItemCount
+                && getLoaderManager().getLoader(0) != null
+                && controller.hasNextMoreId()) {
+            scrollLoading = true;
+            Bundle args = new Bundle(1);
+            args.putString(LOADER_MORE_ID, controller.getNextMoreId());
+            getLoaderManager().restartLoader(0, args, this);
         }
     }
 
@@ -449,7 +448,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(STATE_SESSION_ID, adapter.getSessionId());
+        outState.putLong(STATE_SESSION_ID, controller.getSessionId());
         outState.putString(STATE_ACCOUNT_NAME, adapter.getAccountName());
         outState.putString(STATE_PARENT_SUBREDDIT, adapter.getParentSubreddit());
         outState.putString(STATE_SUBREDDIT, adapter.getSubreddit());
@@ -532,7 +531,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
                     getAccountNameArgument(),
                     getSubredditArgument(),
                     getFilterArgument(),
-                    null,
                     adapter);
         } else {
             throw new IllegalArgumentException();

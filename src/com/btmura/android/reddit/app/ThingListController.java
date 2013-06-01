@@ -48,13 +48,21 @@ interface ThingListController {
 
     // Getters.
 
-    String getNextMore();
+    String getMoreId();
+
+    String getNextMoreId();
+
+    long getSessionId();
+
+    boolean hasNextMoreId();
 
     boolean isSwipeDismissable(int position);
 
     // Setters.
 
-    void setMore(String more);
+    void setMoreId(String moreId);
+
+    void setSessionId(long sessionId);
 
     // Menu preparation methods.
 

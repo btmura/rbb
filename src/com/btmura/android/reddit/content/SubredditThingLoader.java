@@ -38,15 +38,17 @@ public class SubredditThingLoader extends AbstractThingLoader {
     private final String subreddit;
     private final int filter;
     private final String more;
+    private final long sessionId;
     private Bundle session;
 
     public SubredditThingLoader(Context context, String accountName, String subreddit, int filter,
-            String more) {
+            String more, long sessionId) {
         super(context);
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.filter = filter;
         this.more = more;
+        this.sessionId = sessionId;
 
         setUri(ThingProvider.THINGS_WITH_ACTIONS_URI);
         setProjection(PROJECTION);
@@ -60,7 +62,7 @@ public class SubredditThingLoader extends AbstractThingLoader {
         }
         if (session == null) {
             session = ThingProvider.getSubredditSession(getContext(),
-                    accountName, subreddit, filter, more);
+                    accountName, subreddit, filter, more, sessionId);
             long sessionId = session.getLong(ThingProvider.EXTRA_SESSION_ID);
             setSelectionArgs(Array.of(sessionId));
         }

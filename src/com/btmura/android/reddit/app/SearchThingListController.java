@@ -22,7 +22,7 @@ import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.widget.ThingListAdapter;
 
-public class SearchThingListController extends AbstractThingListController {
+class SearchThingListController extends AbstractThingListController {
 
     public SearchThingListController(Context context, String accountName, ThingListAdapter adapter) {
         super(context, accountName, adapter);
@@ -36,9 +36,5 @@ public class SearchThingListController extends AbstractThingListController {
     @Override
     public Loader<Cursor> createLoader() {
         return null;
-    }
-
-    @Override
-    public void setMore(String more) {
     }
 }

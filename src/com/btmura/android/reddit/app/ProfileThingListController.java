@@ -50,9 +50,4 @@ class ProfileThingListController extends AbstractThingListController {
     public Loader<Cursor> createLoader() {
         return new ProfileThingLoader(context, accountName, profileUser, filter, more);
     }
-
-    @Override
-    public void setMore(String more) {
-        this.more = more;
-    }
 }

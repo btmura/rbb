@@ -216,12 +216,13 @@ public class ThingProvider extends BaseProvider {
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
 
     public static final Bundle getSubredditSession(Context context, String accountName,
-            String subreddit, int filter, String more) {
-        Bundle extras = new Bundle(4);
+            String subreddit, int filter, String more, long sessionId) {
+        Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_SUBREDDIT);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
         extras.putInt(EXTRA_FILTER, filter);
         extras.putString(EXTRA_MORE, more);
+        extras.putLong(EXTRA_SESSION_ID, sessionId);
         return call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
@@ -382,7 +383,7 @@ public class ThingProvider extends BaseProvider {
             boolean mark = extras.getBoolean(EXTRA_MARK, false);
             String more = extras.getString(EXTRA_MORE);
             String query = extras.getString(EXTRA_QUERY);
-            long sessionId = extras.getLong(EXTRA_SESSION_ID, -1);
+            long sessionId = extras.getLong(EXTRA_SESSION_ID);
             String subreddit = extras.getString(EXTRA_SUBREDDIT);
             String thingId = extras.getString(EXTRA_THING_ID);
             String user = extras.getString(EXTRA_USER);

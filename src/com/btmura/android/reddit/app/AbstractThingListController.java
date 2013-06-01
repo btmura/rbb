@@ -40,11 +40,13 @@ import com.btmura.android.reddit.widget.ThingBundle;
 
 abstract class AbstractThingListController implements ThingListController {
 
+    private final Formatter formatter = new Formatter();
     private final Context context;
     private final String accountName;
-    private AbstractThingListAdapter adapter;
+    private final AbstractThingListAdapter adapter;
 
-    private final Formatter formatter = new Formatter();
+    protected String moreId;
+    protected long sessionId;
 
     AbstractThingListController(Context context, String accountName,
             AbstractThingListAdapter adapter) {
@@ -215,7 +217,7 @@ abstract class AbstractThingListController implements ThingListController {
     // Getters.
 
     @Override
-    public String getNextMore() {
+    public String getNextMoreId() {
         Cursor c = adapter.getCursor();
         if (c != null && c.moveToLast()) {
             if (c.getInt(AbstractThingLoader.THING_KIND) == Kinds.KIND_MORE) {
@@ -223,6 +225,11 @@ abstract class AbstractThingListController implements ThingListController {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean hasNextMoreId() {
+        return !TextUtils.isEmpty(getNextMoreId());
     }
 
     @Override
@@ -343,7 +350,29 @@ abstract class AbstractThingListController implements ThingListController {
                 || !adapter.getBoolean(position, AbstractThingLoader.THING_HIDDEN);
     }
 
-    // Setters.
+    // Simple getters for state members.
+
+    @Override
+    public String getMoreId() {
+        return moreId;
+    }
+
+    @Override
+    public long getSessionId() {
+        return sessionId;
+    }
+
+    // Simple setters for state members.
+
+    @Override
+    public void setMoreId(String moreId) {
+        this.moreId = moreId;
+    }
+
+    @Override
+    public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
+    }
 
     // Getters for thing attributes.
 
