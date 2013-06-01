@@ -26,6 +26,10 @@ interface ThingListController {
 
     boolean isLoadable();
 
+    void restoreState(Bundle inState);
+
+    void saveState(Bundle outState);
+
     Loader<Cursor> createLoader();
 
     Bundle getThingBundle(int position);

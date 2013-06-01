@@ -56,6 +56,14 @@ class MessageThingListController implements ThingListController {
     }
 
     @Override
+    public void saveState(Bundle outState) {
+    }
+
+    @Override
+    public void restoreState(Bundle savedInstanceState) {
+    }
+
+    @Override
     public Loader<Cursor> createLoader() {
         return new MessageThingLoader(context, accountName, filter, more);
     }

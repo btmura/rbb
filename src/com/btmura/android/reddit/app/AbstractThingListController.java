@@ -34,11 +34,14 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 import com.btmura.android.reddit.widget.ThingBundle;
 
 abstract class AbstractThingListController implements ThingListController {
+
+    private static final String STATE_SESSION_ID = "sessionId";
 
     private final Formatter formatter = new Formatter();
     private final Context context;
@@ -53,6 +56,17 @@ abstract class AbstractThingListController implements ThingListController {
         this.context = context;
         this.accountName = accountName;
         this.adapter = adapter;
+    }
+
+    @Override
+    public void saveState(Bundle outState) {
+        outState.putLong(STATE_SESSION_ID, sessionId);
+    }
+
+    @Override
+    public void restoreState(Bundle savedInstanceState) {
+        savedInstanceState = Objects.nullToEmpty(savedInstanceState);
+        sessionId = savedInstanceState.getLong(STATE_SESSION_ID);
     }
 
     @Override

@@ -83,9 +83,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     private static final String STATE_SUBREDDIT = ARG_SUBREDDIT;
 
-    /** String argument specifying session ID of the data. */
-    private static final String STATE_SESSION_ID = "sessionId";
-
     private static final String STATE_SELECTED_THING_ID = "selectedThingId";
     private static final String STATE_SELECTED_LINK_ID = "selectedLinkId";
     private static final String STATE_EMPTY_TEXT = "emptyText";
@@ -176,7 +173,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
         adapter.setParentSubreddit(getArguments().getString(ARG_SUBREDDIT));
 
         if (savedInstanceState != null) {
-            adapter.setSessionId(savedInstanceState.getLong(STATE_SESSION_ID));
             adapter.setAccountName(savedInstanceState.getString(STATE_ACCOUNT_NAME));
             adapter.setParentSubreddit(savedInstanceState.getString(STATE_PARENT_SUBREDDIT));
             adapter.setSubreddit(savedInstanceState.getString(STATE_SUBREDDIT));
@@ -189,6 +185,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         }
 
         controller = createController();
+        controller.restoreState(savedInstanceState);
 
         setHasOptionsMenu(true);
     }
@@ -448,7 +445,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(STATE_SESSION_ID, controller.getSessionId());
+        controller.saveState(outState);
         outState.putString(STATE_ACCOUNT_NAME, adapter.getAccountName());
         outState.putString(STATE_PARENT_SUBREDDIT, adapter.getParentSubreddit());
         outState.putString(STATE_SUBREDDIT, adapter.getSubreddit());

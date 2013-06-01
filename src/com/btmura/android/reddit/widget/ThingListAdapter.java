@@ -46,7 +46,6 @@ public class ThingListAdapter extends AbstractThingListAdapter {
     private String accountName;
     private String parentSubreddit;
 
-    private long sessionId = -1;
     private String subreddit;
     private String query;
     private String profileUser;
@@ -167,14 +166,6 @@ public class ThingListAdapter extends AbstractThingListAdapter {
 
     public boolean isSingleChoice() {
         return singleChoice;
-    }
-
-    public long getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(long sessionId) {
-        this.sessionId = sessionId;
     }
 
     public String getAccountName() {
