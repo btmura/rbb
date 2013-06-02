@@ -26,27 +26,20 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 class SubredditThingListController extends AbstractThingListController {
 
     private final Context context;
-    private String accountName;
-    private String subreddit;
-    private final int filter;
 
-    SubredditThingListController(Context context, String accountName, String subreddit, int filter,
-            ThingListAdapter adapter) {
-        super(context, accountName, adapter);
+    SubredditThingListController(Context context, ThingListAdapter adapter) {
+        super(context, adapter);
         this.context = context.getApplicationContext();
-        this.accountName = accountName;
-        this.subreddit = subreddit;
-        this.filter = filter;
     }
 
     @Override
     public boolean isLoadable() {
-        return accountName != null && subreddit != null;
+        return getAccountName() != null && getSubreddit() != null;
     }
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new SubredditThingLoader(context, accountName, subreddit, filter,
-                moreId, sessionId);
+        return new SubredditThingLoader(context, getAccountName(), getSubreddit(), getFilter(),
+                getMoreId(), getSessionId());
     }
 }

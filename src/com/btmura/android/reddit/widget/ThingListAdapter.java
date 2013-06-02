@@ -43,7 +43,6 @@ public class ThingListAdapter extends AbstractThingListAdapter {
             ThingView.DETAIL_SUBREDDIT,
     };
 
-    private String accountName;
     private String parentSubreddit;
 
     private String subreddit;
@@ -56,13 +55,11 @@ public class ThingListAdapter extends AbstractThingListAdapter {
     private final Formatter formatter = new Formatter();
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final OnVoteListener listener;
-    private final boolean singleChoice;
 
     public ThingListAdapter(Context context, String subreddit, String query, String profileUser,
             String messageUser, int filter, OnVoteListener listener, boolean singleChoice) {
-        super(context);
+        super(context, singleChoice);
         this.listener = listener;
-        this.singleChoice = singleChoice;
     }
 
     @Override
@@ -166,14 +163,6 @@ public class ThingListAdapter extends AbstractThingListAdapter {
 
     public boolean isSingleChoice() {
         return singleChoice;
-    }
-
-    public String getAccountName() {
-        return accountName;
-    }
-
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
     }
 
     public String getSubreddit() {

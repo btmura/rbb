@@ -33,7 +33,7 @@ class ProfileThingListController extends AbstractThingListController {
 
     ProfileThingListController(Context context, String accountName, String profileUser, int filter,
             String more, ThingListAdapter adapter) {
-        super(context, accountName, adapter);
+        super(context, adapter);
         this.context = context.getApplicationContext();
         this.accountName = accountName;
         this.profileUser = profileUser;

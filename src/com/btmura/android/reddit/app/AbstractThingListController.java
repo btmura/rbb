@@ -33,6 +33,7 @@ import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.StringUtil;
@@ -41,32 +42,79 @@ import com.btmura.android.reddit.widget.ThingBundle;
 
 abstract class AbstractThingListController implements ThingListController {
 
+    private static final String STATE_ACCOUNT_NAME = "accountName";
+    private static final String STATE_EMPTY_TEXT = "emptyText";
+    private static final String STATE_FILTER = "filter";
+    private static final String STATE_PARENT_SUBREDDIT = "parentSubreddit";
+    private static final String STATE_SELECTED_LINK_ID = "selectedLinkId";
+    private static final String STATE_SELECTED_THING_ID = "selectedThingId";
     private static final String STATE_SESSION_ID = "sessionId";
+    private static final String STATE_SUBREDDIT = "subreddit";
 
     private final Formatter formatter = new Formatter();
     private final Context context;
-    private final String accountName;
     private final AbstractThingListAdapter adapter;
 
-    protected String moreId;
-    protected long sessionId;
+    private String accountName;
+    private int emptyText;
+    private int filter;
+    private String moreId;
+    private String query;
+    private long sessionId;
 
-    AbstractThingListController(Context context, String accountName,
-            AbstractThingListAdapter adapter) {
+    AbstractThingListController(Context context, AbstractThingListAdapter adapter) {
         this.context = context;
-        this.accountName = accountName;
         this.adapter = adapter;
     }
 
     @Override
     public void saveState(Bundle outState) {
-        outState.putLong(STATE_SESSION_ID, sessionId);
+        outState.putString(STATE_ACCOUNT_NAME, getAccountName());
+        outState.putInt(STATE_EMPTY_TEXT, getEmptyText());
+        outState.putInt(STATE_FILTER, getFilter());
+        outState.putString(STATE_PARENT_SUBREDDIT, getParentSubreddit());
+        outState.putString(STATE_SELECTED_LINK_ID, getSelectedLinkId());
+        outState.putString(STATE_SELECTED_THING_ID, getSelectedThingId());
+        outState.putLong(STATE_SESSION_ID, getSessionId());
+        outState.putString(STATE_SUBREDDIT, getSubreddit());
     }
 
     @Override
-    public void restoreState(Bundle savedInstanceState) {
-        savedInstanceState = Objects.nullToEmpty(savedInstanceState);
-        sessionId = savedInstanceState.getLong(STATE_SESSION_ID);
+    public void restoreState(Bundle state) {
+        state = Objects.nullToEmpty(state);
+        if (state.containsKey(STATE_ACCOUNT_NAME)) {
+            setAccountName(state.getString(STATE_ACCOUNT_NAME));
+        }
+        if (state.containsKey(STATE_EMPTY_TEXT)) {
+            setEmptyText(state.getInt(STATE_EMPTY_TEXT));
+        }
+        if (state.containsKey(STATE_FILTER)) {
+            setFilter(state.getInt(STATE_FILTER));
+        }
+        if (state.containsKey(STATE_PARENT_SUBREDDIT)) {
+            setParentSubreddit(state.getString(STATE_PARENT_SUBREDDIT));
+        }
+        if (state.containsKey(STATE_SELECTED_LINK_ID)
+                && state.containsKey(STATE_SELECTED_THING_ID)) {
+            setSelectedThing(state.getString(STATE_SELECTED_THING_ID),
+                    state.getString(STATE_SELECTED_LINK_ID));
+        }
+        if (state.containsKey(STATE_SESSION_ID)) {
+            setSessionId(state.getLong(STATE_SESSION_ID));
+        }
+        if (state.containsKey(STATE_SUBREDDIT)) {
+            setSubreddit(state.getString(STATE_SUBREDDIT));
+        }
+    }
+
+    @Override
+    public void swapCursor(Cursor cursor) {
+        setMoreId(null);
+        adapter.swapCursor(cursor);
+        if (cursor != null && cursor.getExtras() != null) {
+            Bundle extras = cursor.getExtras();
+            setSessionId(extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+        }
     }
 
     @Override
@@ -242,8 +290,23 @@ abstract class AbstractThingListController implements ThingListController {
     }
 
     @Override
+    public boolean hasAccountName() {
+        return !TextUtils.isEmpty(getAccountName());
+    }
+
+    @Override
+    public boolean hasCursor() {
+        return adapter.getCursor() != null;
+    }
+
+    @Override
     public boolean hasNextMoreId() {
         return !TextUtils.isEmpty(getNextMoreId());
+    }
+
+    @Override
+    public boolean isSingleChoice() {
+        return adapter.isSingleChoice();
     }
 
     @Override
@@ -367,8 +430,48 @@ abstract class AbstractThingListController implements ThingListController {
     // Simple getters for state members.
 
     @Override
+    public String getAccountName() {
+        return accountName;
+    }
+
+    @Override
+    public AbstractThingListAdapter getAdapter() {
+        return adapter;
+    }
+
+    @Override
+    public int getEmptyText() {
+        return emptyText;
+    }
+
+    @Override
+    public int getFilter() {
+        return filter;
+    }
+
+    @Override
     public String getMoreId() {
         return moreId;
+    }
+
+    @Override
+    public String getParentSubreddit() {
+        return adapter.getParentSubreddit();
+    }
+
+    @Override
+    public String getQuery() {
+        return query;
+    }
+
+    @Override
+    public String getSelectedLinkId() {
+        return adapter.getSelectedLinkId();
+    }
+
+    @Override
+    public String getSelectedThingId() {
+        return adapter.getSelectedThingId();
     }
 
     @Override
@@ -376,7 +479,33 @@ abstract class AbstractThingListController implements ThingListController {
         return sessionId;
     }
 
+    @Override
+    public String getSubreddit() {
+        return adapter.getSubreddit();
+    }
+
+    @Override
+    public boolean hasQuery() {
+        return !TextUtils.isEmpty(getQuery());
+    }
+
     // Simple setters for state members.
+
+    @Override
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+        adapter.setAccountName(accountName);
+    }
+
+    @Override
+    public void setEmptyText(int emptyText) {
+        this.emptyText = emptyText;
+    }
+
+    @Override
+    public void setFilter(int filter) {
+        this.filter = filter;
+    }
 
     @Override
     public void setMoreId(String moreId) {
@@ -384,8 +513,33 @@ abstract class AbstractThingListController implements ThingListController {
     }
 
     @Override
+    public void setParentSubreddit(String parentSubreddit) {
+        adapter.setParentSubreddit(parentSubreddit);
+    }
+
+    @Override
+    public void setSelectedPosition(int position) {
+        adapter.setSelectedPosition(position);
+    }
+
+    @Override
+    public void setSelectedThing(String thingId, String linkId) {
+        adapter.setSelectedThing(thingId, linkId);
+    }
+
+    @Override
     public void setSessionId(long sessionId) {
         this.sessionId = sessionId;
+    }
+
+    @Override
+    public void setSubreddit(String subreddit) {
+        adapter.setSubreddit(subreddit);
+    }
+
+    @Override
+    public void setThingBodyWidth(int thingBodyWidth) {
+        adapter.setThingBodyWidth(thingBodyWidth);
     }
 
     // Getters for thing attributes.

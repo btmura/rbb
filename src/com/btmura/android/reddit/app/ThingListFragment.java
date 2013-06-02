@@ -37,7 +37,6 @@ import android.widget.ListView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
@@ -77,16 +76,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
-    private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
-
-    private static final String STATE_PARENT_SUBREDDIT = "parentSubreddit";
-
-    private static final String STATE_SUBREDDIT = ARG_SUBREDDIT;
-
-    private static final String STATE_SELECTED_THING_ID = "selectedThingId";
-    private static final String STATE_SELECTED_LINK_ID = "selectedLinkId";
-    private static final String STATE_EMPTY_TEXT = "emptyText";
-
     public interface OnThingSelectedListener {
         void onThingSelected(View view, Bundle thingBundle, int pageType);
 
@@ -96,9 +85,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private OnThingSelectedListener listener;
     private OnSubredditEventListener eventListener;
     private ThingBundleHolder thingBundleHolder;
-    private ThingListAdapter adapter;
     private ThingListController controller;
-    private int emptyText;
     private boolean scrollLoading;
 
     public static ThingListFragment newSubredditInstance(String accountName, String subreddit,
@@ -161,7 +148,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
 
-        adapter = new ThingListAdapter(getActivity(),
+        ThingListAdapter adapter = new ThingListAdapter(getActivity(),
                 getArguments().getString(ARG_SUBREDDIT),
                 getArguments().getString(ARG_QUERY),
                 getArguments().getString(ARG_PROFILE_USER),
@@ -169,22 +156,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
                 getArguments().getInt(ARG_FILTER),
                 this, singleChoice);
 
-        adapter.setAccountName(getArguments().getString(ARG_ACCOUNT_NAME));
-        adapter.setParentSubreddit(getArguments().getString(ARG_SUBREDDIT));
-
-        if (savedInstanceState != null) {
-            adapter.setAccountName(savedInstanceState.getString(STATE_ACCOUNT_NAME));
-            adapter.setParentSubreddit(savedInstanceState.getString(STATE_PARENT_SUBREDDIT));
-            adapter.setSubreddit(savedInstanceState.getString(STATE_SUBREDDIT));
-
-            String thingId = savedInstanceState.getString(STATE_SELECTED_THING_ID);
-            String linkId = savedInstanceState.getString(STATE_SELECTED_LINK_ID);
-            adapter.setSelectedThing(thingId, linkId);
-
-            emptyText = savedInstanceState.getInt(STATE_EMPTY_TEXT);
-        }
-
-        controller = createController();
+        controller = createController(adapter);
+        controller.restoreState(getArguments());
         controller.restoreState(savedInstanceState);
 
         setHasOptionsMenu(true);
@@ -223,10 +196,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        adapter.setThingBodyWidth(getThingBodyWidth());
-        setListAdapter(adapter);
+        controller.setThingBodyWidth(getThingBodyWidth());
+        setListAdapter(controller.getAdapter());
         setListShown(false);
-        if (emptyText == 0) {
+        if (controller.getEmptyText() == 0) {
             loadIfPossible();
         } else {
             showEmpty();
@@ -240,12 +213,12 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public void setEmpty(boolean error) {
-        this.emptyText = error ? R.string.error : R.string.empty_list;
+        controller.setEmptyText(error ? R.string.error : R.string.empty_list);
         showEmpty();
     }
 
     private void showEmpty() {
-        setEmptyText(getString(emptyText));
+        setEmptyText(getString(controller.getEmptyText()));
         setListShown(true);
     }
 
@@ -261,11 +234,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         super.onLoadFinished(loader, cursor);
 
         scrollLoading = false;
-        controller.setMoreId(null);
-        adapter.swapCursor(cursor);
-
-        Bundle extras = Objects.nullToEmpty(cursor.getExtras());
-        controller.setSessionId(extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+        controller.swapCursor(cursor);
 
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
@@ -273,13 +242,13 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+        controller.swapCursor(null);
     }
 
     @Override
     protected void onSubredditLoaded(String subreddit) {
-        adapter.setParentSubreddit(subreddit);
-        adapter.setSubreddit(subreddit);
+        controller.setParentSubreddit(subreddit);
+        controller.setSubreddit(subreddit);
         if (eventListener != null) {
             eventListener.onSubredditDiscovery(subreddit);
         }
@@ -306,13 +275,13 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         selectThing(v, position, ThingPagerAdapter.TYPE_LINK);
-        if (adapter.isSingleChoice() && v instanceof ThingView) {
+        if (controller.isSingleChoice() && v instanceof ThingView) {
             ((ThingView) v).setChosen(true);
         }
     }
 
     private void selectThing(View v, int position, int pageType) {
-        adapter.setSelectedPosition(position);
+        controller.setSelectedPosition(position);
         if (listener != null) {
             listener.onThingSelected(v, controller.getThingBundle(position), pageType);
         }
@@ -330,7 +299,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public void onVote(View v, int action) {
-        if (!TextUtils.isEmpty(adapter.getAccountName())) {
+        if (controller.hasAccountName()) {
             int position = getListView().getPositionForView(v);
             controller.vote(position, action);
         }
@@ -368,7 +337,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        if (adapter.getCursor() == null) {
+        if (!controller.hasCursor()) {
             getListView().clearChoices();
             return false;
         }
@@ -446,12 +415,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         controller.saveState(outState);
-        outState.putString(STATE_ACCOUNT_NAME, adapter.getAccountName());
-        outState.putString(STATE_PARENT_SUBREDDIT, adapter.getParentSubreddit());
-        outState.putString(STATE_SUBREDDIT, adapter.getSubreddit());
-        outState.putString(STATE_SELECTED_THING_ID, adapter.getSelectedThingId());
-        outState.putString(STATE_SELECTED_LINK_ID, adapter.getSelectedLinkId());
-        outState.putInt(STATE_EMPTY_TEXT, emptyText);
     }
 
     private int getThingBodyWidth() {
@@ -459,29 +422,29 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public void setAccountName(String accountName) {
-        adapter.setAccountName(accountName);
-    }
-
-    public void setSelectedThing(String thingId, String linkId) {
-        adapter.setSelectedThing(thingId, linkId);
+        controller.setAccountName(accountName);
     }
 
     public String getAccountName() {
-        return adapter.getAccountName();
+        return controller.getAccountName();
+    }
+
+    public void setSelectedThing(String thingId, String linkId) {
+        controller.setSelectedThing(thingId, linkId);
     }
 
     public String getSubreddit() {
-        return adapter.getSubreddit();
+        return controller.getSubreddit();
     }
 
     public void setSubreddit(String subreddit) {
-        if (!Objects.equalsIgnoreCase(subreddit, adapter.getSubreddit())) {
-            adapter.setSubreddit(subreddit);
+        if (!Objects.equalsIgnoreCase(subreddit, controller.getSubreddit())) {
+            controller.setSubreddit(subreddit);
         }
     }
 
     public String getQuery() {
-        return adapter.getQuery();
+        return controller.getQuery();
     }
 
     public boolean isQuery() {
@@ -489,12 +452,12 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     public int getFilter() {
-        return adapter.getFilterValue();
+        return controller.getFilter();
     }
 
     private int getFirstCheckedPosition() {
         SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        int size = adapter.getCount();
+        int size = controller.getAdapter().getCount();
         for (int i = 0; i < size; i++) {
             if (checked.get(i)) {
                 return i;
@@ -504,7 +467,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     }
 
     // Methods for creating the correct controller based upon the fragment arguments.
-    private ThingListController createController() {
+    private ThingListController createController(ThingListAdapter adapter) {
         if (isProfileActivity()) {
             return new ProfileThingListController(getActivity(),
                     getAccountNameArgument(),
@@ -520,15 +483,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
                     null,
                     adapter);
         } else if (isSearchActivity()) {
-            return new SearchThingListController(getActivity(),
-                    getAccountNameArgument(),
-                    adapter);
+            return new SearchThingListController(getActivity(), adapter);
         } else if (isBrowserActivity()) {
-            return new SubredditThingListController(getActivity(),
-                    getAccountNameArgument(),
-                    getSubredditArgument(),
-                    getFilterArgument(),
-                    adapter);
+            return new SubredditThingListController(getActivity(), adapter);
         } else {
             throw new IllegalArgumentException();
         }

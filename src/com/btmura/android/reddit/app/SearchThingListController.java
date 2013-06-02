@@ -24,8 +24,8 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 
 class SearchThingListController extends AbstractThingListController {
 
-    public SearchThingListController(Context context, String accountName, ThingListAdapter adapter) {
-        super(context, accountName, adapter);
+    public SearchThingListController(Context context, ThingListAdapter adapter) {
+        super(context, adapter);
     }
 
     @Override

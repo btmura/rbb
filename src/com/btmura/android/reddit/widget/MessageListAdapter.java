@@ -42,11 +42,9 @@ public class MessageListAdapter extends AbstractThingListAdapter {
     private String accountName;
 
     private final Formatter formatter = new Formatter();
-    private final boolean singleChoice;
 
     public MessageListAdapter(Context context, boolean singleChoice) {
-        super(context);
-        this.singleChoice = singleChoice;
+        super(context, singleChoice);
     }
 
     @Override

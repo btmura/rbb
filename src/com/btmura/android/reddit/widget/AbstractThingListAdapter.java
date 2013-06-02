@@ -28,17 +28,50 @@ import com.btmura.android.reddit.util.Objects;
 
 public abstract class AbstractThingListAdapter extends BaseCursorAdapter {
 
+    protected String accountName;
+    protected String parentSubreddit;
+    protected String subreddit;
     protected int thingBodyWidth;
     protected long nowTimeMs;
     protected String selectedThingId;
     protected String selectedLinkId;
+    protected boolean singleChoice;
 
-    AbstractThingListAdapter(Context context) {
+    AbstractThingListAdapter(Context context, boolean singleChoice) {
         super(context, null, 0);
+        this.singleChoice = singleChoice;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public void setParentSubreddit(String parentSubreddit) {
+        this.parentSubreddit = parentSubreddit;
+    }
+
+    public void setSubreddit(String subreddit) {
+        this.subreddit = subreddit;
     }
 
     public void setThingBodyWidth(int thingBodyWidth) {
         this.thingBodyWidth = thingBodyWidth;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public String getParentSubreddit() {
+        return parentSubreddit;
+    }
+
+    public String getSubreddit() {
+        return subreddit;
+    }
+
+    public boolean isSingleChoice() {
+        return singleChoice;
     }
 
     @Override

@@ -197,6 +197,11 @@ class MessageThingListController implements ThingListController {
     // Simple getters.
 
     @Override
+    public String getAccountName() {
+        return null;
+    }
+
+    @Override
     public String getMoreId() {
         return null;
     }
@@ -206,7 +211,123 @@ class MessageThingListController implements ThingListController {
         return 0;
     }
 
+    @Override
+    public AbstractThingListAdapter getAdapter() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public int getEmptyText() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int getFilter() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public String getParentSubreddit() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getQuery() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getSelectedLinkId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getSelectedThingId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getSubreddit() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean hasAccountName() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean hasCursor() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean hasQuery() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean isSingleChoice() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void setEmptyText(int emptyText) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void setParentSubreddit(String parentSubreddit) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void setSelectedPosition(int position) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void setSelectedThing(String thingId, String linkId) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void setSubreddit(String subreddit) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void setThingBodyWidth(int thingBodyWidth) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void swapCursor(Cursor cursor) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void setFilter(int filter) {
+        // TODO Auto-generated method stub
+    }
+
     // Simple setters.
+
+    @Override
+    public void setAccountName(String accountName) {
+    }
 
     @Override
     public void setMoreId(String moreId) {

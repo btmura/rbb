@@ -22,6 +22,8 @@ import android.support.v4.content.Loader;
 import android.view.Menu;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.widget.AbstractThingListAdapter;
+
 interface ThingListController {
 
     boolean isLoadable();
@@ -31,6 +33,8 @@ interface ThingListController {
     void saveState(Bundle outState);
 
     Loader<Cursor> createLoader();
+
+    void swapCursor(Cursor cursor);
 
     Bundle getThingBundle(int position);
 
@@ -52,21 +56,63 @@ interface ThingListController {
 
     // Getters.
 
+    String getAccountName();
+
+    AbstractThingListAdapter getAdapter();
+
+    int getEmptyText();
+
+    int getFilter();
+
     String getMoreId();
 
     String getNextMoreId();
 
+    String getParentSubreddit();
+
+    String getQuery();
+
+    String getSelectedLinkId();
+
+    String getSelectedThingId();
+
     long getSessionId();
 
+    String getSubreddit();
+
+    boolean hasAccountName();
+
+    boolean hasCursor();
+
     boolean hasNextMoreId();
+
+    boolean hasQuery();
+
+    boolean isSingleChoice();
 
     boolean isSwipeDismissable(int position);
 
     // Setters.
 
+    void setAccountName(String accountName);
+
+    void setEmptyText(int emptyText);
+
+    void setFilter(int filter);
+
     void setMoreId(String moreId);
 
+    void setParentSubreddit(String parentSubreddit);
+
     void setSessionId(long sessionId);
+
+    void setSelectedPosition(int position);
+
+    void setSelectedThing(String thingId, String linkId);
+
+    void setSubreddit(String subreddit);
+
+    void setThingBodyWidth(int thingBodyWidth);
 
     // Menu preparation methods.
 
