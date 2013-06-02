@@ -147,14 +147,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
         int flags = getArguments().getInt(ARG_FLAGS);
         boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
-
-        ThingListAdapter adapter = new ThingListAdapter(getActivity(),
-                getArguments().getString(ARG_SUBREDDIT),
-                getArguments().getString(ARG_QUERY),
-                getArguments().getString(ARG_PROFILE_USER),
-                getArguments().getString(ARG_MESSAGE_USER),
-                getArguments().getInt(ARG_FILTER),
-                this, singleChoice);
+        ThingListAdapter adapter = new ThingListAdapter(getActivity(), this, singleChoice);
 
         controller = createController(adapter);
         controller.restoreState(getArguments());

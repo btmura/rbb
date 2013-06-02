@@ -43,23 +43,36 @@ public class ThingListAdapter extends AbstractThingListAdapter {
             ThingView.DETAIL_SUBREDDIT,
     };
 
-    private String parentSubreddit;
-
-    private String subreddit;
-    private String query;
-    private String profileUser;
-    private String messageUser;
-    private int filter;
-    private String more;
-
     private final Formatter formatter = new Formatter();
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final OnVoteListener listener;
 
-    public ThingListAdapter(Context context, String subreddit, String query, String profileUser,
-            String messageUser, int filter, OnVoteListener listener, boolean singleChoice) {
+    private String parentSubreddit;
+    private String subreddit;
+
+    public ThingListAdapter(Context context, OnVoteListener listener, boolean singleChoice) {
         super(context, singleChoice);
         this.listener = listener;
+    }
+
+    public void setParentSubreddit(String parentSubreddit) {
+        this.parentSubreddit = parentSubreddit;
+    }
+
+    public void setSubreddit(String subreddit) {
+        this.subreddit = subreddit;
+    }
+
+    public String getParentSubreddit() {
+        return parentSubreddit;
+    }
+
+    public String getSubreddit() {
+        return subreddit;
+    }
+
+    public boolean isSingleChoice() {
+        return singleChoice;
     }
 
     @Override
@@ -159,42 +172,6 @@ public class ThingListAdapter extends AbstractThingListAdapter {
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-    public boolean isSingleChoice() {
-        return singleChoice;
-    }
-
-    public String getSubreddit() {
-        return subreddit;
-    }
-
-    public void setSubreddit(String subreddit) {
-        this.subreddit = subreddit;
-    }
-
-    public String getParentSubreddit() {
-        return parentSubreddit;
-    }
-
-    public void setParentSubreddit(String parentSubreddit) {
-        this.parentSubreddit = parentSubreddit;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public int getFilterValue() {
-        return filter;
-    }
-
-    public String getMore() {
-        return more;
-    }
-
-    public void setMore(String more) {
-        this.more = more;
     }
 
     @Override
