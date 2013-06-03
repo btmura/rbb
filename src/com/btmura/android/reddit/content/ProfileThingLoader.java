@@ -45,7 +45,7 @@ public class ProfileThingLoader extends AbstractThingLoader {
         this.filter = filter;
         this.more = more;
 
-        setUri(ThingProvider.THINGS_URI);
+        setUri(ThingProvider.THINGS_WITH_ACTIONS_URI);
         setProjection(PROJECTION);
         setSelection(getSelectionStatement());
     }
