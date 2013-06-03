@@ -34,7 +34,7 @@ class SubredditThingListController extends AbstractThingListController {
 
     @Override
     public boolean isLoadable() {
-        return getAccountName() != null && getSubreddit() != null;
+        return hasAccountName() && getSubreddit() != null;
     }
 
     @Override

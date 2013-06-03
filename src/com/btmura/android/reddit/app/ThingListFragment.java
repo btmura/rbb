@@ -468,10 +468,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private ThingListController createController(ThingListAdapter adapter) {
         if (isProfileActivity()) {
             return new ProfileThingListController(getActivity(),
-                    getAccountNameArgument(),
                     getProfileUserArgument(),
-                    getFilterArgument(),
-                    null,
                     adapter);
         } else if (isMessageActivity()) {
             return new MessageThingListController(getActivity(),

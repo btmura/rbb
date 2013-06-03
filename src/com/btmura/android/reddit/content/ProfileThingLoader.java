@@ -36,14 +36,17 @@ public class ProfileThingLoader extends AbstractThingLoader {
     private final String profileUser;
     private final int filter;
     private final String more;
+    private final long sessionId;
+    private Bundle sessionData;
 
     public ProfileThingLoader(Context context, String accountName, String profileUser, int filter,
-            String more) {
+            String more, long sessionId) {
         super(context);
         this.accountName = accountName;
         this.profileUser = profileUser;
         this.filter = filter;
         this.more = more;
+        this.sessionId = sessionId;
 
         setUri(ThingProvider.THINGS_WITH_ACTIONS_URI);
         setProjection(PROJECTION);
@@ -61,11 +64,12 @@ public class ProfileThingLoader extends AbstractThingLoader {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
-
-        Bundle result = ThingProvider.getProfileSession(getContext(), accountName, profileUser,
-                filter, more);
-        long sessionId = result.getLong(ThingProvider.EXTRA_SESSION_ID);
-        setSelectionArgs(Array.of(sessionId));
-        return new CursorExtrasWrapper(super.loadInBackground(), result);
+        if (sessionData == null) {
+            sessionData = ThingProvider.getProfileSession(getContext(), accountName, profileUser,
+                    filter, more, sessionId);
+            long sessionId = sessionData.getLong(ThingProvider.EXTRA_SESSION_ID);
+            setSelectionArgs(Array.of(sessionId));
+        }
+        return new CursorExtrasWrapper(super.loadInBackground(), sessionData);
     }
 }

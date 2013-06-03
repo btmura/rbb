@@ -227,12 +227,13 @@ public class ThingProvider extends BaseProvider {
     }
 
     public static final Bundle getProfileSession(Context context, String accountName,
-            String profileUser, int filter, String more) {
+            String profileUser, int filter, String more, long sessionId) {
         Bundle extras = new Bundle(4);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_USER);
         extras.putString(EXTRA_USER, profileUser);
         extras.putInt(EXTRA_FILTER, filter);
         extras.putString(EXTRA_MORE, more);
+        extras.putLong(EXTRA_SESSION_ID, sessionId);
         return call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 

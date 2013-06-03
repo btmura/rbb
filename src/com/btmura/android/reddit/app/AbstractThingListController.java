@@ -291,7 +291,7 @@ abstract class AbstractThingListController implements ThingListController {
 
     @Override
     public boolean hasAccountName() {
-        return !TextUtils.isEmpty(getAccountName());
+        return getAccountName() != null;
     }
 
     @Override
