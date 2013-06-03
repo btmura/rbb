@@ -53,6 +53,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
     /** String argument specifying the account being used. */
     private static final String ARG_ACCOUNT_NAME = "accountName";
 
+    /** String argument specifying the parent subreddit. */
+    private static final String ARG_PARENT_SUBREDDIT = "parentSubreddit";
+
     /** String argument specifying the subreddit to load. */
     private static final String ARG_SUBREDDIT = "subreddit";
 
@@ -90,8 +93,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public static ThingListFragment newSubredditInstance(String accountName, String subreddit,
             int filter, int flags) {
-        Bundle args = new Bundle(4);
+        Bundle args = new Bundle(5);
         args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_PARENT_SUBREDDIT, subreddit);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putInt(ARG_FILTER, filter);
         args.putInt(ARG_FLAGS, flags);
@@ -100,8 +104,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public static ThingListFragment newQueryInstance(String accountName, String subreddit,
             String query, int flags) {
-        Bundle args = new Bundle(4);
+        Bundle args = new Bundle(5);
         args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_PARENT_SUBREDDIT, subreddit);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
@@ -110,8 +115,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public static ThingListFragment newInstance(String accountName, String subreddit, String query,
             String profileUser, String messageUser, int filter, int flags) {
-        Bundle args = new Bundle(7);
+        Bundle args = new Bundle(8);
         args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_PARENT_SUBREDDIT, subreddit);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putString(ARG_QUERY, query);
         args.putString(ARG_PROFILE_USER, profileUser);
@@ -145,8 +151,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int flags = getArguments().getInt(ARG_FLAGS);
-        boolean singleChoice = Flag.isEnabled(flags, FLAG_SINGLE_CHOICE);
+        boolean singleChoice = Flag.isEnabled(getFlags(), FLAG_SINGLE_CHOICE);
         ThingListAdapter adapter = new ThingListAdapter(getActivity(), this, singleChoice);
 
         controller = createController(adapter);
