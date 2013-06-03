@@ -247,7 +247,7 @@ public class ThingProvider extends BaseProvider {
         return call(context, COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getSearchSession(Context context, String accountName,
+    public static final Bundle getThingSearchSession(Context context, String accountName,
             String subreddit, String query) {
         Bundle extras = new Bundle(3);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_THING_SEARCH);
@@ -475,9 +475,6 @@ public class ThingProvider extends BaseProvider {
                 v.put(Sessions.COLUMN_TAG, listing.getSessionTag());
                 v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
                 sessionId = db.insert(Sessions.TABLE_NAME, null, v);
-                if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "created session: " + sessionId);
-                }
             }
 
             // Add the session id to the data rows.
@@ -490,6 +487,10 @@ public class ThingProvider extends BaseProvider {
             InsertHelper helper = new InsertHelper(db, listing.getTargetTable());
             for (int i = 0; i < count; i++) {
                 helper.insert(values.get(i));
+            }
+
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "getListingSession sessionId: " + sessionId + " count: " + count);
             }
 
             db.setTransactionSuccessful();

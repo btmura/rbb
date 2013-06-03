@@ -155,8 +155,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
         ThingListAdapter adapter = new ThingListAdapter(getActivity(), this, singleChoice);
 
         controller = createController(adapter);
-        controller.restoreState(getArguments());
-        controller.restoreState(savedInstanceState);
+        controller.loadState(getArguments());
+        controller.loadState(savedInstanceState);
 
         setHasOptionsMenu(true);
     }

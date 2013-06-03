@@ -52,35 +52,22 @@ abstract class AbstractThingListController implements ThingListController {
     private static final String STATE_SUBREDDIT = "subreddit";
 
     private final Formatter formatter = new Formatter();
-    private final Context context;
-    private final AbstractThingListAdapter adapter;
+    protected final Context context;
+    protected final AbstractThingListAdapter adapter;
 
     private String accountName;
     private int emptyText;
     private int filter;
     private String moreId;
-    private String query;
     private long sessionId;
 
     AbstractThingListController(Context context, AbstractThingListAdapter adapter) {
-        this.context = context;
+        this.context = context.getApplicationContext();
         this.adapter = adapter;
     }
 
     @Override
-    public void saveState(Bundle outState) {
-        outState.putString(STATE_ACCOUNT_NAME, getAccountName());
-        outState.putInt(STATE_EMPTY_TEXT, getEmptyText());
-        outState.putInt(STATE_FILTER, getFilter());
-        outState.putString(STATE_PARENT_SUBREDDIT, getParentSubreddit());
-        outState.putString(STATE_SELECTED_LINK_ID, getSelectedLinkId());
-        outState.putString(STATE_SELECTED_THING_ID, getSelectedThingId());
-        outState.putLong(STATE_SESSION_ID, getSessionId());
-        outState.putString(STATE_SUBREDDIT, getSubreddit());
-    }
-
-    @Override
-    public void restoreState(Bundle state) {
+    public void loadState(Bundle state) {
         state = Objects.nullToEmpty(state);
         if (state.containsKey(STATE_ACCOUNT_NAME)) {
             setAccountName(state.getString(STATE_ACCOUNT_NAME));
@@ -105,6 +92,18 @@ abstract class AbstractThingListController implements ThingListController {
         if (state.containsKey(STATE_SUBREDDIT)) {
             setSubreddit(state.getString(STATE_SUBREDDIT));
         }
+    }
+
+    @Override
+    public void saveState(Bundle state) {
+        state.putString(STATE_ACCOUNT_NAME, getAccountName());
+        state.putInt(STATE_EMPTY_TEXT, getEmptyText());
+        state.putInt(STATE_FILTER, getFilter());
+        state.putString(STATE_PARENT_SUBREDDIT, getParentSubreddit());
+        state.putString(STATE_SELECTED_LINK_ID, getSelectedLinkId());
+        state.putString(STATE_SELECTED_THING_ID, getSelectedThingId());
+        state.putLong(STATE_SESSION_ID, getSessionId());
+        state.putString(STATE_SUBREDDIT, getSubreddit());
     }
 
     @Override
@@ -291,7 +290,7 @@ abstract class AbstractThingListController implements ThingListController {
 
     @Override
     public boolean hasAccountName() {
-        return getAccountName() != null;
+        return !TextUtils.isEmpty(getAccountName());
     }
 
     @Override
@@ -459,9 +458,10 @@ abstract class AbstractThingListController implements ThingListController {
         return adapter.getParentSubreddit();
     }
 
+    // TODO: Remove this method.
     @Override
     public String getQuery() {
-        return query;
+        return null;
     }
 
     @Override

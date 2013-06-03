@@ -18,11 +18,18 @@ package com.btmura.android.reddit.app;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.v4.content.Loader;
 
+import com.btmura.android.reddit.content.SearchThingLoader;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingListAdapter;
 
 class SearchThingListController extends AbstractThingListController {
+
+    private static final String EXTRA_QUERY = "query";
+
+    private String query;
 
     public SearchThingListController(Context context, ThingListAdapter adapter) {
         super(context, adapter);
@@ -30,11 +37,35 @@ class SearchThingListController extends AbstractThingListController {
 
     @Override
     public boolean isLoadable() {
-        return false;
+        return getAccountName() != null && getQuery() != null;
     }
 
     @Override
     public Loader<Cursor> createLoader() {
-        return null;
+        return new SearchThingLoader(context, getAccountName(), getSubreddit(), getQuery());
+    }
+
+    @Override
+    public void loadState(Bundle state) {
+        super.loadState(state);
+        state = Objects.nullToEmpty(state);
+        if (state.containsKey(EXTRA_QUERY)) {
+            setQuery(state.getString(EXTRA_QUERY));
+        }
+    }
+
+    @Override
+    public void saveState(Bundle state) {
+        super.saveState(state);
+        state.putString(EXTRA_QUERY, getQuery());
+    }
+
+    private void setQuery(String query) {
+        this.query = query;
+    }
+
+    @Override
+    public String getQuery() {
+        return query;
     }
 }

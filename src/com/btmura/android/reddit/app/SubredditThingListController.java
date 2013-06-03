@@ -25,16 +25,13 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 
 class SubredditThingListController extends AbstractThingListController {
 
-    private final Context context;
-
     SubredditThingListController(Context context, ThingListAdapter adapter) {
         super(context, adapter);
-        this.context = context.getApplicationContext();
     }
 
     @Override
     public boolean isLoadable() {
-        return hasAccountName() && getSubreddit() != null;
+        return getAccountName() != null && getSubreddit() != null;
     }
 
     @Override

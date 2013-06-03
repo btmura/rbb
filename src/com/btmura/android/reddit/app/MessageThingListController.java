@@ -60,7 +60,7 @@ class MessageThingListController implements ThingListController {
     }
 
     @Override
-    public void restoreState(Bundle savedInstanceState) {
+    public void loadState(Bundle savedInstanceState) {
     }
 
     @Override

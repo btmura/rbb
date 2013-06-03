@@ -25,18 +25,16 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 
 class ProfileThingListController extends AbstractThingListController {
 
-    private final Context context;
     private final String profileUser;
 
     ProfileThingListController(Context context, String profileUser, ThingListAdapter adapter) {
         super(context, adapter);
-        this.context = context.getApplicationContext();
         this.profileUser = profileUser;
     }
 
     @Override
     public boolean isLoadable() {
-        return hasAccountName() && profileUser != null;
+        return getAccountName() != null && profileUser != null;
     }
 
     @Override

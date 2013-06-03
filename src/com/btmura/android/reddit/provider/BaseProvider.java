@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.provider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
@@ -44,17 +45,16 @@ abstract class BaseProvider extends ContentProvider {
     public static final String FALSE = Boolean.toString(false);
 
     /**
-     * Sync changes back to the network. Don't set this in sync adapters or else
-     * we'll get stuck in a syncing loop. This is by default false.
+     * Sync changes back to the network. Don't set this in sync adapters or else we'll get stuck in
+     * a syncing loop. This is by default false.
      */
     public static final String PARAM_SYNC = "sync";
 
     /**
-     * Parameter to control whether to notify registered listeners of changes.
-     * This is by default true.
+     * Parameter to control whether to notify registered listeners of changes. This is by default
+     * true.
      */
     public static final String PARAM_NOTIFY = "notify";
-
 
     /** Returns a URI that tickles the sync adapter to activate after. */
     protected static Uri makeSyncUri(Uri uri) {
@@ -78,7 +78,8 @@ abstract class BaseProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
         if (BuildConfig.DEBUG) {
-            Log.d(logTag, "query uri: " + uri);
+            Log.d(logTag, "query uri: " + uri + " selection: " + selection + " selectionArgs: "
+                    + (selectionArgs != null ? Arrays.asList(selectionArgs) : "[]"));
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
