@@ -50,6 +50,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public static final String TAG = "ThingListFragment";
 
+    public static final int FLAG_SINGLE_CHOICE = 0x1;
+
     /** Integer argument specifying the fragment type. */
     private static final String ARG_TYPE = "type";
 
@@ -80,12 +82,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
     /** Optional bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
 
-    public static final int TYPE_SUBREDDIT = 1;
-    public static final int TYPE_QUERY = 2;
-    public static final int TYPE_PROFILE = 3;
-    public static final int TYPE_MESSAGES = 4;
-
-    public static final int FLAG_SINGLE_CHOICE = 0x1;
+    private static final int TYPE_SUBREDDIT = 1;
+    private static final int TYPE_QUERY = 2;
+    private static final int TYPE_PROFILE = 3;
+    private static final int TYPE_MESSAGES = 4;
 
     public interface OnThingSelectedListener {
         void onThingSelected(View view, Bundle thingBundle, int pageType);
