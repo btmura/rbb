@@ -169,7 +169,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        boolean singleChoice = Flag.isEnabled(getFlags(), FLAG_SINGLE_CHOICE);
+        boolean singleChoice = Flag.isEnabled(getFlagsArgument(), FLAG_SINGLE_CHOICE);
         ThingListAdapter adapter = new ThingListAdapter(getActivity(), this, singleChoice);
 
         controller = createController(adapter);
@@ -531,7 +531,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         return getArguments().getInt(ARG_FILTER);
     }
 
-    private int getFlags() {
+    private int getFlagsArgument() {
         return getArguments().getInt(ARG_FLAGS);
     }
 }
