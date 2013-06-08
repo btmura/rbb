@@ -76,9 +76,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
     /** Integer argument to filter things, profile, or messages. */
     private static final String ARG_FILTER = "filter";
 
-    /** String argument that is used to paginate things. */
-    private static final String LOADER_MORE_ID = "moreId";
-
     /** Optional bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
 
@@ -86,6 +83,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private static final int TYPE_QUERY = 2;
     private static final int TYPE_PROFILE = 3;
     private static final int TYPE_MESSAGES = 4;
+
+    /** String argument that is used to paginate things. */
+    private static final String LOADER_MORE_ID = "moreId";
 
     public interface OnThingSelectedListener {
         void onThingSelected(View view, Bundle thingBundle, int pageType);

@@ -233,9 +233,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             // subreddit, because we don't save the subreddit preference when
             // changing filters or on resolving the subreddit!
             boolean isRandom = Subreddits.isRandom(subreddit);
-
-            setSubredditListNavigation(R.id.subreddit_list_container, subreddit, isRandom,
-                    null, thingBundle);
+            setAccountSubredditListNavigation(R.id.subreddit_list_container, subreddit, isRandom,
+                    thingBundle);
         } else if (tlf != null && tlf.getFilter() != filter) {
             replaceThingListFragmentMultiPane();
         }

@@ -161,36 +161,44 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract boolean hasSubredditList();
 
-    protected void setSearchSubredditListNavigation(int containerId, String query) {
-        setSubredditListNavigation(containerId, null, false, query, null);
+    // Methods for setting the content of the left hand subreddit pane.
+
+    protected void setAccountSubredditListNavigation(int containerId, String subreddit,
+            boolean isRandom, Bundle thingBundle) {
+        SubredditListFragment frag = SubredditListFragment.newAccountInstance(getAccountName(),
+                subreddit, sfFlags);
+        setSubredditListNavigation(frag, containerId, subreddit, isRandom, thingBundle);
     }
 
-    protected void setSubredditListNavigation(int containerId, String subreddit, boolean isRandom,
-            String query, Bundle thingBundle) {
+    protected void setSearchSubredditListNavigation(int containerId, String query) {
+        SubredditListFragment frag = SubredditListFragment.newQueryInstance(getAccountName(),
+                query, sfFlags);
+        setSubredditListNavigation(frag, containerId, null, false, null);
+    }
+
+    private void setSubredditListNavigation(SubredditListFragment frag, int containerId,
+            String subreddit, boolean isRandom, Bundle thingBundle) {
         if (isSinglePane) {
-            setSubredditListNavigationSinglePane(containerId, query);
+            setSubredditListNavigationSinglePane(frag, containerId);
         } else {
-            setSubredditListNavigationMultiPane(containerId, subreddit, isRandom,
-                    query, thingBundle);
+            setSubredditListNavigationMultiPane(frag, containerId, subreddit, isRandom,
+                    thingBundle);
         }
     }
 
-    private void setSubredditListNavigationSinglePane(int containerId, String query) {
-        Fragment sf = SubredditListFragment.newInstance(getAccountName(), null, query, sfFlags);
+    private void setSubredditListNavigationSinglePane(SubredditListFragment frag,
+            int containerId) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(containerId, sf, SubredditListFragment.TAG);
+        ft.replace(containerId, frag, SubredditListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
     }
 
-    private void setSubredditListNavigationMultiPane(int containerId, String subreddit,
-            boolean isRandom, String query, Bundle thingBundle) {
+    private void setSubredditListNavigationMultiPane(SubredditListFragment frag, int containerId,
+            String subreddit, boolean isRandom, Bundle thingBundle) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "setSubredditListNavigation subreddit:" + subreddit
-                    + " isRandom: " + isRandom
-                    + " query: " + query
-                    + " thingBundle: " + thingBundle);
+            Log.d(TAG, "setSubredditListNavigation");
         }
         safePopBackStackImmediate();
 
@@ -199,13 +207,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, isRandom, thingBundle,
                 filter);
-        Fragment slf = SubredditListFragment.newInstance(accountName, subreddit, query, sfFlags);
         Fragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
                 tfFlags);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
-        ft.replace(containerId, slf, SubredditListFragment.TAG);
+        ft.replace(containerId, frag, SubredditListFragment.TAG);
         ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
 
         // If a thing was specified by the thingBundle argument, then add the
@@ -234,6 +241,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshViews(thingBundle);
         refreshThingPager(thingBundle, -1);
     }
+
+    // Methods for setting the content of the right hand thing list pane.
 
     protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
         ThingListFragment frag = ThingListFragment.newQueryInstance(getAccountName(),

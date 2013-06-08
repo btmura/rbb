@@ -56,15 +56,28 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
+    /** Integer argument specifying the type of content shown in this fragment. */
+    private static final String ARG_TYPE = "type";
+
+    /** String argument specifying the account being used. */
     private static final String ARG_ACCOUNT_NAME = "accountName";
+
+    /** String argument specifying the selected subreddit. */
     private static final String ARG_SELECTED_SUBREDDIT = "selectedSubreddit";
+
+    /** String argument specifying the search query to use to get subreddits. */
     private static final String ARG_QUERY = "query";
+
+    /** Optional bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
 
     private static final String STATE_SESSION_ID = "sessionId";
     private static final String STATE_ACCOUNT_NAME = ARG_ACCOUNT_NAME;
     private static final String STATE_SELECTED_SUBREDDIT = ARG_SELECTED_SUBREDDIT;
     private static final String STATE_SELECTED_ACTION_ACCOUNT = "selectedActionAccount";
+
+    private static final int TYPE_ACCOUNT = 1;
+    private static final int TYPE_QUERY = 2;
 
     public interface OnSubredditSelectedListener {
         /**
@@ -89,14 +102,27 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     private Spinner accountSpinner;
     private String selectedActionAccount;
 
-    public static SubredditListFragment newInstance(String accountName, String selectedSubreddit,
-            String query, int flags) {
+    public static SubredditListFragment newAccountInstance(String accountName,
+            String selectedSubreddit, int flags) {
         Bundle args = new Bundle(4);
+        args.putInt(ARG_TYPE, TYPE_ACCOUNT);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
+        args.putInt(ARG_FLAGS, flags);
+        return newFragment(args);
+    }
+
+    public static SubredditListFragment newQueryInstance(String accountName,
+            String query, int flags) {
+        Bundle args = new Bundle(4);
+        args.putInt(ARG_TYPE, TYPE_QUERY);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
+        return newFragment(args);
+    }
 
+    private static SubredditListFragment newFragment(Bundle args) {
         SubredditListFragment frag = new SubredditListFragment();
         frag.setArguments(args);
         return frag;
