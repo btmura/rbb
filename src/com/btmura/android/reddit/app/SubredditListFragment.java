@@ -112,7 +112,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         return newFragment(args);
     }
 
-    public static SubredditListFragment newQueryInstance(String accountName,
+    public static SubredditListFragment newSearchInstance(String accountName,
             String query, int flags) {
         Bundle args = new Bundle(4);
         args.putInt(ARG_TYPE, TYPE_QUERY);

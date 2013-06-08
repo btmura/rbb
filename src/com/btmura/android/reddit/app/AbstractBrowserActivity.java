@@ -171,7 +171,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void setSearchSubredditListNavigation(int containerId, String query) {
-        SubredditListFragment frag = SubredditListFragment.newQueryInstance(getAccountName(),
+        SubredditListFragment frag = SubredditListFragment.newSearchInstance(getAccountName(),
                 query, sfFlags);
         setSubredditListNavigation(frag, containerId, null, false, null);
     }
@@ -245,7 +245,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     // Methods for setting the content of the right hand thing list pane.
 
     protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
-        ThingListFragment frag = ThingListFragment.newQueryInstance(getAccountName(),
+        ThingListFragment frag = ThingListFragment.newSearchInstance(getAccountName(),
                 subreddit, query, tfFlags);
         setThingListNavigation(frag, containerId, subreddit);
     }
