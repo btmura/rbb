@@ -80,7 +80,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private static final String ARG_FLAGS = "flags";
 
     private static final int TYPE_SUBREDDIT = 1;
-    private static final int TYPE_QUERY = 2;
+    private static final int TYPE_SEARCH = 2;
     private static final int TYPE_PROFILE = 3;
     private static final int TYPE_MESSAGES = 4;
 
@@ -114,7 +114,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public static ThingListFragment newSearchInstance(String accountName, String subreddit,
             String query, int flags) {
         Bundle args = new Bundle(6);
-        args.putInt(ARG_TYPE, TYPE_QUERY);
+        args.putInt(ARG_TYPE, TYPE_SEARCH);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_PARENT_SUBREDDIT, subreddit);
         args.putString(ARG_SUBREDDIT, subreddit);
@@ -488,7 +488,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
             case TYPE_SUBREDDIT:
                 return new SubredditThingListController(getActivity(), adapter);
 
-            case TYPE_QUERY:
+            case TYPE_SEARCH:
                 return new SearchThingListController(getActivity(), adapter);
 
             case TYPE_PROFILE:

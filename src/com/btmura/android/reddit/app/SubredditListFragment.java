@@ -77,7 +77,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     private static final String STATE_SELECTED_ACTION_ACCOUNT = "selectedActionAccount";
 
     private static final int TYPE_ACCOUNT = 1;
-    private static final int TYPE_QUERY = 2;
+    private static final int TYPE_SEARCH = 2;
 
     public interface OnSubredditSelectedListener {
         /**
@@ -95,6 +95,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
     private boolean singleChoice;
     private SubredditAdapter adapter;
+    private SubredditListController controller;
 
     private ActionMode actionMode;
     private AccountNameAdapter accountNameAdapter;
@@ -115,7 +116,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     public static SubredditListFragment newSearchInstance(String accountName,
             String query, int flags) {
         Bundle args = new Bundle(4);
-        args.putInt(ARG_TYPE, TYPE_QUERY);
+        args.putInt(ARG_TYPE, TYPE_SEARCH);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_QUERY, query);
         args.putInt(ARG_FLAGS, flags);
@@ -161,6 +162,8 @@ public class SubredditListFragment extends ThingProviderListFragment implements
             adapter.setSelectedSubreddit(savedInstanceState.getString(STATE_SELECTED_SUBREDDIT));
             selectedActionAccount = savedInstanceState.getString(STATE_SELECTED_ACTION_ACCOUNT);
         }
+
+        controller = createController(adapter);
     }
 
     @Override
@@ -460,5 +463,25 @@ public class SubredditListFragment extends ThingProviderListFragment implements
             }
         }
         return -1;
+    }
+
+    // Factory method for creating a SubredditListController for the fragment.
+    private SubredditListController createController(SubredditAdapter adapter) {
+        switch (getTypeArgument()) {
+            case TYPE_ACCOUNT:
+                return new AccountSubredditListController();
+
+            case TYPE_SEARCH:
+                return new SearchSubredditListController();
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    // Getters for fragment arguments.
+
+    private int getTypeArgument() {
+        return getArguments().getInt(ARG_TYPE);
     }
 }
