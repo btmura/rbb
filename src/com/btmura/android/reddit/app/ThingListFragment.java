@@ -50,6 +50,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public static final String TAG = "ThingListFragment";
 
+    /** Integer argument specifying the fragment type. */
+    private static final String ARG_TYPE = "type";
+
     /** String argument specifying the account being used. */
     private static final String ARG_ACCOUNT_NAME = "accountName";
 
@@ -77,6 +80,11 @@ public class ThingListFragment extends ThingProviderListFragment implements
     /** Optional bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
 
+    public static final int TYPE_SUBREDDIT = 1;
+    public static final int TYPE_QUERY = 2;
+    public static final int TYPE_PROFILE = 3;
+    public static final int TYPE_MESSAGES = 4;
+
     public static final int FLAG_SINGLE_CHOICE = 0x1;
 
     public interface OnThingSelectedListener {
@@ -93,7 +101,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public static ThingListFragment newSubredditInstance(String accountName, String subreddit,
             int filter, int flags) {
-        Bundle args = new Bundle(5);
+        Bundle args = new Bundle(6);
+        args.putInt(ARG_TYPE, TYPE_SUBREDDIT);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_PARENT_SUBREDDIT, subreddit);
         args.putString(ARG_SUBREDDIT, subreddit);
@@ -104,7 +113,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
 
     public static ThingListFragment newQueryInstance(String accountName, String subreddit,
             String query, int flags) {
-        Bundle args = new Bundle(5);
+        Bundle args = new Bundle(6);
+        args.putInt(ARG_TYPE, TYPE_QUERY);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_PARENT_SUBREDDIT, subreddit);
         args.putString(ARG_SUBREDDIT, subreddit);
@@ -113,14 +123,22 @@ public class ThingListFragment extends ThingProviderListFragment implements
         return newFragment(args);
     }
 
-    public static ThingListFragment newInstance(String accountName, String subreddit, String query,
-            String profileUser, String messageUser, int filter, int flags) {
-        Bundle args = new Bundle(8);
+    public static ThingListFragment newProfileInstance(String accountName, String profileUser,
+            int filter, int flags) {
+        Bundle args = new Bundle(5);
+        args.putInt(ARG_TYPE, TYPE_PROFILE);
         args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_PARENT_SUBREDDIT, subreddit);
-        args.putString(ARG_SUBREDDIT, subreddit);
-        args.putString(ARG_QUERY, query);
         args.putString(ARG_PROFILE_USER, profileUser);
+        args.putInt(ARG_FILTER, filter);
+        args.putInt(ARG_FLAGS, flags);
+        return newFragment(args);
+    }
+
+    public static ThingListFragment newMessageInstance(String accountName, String messageUser,
+            int filter, int flags) {
+        Bundle args = new Bundle(5);
+        args.putInt(ARG_TYPE, TYPE_MESSAGES);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_MESSAGE_USER, messageUser);
         args.putInt(ARG_FILTER, filter);
         args.putInt(ARG_FLAGS, flags);
@@ -464,56 +482,41 @@ public class ThingListFragment extends ThingProviderListFragment implements
         return -1;
     }
 
-    // Methods for creating the correct controller based upon the fragment arguments.
+    // Factory method for creating a ThingListController for the fragment.
     private ThingListController createController(ThingListAdapter adapter) {
-        if (isProfileActivity()) {
-            return new ProfileThingListController(getActivity(),
-                    getProfileUserArgument(),
-                    adapter);
-        } else if (isMessageActivity()) {
-            return new MessageThingListController(getActivity(),
-                    getAccountNameArgument(),
-                    getMessageUserArgument(),
-                    getFilterArgument(),
-                    null,
-                    adapter);
-        } else if (isSearchActivity()) {
-            return new SearchThingListController(getActivity(), adapter);
-        } else if (isBrowserActivity()) {
-            return new SubredditThingListController(getActivity(), adapter);
-        } else {
-            throw new IllegalArgumentException();
+        switch (getTypeArgument()) {
+            case TYPE_SUBREDDIT:
+                return new SubredditThingListController(getActivity(), adapter);
+
+            case TYPE_QUERY:
+                return new SearchThingListController(getActivity(), adapter);
+
+            case TYPE_PROFILE:
+                return new ProfileThingListController(getActivity(),
+                        getProfileUserArgument(),
+                        adapter);
+
+            case TYPE_MESSAGES:
+                return new MessageThingListController(getActivity(),
+                        getAccountNameArgument(),
+                        getMessageUserArgument(),
+                        getFilterArgument(),
+                        null,
+                        adapter);
+
+            default:
+                throw new IllegalArgumentException();
         }
-    }
-
-    private boolean isProfileActivity() {
-        return !TextUtils.isEmpty(getProfileUserArgument());
-    }
-
-    private boolean isMessageActivity() {
-        return !TextUtils.isEmpty(getMessageUserArgument());
-    }
-
-    private boolean isSearchActivity() {
-        return !TextUtils.isEmpty(getQueryArgument());
-    }
-
-    private boolean isBrowserActivity() {
-        return getSubredditArgument() != null; // Empty but non-null subreddit means front page.
     }
 
     // Getters for fragment arguments.
 
+    private int getTypeArgument() {
+        return getArguments().getInt(ARG_TYPE);
+    }
+
     private String getAccountNameArgument() {
         return getArguments().getString(ARG_ACCOUNT_NAME);
-    }
-
-    private String getSubredditArgument() {
-        return getArguments().getString(ARG_SUBREDDIT);
-    }
-
-    private String getQueryArgument() {
-        return getArguments().getString(ARG_QUERY);
     }
 
     private String getProfileUserArgument() {

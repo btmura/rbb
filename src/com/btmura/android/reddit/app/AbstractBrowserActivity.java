@@ -236,69 +236,55 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
-        setThingListNavigation(containerId, subreddit, query, null, null);
+        ThingListFragment frag = ThingListFragment.newQueryInstance(getAccountName(),
+                subreddit, query, tfFlags);
+        setThingListNavigation(frag, containerId, subreddit);
     }
 
     protected void setProfileThingListNavigation(int containerId, String profileUser) {
-        setThingListNavigation(containerId, null, null, profileUser, null);
+        ThingListFragment frag = ThingListFragment.newProfileInstance(getAccountName(),
+                profileUser, getFilter(), tfFlags);
+        setThingListNavigation(frag, containerId, null);
     }
 
     protected void setMessageThingListNavigation(int containerId, String messageUser) {
-        setThingListNavigation(containerId, null, null, null, messageUser);
+        ThingListFragment frag = ThingListFragment.newMessageInstance(getAccountName(),
+                messageUser, getFilter(), tfFlags);
+        setThingListNavigation(frag, containerId, null);
     }
 
-    private void setThingListNavigation(int containerId, String subreddit, String query,
-            String profileUser, String messageUser) {
+    private void setThingListNavigation(ThingListFragment frag, int containerId,
+            String subreddit) {
         if (isSinglePane) {
-            setThingListNavigationSinglePane(containerId, subreddit, query,
-                    profileUser, messageUser);
+            setThingListNavigationSinglePane(frag, containerId);
         } else {
-            setThingListNavigationMultiPane(containerId, subreddit, query,
-                    profileUser, messageUser);
+            setThingListNavigationMultiPane(frag, containerId, subreddit);
         }
     }
 
-    private void setThingListNavigationSinglePane(int containerId, String subreddit, String query,
-            String profileUser, String messageUser) {
-        String accountName = getAccountName();
-        int filter = getFilter();
+    private void setThingListNavigationSinglePane(ThingListFragment frag, int containerId) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "setThingListNavigationSinglePane accountName: " + accountName
-                    + " subreddit: " + subreddit
-                    + " query: " + query
-                    + " profileUser: " + profileUser
-                    + " messageUser: " + messageUser
-                    + " filter: " + filter);
+            Log.d(TAG, "setThingListNavigationSinglePane");
         }
-
-        Fragment tf = ThingListFragment.newInstance(accountName, subreddit, query, profileUser,
-                messageUser, filter, tfFlags);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(containerId, tf, ThingListFragment.TAG);
+        ft.replace(containerId, frag, ThingListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
     }
 
-    private void setThingListNavigationMultiPane(int containerId, String subreddit, String query,
-            String profileUser, String messageUser) {
+    private void setThingListNavigationMultiPane(ThingListFragment frag, int containerId,
+            String subreddit) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "setThingListNavigationMultiPane");
+        }
+
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
         int filter = getFilter();
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "setThingListNavigationMultiPane accountName: " + accountName
-                    + " subreddit: " + subreddit
-                    + " query: " + query
-                    + " profileUser: " + profileUser
-                    + " messageUser: " + messageUser
-                    + " filter: " + filter);
-        }
-
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, false, null, filter);
         Fragment sf = getSubredditListFragment();
-        Fragment tf = ThingListFragment.newInstance(accountName, subreddit, query, profileUser,
-                messageUser, filter, tfFlags);
         Fragment mf = getThingFragment();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -306,7 +292,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (sf != null) {
             ft.remove(sf);
         }
-        ft.replace(containerId, tf, ThingListFragment.TAG);
+        ft.replace(containerId, frag, ThingListFragment.TAG);
         if (mf != null) {
             ft.remove(mf);
         }
