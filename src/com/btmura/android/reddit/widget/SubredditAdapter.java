@@ -112,4 +112,8 @@ public abstract class SubredditAdapter extends BaseLoaderAdapter {
     public boolean isDeletable(int position) {
         return true;
     }
+
+    public boolean isSingleChoice() {
+        return singleChoice;
+    }
 }

@@ -26,7 +26,7 @@ import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.util.Objects;
 
 /** {@link SubredditAdapter} that handles searching for subreddits. */
-class SubredditSearchAdapter extends SubredditAdapter {
+public class SubredditSearchAdapter extends SubredditAdapter {
 
     private static final String[] PROJECTION = {
             SubredditResults._ID,
@@ -41,7 +41,7 @@ class SubredditSearchAdapter extends SubredditAdapter {
 
     private final String query;
 
-    SubredditSearchAdapter(Context context, String query, boolean singleChoice) {
+    public SubredditSearchAdapter(Context context, String query, boolean singleChoice) {
         super(context, singleChoice);
         this.query = query;
     }

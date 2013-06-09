@@ -16,6 +16,14 @@
 
 package com.btmura.android.reddit.app;
 
-class SearchSubredditListController implements SubredditListController {
+import android.content.Context;
+import android.os.Bundle;
 
+import com.btmura.android.reddit.widget.SubredditAdapter;
+
+class SearchSubredditListController extends AccountSubredditListController {
+
+    SearchSubredditListController(Context context, SubredditAdapter adapter, Bundle args) {
+        super(context, adapter, args);
+    }
 }

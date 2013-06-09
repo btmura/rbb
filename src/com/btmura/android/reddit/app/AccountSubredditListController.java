@@ -16,6 +16,142 @@
 
 package com.btmura.android.reddit.app;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.support.v4.content.Loader;
+
+import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.widget.SubredditAdapter;
+
 class AccountSubredditListController implements SubredditListController {
 
+    private static final String EXTRA_ACCOUNT_NAME = SubredditListFragment.ARG_ACCOUNT_NAME;
+    private static final String EXTRA_SUBREDDIT = SubredditListFragment.ARG_SUBREDDIT;
+    private static final String EXTRA_SESSION_ID = SubredditListFragment.STATE_SESSION_ID;
+    private static final String EXTRA_ACTION_ACCOUNT_NAME = SubredditListFragment.STATE_SELECTED_ACTION_ACCOUNT;
+
+    private final Context context;
+    private final SubredditAdapter adapter;
+    private String accountName;
+    private String subreddit;
+    private long sessionId;
+    private String actionAccountName;
+
+    AccountSubredditListController(Context context, SubredditAdapter adapter, Bundle args) {
+        this.context = context;
+        this.adapter = adapter;
+        this.accountName = getAccountNameExtra(args);
+        this.subreddit = getSubredditExtra(args);
+    }
+
+    @Override
+    public void restoreInstanceState(Bundle savedInstanceState) {
+        this.accountName = getAccountNameExtra(savedInstanceState);
+        this.subreddit = getSubredditExtra(savedInstanceState);
+        this.sessionId = getSessionIdExtra(savedInstanceState);
+        this.actionAccountName = getActionAccountNameExtra(savedInstanceState);
+    }
+
+    @Override
+    public void saveInstanceState(Bundle outState) {
+        outState.putString(EXTRA_ACCOUNT_NAME, accountName);
+        outState.putString(EXTRA_SUBREDDIT, subreddit);
+        outState.putLong(EXTRA_SESSION_ID, sessionId);
+        outState.putString(EXTRA_ACTION_ACCOUNT_NAME, actionAccountName);
+    }
+
+    // Loader related methods.
+
+    @Override
+    public boolean isLoadable() {
+        return accountName != null;
+    }
+
+    @Override
+    public Loader<Cursor> createLoader() {
+        return null;
+    }
+
+    @Override
+    public void swapCursor(Cursor cursor) {
+        adapter.swapCursor(cursor);
+    }
+
+    // Getters
+
+    @Override
+    public String getAccountName() {
+        return accountName;
+    }
+
+    @Override
+    public String getActionAccountName() {
+        return actionAccountName;
+    }
+
+    @Override
+    public SubredditAdapter getAdapter() {
+        return adapter;
+    }
+
+    @Override
+    public String getSubreddit() {
+        return subreddit;
+    }
+
+    @Override
+    public boolean hasActionAccountName() {
+        return getActionAccountName() != null;
+    }
+
+    @Override
+    public boolean isSingleChoice() {
+        return adapter.isSingleChoice();
+    }
+
+    @Override
+    public boolean isSwipeDismissable(int position) {
+        return Subreddits.hasSidebar(adapter.getName(position));
+    }
+
+    // Setters
+
+    @Override
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    @Override
+    public void setActionAccountName(String actionAccountName) {
+        this.actionAccountName = actionAccountName;
+    }
+
+    @Override
+    public String setSelectedPosition(int position) {
+        return adapter.setSelectedPosition(position);
+    }
+
+    @Override
+    public void setSubreddit(String subreddit) {
+        this.subreddit = subreddit;
+    }
+
+    // Getters for extras.
+
+    private static String getAccountNameExtra(Bundle extras) {
+        return extras.getString(EXTRA_ACCOUNT_NAME);
+    }
+
+    private static String getSubredditExtra(Bundle extras) {
+        return extras.getString(EXTRA_SUBREDDIT);
+    }
+
+    private static long getSessionIdExtra(Bundle extras) {
+        return extras.getLong(EXTRA_SESSION_ID);
+    }
+
+    private static String getActionAccountNameExtra(Bundle extras) {
+        return extras.getString(EXTRA_ACTION_ACCOUNT_NAME);
+    }
 }
