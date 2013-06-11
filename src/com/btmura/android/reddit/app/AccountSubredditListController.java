@@ -19,12 +19,20 @@ package com.btmura.android.reddit.app;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
 class AccountSubredditListController implements SubredditListController {
+
+    private static final String[] PROJECTION = {
+            Subreddits._ID,
+            Subreddits.COLUMN_NAME
+    };
 
     private static final String EXTRA_ACCOUNT_NAME = SubredditListFragment.ARG_ACCOUNT_NAME;
     private static final String EXTRA_SUBREDDIT = SubredditListFragment.ARG_SUBREDDIT;
@@ -70,7 +78,9 @@ class AccountSubredditListController implements SubredditListController {
 
     @Override
     public Loader<Cursor> createLoader() {
-        return null;
+        return new CursorLoader(context, SubredditProvider.SUBREDDITS_URI, PROJECTION,
+                Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED, Array.of(accountName),
+                Subreddits.SORT_BY_NAME);
     }
 
     @Override
