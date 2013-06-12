@@ -35,7 +35,8 @@ class AccountSubredditListController implements SubredditListController {
     };
 
     private static final String EXTRA_ACCOUNT_NAME = SubredditListFragment.ARG_ACCOUNT_NAME;
-    private static final String EXTRA_SUBREDDIT = SubredditListFragment.ARG_SELECTED_SUBREDDIT;
+    private static final String EXTRA_SELECTED_SUBREDDIT =
+            SubredditListFragment.ARG_SELECTED_SUBREDDIT;
     private static final String EXTRA_SESSION_ID = SubredditListFragment.STATE_SESSION_ID;
     private static final String EXTRA_ACTION_ACCOUNT_NAME =
             SubredditListFragment.STATE_SELECTED_ACTION_ACCOUNT;
@@ -43,7 +44,6 @@ class AccountSubredditListController implements SubredditListController {
     private final Context context;
     private final SubredditAdapter adapter;
     private String accountName;
-    private String subreddit;
     private long sessionId;
     private String actionAccountName;
 
@@ -51,13 +51,13 @@ class AccountSubredditListController implements SubredditListController {
         this.context = context;
         this.adapter = adapter;
         this.accountName = getAccountNameExtra(args);
-        this.subreddit = getSubredditExtra(args);
+        setSelectedSubreddit(getSelectedSubredditExtra(args));
     }
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
         this.accountName = getAccountNameExtra(savedInstanceState);
-        this.subreddit = getSubredditExtra(savedInstanceState);
+        setSelectedSubreddit(getSelectedSubredditExtra(savedInstanceState));
         this.sessionId = getSessionIdExtra(savedInstanceState);
         this.actionAccountName = getActionAccountNameExtra(savedInstanceState);
     }
@@ -65,7 +65,7 @@ class AccountSubredditListController implements SubredditListController {
     @Override
     public void saveInstanceState(Bundle outState) {
         outState.putString(EXTRA_ACCOUNT_NAME, accountName);
-        outState.putString(EXTRA_SUBREDDIT, subreddit);
+        outState.putString(EXTRA_SELECTED_SUBREDDIT, getSelectedSubreddit());
         outState.putLong(EXTRA_SESSION_ID, sessionId);
         outState.putString(EXTRA_ACTION_ACCOUNT_NAME, actionAccountName);
     }
@@ -108,7 +108,7 @@ class AccountSubredditListController implements SubredditListController {
 
     @Override
     public String getSelectedSubreddit() {
-        return subreddit;
+        return adapter.getSelectedSubreddit();
     }
 
     @Override
@@ -145,7 +145,7 @@ class AccountSubredditListController implements SubredditListController {
 
     @Override
     public void setSelectedSubreddit(String subreddit) {
-        this.subreddit = subreddit;
+        adapter.setSelectedSubreddit(subreddit);
     }
 
     // Getters for extras.
@@ -154,8 +154,8 @@ class AccountSubredditListController implements SubredditListController {
         return extras.getString(EXTRA_ACCOUNT_NAME);
     }
 
-    private static String getSubredditExtra(Bundle extras) {
-        return extras.getString(EXTRA_SUBREDDIT);
+    private static String getSelectedSubredditExtra(Bundle extras) {
+        return extras.getString(EXTRA_SELECTED_SUBREDDIT);
     }
 
     private static long getSessionIdExtra(Bundle extras) {
