@@ -64,10 +64,10 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     static final String ARG_ACCOUNT_NAME = "accountName";
 
     /** String argument specifying the selected subreddit. */
-    static final String ARG_SUBREDDIT = "selectedSubreddit";
+    static final String ARG_SELECTED_SUBREDDIT = "selectedSubreddit";
 
     /** String argument specifying the search query to use to get subreddits. */
-    private static final String ARG_QUERY = "query";
+    static final String ARG_QUERY = "query";
 
     /** Optional bit mask for controlling fragment appearance. */
     private static final String ARG_FLAGS = "flags";
@@ -104,7 +104,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         Bundle args = new Bundle(4);
         args.putInt(ARG_TYPE, TYPE_ACCOUNT);
         args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_SUBREDDIT, selectedSubreddit);
+        args.putString(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
         args.putInt(ARG_FLAGS, flags);
         return newFragment(args);
     }
@@ -412,11 +412,11 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     }
 
     public String getSelectedSubreddit() {
-        return controller.getSubreddit();
+        return controller.getSelectedSubreddit();
     }
 
     public void setSelectedSubreddit(String subreddit) {
-        controller.setSubreddit(subreddit);
+        controller.setSelectedSubreddit(subreddit);
     }
 
     public String getQuery() {

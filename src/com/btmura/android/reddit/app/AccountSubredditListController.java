@@ -35,9 +35,10 @@ class AccountSubredditListController implements SubredditListController {
     };
 
     private static final String EXTRA_ACCOUNT_NAME = SubredditListFragment.ARG_ACCOUNT_NAME;
-    private static final String EXTRA_SUBREDDIT = SubredditListFragment.ARG_SUBREDDIT;
+    private static final String EXTRA_SUBREDDIT = SubredditListFragment.ARG_SELECTED_SUBREDDIT;
     private static final String EXTRA_SESSION_ID = SubredditListFragment.STATE_SESSION_ID;
-    private static final String EXTRA_ACTION_ACCOUNT_NAME = SubredditListFragment.STATE_SELECTED_ACTION_ACCOUNT;
+    private static final String EXTRA_ACTION_ACCOUNT_NAME =
+            SubredditListFragment.STATE_SELECTED_ACTION_ACCOUNT;
 
     private final Context context;
     private final SubredditAdapter adapter;
@@ -106,7 +107,7 @@ class AccountSubredditListController implements SubredditListController {
     }
 
     @Override
-    public String getSubreddit() {
+    public String getSelectedSubreddit() {
         return subreddit;
     }
 
@@ -143,7 +144,7 @@ class AccountSubredditListController implements SubredditListController {
     }
 
     @Override
-    public void setSubreddit(String subreddit) {
+    public void setSelectedSubreddit(String subreddit) {
         this.subreddit = subreddit;
     }
 

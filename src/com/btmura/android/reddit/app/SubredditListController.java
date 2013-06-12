@@ -42,7 +42,7 @@ interface SubredditListController {
 
     SubredditAdapter getAdapter();
 
-    String getSubreddit();
+    String getSelectedSubreddit();
 
     boolean hasActionAccountName();
 
@@ -58,5 +58,5 @@ interface SubredditListController {
 
     String setSelectedPosition(int position);
 
-    void setSubreddit(String subreddit);
+    void setSelectedSubreddit(String subreddit);
 }
