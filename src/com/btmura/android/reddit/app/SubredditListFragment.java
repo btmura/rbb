@@ -449,7 +449,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
                 return new AccountSubredditListController(getActivity(), adapter, getArguments());
 
             case TYPE_SEARCH:
-                return new SearchSubredditListController(getActivity(), adapter, getArguments());
+                return new SubredditSearchListController(getActivity(), adapter, getArguments());
 
             default:
                 throw new IllegalArgumentException();

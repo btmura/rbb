@@ -25,7 +25,7 @@ import android.text.TextUtils;
 import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
-class SearchSubredditListController implements SubredditListController {
+class SubredditSearchListController implements SubredditListController {
 
     private static final String EXTRA_ACCOUNT_NAME = SubredditListFragment.ARG_ACCOUNT_NAME;
     private static final String EXTRA_SELECTED_SUBREDDIT =
@@ -42,7 +42,7 @@ class SearchSubredditListController implements SubredditListController {
     private long sessionId;
     private String actionAccountName;
 
-    SearchSubredditListController(Context context, SubredditAdapter adapter, Bundle args) {
+    SubredditSearchListController(Context context, SubredditAdapter adapter, Bundle args) {
         this.context = context;
         this.adapter = adapter;
         this.accountName = getAccountNameExtra(args);
