@@ -32,7 +32,7 @@ import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
 /** {@link SubredditAdapter} that lists a user's subreddits. */
-public class SubredditListAdapter extends SubredditAdapter {
+public class AccountSubredditListAdapter extends SubredditAdapter {
 
     private static final String[] PROJECTION = {
             Subreddits._ID,
@@ -52,7 +52,7 @@ public class SubredditListAdapter extends SubredditAdapter {
 
     private boolean showPresets;
 
-    public SubredditListAdapter(Context context, boolean showPresets, boolean addFilter,
+    public AccountSubredditListAdapter(Context context, boolean showPresets, boolean addFilter,
             boolean singleChoice) {
         super(context, singleChoice);
         this.showPresets = showPresets;

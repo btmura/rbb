@@ -46,7 +46,7 @@ import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
-import com.btmura.android.reddit.widget.SubredditListAdapter;
+import com.btmura.android.reddit.widget.AccountSubredditListAdapter;
 import com.btmura.android.reddit.widget.SubredditSearchAdapter;
 import com.btmura.android.reddit.widget.SubredditView;
 
@@ -449,7 +449,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
                 return new AccountSubredditListController(getActivity(), adapter, getArguments());
 
             case TYPE_SEARCH:
-                return new SubredditSearchListController(getActivity(), adapter, getArguments());
+                return new SubredditSearchController(getActivity(), adapter, getArguments());
 
             default:
                 throw new IllegalArgumentException();
@@ -461,7 +461,7 @@ public class SubredditListFragment extends ThingProviderListFragment implements
         boolean singleChoice = Flag.isEnabled(getFlagsArgument(), FLAG_SINGLE_CHOICE);
         switch (getTypeArgument()) {
             case TYPE_ACCOUNT:
-                return new SubredditListAdapter(getActivity(), true, false, singleChoice);
+                return new AccountSubredditListAdapter(getActivity(), true, false, singleChoice);
 
             case TYPE_SEARCH:
                 return new SubredditSearchAdapter(getActivity(), query, singleChoice);
