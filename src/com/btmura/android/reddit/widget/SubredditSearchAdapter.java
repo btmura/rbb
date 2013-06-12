@@ -18,22 +18,13 @@ package com.btmura.android.reddit.widget;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.util.Objects;
 
 /** {@link SubredditAdapter} that handles searching for subreddits. */
 public class SubredditSearchAdapter extends SubredditAdapter {
-
-    private static final String[] PROJECTION = {
-            SubredditResults._ID,
-            SubredditResults.COLUMN_NAME,
-            SubredditResults.COLUMN_SUBSCRIBERS,
-            SubredditResults.COLUMN_OVER_18,
-    };
 
     private static final int INDEX_NAME = 1;
     private static final int INDEX_SUBSCRIBERS = 2;
@@ -44,21 +35,6 @@ public class SubredditSearchAdapter extends SubredditAdapter {
     public SubredditSearchAdapter(Context context, String query, boolean singleChoice) {
         super(context, singleChoice);
         this.query = query;
-    }
-
-    @Override
-    protected Uri getLoaderUri() {
-        return null; // ThingProvider.subredditSearchUri(accountName, query);
-    }
-
-    @Override
-    protected String[] getProjection() {
-        return PROJECTION;
-    }
-
-    @Override
-    protected String getSortOrder() {
-        return SubredditResults.SORT_BY_NAME;
     }
 
     @Override

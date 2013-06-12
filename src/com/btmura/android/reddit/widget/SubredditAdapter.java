@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import com.btmura.android.reddit.util.Objects;
 
 /** {@link BaseLoaderAdapter} that handles lists of subreddits. */
-public abstract class SubredditAdapter extends BaseLoaderAdapter {
+public abstract class SubredditAdapter extends BaseCursorAdapter {
 
     public static final String TAG = "SubredditAdapter";
 
@@ -32,17 +32,6 @@ public abstract class SubredditAdapter extends BaseLoaderAdapter {
     protected long sessionId = -1;
     protected String accountName;
     protected String selectedSubreddit;
-
-    /** Creates an adapter for showing the user's subreddits with presets. */
-    public static SubredditAdapter newSubredditsInstance(Context context, boolean singleChoice) {
-        return new SubredditListAdapter(context, true, false, singleChoice);
-    }
-
-    /** Creates an adapter for searching for subreddits. */
-    public static SubredditAdapter newSearchInstance(Context context, String query,
-            boolean singleChoice) {
-        return new SubredditSearchAdapter(context, query, singleChoice);
-    }
 
     /** Creates an adapter for use with AutoCompleteTextView. */
     public static SubredditAdapter newAutoCompleteInstance(Context context) {
@@ -53,11 +42,6 @@ public abstract class SubredditAdapter extends BaseLoaderAdapter {
     protected SubredditAdapter(Context context, boolean singleChoice) {
         super(context, null, 0);
         this.singleChoice = singleChoice;
-    }
-
-    @Override
-    public boolean isLoadable() {
-        return accountName != null;
     }
 
     @Override

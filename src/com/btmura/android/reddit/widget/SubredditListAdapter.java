@@ -21,7 +21,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.FilterQueryProvider;
@@ -75,31 +74,6 @@ public class SubredditListAdapter extends SubredditAdapter {
             newCursor = new MergeCursor(new Cursor[] {PRESETS_CURSOR, newCursor});
         }
         return super.swapCursor(newCursor);
-    }
-
-    @Override
-    protected Uri getLoaderUri() {
-        return SubredditProvider.SUBREDDITS_URI;
-    }
-
-    @Override
-    protected String[] getProjection() {
-        return PROJECTION;
-    }
-
-    @Override
-    protected String getSelection() {
-        return Subreddits.SELECT_BY_ACCOUNT_NOT_DELETED;
-    }
-
-    @Override
-    protected String[] getSelectionArgs() {
-        return Array.of(accountName);
-    }
-
-    @Override
-    protected String getSortOrder() {
-        return Subreddits.SORT_BY_NAME;
     }
 
     @Override
