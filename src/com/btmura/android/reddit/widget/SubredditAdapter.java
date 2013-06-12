@@ -29,7 +29,6 @@ public abstract class SubredditAdapter extends BaseCursorAdapter {
     public static final String TAG = "SubredditAdapter";
 
     protected final boolean singleChoice;
-    protected long sessionId = -1;
     protected String accountName;
     protected String selectedSubreddit;
 
@@ -47,18 +46,6 @@ public abstract class SubredditAdapter extends BaseCursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return new SubredditView(context);
-    }
-
-    public long getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(long sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public String getAccountName() {
-        return accountName;
     }
 
     public void setAccountName(String accountName) {
