@@ -62,7 +62,7 @@ abstract class AbstractThingListController implements ThingListController {
     private long sessionId;
 
     AbstractThingListController(Context context, AbstractThingListAdapter adapter) {
-        this.context = context.getApplicationContext();
+        this.context = context;
         this.adapter = adapter;
     }
 
