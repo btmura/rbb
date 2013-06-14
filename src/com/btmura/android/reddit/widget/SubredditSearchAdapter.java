@@ -21,14 +21,11 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.util.Objects;
 
 /** {@link SubredditAdapter} that handles searching for subreddits. */
 public class SubredditSearchAdapter extends SubredditAdapter {
-
-    private static final int INDEX_NAME = 1;
-    private static final int INDEX_SUBSCRIBERS = 2;
-    private static final int INDEX_OVER_18 = 3;
 
     private final String query;
 
@@ -39,9 +36,9 @@ public class SubredditSearchAdapter extends SubredditAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        String name = cursor.getString(INDEX_NAME);
-        int subscribers = query != null ? cursor.getInt(INDEX_SUBSCRIBERS) : -1;
-        boolean over18 = query != null && cursor.getInt(INDEX_OVER_18) == 1;
+        String name = cursor.getString(SubredditSearchLoader.INDEX_NAME);
+        int subscribers = cursor.getInt(SubredditSearchLoader.INDEX_SUBSCRIBERS);
+        boolean over18 = cursor.getInt(SubredditSearchLoader.INDEX_OVER_18) == 1;
         SubredditView v = (SubredditView) view;
         v.setData(name, over18, subscribers);
         v.setChosen(singleChoice && Objects.equalsIgnoreCase(selectedSubreddit, name));
@@ -49,7 +46,7 @@ public class SubredditSearchAdapter extends SubredditAdapter {
 
     @Override
     public String getName(int position) {
-        return getString(position, INDEX_NAME);
+        return getString(position, SubredditSearchLoader.INDEX_NAME);
     }
 
     public boolean isQuery() {

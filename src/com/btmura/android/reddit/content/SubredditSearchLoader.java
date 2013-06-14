@@ -32,6 +32,10 @@ public class SubredditSearchLoader extends CursorLoader {
 
     private static final String TAG = "SubredditSearchLoader";
 
+    public static final int INDEX_NAME = 1;
+    public static final int INDEX_SUBSCRIBERS = 2;
+    public static final int INDEX_OVER_18 = 3;
+
     private static final String[] PROJECTION = {
             SubredditResults._ID,
             SubredditResults.COLUMN_NAME,
