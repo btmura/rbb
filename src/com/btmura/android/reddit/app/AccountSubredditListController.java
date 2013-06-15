@@ -23,26 +23,29 @@ import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.widget.AccountSubredditListAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
 class AccountSubredditListController implements SubredditListController {
 
-    private static final String EXTRA_ACCOUNT_NAME = SubredditListFragment.ARG_ACCOUNT_NAME;
-    private static final String EXTRA_SELECTED_SUBREDDIT =
-            SubredditListFragment.ARG_SELECTED_SUBREDDIT;
-    private static final String EXTRA_SESSION_ID = SubredditListFragment.STATE_SESSION_ID;
-    private static final String EXTRA_ACTION_ACCOUNT_NAME =
-            SubredditListFragment.STATE_SELECTED_ACTION_ACCOUNT;
+    static final String EXTRA_ACCOUNT_NAME = "accountName";
+    static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
+    static final String EXTRA_SINGLE_CHOICE = "singleChoice";
+
+    private static final String EXTRA_SESSION_ID = "sessionId";
+    private static final String EXTRA_ACTION_ACCOUNT_NAME = "actionAccountName";
 
     private final Context context;
     private final SubredditAdapter adapter;
+
     private String accountName;
     private long sessionId;
     private String actionAccountName;
 
-    AccountSubredditListController(Context context, SubredditAdapter adapter, Bundle args) {
+    AccountSubredditListController(Context context, Bundle args) {
         this.context = context;
-        this.adapter = adapter;
+        this.adapter = new AccountSubredditListAdapter(context, true, false,
+                getSingleChoiceExtra(args));
         this.accountName = getAccountNameExtra(args);
         setSelectedSubreddit(getSelectedSubredditExtra(args));
     }
@@ -147,6 +150,10 @@ class AccountSubredditListController implements SubredditListController {
 
     private static String getSelectedSubredditExtra(Bundle extras) {
         return extras.getString(EXTRA_SELECTED_SUBREDDIT);
+    }
+
+    private static boolean getSingleChoiceExtra(Bundle extras) {
+        return extras.getBoolean(EXTRA_SINGLE_CHOICE);
     }
 
     private static long getSessionIdExtra(Bundle extras) {

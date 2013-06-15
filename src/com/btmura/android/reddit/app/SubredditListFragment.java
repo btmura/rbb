@@ -41,13 +41,9 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
-import com.btmura.android.reddit.widget.SubredditAdapter;
-import com.btmura.android.reddit.widget.AccountSubredditListAdapter;
-import com.btmura.android.reddit.widget.SubredditSearchAdapter;
 import com.btmura.android.reddit.widget.SubredditView;
 
 public class SubredditListFragment extends ThingProviderListFragment implements
@@ -55,25 +51,8 @@ public class SubredditListFragment extends ThingProviderListFragment implements
 
     public static final String TAG = "SubredditListFragment";
 
-    public static final int FLAG_SINGLE_CHOICE = 0x1;
-
     /** Integer argument specifying the type of content shown in this fragment. */
-    private static final String ARG_TYPE = "type";
-
-    /** String argument specifying the account being used. */
-    static final String ARG_ACCOUNT_NAME = "accountName";
-
-    /** String argument specifying the selected subreddit. */
-    static final String ARG_SELECTED_SUBREDDIT = "selectedSubreddit";
-
-    /** String argument specifying the search query to use to get subreddits. */
-    static final String ARG_QUERY = "query";
-
-    /** Optional bit mask for controlling fragment appearance. */
-    private static final String ARG_FLAGS = "flags";
-
-    static final String STATE_SESSION_ID = "sessionId";
-    static final String STATE_SELECTED_ACTION_ACCOUNT = "selectedActionAccount";
+    private static final String EXTRA_TYPE = "type";
 
     private static final int TYPE_ACCOUNT = 1;
     private static final int TYPE_SEARCH = 2;
@@ -100,22 +79,22 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     private Spinner accountSpinner;
 
     public static SubredditListFragment newAccountInstance(String accountName,
-            String selectedSubreddit, int flags) {
+            String selectedSubreddit, boolean singleChoice) {
         Bundle args = new Bundle(4);
-        args.putInt(ARG_TYPE, TYPE_ACCOUNT);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_SELECTED_SUBREDDIT, selectedSubreddit);
-        args.putInt(ARG_FLAGS, flags);
+        args.putInt(EXTRA_TYPE, TYPE_ACCOUNT);
+        args.putString(AccountSubredditListController.EXTRA_ACCOUNT_NAME, accountName);
+        args.putString(AccountSubredditListController.EXTRA_SELECTED_SUBREDDIT, selectedSubreddit);
+        args.putBoolean(AccountSubredditListController.EXTRA_SINGLE_CHOICE, singleChoice);
         return newFragment(args);
     }
 
-    public static SubredditListFragment newSearchInstance(String accountName,
-            String query, int flags) {
+    public static SubredditListFragment newSearchInstance(String accountName, String query,
+            boolean singleChoice) {
         Bundle args = new Bundle(4);
-        args.putInt(ARG_TYPE, TYPE_SEARCH);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_QUERY, query);
-        args.putInt(ARG_FLAGS, flags);
+        args.putInt(EXTRA_TYPE, TYPE_SEARCH);
+        args.putString(SubredditSearchController.EXTRA_ACCOUNT_NAME, accountName);
+        args.putString(SubredditSearchController.EXTRA_QUERY, query);
+        args.putBoolean(SubredditSearchController.EXTRA_SINGLE_CHOICE, singleChoice);
         return newFragment(args);
     }
 
@@ -443,28 +422,12 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     }
 
     private SubredditListController createController() {
-        SubredditAdapter adapter = createAdapter();
         switch (getTypeArgument()) {
             case TYPE_ACCOUNT:
-                return new AccountSubredditListController(getActivity(), adapter, getArguments());
+                return new AccountSubredditListController(getActivity(), getArguments());
 
             case TYPE_SEARCH:
-                return new SubredditSearchController(getActivity(), adapter, getArguments());
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-    private SubredditAdapter createAdapter() {
-        String query = getQueryArgument();
-        boolean singleChoice = Flag.isEnabled(getFlagsArgument(), FLAG_SINGLE_CHOICE);
-        switch (getTypeArgument()) {
-            case TYPE_ACCOUNT:
-                return new AccountSubredditListAdapter(getActivity(), true, false, singleChoice);
-
-            case TYPE_SEARCH:
-                return new SubredditSearchAdapter(getActivity(), query, singleChoice);
+                return new SubredditSearchController(getActivity(), getArguments());
 
             default:
                 throw new IllegalArgumentException();
@@ -474,14 +437,6 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     // Getters for fragment arguments.
 
     private int getTypeArgument() {
-        return getArguments().getInt(ARG_TYPE);
-    }
-
-    private String getQueryArgument() {
-        return getArguments().getString(ARG_QUERY);
-    }
-
-    private int getFlagsArgument() {
-        return getArguments().getInt(ARG_FLAGS);
+        return getArguments().getInt(EXTRA_TYPE);
     }
 }

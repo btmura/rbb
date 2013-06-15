@@ -71,7 +71,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected ActionBar bar;
 
     protected boolean isSinglePane;
-    private int sfFlags;
+    private boolean isSingleChoice;
     private int tfFlags;
 
     private View navContainer;
@@ -111,6 +111,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private void setupPrereqs() {
         bar = getActionBar();
         isSinglePane = findViewById(R.id.thing_container) == null;
+        isSingleChoice = !isSinglePane;
     }
 
     protected abstract boolean skipSetup();
@@ -127,7 +128,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (!isSinglePane) {
             getSupportFragmentManager().addOnBackStackChangedListener(this);
 
-            sfFlags |= SubredditListFragment.FLAG_SINGLE_CHOICE;
             tfFlags |= ThingListFragment.FLAG_SINGLE_CHOICE;
 
             navContainer = findViewById(R.id.nav_container);
@@ -166,13 +166,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected void setAccountSubredditListNavigation(int containerId, String subreddit,
             boolean isRandom, Bundle thingBundle) {
         SubredditListFragment frag = SubredditListFragment.newAccountInstance(getAccountName(),
-                subreddit, sfFlags);
+                subreddit, isSingleChoice);
         setSubredditListNavigation(frag, containerId, subreddit, isRandom, thingBundle);
     }
 
     protected void setSearchSubredditListNavigation(int containerId, String query) {
         SubredditListFragment frag = SubredditListFragment.newSearchInstance(getAccountName(),
-                query, sfFlags);
+                query, isSingleChoice);
         setSubredditListNavigation(frag, containerId, null, false, null);
     }
 

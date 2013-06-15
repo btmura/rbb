@@ -49,10 +49,12 @@ public class SubredditSearchAdapter extends SubredditAdapter {
         return getString(position, SubredditSearchLoader.INDEX_NAME);
     }
 
+    // TODO: Remove this method.
     public boolean isQuery() {
         return !TextUtils.isEmpty(query);
     }
 
+    // TODO: Remove this method.
     public String getQuery() {
         return query;
     }

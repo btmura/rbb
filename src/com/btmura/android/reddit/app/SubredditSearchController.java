@@ -24,27 +24,30 @@ import android.text.TextUtils;
 
 import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.widget.SubredditAdapter;
+import com.btmura.android.reddit.widget.SubredditSearchAdapter;
 
 class SubredditSearchController implements SubredditListController {
 
-    private static final String EXTRA_ACCOUNT_NAME = SubredditListFragment.ARG_ACCOUNT_NAME;
-    private static final String EXTRA_SELECTED_SUBREDDIT =
-            SubredditListFragment.ARG_SELECTED_SUBREDDIT;
-    private static final String EXTRA_QUERY = SubredditListFragment.ARG_QUERY;
-    private static final String EXTRA_SESSION_ID = SubredditListFragment.STATE_SESSION_ID;
-    private static final String EXTRA_ACTION_ACCOUNT_NAME =
-            SubredditListFragment.STATE_SELECTED_ACTION_ACCOUNT;
+    static final String EXTRA_ACCOUNT_NAME = "accountName";
+    static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
+    static final String EXTRA_QUERY = "query";
+    static final String EXTRA_SINGLE_CHOICE = "singleChoice";
+
+    private static final String EXTRA_SESSION_ID = "sessionId";
+    private static final String EXTRA_ACTION_ACCOUNT_NAME = "actionAccountName";
 
     private final Context context;
     private final SubredditAdapter adapter;
+
     private String accountName;
     private String query;
     private long sessionId;
     private String actionAccountName;
 
-    SubredditSearchController(Context context, SubredditAdapter adapter, Bundle args) {
+    SubredditSearchController(Context context, Bundle args) {
         this.context = context;
-        this.adapter = adapter;
+        this.adapter = new SubredditSearchAdapter(context, getQueryExtra(args),
+                getSingleChoiceExtra(args));
         this.accountName = getAccountNameExtra(args);
         this.query = getQueryExtra(args);
     }
@@ -154,6 +157,10 @@ class SubredditSearchController implements SubredditListController {
 
     private static String getQueryExtra(Bundle extras) {
         return extras.getString(EXTRA_QUERY);
+    }
+
+    private static boolean getSingleChoiceExtra(Bundle extras) {
+        return extras.getBoolean(EXTRA_SINGLE_CHOICE);
     }
 
     private static long getSessionIdExtra(Bundle extras) {
