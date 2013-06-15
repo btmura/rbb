@@ -51,18 +51,18 @@ public class MessageThingLoader extends CursorLoader {
             MessageActions.COLUMN_ACTION,
     };
 
-    public static final int MESSAGE_AUTHOR = 1;
-    public static final int MESSAGE_BODY = 2;
-    public static final int MESSAGE_CONTEXT = 3;
-    public static final int MESSAGE_CREATED_UTC = 4;
-    public static final int MESSAGE_DESTINATION = 5;
-    public static final int MESSAGE_KIND = 6;
-    public static final int MESSAGE_NEW = 7;
-    public static final int MESSAGE_SUBJECT = 8;
-    public static final int MESSAGE_SUBREDDIT = 9;
-    public static final int MESSAGE_THING_ID = 10;
-    public static final int MESSAGE_WAS_COMMENT = 11;
-    public static final int MESSAGE_ACTION = 12;
+    public static final int INDEX_AUTHOR = 1;
+    public static final int INDEX_BODY = 2;
+    public static final int INDEX_CONTEXT = 3;
+    public static final int INDEX_CREATED_UTC = 4;
+    public static final int INDEX_DESTINATION = 5;
+    public static final int INDEX_KIND = 6;
+    public static final int INDEX_NEW = 7;
+    public static final int INDEX_SUBJECT = 8;
+    public static final int INDEX_SUBREDDIT = 9;
+    public static final int INDEX_THING_ID = 10;
+    public static final int INDEX_WAS_COMMENT = 11;
+    public static final int INDEX_ACTION = 12;
 
     private final String accountName;
     private final int filter;

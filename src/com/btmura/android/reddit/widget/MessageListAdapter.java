@@ -55,23 +55,23 @@ public class MessageListAdapter extends AbstractThingListAdapter {
     }
 
     private void bindMessageThingView(View view, Context context, Cursor cursor) {
-        final String author = cursor.getString(MessageThingLoader.MESSAGE_AUTHOR);
-        final String body = cursor.getString(MessageThingLoader.MESSAGE_BODY);
-        final long createdUtc = cursor.getLong(MessageThingLoader.MESSAGE_CREATED_UTC);
-        final String destination = cursor.getString(MessageThingLoader.MESSAGE_DESTINATION);
+        final String author = cursor.getString(MessageThingLoader.INDEX_AUTHOR);
+        final String body = cursor.getString(MessageThingLoader.INDEX_BODY);
+        final long createdUtc = cursor.getLong(MessageThingLoader.INDEX_CREATED_UTC);
+        final String destination = cursor.getString(MessageThingLoader.INDEX_DESTINATION);
         final String domain = null; // No domain for messages.
         final int downs = 0; // No downs for messages.
         final boolean expanded = true; // Messages are always expanded.
-        final int kind = cursor.getInt(MessageThingLoader.MESSAGE_KIND);
+        final int kind = cursor.getInt(MessageThingLoader.INDEX_KIND);
         final int likes = 0; // No likes for messages.
         final boolean isNew = false; // TODO: FIX isNew(cursor.getPosition());
         final int nesting = 0; // No nesting for messages.
         final int numComments = 0; // No comments for messages.
         final boolean over18 = false; // No over18 for messages.
         final int score = 0; // No score for messages.
-        final String subject = cursor.getString(MessageThingLoader.MESSAGE_SUBJECT);
-        final String subreddit = cursor.getString(MessageThingLoader.MESSAGE_SUBREDDIT);
-        final String thingId = cursor.getString(MessageThingLoader.MESSAGE_THING_ID);
+        final String subject = cursor.getString(MessageThingLoader.INDEX_SUBJECT);
+        final String subreddit = cursor.getString(MessageThingLoader.INDEX_SUBREDDIT);
+        final String thingId = cursor.getString(MessageThingLoader.INDEX_THING_ID);
         final String title = null; // No title for messages.
         final int ups = 0; // No upvotes for messages.
 
@@ -128,12 +128,12 @@ public class MessageListAdapter extends AbstractThingListAdapter {
 
     @Override
     int getAuthorIndex() {
-        return MessageThingLoader.MESSAGE_AUTHOR;
+        return MessageThingLoader.INDEX_AUTHOR;
     }
 
     @Override
     int getKindIndex() {
-        return MessageThingLoader.MESSAGE_KIND;
+        return MessageThingLoader.INDEX_KIND;
     }
 
     @Override
@@ -143,6 +143,6 @@ public class MessageListAdapter extends AbstractThingListAdapter {
 
     @Override
     String getThingId(int position) {
-        return getString(position, MessageThingLoader.MESSAGE_THING_ID);
+        return getString(position, MessageThingLoader.INDEX_THING_ID);
     }
 }

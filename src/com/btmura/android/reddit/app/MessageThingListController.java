@@ -79,17 +79,17 @@ class MessageThingListController implements ThingListController {
 
     private Bundle makeMessageThingBundle(Cursor c) {
         Bundle b = new Bundle(7);
-        ThingBundle.putAuthor(b, c.getString(MessageThingLoader.MESSAGE_AUTHOR));
-        ThingBundle.putSubreddit(b, c.getString(MessageThingLoader.MESSAGE_SUBREDDIT));
-        ThingBundle.putKind(b, c.getInt(MessageThingLoader.MESSAGE_KIND));
+        ThingBundle.putAuthor(b, c.getString(MessageThingLoader.INDEX_AUTHOR));
+        ThingBundle.putSubreddit(b, c.getString(MessageThingLoader.INDEX_SUBREDDIT));
+        ThingBundle.putKind(b, c.getInt(MessageThingLoader.INDEX_KIND));
 
         // Messages don't have titles so use the body for both.
-        String body = c.getString(MessageThingLoader.MESSAGE_BODY);
+        String body = c.getString(MessageThingLoader.INDEX_BODY);
         ThingBundle.putTitle(b, body);
 
-        ThingBundle.putThingId(b, c.getString(MessageThingLoader.MESSAGE_THING_ID));
+        ThingBundle.putThingId(b, c.getString(MessageThingLoader.INDEX_THING_ID));
 
-        String contextUrl = c.getString(MessageThingLoader.MESSAGE_CONTEXT);
+        String contextUrl = c.getString(MessageThingLoader.INDEX_CONTEXT);
         if (!TextUtils.isEmpty(contextUrl)) {
             // If there is a context url, then we have to parse that url to grab
             // the link id embedded inside of it like:
@@ -103,7 +103,7 @@ class MessageThingListController implements ThingListController {
 
         // If this message isn't a comment, then it's simply a message with no
         // comments or links.
-        ThingBundle.putNoComments(b, c.getInt(MessageThingLoader.MESSAGE_WAS_COMMENT) == 0);
+        ThingBundle.putNoComments(b, c.getInt(MessageThingLoader.INDEX_WAS_COMMENT) == 0);
 
         return b;
     }
@@ -181,12 +181,12 @@ class MessageThingListController implements ThingListController {
 
     private boolean isNew(int position) {
         // If no local read actions are pending, then rely on what reddit thinks.
-        if (adapter.isNull(position, MessageThingLoader.MESSAGE_ACTION)) {
-            return adapter.getBoolean(position, MessageThingLoader.MESSAGE_NEW);
+        if (adapter.isNull(position, MessageThingLoader.INDEX_ACTION)) {
+            return adapter.getBoolean(position, MessageThingLoader.INDEX_NEW);
         }
 
         // We have a local pending action so use that to indicate if it's new.
-        return adapter.getInt(position, MessageThingLoader.MESSAGE_ACTION) == ReadActions.ACTION_UNREAD;
+        return adapter.getInt(position, MessageThingLoader.INDEX_ACTION) == ReadActions.ACTION_UNREAD;
     }
 
     @Override
@@ -340,14 +340,14 @@ class MessageThingListController implements ThingListController {
     // Simple adapter getters.
 
     private String getContext(int position) {
-        return adapter.getString(position, MessageThingLoader.MESSAGE_CONTEXT);
+        return adapter.getString(position, MessageThingLoader.INDEX_CONTEXT);
     }
 
     private String getSubject(int position) {
-        return adapter.getString(position, MessageThingLoader.MESSAGE_SUBJECT);
+        return adapter.getString(position, MessageThingLoader.INDEX_SUBJECT);
     }
 
     private String getThingId(int position) {
-        return adapter.getString(MessageThingLoader.MESSAGE_THING_ID, position);
+        return adapter.getString(MessageThingLoader.INDEX_THING_ID, position);
     }
 }
