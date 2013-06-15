@@ -72,7 +72,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected boolean isSinglePane;
     private boolean isSingleChoice;
-    private int tfFlags;
 
     private View navContainer;
     private View subredditListContainer;
@@ -127,8 +126,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private void setupCommonViews() {
         if (!isSinglePane) {
             getSupportFragmentManager().addOnBackStackChangedListener(this);
-
-            tfFlags |= ThingListFragment.FLAG_SINGLE_CHOICE;
 
             navContainer = findViewById(R.id.nav_container);
             subredditListContainer = findViewById(R.id.subreddit_list_container);
@@ -208,7 +205,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, isRandom, thingBundle,
                 filter);
         Fragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
-                tfFlags);
+                isSingleChoice);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
@@ -246,19 +243,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
         ThingListFragment frag = ThingListFragment.newSearchInstance(getAccountName(),
-                subreddit, query, tfFlags);
+                subreddit, query, isSingleChoice);
         setThingListNavigation(frag, containerId, subreddit);
     }
 
     protected void setProfileThingListNavigation(int containerId, String profileUser) {
         ThingListFragment frag = ThingListFragment.newProfileInstance(getAccountName(),
-                profileUser, getFilter(), tfFlags);
+                profileUser, getFilter(), isSingleChoice);
         setThingListNavigation(frag, containerId, null);
     }
 
     protected void setMessageThingListNavigation(int containerId, String messageUser) {
         ThingListFragment frag = ThingListFragment.newMessageInstance(getAccountName(),
-                messageUser, getFilter(), tfFlags);
+                messageUser, getFilter(), isSingleChoice);
         setThingListNavigation(frag, containerId, null);
     }
 
@@ -373,7 +370,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, isRandom, null, filter);
         Fragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
-                tfFlags);
+                isSingleChoice);
         Fragment tf = getThingFragment();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

@@ -37,7 +37,6 @@ import android.widget.ListView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
@@ -49,8 +48,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
         OnScrollListener, OnSwipeDismissListener, OnVoteListener, MultiChoiceModeListener {
 
     public static final String TAG = "ThingListFragment";
-
-    public static final int FLAG_SINGLE_CHOICE = 0x1;
 
     /** Integer argument specifying the fragment type. */
     private static final String ARG_TYPE = "type";
@@ -76,8 +73,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
     /** Integer argument to filter things, profile, or messages. */
     private static final String ARG_FILTER = "filter";
 
-    /** Optional bit mask for controlling fragment appearance. */
-    private static final String ARG_FLAGS = "flags";
+    /** Boolean argument indicating whether the list should be put into single choice mode. */
+    private static final String ARG_SINGLE_CHOICE = "singleChoice";
 
     private static final int TYPE_SUBREDDIT = 1;
     private static final int TYPE_SEARCH = 2;
@@ -100,48 +97,48 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private boolean scrollLoading;
 
     public static ThingListFragment newSubredditInstance(String accountName, String subreddit,
-            int filter, int flags) {
+            int filter, boolean singleChoice) {
         Bundle args = new Bundle(6);
         args.putInt(ARG_TYPE, TYPE_SUBREDDIT);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_PARENT_SUBREDDIT, subreddit);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putInt(ARG_FILTER, filter);
-        args.putInt(ARG_FLAGS, flags);
+        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
         return newFragment(args);
     }
 
     public static ThingListFragment newSearchInstance(String accountName, String subreddit,
-            String query, int flags) {
+            String query, boolean singleChoice) {
         Bundle args = new Bundle(6);
         args.putInt(ARG_TYPE, TYPE_SEARCH);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_PARENT_SUBREDDIT, subreddit);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putString(ARG_QUERY, query);
-        args.putInt(ARG_FLAGS, flags);
+        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
         return newFragment(args);
     }
 
     public static ThingListFragment newProfileInstance(String accountName, String profileUser,
-            int filter, int flags) {
+            int filter, boolean singleChoice) {
         Bundle args = new Bundle(5);
         args.putInt(ARG_TYPE, TYPE_PROFILE);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_PROFILE_USER, profileUser);
         args.putInt(ARG_FILTER, filter);
-        args.putInt(ARG_FLAGS, flags);
+        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
         return newFragment(args);
     }
 
     public static ThingListFragment newMessageInstance(String accountName, String messageUser,
-            int filter, int flags) {
+            int filter, boolean singleChoice) {
         Bundle args = new Bundle(5);
         args.putInt(ARG_TYPE, TYPE_MESSAGES);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_MESSAGE_USER, messageUser);
         args.putInt(ARG_FILTER, filter);
-        args.putInt(ARG_FLAGS, flags);
+        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
         return newFragment(args);
     }
 
@@ -169,8 +166,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        boolean singleChoice = Flag.isEnabled(getFlagsArgument(), FLAG_SINGLE_CHOICE);
-        ThingListAdapter adapter = new ThingListAdapter(getActivity(), this, singleChoice);
+        ThingListAdapter adapter = new ThingListAdapter(getActivity(), this,
+                getSingleChoiceArgument());
 
         controller = createController(adapter);
         controller.loadState(getArguments());
@@ -531,7 +528,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         return getArguments().getInt(ARG_FILTER);
     }
 
-    private int getFlagsArgument() {
-        return getArguments().getInt(ARG_FLAGS);
+    private boolean getSingleChoiceArgument() {
+        return getArguments().getBoolean(ARG_SINGLE_CHOICE);
     }
 }

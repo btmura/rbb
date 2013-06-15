@@ -45,7 +45,7 @@ class AccountSubredditListController implements SubredditListController {
     AccountSubredditListController(Context context, Bundle args) {
         this.context = context;
         this.adapter = new AccountSubredditListAdapter(context, true, false,
-                getSingleChoiceExtra(args));
+                getHighlightSelectedExtra(args));
         this.accountName = getAccountNameExtra(args);
         setSelectedSubreddit(getSelectedSubredditExtra(args));
     }
@@ -152,7 +152,7 @@ class AccountSubredditListController implements SubredditListController {
         return extras.getString(EXTRA_SELECTED_SUBREDDIT);
     }
 
-    private static boolean getSingleChoiceExtra(Bundle extras) {
+    private static boolean getHighlightSelectedExtra(Bundle extras) {
         return extras.getBoolean(EXTRA_SINGLE_CHOICE);
     }
 
