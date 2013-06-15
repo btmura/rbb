@@ -67,9 +67,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
     /** String argument specifying the profileUser profile to load. */
     private static final String ARG_PROFILE_USER = "profileUser";
 
-    /** String argument specifying whose messages to load. */
-    private static final String ARG_MESSAGE_USER = "messageUser";
-
     /** Integer argument to filter things, profile, or messages. */
     private static final String ARG_FILTER = "filter";
 
@@ -135,10 +132,10 @@ public class ThingListFragment extends ThingProviderListFragment implements
             int filter, boolean singleChoice) {
         Bundle args = new Bundle(5);
         args.putInt(ARG_TYPE, TYPE_MESSAGES);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_MESSAGE_USER, messageUser);
-        args.putInt(ARG_FILTER, filter);
-        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        args.putString(MessageThingListController.EXTRA_ACCOUNT_NAME, accountName);
+        args.putString(MessageThingListController.EXTRA_MESSAGE_USER, messageUser);
+        args.putInt(MessageThingListController.EXTRA_FILTER, filter);
+        args.putBoolean(MessageThingListController.EXTRA_SINGLE_CHOICE, singleChoice);
         return newFragment(args);
     }
 
@@ -170,8 +167,9 @@ public class ThingListFragment extends ThingProviderListFragment implements
                 getSingleChoiceArgument());
 
         controller = createController(adapter);
-        controller.loadState(getArguments());
-        controller.loadState(savedInstanceState);
+        if (savedInstanceState != null) {
+            controller.restoreInstanceState(savedInstanceState);
+        }
 
         setHasOptionsMenu(true);
     }
@@ -427,7 +425,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        controller.saveState(outState);
+        controller.saveInstanceState(outState);
     }
 
     private int getThingBodyWidth() {
@@ -483,14 +481,15 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private ThingListController createController(ThingListAdapter adapter) {
         switch (getTypeArgument()) {
             case TYPE_SUBREDDIT:
-                return new SubredditThingListController(getActivity(), adapter);
+                return new SubredditThingListController(getActivity(), getArguments(), adapter);
 
             case TYPE_SEARCH:
-                return new SearchThingListController(getActivity(), adapter);
+                return new SearchThingListController(getActivity(), getArguments(), adapter);
 
             case TYPE_PROFILE:
                 return new ProfileThingListController(getActivity(),
                         getProfileUserArgument(),
+                        getArguments(),
                         adapter);
 
             case TYPE_MESSAGES:

@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.content.MessageThingLoader;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
@@ -40,11 +41,14 @@ class MessageThingListController implements ThingListController {
     static final String EXTRA_FILTER = "filter";
     static final String EXTRA_SINGLE_CHOICE = "singleChoice";
 
+    private static final String EXTRA_SESSION_ID = "sessionId";
+
     private final Context context;
     private final AbstractThingListAdapter adapter;
     private final String messageUser;
 
     private String accountName;
+    private int emptyText;
     private int filter;
     private String moreId;
     private long sessionId;
@@ -58,11 +62,15 @@ class MessageThingListController implements ThingListController {
     }
 
     @Override
-    public void loadState(Bundle savedInstanceState) {
+    public void restoreInstanceState(Bundle savedInstanceState) {
+        setAccountName(getAccountNameExtra(savedInstanceState));
+        setSessionId(getSessionIdExtra(savedInstanceState));
     }
 
     @Override
-    public void saveState(Bundle outState) {
+    public void saveInstanceState(Bundle outState) {
+        outState.putString(EXTRA_ACCOUNT_NAME, getAccountName());
+        outState.putLong(EXTRA_SESSION_ID, getSessionId());
     }
 
     // Loader related methods.
@@ -74,7 +82,7 @@ class MessageThingListController implements ThingListController {
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new MessageThingLoader(context, accountName, filter, moreId);
+        return new MessageThingLoader(context, accountName, filter, moreId, sessionId);
     }
 
     @Override
@@ -190,12 +198,18 @@ class MessageThingListController implements ThingListController {
 
     @Override
     public String getNextMoreId() {
+        Cursor c = adapter.getCursor();
+        if (c != null && c.moveToLast()) {
+            if (c.getInt(MessageThingLoader.INDEX_KIND) == Kinds.KIND_MORE) {
+                return c.getString(MessageThingLoader.INDEX_THING_ID);
+            }
+        }
         return null;
     }
 
     @Override
     public boolean hasNextMoreId() {
-        return false;
+        return !TextUtils.isEmpty(getNextMoreId());
     }
 
     private boolean isNew(int position) {
@@ -226,6 +240,11 @@ class MessageThingListController implements ThingListController {
     }
 
     @Override
+    public int getEmptyText() {
+        return emptyText;
+    }
+
+    @Override
     public int getFilter() {
         return filter;
     }
@@ -236,98 +255,33 @@ class MessageThingListController implements ThingListController {
     }
 
     @Override
+    public String getSelectedLinkId() {
+        return adapter.getSelectedLinkId();
+    }
+
+    @Override
+    public String getSelectedThingId() {
+        return adapter.getSelectedThingId();
+    }
+
+    @Override
     public long getSessionId() {
         return sessionId;
     }
 
     @Override
-    public int getEmptyText() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public String getParentSubreddit() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getQuery() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getSelectedLinkId() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getSelectedThingId() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getSubreddit() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean hasAccountName() {
-        // TODO Auto-generated method stub
-        return false;
+        return !TextUtils.isEmpty(getAccountName());
     }
 
     @Override
     public boolean hasCursor() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean hasQuery() {
-        // TODO Auto-generated method stub
-        return false;
+        return adapter.getCursor() != null;
     }
 
     @Override
     public boolean isSingleChoice() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void setEmptyText(int emptyText) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void setParentSubreddit(String parentSubreddit) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void setSelectedPosition(int position) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void setSelectedThing(String thingId, String linkId) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void setSubreddit(String subreddit) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void setThingBodyWidth(int thingBodyWidth) {
-        // TODO Auto-generated method stub
+        return adapter.isSingleChoice();
     }
 
     // Simple setters.
@@ -335,6 +289,11 @@ class MessageThingListController implements ThingListController {
     @Override
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+    }
+
+    @Override
+    public void setEmptyText(int emptyText) {
+        this.emptyText = emptyText;
     }
 
     @Override
@@ -348,8 +307,23 @@ class MessageThingListController implements ThingListController {
     }
 
     @Override
+    public void setSelectedPosition(int position) {
+        adapter.setSelectedPosition(position);
+    }
+
+    @Override
+    public void setSelectedThing(String thingId, String linkId) {
+        adapter.setSelectedThing(thingId, linkId);
+    }
+
+    @Override
     public void setSessionId(long sessionId) {
         this.sessionId = sessionId;
+    }
+
+    @Override
+    public void setThingBodyWidth(int thingBodyWidth) {
+        adapter.setThingBodyWidth(thingBodyWidth);
     }
 
     // Simple adapter getters.
@@ -383,4 +357,39 @@ class MessageThingListController implements ThingListController {
     private static boolean getSingleChoiceExtra(Bundle extras) {
         return extras.getBoolean(EXTRA_SINGLE_CHOICE);
     }
+
+    private static long getSessionIdExtra(Bundle extras) {
+        return extras.getLong(EXTRA_SESSION_ID);
+    }
+
+    // Unfinished business...
+
+    @Override
+    public String getParentSubreddit() {
+        return null;
+    }
+
+    @Override
+    public String getQuery() {
+        return null;
+    }
+
+    @Override
+    public String getSubreddit() {
+        return null;
+    }
+
+    @Override
+    public boolean hasQuery() {
+        return false;
+    }
+
+    @Override
+    public void setParentSubreddit(String parentSubreddit) {
+    }
+
+    @Override
+    public void setSubreddit(String subreddit) {
+    }
+
 }

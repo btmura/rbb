@@ -31,8 +31,8 @@ class SearchThingListController extends AbstractThingListController {
 
     private String query;
 
-    public SearchThingListController(Context context, ThingListAdapter adapter) {
-        super(context, adapter);
+    public SearchThingListController(Context context, Bundle args, ThingListAdapter adapter) {
+        super(context, args, adapter);
     }
 
     @Override
@@ -46,8 +46,8 @@ class SearchThingListController extends AbstractThingListController {
     }
 
     @Override
-    public void loadState(Bundle state) {
-        super.loadState(state);
+    public void restoreInstanceState(Bundle state) {
+        super.restoreInstanceState(state);
         state = Objects.nullToEmpty(state);
         if (state.containsKey(EXTRA_QUERY)) {
             setQuery(state.getString(EXTRA_QUERY));
@@ -55,8 +55,8 @@ class SearchThingListController extends AbstractThingListController {
     }
 
     @Override
-    public void saveState(Bundle state) {
-        super.saveState(state);
+    public void saveInstanceState(Bundle state) {
+        super.saveInstanceState(state);
         state.putString(EXTRA_QUERY, getQuery());
     }
 

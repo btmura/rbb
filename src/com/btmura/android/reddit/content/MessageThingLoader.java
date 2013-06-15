@@ -67,13 +67,16 @@ public class MessageThingLoader extends CursorLoader {
     private final String accountName;
     private final int filter;
     private final String more;
+    private final long sessionId;
     private Bundle sessionData;
 
-    public MessageThingLoader(Context context, String accountName, int filter, String more) {
+    public MessageThingLoader(Context context, String accountName, int filter, String more,
+            long sessionId) {
         super(context);
         this.accountName = accountName;
         this.filter = filter;
         this.more = more;
+        this.sessionId = sessionId;
 
         setUri(ThingProvider.MESSAGES_WITH_ACTIONS_URI);
         setProjection(PROJECTION);
@@ -86,7 +89,8 @@ public class MessageThingLoader extends CursorLoader {
             Log.d(TAG, "loadInBackground");
         }
         if (sessionData == null) {
-            sessionData = ThingProvider.getMessageSession(getContext(), accountName, filter, more);
+            sessionData = ThingProvider.getMessageSession(getContext(), accountName, filter, more,
+                    sessionId);
             long sessionId = sessionData.getLong(ThingProvider.EXTRA_SESSION_ID);
             setSelectionArgs(Array.of(sessionId));
         }

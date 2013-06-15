@@ -52,7 +52,7 @@ class AccountSubredditListController implements SubredditListController {
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        this.accountName = getAccountNameExtra(savedInstanceState);
+        setAccountName(getAccountNameExtra(savedInstanceState));
         setSelectedSubreddit(getSelectedSubredditExtra(savedInstanceState));
         this.sessionId = getSessionIdExtra(savedInstanceState);
         this.actionAccountName = getActionAccountNameExtra(savedInstanceState);

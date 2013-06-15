@@ -266,14 +266,13 @@ public class ThingProvider extends BaseProvider {
     }
 
     public static final Bundle getMessageSession(Context context, String accountName,
-            int filter, String more) {
+            int filter, String more, long sessionId) {
         Bundle extras = new Bundle(4);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGES);
         extras.putInt(EXTRA_FILTER, filter);
         extras.putString(EXTRA_MORE, more);
+        extras.putLong(EXTRA_SESSION_ID, sessionId);
         return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
-        // if (!TextUtils.isEmpty(more)) {
-        // b.appendQueryParameter(PARAM_MORE, more);
         // } else if (filter == FilterAdapter.MESSAGE_INBOX
         // || filter == FilterAdapter.MESSAGE_UNREAD) {
         // b.appendQueryParameter(PARAM_MARK, TRUE);

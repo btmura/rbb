@@ -18,6 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.content.SubredditThingLoader;
@@ -25,8 +26,8 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 
 class SubredditThingListController extends AbstractThingListController {
 
-    SubredditThingListController(Context context, ThingListAdapter adapter) {
-        super(context, adapter);
+    SubredditThingListController(Context context, Bundle args, ThingListAdapter adapter) {
+        super(context, args, adapter);
     }
 
     @Override

@@ -28,9 +28,9 @@ interface ThingListController {
 
     boolean isLoadable();
 
-    void loadState(Bundle state);
+    void restoreInstanceState(Bundle state);
 
-    void saveState(Bundle state);
+    void saveInstanceState(Bundle state);
 
     Loader<Cursor> createLoader();
 

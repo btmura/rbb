@@ -61,13 +61,14 @@ abstract class AbstractThingListController implements ThingListController {
     private String moreId;
     private long sessionId;
 
-    AbstractThingListController(Context context, AbstractThingListAdapter adapter) {
+    AbstractThingListController(Context context, Bundle args, AbstractThingListAdapter adapter) {
         this.context = context;
         this.adapter = adapter;
+        restoreInstanceState(args);
     }
 
     @Override
-    public void loadState(Bundle state) {
+    public void restoreInstanceState(Bundle state) {
         state = Objects.nullToEmpty(state);
         if (state.containsKey(STATE_ACCOUNT_NAME)) {
             setAccountName(state.getString(STATE_ACCOUNT_NAME));
@@ -95,7 +96,7 @@ abstract class AbstractThingListController implements ThingListController {
     }
 
     @Override
-    public void saveState(Bundle state) {
+    public void saveInstanceState(Bundle state) {
         state.putString(STATE_ACCOUNT_NAME, getAccountName());
         state.putInt(STATE_EMPTY_TEXT, getEmptyText());
         state.putInt(STATE_FILTER, getFilter());
