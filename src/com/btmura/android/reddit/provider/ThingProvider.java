@@ -101,6 +101,7 @@ public class ThingProvider extends BaseProvider {
 
     public static final Uri THINGS_WITH_ACTIONS_URI = makeJoinUri(THINGS_URI);
     public static final Uri COMMENTS_WITH_ACTIONS_URI = makeJoinUri(COMMENTS_URI);
+    public static final Uri MESSAGES_WITH_ACTIONS_URI = makeJoinUri(MESSAGES_URI);
 
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;

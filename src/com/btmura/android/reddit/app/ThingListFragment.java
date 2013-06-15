@@ -494,12 +494,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
                         adapter);
 
             case TYPE_MESSAGES:
-                return new MessageThingListController(getActivity(),
-                        getAccountNameArgument(),
-                        getMessageUserArgument(),
-                        getFilterArgument(),
-                        null,
-                        adapter);
+                return new MessageThingListController(getActivity(), getArguments());
 
             default:
                 throw new IllegalArgumentException();
@@ -512,20 +507,8 @@ public class ThingListFragment extends ThingProviderListFragment implements
         return getArguments().getInt(ARG_TYPE);
     }
 
-    private String getAccountNameArgument() {
-        return getArguments().getString(ARG_ACCOUNT_NAME);
-    }
-
     private String getProfileUserArgument() {
         return getArguments().getString(ARG_PROFILE_USER);
-    }
-
-    private String getMessageUserArgument() {
-        return getArguments().getString(ARG_MESSAGE_USER);
-    }
-
-    private int getFilterArgument() {
-        return getArguments().getInt(ARG_FILTER);
     }
 
     private boolean getSingleChoiceArgument() {

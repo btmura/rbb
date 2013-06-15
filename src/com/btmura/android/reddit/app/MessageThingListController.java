@@ -28,35 +28,33 @@ import com.btmura.android.reddit.content.MessageThingLoader;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
+import com.btmura.android.reddit.widget.MessageListAdapter;
 import com.btmura.android.reddit.widget.ThingBundle;
 
 class MessageThingListController implements ThingListController {
 
+    static final String EXTRA_ACCOUNT_NAME = "accountName";
+    static final String EXTRA_MESSAGE_USER = "messageUser";
+    static final String EXTRA_FILTER = "filter";
+    static final String EXTRA_SINGLE_CHOICE = "singleChoice";
+
     private final Context context;
-    private final String accountName;
-    private final String messageUser;
-    private final int filter;
-    private final String more;
     private final AbstractThingListAdapter adapter;
+    private final String messageUser;
 
-    MessageThingListController(Context context, String accountName, String messageUser, int filter,
-            String more, AbstractThingListAdapter adapter) {
+    private String accountName;
+    private int filter;
+    private String moreId;
+    private long sessionId;
+
+    MessageThingListController(Context context, Bundle args) {
         this.context = context.getApplicationContext();
-        this.accountName = accountName;
-        this.messageUser = messageUser;
-        this.filter = filter;
-        this.more = more;
-        this.adapter = adapter;
-    }
-
-    @Override
-    public boolean isLoadable() {
-        return accountName != null && messageUser != null;
-    }
-
-    @Override
-    public void saveState(Bundle outState) {
+        this.adapter = new MessageListAdapter(context, getSingleChoiceExtra(args));
+        this.accountName = getAccountNameExtra(args);
+        this.messageUser = getMessageUserExtra(args);
+        this.filter = getFilterExtra(args);
     }
 
     @Override
@@ -64,8 +62,29 @@ class MessageThingListController implements ThingListController {
     }
 
     @Override
+    public void saveState(Bundle outState) {
+    }
+
+    // Loader related methods.
+
+    @Override
+    public boolean isLoadable() {
+        return accountName != null && messageUser != null;
+    }
+
+    @Override
     public Loader<Cursor> createLoader() {
-        return new MessageThingLoader(context, accountName, filter, more);
+        return new MessageThingLoader(context, accountName, filter, moreId);
+    }
+
+    @Override
+    public void swapCursor(Cursor cursor) {
+        setMoreId(null);
+        adapter.swapCursor(cursor);
+        if (cursor != null && cursor.getExtras() != null) {
+            Bundle extras = cursor.getExtras();
+            setSessionId(extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+        }
     }
 
     @Override
@@ -194,37 +213,35 @@ class MessageThingListController implements ThingListController {
         return false;
     }
 
-    // Simple getters.
+    // Getters
 
     @Override
     public String getAccountName() {
-        return null;
-    }
-
-    @Override
-    public String getMoreId() {
-        return null;
-    }
-
-    @Override
-    public long getSessionId() {
-        return 0;
+        return accountName;
     }
 
     @Override
     public AbstractThingListAdapter getAdapter() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public int getEmptyText() {
-        // TODO Auto-generated method stub
-        return 0;
+        return adapter;
     }
 
     @Override
     public int getFilter() {
+        return filter;
+    }
+
+    @Override
+    public String getMoreId() {
+        return moreId;
+    }
+
+    @Override
+    public long getSessionId() {
+        return sessionId;
+    }
+
+    @Override
+    public int getEmptyText() {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -313,28 +330,26 @@ class MessageThingListController implements ThingListController {
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void swapCursor(Cursor cursor) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void setFilter(int filter) {
-        // TODO Auto-generated method stub
-    }
-
     // Simple setters.
 
     @Override
     public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    @Override
+    public void setFilter(int filter) {
+        this.filter = filter;
     }
 
     @Override
     public void setMoreId(String moreId) {
+        this.moreId = moreId;
     }
 
     @Override
     public void setSessionId(long sessionId) {
+        this.sessionId = sessionId;
     }
 
     // Simple adapter getters.
@@ -349,5 +364,23 @@ class MessageThingListController implements ThingListController {
 
     private String getThingId(int position) {
         return adapter.getString(MessageThingLoader.INDEX_THING_ID, position);
+    }
+
+    // Getters for extras.
+
+    private static String getAccountNameExtra(Bundle extras) {
+        return extras.getString(EXTRA_ACCOUNT_NAME);
+    }
+
+    private static String getMessageUserExtra(Bundle extras) {
+        return extras.getString(EXTRA_MESSAGE_USER);
+    }
+
+    private static int getFilterExtra(Bundle extras) {
+        return extras.getInt(EXTRA_FILTER);
+    }
+
+    private static boolean getSingleChoiceExtra(Bundle extras) {
+        return extras.getBoolean(EXTRA_SINGLE_CHOICE);
     }
 }
