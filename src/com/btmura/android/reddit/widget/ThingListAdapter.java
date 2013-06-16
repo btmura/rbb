@@ -83,36 +83,36 @@ public class ThingListAdapter extends AbstractThingListAdapter {
     }
 
     private void bindThingView(View view, Context context, Cursor cursor) {
-        final String author = cursor.getString(AbstractThingLoader.THING_AUTHOR);
-        final String body = cursor.getString(AbstractThingLoader.THING_BODY);
-        final long createdUtc = cursor.getLong(AbstractThingLoader.THING_CREATED_UTC);
+        final String author = cursor.getString(AbstractThingLoader.INDEX_AUTHOR);
+        final String body = cursor.getString(AbstractThingLoader.INDEX_BODY);
+        final long createdUtc = cursor.getLong(AbstractThingLoader.INDEX_CREATED_UTC);
         final String destination = null; // Only messages have destinations.
-        final String domain = cursor.getString(AbstractThingLoader.THING_DOMAIN);
-        final int downs = cursor.getInt(AbstractThingLoader.THING_DOWNS);
+        final String domain = cursor.getString(AbstractThingLoader.INDEX_DOMAIN);
+        final int downs = cursor.getInt(AbstractThingLoader.INDEX_DOWNS);
         final boolean expanded = true; // Expanded only for comments handled by different adapter.
-        final int kind = cursor.getInt(AbstractThingLoader.THING_KIND);
-        final String linkId = cursor.getString(AbstractThingLoader.THING_LINK_ID);
-        final String linkTitle = cursor.getString(AbstractThingLoader.THING_LINK_TITLE);
+        final int kind = cursor.getInt(AbstractThingLoader.INDEX_KIND);
+        final String linkId = cursor.getString(AbstractThingLoader.INDEX_LINK_ID);
+        final String linkTitle = cursor.getString(AbstractThingLoader.INDEX_LINK_TITLE);
         final int nesting = 0; // Nesting only for comments handled by different adapter.
-        final int numComments = cursor.getInt(AbstractThingLoader.THING_NUM_COMMENTS);
-        final boolean over18 = cursor.getInt(AbstractThingLoader.THING_OVER_18) == 1;
-        final String subreddit = cursor.getString(AbstractThingLoader.THING_SUBREDDIT);
-        final String thingId = cursor.getString(AbstractThingLoader.THING_THING_ID);
-        final String thumbnailUrl = cursor.getString(AbstractThingLoader.THING_THUMBNAIL_URL);
-        final String title = cursor.getString(AbstractThingLoader.THING_TITLE);
-        final int ups = cursor.getInt(AbstractThingLoader.THING_UPS);
+        final int numComments = cursor.getInt(AbstractThingLoader.INDEX_NUM_COMMENTS);
+        final boolean over18 = cursor.getInt(AbstractThingLoader.INDEX_OVER_18) == 1;
+        final String subreddit = cursor.getString(AbstractThingLoader.INDEX_SUBREDDIT);
+        final String thingId = cursor.getString(AbstractThingLoader.INDEX_THING_ID);
+        final String thumbnailUrl = cursor.getString(AbstractThingLoader.INDEX_THUMBNAIL_URL);
+        final String title = cursor.getString(AbstractThingLoader.INDEX_TITLE);
+        final int ups = cursor.getInt(AbstractThingLoader.INDEX_UPS);
 
         // Comments don't have a score so calculate our own.
-        int score = cursor.getInt(AbstractThingLoader.THING_SCORE);
+        int score = cursor.getInt(AbstractThingLoader.INDEX_SCORE);
         if (kind == Kinds.KIND_COMMENT) {
             score = ups - downs;
         }
 
         // Reconcile local and remote votes.
-        int likes = cursor.getInt(AbstractThingLoader.THING_LIKES);
-        if (!cursor.isNull(AbstractThingLoader.THING_VOTE)) {
+        int likes = cursor.getInt(AbstractThingLoader.INDEX_LIKES);
+        if (!cursor.isNull(AbstractThingLoader.THING_VOTE_ACTION)) {
             // Local votes take precedence over those from reddit.
-            likes = cursor.getInt(AbstractThingLoader.THING_VOTE);
+            likes = cursor.getInt(AbstractThingLoader.THING_VOTE_ACTION);
 
             // Modify the score since the vote is still pending and don't go
             // below 0 since reddit doesn't seem to do that.
@@ -176,21 +176,21 @@ public class ThingListAdapter extends AbstractThingListAdapter {
 
     @Override
     int getAuthorIndex() {
-        return AbstractThingLoader.THING_AUTHOR;
+        return AbstractThingLoader.INDEX_AUTHOR;
     }
 
     @Override
     int getKindIndex() {
-        return AbstractThingLoader.THING_KIND;
+        return AbstractThingLoader.INDEX_KIND;
     }
 
     @Override
     String getLinkId(int position) {
-        return getString(position, AbstractThingLoader.THING_LINK_ID);
+        return getString(position, AbstractThingLoader.INDEX_LINK_ID);
     }
 
     @Override
     String getThingId(int position) {
-        return getString(position, AbstractThingLoader.THING_THING_ID);
+        return getString(position, AbstractThingLoader.INDEX_THING_ID);
     }
 }

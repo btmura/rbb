@@ -55,33 +55,33 @@ public abstract class AbstractThingLoader extends AbstractSessionLoader {
             SharedColumns.COLUMN_VOTE_ACTION,
     };
 
-    public static final int THING_AUTHOR = 1;
-    public static final int THING_BODY = 2;
-    public static final int THING_CREATED_UTC = 3;
-    public static final int THING_DOMAIN = 4;
-    public static final int THING_DOWNS = 5;
-    public static final int THING_HIDDEN = 6;
-    public static final int THING_KIND = 7;
-    public static final int THING_LIKES = 8;
-    public static final int THING_LINK_ID = 9;
-    public static final int THING_LINK_TITLE = 10;
-    public static final int THING_NUM_COMMENTS = 11;
-    public static final int THING_OVER_18 = 12;
-    public static final int THING_PERMA_LINK = 13;
-    public static final int THING_SAVED = 14;
-    public static final int THING_SCORE = 15;
-    public static final int THING_SELF = 16;
-    public static final int THING_SUBREDDIT = 17;
-    public static final int THING_TITLE = 18;
-    public static final int THING_THING_ID = 19;
-    public static final int THING_THUMBNAIL_URL = 20;
-    public static final int THING_UPS = 21;
-    public static final int THING_URL = 22;
+    public static final int INDEX_AUTHOR = 1;
+    public static final int INDEX_BODY = 2;
+    public static final int INDEX_CREATED_UTC = 3;
+    public static final int INDEX_DOMAIN = 4;
+    public static final int INDEX_DOWNS = 5;
+    public static final int INDEX_HIDDEN = 6;
+    public static final int INDEX_KIND = 7;
+    public static final int INDEX_LIKES = 8;
+    public static final int INDEX_LINK_ID = 9;
+    public static final int INDEX_LINK_TITLE = 10;
+    public static final int INDEX_NUM_COMMENTS = 11;
+    public static final int INDEX_OVER_18 = 12;
+    public static final int INDEX_PERMA_LINK = 13;
+    public static final int INDEX_SAVED = 14;
+    public static final int INDEX_SCORE = 15;
+    public static final int INDEX_SELF = 16;
+    public static final int INDEX_SUBREDDIT = 17;
+    public static final int INDEX_TITLE = 18;
+    public static final int INDEX_THING_ID = 19;
+    public static final int INDEX_THUMBNAIL_URL = 20;
+    public static final int INDEX_UPS = 21;
+    public static final int INDEX_URL = 22;
 
     // Following columns are from joined tables at the end.
     public static final int THING_SAVE_ACTION = 22;
-    public static final int THING_VOTE = 23;
-    public static final int THING_LOCAL_HIDDEN = 24;
+    public static final int THING_VOTE_ACTION = 23;
+    public static final int THING_HIDE_ACTION = 24;
 
     AbstractThingLoader(Context context, Uri uri, String[] projection, String selection,
             long sessionId, String more) {
