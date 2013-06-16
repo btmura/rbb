@@ -165,7 +165,7 @@ class CommentListController implements CommentList {
             Provider.collapseCommentAsync(context, id, childIds);
         } else {
             long sessionId = getSessionId(position);
-            Provider.expandCommentAsync(context, sessionId, id);
+            Provider.expandCommentAsync(context, id, sessionId);
         }
     }
 

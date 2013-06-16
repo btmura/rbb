@@ -24,7 +24,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
@@ -33,8 +32,6 @@ import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.app.CommentLogic;
-import com.btmura.android.reddit.app.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
@@ -57,13 +54,6 @@ import com.btmura.android.reddit.util.Objects;
 public class Provider {
 
     public static final String TAG = "Provider";
-
-    /** Projection used by {@link #expandInBackground(Context, long)}. */
-    private static final String[] EXPAND_PROJECTION = {
-            Comments._ID,
-            Comments.COLUMN_EXPANDED,
-            Comments.COLUMN_NESTING,
-    };
 
     private static final Uri HIDE_URI =
             ThingProvider.HIDE_ACTIONS_URI.buildUpon()
@@ -295,45 +285,11 @@ public class Provider {
         });
     }
 
-    public static void expandCommentAsync(Context context, final long sessionId, final long id) {
+    public static void expandCommentAsync(Context context, final long id, final long sessionId) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                ContentResolver cr = appContext.getContentResolver();
-                Cursor c = cr.query(ThingProvider.COMMENTS_URI, EXPAND_PROJECTION,
-                        Comments.SELECT_BY_SESSION_ID, Array.of(sessionId),
-                        Comments.SORT_BY_SEQUENCE_AND_ID);
-                try {
-                    long[] childIds = null;
-                    CursorCommentList cl = new CursorCommentList(c, 0, 2, -1);
-                    int count = cl.getCommentCount();
-                    for (int i = 0; i < count; i++) {
-                        if (cl.getCommentId(i) == id) {
-                            childIds = CommentLogic.getChildren(cl, i);
-                            break;
-                        }
-                    }
-
-                    int childCount = childIds != null ? childIds.length : 0;
-                    ArrayList<ContentProviderOperation> ops =
-                            new ArrayList<ContentProviderOperation>(childCount + 1);
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                            .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                            .withValue(Comments.COLUMN_EXPANDED, true)
-                            .build());
-                    for (int i = 0; i < childCount; i++) {
-                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                                .withSelection(ThingProvider.ID_SELECTION, Array.of(childIds[i]))
-                                .withValue(Comments.COLUMN_EXPANDED, true)
-                                .withValue(Comments.COLUMN_VISIBLE, true)
-                                .build());
-                    }
-
-                    applyOps(appContext, ThingProvider.AUTHORITY, ops);
-
-                } finally {
-                    c.close();
-                }
+                ThingProvider.expandComment(appContext, id, sessionId);
             }
         });
     }
@@ -343,22 +299,7 @@ public class Provider {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
-                int childCount = childIds != null ? childIds.length : 0;
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(childCount + 1);
-                ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                        .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                        .withValue(Comments.COLUMN_EXPANDED, false)
-                        .build());
-                for (int i = 0; i < childCount; i++) {
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                            .withSelection(ThingProvider.ID_SELECTION, Array.of(childIds[i]))
-                            .withValue(Comments.COLUMN_EXPANDED, true)
-                            .withValue(Comments.COLUMN_VISIBLE, false)
-                            .build());
-                }
-
-                applyOps(appContext, ThingProvider.AUTHORITY, ops);
+                ThingProvider.collapseComment(appContext, id, childIds);
             }
         });
     }

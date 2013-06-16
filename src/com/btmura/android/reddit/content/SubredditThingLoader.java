@@ -59,6 +59,7 @@ public class SubredditThingLoader extends AbstractThingLoader {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
+        // TODO: Handle null extras since network may go down.
         Bundle extras = ThingProvider.getSubredditSession(getContext(), accountName, subreddit,
                 filter, more, sessionId);
         long sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);

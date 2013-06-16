@@ -23,6 +23,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
+import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -32,6 +33,8 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.CommentLogic;
+import com.btmura.android.reddit.app.CommentLogic.CursorCommentList;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.HideActions;
@@ -182,6 +185,12 @@ public class ThingProvider extends BaseProvider {
             + ReadActions.COLUMN_ACCOUNT + ", "
             + SharedColumns.COLUMN_THING_ID + ")";
 
+    /** Method to collapse a comment in a listing session. */
+    private static final String METHOD_COLLAPSE_COMMENT = "collapseComment";
+
+    /** Method to expand a comment in a listing session. */
+    private static final String METHOD_EXPAND_COMMENT = "expandComment";
+
     /** Method to create a listing session of some kind. */
     private static final String METHOD_GET_SESSION = "getSession";
 
@@ -193,6 +202,8 @@ public class ThingProvider extends BaseProvider {
     public static final String EXTRA_BODY = "body";
     public static final String EXTRA_COUNT = "count";
     public static final String EXTRA_FILTER = "filter";
+    public static final String EXTRA_ID = "id";
+    public static final String EXTRA_IDS = "ids";
     public static final String EXTRA_LINK_ID = "linkId";
     public static final String EXTRA_MARK = "mark";
     public static final String EXTRA_MORE = "more";
@@ -209,12 +220,22 @@ public class ThingProvider extends BaseProvider {
     public static final String EXTRA_THING_ID = "thingId";
     public static final String EXTRA_USER = "user";
 
+    private static final String[] EXPAND_PROJECTION = {
+            Comments._ID,
+            Comments.COLUMN_EXPANDED,
+            Comments.COLUMN_NESTING,
+    };
+
     private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Comments.TABLE_NAME
             + " SET " + Comments.COLUMN_SEQUENCE + "=" + Comments.COLUMN_SEQUENCE + "+1"
             + " WHERE " + Comments.COLUMN_SESSION_ID + "=? AND " + Comments.COLUMN_SEQUENCE + ">=?";
 
     private static final String SELECT_MORE_WITH_SESSION_ID = Kinds.COLUMN_KIND + "="
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
+
+    private static final boolean SYNC = true;
+
+    private static final boolean NO_SYNC = false;
 
     public static final Bundle getSubredditSession(Context context, String accountName,
             String subreddit, int filter, String more, long sessionId) {
@@ -288,6 +309,20 @@ public class ThingProvider extends BaseProvider {
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGE_THREAD);
         extras.putString(EXTRA_THING_ID, thingId);
         return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
+    }
+
+    public static final void expandComment(Context context, long id, long sessionId) {
+        Bundle extras = new Bundle(2);
+        extras.putLong(EXTRA_ID, id);
+        extras.putLong(EXTRA_SESSION_ID, sessionId);
+        call(context, COMMENTS_URI, METHOD_EXPAND_COMMENT, null, extras);
+    }
+
+    public static final void collapseComment(Context context, long id, long[] childIds) {
+        Bundle extras = new Bundle(2);
+        extras.putLong(EXTRA_ID, id);
+        extras.putLongArray(EXTRA_IDS, childIds);
+        call(context, COMMENTS_URI, METHOD_COLLAPSE_COMMENT, null, extras);
     }
 
     public static final Bundle insertComment(Context context, String accountName, String body,
@@ -366,10 +401,14 @@ public class ThingProvider extends BaseProvider {
     public Bundle call(String method, String arg, Bundle extras) {
         if (METHOD_GET_SESSION.equals(method)) {
             return getSession(arg, extras);
+        } else if (METHOD_EXPAND_COMMENT.equals(method)) {
+            return expandComment(extras);
+        } else if (METHOD_COLLAPSE_COMMENT.equals(method)) {
+            return collapseComment(extras);
         } else if (METHOD_INSERT_COMMENT.equals(method)) {
             return insertComment(arg, extras);
         }
-        return null;
+        throw new IllegalArgumentException();
     }
 
     private Bundle getSession(String accountName, Bundle extras) {
@@ -505,6 +544,80 @@ public class ThingProvider extends BaseProvider {
         }
     }
 
+    private Bundle expandComment(Bundle extras) {
+        Cursor c = null;
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            long sessionId = extras.getLong(EXTRA_SESSION_ID);
+            c = db.query(Comments.TABLE_NAME, EXPAND_PROJECTION,
+                    Comments.SELECT_BY_SESSION_ID, Array.of(sessionId),
+                    null, null, Comments.SORT_BY_SEQUENCE_AND_ID);
+
+            long id = extras.getLong(EXTRA_ID);
+            long[] childIds = null;
+            CursorCommentList cl = new CursorCommentList(c, 0, 2, -1);
+            int count = cl.getCommentCount();
+            for (int i = 0; i < count; i++) {
+                if (cl.getCommentId(i) == id) {
+                    childIds = CommentLogic.getChildren(cl, i);
+                    break;
+                }
+            }
+
+            ContentValues values = new ContentValues(2);
+            values.put(Comments.COLUMN_EXPANDED, true);
+            db.update(Comments.TABLE_NAME, values, ID_SELECTION, Array.of(id));
+
+            values.clear();
+            values.put(Comments.COLUMN_EXPANDED, true);
+            values.put(Comments.COLUMN_VISIBLE, true);
+            int childCount = childIds != null ? childIds.length : 0;
+            for (int i = 0; i < childCount; i++) {
+                db.update(Comments.TABLE_NAME, values, ID_SELECTION, Array.of(childIds[i]));
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
+        return null;
+    }
+
+    private Bundle collapseComment(Bundle extras) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues(2);
+            values.put(Comments.COLUMN_EXPANDED, false);
+            long id = extras.getLong(EXTRA_ID);
+            db.update(Comments.TABLE_NAME, values, ID_SELECTION, Array.of(id));
+
+            values.clear();
+            values.put(Comments.COLUMN_EXPANDED, true);
+            values.put(Comments.COLUMN_VISIBLE, false);
+            long[] childIds = extras.getLongArray(EXTRA_IDS);
+            int childCount = childIds != null ? childIds.length : 0;
+            for (int i = 0; i < childCount; i++) {
+                db.update(Comments.TABLE_NAME, values, ID_SELECTION, Array.of(childIds[i]));
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
+        return null;
+    }
+
     private Bundle insertComment(String accountName, Bundle extras) {
         String body = extras.getString(EXTRA_BODY);
         int nesting = extras.getInt(EXTRA_NESTING);
@@ -564,17 +677,15 @@ public class ThingProvider extends BaseProvider {
             if (commentId == -1) {
                 return null;
             }
-
             db.setTransactionSuccessful();
-
-            // Update observers and schedule a sync. Both URIs are backed by the same sync adapter.
-            ContentResolver cr = getContext().getContentResolver();
-            cr.notifyChange(THINGS_URI, null, false);
-            cr.notifyChange(COMMENTS_URI, null, true);
-
         } finally {
             db.endTransaction();
         }
+
+        // Update observers and schedule a sync. Both URIs are backed by the same sync adapter.
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(THINGS_URI, null, NO_SYNC);
+        cr.notifyChange(COMMENTS_URI, null, SYNC);
         return null;
     }
 
