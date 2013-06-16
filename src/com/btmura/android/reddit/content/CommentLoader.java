@@ -96,14 +96,15 @@ public class CommentLoader extends AbstractSessionLoader {
     public CommentLoader(Context context, String accountName, String thingId, String linkId,
             long sessionId) {
         super(context, ThingProvider.COMMENTS_WITH_ACTIONS_URI, PROJECTION,
-                Comments.SELECT_VISIBLE_BY_SESSION_ID, sessionId, Comments.SORT_BY_SEQUENCE_AND_ID);
+                Comments.SELECT_VISIBLE_BY_SESSION_ID, Comments.SORT_BY_SEQUENCE_AND_ID, sessionId,
+                null);
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;
     }
 
     @Override
-    protected Bundle createSession(long sessionId) {
+    protected Bundle createSession(long sessionId, String more) {
         return ThingProvider.getCommentsSession(getContext(), accountName, thingId,
                 linkId, sessionId, -1);
     }

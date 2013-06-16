@@ -30,20 +30,18 @@ public class SubredditThingLoader extends AbstractThingLoader {
     private final String accountName;
     private final String subreddit;
     private final int filter;
-    private final String more;
 
     public SubredditThingLoader(Context context, String accountName, String subreddit, int filter,
             String more, long sessionId) {
         super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
-                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, sessionId);
+                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, sessionId, more);
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.filter = filter;
-        this.more = more;
     }
 
     @Override
-    protected Bundle createSession(long sessionId) {
+    protected Bundle createSession(long sessionId, String more) {
         return ThingProvider.getSubredditSession(getContext(), accountName, subreddit, filter,
                 more, sessionId);
     }

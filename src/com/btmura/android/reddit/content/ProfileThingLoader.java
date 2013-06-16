@@ -28,16 +28,14 @@ public class ProfileThingLoader extends AbstractThingLoader {
     private final String accountName;
     private final String profileUser;
     private final int filter;
-    private final String more;
 
     public ProfileThingLoader(Context context, String accountName, String profileUser, int filter,
             String more, long sessionId) {
         super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
-                getSelectionStatement(filter), sessionId);
+                getSelectionStatement(filter), sessionId, more);
         this.accountName = accountName;
         this.profileUser = profileUser;
         this.filter = filter;
-        this.more = more;
     }
 
     private static String getSelectionStatement(int filter) {
@@ -47,7 +45,7 @@ public class ProfileThingLoader extends AbstractThingLoader {
     }
 
     @Override
-    protected Bundle createSession(long sessionId) {
+    protected Bundle createSession(long sessionId, String more) {
         return ThingProvider.getProfileSession(getContext(), accountName, profileUser,
                 filter, more, sessionId);
     }

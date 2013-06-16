@@ -84,7 +84,7 @@ public abstract class AbstractThingLoader extends AbstractSessionLoader {
     public static final int THING_LOCAL_HIDDEN = 24;
 
     AbstractThingLoader(Context context, Uri uri, String[] projection, String selection,
-            long sessionId) {
-        super(context, uri, projection, selection, sessionId, null);
+            long sessionId, String more) {
+        super(context, uri, projection, selection, null, sessionId, more);
     }
 }

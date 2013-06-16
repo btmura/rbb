@@ -41,13 +41,14 @@ public class SubredditSearchLoader extends AbstractSessionLoader {
     public SubredditSearchLoader(Context context, String accountName, String query,
             long sessionId) {
         super(context, ThingProvider.SUBREDDITS_URI, PROJECTION,
-                SubredditResults.SELECT_BY_SESSION_ID, sessionId, SubredditResults.SORT_BY_NAME);
+                SubredditResults.SELECT_BY_SESSION_ID, SubredditResults.SORT_BY_NAME, sessionId,
+                null);
         this.accountName = accountName;
         this.query = query;
     }
 
     @Override
-    protected Bundle createSession(long sessionId) {
+    protected Bundle createSession(long sessionId, String more) {
         return ThingProvider.getSubredditSearchSession(getContext(), accountName, query);
     }
 }

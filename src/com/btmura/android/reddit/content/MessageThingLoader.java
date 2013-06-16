@@ -58,19 +58,17 @@ public class MessageThingLoader extends AbstractSessionLoader {
 
     private final String accountName;
     private final int filter;
-    private final String more;
 
     public MessageThingLoader(Context context, String accountName, int filter, String more,
             long sessionId) {
         super(context, ThingProvider.MESSAGES_WITH_ACTIONS_URI, PROJECTION,
-                Messages.SELECT_BY_SESSION_ID, sessionId, null);
+                Messages.SELECT_BY_SESSION_ID, null, sessionId, more);
         this.accountName = accountName;
         this.filter = filter;
-        this.more = more;
     }
 
     @Override
-    protected Bundle createSession(long sessionId) {
+    protected Bundle createSession(long sessionId, String more) {
         return ThingProvider.getMessageSession(getContext(), accountName, filter, more,
                 sessionId);
     }

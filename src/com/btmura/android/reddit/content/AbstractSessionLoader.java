@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -33,11 +34,13 @@ abstract class AbstractSessionLoader extends CursorLoader {
     private static final String TAG = "AbstractSessionLoader";
 
     private long sessionId;
+    private String more;
 
     AbstractSessionLoader(Context context, Uri uri, String[] projection, String selection,
-            long sessionId, String sortOrder) {
+            String sortOrder, long sessionId, String more) {
         super(context, uri, projection, selection, null, sortOrder);
         this.sessionId = sessionId;
+        this.more = more;
     }
 
     @Override
@@ -45,8 +48,8 @@ abstract class AbstractSessionLoader extends CursorLoader {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
-        if (sessionId == 0) {
-            Bundle extras = createSession(sessionId);
+        if (sessionId == 0 || !TextUtils.isEmpty(more)) {
+            Bundle extras = createSession(sessionId, more);
             if (extras != null) {
                 sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
                 setSelectionArgs(Array.of(sessionId));
@@ -59,5 +62,5 @@ abstract class AbstractSessionLoader extends CursorLoader {
         return new CursorExtrasWrapper(super.loadInBackground(), extras);
     }
 
-    protected abstract Bundle createSession(long sessionId);
+    protected abstract Bundle createSession(long sessionId, String more);
 }
