@@ -19,6 +19,7 @@ package com.btmura.android.reddit.app;
 import java.util.ArrayList;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -42,9 +43,11 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
     public static final int PAGE_COMMENTS = TYPE_COMMENTS;
     public static final int PAGE_MESSAGES = 0;
 
+    private static final String STATE_PAGE_TYPES = "pageTypes";
+    private static final String STATE_OLD_PAGE_TYPES = "oldPageTypes";
+
     private final ArrayList<Integer> pageTypes = new ArrayList<Integer>(2);
     private final ArrayList<Integer> oldPageTypes = new ArrayList<Integer>(2);
-
     private final String accountName;
     private final Bundle thingBundle;
 
@@ -53,6 +56,29 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
         this.accountName = accountName;
         this.thingBundle = thingBundle;
         setupPages(thingBundle);
+    }
+
+    @Override
+    public Parcelable saveState() {
+        Bundle state = (Bundle) super.saveState();
+        if (state != null) {
+            state.putIntegerArrayList(STATE_PAGE_TYPES, pageTypes);
+            state.putIntegerArrayList(STATE_OLD_PAGE_TYPES, oldPageTypes);
+        }
+        return state;
+    }
+
+    @Override
+    public void restoreState(Parcelable state, ClassLoader loader) {
+        super.restoreState(state, loader);
+        if (state != null) {
+            Bundle bundle = (Bundle) state;
+            pageTypes.clear();
+            pageTypes.addAll(bundle.getIntegerArrayList(STATE_PAGE_TYPES));
+            oldPageTypes.clear();
+            oldPageTypes.addAll(bundle.getIntegerArrayList(STATE_OLD_PAGE_TYPES));
+            notifyDataSetChanged();
+        }
     }
 
     private void setupPages(Bundle thingBundle) {

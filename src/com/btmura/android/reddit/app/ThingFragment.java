@@ -93,11 +93,14 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
 
     @Override
     public void onLoadFinished(Loader<Bundle> loader, Bundle bundle) {
-        thingBundle = bundle;
-        pagerAdapter = new ThingPagerAdapter(getChildFragmentManager(),
-                getArguments().getString(ARG_ACCOUNT_NAME),
-                thingBundle);
-        pager.setAdapter(pagerAdapter);
+        // Handle the fact that onLoadFinished is called twice after orientation changes.
+        if (thingBundle != bundle) {
+            thingBundle = bundle;
+            pagerAdapter = new ThingPagerAdapter(getChildFragmentManager(),
+                    getArguments().getString(ARG_ACCOUNT_NAME),
+                    thingBundle);
+            pager.setAdapter(pagerAdapter);
+        }
     }
 
     @Override
