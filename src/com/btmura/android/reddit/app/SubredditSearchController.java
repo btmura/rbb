@@ -23,6 +23,7 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 
 import com.btmura.android.reddit.content.SubredditSearchLoader;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditSearchAdapter;
 
@@ -79,13 +80,17 @@ class SubredditSearchController implements SubredditListController {
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new SubredditSearchLoader(context, accountName, query);
+        return new SubredditSearchLoader(context, accountName, query, sessionId);
     }
 
     @Override
     public boolean swapCursor(Cursor cursor) {
         if (adapter.getCursor() != cursor) {
             adapter.swapCursor(cursor);
+            if (cursor != null && cursor.getExtras() != null) {
+                Bundle extras = cursor.getExtras();
+                sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+            }
             return true;
         }
         return false;

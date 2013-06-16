@@ -17,21 +17,13 @@
 package com.btmura.android.reddit.content;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.content.CursorLoader;
-import android.util.Log;
 
-import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.CursorExtrasWrapper;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.util.Array;
 
-public class MessageThingLoader extends CursorLoader {
-
-    private static final String TAG = "MessageThingLoader";
+public class MessageThingLoader extends AbstractSessionLoader {
 
     public static final String[] PROJECTION = {
             Messages._ID,
@@ -67,33 +59,19 @@ public class MessageThingLoader extends CursorLoader {
     private final String accountName;
     private final int filter;
     private final String more;
-    private final long sessionId;
-    private Bundle sessionData;
 
     public MessageThingLoader(Context context, String accountName, int filter, String more,
             long sessionId) {
-        super(context);
+        super(context, ThingProvider.MESSAGES_WITH_ACTIONS_URI, PROJECTION,
+                Messages.SELECT_BY_SESSION_ID, sessionId, null);
         this.accountName = accountName;
         this.filter = filter;
         this.more = more;
-        this.sessionId = sessionId;
-
-        setUri(ThingProvider.MESSAGES_WITH_ACTIONS_URI);
-        setProjection(PROJECTION);
-        setSelection(Messages.SELECT_BY_SESSION_ID);
     }
 
     @Override
-    public Cursor loadInBackground() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground");
-        }
-        if (sessionData == null) {
-            sessionData = ThingProvider.getMessageSession(getContext(), accountName, filter, more,
-                    sessionId);
-            long sessionId = sessionData.getLong(ThingProvider.EXTRA_SESSION_ID);
-            setSelectionArgs(Array.of(sessionId));
-        }
-        return new CursorExtrasWrapper(super.loadInBackground(), sessionData);
+    protected Bundle createSession(long sessionId) {
+        return ThingProvider.getMessageSession(getContext(), accountName, filter, more,
+                sessionId);
     }
 }

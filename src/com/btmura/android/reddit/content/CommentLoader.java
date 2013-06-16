@@ -17,24 +17,17 @@
 package com.btmura.android.reddit.content;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
-import android.util.Log;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.database.CursorExtrasWrapper;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.util.Array;
 
 /**
  * {@link CursorLoader} for viewing a thing's comments.
  */
-public class CommentLoader extends CursorLoader {
-
-    private static final String TAG = "CommentLoader";
+public class CommentLoader extends AbstractSessionLoader {
 
     private static final String[] PROJECTION = {
             Comments._ID,
@@ -99,31 +92,19 @@ public class CommentLoader extends CursorLoader {
     private final String accountName;
     private final String thingId;
     private final String linkId;
-    private final long sessionId;
 
     public CommentLoader(Context context, String accountName, String thingId, String linkId,
             long sessionId) {
-        super(context);
+        super(context, ThingProvider.COMMENTS_WITH_ACTIONS_URI, PROJECTION,
+                Comments.SELECT_VISIBLE_BY_SESSION_ID, sessionId, Comments.SORT_BY_SEQUENCE_AND_ID);
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;
-        this.sessionId = sessionId;
-
-        setUri(ThingProvider.COMMENTS_WITH_ACTIONS_URI);
-        setProjection(PROJECTION);
-        setSelection(Comments.SELECT_VISIBLE_BY_SESSION_ID);
-        setSortOrder(Comments.SORT_BY_SEQUENCE_AND_ID);
     }
 
     @Override
-    public Cursor loadInBackground() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground");
-        }
-        Bundle extras = ThingProvider.getCommentsSession(getContext(), accountName, thingId,
+    protected Bundle createSession(long sessionId) {
+        return ThingProvider.getCommentsSession(getContext(), accountName, thingId,
                 linkId, sessionId, -1);
-        long sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
-        setSelectionArgs(Array.of(sessionId));
-        return new CursorExtrasWrapper(super.loadInBackground(), extras);
     }
 }

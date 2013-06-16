@@ -17,56 +17,38 @@
 package com.btmura.android.reddit.content;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.CursorExtrasWrapper;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class ProfileThingLoader extends AbstractThingLoader {
-
-    private static final String TAG = "ProfileThingLoader";
 
     private final String accountName;
     private final String profileUser;
     private final int filter;
     private final String more;
-    private final long sessionId;
 
     public ProfileThingLoader(Context context, String accountName, String profileUser, int filter,
             String more, long sessionId) {
-        super(context);
+        super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
+                getSelectionStatement(filter), sessionId);
         this.accountName = accountName;
         this.profileUser = profileUser;
         this.filter = filter;
         this.more = more;
-        this.sessionId = sessionId;
-
-        setUri(ThingProvider.THINGS_WITH_ACTIONS_URI);
-        setProjection(PROJECTION);
-        setSelection(getSelectionStatement());
     }
 
-    private String getSelectionStatement() {
+    private static String getSelectionStatement(int filter) {
         return filter == FilterAdapter.PROFILE_HIDDEN
                 ? HideActions.SELECT_HIDDEN_BY_SESSION_ID
                 : HideActions.SELECT_UNHIDDEN_BY_SESSION_ID;
     }
 
     @Override
-    public Cursor loadInBackground() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground");
-        }
-        Bundle extras = ThingProvider.getProfileSession(getContext(), accountName, profileUser,
+    protected Bundle createSession(long sessionId) {
+        return ThingProvider.getProfileSession(getContext(), accountName, profileUser,
                 filter, more, sessionId);
-        long sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
-        setSelectionArgs(Array.of(sessionId));
-        return new CursorExtrasWrapper(super.loadInBackground(), extras);
     }
 }

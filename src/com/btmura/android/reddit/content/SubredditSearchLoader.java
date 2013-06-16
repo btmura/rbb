@@ -17,20 +17,12 @@
 package com.btmura.android.reddit.content;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.content.CursorLoader;
-import android.util.Log;
 
-import com.btmura.android.reddit.BuildConfig;
-import com.btmura.android.reddit.database.CursorExtrasWrapper;
 import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.util.Array;
 
-public class SubredditSearchLoader extends CursorLoader {
-
-    private static final String TAG = "SubredditSearchLoader";
+public class SubredditSearchLoader extends AbstractSessionLoader {
 
     public static final int INDEX_NAME = 1;
     public static final int INDEX_SUBSCRIBERS = 2;
@@ -45,35 +37,17 @@ public class SubredditSearchLoader extends CursorLoader {
 
     private final String accountName;
     private final String query;
-    private Bundle sessionData;
 
-    public SubredditSearchLoader(Context context, String accountName, String query) {
-        super(context);
+    public SubredditSearchLoader(Context context, String accountName, String query,
+            long sessionId) {
+        super(context, ThingProvider.SUBREDDITS_URI, PROJECTION,
+                SubredditResults.SELECT_BY_SESSION_ID, sessionId, SubredditResults.SORT_BY_NAME);
         this.accountName = accountName;
         this.query = query;
-
-        setUri(ThingProvider.SUBREDDITS_URI);
-        setProjection(PROJECTION);
-        setSelection(SubredditResults.SELECT_BY_SESSION_ID);
-        setSortOrder(SubredditResults.SORT_BY_NAME);
     }
 
     @Override
-    public Cursor loadInBackground() {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "loadInBackground");
-        }
-
-        if (sessionData == null) {
-            sessionData = ThingProvider.getSubredditSearchSession(getContext(), accountName, query);
-        }
-        long sessionId = sessionData.getLong(ThingProvider.EXTRA_SESSION_ID);
-        setSelectionArgs(Array.of(sessionId));
-
-        Cursor cursor = super.loadInBackground();
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "sessionId: " + sessionId + " count: " + cursor.getCount());
-        }
-        return new CursorExtrasWrapper(cursor, sessionData);
+    protected Bundle createSession(long sessionId) {
+        return ThingProvider.getSubredditSearchSession(getContext(), accountName, query);
     }
 }

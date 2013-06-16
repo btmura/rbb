@@ -17,12 +17,12 @@
 package com.btmura.android.reddit.content;
 
 import android.content.Context;
-import android.support.v4.content.CursorLoader;
+import android.net.Uri;
 
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 
-public abstract class AbstractThingLoader extends CursorLoader {
+public abstract class AbstractThingLoader extends AbstractSessionLoader {
 
     public static final String[] PROJECTION = {
             Things._ID,
@@ -83,7 +83,8 @@ public abstract class AbstractThingLoader extends CursorLoader {
     public static final int THING_VOTE = 23;
     public static final int THING_LOCAL_HIDDEN = 24;
 
-    AbstractThingLoader(Context context) {
-        super(context);
+    AbstractThingLoader(Context context, Uri uri, String[] projection, String selection,
+            long sessionId) {
+        super(context, uri, projection, selection, sessionId, null);
     }
 }
