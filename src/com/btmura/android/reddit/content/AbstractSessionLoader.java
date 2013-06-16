@@ -54,6 +54,7 @@ abstract class AbstractSessionLoader extends CursorLoader {
                 return null;
             }
             sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+            more = null;
         }
         Bundle extras = new Bundle(1);
         extras.putLong(ThingProvider.EXTRA_SESSION_ID, sessionId);
