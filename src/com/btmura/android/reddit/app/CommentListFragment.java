@@ -90,9 +90,10 @@ public class CommentListFragment extends ListFragment implements
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        controller.swapCursor(cursor);
-        setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
-        setListShown(true);
+        if (controller.swapCursor(cursor)) {
+            setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
+            setListShown(true);
+        }
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
