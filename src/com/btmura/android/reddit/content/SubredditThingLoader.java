@@ -39,7 +39,6 @@ public class SubredditThingLoader extends AbstractThingLoader {
     private final int filter;
     private final String more;
     private final long sessionId;
-    private Bundle sessionData;
 
     public SubredditThingLoader(Context context, String accountName, String subreddit, int filter,
             String more, long sessionId) {
@@ -60,12 +59,10 @@ public class SubredditThingLoader extends AbstractThingLoader {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
-        if (sessionData == null) {
-            sessionData = ThingProvider.getSubredditSession(getContext(),
-                    accountName, subreddit, filter, more, sessionId);
-            long sessionId = sessionData.getLong(ThingProvider.EXTRA_SESSION_ID);
-            setSelectionArgs(Array.of(sessionId));
-        }
-        return new CursorExtrasWrapper(super.loadInBackground(), sessionData);
+        Bundle extras = ThingProvider.getSubredditSession(getContext(), accountName, subreddit,
+                filter, more, sessionId);
+        long sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+        setSelectionArgs(Array.of(sessionId));
+        return new CursorExtrasWrapper(super.loadInBackground(), extras);
     }
 }

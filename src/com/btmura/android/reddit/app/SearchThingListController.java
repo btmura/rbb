@@ -42,7 +42,8 @@ class SearchThingListController extends AbstractThingListController {
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new SearchThingLoader(context, getAccountName(), getSubreddit(), getQuery());
+        return new SearchThingLoader(context, getAccountName(), getSubreddit(), getQuery(),
+                getSessionId());
     }
 
     @Override

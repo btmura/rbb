@@ -99,13 +99,15 @@ public class CommentLoader extends CursorLoader {
     private final String accountName;
     private final String thingId;
     private final String linkId;
-    private Bundle session;
+    private final long sessionId;
 
-    public CommentLoader(Context context, String accountName, String thingId, String linkId) {
+    public CommentLoader(Context context, String accountName, String thingId, String linkId,
+            long sessionId) {
         super(context);
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;
+        this.sessionId = sessionId;
 
         setUri(ThingProvider.COMMENTS_WITH_ACTIONS_URI);
         setProjection(PROJECTION);
@@ -118,12 +120,10 @@ public class CommentLoader extends CursorLoader {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
-        if (session == null) {
-            session = ThingProvider.getCommentsSession(getContext(),
-                    accountName, thingId, linkId, -1);
-            long sessionId = session.getLong(ThingProvider.EXTRA_SESSION_ID);
-            setSelectionArgs(Array.of(sessionId));
-        }
-        return new CursorExtrasWrapper(super.loadInBackground(), session);
+        Bundle extras = ThingProvider.getCommentsSession(getContext(), accountName, thingId,
+                linkId, sessionId, -1);
+        long sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+        setSelectionArgs(Array.of(sessionId));
+        return new CursorExtrasWrapper(super.loadInBackground(), extras);
     }
 }

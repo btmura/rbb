@@ -239,21 +239,23 @@ public class ThingProvider extends BaseProvider {
     }
 
     public static final Bundle getCommentsSession(Context context, String accountName,
-            String thingId, String linkId, int numComments) {
-        Bundle extras = new Bundle(4);
+            String thingId, String linkId, long sessionId, int numComments) {
+        Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_COMMENTS);
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putString(EXTRA_LINK_ID, linkId);
         extras.putInt(EXTRA_COUNT, numComments);
+        extras.putLong(EXTRA_SESSION_ID, sessionId);
         return call(context, COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getThingSearchSession(Context context, String accountName,
-            String subreddit, String query) {
-        Bundle extras = new Bundle(3);
+            String subreddit, String query, long sessionId) {
+        Bundle extras = new Bundle(4);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_THING_SEARCH);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
         extras.putString(EXTRA_QUERY, query);
+        extras.putLong(EXTRA_SESSION_ID, sessionId);
         return call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
@@ -444,11 +446,19 @@ public class ThingProvider extends BaseProvider {
     }
 
     private long getListingSession(Listing listing, long sessionId) throws IOException {
-        SQLiteDatabase db = helper.getWritableDatabase();
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "getListingSession sessionId: " + sessionId);
+        }
+
+        // Don't get new values if the session appears valid.
+        if (sessionId != 0 && !listing.isAppend()) {
+            return sessionId;
+        }
 
         // Get new values over the network.
         ArrayList<ContentValues> values = listing.getValues();
 
+        SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
             // Delete any existing "Loading..." signs if appending.
@@ -488,13 +498,7 @@ public class ThingProvider extends BaseProvider {
             for (int i = 0; i < count; i++) {
                 helper.insert(values.get(i));
             }
-
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "getListingSession sessionId: " + sessionId + " count: " + count);
-            }
-
             db.setTransactionSuccessful();
-
             return sessionId;
         } finally {
             db.endTransaction();

@@ -34,13 +34,15 @@ public class SearchThingLoader extends AbstractThingLoader {
     private final String accountName;
     private final String subreddit;
     private final String query;
-    private Bundle sessionData;
+    private final long sessionId;
 
-    public SearchThingLoader(Context context, String accountName, String subreddit, String query) {
+    public SearchThingLoader(Context context, String accountName, String subreddit, String query,
+            long sessionId) {
         super(context);
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;
+        this.sessionId = sessionId;
 
         setUri(ThingProvider.THINGS_WITH_ACTIONS_URI);
         setProjection(PROJECTION);
@@ -52,18 +54,10 @@ public class SearchThingLoader extends AbstractThingLoader {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
-
-        if (sessionData == null) {
-            sessionData = ThingProvider.getThingSearchSession(getContext(), accountName,
-                    subreddit, query);
-        }
-        long sessionId = sessionData.getLong(ThingProvider.EXTRA_SESSION_ID);
+        Bundle extras = ThingProvider.getThingSearchSession(getContext(), accountName, subreddit,
+                query, sessionId);
+        long sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
         setSelectionArgs(Array.of(sessionId));
-
-        Cursor cursor = super.loadInBackground();
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "sessionId: " + sessionId + " count: " + cursor.getCount());
-        }
-        return new CursorExtrasWrapper(cursor, sessionData);
+        return new CursorExtrasWrapper(super.loadInBackground(), extras);
     }
 }

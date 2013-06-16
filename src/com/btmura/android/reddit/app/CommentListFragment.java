@@ -33,8 +33,6 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.CommentLoader;
-import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ListFragment implements
@@ -44,26 +42,14 @@ public class CommentListFragment extends ListFragment implements
 
     public static final String TAG = "CommentListFragment";
 
-    private static final String ARG_ACCOUNT_NAME = "accountName";
-    private static final String ARG_THING_ID = "thingId";
-    private static final String ARG_LINK_ID = "linkId";
-
-    /** Optional bit mask for controlling fragment appearance. */
-    private static final String ARG_FLAGS = "flags";
-
-    /** Flag to immediately show link button if thing definitely has a link. */
-    public static final int FLAG_SHOW_LINK_MENU_ITEM = 0x1;
-
-    private CommentAdapter adapter;
     private CommentListController controller;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
-            String linkId, int flags) {
-        Bundle args = new Bundle(4);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_THING_ID, thingId);
-        args.putString(ARG_LINK_ID, linkId);
-        args.putInt(ARG_FLAGS, flags);
+            String linkId) {
+        Bundle args = new Bundle(3);
+        args.putString(CommentListController.EXTRA_ACCOUNT_NAME, accountName);
+        args.putString(CommentListController.EXTRA_THING_ID, thingId);
+        args.putString(CommentListController.EXTRA_LINK_ID, linkId);
 
         CommentListFragment frag = new CommentListFragment();
         frag.setArguments(args);
@@ -73,9 +59,10 @@ public class CommentListFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-        adapter = new CommentAdapter(getActivity(), accountName, this);
-        controller = new CommentListController(getActivity(), accountName, adapter);
+        controller = new CommentListController(getActivity(), getArguments(), this);
+        if (savedInstanceState != null) {
+            controller.restoreInstanceState(savedInstanceState);
+        }
         setHasOptionsMenu(true);
     }
 
@@ -93,26 +80,23 @@ public class CommentListFragment extends ListFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setListAdapter(adapter);
+        setListAdapter(controller.getAdapter());
         setListShown(false);
         getLoaderManager().initLoader(0, null, this);
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String accountName = getArguments().getString(ARG_ACCOUNT_NAME);
-        String thingId = getArguments().getString(ARG_THING_ID);
-        String linkId = getArguments().getString(ARG_LINK_ID);
-        return new CommentLoader(getActivity(), accountName, thingId, linkId);
+        return controller.createLoader();
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        adapter.swapCursor(cursor);
+        controller.swapCursor(cursor);
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.swapCursor(null);
+        controller.swapCursor(null);
     }
 
     @Override
@@ -126,7 +110,7 @@ public class CommentListFragment extends ListFragment implements
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        if (adapter.getCursor() == null) {
+        if (controller.getAdapter().getCursor() == null) {
             getListView().clearChoices();
             return false;
         }
@@ -181,9 +165,15 @@ public class CommentListFragment extends ListFragment implements
     public void onDestroyActionMode(ActionMode mode) {
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        controller.saveInstanceState(outState);
+    }
+
     private int getFirstCheckedPosition() {
         SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        int size = adapter.getCount();
+        int size = controller.getAdapter().getCount();
         for (int i = 0; i < size; i++) {
             if (checked.get(i)) {
                 return i;

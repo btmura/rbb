@@ -47,22 +47,12 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
     private final String accountName;
     private final Bundle thingBundle;
-    private final int clfFlags;
 
     public ThingPagerAdapter(FragmentManager fm, String accountName, Bundle thingBundle) {
         super(fm);
         this.accountName = accountName;
         this.thingBundle = thingBundle;
-        this.clfFlags = getFlags(thingBundle);
         setupPages(thingBundle);
-    }
-
-    private static int getFlags(Bundle thingBundle) {
-        int flags = 0;
-        if (ThingBundle.hasLinkUrl(thingBundle)) {
-            flags |= CommentListFragment.FLAG_SHOW_LINK_MENU_ITEM;
-        }
-        return flags;
     }
 
     private void setupPages(Bundle thingBundle) {
@@ -167,8 +157,7 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
             case TYPE_COMMENTS:
                 return CommentListFragment.newInstance(accountName,
                         ThingBundle.getThingId(thingBundle),
-                        ThingBundle.getLinkId(thingBundle),
-                        clfFlags);
+                        ThingBundle.getLinkId(thingBundle));
 
             case TYPE_MESSAGES:
                 return MessageThreadListFragment.newInstance(accountName,

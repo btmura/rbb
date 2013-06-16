@@ -17,7 +17,9 @@
 package com.btmura.android.reddit.app;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
@@ -31,22 +33,61 @@ import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.CommentAdapter;
+import com.btmura.android.reddit.widget.OnVoteListener;
 
 /**
  * Controller that handles all the logic required by {@link CommentListFragment}.
  */
 class CommentListController implements CommentList {
 
+    static final String EXTRA_ACCOUNT_NAME = "accountName";
+    static final String EXTRA_THING_ID = "thingId";
+    static final String EXTRA_LINK_ID = "linkId";
+    static final String EXTRA_SESSION_ID = "sessionId";
+
     private final Context context;
     private final String accountName;
+    private final String thingId;
+    private final String linkId;
     private final CommentAdapter adapter;
 
-    CommentListController(Context context, String accountName, CommentAdapter adapter) {
+    private long sessionId;
+
+    CommentListController(Context context, Bundle args, OnVoteListener listener) {
         this.context = context;
-        this.accountName = accountName;
-        this.adapter = adapter;
+        this.accountName = getAccountNameExtra(args);
+        this.thingId = getThingIdExtra(args);
+        this.linkId = getLinkIdExtra(args);
+        this.adapter = new CommentAdapter(context, accountName, listener);
+    }
+
+    public void restoreInstanceState(Bundle savedInstanceState) {
+        this.sessionId = savedInstanceState.getLong(EXTRA_SESSION_ID);
+    }
+
+    public void saveInstanceState(Bundle outState) {
+        outState.putLong(EXTRA_SESSION_ID, sessionId);
+    }
+
+    public Loader<Cursor> createLoader() {
+        return new CommentLoader(context, accountName, thingId, linkId, sessionId);
+    }
+
+    public void swapCursor(Cursor cursor) {
+        adapter.swapCursor(cursor);
+        if (cursor != null && cursor.getExtras() != null) {
+            Bundle extras = cursor.getExtras();
+            sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+        }
+    }
+
+    // Getters
+
+    public CommentAdapter getAdapter() {
+        return adapter;
     }
 
     // Actions to be done on comments.
@@ -407,4 +448,19 @@ class CommentListController implements CommentList {
     public int getCommentSequence(int position) {
         return getSequence(position);
     }
+
+    // Getters for extras.
+
+    private static String getAccountNameExtra(Bundle extras) {
+        return extras.getString(EXTRA_ACCOUNT_NAME);
+    }
+
+    private static String getThingIdExtra(Bundle extras) {
+        return extras.getString(EXTRA_THING_ID);
+    }
+
+    private static String getLinkIdExtra(Bundle extras) {
+        return extras.getString(EXTRA_LINK_ID);
+    }
+
 }
