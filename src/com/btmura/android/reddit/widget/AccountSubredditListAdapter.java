@@ -50,14 +50,14 @@ public class AccountSubredditListAdapter extends SubredditAdapter {
         PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM);
     }
 
-    private boolean showPresets;
+    private final boolean showPresets;
+    private Cursor originalCursor;
 
     public AccountSubredditListAdapter(Context context, boolean showPresets, boolean addFilter,
             boolean singleChoice) {
         super(context, singleChoice);
         this.showPresets = showPresets;
         if (addFilter) {
-            showPresets = false;
             // Attach filter that executes a query as the user types.
             final Context appContext = context.getApplicationContext();
             setFilterQueryProvider(new FilterQueryProvider() {
@@ -70,6 +70,7 @@ public class AccountSubredditListAdapter extends SubredditAdapter {
 
     @Override
     public Cursor swapCursor(Cursor newCursor) {
+        originalCursor = newCursor;
         if (showPresets) {
             newCursor = new MergeCursor(new Cursor[] {PRESETS_CURSOR, newCursor});
         }
@@ -89,6 +90,10 @@ public class AccountSubredditListAdapter extends SubredditAdapter {
         return getString(position, INDEX_NAME);
     }
 
+    public Cursor getOriginalCursor() {
+        return originalCursor;
+    }
+
     public boolean isQuery() {
         return false;
     }
@@ -98,7 +103,7 @@ public class AccountSubredditListAdapter extends SubredditAdapter {
     }
 
     public boolean isDeletable(int position) {
-        // Non-presets are deletable. Presents have negative ids.
+        // Non-presets are deletable. Presets have negative ids.
         return getLong(position, INDEX_ID) >= 0;
     }
 

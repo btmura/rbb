@@ -83,8 +83,12 @@ class SubredditSearchController implements SubredditListController {
     }
 
     @Override
-    public void swapCursor(Cursor cursor) {
-        adapter.swapCursor(cursor);
+    public boolean swapCursor(Cursor cursor) {
+        if (adapter.getCursor() != cursor) {
+            adapter.swapCursor(cursor);
+            return true;
+        }
+        return false;
     }
 
     // Getters

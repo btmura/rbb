@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -37,6 +38,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
@@ -159,23 +161,28 @@ public class SubredditListFragment extends ThingProviderListFragment implements
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        // Process ThingProvider results.
-        super.onLoadFinished(loader, cursor);
+        if (controller.swapCursor(cursor)) {
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "onLoadFinished");
+            }
 
-        controller.swapCursor(cursor);
-        setEmptyText(getEmptyText(cursor == null));
-        setListShown(true);
+            // TODO: Remove dependency on ThingProviderListFragment.
+            super.onLoadFinished(loader, cursor);
 
-        if (actionMode != null) {
-            actionMode.invalidate();
-        }
-        if (listener != null) {
-            if (cursor == null) {
-                listener.onInitialSubredditSelected(null, true);
-            } else if (cursor.getCount() == 0) {
-                listener.onInitialSubredditSelected(null, false);
-            } else {
-                listener.onInitialSubredditSelected(getSubreddit(0), false);
+            setEmptyText(getEmptyText(cursor == null));
+            setListShown(true);
+
+            if (actionMode != null) {
+                actionMode.invalidate();
+            }
+            if (listener != null) {
+                if (cursor == null) {
+                    listener.onInitialSubredditSelected(null, true);
+                } else if (cursor.getCount() == 0) {
+                    listener.onInitialSubredditSelected(null, false);
+                } else {
+                    listener.onInitialSubredditSelected(getSubreddit(0), false);
+                }
             }
         }
     }

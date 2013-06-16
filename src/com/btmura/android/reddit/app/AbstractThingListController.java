@@ -108,13 +108,17 @@ abstract class AbstractThingListController implements ThingListController {
     }
 
     @Override
-    public void swapCursor(Cursor cursor) {
-        setMoreId(null);
-        adapter.swapCursor(cursor);
-        if (cursor != null && cursor.getExtras() != null) {
-            Bundle extras = cursor.getExtras();
-            setSessionId(extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+    public boolean swapCursor(Cursor cursor) {
+        if (adapter.getCursor() != cursor) {
+            setMoreId(null);
+            adapter.swapCursor(cursor);
+            if (cursor != null && cursor.getExtras() != null) {
+                Bundle extras = cursor.getExtras();
+                setSessionId(extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+            }
+            return true;
         }
+        return false;
     }
 
     @Override

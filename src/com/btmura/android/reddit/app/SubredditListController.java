@@ -32,7 +32,7 @@ interface SubredditListController {
 
     Loader<Cursor> createLoader();
 
-    void swapCursor(Cursor cursor);
+    boolean swapCursor(Cursor cursor);
 
     // Getters
 

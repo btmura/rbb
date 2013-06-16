@@ -36,7 +36,7 @@ class AccountSubredditListController implements SubredditListController {
     private static final String EXTRA_ACTION_ACCOUNT_NAME = "actionAccountName";
 
     private final Context context;
-    private final SubredditAdapter adapter;
+    private final AccountSubredditListAdapter adapter;
 
     private String accountName;
     private long sessionId;
@@ -79,8 +79,12 @@ class AccountSubredditListController implements SubredditListController {
     }
 
     @Override
-    public void swapCursor(Cursor cursor) {
-        adapter.swapCursor(cursor);
+    public boolean swapCursor(Cursor cursor) {
+        if (adapter.getOriginalCursor() != cursor) {
+            adapter.swapCursor(cursor);
+            return true;
+        }
+        return false;
     }
 
     // Getters
