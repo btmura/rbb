@@ -110,7 +110,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountResult = result;
         accountName = result.getLastAccount(this);
-        SubredditListFragment sf = getSubredditListFragment();
+        SubredditSearchFragment sf = getSubredditSearchFragment();
         if (sf != null && sf.getAccountName() == null) {
             sf.setAccountName(accountName);
             sf.loadIfPossible();
@@ -193,9 +193,8 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     private boolean isSubredditListDifferent(String query) {
-        SubredditListFragment frag = getSubredditListFragment();
-        return frag == null
-                || !Objects.equals(query, frag.getQuery());
+        SubredditSearchFragment frag = getSubredditSearchFragment();
+        return frag == null || !Objects.equals(query, frag.getQuery());
     }
 
     private boolean isThingListDifferent(String subreddit, String query) {

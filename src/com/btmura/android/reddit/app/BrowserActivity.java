@@ -208,7 +208,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                     + " filter:" + filter);
         }
 
-        SubredditListFragment slf = getSubredditListFragment();
+        AccountSubredditListFragment slf = getAccountSubredditListFragment();
         ThingListFragment tlf = getThingListFragment();
 
         if (slf == null || !slf.getAccountName().equals(accountName)) {
