@@ -16,10 +16,14 @@
 
 package com.btmura.android.reddit.widget;
 
+import java.util.Arrays;
+
 import android.content.Context;
 import android.database.Cursor;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.btmura.android.reddit.util.Objects;
 
@@ -72,12 +76,6 @@ public abstract class SubredditAdapter extends BaseCursorAdapter {
         return subreddit;
     }
 
-    // TODO: Remove the need for this method.
-    public abstract String getQuery();
-
-    // TODO: Remove the need for this method.
-    public abstract boolean isQuery();
-
     public abstract String getName(int position);
 
     public boolean isDeletable(int position) {
@@ -86,5 +84,20 @@ public abstract class SubredditAdapter extends BaseCursorAdapter {
 
     public boolean isSingleChoice() {
         return singleChoice;
+    }
+
+    public String[] getCheckedSubreddits(ListView listView) {
+        SparseBooleanArray checked = listView.getCheckedItemPositions();
+        int checkedCount = listView.getCheckedItemCount();
+        String[] subreddits = new String[checkedCount];
+
+        int j = 0;
+        int count = listView.getCount();
+        for (int i = 0; i < count; i++) {
+            if (checked.get(i) && isDeletable(i)) {
+                subreddits[j++] = getName(i);
+            }
+        }
+        return Arrays.copyOf(subreddits, j);
     }
 }

@@ -21,8 +21,8 @@ import android.database.Cursor;
 import android.widget.CursorAdapter;
 
 /**
- * {@link CursorAdapter} that adds some convenience methods to get values by
- * adapter position and column index.
+ * {@link CursorAdapter} that adds some convenience methods to get values by adapter position and
+ * column index.
  */
 abstract class BaseCursorAdapter extends CursorAdapter {
 

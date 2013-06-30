@@ -18,7 +18,6 @@ package com.btmura.android.reddit.widget;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.text.TextUtils;
 import android.view.View;
 
 import com.btmura.android.reddit.content.SubredditSearchLoader;
@@ -27,11 +26,8 @@ import com.btmura.android.reddit.util.Objects;
 /** {@link SubredditAdapter} that handles searching for subreddits. */
 public class SubredditSearchAdapter extends SubredditAdapter {
 
-    private final String query;
-
-    public SubredditSearchAdapter(Context context, String query, boolean singleChoice) {
+    public SubredditSearchAdapter(Context context, boolean singleChoice) {
         super(context, singleChoice);
-        this.query = query;
     }
 
     @Override
@@ -47,15 +43,5 @@ public class SubredditSearchAdapter extends SubredditAdapter {
     @Override
     public String getName(int position) {
         return getString(position, SubredditSearchLoader.INDEX_NAME);
-    }
-
-    // TODO: Remove this method.
-    public boolean isQuery() {
-        return !TextUtils.isEmpty(query);
-    }
-
-    // TODO: Remove this method.
-    public String getQuery() {
-        return query;
     }
 }

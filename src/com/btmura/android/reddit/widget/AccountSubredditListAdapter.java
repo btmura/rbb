@@ -94,14 +94,6 @@ public class AccountSubredditListAdapter extends SubredditAdapter {
         return originalCursor;
     }
 
-    public boolean isQuery() {
-        return false;
-    }
-
-    public String getQuery() {
-        return null;
-    }
-
     public boolean isDeletable(int position) {
         // Non-presets are deletable. Presets have negative ids.
         return getLong(position, INDEX_ID) >= 0;

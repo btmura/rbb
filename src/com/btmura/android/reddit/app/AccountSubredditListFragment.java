@@ -19,7 +19,8 @@ package com.btmura.android.reddit.app;
 import android.os.Bundle;
 
 public class AccountSubredditListFragment
-        extends SubredditListFragment<AccountSubredditListController> {
+        extends SubredditListFragment<AccountSubredditListController,
+        AccountSubredditListActionModeController> {
 
     public static AccountSubredditListFragment newInstance(String accountName,
             String selectedSubreddit, boolean singleChoice) {
@@ -36,5 +37,12 @@ public class AccountSubredditListFragment
     @Override
     protected AccountSubredditListController createController() {
         return new AccountSubredditListController(getActivity(), getArguments());
+    }
+
+    @Override
+    protected AccountSubredditListActionModeController createActionModeController(
+            AccountSubredditListController controller) {
+        return new AccountSubredditListActionModeController(getActivity(),
+                controller.getAccountName(), controller.getAdapter());
     }
 }

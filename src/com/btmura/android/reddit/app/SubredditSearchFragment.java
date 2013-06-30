@@ -19,7 +19,8 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class SubredditSearchFragment extends SubredditListFragment<SubredditSearchController> {
+public class SubredditSearchFragment extends SubredditListFragment<SubredditSearchController,
+        SubredditListActionModeController> {
 
     private AccountResultHolder accountResultHolder;
 
@@ -45,10 +46,17 @@ public class SubredditSearchFragment extends SubredditListFragment<SubredditSear
 
     @Override
     protected SubredditSearchController createController() {
-        return new SubredditSearchController(getActivity(), getArguments(), accountResultHolder);
+        return new SubredditSearchController(getActivity(), getArguments());
+    }
+
+    @Override
+    protected SubredditListActionModeController createActionModeController(
+            SubredditSearchController controller) {
+        return new SubredditSearchActionModeController(getActivity(), controller.getAdapter(),
+                accountResultHolder);
     }
 
     public String getQuery() {
-        return controller.getAdapter().getQuery();
+        return controller.getQuery();
     }
 }

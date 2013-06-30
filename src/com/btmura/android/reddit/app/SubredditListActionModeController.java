@@ -16,41 +16,29 @@
 
 package com.btmura.android.reddit.app;
 
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ListView;
 
-import com.btmura.android.reddit.widget.SubredditAdapter;
-
-interface SubredditListController<A extends SubredditAdapter> {
-
-    boolean isLoadable();
+interface SubredditListActionModeController {
 
     void restoreInstanceState(Bundle savedInstanceState);
 
     void saveInstanceState(Bundle outState);
 
-    Loader<Cursor> createLoader();
+    void invalidateActionMode();
 
-    boolean swapCursor(Cursor cursor);
+    // MultiChoiceModeListener-like methods
 
-    // Getters
+    boolean onCreateActionMode(ActionMode mode, Menu menu, ListView listView);
 
-    String getAccountName();
+    boolean onPrepareActionMode(ActionMode mode, Menu menu, ListView listView);
 
-    A getAdapter();
+    boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView listView);
 
-    String getSelectedSubreddit();
+    void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked);
 
-    boolean isSingleChoice();
-
-    boolean isSwipeDismissable(int position);
-
-    // Setters
-
-    void setAccountName(String accountName);
-
-    String setSelectedPosition(int position);
-
-    void setSelectedSubreddit(String subreddit);
+    void onDestroyActionMode(ActionMode mode);
 }

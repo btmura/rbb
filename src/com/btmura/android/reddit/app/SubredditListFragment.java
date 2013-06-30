@@ -21,7 +21,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,7 +37,7 @@ import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.SubredditView;
 
-abstract class SubredditListFragment<C extends SubredditListController>
+abstract class SubredditListFragment<C extends SubredditListController<?>, AC extends SubredditListActionModeController>
         extends ThingProviderListFragment
         implements OnSwipeDismissListener, MultiChoiceModeListener {
 
@@ -56,12 +55,13 @@ abstract class SubredditListFragment<C extends SubredditListController>
     }
 
     protected C controller;
+    protected AC actionModeController;
 
     private OnSubredditSelectedListener listener;
 
-    private ActionMode actionMode;
-
     protected abstract C createController();
+
+    protected abstract AC createActionModeController(C controller);
 
     @Override
     public void onAttach(Activity activity) {
@@ -75,8 +75,10 @@ abstract class SubredditListFragment<C extends SubredditListController>
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controller = createController();
+        actionModeController = createActionModeController(controller);
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
+            actionModeController.restoreInstanceState(savedInstanceState);
         }
     }
 
@@ -126,9 +128,7 @@ abstract class SubredditListFragment<C extends SubredditListController>
             setEmptyText(getEmptyText(cursor == null));
             setListShown(true);
 
-            if (actionMode != null) {
-                actionMode.invalidate();
-            }
+            actionModeController.invalidateActionMode();
             if (listener != null) {
                 if (cursor == null) {
                     listener.onInitialSubredditSelected(null, true);
@@ -179,50 +179,30 @@ abstract class SubredditListFragment<C extends SubredditListController>
     }
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        return controller.createActionMode(mode, menu, getListView());
+        return actionModeController.onCreateActionMode(mode, menu, getListView());
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        return controller.prepareActionMode(mode, menu, getListView());
+        return actionModeController.onPrepareActionMode(mode, menu, getListView());
     }
 
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        mode.invalidate();
+        actionModeController.onItemCheckedStateChanged(mode, position, id, checked);
     }
 
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_add:
-                controller.add(getListView(), getFirstCheckedPosition());
-                mode.finish();
-                return true;
-
-            case R.id.menu_subreddit:
-                controller.subreddit(getFirstCheckedPosition());
-                mode.finish();
-                return true;
-
-            case R.id.menu_delete:
-                controller.delete(getListView(), getFirstCheckedPosition());
-                mode.finish();
-                return true;
-
-            default:
-                return false;
-        }
+        return actionModeController.onActionItemClicked(mode, item, getListView());
     }
 
     public void onDestroyActionMode(ActionMode mode) {
-        actionMode = null;
-
-        // Don't persist the selected account across action modes.
-        controller.setActionAccountName(null);
+        actionModeController.onDestroyActionMode(mode);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         controller.saveInstanceState(outState);
+        actionModeController.saveInstanceState(outState);
     }
 
     public String getAccountName() {
@@ -243,16 +223,5 @@ abstract class SubredditListFragment<C extends SubredditListController>
 
     private String getSubreddit(int position) {
         return controller.getAdapter().getName(position);
-    }
-
-    private int getFirstCheckedPosition() {
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        int size = controller.getAdapter().getCount();
-        for (int i = 0; i < size; i++) {
-            if (checked.get(i)) {
-                return i;
-            }
-        }
-        return -1;
     }
 }
