@@ -16,9 +16,12 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 public class SubredditSearchFragment extends SubredditListFragment<SubredditSearchController> {
+
+    private AccountResultHolder accountResultHolder;
 
     public static SubredditSearchFragment newInstance(String accountName, String query,
             boolean singleChoice) {
@@ -33,8 +36,16 @@ public class SubredditSearchFragment extends SubredditListFragment<SubredditSear
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof AccountResultHolder) {
+            accountResultHolder = (AccountResultHolder) activity;
+        }
+    }
+
+    @Override
     protected SubredditSearchController createController() {
-        return new SubredditSearchController(getActivity(), getArguments());
+        return new SubredditSearchController(getActivity(), getArguments(), accountResultHolder);
     }
 
     public String getQuery() {

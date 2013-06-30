@@ -21,13 +21,30 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.SubredditSearchLoader;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.util.ViewUtils;
+import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditSearchAdapter;
 
-class SubredditSearchController implements SubredditListController {
+class SubredditSearchController extends AbstractSubredditListController implements
+        OnItemSelectedListener {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
@@ -37,16 +54,23 @@ class SubredditSearchController implements SubredditListController {
     private static final String EXTRA_SESSION_ID = "sessionId";
     private static final String EXTRA_ACTION_ACCOUNT_NAME = "actionAccountName";
 
-    private final Context context;
+    private final AccountResultHolder accountResultHolder;
     private final SubredditAdapter adapter;
+    private AccountNameAdapter accountNameAdapter;
 
     private String accountName;
     private String query;
     private long sessionId;
     private String actionAccountName;
 
-    SubredditSearchController(Context context, Bundle args) {
-        this.context = context;
+    private ActionMode actionMode;
+    private TextView subredditCountText;
+    private Spinner accountSpinner;
+
+    SubredditSearchController(Context context, Bundle args,
+            AccountResultHolder accountResultHolder) {
+        super(context);
+        this.accountResultHolder = accountResultHolder;
         this.adapter = new SubredditSearchAdapter(context, getQueryExtra(args),
                 getSingleChoiceExtra(args));
         this.accountName = getAccountNameExtra(args);
@@ -94,6 +118,86 @@ class SubredditSearchController implements SubredditListController {
             return true;
         }
         return false;
+    }
+
+    // Menu creation and preparation methods
+
+    @Override
+    public boolean createActionMode(ActionMode mode, Menu menu, ListView listView) {
+        if (adapter.getCursor() == null) {
+            listView.clearChoices();
+            return false;
+        }
+
+        View v = LayoutInflater.from(context).inflate(R.layout.subreddit_cab, null, false);
+        mode.setCustomView(v);
+
+        actionMode = mode;
+        subredditCountText = (TextView) v.findViewById(R.id.subreddit_count);
+        accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
+
+        MenuInflater menuInflater = mode.getMenuInflater();
+        menuInflater.inflate(R.menu.subreddit_action_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean prepareActionMode(ActionMode mode, Menu menu, ListView listView) {
+        int count = listView.getCheckedItemCount();
+        boolean hasCursor = adapter.getCursor() != null;
+
+        if (hasCursor) {
+            String text = context.getResources().getQuantityString(R.plurals.subreddits, count,
+                    count);
+            subredditCountText.setText(text);
+            subredditCountText.setVisibility(View.VISIBLE);
+        } else {
+            subredditCountText.setVisibility(View.GONE);
+        }
+
+        if (accountResultHolder != null && accountResultHolder.getAccountResult() != null) {
+            if (accountNameAdapter == null) {
+                accountNameAdapter = new AccountNameAdapter(context, R.layout.account_name_row);
+            } else {
+                accountNameAdapter.clear();
+            }
+
+            AccountResult result = accountResultHolder.getAccountResult();
+            accountNameAdapter.addAll(result.accountNames);
+            accountSpinner.setAdapter(accountNameAdapter);
+            accountSpinner.setOnItemSelectedListener(this);
+
+            if (result.accountNames.length > 0) {
+                if (!hasActionAccountName()) {
+                    setActionAccountName(result.getLastAccount(context));
+                }
+                int position = accountNameAdapter.findAccountName(getActionAccountName());
+                accountSpinner.setSelection(position);
+                accountSpinner.setVisibility(View.VISIBLE);
+            } else {
+                accountSpinner.setSelection(0);
+                accountSpinner.setVisibility(View.GONE);
+            }
+        }
+
+        menu.findItem(R.id.menu_add).setVisible(hasCursor);
+        menu.findItem(R.id.menu_delete).setVisible(false);
+
+        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
+        subredditItem.setVisible(hasCursor && count == 1
+                && Subreddits.hasSidebar(getSubreddit(ViewUtils.getFirstCheckedPosition(listView))));
+
+        return true;
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> av, View v, int position, long id) {
+        setActionAccountName(accountNameAdapter.getItem(position));
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {
+        setActionAccountName(null);
     }
 
     // Getters
@@ -178,5 +282,27 @@ class SubredditSearchController implements SubredditListController {
 
     private static String getActionAccountNameExtra(Bundle extras) {
         return extras.getString(EXTRA_ACTION_ACCOUNT_NAME);
+    }
+
+    // Getters for subreddit attributes.
+
+    @Override
+    protected String getSelectedAccountName() {
+        return accountNameAdapter.getItem(accountSpinner.getSelectedItemPosition());
+    }
+
+    @Override
+    protected int getCount() {
+        return adapter.getCount();
+    }
+
+    @Override
+    protected String getSubreddit(int position) {
+        return adapter.getName(position);
+    }
+
+    @Override
+    protected boolean isDeletable(int position) {
+        return adapter.isDeletable(position);
     }
 }

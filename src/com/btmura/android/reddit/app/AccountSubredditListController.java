@@ -17,16 +17,25 @@
 package com.btmura.android.reddit.app;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.TextView;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.util.ViewUtils;
 import com.btmura.android.reddit.widget.AccountSubredditListAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
-class AccountSubredditListController implements SubredditListController {
+class AccountSubredditListController extends AbstractSubredditListController {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
@@ -35,15 +44,15 @@ class AccountSubredditListController implements SubredditListController {
     private static final String EXTRA_SESSION_ID = "sessionId";
     private static final String EXTRA_ACTION_ACCOUNT_NAME = "actionAccountName";
 
-    private final Context context;
     private final AccountSubredditListAdapter adapter;
+    private TextView subredditCountText;
 
     private String accountName;
     private long sessionId;
     private String actionAccountName;
 
     AccountSubredditListController(Context context, Bundle args) {
-        this.context = context;
+        super(context);
         this.adapter = new AccountSubredditListAdapter(context, true, false,
                 getSingleChoiceExtra(args));
         this.accountName = getAccountNameExtra(args);
@@ -85,6 +94,35 @@ class AccountSubredditListController implements SubredditListController {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean createActionMode(ActionMode mode, Menu menu, ListView listView) {
+        return false;
+    }
+
+    @Override
+    public boolean prepareActionMode(ActionMode mode, Menu menu, ListView listView) {
+        int count = listView.getCheckedItemCount();
+        boolean hasCursor = adapter.getCursor() != null;
+
+        if (hasCursor) {
+            Resources resources = context.getResources();
+            String text = resources.getQuantityString(R.plurals.subreddits, count, count);
+            subredditCountText.setText(text);
+            subredditCountText.setVisibility(View.VISIBLE);
+        } else {
+            subredditCountText.setVisibility(View.GONE);
+        }
+
+        menu.findItem(R.id.menu_add).setVisible(false);
+        menu.findItem(R.id.menu_delete).setVisible(hasCursor);
+
+        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
+        subredditItem.setVisible(hasCursor && count == 1
+                && Subreddits.hasSidebar(getSubreddit(ViewUtils.getFirstCheckedPosition(listView))));
+
+        return true;
     }
 
     // Getters
@@ -167,4 +205,27 @@ class AccountSubredditListController implements SubredditListController {
     private static String getActionAccountNameExtra(Bundle extras) {
         return extras.getString(EXTRA_ACTION_ACCOUNT_NAME);
     }
+
+    // Getters for subreddit attributes.
+
+    @Override
+    protected String getSelectedAccountName() {
+        return getAccountName();
+    }
+
+    @Override
+    protected int getCount() {
+        return adapter.getCount();
+    }
+
+    @Override
+    protected String getSubreddit(int position) {
+        return adapter.getName(position);
+    }
+
+    @Override
+    protected boolean isDeletable(int position) {
+        return adapter.isDeletable(position);
+    }
+
 }

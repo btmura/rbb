@@ -19,6 +19,9 @@ package com.btmura.android.reddit.app;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.widget.ListView;
 
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
@@ -33,6 +36,20 @@ interface SubredditListController {
     Loader<Cursor> createLoader();
 
     boolean swapCursor(Cursor cursor);
+
+    // Actions on subreddits
+
+    void add(ListView listView, int position);
+
+    void subreddit(int position);
+
+    void delete(ListView listView, int position);
+
+    // Menu creation and preparation methods
+
+    boolean createActionMode(ActionMode mode, Menu menu, ListView listView);
+
+    boolean prepareActionMode(ActionMode mode, Menu menu, ListView listView);
 
     // Getters
 
