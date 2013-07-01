@@ -26,7 +26,7 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.content.AbstractThingLoader;
+import com.btmura.android.reddit.content.ThingProjection;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
@@ -42,7 +42,8 @@ import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingBundle;
 import com.btmura.android.reddit.widget.ThingListAdapter;
 
-abstract class AbstractThingListController implements ThingListController {
+abstract class AbstractThingTableListController
+        implements ThingListController, ThingProjection {
 
     private static final String STATE_ACCOUNT_NAME = "accountName";
     private static final String STATE_EMPTY_TEXT = "emptyText";
@@ -65,7 +66,7 @@ abstract class AbstractThingListController implements ThingListController {
     private String moreId;
     private long sessionId;
 
-    AbstractThingListController(Context context, Bundle args, OnVoteListener listener) {
+    AbstractThingTableListController(Context context, Bundle args, OnVoteListener listener) {
         this.context = context;
         this.adapter = new ThingListAdapter(context, listener, getSingleChoiceExtra(args));
         restoreInstanceState(args);
@@ -136,27 +137,27 @@ abstract class AbstractThingListController implements ThingListController {
 
     private Bundle makeThingBundle(Cursor c) {
         Bundle b = new Bundle(8);
-        ThingBundle.putAuthor(b, c.getString(AbstractThingLoader.INDEX_AUTHOR));
-        ThingBundle.putSubreddit(b, c.getString(AbstractThingLoader.INDEX_SUBREDDIT));
-        ThingBundle.putKind(b, c.getInt(AbstractThingLoader.INDEX_KIND));
+        ThingBundle.putAuthor(b, c.getString(INDEX_AUTHOR));
+        ThingBundle.putSubreddit(b, c.getString(INDEX_SUBREDDIT));
+        ThingBundle.putKind(b, c.getInt(INDEX_KIND));
 
-        String title = c.getString(AbstractThingLoader.INDEX_TITLE);
+        String title = c.getString(INDEX_TITLE);
         ThingBundle.putTitle(b, !TextUtils.isEmpty(title)
                 ? format(title)
-                : format(c.getString(AbstractThingLoader.INDEX_LINK_TITLE)));
+                : format(c.getString(INDEX_LINK_TITLE)));
 
-        String thingId = c.getString(AbstractThingLoader.INDEX_THING_ID);
+        String thingId = c.getString(INDEX_THING_ID);
         ThingBundle.putThingId(b, thingId);
 
-        String linkId = c.getString(AbstractThingLoader.INDEX_LINK_ID);
+        String linkId = c.getString(INDEX_LINK_ID);
         ThingBundle.putLinkId(b, linkId);
 
-        boolean isSelf = c.getInt(AbstractThingLoader.INDEX_SELF) == 1;
+        boolean isSelf = c.getInt(INDEX_SELF) == 1;
         if (!isSelf) {
-            ThingBundle.putLinkUrl(b, c.getString(AbstractThingLoader.INDEX_URL));
+            ThingBundle.putLinkUrl(b, c.getString(INDEX_URL));
         }
 
-        String permaLink = c.getString(AbstractThingLoader.INDEX_PERMA_LINK);
+        String permaLink = c.getString(INDEX_PERMA_LINK);
         if (!TextUtils.isEmpty(permaLink)) {
             ThingBundle.putCommentUrl(b, Urls.perma(permaLink, null));
         }
@@ -290,8 +291,8 @@ abstract class AbstractThingListController implements ThingListController {
     public String getNextMoreId() {
         Cursor c = adapter.getCursor();
         if (c != null && c.moveToLast()) {
-            if (c.getInt(AbstractThingLoader.INDEX_KIND) == Kinds.KIND_MORE) {
-                return c.getString(AbstractThingLoader.INDEX_THING_ID);
+            if (c.getInt(INDEX_KIND) == Kinds.KIND_MORE) {
+                return c.getString(INDEX_THING_ID);
             }
         }
         return null;
@@ -410,9 +411,9 @@ abstract class AbstractThingListController implements ThingListController {
     }
 
     private boolean isHidden(int position) {
-        return !adapter.isNull(position, AbstractThingLoader.THING_HIDE_ACTION)
-                && adapter.getInt(position, AbstractThingLoader.THING_HIDE_ACTION) == HideActions.ACTION_HIDE
-                || adapter.getBoolean(position, AbstractThingLoader.INDEX_HIDDEN);
+        return !adapter.isNull(position, THING_HIDE_ACTION)
+                && adapter.getInt(position, THING_HIDE_ACTION) == HideActions.ACTION_HIDE
+                || adapter.getBoolean(position, INDEX_HIDDEN);
     }
 
     private boolean isKind(int position, int kind) {
@@ -421,18 +422,18 @@ abstract class AbstractThingListController implements ThingListController {
 
     private boolean isSaved(int position) {
         // If no local save actions are pending, then rely on server info.
-        if (adapter.isNull(position, AbstractThingLoader.THING_SAVE_ACTION)) {
-            return adapter.getBoolean(position, AbstractThingLoader.INDEX_SAVED);
+        if (adapter.isNull(position, THING_SAVE_ACTION)) {
+            return adapter.getBoolean(position, INDEX_SAVED);
         }
 
         // We have a local pending action so use that to indicate if it's read.
-        return adapter.getInt(position, AbstractThingLoader.THING_SAVE_ACTION) == SaveActions.ACTION_SAVE;
+        return adapter.getInt(position, THING_SAVE_ACTION) == SaveActions.ACTION_SAVE;
     }
 
     private boolean isUnhidden(int position) {
-        return !adapter.isNull(position, AbstractThingLoader.THING_HIDE_ACTION)
-                && adapter.getInt(position, AbstractThingLoader.THING_HIDE_ACTION) == HideActions.ACTION_UNHIDE
-                || !adapter.getBoolean(position, AbstractThingLoader.INDEX_HIDDEN);
+        return !adapter.isNull(position, THING_HIDE_ACTION)
+                && adapter.getInt(position, THING_HIDE_ACTION) == HideActions.ACTION_UNHIDE
+                || !adapter.getBoolean(position, INDEX_HIDDEN);
     }
 
     // Simple getters for state members.
@@ -554,79 +555,79 @@ abstract class AbstractThingListController implements ThingListController {
     // Getters for thing attributes.
 
     private String getAuthor(int position) {
-        return adapter.getString(position, AbstractThingLoader.INDEX_AUTHOR);
+        return adapter.getString(position, INDEX_AUTHOR);
     }
 
     private String getBody(int position) {
-        return adapter.getString(position, AbstractThingLoader.INDEX_BODY);
+        return adapter.getString(position, INDEX_BODY);
     }
 
     private long getCreatedUtc(int position) {
-        return adapter.getLong(position, AbstractThingLoader.INDEX_CREATED_UTC);
+        return adapter.getLong(position, INDEX_CREATED_UTC);
     }
 
     private String getDomain(int position) {
-        return adapter.getString(position, AbstractThingLoader.INDEX_DOMAIN);
+        return adapter.getString(position, INDEX_DOMAIN);
     }
 
     private int getDowns(int position) {
-        return adapter.getInt(position, AbstractThingLoader.INDEX_DOWNS);
+        return adapter.getInt(position, INDEX_DOWNS);
     }
 
     private int getKind(int position) {
-        return adapter.getInt(position, AbstractThingLoader.INDEX_KIND);
+        return adapter.getInt(position, INDEX_KIND);
     }
 
     private int getLikes(int position) {
-        return adapter.getInt(position, AbstractThingLoader.INDEX_LIKES);
+        return adapter.getInt(position, INDEX_LIKES);
     }
 
     private String getLinkId(int position) {
-        return adapter.getString(position, AbstractThingLoader.INDEX_LINK_ID);
+        return adapter.getString(position, INDEX_LINK_ID);
     }
 
     private int getNumComments(int position) {
-        return adapter.getInt(position, AbstractThingLoader.INDEX_NUM_COMMENTS);
+        return adapter.getInt(position, INDEX_NUM_COMMENTS);
     }
 
     private String getPermaLink(int position) {
-        return adapter.getString(position, AbstractThingLoader.INDEX_PERMA_LINK);
+        return adapter.getString(position, INDEX_PERMA_LINK);
     }
 
     private int getScore(int position) {
-        return adapter.getInt(position, AbstractThingLoader.INDEX_SCORE);
+        return adapter.getInt(position, INDEX_SCORE);
     }
 
     private String getSubreddit(int position) {
-        return adapter.getString(position, AbstractThingLoader.INDEX_SUBREDDIT);
+        return adapter.getString(position, INDEX_SUBREDDIT);
     }
 
     private String getThingId(int position) {
-        return adapter.getString(position, AbstractThingLoader.INDEX_THING_ID);
+        return adapter.getString(position, INDEX_THING_ID);
     }
 
     private String getThumbnailUrl(int position) {
-        return adapter.getString(position, AbstractThingLoader.INDEX_THUMBNAIL_URL);
+        return adapter.getString(position, INDEX_THUMBNAIL_URL);
     }
 
     private String getTitle(int position) {
-        return adapter.getString(position, AbstractThingLoader.INDEX_TITLE);
+        return adapter.getString(position, INDEX_TITLE);
     }
 
     private int getUps(int position) {
-        return adapter.getInt(position, AbstractThingLoader.INDEX_UPS);
+        return adapter.getInt(position, INDEX_UPS);
     }
 
     private String getUrl(int position) {
-        return adapter.getString(position, AbstractThingLoader.INDEX_URL);
+        return adapter.getString(position, INDEX_URL);
     }
 
     private boolean isOver18(int position) {
-        return adapter.getBoolean(position, AbstractThingLoader.INDEX_OVER_18);
+        return adapter.getBoolean(position, INDEX_OVER_18);
     }
 
     private boolean isSelf(int position) {
-        return adapter.getBoolean(position, AbstractThingLoader.INDEX_SELF);
+        return adapter.getBoolean(position, INDEX_SELF);
     }
 
     // Getters for extras

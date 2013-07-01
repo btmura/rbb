@@ -16,13 +16,13 @@
 
 package com.btmura.android.reddit.content;
 
-import android.content.Context;
-import android.net.Uri;
-
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 
-public abstract class AbstractThingLoader extends AbstractSessionLoader {
+/**
+ * Interface that defines constants for a commonly used projection on the things table.
+ */
+public interface ThingProjection {
 
     public static final String[] PROJECTION = {
             Things._ID,
@@ -82,9 +82,4 @@ public abstract class AbstractThingLoader extends AbstractSessionLoader {
     public static final int THING_HIDE_ACTION = 23;
     public static final int THING_SAVE_ACTION = 24;
     public static final int THING_VOTE_ACTION = 25;
-
-    AbstractThingLoader(Context context, Uri uri, String[] projection, String selection,
-            long sessionId, String more) {
-        super(context, uri, projection, selection, null, sessionId, more);
-    }
 }

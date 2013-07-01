@@ -22,7 +22,7 @@ import android.os.Bundle;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.provider.ThingProvider;
 
-public class SearchThingLoader extends AbstractThingLoader {
+public class SearchThingLoader extends AbstractSessionLoader implements ThingProjection {
 
     private final String accountName;
     private final String subreddit;
@@ -31,7 +31,7 @@ public class SearchThingLoader extends AbstractThingLoader {
     public SearchThingLoader(Context context, String accountName, String subreddit, String query,
             long sessionId) {
         super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
-                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, sessionId, null);
+                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, null, sessionId, null);
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;

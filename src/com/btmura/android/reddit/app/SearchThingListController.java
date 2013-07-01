@@ -25,7 +25,7 @@ import com.btmura.android.reddit.content.SearchThingLoader;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
-class SearchThingListController extends AbstractThingListController {
+class SearchThingListController extends AbstractThingTableListController {
 
     /** String extra specifying the search query to use. */
     static final String EXTRA_QUERY = "query";

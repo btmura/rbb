@@ -23,9 +23,9 @@ import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.provider.ThingProvider;
 
 /**
- * {@link AbstractThingLoader} that loads a subreddit's things.
+ * {@link ThingProjection} that loads a subreddit's things.
  */
-public class SubredditThingLoader extends AbstractThingLoader {
+public class SubredditThingLoader extends AbstractSessionLoader implements ThingProjection {
 
     private final String accountName;
     private final String subreddit;
@@ -34,7 +34,7 @@ public class SubredditThingLoader extends AbstractThingLoader {
     public SubredditThingLoader(Context context, String accountName, String subreddit, int filter,
             String more, long sessionId) {
         super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
-                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, sessionId, more);
+                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, null, sessionId, more);
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.filter = filter;

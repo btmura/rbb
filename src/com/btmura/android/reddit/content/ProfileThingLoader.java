@@ -23,7 +23,7 @@ import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
-public class ProfileThingLoader extends AbstractThingLoader {
+public class ProfileThingLoader extends AbstractSessionLoader implements ThingProjection {
 
     private final String accountName;
     private final String profileUser;
@@ -32,7 +32,7 @@ public class ProfileThingLoader extends AbstractThingLoader {
     public ProfileThingLoader(Context context, String accountName, String profileUser, int filter,
             String more, long sessionId) {
         super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
-                getSelectionStatement(filter), sessionId, more);
+                getSelectionStatement(filter), null, sessionId, more);
         this.accountName = accountName;
         this.profileUser = profileUser;
         this.filter = filter;
