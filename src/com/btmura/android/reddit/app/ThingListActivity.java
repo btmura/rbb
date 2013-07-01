@@ -140,7 +140,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         int filter = adapter.getFilter(itemPosition);
         AccountPrefs.setLastSubredditFilter(this, filter);
 
-        ThingListFragment frag = getThingListFragment();
+        ThingListFragment<?> frag = getThingListFragment();
         if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != filter) {
             frag = SubredditThingListFragment.newInstance(accountName, subreddit, filter, false);
@@ -216,8 +216,8 @@ public class ThingListActivity extends GlobalMenuActivity implements
         outState.putString(STATE_SUBREDDIT, subreddit);
     }
 
-    private ThingListFragment getThingListFragment() {
-        return (ThingListFragment) getSupportFragmentManager()
+    private ThingListFragment<?> getThingListFragment() {
+        return (ThingListFragment<?>) getSupportFragmentManager()
                 .findFragmentByTag(ThingListFragment.TAG);
     }
 }

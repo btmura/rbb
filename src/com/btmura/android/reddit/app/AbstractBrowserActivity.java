@@ -242,24 +242,24 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     // Methods for setting the content of the right hand thing list pane.
 
     protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
-        ThingListFragment frag = SearchThingListFragment.newInstance(getAccountName(),
+        SearchThingListFragment frag = SearchThingListFragment.newInstance(getAccountName(),
                 subreddit, query, isSingleChoice);
         setThingListNavigation(frag, containerId, subreddit);
     }
 
     protected void setProfileThingListNavigation(int containerId, String profileUser) {
-        ThingListFragment frag = ProfileThingListFragment.newInstance(getAccountName(),
+        ProfileThingListFragment frag = ProfileThingListFragment.newInstance(getAccountName(),
                 profileUser, getFilter(), isSingleChoice);
         setThingListNavigation(frag, containerId, null);
     }
 
     protected void setMessageThingListNavigation(int containerId, String messageUser) {
-        ThingListFragment frag = MessageThingListFragment.newInstance(getAccountName(),
+        MessageThingListFragment frag = MessageThingListFragment.newInstance(getAccountName(),
                 messageUser, getFilter(), isSingleChoice);
         setThingListNavigation(frag, containerId, null);
     }
 
-    private void setThingListNavigation(ThingListFragment frag, int containerId,
+    private void setThingListNavigation(ThingListFragment<?> frag, int containerId,
             String subreddit) {
         if (isSinglePane) {
             setThingListNavigationSinglePane(frag, containerId);
@@ -268,7 +268,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    private void setThingListNavigationSinglePane(ThingListFragment frag, int containerId) {
+    private void setThingListNavigationSinglePane(ThingListFragment<?> frag, int containerId) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setThingListNavigationSinglePane");
         }
@@ -279,7 +279,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commit();
     }
 
-    private void setThingListNavigationMultiPane(ThingListFragment frag, int containerId,
+    private void setThingListNavigationMultiPane(ThingListFragment<?> frag, int containerId,
             String subreddit) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setThingListNavigationMultiPane");
@@ -325,7 +325,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             SubredditListFragment<?, ?> sf = getSubredditListFragment();
             sf.setSelectedSubreddit(subreddit);
 
-            ThingListFragment tf = getThingListFragment();
+            ThingListFragment<?> tf = getThingListFragment();
             if (subreddit != null) {
                 tf.setSubreddit(subreddit);
                 tf.loadIfPossible();
@@ -571,7 +571,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             sf.setSelectedSubreddit(cf.isRandom() ? Subreddits.NAME_RANDOM : cf.getSubreddit());
         }
 
-        ThingListFragment tf = getThingListFragment();
+        ThingListFragment<?> tf = getThingListFragment();
         if (tf != null) {
             tf.setSelectedThing(ThingBundle.getThingId(cf.getThingBundle()),
                     ThingBundle.getLinkId(cf.getThingBundle()));
@@ -669,8 +669,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 .findFragmentByTag(SubredditListFragment.TAG);
     }
 
-    protected ThingListFragment getThingListFragment() {
-        return (ThingListFragment) getSupportFragmentManager()
+    protected ThingListFragment<?> getThingListFragment() {
+        return (ThingListFragment<?>) getSupportFragmentManager()
                 .findFragmentByTag(ThingListFragment.TAG);
     }
 

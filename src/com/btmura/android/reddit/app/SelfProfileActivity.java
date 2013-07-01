@@ -122,7 +122,7 @@ public class SelfProfileActivity extends AbstractBrowserActivity implements OnNa
         currentUser = adapter.getAccountName();
         currentFilter = adapter.getFilter();
 
-        ThingListFragment frag = getThingListFragment();
+        ThingListFragment<?> frag = getThingListFragment();
         if (frag == null
                 || !Objects.equals(frag.getAccountName(), currentUser)
                 || frag.getFilter() != currentFilter) {

@@ -115,7 +115,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
             sf.setAccountName(accountName);
             sf.loadIfPossible();
         }
-        ThingListFragment tf = getThingListFragment();
+        ThingListFragment<?> tf = getThingListFragment();
         if (tf != null && tf.getAccountName() == null) {
             tf.setAccountName(accountName);
             tf.loadIfPossible();
@@ -198,7 +198,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     private boolean isThingListDifferent(String subreddit, String query) {
-        ThingListFragment frag = getThingListFragment();
+        ThingListFragment<?> frag = getThingListFragment();
         return frag == null
                 || !Objects.equals(subreddit, frag.getSubreddit())
                 || !Objects.equals(query, frag.getQuery());

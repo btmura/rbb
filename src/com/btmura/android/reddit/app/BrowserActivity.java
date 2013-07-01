@@ -209,7 +209,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         }
 
         AccountSubredditListFragment slf = getAccountSubredditListFragment();
-        ThingListFragment tlf = getThingListFragment();
+        ThingListFragment<?> tlf = getThingListFragment();
 
         if (slf == null || !slf.getAccountName().equals(accountName)) {
             // Set the subreddit to be the account's last visited subreddit.

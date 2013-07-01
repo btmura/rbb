@@ -142,7 +142,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         adapter.updateState(itemPosition);
         currentFilter = adapter.getFilter();
 
-        ThingListFragment frag = getThingListFragment();
+        ThingListFragment<?> frag = getThingListFragment();
         if (frag == null
                 || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != currentFilter) {
