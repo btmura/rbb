@@ -18,12 +18,13 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-public class MessageThingListFragment extends ThingListFragment {
+import com.btmura.android.reddit.widget.ThingListAdapter;
+
+public class MessageThingListFragment extends ThingListFragment<MessageThingListController> {
 
     public static MessageThingListFragment newInstance(String accountName, String messageUser,
             int filter, boolean singleChoice) {
-        Bundle args = new Bundle(5);
-        args.putInt(ARG_TYPE, TYPE_MESSAGES);
+        Bundle args = new Bundle(4);
         args.putString(MessageThingListController.EXTRA_ACCOUNT_NAME, accountName);
         args.putString(MessageThingListController.EXTRA_MESSAGE_USER, messageUser);
         args.putInt(MessageThingListController.EXTRA_FILTER, filter);
@@ -32,5 +33,10 @@ public class MessageThingListFragment extends ThingListFragment {
         MessageThingListFragment frag = new MessageThingListFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    protected MessageThingListController createController(ThingListAdapter adapter) {
+        return new MessageThingListController(getActivity(), getArguments());
     }
 }

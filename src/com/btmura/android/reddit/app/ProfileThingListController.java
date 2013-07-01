@@ -26,12 +26,14 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 
 class ProfileThingListController extends AbstractThingListController {
 
+    /** String argument specifying the profileUser profile to load. */
+    static final String EXTRA_PROFILE_USER = "profileUser";
+
     private final String profileUser;
 
-    ProfileThingListController(Context context, String profileUser, Bundle args,
-            ThingListAdapter adapter) {
+    ProfileThingListController(Context context, Bundle args, ThingListAdapter adapter) {
         super(context, args, adapter);
-        this.profileUser = profileUser;
+        this.profileUser = getProfileUserExtra(args);
     }
 
     @Override
@@ -43,5 +45,9 @@ class ProfileThingListController extends AbstractThingListController {
     public Loader<Cursor> createLoader() {
         return new ProfileThingLoader(context, getAccountName(), profileUser, getFilter(),
                 getMoreId(), getSessionId());
+    }
+
+    private String getProfileUserExtra(Bundle extras) {
+        return extras.getString(EXTRA_PROFILE_USER);
     }
 }

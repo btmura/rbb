@@ -18,12 +18,13 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-public class SubredditThingListFragment extends ThingListFragment {
+import com.btmura.android.reddit.widget.ThingListAdapter;
+
+public class SubredditThingListFragment extends ThingListFragment<SubredditThingListController> {
 
     public static SubredditThingListFragment newInstance(String accountName, String subreddit,
             int filter, boolean singleChoice) {
-        Bundle args = new Bundle(6);
-        args.putInt(ThingListFragment.ARG_TYPE, TYPE_SUBREDDIT);
+        Bundle args = new Bundle(5);
         args.putString(ThingListFragment.ARG_ACCOUNT_NAME, accountName);
         args.putString(ThingListFragment.ARG_PARENT_SUBREDDIT, subreddit);
         args.putString(ThingListFragment.ARG_SUBREDDIT, subreddit);
@@ -33,5 +34,10 @@ public class SubredditThingListFragment extends ThingListFragment {
         SubredditThingListFragment frag = new SubredditThingListFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    protected SubredditThingListController createController(ThingListAdapter adapter) {
+        return new SubredditThingListController(getActivity(), getArguments(), adapter);
     }
 }

@@ -18,19 +18,25 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-public class ProfileThingListFragment extends ThingListFragment {
+import com.btmura.android.reddit.widget.ThingListAdapter;
+
+public class ProfileThingListFragment extends ThingListFragment<ProfileThingListController> {
 
     public static ProfileThingListFragment newInstance(String accountName, String profileUser,
             int filter, boolean singleChoice) {
-        Bundle args = new Bundle(5);
-        args.putInt(ARG_TYPE, TYPE_PROFILE);
+        Bundle args = new Bundle(4);
         args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_PROFILE_USER, profileUser);
+        args.putString(ProfileThingListController.EXTRA_PROFILE_USER, profileUser);
         args.putInt(ARG_FILTER, filter);
         args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
 
         ProfileThingListFragment frag = new ProfileThingListFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    protected ProfileThingListController createController(ThingListAdapter adapter) {
+        return new ProfileThingListController(getActivity(), getArguments(), adapter);
     }
 }

@@ -18,20 +18,26 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-public class SearchThingListFragment extends ThingListFragment {
+import com.btmura.android.reddit.widget.ThingListAdapter;
+
+public class SearchThingListFragment extends ThingListFragment<SearchThingListController> {
 
     public static SearchThingListFragment newInstance(String accountName, String subreddit,
             String query, boolean singleChoice) {
-        Bundle args = new Bundle(6);
-        args.putInt(ARG_TYPE, TYPE_SEARCH);
+        Bundle args = new Bundle(5);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_PARENT_SUBREDDIT, subreddit);
         args.putString(ARG_SUBREDDIT, subreddit);
-        args.putString(ARG_QUERY, query);
+        args.putString(SearchThingListController.EXTRA_QUERY, query);
         args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
 
         SearchThingListFragment frag = new SearchThingListFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    protected SearchThingListController createController(ThingListAdapter adapter) {
+        return new SearchThingListController(getActivity(), getArguments(), adapter);
     }
 }

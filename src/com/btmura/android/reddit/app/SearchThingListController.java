@@ -27,7 +27,8 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 
 class SearchThingListController extends AbstractThingListController {
 
-    private static final String EXTRA_QUERY = "query";
+    /** String extra specifying the search query to use. */
+    static final String EXTRA_QUERY = "query";
 
     private String query;
 

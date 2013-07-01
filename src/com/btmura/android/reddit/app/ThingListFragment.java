@@ -46,13 +46,11 @@ import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingListAdapter;
 import com.btmura.android.reddit.widget.ThingView;
 
-public class ThingListFragment extends ThingProviderListFragment implements
-        OnScrollListener, OnSwipeDismissListener, OnVoteListener, MultiChoiceModeListener {
+abstract class ThingListFragment<C extends ThingListController> extends ThingProviderListFragment
+        implements OnScrollListener, OnSwipeDismissListener, OnVoteListener,
+        MultiChoiceModeListener {
 
     public static final String TAG = "ThingListFragment";
-
-    /** Integer argument specifying the fragment type. */
-    static final String ARG_TYPE = "type";
 
     /** String argument specifying the account being used. */
     static final String ARG_ACCOUNT_NAME = "accountName";
@@ -63,22 +61,11 @@ public class ThingListFragment extends ThingProviderListFragment implements
     /** String argument specifying the subreddit to load. */
     static final String ARG_SUBREDDIT = "subreddit";
 
-    /** String argument specifying the search query to use. */
-    static final String ARG_QUERY = "query";
-
-    /** String argument specifying the profileUser profile to load. */
-    static final String ARG_PROFILE_USER = "profileUser";
-
     /** Integer argument to filter things, profile, or messages. */
     static final String ARG_FILTER = "filter";
 
     /** Boolean argument indicating whether the list should be put into single choice mode. */
     static final String ARG_SINGLE_CHOICE = "singleChoice";
-
-    static final int TYPE_SUBREDDIT = 1;
-    static final int TYPE_SEARCH = 2;
-    static final int TYPE_PROFILE = 3;
-    static final int TYPE_MESSAGES = 4;
 
     /** String argument that is used to paginate things. */
     private static final String LOADER_MORE_ID = "moreId";
@@ -89,11 +76,14 @@ public class ThingListFragment extends ThingProviderListFragment implements
         int onMeasureThingBody();
     }
 
+    protected C controller;
+
     private OnThingSelectedListener listener;
     private OnSubredditEventListener eventListener;
     private ThingBundleHolder thingBundleHolder;
-    private ThingListController controller;
     private boolean scrollLoading;
+
+    protected abstract C createController(ThingListAdapter adapter);
 
     @Override
     public void onAttach(Activity activity) {
@@ -432,38 +422,7 @@ public class ThingListFragment extends ThingProviderListFragment implements
         return -1;
     }
 
-    // Factory method for creating a ThingListController for the fragment.
-    private ThingListController createController(ThingListAdapter adapter) {
-        switch (getTypeArgument()) {
-            case TYPE_SUBREDDIT:
-                return new SubredditThingListController(getActivity(), getArguments(), adapter);
-
-            case TYPE_SEARCH:
-                return new SearchThingListController(getActivity(), getArguments(), adapter);
-
-            case TYPE_PROFILE:
-                return new ProfileThingListController(getActivity(),
-                        getProfileUserArgument(),
-                        getArguments(),
-                        adapter);
-
-            case TYPE_MESSAGES:
-                return new MessageThingListController(getActivity(), getArguments());
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
     // Getters for fragment arguments.
-
-    private int getTypeArgument() {
-        return getArguments().getInt(ARG_TYPE);
-    }
-
-    private String getProfileUserArgument() {
-        return getArguments().getString(ARG_PROFILE_USER);
-    }
 
     private boolean getSingleChoiceArgument() {
         return getArguments().getBoolean(ARG_SINGLE_CHOICE);
