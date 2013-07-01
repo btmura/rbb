@@ -79,9 +79,9 @@ public abstract class AbstractThingLoader extends AbstractSessionLoader {
     public static final int INDEX_URL = 22;
 
     // Following columns are from joined tables at the end.
-    public static final int THING_SAVE_ACTION = 22;
-    public static final int THING_VOTE_ACTION = 23;
-    public static final int THING_HIDE_ACTION = 24;
+    public static final int THING_HIDE_ACTION = 23;
+    public static final int THING_SAVE_ACTION = 24;
+    public static final int THING_VOTE_ACTION = 25;
 
     AbstractThingLoader(Context context, Uri uri, String[] projection, String selection,
             long sessionId, String more) {
