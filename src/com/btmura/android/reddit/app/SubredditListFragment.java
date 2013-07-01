@@ -19,6 +19,8 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.ActionMode;
@@ -38,8 +40,8 @@ import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissLi
 import com.btmura.android.reddit.widget.SubredditView;
 
 abstract class SubredditListFragment<C extends SubredditListController<?>, AC extends SearchSubredditListActionModeController>
-        extends ThingProviderListFragment
-        implements OnSwipeDismissListener, MultiChoiceModeListener {
+        extends ListFragment
+        implements LoaderCallbacks<Cursor>, OnSwipeDismissListener, MultiChoiceModeListener {
 
     public static final String TAG = "SubredditListFragment";
 
@@ -122,9 +124,6 @@ abstract class SubredditListFragment<C extends SubredditListController<?>, AC ex
                 Log.d(TAG, "onLoadFinished");
             }
 
-            // TODO: Remove dependency on ThingProviderListFragment.
-            super.onLoadFinished(loader, cursor);
-
             setEmptyText(getEmptyText(cursor == null));
             setListShown(true);
 
@@ -146,11 +145,6 @@ abstract class SubredditListFragment<C extends SubredditListController<?>, AC ex
             return ""; // Don't show duplicate message in multipane layout.
         }
         return getString(error ? R.string.error : R.string.empty_list);
-    }
-
-    @Override
-    protected void onSubredditLoaded(String subreddit) {
-        throw new IllegalStateException();
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
