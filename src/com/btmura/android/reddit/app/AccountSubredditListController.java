@@ -23,10 +23,10 @@ import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.widget.AccountSubredditListAdapter;
+import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 
 class AccountSubredditListController
-        implements SubredditListController<AccountSubredditListAdapter> {
+        implements SubredditListController<AccountSubredditAdapter> {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
@@ -35,14 +35,14 @@ class AccountSubredditListController
     private static final String EXTRA_SESSION_ID = "sessionId";
 
     private final Context context;
-    private final AccountSubredditListAdapter adapter;
+    private final AccountSubredditAdapter adapter;
 
     private String accountName;
     private long sessionId;
 
     AccountSubredditListController(Context context, Bundle args) {
         this.context = context;
-        this.adapter = new AccountSubredditListAdapter(context, true, false,
+        this.adapter = new AccountSubredditAdapter(context, true, false,
                 getSingleChoiceExtra(args));
         this.accountName = getAccountNameExtra(args);
         setSelectedSubreddit(getSelectedSubredditExtra(args));
@@ -90,7 +90,7 @@ class AccountSubredditListController
     }
 
     @Override
-    public AccountSubredditListAdapter getAdapter() {
+    public AccountSubredditAdapter getAdapter() {
         return adapter;
     }
 

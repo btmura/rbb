@@ -24,9 +24,9 @@ import android.text.TextUtils;
 
 import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.widget.SubredditSearchAdapter;
+import com.btmura.android.reddit.widget.SearchSubredditAdapter;
 
-class SubredditSearchController implements SubredditListController<SubredditSearchAdapter> {
+class SearchSubredditListController implements SubredditListController<SearchSubredditAdapter> {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
@@ -36,15 +36,15 @@ class SubredditSearchController implements SubredditListController<SubredditSear
     private static final String EXTRA_SESSION_ID = "sessionId";
 
     private final Context context;
-    private final SubredditSearchAdapter adapter;
+    private final SearchSubredditAdapter adapter;
 
     private String accountName;
     private String query;
     private long sessionId;
 
-    SubredditSearchController(Context context, Bundle args) {
+    SearchSubredditListController(Context context, Bundle args) {
         this.context = context;
-        this.adapter = new SubredditSearchAdapter(context, getSingleChoiceExtra(args));
+        this.adapter = new SearchSubredditAdapter(context, getSingleChoiceExtra(args));
         this.accountName = getAccountNameExtra(args);
         this.query = getQueryExtra(args);
     }
@@ -104,7 +104,7 @@ class SubredditSearchController implements SubredditListController<SubredditSear
     }
 
     @Override
-    public SubredditSearchAdapter getAdapter() {
+    public SearchSubredditAdapter getAdapter() {
         return adapter;
     }
 

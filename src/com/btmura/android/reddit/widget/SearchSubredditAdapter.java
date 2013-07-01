@@ -24,9 +24,9 @@ import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.util.Objects;
 
 /** {@link SubredditAdapter} that handles searching for subreddits. */
-public class SubredditSearchAdapter extends SubredditAdapter {
+public class SearchSubredditAdapter extends SubredditAdapter {
 
-    public SubredditSearchAdapter(Context context, boolean singleChoice) {
+    public SearchSubredditAdapter(Context context, boolean singleChoice) {
         super(context, singleChoice);
     }
 

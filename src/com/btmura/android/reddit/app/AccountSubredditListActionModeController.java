@@ -29,20 +29,20 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.ViewUtils;
-import com.btmura.android.reddit.widget.AccountSubredditListAdapter;
+import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 
 public class AccountSubredditListActionModeController
-        implements SubredditListActionModeController {
+        implements SearchSubredditListActionModeController {
 
     private final Context context;
     private final String accountName;
-    private final AccountSubredditListAdapter adapter;
+    private final AccountSubredditAdapter adapter;
 
     private ActionMode actionMode;
 
     public AccountSubredditListActionModeController(Context context,
             String accountName,
-            AccountSubredditListAdapter adapter) {
+            AccountSubredditAdapter adapter) {
         this.context = context;
         this.accountName = accountName;
         this.adapter = adapter;

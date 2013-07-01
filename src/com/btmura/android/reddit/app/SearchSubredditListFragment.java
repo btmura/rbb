@@ -19,19 +19,20 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class SubredditSearchFragment extends SubredditListFragment<SubredditSearchController,
-        SubredditListActionModeController> {
+public class SearchSubredditListFragment
+        extends SubredditListFragment<SearchSubredditListController,
+        SearchSubredditListActionModeController> {
 
     private AccountResultHolder accountResultHolder;
 
-    public static SubredditSearchFragment newInstance(String accountName, String query,
+    public static SearchSubredditListFragment newInstance(String accountName, String query,
             boolean singleChoice) {
         Bundle args = new Bundle(3);
-        args.putString(SubredditSearchController.EXTRA_ACCOUNT_NAME, accountName);
-        args.putString(SubredditSearchController.EXTRA_QUERY, query);
-        args.putBoolean(SubredditSearchController.EXTRA_SINGLE_CHOICE, singleChoice);
+        args.putString(SearchSubredditListController.EXTRA_ACCOUNT_NAME, accountName);
+        args.putString(SearchSubredditListController.EXTRA_QUERY, query);
+        args.putBoolean(SearchSubredditListController.EXTRA_SINGLE_CHOICE, singleChoice);
 
-        SubredditSearchFragment frag = new SubredditSearchFragment();
+        SearchSubredditListFragment frag = new SearchSubredditListFragment();
         frag.setArguments(args);
         return frag;
     }
@@ -45,13 +46,13 @@ public class SubredditSearchFragment extends SubredditListFragment<SubredditSear
     }
 
     @Override
-    protected SubredditSearchController createController() {
-        return new SubredditSearchController(getActivity(), getArguments());
+    protected SearchSubredditListController createController() {
+        return new SearchSubredditListController(getActivity(), getArguments());
     }
 
     @Override
-    protected SubredditListActionModeController createActionModeController(
-            SubredditSearchController controller) {
+    protected SearchSubredditListActionModeController createActionModeController(
+            SearchSubredditListController controller) {
         return new SubredditSearchActionModeController(getActivity(), controller.getAdapter(),
                 accountResultHolder);
     }

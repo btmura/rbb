@@ -168,7 +168,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void setSearchSubredditListNavigation(int containerId, String query) {
-        SubredditListFragment<?, ?> frag = SubredditSearchFragment.newInstance(getAccountName(),
+        SubredditListFragment<?, ?> frag = SearchSubredditListFragment.newInstance(getAccountName(),
                 query, isSingleChoice);
         setSubredditListNavigation(frag, containerId, null, false, null);
     }
@@ -659,8 +659,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 .findFragmentByTag(SubredditListFragment.TAG);
     }
 
-    protected SubredditSearchFragment getSubredditSearchFragment() {
-        return (SubredditSearchFragment) getSupportFragmentManager()
+    protected SearchSubredditListFragment getSubredditSearchFragment() {
+        return (SearchSubredditListFragment) getSupportFragmentManager()
                 .findFragmentByTag(SubredditListFragment.TAG);
     }
 

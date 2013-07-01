@@ -37,15 +37,15 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.ViewUtils;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
-import com.btmura.android.reddit.widget.SubredditSearchAdapter;
+import com.btmura.android.reddit.widget.SearchSubredditAdapter;
 
-class SubredditSearchActionModeController implements SubredditListActionModeController,
+class SubredditSearchActionModeController implements SearchSubredditListActionModeController,
         OnItemSelectedListener {
 
     private static final String EXTRA_ACTION_ACCOUNT_NAME = "actionAccountName";
 
     private final Context context;
-    private final SubredditSearchAdapter adapter;
+    private final SearchSubredditAdapter adapter;
     private final AccountResultHolder accountResultHolder;
 
     private ActionMode actionMode;
@@ -56,7 +56,7 @@ class SubredditSearchActionModeController implements SubredditListActionModeCont
     private String actionAccountName;
 
     SubredditSearchActionModeController(Context context,
-            SubredditSearchAdapter adapter,
+            SearchSubredditAdapter adapter,
             AccountResultHolder accountResultHolder) {
         this.context = context;
         this.adapter = adapter;

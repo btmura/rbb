@@ -22,7 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-interface SubredditListActionModeController {
+interface SearchSubredditListActionModeController {
 
     void restoreInstanceState(Bundle savedInstanceState);
 
