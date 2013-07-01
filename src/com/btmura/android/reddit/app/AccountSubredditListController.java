@@ -44,8 +44,7 @@ class AccountSubredditListController
         this.context = context;
         this.adapter = new AccountSubredditAdapter(context, true, false,
                 getSingleChoiceExtra(args));
-        this.accountName = getAccountNameExtra(args);
-        setSelectedSubreddit(getSelectedSubredditExtra(args));
+        restoreInstanceState(args);
     }
 
     @Override

@@ -23,10 +23,10 @@ public class ProfileThingListFragment extends ThingListFragment<ProfileThingList
     public static ProfileThingListFragment newInstance(String accountName, String profileUser,
             int filter, boolean singleChoice) {
         Bundle args = new Bundle(4);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ProfileThingListController.EXTRA_ACCOUNT_NAME, accountName);
         args.putString(ProfileThingListController.EXTRA_PROFILE_USER, profileUser);
-        args.putInt(ARG_FILTER, filter);
-        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        args.putInt(ProfileThingListController.EXTRA_FILTER, filter);
+        args.putBoolean(ProfileThingListController.EXTRA_SINGLE_CHOICE, singleChoice);
 
         ProfileThingListFragment frag = new ProfileThingListFragment();
         frag.setArguments(args);

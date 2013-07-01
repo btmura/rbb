@@ -35,7 +35,6 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
-import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -45,16 +44,15 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 abstract class AbstractThingTableListController
         implements ThingListController, ThingProjection {
 
-    private static final String STATE_ACCOUNT_NAME = "accountName";
-    private static final String STATE_EMPTY_TEXT = "emptyText";
-    private static final String STATE_FILTER = "filter";
-    private static final String STATE_PARENT_SUBREDDIT = "parentSubreddit";
-    private static final String STATE_SELECTED_LINK_ID = "selectedLinkId";
-    private static final String STATE_SELECTED_THING_ID = "selectedThingId";
-    private static final String STATE_SESSION_ID = "sessionId";
-    private static final String STATE_SUBREDDIT = "subreddit";
-
+    static final String EXTRA_ACCOUNT_NAME = "accountName";
+    static final String EXTRA_PARENT_SUBREDDIT = "parentSubreddit";
+    static final String EXTRA_SUBREDDIT = "subreddit";
+    static final String EXTRA_FILTER = "filter";
     static final String EXTRA_SINGLE_CHOICE = "singleChoice";
+    static final String EXTRA_SELECTED_LINK_ID = "selectedLinkId";
+    static final String EXTRA_SELECTED_THING_ID = "selectedThingId";
+    static final String EXTRA_SESSION_ID = "sessionId";
+    static final String EXTRA_EMPTY_TEXT = "emptyText";
 
     protected final Context context;
     protected final AbstractThingListAdapter adapter;
@@ -73,43 +71,27 @@ abstract class AbstractThingTableListController
     }
 
     @Override
-    public void restoreInstanceState(Bundle state) {
-        state = Objects.nullToEmpty(state);
-        if (state.containsKey(STATE_ACCOUNT_NAME)) {
-            setAccountName(state.getString(STATE_ACCOUNT_NAME));
-        }
-        if (state.containsKey(STATE_EMPTY_TEXT)) {
-            setEmptyText(state.getInt(STATE_EMPTY_TEXT));
-        }
-        if (state.containsKey(STATE_FILTER)) {
-            setFilter(state.getInt(STATE_FILTER));
-        }
-        if (state.containsKey(STATE_PARENT_SUBREDDIT)) {
-            setParentSubreddit(state.getString(STATE_PARENT_SUBREDDIT));
-        }
-        if (state.containsKey(STATE_SELECTED_LINK_ID)
-                && state.containsKey(STATE_SELECTED_THING_ID)) {
-            setSelectedThing(state.getString(STATE_SELECTED_THING_ID),
-                    state.getString(STATE_SELECTED_LINK_ID));
-        }
-        if (state.containsKey(STATE_SESSION_ID)) {
-            setSessionId(state.getLong(STATE_SESSION_ID));
-        }
-        if (state.containsKey(STATE_SUBREDDIT)) {
-            setSubreddit(state.getString(STATE_SUBREDDIT));
-        }
+    public void restoreInstanceState(Bundle savedInstanceState) {
+        setAccountName(getAccountNameExtra(savedInstanceState));
+        setParentSubreddit(getParentSubredditExtra(savedInstanceState));
+        setSubreddit(getSubredditExtra(savedInstanceState));
+        setFilter(getFilterExtra(savedInstanceState));
+        setEmptyText(getEmptyTextExtra(savedInstanceState));
+        setSelectedThing(getSelectedThingId(savedInstanceState),
+                getSelectedLinkId(savedInstanceState));
+        this.sessionId = getSessionIdExtra(savedInstanceState);
     }
 
     @Override
     public void saveInstanceState(Bundle state) {
-        state.putString(STATE_ACCOUNT_NAME, getAccountName());
-        state.putInt(STATE_EMPTY_TEXT, getEmptyText());
-        state.putInt(STATE_FILTER, getFilter());
-        state.putString(STATE_PARENT_SUBREDDIT, getParentSubreddit());
-        state.putString(STATE_SELECTED_LINK_ID, getSelectedLinkId());
-        state.putString(STATE_SELECTED_THING_ID, getSelectedThingId());
-        state.putLong(STATE_SESSION_ID, getSessionId());
-        state.putString(STATE_SUBREDDIT, getSubreddit());
+        state.putString(EXTRA_ACCOUNT_NAME, getAccountName());
+        state.putInt(EXTRA_EMPTY_TEXT, getEmptyText());
+        state.putInt(EXTRA_FILTER, getFilter());
+        state.putString(EXTRA_PARENT_SUBREDDIT, getParentSubreddit());
+        state.putString(EXTRA_SELECTED_LINK_ID, getSelectedLinkId());
+        state.putString(EXTRA_SELECTED_THING_ID, getSelectedThingId());
+        state.putLong(EXTRA_SESSION_ID, getSessionId());
+        state.putString(EXTRA_SUBREDDIT, getSubreddit());
     }
 
     @Override
@@ -632,7 +614,39 @@ abstract class AbstractThingTableListController
 
     // Getters for extras
 
+    private static String getAccountNameExtra(Bundle extras) {
+        return extras.getString(EXTRA_ACCOUNT_NAME);
+    }
+
+    private static String getParentSubredditExtra(Bundle extras) {
+        return extras.getString(EXTRA_PARENT_SUBREDDIT);
+    }
+
+    private static String getSubredditExtra(Bundle extras) {
+        return extras.getString(EXTRA_SUBREDDIT);
+    }
+
+    private static int getFilterExtra(Bundle extras) {
+        return extras.getInt(EXTRA_FILTER);
+    }
+
     private static boolean getSingleChoiceExtra(Bundle extras) {
         return extras.getBoolean(EXTRA_SINGLE_CHOICE);
+    }
+
+    private static String getSelectedThingId(Bundle extras) {
+        return extras.getString(EXTRA_SELECTED_THING_ID);
+    }
+
+    private static String getSelectedLinkId(Bundle extras) {
+        return extras.getString(EXTRA_SELECTED_LINK_ID);
+    }
+
+    private static long getSessionIdExtra(Bundle extras) {
+        return extras.getLong(EXTRA_SESSION_ID);
+    }
+
+    private static int getEmptyTextExtra(Bundle extras) {
+        return extras.getInt(EXTRA_EMPTY_TEXT);
     }
 }

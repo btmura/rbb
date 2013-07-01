@@ -23,11 +23,11 @@ public class SearchThingListFragment extends ThingListFragment<SearchThingListCo
     public static SearchThingListFragment newInstance(String accountName, String subreddit,
             String query, boolean singleChoice) {
         Bundle args = new Bundle(5);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_PARENT_SUBREDDIT, subreddit);
-        args.putString(ARG_SUBREDDIT, subreddit);
+        args.putString(SearchThingListController.EXTRA_ACCOUNT_NAME, accountName);
+        args.putString(SearchThingListController.EXTRA_PARENT_SUBREDDIT, subreddit);
+        args.putString(SearchThingListController.EXTRA_SUBREDDIT, subreddit);
         args.putString(SearchThingListController.EXTRA_QUERY, query);
-        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
+        args.putBoolean(SearchThingListController.EXTRA_SINGLE_CHOICE, singleChoice);
 
         SearchThingListFragment frag = new SearchThingListFragment();
         frag.setArguments(args);

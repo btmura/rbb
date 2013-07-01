@@ -51,21 +51,6 @@ abstract class ThingListFragment<C extends ThingListController> extends ThingPro
 
     public static final String TAG = "ThingListFragment";
 
-    /** String argument specifying the account being used. */
-    static final String ARG_ACCOUNT_NAME = "accountName";
-
-    /** String argument specifying the parent subreddit. */
-    static final String ARG_PARENT_SUBREDDIT = "parentSubreddit";
-
-    /** String argument specifying the subreddit to load. */
-    static final String ARG_SUBREDDIT = "subreddit";
-
-    /** Integer argument to filter things, profile, or messages. */
-    static final String ARG_FILTER = "filter";
-
-    /** Boolean argument indicating whether the list should be put into single choice mode. */
-    static final String ARG_SINGLE_CHOICE = "singleChoice";
-
     /** String argument that is used to paginate things. */
     private static final String LOADER_MORE_ID = "moreId";
 

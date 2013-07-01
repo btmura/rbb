@@ -45,13 +45,12 @@ class SearchSubredditListController implements SubredditListController<SearchSub
     SearchSubredditListController(Context context, Bundle args) {
         this.context = context;
         this.adapter = new SearchSubredditAdapter(context, getSingleChoiceExtra(args));
-        this.accountName = getAccountNameExtra(args);
-        this.query = getQueryExtra(args);
+        restoreInstanceState(args);
     }
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        this.accountName = getAccountNameExtra(savedInstanceState);
+        setAccountName(getAccountNameExtra(savedInstanceState));
         setSelectedSubreddit(getSelectedSubredditExtra(savedInstanceState));
         this.query = getQueryExtra(savedInstanceState);
         this.sessionId = getSessionIdExtra(savedInstanceState);

@@ -23,11 +23,11 @@ public class SubredditThingListFragment extends ThingListFragment<SubredditThing
     public static SubredditThingListFragment newInstance(String accountName, String subreddit,
             int filter, boolean singleChoice) {
         Bundle args = new Bundle(5);
-        args.putString(ThingListFragment.ARG_ACCOUNT_NAME, accountName);
-        args.putString(ThingListFragment.ARG_PARENT_SUBREDDIT, subreddit);
-        args.putString(ThingListFragment.ARG_SUBREDDIT, subreddit);
-        args.putInt(ThingListFragment.ARG_FILTER, filter);
-        args.putBoolean(ThingListFragment.ARG_SINGLE_CHOICE, singleChoice);
+        args.putString(SubredditThingListController.EXTRA_ACCOUNT_NAME, accountName);
+        args.putString(SubredditThingListController.EXTRA_PARENT_SUBREDDIT, subreddit);
+        args.putString(SubredditThingListController.EXTRA_SUBREDDIT, subreddit);
+        args.putInt(SubredditThingListController.EXTRA_FILTER, filter);
+        args.putBoolean(SubredditThingListController.EXTRA_SINGLE_CHOICE, singleChoice);
 
         SubredditThingListFragment frag = new SubredditThingListFragment();
         frag.setArguments(args);
