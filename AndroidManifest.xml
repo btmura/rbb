@@ -49,7 +49,6 @@
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.BrowserActivity"
-            android:clearTaskOnLaunch="true"
             tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
