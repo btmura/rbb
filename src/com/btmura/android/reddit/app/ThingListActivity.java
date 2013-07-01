@@ -119,7 +119,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         // Commit the fragment here to avoid some menu item jank.
         if (getThingListFragment() == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            Fragment frag = ThingListFragment.newSubredditInstance(accountName, subreddit,
+            Fragment frag = SubredditThingListFragment.newInstance(accountName, subreddit,
                     filter, false);
             ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
             ft.commitAllowingStateLoss();
@@ -143,7 +143,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
         ThingListFragment frag = getThingListFragment();
         if (frag == null || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != filter) {
-            frag = ThingListFragment.newSubredditInstance(accountName, subreddit, filter, false);
+            frag = SubredditThingListFragment.newInstance(accountName, subreddit, filter, false);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
             ft.commit();

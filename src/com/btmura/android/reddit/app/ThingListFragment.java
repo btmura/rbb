@@ -52,33 +52,33 @@ public class ThingListFragment extends ThingProviderListFragment implements
     public static final String TAG = "ThingListFragment";
 
     /** Integer argument specifying the fragment type. */
-    private static final String ARG_TYPE = "type";
+    static final String ARG_TYPE = "type";
 
     /** String argument specifying the account being used. */
-    private static final String ARG_ACCOUNT_NAME = "accountName";
+    static final String ARG_ACCOUNT_NAME = "accountName";
 
     /** String argument specifying the parent subreddit. */
-    private static final String ARG_PARENT_SUBREDDIT = "parentSubreddit";
+    static final String ARG_PARENT_SUBREDDIT = "parentSubreddit";
 
     /** String argument specifying the subreddit to load. */
-    private static final String ARG_SUBREDDIT = "subreddit";
+    static final String ARG_SUBREDDIT = "subreddit";
 
     /** String argument specifying the search query to use. */
-    private static final String ARG_QUERY = "query";
+    static final String ARG_QUERY = "query";
 
     /** String argument specifying the profileUser profile to load. */
-    private static final String ARG_PROFILE_USER = "profileUser";
+    static final String ARG_PROFILE_USER = "profileUser";
 
     /** Integer argument to filter things, profile, or messages. */
-    private static final String ARG_FILTER = "filter";
+    static final String ARG_FILTER = "filter";
 
     /** Boolean argument indicating whether the list should be put into single choice mode. */
-    private static final String ARG_SINGLE_CHOICE = "singleChoice";
+    static final String ARG_SINGLE_CHOICE = "singleChoice";
 
-    private static final int TYPE_SUBREDDIT = 1;
-    private static final int TYPE_SEARCH = 2;
-    private static final int TYPE_PROFILE = 3;
-    private static final int TYPE_MESSAGES = 4;
+    static final int TYPE_SUBREDDIT = 1;
+    static final int TYPE_SEARCH = 2;
+    static final int TYPE_PROFILE = 3;
+    static final int TYPE_MESSAGES = 4;
 
     /** String argument that is used to paginate things. */
     private static final String LOADER_MORE_ID = "moreId";
@@ -94,58 +94,6 @@ public class ThingListFragment extends ThingProviderListFragment implements
     private ThingBundleHolder thingBundleHolder;
     private ThingListController controller;
     private boolean scrollLoading;
-
-    public static ThingListFragment newSubredditInstance(String accountName, String subreddit,
-            int filter, boolean singleChoice) {
-        Bundle args = new Bundle(6);
-        args.putInt(ARG_TYPE, TYPE_SUBREDDIT);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_PARENT_SUBREDDIT, subreddit);
-        args.putString(ARG_SUBREDDIT, subreddit);
-        args.putInt(ARG_FILTER, filter);
-        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
-        return newFragment(args);
-    }
-
-    public static ThingListFragment newSearchInstance(String accountName, String subreddit,
-            String query, boolean singleChoice) {
-        Bundle args = new Bundle(6);
-        args.putInt(ARG_TYPE, TYPE_SEARCH);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_PARENT_SUBREDDIT, subreddit);
-        args.putString(ARG_SUBREDDIT, subreddit);
-        args.putString(ARG_QUERY, query);
-        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
-        return newFragment(args);
-    }
-
-    public static ThingListFragment newProfileInstance(String accountName, String profileUser,
-            int filter, boolean singleChoice) {
-        Bundle args = new Bundle(5);
-        args.putInt(ARG_TYPE, TYPE_PROFILE);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_PROFILE_USER, profileUser);
-        args.putInt(ARG_FILTER, filter);
-        args.putBoolean(ARG_SINGLE_CHOICE, singleChoice);
-        return newFragment(args);
-    }
-
-    public static ThingListFragment newMessageInstance(String accountName, String messageUser,
-            int filter, boolean singleChoice) {
-        Bundle args = new Bundle(5);
-        args.putInt(ARG_TYPE, TYPE_MESSAGES);
-        args.putString(MessageThingListController.EXTRA_ACCOUNT_NAME, accountName);
-        args.putString(MessageThingListController.EXTRA_MESSAGE_USER, messageUser);
-        args.putInt(MessageThingListController.EXTRA_FILTER, filter);
-        args.putBoolean(MessageThingListController.EXTRA_SINGLE_CHOICE, singleChoice);
-        return newFragment(args);
-    }
-
-    private static ThingListFragment newFragment(Bundle args) {
-        ThingListFragment frag = new ThingListFragment();
-        frag.setArguments(args);
-        return frag;
-    }
 
     @Override
     public void onAttach(Activity activity) {

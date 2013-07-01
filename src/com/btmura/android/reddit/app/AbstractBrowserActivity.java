@@ -168,8 +168,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void setSearchSubredditListNavigation(int containerId, String query) {
-        SubredditListFragment<?, ?> frag = SearchSubredditListFragment.newInstance(getAccountName(),
-                query, isSingleChoice);
+        SubredditListFragment<?, ?> frag = SearchSubredditListFragment.newInstance(
+                getAccountName(), query, isSingleChoice);
         setSubredditListNavigation(frag, containerId, null, false, null);
     }
 
@@ -178,8 +178,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (isSinglePane) {
             setSubredditListNavigationSinglePane(frag, containerId);
         } else {
-            setSubredditListNavigationMultiPane(frag, containerId, subreddit, isRandom,
-                    thingBundle);
+            setSubredditListNavigationMultiPane(frag, containerId,
+                    subreddit, isRandom, thingBundle);
         }
     }
 
@@ -204,7 +204,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, isRandom, thingBundle,
                 filter);
-        Fragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
+        Fragment tlf = SubredditThingListFragment.newInstance(accountName, subreddit, filter,
                 isSingleChoice);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -242,19 +242,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     // Methods for setting the content of the right hand thing list pane.
 
     protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
-        ThingListFragment frag = ThingListFragment.newSearchInstance(getAccountName(),
+        ThingListFragment frag = SearchThingListFragment.newInstance(getAccountName(),
                 subreddit, query, isSingleChoice);
         setThingListNavigation(frag, containerId, subreddit);
     }
 
     protected void setProfileThingListNavigation(int containerId, String profileUser) {
-        ThingListFragment frag = ThingListFragment.newProfileInstance(getAccountName(),
+        ThingListFragment frag = ProfileThingListFragment.newInstance(getAccountName(),
                 profileUser, getFilter(), isSingleChoice);
         setThingListNavigation(frag, containerId, null);
     }
 
     protected void setMessageThingListNavigation(int containerId, String messageUser) {
-        ThingListFragment frag = ThingListFragment.newMessageInstance(getAccountName(),
+        ThingListFragment frag = MessageThingListFragment.newInstance(getAccountName(),
                 messageUser, getFilter(), isSingleChoice);
         setThingListNavigation(frag, containerId, null);
     }
@@ -369,7 +369,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         int filter = getFilter();
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, isRandom, null, filter);
-        Fragment tlf = ThingListFragment.newSubredditInstance(accountName, subreddit, filter,
+        Fragment tlf = SubredditThingListFragment.newInstance(accountName, subreddit, filter,
                 isSingleChoice);
         Fragment tf = getThingFragment();
 
