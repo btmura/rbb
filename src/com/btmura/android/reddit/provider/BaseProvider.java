@@ -88,7 +88,7 @@ abstract class BaseProvider extends ContentProvider {
         Cursor c = null;
         db.beginTransaction();
         try {
-            c = innerQuery(uri, db, table, projection, selection, selectionArgs, sortOrder);
+            c = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
             if (c != null) {
                 c.setNotificationUri(getContext().getContentResolver(), uri);
             }
@@ -107,7 +107,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            id = innerInsert(uri, db, table, null, values);
+            id = db.replace(table, null, values);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -131,7 +131,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            count = innerUpdate(uri, db, table, values, selection, selectionArgs);
+            count = db.update(table, values, selection, selectionArgs);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -154,7 +154,7 @@ abstract class BaseProvider extends ContentProvider {
 
         db.beginTransaction();
         try {
-            count = innerDelete(uri, db, table, selection, selectionArgs);
+            count = db.delete(table, selection, selectionArgs);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -175,26 +175,6 @@ abstract class BaseProvider extends ContentProvider {
     }
 
     protected abstract String getTable(Uri uri);
-
-    protected Cursor innerQuery(Uri uri, SQLiteDatabase db, String table,
-            String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
-    }
-
-    protected long innerInsert(Uri uri, SQLiteDatabase db, String table,
-            String nullColumnHack, ContentValues values) {
-        return db.replace(table, nullColumnHack, values);
-    }
-
-    protected int innerUpdate(Uri uri, SQLiteDatabase db, String table,
-            ContentValues values, String selection, String[] selectionArgs) {
-        return db.update(table, values, selection, selectionArgs);
-    }
-
-    protected int innerDelete(Uri uri, SQLiteDatabase db, String table,
-            String selection, String[] selectionArgs) {
-        return db.delete(table, selection, selectionArgs);
-    }
 
     protected void notifyChange(Uri uri) {
         if (uri.getBooleanQueryParameter(PARAM_NOTIFY, true)) {
