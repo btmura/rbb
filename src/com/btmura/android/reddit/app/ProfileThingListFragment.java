@@ -18,8 +18,6 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-import com.btmura.android.reddit.widget.ThingListAdapter;
-
 public class ProfileThingListFragment extends ThingListFragment<ProfileThingListController> {
 
     public static ProfileThingListFragment newInstance(String accountName, String profileUser,
@@ -36,7 +34,7 @@ public class ProfileThingListFragment extends ThingListFragment<ProfileThingList
     }
 
     @Override
-    protected ProfileThingListController createController(ThingListAdapter adapter) {
-        return new ProfileThingListController(getActivity(), getArguments(), adapter);
+    protected ProfileThingListController createController() {
+        return new ProfileThingListController(getActivity(), getArguments(), this);
     }
 }

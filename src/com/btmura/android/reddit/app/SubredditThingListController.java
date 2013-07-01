@@ -22,12 +22,12 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.content.SubredditThingLoader;
-import com.btmura.android.reddit.widget.ThingListAdapter;
+import com.btmura.android.reddit.widget.OnVoteListener;
 
 class SubredditThingListController extends AbstractThingListController {
 
-    SubredditThingListController(Context context, Bundle args, ThingListAdapter adapter) {
-        super(context, args, adapter);
+    SubredditThingListController(Context context, Bundle args, OnVoteListener listener) {
+        super(context, args, listener);
     }
 
     @Override

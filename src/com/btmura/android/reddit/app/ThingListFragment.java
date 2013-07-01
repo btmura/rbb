@@ -43,7 +43,6 @@ import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.OnVoteListener;
-import com.btmura.android.reddit.widget.ThingListAdapter;
 import com.btmura.android.reddit.widget.ThingView;
 
 abstract class ThingListFragment<C extends ThingListController> extends ThingProviderListFragment
@@ -83,7 +82,7 @@ abstract class ThingListFragment<C extends ThingListController> extends ThingPro
     private ThingBundleHolder thingBundleHolder;
     private boolean scrollLoading;
 
-    protected abstract C createController(ThingListAdapter adapter);
+    protected abstract C createController();
 
     @Override
     public void onAttach(Activity activity) {
@@ -102,15 +101,10 @@ abstract class ThingListFragment<C extends ThingListController> extends ThingPro
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ThingListAdapter adapter = new ThingListAdapter(getActivity(), this,
-                getSingleChoiceArgument());
-
-        controller = createController(adapter);
+        controller = createController();
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
         }
-
         setHasOptionsMenu(true);
     }
 
@@ -420,11 +414,5 @@ abstract class ThingListFragment<C extends ThingListController> extends ThingPro
             }
         }
         return -1;
-    }
-
-    // Getters for fragment arguments.
-
-    private boolean getSingleChoiceArgument() {
-        return getArguments().getBoolean(ARG_SINGLE_CHOICE);
     }
 }

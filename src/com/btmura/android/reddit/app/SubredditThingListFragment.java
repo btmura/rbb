@@ -18,8 +18,6 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-import com.btmura.android.reddit.widget.ThingListAdapter;
-
 public class SubredditThingListFragment extends ThingListFragment<SubredditThingListController> {
 
     public static SubredditThingListFragment newInstance(String accountName, String subreddit,
@@ -37,7 +35,7 @@ public class SubredditThingListFragment extends ThingListFragment<SubredditThing
     }
 
     @Override
-    protected SubredditThingListController createController(ThingListAdapter adapter) {
-        return new SubredditThingListController(getActivity(), getArguments(), adapter);
+    protected SubredditThingListController createController() {
+        return new SubredditThingListController(getActivity(), getArguments(), this);
     }
 }

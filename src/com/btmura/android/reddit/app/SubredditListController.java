@@ -24,11 +24,11 @@ import com.btmura.android.reddit.widget.SubredditAdapter;
 
 interface SubredditListController<A extends SubredditAdapter> {
 
-    boolean isLoadable();
-
     void restoreInstanceState(Bundle savedInstanceState);
 
     void saveInstanceState(Bundle outState);
+
+    boolean isLoadable();
 
     Loader<Cursor> createLoader();
 

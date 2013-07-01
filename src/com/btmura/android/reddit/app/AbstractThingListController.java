@@ -38,7 +38,9 @@ import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
+import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingBundle;
+import com.btmura.android.reddit.widget.ThingListAdapter;
 
 abstract class AbstractThingListController implements ThingListController {
 
@@ -51,19 +53,21 @@ abstract class AbstractThingListController implements ThingListController {
     private static final String STATE_SESSION_ID = "sessionId";
     private static final String STATE_SUBREDDIT = "subreddit";
 
-    private final Formatter formatter = new Formatter();
+    static final String EXTRA_SINGLE_CHOICE = "singleChoice";
+
     protected final Context context;
     protected final AbstractThingListAdapter adapter;
 
+    private final Formatter formatter = new Formatter();
     private String accountName;
     private int emptyText;
     private int filter;
     private String moreId;
     private long sessionId;
 
-    AbstractThingListController(Context context, Bundle args, AbstractThingListAdapter adapter) {
+    AbstractThingListController(Context context, Bundle args, OnVoteListener listener) {
         this.context = context;
-        this.adapter = adapter;
+        this.adapter = new ThingListAdapter(context, listener, getSingleChoiceExtra(args));
         restoreInstanceState(args);
     }
 
@@ -623,5 +627,11 @@ abstract class AbstractThingListController implements ThingListController {
 
     private boolean isSelf(int position) {
         return adapter.getBoolean(position, AbstractThingLoader.INDEX_SELF);
+    }
+
+    // Getters for extras
+
+    private static boolean getSingleChoiceExtra(Bundle extras) {
+        return extras.getBoolean(EXTRA_SINGLE_CHOICE);
     }
 }

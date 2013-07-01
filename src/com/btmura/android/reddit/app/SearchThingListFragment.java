@@ -18,8 +18,6 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-import com.btmura.android.reddit.widget.ThingListAdapter;
-
 public class SearchThingListFragment extends ThingListFragment<SearchThingListController> {
 
     public static SearchThingListFragment newInstance(String accountName, String subreddit,
@@ -37,7 +35,7 @@ public class SearchThingListFragment extends ThingListFragment<SearchThingListCo
     }
 
     @Override
-    protected SearchThingListController createController(ThingListAdapter adapter) {
-        return new SearchThingListController(getActivity(), getArguments(), adapter);
+    protected SearchThingListController createController() {
+        return new SearchThingListController(getActivity(), getArguments(), this);
     }
 }

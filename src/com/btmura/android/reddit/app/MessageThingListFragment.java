@@ -18,8 +18,6 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-import com.btmura.android.reddit.widget.ThingListAdapter;
-
 public class MessageThingListFragment extends ThingListFragment<MessageThingListController> {
 
     public static MessageThingListFragment newInstance(String accountName, String messageUser,
@@ -36,7 +34,7 @@ public class MessageThingListFragment extends ThingListFragment<MessageThingList
     }
 
     @Override
-    protected MessageThingListController createController(ThingListAdapter adapter) {
+    protected MessageThingListController createController() {
         return new MessageThingListController(getActivity(), getArguments());
     }
 }

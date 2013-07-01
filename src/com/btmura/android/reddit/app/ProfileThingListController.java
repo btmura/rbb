@@ -22,7 +22,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.content.ProfileThingLoader;
-import com.btmura.android.reddit.widget.ThingListAdapter;
+import com.btmura.android.reddit.widget.OnVoteListener;
 
 class ProfileThingListController extends AbstractThingListController {
 
@@ -31,8 +31,8 @@ class ProfileThingListController extends AbstractThingListController {
 
     private final String profileUser;
 
-    ProfileThingListController(Context context, Bundle args, ThingListAdapter adapter) {
-        super(context, args, adapter);
+    ProfileThingListController(Context context, Bundle args, OnVoteListener listener) {
+        super(context, args, listener);
         this.profileUser = getProfileUserExtra(args);
     }
 
