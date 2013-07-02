@@ -14,47 +14,46 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="@dimen/padding" >
+    android:layout_height="match_parent"
+    android:columnCount="2"
+    android:padding="@dimen/padding"
+    android:rowCount="3" >
 
     <ImageView
         android:id="@+id/header_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="@dimen/element_padding"
+        android:layout_rowSpan="3"
         android:contentDescription="@string/header_image"
         android:visibility="gone" />
 
     <!-- These TextViews are clickable, so we cannot make the text selectable. -->
 
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="fill_vertical" />
+
     <TextView
         android:id="@+id/title"
         style="@style/SidebarTitleText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignWithParentIfMissing="true"
+        android:layout_gravity="fill_horizontal"
         android:layout_marginBottom="@dimen/element_padding"
-        android:layout_marginRight="@dimen/element_padding"
-        android:layout_toLeftOf="@+id/header_image"
         tools:ignore="SelectableText" />
 
     <TextView
         android:id="@+id/status"
         style="@style/SidebarStatusText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_below="@+id/title"
-        android:layout_marginRight="@dimen/element_padding"
-        android:layout_toLeftOf="@+id/header_image"
+        android:layout_gravity="fill_horizontal"
         tools:ignore="SelectableText" />
 
-</RelativeLayout>
+</GridLayout>
