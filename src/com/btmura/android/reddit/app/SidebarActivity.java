@@ -84,10 +84,6 @@ public class SidebarActivity extends FragmentActivity implements SubredditNameHo
                 handleAddSubreddit();
                 return true;
 
-            case R.id.menu_view_subreddit:
-                handleViewSubreddit();
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -95,10 +91,6 @@ public class SidebarActivity extends FragmentActivity implements SubredditNameHo
 
     private void handleAddSubreddit() {
         MenuHelper.showAddSubredditDialog(getSupportFragmentManager(), getSubreddit());
-    }
-
-    private void handleViewSubreddit() {
-        MenuHelper.startSubredditActivity(this, getSubreddit());
     }
 
     private String getSubreddit() {

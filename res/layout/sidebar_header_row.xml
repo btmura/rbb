@@ -28,8 +28,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="@dimen/element_padding"
-        android:layout_marginRight="@dimen/element_padding"
-        android:textIsSelectable="true" />
+        android:layout_marginRight="@dimen/element_padding" />
 
     <TextView
         android:id="@+id/status"
@@ -38,7 +37,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/title"
-        android:layout_marginRight="@dimen/element_padding"
-        android:textIsSelectable="true" />
+        android:layout_marginRight="@dimen/element_padding" />
 
 </RelativeLayout>

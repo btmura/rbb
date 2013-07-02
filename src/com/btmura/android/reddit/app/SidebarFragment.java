@@ -20,6 +20,8 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.view.View;
+import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SidebarLoader;
@@ -56,7 +58,7 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sid
     }
 
     public Loader<SidebarResult> onCreateLoader(int id, Bundle args) {
-        return new SidebarLoader(getActivity().getApplicationContext(), getSubreddit());
+        return new SidebarLoader(getActivity().getApplicationContext(), getSubredditArgument());
     }
 
     public void onLoadFinished(Loader<SidebarResult> loader, SidebarResult data) {
@@ -69,7 +71,12 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sid
         adapter.swapData(null);
     }
 
-    private String getSubreddit() {
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        MenuHelper.startSubredditActivity(getActivity(), getSubredditArgument());
+    }
+
+    private String getSubredditArgument() {
         return getArguments().getString(ARGS_SUBREDDIT);
     }
 }

@@ -49,7 +49,7 @@ public class SidebarAdapter extends BaseAdapter {
 
     @Override
     public boolean isEnabled(int position) {
-        return false;
+        return getItemViewType(position) == TYPE_HEADER;
     }
 
     public int getCount() {
