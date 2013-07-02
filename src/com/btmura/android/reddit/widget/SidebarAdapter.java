@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.widget;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,15 +36,15 @@ public class SidebarAdapter extends BaseAdapter {
     private final Context context;
     private final LayoutInflater inflater;
 
-    private SidebarResult item;
+    private SidebarResult result;
 
     public SidebarAdapter(Context context) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
     }
 
-    public void swapData(SidebarResult item) {
-        this.item = item;
+    public void swapData(SidebarResult result) {
+        this.result = result;
         notifyDataSetChanged();
     }
 
@@ -52,14 +53,20 @@ public class SidebarAdapter extends BaseAdapter {
         return getItemViewType(position) == TYPE_HEADER;
     }
 
+    @Override
     public int getCount() {
-        return item != null ? 2 : 0;
+        if (result != null) {
+            return !TextUtils.isEmpty(result.description) ? 2 : 1;
+        }
+        return 0;
     }
 
+    @Override
     public SidebarResult getItem(int position) {
-        return item;
+        return result;
     }
 
+    @Override
     public long getItemId(int position) {
         return position;
     }
@@ -79,9 +86,7 @@ public class SidebarAdapter extends BaseAdapter {
         if (v == null) {
             v = inflater.inflate(getLayout(position), parent, false);
         }
-
-        SidebarResult sr = getItem(position);
-        setSubreddit(sr, v, position);
+        setSubreddit(v, position);
         return v;
     }
 
@@ -98,20 +103,20 @@ public class SidebarAdapter extends BaseAdapter {
         }
     }
 
-    private void setSubreddit(SidebarResult sb, View v, int position) {
+    private void setSubreddit(View v, int position) {
         switch (getItemViewType(position)) {
             case TYPE_HEADER:
                 TextView title = (TextView) v.findViewById(R.id.title);
-                title.setText(sb.title);
+                title.setText(result.title);
 
                 TextView status = (TextView) v.findViewById(R.id.status);
                 status.setText(context.getResources().getQuantityString(R.plurals.subscribers,
-                        sb.subscribers, sb.subscribers));
+                        result.subscribers, result.subscribers));
                 break;
 
             case TYPE_DESCRIPTION:
                 TextView desc = (TextView) v;
-                desc.setText(sb.description);
+                desc.setText(result.description);
                 desc.setMovementMethod(LinkMovementMethod.getInstance());
                 break;
 
