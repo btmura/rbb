@@ -84,16 +84,21 @@ public class RedditApi {
         return postData(Urls.delete(), Urls.deleteQuery(thingId, modhash), cookie);
     }
 
-    public static Bitmap getCaptcha(String id) throws IOException {
+    // TODO(btmura): Not Reddit specific. Move HTTP stuff out to separate helper class.
+    public static Bitmap getBitmap(CharSequence url) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {
-            conn = connect(Urls.captcha(id), null, true, false);
+            conn = connect(url, null, true, false);
             in = conn.getInputStream();
             return BitmapFactory.decodeStream(in);
         } finally {
             close(in, conn);
         }
+    }
+
+    public static Bitmap getCaptcha(String id) throws IOException {
+        return getBitmap(Urls.captcha(id));
     }
 
     public static Result newCaptcha() throws IOException {

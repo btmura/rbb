@@ -180,12 +180,12 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void onAuthor(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Comments.COLUMN_AUTHOR, readTrimmedString(reader, ""));
+        values.get(index).put(Comments.COLUMN_AUTHOR, readString(reader, ""));
     }
 
     @Override
     public void onBody(JsonReader reader, int index) throws IOException {
-        CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        CharSequence body = formatter.formatNoSpans(context, readString(reader, ""));
         values.get(index).put(Comments.COLUMN_BODY, body.toString());
     }
 
@@ -234,7 +234,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void onName(JsonReader reader, int index) throws IOException {
-        String id = readTrimmedString(reader, "");
+        String id = readString(reader, "");
         ContentValues v = values.get(index);
         v.put(Comments.COLUMN_THING_ID, id);
         valueMap.put(id, v);
@@ -267,7 +267,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void onSelfText(JsonReader reader, int index) throws IOException {
-        CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        CharSequence body = formatter.formatNoSpans(context, readString(reader, ""));
         values.get(index).put(Comments.COLUMN_BODY, body.toString());
     }
 
@@ -279,7 +279,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
-        CharSequence title = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        CharSequence title = formatter.formatNoSpans(context, readString(reader, ""));
         values.get(index).put(Comments.COLUMN_TITLE, title.toString());
     }
 
@@ -296,7 +296,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     @Override
     public void onThumbnail(JsonReader reader, int index) throws IOException {
         // TODO: Remove code duplication with ThingListing.
-        String thumbnail = readTrimmedString(reader, null);
+        String thumbnail = readString(reader, null);
         if (!TextUtils.isEmpty(thumbnail) && thumbnail.startsWith("http")) {
             values.get(index).put(Comments.COLUMN_THUMBNAIL_URL, thumbnail);
         }

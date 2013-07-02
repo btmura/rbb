@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
@@ -106,6 +107,14 @@ public class SidebarAdapter extends BaseAdapter {
     private void setSubreddit(View v, int position) {
         switch (getItemViewType(position)) {
             case TYPE_HEADER:
+                ImageView headerImage = (ImageView) v.findViewById(R.id.header_image);
+                if (result.headerImageBitmap != null) {
+                    headerImage.setImageBitmap(result.headerImageBitmap);
+                    headerImage.setVisibility(View.VISIBLE);
+                } else {
+                    headerImage.setVisibility(View.GONE);
+                }
+
                 TextView title = (TextView) v.findViewById(R.id.title);
                 title.setText(result.title);
 

@@ -327,12 +327,12 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onAuthor(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_AUTHOR, readTrimmedString(reader, ""));
+        values.get(index).put(Things.COLUMN_AUTHOR, readString(reader, ""));
     }
 
     @Override
     public void onBody(JsonReader reader, int index) throws IOException {
-        CharSequence body = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        CharSequence body = formatter.formatNoSpans(context, readString(reader, ""));
         values.get(index).put(Things.COLUMN_BODY, body.toString());
     }
 
@@ -343,7 +343,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onDomain(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_DOMAIN, readTrimmedString(reader, ""));
+        values.get(index).put(Things.COLUMN_DOMAIN, readString(reader, ""));
     }
 
     @Override
@@ -380,13 +380,13 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onLinkTitle(JsonReader reader, int index) throws IOException {
-        CharSequence title = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        CharSequence title = formatter.formatNoSpans(context, readString(reader, ""));
         values.get(index).put(Things.COLUMN_LINK_TITLE, title.toString());
     }
 
     @Override
     public void onName(JsonReader reader, int index) throws IOException {
-        String name = readTrimmedString(reader, "");
+        String name = readString(reader, "");
         values.get(index).put(Things.COLUMN_THING_ID, name);
     }
 
@@ -402,7 +402,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onPermaLink(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_PERMA_LINK, readTrimmedString(reader, ""));
+        values.get(index).put(Things.COLUMN_PERMA_LINK, readString(reader, ""));
     }
 
     @Override
@@ -422,18 +422,18 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onSubreddit(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_SUBREDDIT, readTrimmedString(reader, ""));
+        values.get(index).put(Things.COLUMN_SUBREDDIT, readString(reader, ""));
     }
 
     @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
-        CharSequence title = formatter.formatNoSpans(context, readTrimmedString(reader, ""));
+        CharSequence title = formatter.formatNoSpans(context, readString(reader, ""));
         values.get(index).put(Things.COLUMN_TITLE, title.toString());
     }
 
     @Override
     public void onThumbnail(JsonReader reader, int index) throws IOException {
-        String thumbnail = readTrimmedString(reader, null);
+        String thumbnail = readString(reader, null);
         if (!TextUtils.isEmpty(thumbnail) && thumbnail.startsWith("http")) {
             values.get(index).put(Things.COLUMN_THUMBNAIL_URL, thumbnail);
         }
@@ -441,7 +441,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onUrl(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_URL, readTrimmedString(reader, ""));
+        values.get(index).put(Things.COLUMN_URL, readString(reader, ""));
     }
 
     @Override
@@ -451,7 +451,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onAfter(JsonReader reader) throws IOException {
-        moreThingId = readTrimmedString(reader, null);
+        moreThingId = readString(reader, null);
     }
 
     @Override

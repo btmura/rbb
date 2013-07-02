@@ -62,6 +62,7 @@
     <string name="filter_subreddit_rising">rising</string>
     <string name="filter_subreddit_top">top</string>
     <string name="front_page">front page</string>
+    <string name="header_image">Header image</string>
     <string name="hint_captcha">Captcha</string>
     <string name="hint_comment">Comment</string>
     <string name="hint_login">Login</string>

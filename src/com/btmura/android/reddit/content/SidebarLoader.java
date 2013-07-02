@@ -19,35 +19,23 @@ package com.btmura.android.reddit.content;
 import java.io.IOException;
 
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.SidebarResult;
 
 /**
- * {@link AsyncTaskLoader} that loads the sidebar of a subreddit.
+ * {@link BaseAsyncTaskLoader} that loads the sidebar of a subreddit.
  */
-public class SidebarLoader extends AsyncTaskLoader<SidebarResult> {
+public class SidebarLoader extends BaseAsyncTaskLoader<SidebarResult> {
 
     public static final String TAG = "SidebarLoader";
 
     private final String subreddit;
-    private SidebarResult result;
 
     public SidebarLoader(Context context, String subreddit) {
         super(context.getApplicationContext());
         this.subreddit = subreddit;
-    }
-
-    @Override
-    protected void onStartLoading() {
-        super.onStartLoading();
-        if (result != null) {
-            deliverResult(result);
-        } else {
-            forceLoad();
-        }
     }
 
     @Override
@@ -58,5 +46,19 @@ public class SidebarLoader extends AsyncTaskLoader<SidebarResult> {
             Log.e(TAG, e.getMessage(), e);
         }
         return null;
+    }
+
+    @Override
+    protected void onNewDataDelivered(SidebarResult oldData, SidebarResult newData) {
+        if (oldData != null) {
+            oldData.recycle();
+        }
+    }
+
+    @Override
+    protected void onCleanData(SidebarResult data) {
+        if (data != null) {
+            data.recycle();
+        }
     }
 }

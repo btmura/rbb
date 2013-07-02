@@ -155,6 +155,8 @@ public class JsonParser {
                 onDowns(r, i);
             } else if ("has_mail".equals(name)) {
                 onHasMail(r, i);
+            } else if ("header_img".equals(name)) {
+                onHeaderImage(r, i);
             } else if ("hidden".equals(name)) {
                 onHidden(r, i);
             } else if ("id".equals(name)) {
@@ -259,6 +261,10 @@ public class JsonParser {
     }
 
     public void onDowns(JsonReader reader, int index) throws IOException {
+        reader.skipValue();
+    }
+
+    public void onHeaderImage(JsonReader reader, int index) throws IOException {
         reader.skipValue();
     }
 
@@ -391,7 +397,8 @@ public class JsonParser {
         return false;
     }
 
-    protected static String readTrimmedString(JsonReader reader, String nullValue)
+    // TODO: Create other safe read methods and use them.
+    protected static String readString(JsonReader reader, String nullValue)
             throws IOException {
         if (reader.peek() == JsonToken.NULL) {
             reader.skipValue();

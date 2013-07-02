@@ -122,7 +122,7 @@ class SubredditResultListing extends JsonParser implements Listing {
 
     @Override
     public void onDisplayName(JsonReader reader, int index) throws IOException {
-        values.get(index).put(SubredditResults.COLUMN_NAME, readTrimmedString(reader, ""));
+        values.get(index).put(SubredditResults.COLUMN_NAME, readString(reader, ""));
     }
 
     @Override

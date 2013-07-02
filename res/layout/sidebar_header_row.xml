@@ -21,6 +21,15 @@
     android:orientation="vertical"
     android:padding="@dimen/padding" >
 
+    <ImageView
+        android:id="@+id/header_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/header_image"
+        android:visibility="gone" />
+
     <!-- These TextViews are clickable, so we cannot make the text selectable. -->
 
     <TextView
@@ -30,8 +39,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
         android:layout_marginBottom="@dimen/element_padding"
         android:layout_marginRight="@dimen/element_padding"
+        android:layout_toLeftOf="@+id/header_image"
         tools:ignore="SelectableText" />
 
     <TextView
@@ -40,8 +51,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_alignWithParentIfMissing="true"
         android:layout_below="@+id/title"
         android:layout_marginRight="@dimen/element_padding"
+        android:layout_toLeftOf="@+id/header_image"
         tools:ignore="SelectableText" />
 
 </RelativeLayout>

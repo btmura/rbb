@@ -229,7 +229,7 @@ class MessageListing extends JsonParser implements Listing {
 
     @Override
     public void onSubreddit(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Messages.COLUMN_SUBREDDIT, readTrimmedString(reader, null));
+        values.get(index).put(Messages.COLUMN_SUBREDDIT, readString(reader, null));
     }
 
     @Override
@@ -244,7 +244,7 @@ class MessageListing extends JsonParser implements Listing {
 
     @Override
     public void onAfter(JsonReader reader) throws IOException {
-        moreThingId = readTrimmedString(reader, null);
+        moreThingId = readString(reader, null);
     }
 
     @Override
