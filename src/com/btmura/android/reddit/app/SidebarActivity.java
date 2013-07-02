@@ -29,6 +29,7 @@ import android.view.ViewStub;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.widget.SidebarPagerAdapter;
 
 public class SidebarActivity extends FragmentActivity
@@ -78,6 +79,16 @@ public class SidebarActivity extends FragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.sidebar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem shareItem = menu.findItem(R.id.menu_share_subreddit);
+        String title = getSubreddit();
+        CharSequence url = Urls.subreddit(getSubreddit(), -1, null, Urls.TYPE_HTML);
+        MenuHelper.setShareProvider(shareItem, title, url);
         return true;
     }
 

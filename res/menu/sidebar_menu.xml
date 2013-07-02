@@ -22,6 +22,11 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_add"/>
     <item
+        android:id="@+id/menu_share_subreddit"
+        android:actionProviderClass="android.widget.ShareActionProvider"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_share"/>
+    <item
         android:id="@+id/menu_view_subreddit"
         android:icon="?attr/menu_view_icon"
         android:showAsAction="ifRoom"
