@@ -15,10 +15,13 @@
      limitations under the License.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="@dimen/padding" >
+
+    <!-- These TextViews are clickable, so we cannot make the text selectable. -->
 
     <TextView
         android:id="@+id/title"
@@ -28,7 +31,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="@dimen/element_padding"
-        android:layout_marginRight="@dimen/element_padding" />
+        android:layout_marginRight="@dimen/element_padding"
+        tools:ignore="SelectableText" />
 
     <TextView
         android:id="@+id/status"
@@ -37,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/title"
-        android:layout_marginRight="@dimen/element_padding" />
+        android:layout_marginRight="@dimen/element_padding"
+        tools:ignore="SelectableText" />
 
 </RelativeLayout>

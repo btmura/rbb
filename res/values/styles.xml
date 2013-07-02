@@ -41,7 +41,6 @@
         <item name="menu_search_icon">@drawable/ic_action_search_light</item>
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
-        <item name="menu_view_icon">@drawable/ic_action_view_light</item>
         <item name="nesting_line_color">@android:color/holo_blue_dark</item>
     </style>
 
@@ -60,7 +59,6 @@
         <item name="menu_search_icon">@drawable/ic_action_search_light</item>
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
-        <item name="menu_view_icon">@drawable/ic_action_view_light</item>
         <item name="nesting_line_color">@android:color/holo_blue_dark</item>
     </style>
 
@@ -79,7 +77,6 @@
         <item name="menu_search_icon">@drawable/ic_action_search_light</item>
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
-        <item name="menu_view_icon">@drawable/ic_action_view_light</item>
         <item name="nesting_line_color">@android:color/holo_blue_dark</item>
     </style>
 
@@ -98,7 +95,6 @@
         <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
-        <item name="menu_view_icon">@drawable/ic_action_view_dark</item>
         <item name="nesting_line_color">@android:color/holo_blue_bright</item>
     </style>
 
@@ -117,7 +113,6 @@
         <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
-        <item name="menu_view_icon">@drawable/ic_action_view_dark</item>
         <item name="nesting_line_color">@android:color/holo_blue_bright</item>
     </style>
 
@@ -136,7 +131,6 @@
         <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
-        <item name="menu_view_icon">@drawable/ic_action_view_dark</item>
         <item name="nesting_line_color">@android:color/holo_blue_bright</item>
     </style>
 

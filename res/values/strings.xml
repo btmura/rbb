@@ -24,8 +24,6 @@
     <string name="authority_accounts">com.btmura.android.reddit.provider.accounts</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>
     <string name="authority_things">com.btmura.android.reddit.provider.things</string>
-    <string name="button_add">Add</string>
-    <string name="button_view">View</string>
     <string name="captcha_image">Captcha image</string>
     <string name="captcha_title">Are you a robot?</string>
     <string name="compose_add_account">Add account</string>
@@ -111,7 +109,6 @@
     <string name="menu_unhide">Unhide</string>
     <string name="menu_unsave">Unsave</string>
     <string name="menu_user">/u/%1$s</string>
-    <string name="menu_view">View</string>
     <string name="nsfw">"NSFW"</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
     <string name="provider_accounts">Accounts</string>

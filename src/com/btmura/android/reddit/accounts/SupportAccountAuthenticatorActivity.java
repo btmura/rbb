@@ -39,7 +39,7 @@ import android.support.v4.app.FragmentActivity;
  * This version is an exact copy of the framework AccountAuthenticatorActivity except that it
  * extends FragmentActivity so it can work with support Fragments.
  */
-public class SupportAccountAuthenticatorActivity extends FragmentActivity {
+abstract class SupportAccountAuthenticatorActivity extends FragmentActivity {
     private AccountAuthenticatorResponse mAccountAuthenticatorResponse = null;
     private Bundle mResultBundle = null;
 
