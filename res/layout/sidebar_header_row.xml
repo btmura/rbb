@@ -19,41 +19,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:columnCount="2"
-    android:padding="@dimen/padding"
-    android:rowCount="3" >
+    android:padding="@dimen/padding" >
 
     <ImageView
         android:id="@+id/header_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="@dimen/element_padding"
-        android:layout_rowSpan="3"
+        android:layout_marginRight="@dimen/padding"
+        android:background="@android:color/white"
         android:contentDescription="@string/header_image"
         android:visibility="gone" />
 
     <!-- These TextViews are clickable, so we cannot make the text selectable. -->
 
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_gravity="fill_vertical" />
-
-    <TextView
-        android:id="@+id/title"
-        style="@style/SidebarTitleText"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="fill_horizontal"
-        android:layout_marginBottom="@dimen/element_padding"
-        tools:ignore="SelectableText" />
+        android:layout_gravity="center_vertical|fill_horizontal"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/status"
-        style="@style/SidebarStatusText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="fill_horizontal"
-        tools:ignore="SelectableText" />
+        <TextView
+            android:id="@+id/title"
+            style="@style/SidebarTitleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/element_padding"
+            tools:ignore="SelectableText" />
+
+        <TextView
+            android:id="@+id/status"
+            style="@style/SidebarStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:ignore="SelectableText" />
+    </LinearLayout>
 
 </GridLayout>
