@@ -24,27 +24,20 @@ import com.btmura.android.reddit.app.SidebarFragment;
 
 public class SidebarPagerAdapter extends FragmentPagerAdapter {
 
-    private final String[] subreddits;
-    private final boolean showHeaderButtons;
+    private final String subreddit;
 
-    public SidebarPagerAdapter(FragmentManager fm, String[] subreddits, boolean showHeaderButtons) {
+    public SidebarPagerAdapter(FragmentManager fm, String subreddit) {
         super(fm);
-        this.subreddits = subreddits;
-        this.showHeaderButtons = showHeaderButtons;
+        this.subreddit = subreddit;
     }
 
     @Override
     public int getCount() {
-        return subreddits.length;
+        return 1;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return SidebarFragment.newInstance(subreddits[position], showHeaderButtons);
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return subreddits[position];
+        return SidebarFragment.newInstance(subreddit);
     }
 }

@@ -20,27 +20,6 @@
     android:orientation="vertical"
     android:padding="@dimen/padding" >
 
-    <Button
-        android:id="@+id/view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:drawableLeft="?attr/menu_view_icon"
-        android:drawablePadding="@dimen/element_padding"
-        android:text="@string/button_view" />
-
-    <Button
-        android:id="@+id/add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="@dimen/element_padding"
-        android:layout_toLeftOf="@+id/view"
-        android:drawableLeft="?attr/menu_add_icon"
-        android:drawablePadding="@dimen/element_padding"
-        android:text="@string/button_add" />
-
     <TextView
         android:id="@+id/title"
         style="@style/SidebarTitleText"
@@ -50,7 +29,6 @@
         android:layout_alignParentTop="true"
         android:layout_marginBottom="@dimen/element_padding"
         android:layout_marginRight="@dimen/element_padding"
-        android:layout_toLeftOf="@+id/add"
         android:textIsSelectable="true" />
 
     <TextView
@@ -61,7 +39,6 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/title"
         android:layout_marginRight="@dimen/element_padding"
-        android:layout_toLeftOf="@+id/add"
         android:textIsSelectable="true" />
 
 </RelativeLayout>

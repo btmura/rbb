@@ -22,9 +22,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewStub;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ThemePrefs;
@@ -32,8 +29,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.widget.SidebarPagerAdapter;
 
-public class SidebarActivity extends FragmentActivity
-        implements OnClickListener, SubredditNameHolder {
+public class SidebarActivity extends FragmentActivity implements SubredditNameHolder {
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
 
@@ -43,36 +39,21 @@ public class SidebarActivity extends FragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(ThemePrefs.getDialogWhenLargeTheme(this));
+        setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.sidebar);
         setupViews();
     }
 
     private void setupViews() {
         ActionBar bar = getActionBar();
-        if (bar != null) {
-            bar.setDisplayHomeAsUpEnabled(true);
-        } else {
-            ViewStub vs = (ViewStub) findViewById(R.id.button_bar_stub);
-            View buttonBar = vs.inflate();
-            buttonBar.findViewById(R.id.ok).setOnClickListener(this);
-            buttonBar.findViewById(R.id.cancel).setOnClickListener(this);
-        }
+        bar.setDisplayHomeAsUpEnabled(true);
 
         String subreddit = getSubreddit();
         setTitle(Subreddits.getTitle(this, subreddit));
 
-        String[] subreddits = subreddit.split("\\+");
-        adapter = new SidebarPagerAdapter(getSupportFragmentManager(), subreddits, bar == null);
+        adapter = new SidebarPagerAdapter(getSupportFragmentManager(), subreddit);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
-
-        View pagerStrip = findViewById(R.id.pager_strip);
-        pagerStrip.setVisibility(subreddits.length > 1 ? View.VISIBLE : View.GONE);
-    }
-
-    public void onClick(View v) {
-        finish();
     }
 
     @Override

@@ -25,20 +25,16 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SidebarLoader;
 import com.btmura.android.reddit.net.SidebarResult;
 import com.btmura.android.reddit.widget.SidebarAdapter;
-import com.btmura.android.reddit.widget.SidebarAdapter.OnSidebarButtonClickListener;
 
-public class SidebarFragment extends ListFragment implements LoaderCallbacks<SidebarResult>,
-        OnSidebarButtonClickListener {
+public class SidebarFragment extends ListFragment implements LoaderCallbacks<SidebarResult> {
 
     private static final String ARGS_SUBREDDIT = "subreddit";
-    private static final String ARG_SHOW_HEADER_BUTTONS = "showHeaderButtons";
 
     private SidebarAdapter adapter;
 
-    public static SidebarFragment newInstance(String subreddit, boolean showHeaderButtons) {
-        Bundle b = new Bundle(2);
+    public static SidebarFragment newInstance(String subreddit) {
+        Bundle b = new Bundle(1);
         b.putString(ARGS_SUBREDDIT, subreddit);
-        b.putBoolean(ARG_SHOW_HEADER_BUTTONS, showHeaderButtons);
 
         SidebarFragment frag = new SidebarFragment();
         frag.setArguments(b);
@@ -48,8 +44,7 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sid
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new SidebarAdapter(getActivity(), showHeaderButtons());
-        adapter.setOnSidebarButtonClickListener(this);
+        adapter = new SidebarAdapter(getActivity());
     }
 
     @Override
@@ -74,19 +69,7 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sid
         adapter.swapData(null);
     }
 
-    public void onAddClicked() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
-    }
-
-    public void onViewClicked() {
-        MenuHelper.startSubredditActivity(getActivity(), getSubreddit());
-    }
-
     private String getSubreddit() {
         return getArguments().getString(ARGS_SUBREDDIT);
-    }
-
-    private boolean showHeaderButtons() {
-        return getArguments().getBoolean(ARG_SHOW_HEADER_BUTTONS);
     }
 }
