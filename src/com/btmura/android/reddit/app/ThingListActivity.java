@@ -41,6 +41,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
+import com.btmura.android.reddit.widget.ThingBundle;
 import com.btmura.android.reddit.widget.ThingView;
 
 public class ThingListActivity extends GlobalMenuActivity implements
@@ -160,7 +161,7 @@ public class ThingListActivity extends GlobalMenuActivity implements
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public void onThingSelected(View view, Bundle thingBundle, int pageType) {
+    public void onThingSelected(View view, ThingBundle thingBundle, int pageType) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         intent.putExtra(ThingActivity.EXTRA_PAGE_TYPE, pageType);

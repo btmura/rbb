@@ -140,8 +140,6 @@ public abstract class AbstractThingListAdapter extends BaseCursorAdapter {
 
     // Abstract methods.
 
-    abstract int getAuthorIndex();
-
     abstract int getKindIndex();
 
     abstract String getThingId(int position);

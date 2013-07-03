@@ -20,7 +20,6 @@ import java.util.List;
 
 import android.content.UriMatcher;
 import android.net.Uri;
-import android.os.Bundle;
 
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.util.ThingIds;
@@ -150,25 +149,20 @@ public class UriHelper {
         return -1;
     }
 
-    public static Bundle getThingBundle(Uri data) {
+    public static ThingBundle getThingBundle(Uri data) {
         switch (MATCHER.match(data)) {
             case MATCH_COMMENTS:
                 List<String> segments = data.getPathSegments();
-                Bundle b = new Bundle(2);
-                ThingBundle.putSubreddit(b, segments.get(1));
-                ThingBundle.putThingId(b, ThingIds.addTag(segments.get(3),
-                        Kinds.getTag(Kinds.KIND_LINK)));
-                return b;
+                String subreddit = segments.get(1);
+                String thingId = ThingIds.addTag(segments.get(3), Kinds.getTag(Kinds.KIND_LINK));
+                return ThingBundle.newCommentsUrlInstance(subreddit, thingId);
 
             case MATCH_COMMENTS_CONTEXT:
                 segments = data.getPathSegments();
-                b = new Bundle(3);
-                ThingBundle.putSubreddit(b, segments.get(1));
-                ThingBundle.putLinkId(b, ThingIds.addTag(segments.get(3),
-                        Kinds.getTag(Kinds.KIND_LINK)));
-                ThingBundle.putThingId(b, ThingIds.addTag(segments.get(5),
-                        Kinds.getTag(Kinds.KIND_COMMENT)));
-                return b;
+                subreddit = segments.get(1);
+                thingId = ThingIds.addTag(segments.get(5), Kinds.getTag(Kinds.KIND_COMMENT));
+                String linkId = ThingIds.addTag(segments.get(3), Kinds.getTag(Kinds.KIND_LINK));
+                return ThingBundle.newCommentsUrlInstance(subreddit, thingId, linkId);
 
             default:
                 return null;

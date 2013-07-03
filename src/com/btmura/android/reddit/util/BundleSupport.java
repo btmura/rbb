@@ -28,6 +28,10 @@ public abstract class BundleSupport {
         return bundle != null ? bundle.getInt(key) : null;
     }
 
+    protected static long getLong(Bundle bundle, String key) {
+        return bundle != null ? bundle.getLong(key) : null;
+    }
+
     protected static String getString(Bundle bundle, String key) {
         return bundle != null ? bundle.getString(key) : null;
     }

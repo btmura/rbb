@@ -36,6 +36,7 @@ import com.btmura.android.reddit.text.style.URLSpan;
 import com.btmura.android.reddit.text.style.UserSpan;
 import com.btmura.android.reddit.util.Array;
 
+// TODO: Rename class to stop clashing with framework class.
 public class Formatter {
 
     private final Matcher matcher = RawLinks.PATTERN.matcher("");

@@ -40,7 +40,6 @@ public class LinkFragment extends Fragment {
 
     public static final String TAG = "LinkFragment";
 
-    private static final String ARG_TITLE = "title";
     private static final String ARG_URL = "url";
 
     private static final String STATE_URL = "url";
@@ -51,9 +50,8 @@ public class LinkFragment extends Fragment {
     private WebView webView;
     private ProgressBar progress;
 
-    public static LinkFragment newInstance(String title, CharSequence url) {
-        Bundle b = new Bundle(2);
-        b.putString(ARG_TITLE, title);
+    public static LinkFragment newInstance(CharSequence url) {
+        Bundle b = new Bundle(1);
         b.putCharSequence(ARG_URL, url);
         LinkFragment frag = new LinkFragment();
         frag.setArguments(b);

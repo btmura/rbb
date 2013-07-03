@@ -43,6 +43,7 @@ import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.OnVoteListener;
+import com.btmura.android.reddit.widget.ThingBundle;
 import com.btmura.android.reddit.widget.ThingView;
 
 abstract class ThingListFragment<C extends ThingListController> extends ThingProviderListFragment
@@ -55,7 +56,7 @@ abstract class ThingListFragment<C extends ThingListController> extends ThingPro
     private static final String LOADER_MORE_ID = "moreId";
 
     public interface OnThingSelectedListener {
-        void onThingSelected(View view, Bundle thingBundle, int pageType);
+        void onThingSelected(View view, ThingBundle thingBundle, int pageType);
 
         int onMeasureThingBody();
     }

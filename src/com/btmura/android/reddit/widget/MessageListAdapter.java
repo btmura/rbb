@@ -127,11 +127,6 @@ public class MessageListAdapter extends AbstractThingListAdapter {
     // Index getters.
 
     @Override
-    int getAuthorIndex() {
-        return MessageThingLoader.INDEX_AUTHOR;
-    }
-
-    @Override
     int getKindIndex() {
         return MessageThingLoader.INDEX_KIND;
     }

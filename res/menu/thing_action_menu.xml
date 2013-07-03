@@ -17,20 +17,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_saved"
-        android:icon="?attr/menu_saved_icon"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_unsave"/>
-    <item
-        android:id="@+id/menu_unsaved"
-        android:icon="?attr/menu_unsaved_icon"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_save"/>
-    <item
         android:id="@+id/menu_comments"
         android:icon="?attr/menu_comments_icon"
         android:showAsAction="ifRoom"
         android:title="@string/menu_comments"/>
+    <!-- Made invisible to avoid flicker for no accounts. -->
+    <item
+        android:id="@+id/menu_saved"
+        android:icon="?attr/menu_saved_icon"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_unsave"
+        android:visible="false"/>
+    <!-- Made invisible to avoid flicker for no accounts. -->
+    <item
+        android:id="@+id/menu_unsaved"
+        android:icon="?attr/menu_unsaved_icon"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_save"
+        android:visible="false"/>
     <item
         android:id="@+id/menu_share_thing"
         android:actionProviderClass="android.widget.ShareActionProvider"

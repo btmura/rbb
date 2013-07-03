@@ -15,13 +15,11 @@
  */
 package com.btmura.android.reddit.net;
 
-import com.btmura.android.reddit.net.UriHelper;
-import com.btmura.android.reddit.widget.FilterAdapter;
-import com.btmura.android.reddit.widget.ThingBundle;
-
 import junit.framework.TestCase;
 import android.net.Uri;
-import android.os.Bundle;
+
+import com.btmura.android.reddit.widget.FilterAdapter;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public class UriHelperTest extends TestCase {
 
@@ -75,10 +73,10 @@ public class UriHelperTest extends TestCase {
 
     private void assertThingBundle(String expectedSubreddit, String expectedThingId,
             String expectedLinkId, String url) {
-        Bundle b = UriHelper.getThingBundle(Uri.parse(url));
-        assertEquals(expectedSubreddit, ThingBundle.getSubreddit(b));
-        assertEquals(expectedThingId, ThingBundle.getThingId(b));
-        assertEquals(expectedLinkId, ThingBundle.getLinkId(b));
+        ThingBundle b = UriHelper.getThingBundle(Uri.parse(url));
+        assertEquals(expectedSubreddit, b.getSubreddit());
+        assertEquals(expectedThingId, b.getThingId());
+        assertEquals(expectedLinkId, b.getLinkId());
     }
 
     private void assertNullThingBundle(String url) {

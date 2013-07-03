@@ -34,8 +34,6 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
-import com.btmura.android.reddit.text.Formatter;
-import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingBundle;
@@ -55,9 +53,8 @@ abstract class AbstractThingTableListController
     static final String EXTRA_EMPTY_TEXT = "emptyText";
 
     protected final Context context;
-    protected final AbstractThingListAdapter adapter;
+    protected final ThingListAdapter adapter;
 
-    private final Formatter formatter = new Formatter();
     private String accountName;
     private int emptyText;
     private int filter;
@@ -109,46 +106,8 @@ abstract class AbstractThingTableListController
     }
 
     @Override
-    public Bundle getThingBundle(int position) {
-        Cursor c = adapter.getCursor();
-        if (c != null && c.moveToPosition(position)) {
-            return makeThingBundle(c);
-        }
-        return null;
-    }
-
-    private Bundle makeThingBundle(Cursor c) {
-        Bundle b = new Bundle(8);
-        ThingBundle.putAuthor(b, c.getString(INDEX_AUTHOR));
-        ThingBundle.putSubreddit(b, c.getString(INDEX_SUBREDDIT));
-        ThingBundle.putKind(b, c.getInt(INDEX_KIND));
-
-        String title = c.getString(INDEX_TITLE);
-        ThingBundle.putTitle(b, !TextUtils.isEmpty(title)
-                ? format(title)
-                : format(c.getString(INDEX_LINK_TITLE)));
-
-        String thingId = c.getString(INDEX_THING_ID);
-        ThingBundle.putThingId(b, thingId);
-
-        String linkId = c.getString(INDEX_LINK_ID);
-        ThingBundle.putLinkId(b, linkId);
-
-        boolean isSelf = c.getInt(INDEX_SELF) == 1;
-        if (!isSelf) {
-            ThingBundle.putLinkUrl(b, c.getString(INDEX_URL));
-        }
-
-        String permaLink = c.getString(INDEX_PERMA_LINK);
-        if (!TextUtils.isEmpty(permaLink)) {
-            ThingBundle.putCommentUrl(b, Urls.perma(permaLink, null));
-        }
-
-        return b;
-    }
-
-    private String format(String text) {
-        return StringUtil.safeString(formatter.formatAll(context, text));
+    public ThingBundle getThingBundle(int position) {
+        return adapter.getThingBundle(position);
     }
 
     // Actions to be done on things.
@@ -239,6 +198,7 @@ abstract class AbstractThingTableListController
 
     @Override
     public void select(int position) {
+        // TODO: What was this for?
     }
 
     @Override

@@ -50,7 +50,7 @@ public class SidebarLoader extends BaseAsyncTaskLoader<SidebarResult> {
 
     @Override
     protected void onNewDataDelivered(SidebarResult oldData, SidebarResult newData) {
-        if (oldData != null) {
+        if (oldData != null && oldData != newData) {
             oldData.recycle();
         }
     }

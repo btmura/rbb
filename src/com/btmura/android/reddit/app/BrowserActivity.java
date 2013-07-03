@@ -45,6 +45,7 @@ import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
@@ -52,7 +53,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private String requestedSubreddit;
 
     /** Requested thing bundle from intent data. */
-    private Bundle requestedThingBundle;
+    private ThingBundle requestedThingBundle;
 
     private boolean hasSubredditList;
 
@@ -188,7 +189,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     }
 
     @Override
-    protected void refreshActionBar(String subreddit, Bundle thingBundle) {
+    protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
         bar.setDisplayHomeAsUpEnabled(!hasSubredditList || thingBundle != null);
         adapter.setSubreddit(subreddit);
     }
@@ -216,7 +217,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             String subreddit = AccountPrefs.getLastSubreddit(this, accountName);
 
             // Reference to thingBundle that will often be null.
-            Bundle thingBundle = null;
+            ThingBundle thingBundle = null;
 
             // Override the subreddit and thing to the one requested by the
             // intent. Single pane activities have launched another activity to

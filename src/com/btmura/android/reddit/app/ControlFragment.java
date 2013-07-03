@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ControlFragment extends Fragment {
 
@@ -34,16 +35,16 @@ public class ControlFragment extends Fragment {
     private String accountName;
     private String subreddit;
     private boolean isRandom;
-    private Bundle thingBundle;
+    private ThingBundle thingBundle;
     private int filter;
 
     public static ControlFragment newInstance(String accountName, String subreddit,
-            boolean isRandom, Bundle thingBundle, int filter) {
+            boolean isRandom, ThingBundle thingBundle, int filter) {
         Bundle b = new Bundle(5);
         b.putString(ARG_ACCOUNT_NAME, accountName);
         b.putString(ARG_SUBREDDIT, subreddit);
         b.putBoolean(ARG_IS_RANDOM, isRandom);
-        b.putBundle(ARG_THING_BUNDLE, thingBundle);
+        b.putParcelable(ARG_THING_BUNDLE, thingBundle);
         b.putInt(ARG_FILTER, filter);
 
         ControlFragment frag = new ControlFragment();
@@ -72,11 +73,11 @@ public class ControlFragment extends Fragment {
         this.isRandom = isRandom;
     }
 
-    public Bundle getThingBundle() {
+    public ThingBundle getThingBundle() {
         return thingBundle;
     }
 
-    public void setThingBundle(Bundle thingBundle) {
+    public void setThingBundle(ThingBundle thingBundle) {
         this.thingBundle = thingBundle;
     }
 
@@ -92,7 +93,7 @@ public class ControlFragment extends Fragment {
         accountName = b.getString(ARG_ACCOUNT_NAME);
         subreddit = b.getString(ARG_SUBREDDIT);
         isRandom = b.getBoolean(ARG_IS_RANDOM);
-        thingBundle = b.getBundle(ARG_THING_BUNDLE);
+        thingBundle = b.getParcelable(ARG_THING_BUNDLE);
         filter = b.getInt(ARG_FILTER);
     }
 
@@ -102,7 +103,7 @@ public class ControlFragment extends Fragment {
         outState.putString(ARG_ACCOUNT_NAME, accountName);
         outState.putString(ARG_SUBREDDIT, subreddit);
         outState.putBoolean(ARG_IS_RANDOM, isRandom);
-        outState.putBundle(ARG_THING_BUNDLE, thingBundle);
+        outState.putParcelable(ARG_THING_BUNDLE, thingBundle);
         outState.putInt(ARG_FILTER, filter);
     }
 }

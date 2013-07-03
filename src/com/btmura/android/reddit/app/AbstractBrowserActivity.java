@@ -46,7 +46,6 @@ import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedLi
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingBundle;
 import com.btmura.android.reddit.widget.ThingView;
 
@@ -161,7 +160,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     // Methods for setting the content of the left hand subreddit pane.
 
     protected void setAccountSubredditListNavigation(int containerId, String subreddit,
-            boolean isRandom, Bundle thingBundle) {
+            boolean isRandom, ThingBundle thingBundle) {
         SubredditListFragment<?, ?> frag = AccountSubredditListFragment.newInstance(
                 getAccountName(), subreddit, isSingleChoice);
         setSubredditListNavigation(frag, containerId, subreddit, isRandom, thingBundle);
@@ -174,7 +173,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void setSubredditListNavigation(SubredditListFragment<?, ?> frag, int containerId,
-            String subreddit, boolean isRandom, Bundle thingBundle) {
+            String subreddit, boolean isRandom, ThingBundle thingBundle) {
         if (isSinglePane) {
             setSubredditListNavigationSinglePane(frag, containerId);
         } else {
@@ -193,7 +192,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void setSubredditListNavigationMultiPane(SubredditListFragment<?, ?> frag,
-            int containerId, String subreddit, boolean isRandom, Bundle thingBundle) {
+            int containerId, String subreddit, boolean isRandom, ThingBundle thingBundle) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setSubredditListNavigation");
         }
@@ -392,11 +391,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         selectSubredditMultiPane(cf.getSubreddit(), cf.isRandom());
     }
 
-    public void onThingSelected(View view, Bundle thingBundle, int pageType) {
+    public void onThingSelected(View view, ThingBundle thingBundle, int pageType) {
         selectThing(view, thingBundle, 0, pageType);
     }
 
-    protected void selectThing(View view, Bundle thingBundle, int flags, int pageType) {
+    protected void selectThing(View view, ThingBundle thingBundle, int flags, int pageType) {
         if (isSinglePane) {
             selectThingSinglePane(view, thingBundle, pageType, 0);
         } else {
@@ -405,7 +404,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void selectThingSinglePane(View view, Bundle thingBundle, int pageType, int flags) {
+    private void selectThingSinglePane(View view, ThingBundle thingBundle, int pageType,
+            int flags) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         intent.putExtra(ThingActivity.EXTRA_PAGE_TYPE, pageType);
@@ -417,7 +417,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    private void selectThingMultiPane(Bundle thingBundle, int pageType) {
+    private void selectThingMultiPane(ThingBundle thingBundle, int pageType) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
@@ -447,19 +447,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     public void onThingLoaded(ThingHolder thingHolder) {
-        ControlFragment cf = getControlFragment();
-        Bundle thingBundle = cf.getThingBundle();
-        if (Objects.equals(thingHolder.getThingId(), ThingBundle.getThingId(thingBundle))) {
-            if (!ThingBundle.hasTitle(thingBundle)) {
-                ThingBundle.putTitle(thingBundle, thingHolder.getThingId());
-                cf.setThingBundle(thingBundle);
-            }
-
-            if (!thingHolder.isSelf() && !ThingBundle.hasLinkUrl(thingBundle)) {
-                ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
-                cf.setThingBundle(thingBundle);
-            }
-        }
+        // ControlFragment cf = getControlFragment();
+        // ThingBundle thingBundle = cf.getThingBundle();
+        // if (Objects.equals(thingHolder.getThingId(), ThingBundle.getThingId(thingBundle))) {
+        // if (!ThingBundle.hasTitle(thingBundle)) {
+        // ThingBundle.putTitle(thingBundle, thingHolder.getThingId());
+        // cf.setThingBundle(thingBundle);
+        // }
+        //
+        // if (!thingHolder.isSelf() && !ThingBundle.hasLinkUrl(thingBundle)) {
+        // ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
+        // cf.setThingBundle(thingBundle);
+        // }
+        // }
     }
 
     public ViewPager getThingPager() {
@@ -483,7 +483,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment cf = getControlFragment();
         if (cf != null) {
             String subreddit = cf.getSubreddit();
-            Bundle thingBundle = cf.getThingBundle();
+            ThingBundle thingBundle = cf.getThingBundle();
             refreshActionBar(subreddit, thingBundle);
             refreshViews(thingBundle);
             refreshCheckedItems();
@@ -497,7 +497,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ControlFragment cf = getControlFragment();
             if (cf != null) {
                 String subreddit = cf.getSubreddit();
-                Bundle thingBundle = cf.getThingBundle();
+                ThingBundle thingBundle = cf.getThingBundle();
                 refreshThingPager(thingBundle, -1);
                 refreshActionBar(subreddit, thingBundle);
                 refreshViews(thingBundle);
@@ -506,7 +506,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    private void refreshViews(Bundle thingBundle) {
+    private void refreshViews(ThingBundle thingBundle) {
         boolean hasThing = thingBundle != null;
         int nextThingVisibility = hasThing ?
                 View.VISIBLE : View.GONE;
@@ -561,7 +561,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    protected abstract void refreshActionBar(String subreddit, Bundle thingBundle);
+    protected abstract void refreshActionBar(String subreddit, ThingBundle thingBundle);
 
     private void refreshCheckedItems() {
         ControlFragment cf = getControlFragment();
@@ -573,12 +573,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         ThingListFragment<?> tf = getThingListFragment();
         if (tf != null) {
-            tf.setSelectedThing(ThingBundle.getThingId(cf.getThingBundle()),
-                    ThingBundle.getLinkId(cf.getThingBundle()));
+            ThingBundle thingBundle = cf.getThingBundle();
+            if (thingBundle != null) {
+                tf.setSelectedThing(thingBundle.getThingId(), thingBundle.getLinkId());
+            }
         }
     }
 
-    private void refreshThingPager(Bundle thingBundle, int pageType) {
+    private void refreshThingPager(ThingBundle thingBundle, int pageType) {
     }
 
     protected void refreshSubredditListVisibility() {
@@ -611,12 +613,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             if (subreddit != null) {
                 return subreddit;
             }
-            return ThingBundle.getSubreddit(cf.getThingBundle());
+            return cf.getThingBundle().getSubreddit();
         }
         return null;
     }
 
-    public Bundle getThingBundle() {
+    public ThingBundle getThingBundle() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
             return cf.getThingBundle();

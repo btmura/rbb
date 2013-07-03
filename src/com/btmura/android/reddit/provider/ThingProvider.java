@@ -29,6 +29,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -49,6 +50,7 @@ import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
  * URI MATCHING PATTERNS:
@@ -293,14 +295,14 @@ public class ThingProvider extends BaseProvider {
         Bundle extras = new Bundle(4);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGES);
         extras.putInt(EXTRA_FILTER, filter);
-        extras.putString(EXTRA_MORE, more);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
+        if (!TextUtils.isEmpty(more)) {
+            extras.putString(EXTRA_MORE, more);
+        } else if (filter == FilterAdapter.MESSAGE_INBOX
+                || filter == FilterAdapter.MESSAGE_UNREAD) {
+            extras.putBoolean(EXTRA_MARK, true);
+        }
         return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
-        // } else if (filter == FilterAdapter.MESSAGE_INBOX
-        // || filter == FilterAdapter.MESSAGE_UNREAD) {
-        // b.appendQueryParameter(PARAM_MARK, TRUE);
-        // b.appendQueryParameter(PARAM_NOTIFY_ACCOUNTS, TRUE);
-        // }
     }
 
     public static final Bundle getMessageThreadSession(Context context, String accountName,
@@ -399,16 +401,22 @@ public class ThingProvider extends BaseProvider {
 
     @Override
     public Bundle call(String method, String arg, Bundle extras) {
-        if (METHOD_GET_SESSION.equals(method)) {
-            return getSession(arg, extras);
-        } else if (METHOD_EXPAND_COMMENT.equals(method)) {
-            return expandComment(extras);
-        } else if (METHOD_COLLAPSE_COMMENT.equals(method)) {
-            return collapseComment(extras);
-        } else if (METHOD_INSERT_COMMENT.equals(method)) {
-            return insertComment(arg, extras);
+        try {
+            if (METHOD_GET_SESSION.equals(method)) {
+                return getSession(arg, extras);
+            } else if (METHOD_EXPAND_COMMENT.equals(method)) {
+                return expandComment(extras);
+            } else if (METHOD_COLLAPSE_COMMENT.equals(method)) {
+                return collapseComment(extras);
+            } else if (METHOD_INSERT_COMMENT.equals(method)) {
+                return insertComment(arg, extras);
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+            return null;
         }
-        throw new IllegalArgumentException();
     }
 
     private Bundle getSession(String accountName, Bundle extras) {

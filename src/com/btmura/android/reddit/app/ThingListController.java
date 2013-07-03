@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 interface ThingListController {
 
@@ -36,7 +37,7 @@ interface ThingListController {
 
     boolean swapCursor(Cursor cursor);
 
-    Bundle getThingBundle(int position);
+    ThingBundle getThingBundle(int position);
 
     // Actions on things.
 

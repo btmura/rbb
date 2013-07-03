@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.widget.ThingBundle;
 
 /**
@@ -49,9 +50,10 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
     private final ArrayList<Integer> pageTypes = new ArrayList<Integer>(2);
     private final ArrayList<Integer> oldPageTypes = new ArrayList<Integer>(2);
     private final String accountName;
-    private final Bundle thingBundle;
+    private final ThingBundle thingBundle;
 
-    public ThingPagerAdapter(FragmentManager fm, String accountName, Bundle thingBundle) {
+    public ThingPagerAdapter(FragmentManager fm, String accountName,
+            ThingBundle thingBundle) {
         super(fm);
         this.accountName = accountName;
         this.thingBundle = thingBundle;
@@ -81,14 +83,18 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
         }
     }
 
-    private void setupPages(Bundle thingBundle) {
-        if (ThingBundle.hasNoComments(thingBundle)) {
-            addPage(TYPE_MESSAGES);
-        } else {
-            if (ThingBundle.hasLinkUrl(thingBundle)) {
-                addPage(TYPE_LINK);
-            }
-            addPage(TYPE_COMMENTS);
+    private void setupPages(ThingBundle thingBundle) {
+        switch (thingBundle.getKind()) {
+            case Kinds.KIND_LINK:
+                if (thingBundle.hasLinkUrl()) {
+                    addPage(TYPE_LINK);
+                }
+                addPage(TYPE_COMMENTS);
+                break;
+
+            case Kinds.KIND_MESSAGE:
+                addPage(TYPE_MESSAGES);
+                break;
         }
     }
 
@@ -177,17 +183,16 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
         }
         switch (pageTypes.get(position)) {
             case TYPE_LINK:
-                return LinkFragment.newInstance(ThingBundle.getTitle(thingBundle),
-                        ThingBundle.getLinkUrl(thingBundle));
+                return LinkFragment.newInstance(thingBundle.getLinkUrl());
 
             case TYPE_COMMENTS:
                 return CommentListFragment.newInstance(accountName,
-                        ThingBundle.getThingId(thingBundle),
-                        ThingBundle.getLinkId(thingBundle));
+                        thingBundle.getThingId(),
+                        thingBundle.getLinkId());
 
             case TYPE_MESSAGES:
                 return MessageThreadListFragment.newInstance(accountName,
-                        ThingBundle.getThingId(thingBundle));
+                        thingBundle.getThingId());
 
             default:
                 throw new IllegalStateException();

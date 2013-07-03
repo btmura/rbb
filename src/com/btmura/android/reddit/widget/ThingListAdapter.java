@@ -27,7 +27,7 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Objects;
 
-public class ThingListAdapter extends AbstractThingListAdapter {
+public class ThingListAdapter extends AbstractThingListAdapter implements ThingProjection {
 
     public static final String TAG = "ThingListAdapter";
 
@@ -174,9 +174,31 @@ public class ThingListAdapter extends AbstractThingListAdapter {
         }
     }
 
-    @Override
-    int getAuthorIndex() {
-        return ThingProjection.INDEX_AUTHOR;
+    public ThingBundle getThingBundle(int position) {
+        Cursor cursor = getCursor();
+        if (cursor != null && cursor.moveToPosition(position)) {
+            return ThingBundle.newLinkInstance(cursor.getString(INDEX_AUTHOR),
+                    cursor.getLong(INDEX_CREATED_UTC),
+                    cursor.getString(INDEX_DOMAIN),
+                    cursor.getInt(INDEX_DOWNS),
+                    cursor.getInt(INDEX_LIKES),
+                    cursor.getInt(INDEX_KIND),
+                    cursor.getString(INDEX_LINK_ID),
+                    cursor.getString(INDEX_LINK_TITLE),
+                    cursor.getInt(INDEX_NUM_COMMENTS),
+                    cursor.getInt(INDEX_OVER_18) == 1,
+                    cursor.getString(INDEX_PERMA_LINK),
+                    cursor.getInt(INDEX_SAVED) == 1,
+                    cursor.getInt(INDEX_SCORE),
+                    cursor.getInt(INDEX_SELF) == 1,
+                    cursor.getString(INDEX_SUBREDDIT),
+                    cursor.getString(INDEX_THING_ID),
+                    cursor.getString(INDEX_THUMBNAIL_URL),
+                    cursor.getString(INDEX_TITLE),
+                    cursor.getInt(INDEX_UPS),
+                    cursor.getString(INDEX_URL));
+        }
+        return null;
     }
 
     @Override

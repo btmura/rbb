@@ -30,7 +30,6 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.util.Flag;
-import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingActivity extends GlobalMenuActivity implements
@@ -49,7 +48,7 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     private static final String STATE_THING_BUNDLE = EXTRA_THING_BUNDLE;
 
-    private Bundle thingBundle;
+    private ThingBundle thingBundle;
     private String accountName;
 
     @Override
@@ -65,9 +64,9 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     private void setupPrereqs(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            thingBundle = getIntent().getBundleExtra(EXTRA_THING_BUNDLE);
+            thingBundle = getIntent().getParcelableExtra(EXTRA_THING_BUNDLE);
         } else {
-            thingBundle = savedInstanceState.getBundle(STATE_THING_BUNDLE);
+            thingBundle = savedInstanceState.getParcelable(STATE_THING_BUNDLE);
         }
     }
 
@@ -88,7 +87,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     private void refreshTitle() {
-        setTitle(ThingBundle.getTitle(thingBundle));
+        setTitle(thingBundle.getDisplayTitle(this));
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
@@ -113,16 +112,16 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     public void onThingLoaded(ThingHolder thingHolder) {
-        if (Objects.equals(thingHolder.getThingId(), ThingBundle.getThingId(thingBundle))) {
-            if (!ThingBundle.hasTitle(thingBundle)) {
-                ThingBundle.putTitle(thingBundle, thingHolder.getTitle());
-                refreshTitle();
-            }
-
-            if (!thingHolder.isSelf() && !ThingBundle.hasLinkUrl(thingBundle)) {
-                ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
-            }
-        }
+        // if (Objects.equals(thingHolder.getThingId(), ThingBundle.getThingId(thingBundle))) {
+        // if (!ThingBundle.hasTitle(thingBundle)) {
+        // ThingBundle.putTitle(thingBundle, thingHolder.getTitle());
+        // refreshTitle();
+        // }
+        //
+        // if (!thingHolder.isSelf() && !ThingBundle.hasLinkUrl(thingBundle)) {
+        // ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
+        // }
+        // }
     }
 
     public String getAccountName() {
@@ -130,7 +129,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     public String getSubredditName() {
-        return ThingBundle.getSubreddit(thingBundle);
+        return thingBundle.getSubreddit();
     }
 
     @Override
@@ -163,7 +162,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBundle(STATE_THING_BUNDLE, thingBundle);
+        outState.putParcelable(STATE_THING_BUNDLE, thingBundle);
     }
 
     private ThingFragment getThingFragment() {

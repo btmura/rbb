@@ -49,6 +49,9 @@ public class SaveActions implements BaseThingColumns, BaseColumns {
 
     public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
 
+    public static final String SELECT_BY_ACCOUNT_AND_THING_ID = SharedColumns.SELECT_BY_ACCOUNT
+            + " AND " + COLUMN_THING_ID + "=?";
+
     public static final String SELECT_UNSAVED_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT
             + " AND " + COLUMN_ACTION + "=" + ACTION_UNSAVE;
 

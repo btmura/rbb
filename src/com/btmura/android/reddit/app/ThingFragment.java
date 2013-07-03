@@ -31,17 +31,19 @@ import android.view.ViewGroup;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.content.ThingBundleLoader;
+import com.btmura.android.reddit.content.ThingDataLoader;
+import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.widget.ThingBundle;
 
-public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
+public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData> {
 
     static final String TAG = "ThingFragment";
 
-    private static final String ARG_ACCOUNT_NAME = "an";
-    private static final String ARG_THING_BUNDLE = "tb";
+    private static final String ARG_ACCOUNT_NAME = "accountName";
+    private static final String ARG_THING_BUNDLE = "thingBundle";
 
-    private Bundle thingBundle;
+    private ThingData thingData;
     private ThingPagerAdapter pagerAdapter;
     private ViewPager pager;
 
@@ -56,10 +58,10 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
     private MenuItem userItem;
     private MenuItem subredditItem;
 
-    public static ThingFragment newInstance(String accountName, Bundle thingBundle) {
+    public static ThingFragment newInstance(String accountName, ThingBundle thingBundle) {
         Bundle args = new Bundle(2);
         args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putBundle(ARG_THING_BUNDLE, thingBundle);
+        args.putParcelable(ARG_THING_BUNDLE, thingBundle);
 
         ThingFragment frag = new ThingFragment();
         frag.setArguments(args);
@@ -87,24 +89,30 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
     }
 
     @Override
-    public Loader<Bundle> onCreateLoader(int id, Bundle args) {
-        return new ThingBundleLoader(getActivity(), getArguments().getBundle(ARG_THING_BUNDLE));
+    public Loader<ThingData> onCreateLoader(int id, Bundle args) {
+        return new ThingDataLoader(getActivity(),
+                getAccountName(),
+                getThingBundleArgument());
     }
 
     @Override
-    public void onLoadFinished(Loader<Bundle> loader, Bundle bundle) {
+    public void onLoadFinished(Loader<ThingData> loader, ThingData data) {
         // Handle the fact that onLoadFinished is called twice after orientation changes.
-        if (thingBundle != bundle) {
-            thingBundle = bundle;
+        if (thingData != data) {
+            thingData = data;
+            getActivity().invalidateOptionsMenu();
+        }
+
+        if (pagerAdapter == null) {
             pagerAdapter = new ThingPagerAdapter(getChildFragmentManager(),
-                    getArguments().getString(ARG_ACCOUNT_NAME),
-                    thingBundle);
+                    getAccountName(), data);
             pager.setAdapter(pagerAdapter);
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Bundle> loader) {
+    public void onLoaderReset(Loader<ThingData> loader) {
+        thingData = null;
     }
 
     @Override
@@ -113,12 +121,11 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
         inflater.inflate(R.menu.thing_frag_menu, menu);
         linkItem = menu.findItem(R.id.menu_link);
         commentsItem = menu.findItem(R.id.menu_comments);
-        newCommentItem = menu.findItem(R.id.menu_new_comment);
         savedItem = menu.findItem(R.id.menu_saved);
         unsavedItem = menu.findItem(R.id.menu_unsaved);
-        shareItem = menu.findItem(R.id.menu_share);
         newCommentItem = menu.findItem(R.id.menu_new_comment);
         openItem = menu.findItem(R.id.menu_open);
+        shareItem = menu.findItem(R.id.menu_share);
         copyUrlItem = menu.findItem(R.id.menu_copy_url);
         userItem = menu.findItem(R.id.menu_user);
         subredditItem = menu.findItem(R.id.menu_thing_subreddit);
@@ -127,21 +134,22 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if (linkItem == null || thingBundle == null) {
+        if (linkItem == null || thingData == null) {
             return; // Bail out if the menu hasn't been created.
         }
 
-        linkItem.setVisible(ThingBundle.hasLinkUrl(thingBundle)
-                && getCurrentPageType() != ThingPagerAdapter.TYPE_LINK);
-        commentsItem.setVisible(ThingBundle.hasCommentUrl(thingBundle)
-                && getCurrentPageType() != ThingPagerAdapter.TYPE_COMMENTS);
+        linkItem.setVisible(thingData.hasLinkUrl()
+                && isCurrentPageType(ThingPagerAdapter.TYPE_LINK));
+        commentsItem.setVisible(thingData.hasLinkUrl() && thingData.hasCommentsUrl()
+                && isCurrentPageType(ThingPagerAdapter.TYPE_COMMENTS));
+
+        savedItem.setVisible(thingData.isSaveable() && thingData.isSaved());
+        unsavedItem.setVisible(thingData.isSaveable() && !thingData.isSaved());
 
         boolean hasAccount = AccountUtils.isAccount(getAccountName());
-        savedItem.setVisible(hasAccount);
-        unsavedItem.setVisible(hasAccount);
         newCommentItem.setVisible(hasAccount);
 
-        String title = getTitle();
+        String title = thingData.getDisplayTitle(getActivity());
         CharSequence url = getUrl();
         boolean hasTitleAndUrl = !TextUtils.isEmpty(title) && !TextUtils.isEmpty(url);
         openItem.setVisible(hasTitleAndUrl);
@@ -151,10 +159,8 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
             MenuHelper.setShareProvider(shareItem, title, url);
         }
 
-        userItem.setTitle(getString(R.string.menu_user,
-                ThingBundle.getAuthor(thingBundle)));
-        subredditItem.setTitle(getString(R.string.menu_subreddit,
-                ThingBundle.getSubreddit(thingBundle)));
+        userItem.setTitle(getString(R.string.menu_user, thingData.getAuthor()));
+        subredditItem.setTitle(getString(R.string.menu_subreddit, thingData.getSubreddit()));
     }
 
     @Override
@@ -166,6 +172,14 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
 
             case R.id.menu_comments:
                 handleCommentsItem();
+                return true;
+
+            case R.id.menu_saved:
+                handleSaved();
+                return true;
+
+            case R.id.menu_unsaved:
+                handleUnsaved();
                 return true;
 
             case R.id.menu_open:
@@ -201,33 +215,59 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
         setCurrentPageType(ThingPagerAdapter.PAGE_COMMENTS, true);
     }
 
+    private void handleSaved() {
+        Provider.unsaveAsync(getActivity(), getAccountName(),
+                thingData.getThingId());
+    }
+
+    private void handleUnsaved() {
+        Provider.saveAsync(getActivity(), getAccountName(),
+                thingData.getAuthor(),
+                thingData.getCreatedUtc(),
+                thingData.getDomain(),
+                thingData.getDowns(),
+                thingData.getLikes(),
+                thingData.getNumComments(),
+                thingData.isOver18(),
+                thingData.getPermaLink(),
+                thingData.getScore(),
+                thingData.isSelf(),
+                thingData.getSubreddit(),
+                thingData.getThingId(),
+                thingData.getThumbnailUrl(),
+                thingData.getTitle(),
+                thingData.getUps(),
+                thingData.getUrl());
+    }
+
     private void handleOpenItem() {
         MenuHelper.startIntentChooser(getActivity(), getUrl());
     }
 
     private void handleCopyUrlItem() {
-        MenuHelper.setClipAndToast(getActivity(), getTitle(), getUrl());
+        MenuHelper.setClipAndToast(getActivity(),
+                thingData.getDisplayTitle(getActivity()), getUrl());
     }
 
     private void handleAddSubredditItem() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), thingData.getSubreddit());
     }
 
     private void handleUserItem() {
-        MenuHelper.startProfileActivity(getActivity(), getAuthor(), -1);
+        MenuHelper.startProfileActivity(getActivity(), thingData.getAuthor(), -1);
     }
 
     private void handleSubredditItem() {
-        MenuHelper.startSidebarActivity(getActivity(), getSubreddit());
+        MenuHelper.startSidebarActivity(getActivity(), thingData.getSubreddit());
     }
 
     private CharSequence getUrl() {
         switch (getCurrentPageType()) {
             case ThingPagerAdapter.TYPE_LINK:
-                return ThingBundle.getLinkUrl(thingBundle);
+                return thingData.getLinkUrl();
 
             case ThingPagerAdapter.TYPE_COMMENTS:
-                return ThingBundle.getCommentUrl(thingBundle);
+                return thingData.getCommentsUrl();
 
             default:
                 return null;
@@ -246,19 +286,17 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<Bundle> {
         return -1;
     }
 
-    private String getAuthor() {
-        return ThingBundle.getAuthor(thingBundle);
+    private boolean isCurrentPageType(int pageType) {
+        return pageType == getCurrentPageType();
     }
 
-    private String getSubreddit() {
-        return ThingBundle.getSubreddit(thingBundle);
-    }
-
-    private String getTitle() {
-        return ThingBundle.getTitle(thingBundle);
-    }
+    // Getters for arguments
 
     private String getAccountName() {
         return getArguments().getString(ARG_ACCOUNT_NAME);
+    }
+
+    private ThingBundle getThingBundleArgument() {
+        return getArguments().getParcelable(ARG_THING_BUNDLE);
     }
 }

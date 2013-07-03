@@ -16,130 +16,254 @@
 
 package com.btmura.android.reddit.widget;
 
-import com.btmura.android.reddit.util.BundleSupport;
-
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
+import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.util.BundleSupport;
+import com.btmura.android.reddit.util.StringUtil;
+
 /**
- * {@link ThingBundle} describes a {@link Bundle} that defines a common set of
- * keys for all thing types that should be used throughout the app for setting
- * the title and copying urls.
+ * {@link ThingBundle} is a {@link Bundle} representation of some thing. This class adds type
+ * information to the underlying {@link Bundle}s attributes and nothing more.
  */
-public class ThingBundle extends BundleSupport {
+public class ThingBundle extends BundleSupport implements Parcelable {
 
-    /** String subreddit that this thing belongs to. */
-    private static final String KEY_SUBREDDIT = "subreddit";
+    private static final int NUM_KEYS = 20;
 
-    /** Integer indicating what kind this thing is. */
-    private static final String KEY_KIND = "kind";
-
-    /** String for the title of this thing. */
-    private static final String KEY_TITLE = "title";
-
-    /** String for the thing id of this thing. */
-    private static final String KEY_THING_ID = "thingId";
-
-    /** String that is the parent thing id when this is a comment. */
-    private static final String KEY_LINK_ID = "linkId";
-
-    /** String for the link url of this thing. Null when just comments. */
-    private static final String KEY_LINK_URL = "linkUrl";
-
-    /** String for the comment url of this thing. */
-    private static final String KEY_COMMENT_URL = "commentUrl";
-
-    /** Boolean indicating whether this thing has comments at all. */
-    private static final String KEY_NO_COMMENTS = "noComments";
-
-    /** String name of the author of this thing. */
     private static final String KEY_AUTHOR = "author";
+    private static final String KEY_CREATED_UTC = "createdUtc";
+    private static final String KEY_DOMAIN = "domain";
+    private static final String KEY_DOWNS = "downs";
+    private static final String KEY_KIND = "kind";
+    private static final String KEY_LIKES = "likes";
+    private static final String KEY_LINK_ID = "linkId";
+    private static final String KEY_LINK_TITLE = "linkTitle";
+    private static final String KEY_NUM_COMMENTS = "numComments";
+    private static final String KEY_OVER_18 = "over18";
+    private static final String KEY_PERMA_LINK = "permaLink";
+    private static final String KEY_SAVED = "saved";
+    private static final String KEY_SCORE = "score";
+    private static final String KEY_SELF = "self";
+    private static final String KEY_SUBREDDIT = "subreddit";
+    private static final String KEY_THING_ID = "thingId";
+    private static final String KEY_THUMBNAIL_URL = "thumbnailUrl";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_UPS = "ups";
+    private static final String KEY_URL = "url";
 
-    public static String getSubreddit(Bundle bundle) {
-        return getString(bundle, KEY_SUBREDDIT);
+    public static final Parcelable.Creator<ThingBundle> CREATOR =
+            new Parcelable.Creator<ThingBundle>() {
+                public ThingBundle createFromParcel(Parcel in) {
+                    return new ThingBundle(in);
+                }
+
+                public ThingBundle[] newArray(int size) {
+                    return new ThingBundle[size];
+                }
+            };
+
+    private final Bundle data;
+
+    private Formatter formatter;
+
+    public static ThingBundle newCommentsUrlInstance(String subreddit, String thingId) {
+        Bundle data = new Bundle(NUM_KEYS);
+        data.putString(KEY_SUBREDDIT, subreddit);
+        data.putString(KEY_THING_ID, thingId);
+        return new ThingBundle(data);
     }
 
-    public static void putSubreddit(Bundle bundle, String subreddit) {
-        bundle.putString(KEY_SUBREDDIT, subreddit);
+    public static ThingBundle newCommentsUrlInstance(String subreddit, String thingId,
+            String linkId) {
+        Bundle data = new Bundle(NUM_KEYS);
+        data.putString(KEY_SUBREDDIT, subreddit);
+        data.putString(KEY_THING_ID, thingId);
+        data.putString(KEY_LINK_ID, linkId);
+        return new ThingBundle(data);
     }
 
-    public static int getKind(Bundle bundle) {
-        return getInt(bundle, KEY_KIND);
+    public static ThingBundle newLinkInstance(String author,
+            long createdUtc,
+            String domain,
+            int downs,
+            int likes,
+            int kind,
+            String linkId,
+            String linkTitle,
+            int numComments,
+            boolean over18,
+            String permaLink,
+            boolean saved,
+            int score,
+            boolean self,
+            String subreddit,
+            String thingId,
+            String thumbnailUrl,
+            String title,
+            int ups,
+            String url) {
+        Bundle data = new Bundle(NUM_KEYS);
+        data.putString(KEY_AUTHOR, author);
+        data.putLong(KEY_CREATED_UTC, createdUtc);
+        data.putString(KEY_DOMAIN, domain);
+        data.putInt(KEY_DOWNS, downs);
+        data.putInt(KEY_KIND, kind);
+        data.putString(KEY_LINK_ID, linkId);
+        data.putString(KEY_LINK_TITLE, linkTitle);
+        data.putInt(KEY_LIKES, likes);
+        data.putInt(KEY_NUM_COMMENTS, numComments);
+        data.putBoolean(KEY_OVER_18, over18);
+        data.putString(KEY_PERMA_LINK, permaLink);
+        data.putBoolean(KEY_SAVED, saved);
+        data.putInt(KEY_SCORE, score);
+        data.putBoolean(KEY_SELF, self);
+        data.putString(KEY_SUBREDDIT, subreddit);
+        data.putString(KEY_THING_ID, thingId);
+        data.putString(KEY_THUMBNAIL_URL, thumbnailUrl);
+        data.putString(KEY_TITLE, title);
+        data.putInt(KEY_UPS, ups);
+        data.putString(KEY_URL, url);
+        return new ThingBundle(data);
     }
 
-    public static void putKind(Bundle bundle, int kind) {
-        bundle.putInt(KEY_KIND, kind);
+    protected ThingBundle(ThingBundle thingBundle) {
+        this(thingBundle.data);
     }
 
-    public static String getTitle(Bundle bundle) {
-        return getString(bundle, KEY_TITLE);
+    private ThingBundle(Parcel in) {
+        this(in.readBundle());
     }
 
-    public static void putTitle(Bundle bundle, String title) {
-        bundle.putString(KEY_TITLE, title);
+    private ThingBundle(Bundle data) {
+        this.data = data;
     }
 
-    public static boolean hasTitle(Bundle bundle) {
-        return !TextUtils.isEmpty(getTitle(bundle));
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public static String getThingId(Bundle bundle) {
-        return getString(bundle, KEY_THING_ID);
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeBundle(data);
     }
 
-    public static void putThingId(Bundle bundle, String thingId) {
-        bundle.putString(KEY_THING_ID, thingId);
+    // TODO: Move these methods with logic to a different class.
+
+    public CharSequence getCommentsUrl() {
+        return Urls.perma(getPermaLink(), null);
     }
 
-    public static String getLinkId(Bundle bundle) {
-        return getString(bundle, KEY_LINK_ID);
+    public String getDisplayTitle(Context context) {
+        String title = getTitle();
+        return !TextUtils.isEmpty(title)
+                ? format(context, title)
+                : format(context, getLinkTitle());
     }
 
-    public static void putLinkId(Bundle bundle, String linkId) {
-        bundle.putString(KEY_LINK_ID, linkId);
+    private String format(Context context, String text) {
+        if (formatter == null) {
+            formatter = new Formatter();
+        }
+        return StringUtil.safeString(formatter.formatAll(context, text));
     }
 
-    public static boolean hasLinkUrl(Bundle bundle) {
-        return !TextUtils.isEmpty(getLinkUrl(bundle));
+    public CharSequence getLinkUrl() {
+        return getUrl();
     }
 
-    public static CharSequence getLinkUrl(Bundle bundle) {
-        return getCharSequence(bundle, KEY_LINK_URL);
+    public boolean hasCommentsUrl() {
+        return true;
     }
 
-    public static void putLinkUrl(Bundle bundle, CharSequence url) {
-        bundle.putCharSequence(KEY_LINK_URL, url);
+    public boolean hasLinkUrl() {
+        return !isSelf();
     }
 
-    public static boolean hasCommentUrl(Bundle bundle) {
-        return !TextUtils.isEmpty(getCommentUrl(bundle));
+    // Simple getters that return attributes as they are
+
+    public String getAuthor() {
+        return getString(data, KEY_AUTHOR);
     }
 
-    public static CharSequence getCommentUrl(Bundle bundle) {
-        return getCharSequence(bundle, KEY_COMMENT_URL);
+    public long getCreatedUtc() {
+        return getLong(data, KEY_CREATED_UTC);
     }
 
-    public static void putCommentUrl(Bundle bundle, CharSequence url) {
-        bundle.putCharSequence(KEY_COMMENT_URL, url);
+    public String getDomain() {
+        return getString(data, KEY_DOMAIN);
     }
 
-    public static boolean hasNoComments(Bundle bundle) {
-        return getBoolean(bundle, KEY_NO_COMMENTS);
+    public int getDowns() {
+        return getInt(data, KEY_DOWNS);
     }
 
-    public static void putNoComments(Bundle bundle, boolean noComments) {
-        bundle.putBoolean(KEY_NO_COMMENTS, noComments);
+    public int getKind() {
+        return getInt(data, KEY_KIND);
     }
 
-    public static String getAuthor(Bundle bundle) {
-        return getString(bundle, KEY_AUTHOR);
+    public int getLikes() {
+        return getInt(data, KEY_LIKES);
     }
 
-    public static boolean hasAuthor(Bundle bundle) {
-        return !TextUtils.isEmpty(getAuthor(bundle));
+    public String getLinkId() {
+        return getString(data, KEY_LINK_ID);
     }
 
-    public static void putAuthor(Bundle bundle, String author) {
-        bundle.putString(KEY_AUTHOR, author);
+    public String getLinkTitle() {
+        return getString(data, KEY_LINK_TITLE);
+    }
+
+    public int getNumComments() {
+        return getInt(data, KEY_NUM_COMMENTS);
+    }
+
+    public String getPermaLink() {
+        return getString(data, KEY_PERMA_LINK);
+    }
+
+    public int getScore() {
+        return getInt(data, KEY_SCORE);
+    }
+
+    public String getSubreddit() {
+        return getString(data, KEY_SUBREDDIT);
+    }
+
+    public String getTitle() {
+        return getString(data, KEY_TITLE);
+    }
+
+    public String getThingId() {
+        return getString(data, KEY_THING_ID);
+    }
+
+    public String getThumbnailUrl() {
+        return getString(data, KEY_THUMBNAIL_URL);
+    }
+
+    public int getUps() {
+        return getInt(data, KEY_UPS);
+    }
+
+    public String getUrl() {
+        return getString(data, KEY_URL);
+    }
+
+    public boolean isOver18() {
+        return data.getBoolean(KEY_OVER_18);
+    }
+
+    public boolean isSaved() {
+        return data.getBoolean(KEY_SAVED);
+    }
+
+    public boolean isSelf() {
+        return data.getBoolean(KEY_SELF);
     }
 }

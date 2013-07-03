@@ -16,8 +16,8 @@
 
 package com.btmura.android.reddit.app;
 
-import android.os.Bundle;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public interface ThingBundleHolder {
-    Bundle getThingBundle();
+    ThingBundle getThingBundle();
 }
