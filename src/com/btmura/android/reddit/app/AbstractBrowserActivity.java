@@ -576,6 +576,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ThingBundle thingBundle = cf.getThingBundle();
             if (thingBundle != null) {
                 tf.setSelectedThing(thingBundle.getThingId(), thingBundle.getLinkId());
+            } else {
+                tf.setSelectedThing(null, null);
             }
         }
     }
