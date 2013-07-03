@@ -104,7 +104,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
         }
 
         if (pagerAdapter == null) {
-            pagerAdapter = new ThingPagerAdapter(getChildFragmentManager(),
+            pagerAdapter = new ThingPagerAdapter(getActivity(), getChildFragmentManager(),
                     getAccountName(), data);
             pager.setAdapter(pagerAdapter);
         }
@@ -139,9 +139,9 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
         }
 
         linkItem.setVisible(thingData.hasLinkUrl()
-                && isCurrentPageType(ThingPagerAdapter.TYPE_LINK));
+                && !isCurrentPageType(ThingPagerAdapter.TYPE_LINK));
         commentsItem.setVisible(thingData.hasLinkUrl() && thingData.hasCommentsUrl()
-                && isCurrentPageType(ThingPagerAdapter.TYPE_COMMENTS));
+                && !isCurrentPageType(ThingPagerAdapter.TYPE_COMMENTS));
 
         savedItem.setVisible(thingData.isSaveable() && thingData.isSaved());
         unsavedItem.setVisible(thingData.isSaveable() && !thingData.isSaved());

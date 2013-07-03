@@ -18,6 +18,12 @@
 
     <group android:orderInCategory="@integer/menu_order_thing" >
         <item
+            android:id="@+id/menu_new_comment"
+            android:icon="?attr/menu_edit_icon"
+            android:showAsAction="ifRoom"
+            android:title="@string/menu_new_comment"
+            android:visible="false"/>
+        <item
             android:id="@+id/menu_link"
             android:icon="?attr/menu_link_icon"
             android:showAsAction="ifRoom"
@@ -33,17 +39,14 @@
             android:id="@+id/menu_saved"
             android:icon="?attr/menu_saved_icon"
             android:showAsAction="ifRoom"
-            android:title="@string/menu_unsave"/>
+            android:title="@string/menu_unsave"
+            android:visible="false"/>
         <item
             android:id="@+id/menu_unsaved"
             android:icon="?attr/menu_unsaved_icon"
             android:showAsAction="ifRoom"
-            android:title="@string/menu_save"/>
-        <item
-            android:id="@+id/menu_new_comment"
-            android:icon="?attr/menu_edit_icon"
-            android:showAsAction="ifRoom"
-            android:title="@string/menu_new_comment"/>
+            android:title="@string/menu_save"
+            android:visible="false"/>
         <item
             android:id="@+id/menu_open"
             android:showAsAction="never"
