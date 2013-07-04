@@ -196,11 +196,6 @@ abstract class AbstractThingTableListController
     }
 
     @Override
-    public void select(int position) {
-        // TODO: What was this for?
-    }
-
-    @Override
     public void subreddit(int position) {
         MenuHelper.startSidebarActivity(context, getSubreddit(position));
     }
@@ -269,7 +264,6 @@ abstract class AbstractThingTableListController
     @Override
     public void prepareActionMenu(Menu menu, ListView listView, int position) {
         prepareAuthorActionItem(menu, listView, position);
-        prepareCommentsActionItem(menu, listView, position);
         prepareCopyUrlActionItem(menu, listView, position);
         prepareHideActionItems(menu, listView, position);
         prepareSaveActionItems(menu, listView, position);
@@ -284,11 +278,6 @@ abstract class AbstractThingTableListController
         if (item.isVisible()) {
             item.setTitle(MenuHelper.getUserTitle(context, author));
         }
-    }
-
-    private void prepareCommentsActionItem(Menu menu, ListView listView, int position) {
-        MenuItem item = menu.findItem(R.id.menu_comments);
-        item.setVisible(isCheckedCount(listView, 1) && isKind(position, Kinds.KIND_LINK));
     }
 
     private void prepareCopyUrlActionItem(Menu menu, ListView listView, int position) {
