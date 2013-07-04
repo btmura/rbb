@@ -195,9 +195,16 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
                 }
 
             case TYPE_COMMENTS:
-                return CommentListFragment.newInstance(accountName,
-                        thingData.child.getThingId(),
-                        thingData.child.getLinkId());
+                // TODO: Standardize parentId/childId selector throughout app.
+                if (thingData.child != null) {
+                    return CommentListFragment.newInstance(accountName,
+                            thingData.child.getThingId(),
+                            thingData.parent.getThingId());
+                } else {
+                    return CommentListFragment.newInstance(accountName,
+                            thingData.parent.getThingId(),
+                            null);
+                }
 
             case TYPE_MESSAGES:
                 return MessageThreadListFragment.newInstance(accountName,
