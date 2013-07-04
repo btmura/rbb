@@ -17,11 +17,11 @@
 package com.btmura.android.reddit.app;
 
 /**
- * Interface used to tell other parts of the app about the thing that is
- * currently being viewed as well as when links or comments are selected.
+ * Interface used to tell other parts of the app about the thing that is currently being viewed as
+ * well as when links or comments are selected.
  */
 interface OnThingEventListener {
 
-    void onThingLoaded(ThingHolder thingHolder);
+    void onThingTitleDiscovery(String title);
 
 }

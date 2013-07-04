@@ -31,7 +31,6 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.BundleSupport;
 import com.btmura.android.reddit.util.JsonParser;
-import com.btmura.android.reddit.util.StringUtil;
 
 /**
  * {@link ThingBundle} is a {@link Bundle} representation of some thing. This class adds type
@@ -39,10 +38,12 @@ import com.btmura.android.reddit.util.StringUtil;
  */
 public class ThingBundle extends BundleSupport implements Parcelable {
 
-    // TODO(btmura): Move this class since it has nothing to do with widgets.
+    // TODO: Move this class since it has nothing to do with widgets.
 
     public static final int TYPE_LINK = 0;
     public static final int TYPE_COMMENT = 1;
+
+    // TODO: Make separate reference classes rather than reusing this one.
     public static final int TYPE_LINK_REFERENCE = 2;
     public static final int TYPE_COMMENT_REFERENCE = 3;
 
@@ -82,8 +83,6 @@ public class ThingBundle extends BundleSupport implements Parcelable {
 
     private final Bundle data;
     private final int type;
-
-    private Formatter formatter;
 
     public static ThingBundle fromJsonReader(Context context, JsonReader reader,
             Formatter formatter) throws IOException {
@@ -225,20 +224,6 @@ public class ThingBundle extends BundleSupport implements Parcelable {
 
     public CharSequence getCommentsUrl() {
         return Urls.perma(getPermaLink(), null);
-    }
-
-    public String getDisplayTitle(Context context) {
-        String title = getTitle();
-        return !TextUtils.isEmpty(title)
-                ? format(context, title)
-                : format(context, getLinkTitle());
-    }
-
-    private String format(Context context, String text) {
-        if (formatter == null) {
-            formatter = new Formatter();
-        }
-        return StringUtil.safeString(formatter.formatAll(context, text));
     }
 
     public CharSequence getLinkUrl() {

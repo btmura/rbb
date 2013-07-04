@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -43,6 +44,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_BUNDLE = "thingBundle";
 
+    private OnThingEventListener listener;
     private ThingData thingData;
     private ThingPagerAdapter pagerAdapter;
     private ViewPager pager;
@@ -66,6 +68,14 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
         ThingFragment frag = new ThingFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnThingEventListener) {
+            listener = (OnThingEventListener) activity;
+        }
     }
 
     @Override
@@ -107,6 +117,10 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
             pagerAdapter = new ThingPagerAdapter(getActivity(), getChildFragmentManager(),
                     getAccountName(), data);
             pager.setAdapter(pagerAdapter);
+
+            if (listener != null) {
+                listener.onThingTitleDiscovery(thingData.parent.getTitle());
+            }
         }
     }
 

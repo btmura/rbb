@@ -29,7 +29,9 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
+import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Flag;
+import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingActivity extends GlobalMenuActivity implements
@@ -48,6 +50,7 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     private static final String STATE_THING_BUNDLE = EXTRA_THING_BUNDLE;
 
+    private final Formatter formatter = new Formatter();
     private ThingBundle thingBundle;
     private String accountName;
 
@@ -83,11 +86,11 @@ public class ThingActivity extends GlobalMenuActivity implements
         bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
                 | ActionBar.DISPLAY_HOME_AS_UP
                 | ActionBar.DISPLAY_SHOW_TITLE);
-        refreshTitle();
+        refreshTitle(thingBundle.hasLinkId() ? thingBundle.getLinkTitle() : thingBundle.getTitle());
     }
 
-    private void refreshTitle() {
-        setTitle(thingBundle.getDisplayTitle(this));
+    private void refreshTitle(String title) {
+        setTitle(StringUtil.safeString(formatter.formatAll(this, title)));
     }
 
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
@@ -111,17 +114,9 @@ public class ThingActivity extends GlobalMenuActivity implements
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
-    public void onThingLoaded(ThingHolder thingHolder) {
-        // if (Objects.equals(thingHolder.getThingId(), ThingBundle.getThingId(thingBundle))) {
-        // if (!ThingBundle.hasTitle(thingBundle)) {
-        // ThingBundle.putTitle(thingBundle, thingHolder.getTitle());
-        // refreshTitle();
-        // }
-        //
-        // if (!thingHolder.isSelf() && !ThingBundle.hasLinkUrl(thingBundle)) {
-        // ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
-        // }
-        // }
+    @Override
+    public void onThingTitleDiscovery(String title) {
+        refreshTitle(title);
     }
 
     public String getAccountName() {

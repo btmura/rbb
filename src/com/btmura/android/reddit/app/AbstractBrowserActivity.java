@@ -437,6 +437,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshThingPager(thingBundle, pageType);
     }
 
+    @Override
     public void onSubredditDiscovery(String subreddit) {
         ControlFragment cf = getControlFragment();
         if (Subreddits.isRandom(cf.getSubreddit())) {
@@ -446,20 +447,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public void onThingLoaded(ThingHolder thingHolder) {
-        // ControlFragment cf = getControlFragment();
-        // ThingBundle thingBundle = cf.getThingBundle();
-        // if (Objects.equals(thingHolder.getThingId(), ThingBundle.getThingId(thingBundle))) {
-        // if (!ThingBundle.hasTitle(thingBundle)) {
-        // ThingBundle.putTitle(thingBundle, thingHolder.getThingId());
-        // cf.setThingBundle(thingBundle);
-        // }
-        //
-        // if (!thingHolder.isSelf() && !ThingBundle.hasLinkUrl(thingBundle)) {
-        // ThingBundle.putLinkUrl(thingBundle, thingHolder.getUrl());
-        // cf.setThingBundle(thingBundle);
-        // }
-        // }
+    @Override
+    public void onThingTitleDiscovery(String title) {
     }
 
     public ViewPager getThingPager() {

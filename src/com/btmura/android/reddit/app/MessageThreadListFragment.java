@@ -40,8 +40,7 @@ import com.btmura.android.reddit.widget.MessageThreadAdapter;
  * {@link ThingProviderListFragment} for showing the messages in a thread.
  */
 public class MessageThreadListFragment extends ThingProviderListFragment implements
-        MultiChoiceModeListener,
-        ThingHolder {
+        MultiChoiceModeListener {
 
     public static final String TAG = "MessageThreadListFragment";
 
@@ -116,7 +115,7 @@ public class MessageThreadListFragment extends ThingProviderListFragment impleme
         setListShown(true);
 
         if (adapter.getCount() > 0 && listener != null) {
-            listener.onThingLoaded(this);
+            // listener.onThingLoaded(this);
         }
     }
 
