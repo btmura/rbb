@@ -35,6 +35,7 @@ abstract class AbstractSessionLoader extends CursorLoader {
 
     private long sessionId;
     private String more;
+    private Bundle extras;
 
     AbstractSessionLoader(Context context, Uri uri, String[] projection, String selection,
             String sortOrder, long sessionId, String more) {
@@ -50,7 +51,7 @@ abstract class AbstractSessionLoader extends CursorLoader {
         }
 
         if (sessionId == 0 || !TextUtils.isEmpty(more)) {
-            Bundle extras = createSession(sessionId, more);
+            extras = createSession(sessionId, more);
             if (extras == null) {
                 return null;
             }
@@ -60,12 +61,7 @@ abstract class AbstractSessionLoader extends CursorLoader {
         setSelectionArgs(Array.of(sessionId));
 
         Cursor c = super.loadInBackground();
-        if (c != null) {
-            Bundle extras = new Bundle(1);
-            extras.putLong(ThingProvider.EXTRA_SESSION_ID, sessionId);
-            return new CursorExtrasWrapper(c, extras);
-        }
-        return null;
+        return c != null ? new CursorExtrasWrapper(c, extras) : null;
     }
 
     protected abstract Bundle createSession(long sessionId, String more);
