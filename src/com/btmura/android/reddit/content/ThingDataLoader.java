@@ -102,13 +102,42 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
         }
 
         try {
-            ThingBundle parentBundle = thingBundle;
-            ThingBundle childBundle = null;
-            if (thingBundle.hasLinkId()) {
-                parentBundle = RedditApi.getInfo(getContext(), thingBundle.getLinkId(),
-                        AccountUtils.getCookie(getContext(), accountName),
-                        new Formatter());
-                childBundle = thingBundle;
+            ThingBundle parentBundle;
+            ThingBundle childBundle;
+
+            switch (thingBundle.getType()) {
+                case ThingBundle.TYPE_LINK:
+                    parentBundle = thingBundle;
+                    childBundle = null;
+                    break;
+
+                case ThingBundle.TYPE_COMMENT:
+                    String cookie = getCookie();
+                    Formatter formatter = getFormatter();
+                    parentBundle = RedditApi.getInfo(getContext(), thingBundle.getLinkId(),
+                            cookie, formatter);
+                    childBundle = thingBundle;
+                    break;
+
+                case ThingBundle.TYPE_LINK_REFERENCE:
+                    cookie = getCookie();
+                    formatter = getFormatter();
+                    parentBundle = RedditApi.getInfo(getContext(), thingBundle.getThingId(),
+                            cookie, formatter);
+                    childBundle = null;
+                    break;
+
+                case ThingBundle.TYPE_COMMENT_REFERENCE:
+                    cookie = getCookie();
+                    formatter = getFormatter();
+                    parentBundle = RedditApi.getInfo(getContext(), thingBundle.getLinkId(),
+                            cookie, formatter);
+                    childBundle = RedditApi.getInfo(getContext(), thingBundle.getThingId(),
+                            cookie, formatter);
+                    break;
+
+                default:
+                    throw new IllegalArgumentException();
             }
 
             Cursor saveActionCursor = null;
@@ -135,6 +164,15 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
             Log.e(TAG, e.getMessage(), e);
             return null;
         }
+    }
+
+    private String getCookie()
+            throws OperationCanceledException, AuthenticatorException, IOException {
+        return AccountUtils.getCookie(getContext(), accountName);
+    }
+
+    private Formatter getFormatter() {
+        return new Formatter();
     }
 
     @Override

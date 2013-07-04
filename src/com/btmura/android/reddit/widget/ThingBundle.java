@@ -41,6 +41,11 @@ public class ThingBundle extends BundleSupport implements Parcelable {
 
     // TODO(btmura): Move this class since it has nothing to do with widgets.
 
+    public static final int TYPE_LINK = 0;
+    public static final int TYPE_COMMENT = 1;
+    public static final int TYPE_LINK_REFERENCE = 2;
+    public static final int TYPE_COMMENT_REFERENCE = 3;
+
     private static final int NUM_KEYS = 20;
 
     private static final String KEY_AUTHOR = "author";
@@ -76,6 +81,7 @@ public class ThingBundle extends BundleSupport implements Parcelable {
             };
 
     private final Bundle data;
+    private final int type;
 
     private Formatter formatter;
 
@@ -83,26 +89,50 @@ public class ThingBundle extends BundleSupport implements Parcelable {
             Formatter formatter) throws IOException {
         ThingBundleParser parser = new ThingBundleParser(context, formatter);
         parser.parseListingObject(reader);
-        return new ThingBundle(parser.data);
-    }
-
-    public static ThingBundle newCommentsUrlInstance(String subreddit, String thingId) {
-        Bundle data = new Bundle(NUM_KEYS);
-        data.putString(KEY_SUBREDDIT, subreddit);
-        data.putString(KEY_THING_ID, thingId);
-        return new ThingBundle(data);
-    }
-
-    public static ThingBundle newCommentsUrlInstance(String subreddit, String thingId,
-            String linkId) {
-        Bundle data = new Bundle(NUM_KEYS);
-        data.putString(KEY_SUBREDDIT, subreddit);
-        data.putString(KEY_THING_ID, thingId);
-        data.putString(KEY_LINK_ID, linkId);
-        return new ThingBundle(data);
+        return new ThingBundle(parser.data, TYPE_LINK);
     }
 
     public static ThingBundle newLinkInstance(String author,
+            long createdUtc,
+            String domain,
+            int downs,
+            int likes,
+            int kind,
+            int numComments,
+            boolean over18,
+            String permaLink,
+            boolean saved,
+            int score,
+            boolean self,
+            String subreddit,
+            String thingId,
+            String thumbnailUrl,
+            String title,
+            int ups,
+            String url) {
+        Bundle data = new Bundle(NUM_KEYS);
+        data.putString(KEY_AUTHOR, author);
+        data.putLong(KEY_CREATED_UTC, createdUtc);
+        data.putString(KEY_DOMAIN, domain);
+        data.putInt(KEY_DOWNS, downs);
+        data.putInt(KEY_KIND, kind);
+        data.putInt(KEY_LIKES, likes);
+        data.putInt(KEY_NUM_COMMENTS, numComments);
+        data.putBoolean(KEY_OVER_18, over18);
+        data.putString(KEY_PERMA_LINK, permaLink);
+        data.putBoolean(KEY_SAVED, saved);
+        data.putInt(KEY_SCORE, score);
+        data.putBoolean(KEY_SELF, self);
+        data.putString(KEY_SUBREDDIT, subreddit);
+        data.putString(KEY_THING_ID, thingId);
+        data.putString(KEY_THUMBNAIL_URL, thumbnailUrl);
+        data.putString(KEY_TITLE, title);
+        data.putInt(KEY_UPS, ups);
+        data.putString(KEY_URL, url);
+        return new ThingBundle(data, TYPE_LINK);
+    }
+
+    public static ThingBundle newCommentInstance(String author,
             long createdUtc,
             String domain,
             int downs,
@@ -143,19 +173,37 @@ public class ThingBundle extends BundleSupport implements Parcelable {
         data.putString(KEY_TITLE, title);
         data.putInt(KEY_UPS, ups);
         data.putString(KEY_URL, url);
-        return new ThingBundle(data);
+        return new ThingBundle(data, TYPE_COMMENT);
+    }
+
+    public static ThingBundle newLinkReference(String subreddit, String thingId) {
+        Bundle data = new Bundle(NUM_KEYS);
+        data.putString(KEY_SUBREDDIT, subreddit);
+        data.putString(KEY_THING_ID, thingId);
+        return new ThingBundle(data, TYPE_LINK_REFERENCE);
+    }
+
+    public static ThingBundle newCommentReference(String subreddit, String thingId,
+            String linkId) {
+        Bundle data = new Bundle(NUM_KEYS);
+        data.putString(KEY_SUBREDDIT, subreddit);
+        data.putString(KEY_THING_ID, thingId);
+        data.putString(KEY_LINK_ID, linkId);
+        return new ThingBundle(data, TYPE_COMMENT_REFERENCE);
     }
 
     protected ThingBundle(ThingBundle thingBundle) {
-        this(thingBundle.data);
+        this(thingBundle.data, thingBundle.type);
     }
 
     private ThingBundle(Parcel in) {
-        this(in.readBundle());
+        this.data = in.readBundle();
+        this.type = in.readInt();
     }
 
-    private ThingBundle(Bundle data) {
+    private ThingBundle(Bundle data, int type) {
         this.data = data;
+        this.type = type;
     }
 
     @Override
@@ -166,6 +214,11 @@ public class ThingBundle extends BundleSupport implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeBundle(data);
+        dest.writeInt(type);
+    }
+
+    public int getType() {
+        return type;
     }
 
     // TODO: Move these methods with logic to a different class.

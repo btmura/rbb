@@ -155,14 +155,14 @@ public class UriHelper {
                 List<String> segments = data.getPathSegments();
                 String subreddit = segments.get(1);
                 String thingId = ThingIds.addTag(segments.get(3), Kinds.getTag(Kinds.KIND_LINK));
-                return ThingBundle.newCommentsUrlInstance(subreddit, thingId);
+                return ThingBundle.newLinkReference(subreddit, thingId);
 
             case MATCH_COMMENTS_CONTEXT:
                 segments = data.getPathSegments();
                 subreddit = segments.get(1);
                 thingId = ThingIds.addTag(segments.get(5), Kinds.getTag(Kinds.KIND_COMMENT));
                 String linkId = ThingIds.addTag(segments.get(3), Kinds.getTag(Kinds.KIND_LINK));
-                return ThingBundle.newCommentsUrlInstance(subreddit, thingId, linkId);
+                return ThingBundle.newCommentReference(subreddit, thingId, linkId);
 
             default:
                 return null;
