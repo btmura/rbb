@@ -139,7 +139,7 @@ public class Provider {
                     showChangeToast(appContext, add, subreddits.length);
                     scheduleBackup(appContext, accountName);
                 } else {
-                    Toast.makeText(appContext, R.string.error, Toast.LENGTH_SHORT).show();
+                    showErrorToast(appContext);
                 }
             }
         }.execute();
@@ -149,6 +149,10 @@ public class Provider {
         int resId = added ? R.plurals.added : R.plurals.deleted;
         CharSequence text = context.getResources().getQuantityString(resId, count, count);
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+    }
+
+    private static void showErrorToast(Context context) {
+        Toast.makeText(context, R.string.error, Toast.LENGTH_SHORT).show();
     }
 
     private static void scheduleBackup(Context context, String accountName) {
@@ -175,6 +179,36 @@ public class Provider {
                         parentNumComments, parentThingId, sequence, sessionId, thingId);
             }
         });
+    }
+
+    public static void deferredCommentReplyAsync(Context context,
+            final String accountName,
+            final String body,
+            final String parentThingId,
+            final String thingId) {
+        final Context appContext = context.getApplicationContext();
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voidRay) {
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(1);
+                ops.add(ContentProviderOperation.newInsert(ThingProvider.COMMENT_ACTIONS_SYNC_URI)
+                        .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
+                        .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT)
+                        .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentThingId)
+                        .withValue(CommentActions.COLUMN_TEXT, body)
+                        .withValue(CommentActions.COLUMN_THING_ID, thingId)
+                        .build());
+                return applyOps(appContext, ThingProvider.AUTHORITY, ops);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                if (!success) {
+                    showErrorToast(appContext);
+                }
+            }
+        }.execute();
     }
 
     // TODO: Move this to ThingProvider#call like commentReplyAsync.

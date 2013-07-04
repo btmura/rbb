@@ -217,6 +217,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 titleText.setHint(R.string.hint_subject);
                 break;
 
+            case ComposeActivity.TYPE_DEFERRED_COMMENT_REPLY:
             case ComposeActivity.TYPE_COMMENT_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
             case ComposeActivity.TYPE_EDIT_POST:
@@ -251,6 +252,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 destinationText.setFilters(InputFilters.NO_SPACE_FILTERS);
                 break;
 
+            case ComposeActivity.TYPE_DEFERRED_COMMENT_REPLY:
             case ComposeActivity.TYPE_COMMENT_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
             case ComposeActivity.TYPE_EDIT_POST:
@@ -280,6 +282,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 linkSwitch.setVisibility(View.GONE);
                 break;
 
+            case ComposeActivity.TYPE_DEFERRED_COMMENT_REPLY:
             case ComposeActivity.TYPE_COMMENT_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
             case ComposeActivity.TYPE_EDIT_POST:

@@ -327,9 +327,9 @@ public class ThingProvider extends BaseProvider {
         call(context, COMMENTS_URI, METHOD_COLLAPSE_COMMENT, null, extras);
     }
 
-    public static final Bundle insertComment(Context context, String accountName, String body,
-            int nesting, long parentId, int parentNumComments, String parentThingId, int sequence,
-            long sessionId, String thingId) {
+    public static final Bundle insertComment(Context context, String accountName,
+            String body, int nesting, long parentId, int parentNumComments, String parentThingId,
+            int sequence, long sessionId, String thingId) {
         Bundle extras = new Bundle(8);
         extras.putString(EXTRA_BODY, body);
         extras.putInt(EXTRA_NESTING, nesting);
