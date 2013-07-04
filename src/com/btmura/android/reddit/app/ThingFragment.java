@@ -35,7 +35,6 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.ThingDataLoader;
 import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData> {
 

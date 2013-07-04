@@ -37,8 +37,8 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.text.Formatter;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class RedditApi {
 

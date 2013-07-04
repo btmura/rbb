@@ -23,7 +23,6 @@ import android.view.Menu;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 interface ThingListController {
 

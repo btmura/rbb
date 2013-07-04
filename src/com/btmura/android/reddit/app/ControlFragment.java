@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ControlFragment extends Fragment {
 

@@ -31,7 +31,6 @@ import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class MessageActivity extends AbstractBrowserActivity implements OnNavigationListener {
 

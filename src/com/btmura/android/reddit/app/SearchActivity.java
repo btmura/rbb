@@ -33,7 +33,6 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class SearchActivity extends AbstractBrowserActivity implements
         TabListener,

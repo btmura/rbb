@@ -36,7 +36,6 @@ import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
-import com.btmura.android.reddit.widget.ThingBundle;
 import com.btmura.android.reddit.widget.ThingListAdapter;
 
 abstract class AbstractThingTableListController

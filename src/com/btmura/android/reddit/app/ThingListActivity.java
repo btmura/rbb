@@ -41,7 +41,6 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
-import com.btmura.android.reddit.widget.ThingBundle;
 import com.btmura.android.reddit.widget.ThingView;
 
 public class ThingListActivity extends GlobalMenuActivity implements

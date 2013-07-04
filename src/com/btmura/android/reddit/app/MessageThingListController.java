@@ -32,7 +32,6 @@ import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 import com.btmura.android.reddit.widget.MessageListAdapter;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 class MessageThingListController implements ThingListController {
 

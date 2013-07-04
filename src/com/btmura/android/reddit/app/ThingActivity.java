@@ -32,7 +32,6 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.StringUtil;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,

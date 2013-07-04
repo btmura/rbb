@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.content.ThingProjection;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;

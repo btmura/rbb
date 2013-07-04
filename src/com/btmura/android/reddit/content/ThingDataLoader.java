@@ -27,6 +27,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
@@ -34,7 +35,6 @@ import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Array;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
 

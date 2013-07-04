@@ -21,10 +21,10 @@ import java.util.List;
 import android.content.UriMatcher;
 import android.net.Uri;
 
+import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.util.ThingIds;
 import com.btmura.android.reddit.widget.FilterAdapter;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class UriHelper {
 

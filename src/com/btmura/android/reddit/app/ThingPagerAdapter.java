@@ -28,7 +28,6 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 /**
  * {@link FragmentStateItemPagerAdapter} for controlling what is shown in the ViewPager for looking

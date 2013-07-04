@@ -46,7 +46,6 @@ import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedLi
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.widget.ThingBundle;
 import com.btmura.android.reddit.widget.ThingView;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements

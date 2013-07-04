@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.btmura.android.reddit.widget;
+package com.btmura.android.reddit.app;
 
 import java.io.IOException;
 

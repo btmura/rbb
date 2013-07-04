@@ -45,7 +45,6 @@ import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
-import com.btmura.android.reddit.widget.ThingBundle;
 
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
