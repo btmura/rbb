@@ -48,6 +48,8 @@ interface ThingListController {
 
     void save(int position, boolean save);
 
+    void select(int position);
+
     void subreddit(int position);
 
     void vote(int position, int action);

@@ -195,6 +195,10 @@ abstract class AbstractThingTableListController
         }
     }
 
+    public void select(int position) {
+        // TODO: What was this for?
+    }
+
     @Override
     public void subreddit(int position) {
         MenuHelper.startSidebarActivity(context, getSubreddit(position));
