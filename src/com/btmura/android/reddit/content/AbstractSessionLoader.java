@@ -48,6 +48,7 @@ abstract class AbstractSessionLoader extends CursorLoader {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
+
         if (sessionId == 0 || !TextUtils.isEmpty(more)) {
             Bundle extras = createSession(sessionId, more);
             if (extras == null) {
@@ -56,10 +57,15 @@ abstract class AbstractSessionLoader extends CursorLoader {
             sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
             more = null;
         }
-        Bundle extras = new Bundle(1);
-        extras.putLong(ThingProvider.EXTRA_SESSION_ID, sessionId);
         setSelectionArgs(Array.of(sessionId));
-        return new CursorExtrasWrapper(super.loadInBackground(), extras);
+
+        Cursor c = super.loadInBackground();
+        if (c != null) {
+            Bundle extras = new Bundle(1);
+            extras.putLong(ThingProvider.EXTRA_SESSION_ID, sessionId);
+            return new CursorExtrasWrapper(c, extras);
+        }
+        return null;
     }
 
     protected abstract Bundle createSession(long sessionId, String more);
