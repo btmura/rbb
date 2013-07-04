@@ -23,6 +23,7 @@ import java.net.URLEncoder;
 
 import android.text.TextUtils;
 
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.ThingIds;
 import com.btmura.android.reddit.widget.FilterAdapter;
@@ -43,6 +44,7 @@ public class Urls {
     private static final String API_DELETE_URL = BASE_URL + "/api/del";
     private static final String API_EDIT_URL = BASE_URL + "/api/editusertext";
     private static final String API_HIDE_URL = BASE_URL + "/api/hide";
+    private static final String API_INFO_URL = BASE_URL + "/api/info";
     private static final String API_LOGIN_URL = BASE_SSL_URL + "/api/login/";
     private static final String API_ME_URL = BASE_URL + "/api/me";
     private static final String API_NEW_CAPTCHA_URL = BASE_URL + "/api/new_captcha";
@@ -169,6 +171,12 @@ public class Urls {
 
     public static CharSequence hideQuery(String thingId, String modhash) {
         return thingQuery(thingId, modhash);
+    }
+
+    public static CharSequence info(String thingId) {
+        return new StringBuilder(API_INFO_URL)
+                .append(".json?id=")
+                .append(ThingIds.addTag(thingId, Kinds.getTag(Kinds.KIND_LINK)));
     }
 
     public static CharSequence loginCookie(String cookie) {

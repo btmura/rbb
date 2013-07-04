@@ -37,6 +37,8 @@ import android.util.JsonReader;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.widget.ThingBundle;
 
 public class RedditApi {
 
@@ -105,7 +107,22 @@ public class RedditApi {
         return postData(Urls.newCaptcha(), Urls.newCaptchaQuery(), null);
     }
 
-    public static SidebarResult getSidebar(Context context, String subreddit, String cookie)
+    public static ThingBundle getInfo(Context context, String thingId, String cookie,
+            Formatter formatter) throws IOException {
+        HttpURLConnection conn = null;
+        InputStream in = null;
+        try {
+            conn = connect(Urls.info(thingId), cookie, true, false);
+            in = conn.getInputStream();
+            return ThingBundle.fromJsonReader(context, new JsonReader(new InputStreamReader(in)),
+                    formatter);
+        } finally {
+            close(in, conn);
+        }
+    }
+
+    public static SidebarResult getSidebar(Context context, String subreddit,
+            String cookie)
             throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;

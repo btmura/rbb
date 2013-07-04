@@ -36,11 +36,6 @@
         android:title="@string/menu_save"
         android:visible="false"/>
     <item
-        android:id="@+id/menu_share_thing"
-        android:actionProviderClass="android.widget.ShareActionProvider"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_share"/>
-    <item
         android:id="@+id/menu_hide"
         android:showAsAction="never"
         android:title="@string/menu_hide"/>
@@ -48,6 +43,11 @@
         android:id="@+id/menu_unhide"
         android:showAsAction="never"
         android:title="@string/menu_unhide"/>
+    <item
+        android:id="@+id/menu_share_thing"
+        android:actionProviderClass="android.widget.ShareActionProvider"
+        android:showAsAction="never"
+        android:title="@string/menu_share"/>
     <item
         android:id="@+id/menu_copy_url"
         android:showAsAction="never"

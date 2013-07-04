@@ -16,15 +16,21 @@
 
 package com.btmura.android.reddit.widget;
 
+import java.io.IOException;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import android.util.JsonReader;
+import android.util.JsonToken;
 
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.BundleSupport;
+import com.btmura.android.reddit.util.JsonParser;
 import com.btmura.android.reddit.util.StringUtil;
 
 /**
@@ -32,6 +38,8 @@ import com.btmura.android.reddit.util.StringUtil;
  * information to the underlying {@link Bundle}s attributes and nothing more.
  */
 public class ThingBundle extends BundleSupport implements Parcelable {
+
+    // TODO(btmura): Move this class since it has nothing to do with widgets.
 
     private static final int NUM_KEYS = 20;
 
@@ -70,6 +78,13 @@ public class ThingBundle extends BundleSupport implements Parcelable {
     private final Bundle data;
 
     private Formatter formatter;
+
+    public static ThingBundle fromJsonReader(Context context, JsonReader reader,
+            Formatter formatter) throws IOException {
+        ThingBundleParser parser = new ThingBundleParser(context, formatter);
+        parser.parseListingObject(reader);
+        return new ThingBundle(parser.data);
+    }
 
     public static ThingBundle newCommentsUrlInstance(String subreddit, String thingId) {
         Bundle data = new Bundle(NUM_KEYS);
@@ -255,6 +270,10 @@ public class ThingBundle extends BundleSupport implements Parcelable {
         return getString(data, KEY_URL);
     }
 
+    public boolean hasLinkId() {
+        return !TextUtils.isEmpty(getLinkId());
+    }
+
     public boolean isOver18() {
         return data.getBoolean(KEY_OVER_18);
     }
@@ -265,5 +284,129 @@ public class ThingBundle extends BundleSupport implements Parcelable {
 
     public boolean isSelf() {
         return data.getBoolean(KEY_SELF);
+    }
+
+    static class ThingBundleParser extends JsonParser {
+
+        private final Bundle data = new Bundle(NUM_KEYS);
+        private final Context context;
+        private final Formatter formatter;
+
+        ThingBundleParser(Context context, Formatter formatter) {
+            this.context = context;
+            this.formatter = formatter;
+        }
+
+        @Override
+        public void onAuthor(JsonReader reader, int index) throws IOException {
+            data.putString(KEY_AUTHOR, readString(reader, ""));
+        }
+
+        @Override
+        public void onCreatedUtc(JsonReader reader, int index) throws IOException {
+            data.putLong(KEY_CREATED_UTC, reader.nextLong());
+        }
+
+        @Override
+        public void onDomain(JsonReader reader, int index) throws IOException {
+            data.putString(KEY_DOMAIN, readString(reader, ""));
+        }
+
+        @Override
+        public void onDowns(JsonReader reader, int index) throws IOException {
+            data.putInt(KEY_DOWNS, reader.nextInt());
+        }
+
+        @Override
+        public void onKind(JsonReader reader, int index) throws IOException {
+            data.putInt(KEY_KIND, Kinds.parseKind(reader.nextString()));
+        }
+
+        @Override
+        public void onLikes(JsonReader reader, int index) throws IOException {
+            int likes = 0;
+            if (reader.peek() == JsonToken.BOOLEAN) {
+                likes = reader.nextBoolean() ? 1 : -1;
+            } else {
+                reader.skipValue();
+            }
+            data.putInt(KEY_LIKES, likes);
+        }
+
+        @Override
+        public void onLinkId(JsonReader reader, int index) throws IOException {
+            data.putString(KEY_LINK_ID, readString(reader, null));
+        }
+
+        @Override
+        public void onLinkTitle(JsonReader reader, int index) throws IOException {
+            CharSequence title = formatter.formatNoSpans(context, readString(reader, ""));
+            data.putString(KEY_LINK_TITLE, title.toString());
+        }
+
+        @Override
+        public void onName(JsonReader reader, int index) throws IOException {
+            data.putString(KEY_THING_ID, readString(reader, ""));
+        }
+
+        @Override
+        public void onNumComments(JsonReader reader, int index) throws IOException {
+            data.putInt(KEY_NUM_COMMENTS, reader.nextInt());
+        }
+
+        @Override
+        public void onOver18(JsonReader reader, int index) throws IOException {
+            data.putBoolean(KEY_OVER_18, reader.nextBoolean());
+        }
+
+        @Override
+        public void onPermaLink(JsonReader reader, int index) throws IOException {
+            data.putString(KEY_PERMA_LINK, readString(reader, ""));
+        }
+
+        @Override
+        public void onSaved(JsonReader reader, int index) throws IOException {
+            data.putBoolean(KEY_SAVED, reader.nextBoolean());
+        }
+
+        @Override
+        public void onScore(JsonReader reader, int index) throws IOException {
+            data.putInt(KEY_SCORE, reader.nextInt());
+        }
+
+        @Override
+        public void onIsSelf(JsonReader reader, int index) throws IOException {
+            data.putBoolean(KEY_SELF, reader.nextBoolean());
+        }
+
+        @Override
+        public void onSubreddit(JsonReader reader, int index) throws IOException {
+            data.putString(KEY_SUBREDDIT, readString(reader, ""));
+        }
+
+        @Override
+        public void onThumbnail(JsonReader reader, int index) throws IOException {
+            String thumbnail = readString(reader, null);
+            if (!TextUtils.isEmpty(thumbnail) && thumbnail.startsWith("http")) {
+                data.putString(KEY_THUMBNAIL_URL, thumbnail);
+            }
+        }
+
+        @Override
+        public void onTitle(JsonReader reader, int index) throws IOException {
+            CharSequence title = formatter.formatNoSpans(context, readString(reader, ""));
+            data.putString(KEY_TITLE, title.toString());
+        }
+
+        @Override
+        public void onUps(JsonReader reader, int index) throws IOException {
+            data.putInt(KEY_UPS, reader.nextInt());
+        }
+
+        @Override
+        public void onUrl(JsonReader reader, int index) throws IOException {
+            data.putString(KEY_URL, readString(reader, ""));
+        }
+
     }
 }

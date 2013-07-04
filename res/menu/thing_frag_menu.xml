@@ -55,7 +55,7 @@
         <item
             android:id="@+id/menu_share"
             android:actionProviderClass="android.widget.ShareActionProvider"
-            android:showAsAction="ifRoom"
+            android:showAsAction="never"
             android:title="@string/menu_share"
             android:visible="false"/>
         <item

@@ -16,10 +16,13 @@
 
 package com.btmura.android.reddit.content;
 
+import java.io.IOException;
+
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -27,7 +30,9 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
+import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.widget.ThingBundle;
 
@@ -35,24 +40,30 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
 
     private static final String TAG = "ThingDataLoader";
 
-    public static class ThingData extends ThingBundle {
+    public static class ThingData {
+        public final ThingBundle parent;
+        public final ThingBundle child;
+
         private final String accountName;
         private final Cursor saveActionCursor;
 
-        private ThingData(String accountName, ThingBundle thingBundle, Cursor saveActionCursor) {
-            super(thingBundle);
+        private ThingData(String accountName, ThingBundle parent, ThingBundle child,
+                Cursor saveActionCursor) {
             this.accountName = accountName;
+            this.parent = parent;
+            this.child = child;
             this.saveActionCursor = saveActionCursor;
         }
 
-        public boolean isSaveable() {
-            return AccountUtils.isAccount(accountName) && getKind() == Kinds.KIND_LINK;
+        public boolean isParentSaveable() {
+            return AccountUtils.isAccount(accountName)
+                    && parent.getKind() == Kinds.KIND_LINK;
         }
 
-        public boolean isSaved() {
+        public boolean isParentSaved() {
             // If no local save actions are pending, then rely on server info.
             if (saveActionCursor == null || !saveActionCursor.moveToFirst()) {
-                return super.isSaved();
+                return parent.isSaved();
             }
 
             // We have a local pending action so use that to indicate if it's read.
@@ -90,23 +101,40 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
             Log.d(TAG, "loadInBackground");
         }
 
-        String thingId = thingBundle.getLinkId();
-        if (TextUtils.isEmpty(thingId)) {
-            thingId = thingBundle.getThingId();
-        }
-
-        Cursor saveActionCursor = null;
-        if (AccountUtils.isAccount(accountName)) {
-            ContentResolver cr = getContext().getContentResolver();
-            saveActionCursor = cr.query(ThingProvider.SAVE_ACTIONS_URI, PROJECTION,
-                    SaveActions.SELECT_BY_ACCOUNT_AND_THING_ID, Array.of(accountName, thingId),
-                    null);
-            if (saveActionCursor != null) {
-                saveActionCursor.getCount();
-                saveActionCursor.registerContentObserver(observer);
+        try {
+            ThingBundle parentBundle = thingBundle;
+            ThingBundle childBundle = null;
+            if (thingBundle.hasLinkId()) {
+                parentBundle = RedditApi.getInfo(getContext(), thingBundle.getLinkId(),
+                        AccountUtils.getCookie(getContext(), accountName),
+                        new Formatter());
+                childBundle = thingBundle;
             }
+
+            Cursor saveActionCursor = null;
+            if (AccountUtils.isAccount(accountName)) {
+                ContentResolver cr = getContext().getContentResolver();
+                saveActionCursor = cr.query(ThingProvider.SAVE_ACTIONS_URI, PROJECTION,
+                        SaveActions.SELECT_BY_ACCOUNT_AND_THING_ID,
+                        Array.of(accountName, parentBundle.getThingId()),
+                        null);
+                if (saveActionCursor != null) {
+                    saveActionCursor.getCount();
+                    saveActionCursor.registerContentObserver(observer);
+                }
+            }
+
+            return new ThingData(accountName, parentBundle, childBundle, saveActionCursor);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+            return null;
+        } catch (OperationCanceledException e) {
+            Log.e(TAG, e.getMessage(), e);
+            return null;
+        } catch (AuthenticatorException e) {
+            Log.e(TAG, e.getMessage(), e);
+            return null;
         }
-        return new ThingData(accountName, thingBundle, saveActionCursor);
     }
 
     @Override

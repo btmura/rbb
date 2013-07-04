@@ -138,18 +138,18 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
             return; // Bail out if the menu hasn't been created.
         }
 
-        linkItem.setVisible(thingData.hasLinkUrl()
+        linkItem.setVisible(thingData.parent.hasLinkUrl()
                 && !isCurrentPageType(ThingPagerAdapter.TYPE_LINK));
-        commentsItem.setVisible(thingData.hasLinkUrl() && thingData.hasCommentsUrl()
+        commentsItem.setVisible(thingData.parent.hasLinkUrl() && thingData.parent.hasCommentsUrl()
                 && !isCurrentPageType(ThingPagerAdapter.TYPE_COMMENTS));
 
-        savedItem.setVisible(thingData.isSaveable() && thingData.isSaved());
-        unsavedItem.setVisible(thingData.isSaveable() && !thingData.isSaved());
+        savedItem.setVisible(thingData.isParentSaveable() && thingData.isParentSaved());
+        unsavedItem.setVisible(thingData.isParentSaveable() && !thingData.isParentSaved());
 
         boolean hasAccount = AccountUtils.isAccount(getAccountName());
         newCommentItem.setVisible(hasAccount);
 
-        String title = thingData.getDisplayTitle(getActivity());
+        String title = thingData.parent.getTitle();
         CharSequence url = getUrl();
         boolean hasTitleAndUrl = !TextUtils.isEmpty(title) && !TextUtils.isEmpty(url);
         openItem.setVisible(hasTitleAndUrl);
@@ -159,8 +159,8 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
             MenuHelper.setShareProvider(shareItem, title, url);
         }
 
-        userItem.setTitle(getString(R.string.menu_user, thingData.getAuthor()));
-        subredditItem.setTitle(getString(R.string.menu_subreddit, thingData.getSubreddit()));
+        userItem.setTitle(getString(R.string.menu_user, thingData.parent.getAuthor()));
+        subredditItem.setTitle(getString(R.string.menu_subreddit, thingData.parent.getSubreddit()));
     }
 
     @Override
@@ -217,27 +217,27 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
 
     private void handleSaved() {
         Provider.unsaveAsync(getActivity(), getAccountName(),
-                thingData.getThingId());
+                thingData.parent.getThingId());
     }
 
     private void handleUnsaved() {
         Provider.saveAsync(getActivity(), getAccountName(),
-                thingData.getAuthor(),
-                thingData.getCreatedUtc(),
-                thingData.getDomain(),
-                thingData.getDowns(),
-                thingData.getLikes(),
-                thingData.getNumComments(),
-                thingData.isOver18(),
-                thingData.getPermaLink(),
-                thingData.getScore(),
-                thingData.isSelf(),
-                thingData.getSubreddit(),
-                thingData.getThingId(),
-                thingData.getThumbnailUrl(),
-                thingData.getTitle(),
-                thingData.getUps(),
-                thingData.getUrl());
+                thingData.parent.getAuthor(),
+                thingData.parent.getCreatedUtc(),
+                thingData.parent.getDomain(),
+                thingData.parent.getDowns(),
+                thingData.parent.getLikes(),
+                thingData.parent.getNumComments(),
+                thingData.parent.isOver18(),
+                thingData.parent.getPermaLink(),
+                thingData.parent.getScore(),
+                thingData.parent.isSelf(),
+                thingData.parent.getSubreddit(),
+                thingData.parent.getThingId(),
+                thingData.parent.getThumbnailUrl(),
+                thingData.parent.getTitle(),
+                thingData.parent.getUps(),
+                thingData.parent.getUrl());
     }
 
     private void handleOpenItem() {
@@ -246,28 +246,28 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
 
     private void handleCopyUrlItem() {
         MenuHelper.setClipAndToast(getActivity(),
-                thingData.getDisplayTitle(getActivity()), getUrl());
+                thingData.parent.getTitle(), getUrl());
     }
 
     private void handleAddSubredditItem() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager(), thingData.getSubreddit());
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), thingData.parent.getSubreddit());
     }
 
     private void handleUserItem() {
-        MenuHelper.startProfileActivity(getActivity(), thingData.getAuthor(), -1);
+        MenuHelper.startProfileActivity(getActivity(), thingData.parent.getAuthor(), -1);
     }
 
     private void handleSubredditItem() {
-        MenuHelper.startSidebarActivity(getActivity(), thingData.getSubreddit());
+        MenuHelper.startSidebarActivity(getActivity(), thingData.parent.getSubreddit());
     }
 
     private CharSequence getUrl() {
         switch (getCurrentPageType()) {
             case ThingPagerAdapter.TYPE_LINK:
-                return thingData.getLinkUrl();
+                return thingData.parent.getLinkUrl();
 
             case ThingPagerAdapter.TYPE_COMMENTS:
-                return thingData.getCommentsUrl();
+                return thingData.parent.getCommentsUrl();
 
             default:
                 return null;

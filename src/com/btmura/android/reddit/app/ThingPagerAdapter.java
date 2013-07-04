@@ -26,6 +26,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
+import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.widget.ThingBundle;
 
@@ -52,15 +53,15 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
     private final ArrayList<Integer> oldPageTypes = new ArrayList<Integer>(2);
     private final Context context;
     private final String accountName;
-    private final ThingBundle thingBundle;
+    private final ThingData thingData;
 
     public ThingPagerAdapter(Context context, FragmentManager fm, String accountName,
-            ThingBundle thingBundle) {
+            ThingData thingData) {
         super(fm);
         this.context = context.getApplicationContext();
         this.accountName = accountName;
-        this.thingBundle = thingBundle;
-        setupPages(thingBundle);
+        this.thingData = thingData;
+        setupPages(thingData.parent);
     }
 
     @Override
@@ -186,7 +187,7 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
         }
         switch (pageTypes.get(position)) {
             case TYPE_LINK:
-                String url = thingBundle.getLinkUrl().toString();
+                String url = thingData.parent.getLinkUrl().toString();
                 if (YouTubePlayerFragment.isPlayableWithYouTube(context, url)) {
                     return YouTubePlayerFragment.newInstance(url);
                 } else {
@@ -195,12 +196,12 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
             case TYPE_COMMENTS:
                 return CommentListFragment.newInstance(accountName,
-                        thingBundle.getThingId(),
-                        thingBundle.getLinkId());
+                        thingData.child.getThingId(),
+                        thingData.child.getLinkId());
 
             case TYPE_MESSAGES:
                 return MessageThreadListFragment.newInstance(accountName,
-                        thingBundle.getThingId());
+                        thingData.parent.getThingId());
 
             default:
                 throw new IllegalArgumentException();
