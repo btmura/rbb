@@ -127,9 +127,11 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         long t1 = System.currentTimeMillis();
         CharSequence url = Urls.commentListing(thingId, linkId, numComments, Urls.TYPE_JSON);
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
-        InputStream input = new BufferedInputStream(conn.getInputStream());
-        long t2 = System.currentTimeMillis();
+        InputStream input = null;
         try {
+            input = new BufferedInputStream(conn.getInputStream());
+            long t2 = System.currentTimeMillis();
+
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingArray(reader);
             if (BuildConfig.DEBUG) {

@@ -102,16 +102,23 @@ public class ThumbnailLoader {
                     return null;
                 }
 
-                InputStream is = conn.getInputStream();
-                if (isCancelled()) {
-                    return null;
-                }
+                InputStream is = null;
+                try {
+                    is = conn.getInputStream();
+                    if (isCancelled()) {
+                        return null;
+                    }
 
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inScaled = true;
-                options.inDensity = DisplayMetrics.DENSITY_MEDIUM;
-                options.inTargetDensity = context.getResources().getDisplayMetrics().densityDpi;
-                return BitmapFactory.decodeStream(is, null, options);
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inScaled = true;
+                    options.inDensity = DisplayMetrics.DENSITY_MEDIUM;
+                    options.inTargetDensity = context.getResources().getDisplayMetrics().densityDpi;
+                    return BitmapFactory.decodeStream(is, null, options);
+                } finally {
+                    if (is != null) {
+                        is.close();
+                    }
+                }
 
             } catch (MalformedURLException e) {
                 Log.e(TAG, e.getMessage(), e);

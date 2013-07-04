@@ -116,9 +116,11 @@ class MessageListing extends JsonParser implements Listing {
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, true, false);
-        InputStream input = new BufferedInputStream(conn.getInputStream());
-        long t2 = System.currentTimeMillis();
+        InputStream input = null;
         try {
+            input = new BufferedInputStream(conn.getInputStream());
+            long t2 = System.currentTimeMillis();
+
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingObject(reader);
             if (BuildConfig.DEBUG) {

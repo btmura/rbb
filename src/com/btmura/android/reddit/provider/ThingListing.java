@@ -277,9 +277,11 @@ class ThingListing extends JsonParser implements Listing {
             conn = RedditApi.connect(url, cookie, false, false);
         }
 
-        InputStream input = new BufferedInputStream(conn.getInputStream());
-        long t2 = System.currentTimeMillis();
+        InputStream input = null;
         try {
+            input = new BufferedInputStream(conn.getInputStream());
+            long t2 = System.currentTimeMillis();
+
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingObject(reader);
             if (BuildConfig.DEBUG) {
