@@ -291,7 +291,9 @@ class ThingListing extends JsonParser implements Listing {
             }
             return values;
         } finally {
-            input.close();
+            if (input != null) {
+                input.close();
+            }
             conn.disconnect();
         }
     }

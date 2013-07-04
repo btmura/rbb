@@ -141,7 +141,9 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             }
             return values;
         } finally {
-            input.close();
+            if (input != null) {
+                input.close();
+            }
             conn.disconnect();
         }
     }
