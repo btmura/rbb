@@ -21,7 +21,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -35,7 +34,6 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
@@ -160,20 +158,16 @@ abstract class ThingListFragment<C extends ThingListController> extends ThingPro
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (controller.swapCursor(cursor)) {
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "onLoadFinished");
-            }
+        controller.swapCursor(cursor);
 
-            // TODO: Remove dependency on ThingProviderListFragment.
-            super.onLoadFinished(loader, cursor);
+        // TODO: Remove dependency on ThingProviderListFragment.
+        super.onLoadFinished(loader, cursor);
 
-            scrollLoading = false;
+        scrollLoading = false;
 
-            setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
-            setListShown(true);
-            getActivity().invalidateOptionsMenu();
-        }
+        setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
+        setListShown(true);
+        getActivity().invalidateOptionsMenu();
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {

@@ -34,7 +34,7 @@ interface ThingListController {
 
     Loader<Cursor> createLoader();
 
-    boolean swapCursor(Cursor cursor);
+    void swapCursor(Cursor cursor);
 
     ThingBundle getThingBundle(int position);
 

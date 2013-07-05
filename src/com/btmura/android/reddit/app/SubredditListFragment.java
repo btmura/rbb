@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,7 +31,6 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
@@ -119,23 +117,22 @@ abstract class SubredditListFragment<C extends SubredditListController<?>, AC ex
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (controller.swapCursor(cursor)) {
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "onLoadFinished");
-            }
+        controller.swapCursor(cursor);
 
-            setEmptyText(getEmptyText(cursor == null));
-            setListShown(true);
+        setEmptyText(getEmptyText(cursor == null));
+        setListShown(true);
 
+        if (cursor != null) {
             actionModeController.invalidateActionMode();
-            if (listener != null) {
-                if (cursor == null) {
-                    listener.onInitialSubredditSelected(null, true);
-                } else if (cursor.getCount() == 0) {
-                    listener.onInitialSubredditSelected(null, false);
-                } else {
-                    listener.onInitialSubredditSelected(getSubreddit(0), false);
-                }
+        }
+
+        if (listener != null) {
+            if (cursor == null) {
+                listener.onInitialSubredditSelected(null, true);
+            } else if (cursor.getCount() == 0) {
+                listener.onInitialSubredditSelected(null, false);
+            } else {
+                listener.onInitialSubredditSelected(getSubreddit(0), false);
             }
         }
     }

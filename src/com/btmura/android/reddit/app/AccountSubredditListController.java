@@ -73,12 +73,9 @@ class AccountSubredditListController
         return new AccountSubredditListLoader(context, accountName);
     }
 
-    public boolean swapCursor(Cursor cursor) {
-        if (adapter.getOriginalCursor() != cursor) {
-            adapter.swapCursor(cursor);
-            return true;
-        }
-        return false;
+    @Override
+    public void swapCursor(Cursor cursor) {
+        adapter.swapCursor(cursor);
     }
 
     // Getters

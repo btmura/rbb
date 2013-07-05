@@ -70,11 +70,14 @@ public class AccountSubredditAdapter extends SubredditAdapter {
 
     @Override
     public Cursor swapCursor(Cursor newCursor) {
-        originalCursor = newCursor;
-        if (showPresets) {
-            newCursor = new MergeCursor(new Cursor[] {PRESETS_CURSOR, newCursor});
+        if (originalCursor != newCursor) {
+            originalCursor = newCursor;
+            if (showPresets) {
+                newCursor = new MergeCursor(new Cursor[] {PRESETS_CURSOR, newCursor});
+            }
+            return super.swapCursor(newCursor);
         }
-        return super.swapCursor(newCursor);
+        return null;
     }
 
     @Override
@@ -88,10 +91,6 @@ public class AccountSubredditAdapter extends SubredditAdapter {
     @Override
     public String getName(int position) {
         return getString(position, INDEX_NAME);
-    }
-
-    public Cursor getOriginalCursor() {
-        return originalCursor;
     }
 
     public boolean isDeletable(int position) {
