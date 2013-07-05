@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.widget.ListView;
 
@@ -175,7 +176,7 @@ class MessageThingListController implements ThingListController {
     // Menu preparation methods.
 
     @Override
-    public void prepareActionMenu(Menu menu, ListView listView, int position) {
+    public void onPrepareActionMode(ActionMode mode, Menu menu, ListView listView) {
     }
 
     // More complex getters.

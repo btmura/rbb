@@ -276,9 +276,7 @@ abstract class ThingListFragment<C extends ThingListController> extends ThingPro
     }
 
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        int count = getListView().getCheckedItemCount();
-        mode.setTitle(getResources().getQuantityString(R.plurals.things, count, count));
-        controller.prepareActionMenu(menu, getListView(), getFirstCheckedPosition());
+        controller.onPrepareActionMode(mode, menu, getListView());
         return true;
     }
 

@@ -19,7 +19,7 @@ package com.btmura.android.reddit.util;
 import android.util.SparseBooleanArray;
 import android.widget.ListView;
 
-public class ViewUtils {
+public class ListViewUtils {
 
     public static int getFirstCheckedPosition(ListView listView) {
         SparseBooleanArray checked = listView.getCheckedItemPositions();

@@ -35,7 +35,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.util.ViewUtils;
+import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SearchSubredditAdapter;
 
@@ -135,7 +135,7 @@ class SubredditSearchActionModeController implements SearchSubredditListActionMo
         menu.findItem(R.id.menu_delete).setVisible(false);
 
         MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
-        String subreddit = adapter.getName(ViewUtils.getFirstCheckedPosition(listView));
+        String subreddit = adapter.getName(ListViewUtils.getFirstCheckedPosition(listView));
         subredditItem.setVisible(hasCursor && count == 1 && Subreddits.hasSidebar(subreddit));
 
         return true;
@@ -175,7 +175,7 @@ class SubredditSearchActionModeController implements SearchSubredditListActionMo
     }
 
     private void handleSubreddit(ListView listView) {
-        String subreddit = adapter.getName(ViewUtils.getFirstCheckedPosition(listView));
+        String subreddit = adapter.getName(ListViewUtils.getFirstCheckedPosition(listView));
         MenuHelper.startSidebarActivity(context, subreddit);
     }
 

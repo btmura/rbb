@@ -20,6 +20,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -34,6 +35,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingListAdapter;
@@ -262,7 +264,16 @@ abstract class AbstractThingTableListController
     // Menu preparation methods.
 
     @Override
-    public void prepareActionMenu(Menu menu, ListView listView, int position) {
+    public void onPrepareActionMode(ActionMode mode, Menu menu, ListView listView) {
+        int count = listView.getCheckedItemCount();
+        int position = ListViewUtils.getFirstCheckedPosition(listView);
+
+        if (count == 1 && !TextUtils.isEmpty(getDomain(position))) {
+            mode.setTitle(getDomain(position));
+        } else {
+            mode.setTitle(context.getResources().getQuantityString(R.plurals.things, count, count));
+        }
+
         prepareAuthorActionItem(menu, listView, position);
         prepareCopyUrlActionItem(menu, listView, position);
         prepareHideActionItems(menu, listView, position);
