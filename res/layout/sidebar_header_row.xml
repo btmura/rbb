@@ -28,7 +28,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginRight="@dimen/padding"
         android:background="@android:color/white"
-        android:contentDescription="@string/header_image"
+        android:contentDescription="@string/content_desc_header"
         android:visibility="gone" />
 
     <!-- These TextViews are clickable, so we cannot make the text selectable. -->

@@ -59,8 +59,9 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
                 public void onLoadFinished(Loader<AccountInfoResult> loader,
                         AccountInfoResult result) {
-                    int[] karmaCounts = result != null ? new int[result.linkKarma] : null;
-                    adapter.setAccountInfo(Array.of(currentUser), karmaCounts, null);
+                    int[] linkKarma = result != null ? new int[result.linkKarma] : null;
+                    int[] commentKarma = result != null ? new int[result.commentKarma] : null;
+                    adapter.setAccountInfo(Array.of(currentUser), linkKarma, commentKarma, null);
                 }
 
                 public void onLoaderReset(Loader<AccountInfoResult> loader) {
@@ -108,7 +109,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
         adapter.addProfileFilters(this, false);
 
         // Set the only account option to the user we are viewing not us.
-        adapter.setAccountInfo(Array.of(currentUser), null, null);
+        adapter.setAccountInfo(Array.of(currentUser), null, null, null);
 
         if (currentFilter == -1) {
             currentFilter = FilterAdapter.PROFILE_OVERVIEW;

@@ -22,6 +22,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
@@ -40,12 +41,14 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         private final int type;
         private final String text1;
         private final String text2;
+        private final String text3;
         private final int value;
 
-        Item(int type, String text1, String text2, int value) {
+        Item(int type, String text1, String text2, String text3, int value) {
             this.type = type;
             this.text1 = text1;
             this.text2 = text2;
+            this.text3 = text3;
             this.value = value;
         }
     }
@@ -75,29 +78,33 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         if (filters == null) {
             filters = new ArrayList<Item>(6);
         }
-        filters.add(new Item(Item.TYPE_FILTER, context.getString(resId), null, value));
+        filters.add(new Item(Item.TYPE_FILTER, context.getString(resId), null, null, value));
     }
 
-    public void setAccountInfo(String[] accountNames, int[] linkKarma, boolean[] hasMail) {
+    public void setAccountInfo(String[] accountNames, int[] linkKarma, int[] commentKarma,
+            boolean[] hasMail) {
         items.clear();
         if (accountNames != null) {
             int count = accountNames.length;
             for (int i = 0; i < count; i++) {
                 String text2 = linkKarma != null && linkKarma[i] != -1 ?
                         Integer.toString(linkKarma[i]) : null;
+                String text3 = commentKarma != null && commentKarma[i] != -1 ?
+                        Integer.toString(commentKarma[i]) : null;
                 int value = hasMail != null && hasMail[i] ? 1 : 0;
-                addItem(Item.TYPE_ACCOUNT_NAME, accountNames[i], text2, value);
+                addItem(Item.TYPE_ACCOUNT_NAME, accountNames[i], text2, text3, value);
             }
         }
         if (filters != null) {
-            addItem(Item.TYPE_CATEGORY, context.getString(R.string.filter_category), null, -1);
+            addItem(Item.TYPE_CATEGORY, context.getString(R.string.filter_category),
+                    null, null, -1);
             items.addAll(filters);
         }
         notifyDataSetChanged();
     }
 
-    private void addItem(int type, String text1, String text2, int value) {
-        items.add(new Item(type, text1, text2, value));
+    private void addItem(int type, String text1, String text2, String text3, int value) {
+        items.add(new Item(type, text1, text2, text3, value));
     }
 
     public void updateState(int position) {
@@ -224,7 +231,10 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
 
     static class DropDownViewHolder {
         TextView accountFilter;
+        ImageView statusIcon;
+        View karmaCounts;
         TextView linkKarma;
+        TextView commentKarma;
         TextView category;
     }
 
@@ -235,7 +245,10 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
             v = inflater.inflate(R.layout.account_filter_dropdown_row, parent, false);
             DropDownViewHolder vh = new DropDownViewHolder();
             vh.accountFilter = (TextView) v.findViewById(R.id.account_filter);
+            vh.statusIcon = (ImageView) v.findViewById(R.id.status_icon);
+            vh.karmaCounts = v.findViewById(R.id.karma_counts);
             vh.linkKarma = (TextView) v.findViewById(R.id.link_karma);
+            vh.commentKarma = (TextView) v.findViewById(R.id.comment_karma);
             vh.category = (TextView) v.findViewById(R.id.category);
             v.setTag(vh);
         }
@@ -250,23 +263,32 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
             case Item.TYPE_ACCOUNT_NAME:
                 vh.accountFilter.setText(getTitle(item.text1, true));
                 vh.accountFilter.setVisibility(View.VISIBLE);
+
+                if (item.value == 1) {
+                    vh.statusIcon.setImageResource(ThemePrefs.getMessagesIcon(view.getContext()));
+                    vh.statusIcon.setVisibility(View.VISIBLE);
+                } else {
+                    vh.statusIcon.setVisibility(View.GONE);
+                }
+
+                vh.karmaCounts.setVisibility(View.VISIBLE);
                 vh.linkKarma.setText(item.text2);
-                vh.linkKarma.setVisibility(View.VISIBLE);
-                int resId = item.value == 1 ? ThemePrefs.getMessagesIcon(view.getContext()) : 0;
-                vh.linkKarma.setCompoundDrawablesWithIntrinsicBounds(resId, 0, 0, 0);
+                vh.commentKarma.setText(item.text3);
                 vh.category.setVisibility(View.GONE);
                 break;
 
             case Item.TYPE_FILTER:
                 vh.accountFilter.setText(item.text1);
                 vh.accountFilter.setVisibility(View.VISIBLE);
-                vh.linkKarma.setVisibility(View.GONE);
+                vh.statusIcon.setVisibility(View.GONE);
+                vh.karmaCounts.setVisibility(View.GONE);
                 vh.category.setVisibility(View.GONE);
                 break;
 
             case Item.TYPE_CATEGORY:
                 vh.accountFilter.setVisibility(View.GONE);
-                vh.linkKarma.setVisibility(View.GONE);
+                vh.statusIcon.setVisibility(View.GONE);
+                vh.karmaCounts.setVisibility(View.GONE);
                 vh.category.setText(item.text1);
                 vh.category.setVisibility(View.VISIBLE);
                 break;

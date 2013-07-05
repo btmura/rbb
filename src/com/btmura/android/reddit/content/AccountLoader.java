@@ -45,11 +45,14 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
     public static class AccountResult {
         public String[] accountNames;
         public int[] linkKarma;
+        public int[] commentKarma;
         public boolean[] hasMail;
 
-        private AccountResult(String[] accountNames, int[] linkKarma, boolean[] hasMail) {
+        private AccountResult(String[] accountNames, int[] linkKarma, int[] commentKarma,
+                boolean[] hasMail) {
             this.accountNames = accountNames;
             this.linkKarma = linkKarma;
+            this.commentKarma = commentKarma;
             this.hasMail = hasMail;
         }
 
@@ -79,12 +82,14 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
             Accounts._ID,
             Accounts.COLUMN_ACCOUNT,
             Accounts.COLUMN_LINK_KARMA,
+            Accounts.COLUMN_COMMENT_KARMA,
             Accounts.COLUMN_HAS_MAIL,
     };
 
     private static final int INDEX_ACCOUNT = 1;
     private static final int INDEX_LINK_KARMA = 2;
-    private static final int INDEX_HAS_MAIL = 3;
+    private static final int INDEX_COMMENT_KARMA = 3;
+    private static final int INDEX_HAS_MAIL = 4;
 
     private final AccountManager manager;
     private final boolean includeNoAccount;
@@ -138,14 +143,17 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
         }
 
         int[] linkKarma = null;
+        int[] commentKarma = null;
         boolean[] hasMail = null;
         if (includeAccountInfo) {
             ContentResolver cr = getContext().getContentResolver();
             Cursor c = cr.query(AccountProvider.ACCOUNTS_URI, PROJECTION, null, null, null);
             linkKarma = new int[length];
+            commentKarma = new int[length];
             hasMail = new boolean[length];
             if (includeNoAccount) {
                 linkKarma[0] = -1;
+                commentKarma[0] = -1;
                 hasMail[0] = false;
             }
             for (int i = 0; i < accounts.length; i++) {
@@ -153,6 +161,7 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
                 for (c.moveToPosition(-1); c.moveToNext();) {
                     if (accountName.equals(c.getString(INDEX_ACCOUNT))) {
                         linkKarma[i + offset] = c.getInt(INDEX_LINK_KARMA);
+                        commentKarma[i + offset] = c.getInt(INDEX_COMMENT_KARMA);
                         hasMail[i + offset] = c.getInt(INDEX_HAS_MAIL) != 0;
                         break;
                     }
@@ -161,7 +170,7 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
             c.close();
         }
 
-        return new AccountResult(accountNames, linkKarma, hasMail);
+        return new AccountResult(accountNames, linkKarma, commentKarma, hasMail);
     }
 
     @Override

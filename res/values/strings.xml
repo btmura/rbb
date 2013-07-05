@@ -40,6 +40,8 @@
     <string name="compose_link">LINK</string>
     <string name="compose_text">TEXT</string>
     <string name="content_browser">Content providers</string>
+    <string name="content_desc_header">Header</string>
+    <string name="content_desc_status">Status</string>
     <string name="empty_accounts">You have no accounts.</string>
     <string name="empty_list">Nothing to see here…</string>
     <string name="error">Something went wrong…</string>
@@ -62,7 +64,6 @@
     <string name="filter_subreddit_rising">rising</string>
     <string name="filter_subreddit_top">top</string>
     <string name="front_page">front page</string>
-    <string name="header_image">Header image</string>
     <string name="hint_captcha">Captcha</string>
     <string name="hint_comment">Comment</string>
     <string name="hint_login">Login</string>

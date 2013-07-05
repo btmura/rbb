@@ -150,7 +150,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         if (!isSinglePane) {
             adapter.addSubredditFilters(this);
         }
-        adapter.setAccountInfo(result.accountNames, result.linkKarma, result.hasMail);
+        adapter.setAccountInfo(result.accountNames, result.linkKarma, result.commentKarma,
+                result.hasMail);
 
         String accountName = result.getLastAccount(this);
         adapter.setAccountName(accountName);
