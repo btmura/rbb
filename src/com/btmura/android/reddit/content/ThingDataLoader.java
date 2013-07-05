@@ -183,7 +183,7 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
     }
 
     @Override
-    public void onCanceled(ThingData data) {
+    protected void onCleanData(ThingData data) {
         if (data != null) {
             data.recycle();
         }
