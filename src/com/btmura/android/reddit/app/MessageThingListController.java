@@ -44,7 +44,7 @@ class MessageThingListController implements ThingListController {
     private static final String EXTRA_SESSION_ID = "sessionId";
 
     private final Context context;
-    private final AbstractThingListAdapter adapter;
+    private final MessageListAdapter adapter;
     private final String messageUser;
 
     private String accountName;
@@ -99,43 +99,12 @@ class MessageThingListController implements ThingListController {
     public ThingBundle getThingBundle(int position) {
         Cursor c = adapter.getCursor();
         if (c != null && c.moveToPosition(position)) {
-            return null; // makeMessageThingBundle(c);
+            return adapter.getThingBundle(position);
         }
         return null;
     }
 
-    private Bundle makeMessageThingBundle(Cursor c) {
-        Bundle b = new Bundle(7);
-        // ThingBundle.putAuthor(b, c.getString(MessageThingLoader.INDEX_AUTHOR));
-        // ThingBundle.putSubreddit(b, c.getString(MessageThingLoader.INDEX_SUBREDDIT));
-        // ThingBundle.putKind(b, c.getInt(MessageThingLoader.INDEX_KIND));
-        //
-        // // Messages don't have titles so use the body for both.
-        // String body = c.getString(MessageThingLoader.INDEX_BODY);
-        // ThingBundle.putTitle(b, body);
-        //
-        // ThingBundle.putThingId(b, c.getString(MessageThingLoader.INDEX_THING_ID));
-        //
-        // String contextUrl = c.getString(MessageThingLoader.INDEX_CONTEXT);
-        // if (!TextUtils.isEmpty(contextUrl)) {
-        // // If there is a context url, then we have to parse that url to grab
-        // // the link id embedded inside of it like:
-        // //
-        // // /r/rbb/comments/13ejyf/testing_from_laptop/c738opg?context=3
-        // String[] parts = contextUrl.split("/");
-        // if (parts != null && parts.length >= 5) {
-        // ThingBundle.putLinkId(b, parts[4]);
-        // }
-        // }
-        //
-        // // If this message isn't a comment, then it's simply a message with no
-        // // comments or links.
-        // ThingBundle.putNoComments(b, c.getInt(MessageThingLoader.INDEX_WAS_COMMENT) == 0);
-
-        return b;
-    }
-
-    // Actions.
+    // Actions
 
     @Override
     public void author(int position) {

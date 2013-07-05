@@ -107,6 +107,7 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
 
             switch (thingBundle.getType()) {
                 case ThingBundle.TYPE_LINK:
+                case ThingBundle.TYPE_MESSAGE:
                     parentBundle = thingBundle;
                     childBundle = null;
                     break;

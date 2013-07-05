@@ -20,6 +20,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.view.View;
 
+import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.content.MessageThingLoader;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
@@ -124,7 +125,33 @@ public class MessageListAdapter extends AbstractThingListAdapter {
         }
     }
 
-    // Index getters.
+    public ThingBundle getThingBundle(int position) {
+        Cursor cursor = getCursor();
+        if (cursor != null && cursor.moveToPosition(position)) {
+            switch (getKind(position)) {
+                case Kinds.KIND_MESSAGE:
+                    return ThingBundle.newMessageInstance(
+                            cursor.getInt(MessageThingLoader.INDEX_KIND),
+                            cursor.getString(MessageThingLoader.INDEX_THING_ID));
+
+                case Kinds.KIND_COMMENT:
+                    return ThingBundle.newCommentReference(
+                            cursor.getString(MessageThingLoader.INDEX_SUBREDDIT),
+                            cursor.getString(MessageThingLoader.INDEX_THING_ID),
+                            getLinkId(cursor));
+            }
+        }
+        return null;
+    }
+
+    private String getLinkId(Cursor cursor) {
+        String context = cursor.getString(MessageThingLoader.INDEX_CONTEXT);
+        String[] parts = context.split("/");
+        if (parts != null && parts.length >= 5) {
+            return parts[4];
+        }
+        throw new IllegalStateException();
+    }
 
     @Override
     int getKindIndex() {

@@ -38,14 +38,12 @@ import com.btmura.android.reddit.util.JsonParser;
  */
 public class ThingBundle extends BundleSupport implements Parcelable {
 
-    // TODO: Move this class since it has nothing to do with widgets.
-
+    // TODO: Make separate reference classes rather than reusing this one.
     public static final int TYPE_LINK = 0;
     public static final int TYPE_COMMENT = 1;
-
-    // TODO: Make separate reference classes rather than reusing this one.
-    public static final int TYPE_LINK_REFERENCE = 2;
-    public static final int TYPE_COMMENT_REFERENCE = 3;
+    public static final int TYPE_MESSAGE = 2;
+    public static final int TYPE_LINK_REFERENCE = 3;
+    public static final int TYPE_COMMENT_REFERENCE = 4;
 
     private static final int NUM_KEYS = 20;
 
@@ -173,6 +171,13 @@ public class ThingBundle extends BundleSupport implements Parcelable {
         data.putInt(KEY_UPS, ups);
         data.putString(KEY_URL, url);
         return new ThingBundle(data, TYPE_COMMENT);
+    }
+
+    public static ThingBundle newMessageInstance(int kind, String thingId) {
+        Bundle data = new Bundle(NUM_KEYS);
+        data.putInt(KEY_KIND, kind);
+        data.putString(KEY_THING_ID, thingId);
+        return new ThingBundle(data, TYPE_MESSAGE);
     }
 
     public static ThingBundle newLinkReference(String subreddit, String thingId) {
