@@ -51,12 +51,14 @@
             android:id="@+id/link_karma"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_gravity="right"
             tools:ignore="SelectableText" />
 
         <TextView
             android:id="@+id/comment_karma"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_gravity="right"
             tools:ignore="SelectableText" />
     </LinearLayout>
 

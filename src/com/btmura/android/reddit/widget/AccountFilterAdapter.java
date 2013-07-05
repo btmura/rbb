@@ -87,10 +87,8 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         if (accountNames != null) {
             int count = accountNames.length;
             for (int i = 0; i < count; i++) {
-                String text2 = linkKarma != null && linkKarma[i] != -1 ?
-                        Integer.toString(linkKarma[i]) : null;
-                String text3 = commentKarma != null && commentKarma[i] != -1 ?
-                        Integer.toString(commentKarma[i]) : null;
+                String text2 = getKarmaCount(linkKarma, i);
+                String text3 = getKarmaCount(commentKarma, i);
                 int value = hasMail != null && hasMail[i] ? 1 : 0;
                 addItem(Item.TYPE_ACCOUNT_NAME, accountNames[i], text2, text3, value);
             }
@@ -101,6 +99,13 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
             items.addAll(filters);
         }
         notifyDataSetChanged();
+    }
+
+    private String getKarmaCount(int[] karmaCounts, int index) {
+        if (karmaCounts != null && karmaCounts[index] != -1) {
+            return context.getString(R.string.karma_count, karmaCounts[index]);
+        }
+        return null;
     }
 
     private void addItem(int type, String text1, String text2, String text3, int value) {
