@@ -36,8 +36,7 @@
         android:backupAgent=".app.backup.BackupAgent"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Transition"
-        android:uiOptions="splitActionBarWhenNarrow" >
+        android:theme="@style/Theme.Transition" >
         <activity
             android:name=".accounts.AccountAuthenticatorActivity"
             android:label="@string/add_account"
@@ -49,6 +48,7 @@
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.BrowserActivity"
+            android:uiOptions="splitActionBarWhenNarrow"
             tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -92,8 +92,11 @@
         <activity android:name=".app.SidebarActivity" />
         <activity
             android:name=".app.ThingActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name=".app.ThingListActivity" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:uiOptions="splitActionBarWhenNarrow" />
+        <activity
+            android:name=".app.ThingListActivity"
+            android:uiOptions="splitActionBarWhenNarrow" />
         <activity
             android:name=".app.UserProfileActivity"
             tools:ignore="ExportedActivity" >
