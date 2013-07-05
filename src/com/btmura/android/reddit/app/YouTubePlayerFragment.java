@@ -16,17 +16,21 @@
 
 package com.btmura.android.reddit.app;
 
-import java.util.regex.Pattern;
+import java.util.List;
 
 import android.content.Context;
+import android.content.UriMatcher;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.google.android.youtube.player.YouTubeApiServiceUtil;
 import com.google.android.youtube.player.YouTubeInitializationResult;
@@ -37,20 +41,47 @@ import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
 public class YouTubePlayerFragment extends Fragment implements OnInitializedListener {
 
+    private static final String TAG = "YouTubePlayerFragment";
+
     private static final String ARG_URL = "url";
 
-    private static final Pattern PATTERN_FIND_URL =
-            Pattern.compile("(youtube|youtu\\.be)", Pattern.CASE_INSENSITIVE);
+    private static final UriMatcher MATCHER = new UriMatcher(0);
+    private static final int MATCH_YOUTUBE = 1;
+    private static final int MATCH_YOUTU_BE = 2;
 
-    private String videoId;
+    static {
+        MATCHER.addURI("youtube.com", "watch", MATCH_YOUTUBE);
+        MATCHER.addURI("www.youtube.com", "watch", MATCH_YOUTUBE);
+        MATCHER.addURI("youtu.be", "*", MATCH_YOUTU_BE);
+        MATCHER.addURI("www.youtu.be", "*", MATCH_YOUTU_BE);
+    }
 
     public static boolean isPlayableWithYouTube(Context context, String url) {
-        return isYouTubeAvailable(context) && PATTERN_FIND_URL.matcher(url).find();
+        return isYouTubeAvailable(context) && isYouTubeVideoUrl(url);
     }
 
     private static boolean isYouTubeAvailable(Context context) {
         return YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(context)
                 == YouTubeInitializationResult.SUCCESS;
+    }
+
+    static boolean isYouTubeVideoUrl(String url) {
+        return !TextUtils.isEmpty(getVideoId(url));
+    }
+
+    static String getVideoId(String url) {
+        Uri uri = Uri.parse(url);
+        switch (MATCHER.match(uri)) {
+            case MATCH_YOUTUBE:
+                return uri.getQueryParameter("v");
+
+            case MATCH_YOUTU_BE:
+                List<String> segments = uri.getPathSegments();
+                return segments.size() == 1 ? segments.get(0) : null;
+
+            default:
+                return null;
+        }
     }
 
     public static YouTubePlayerFragment newInstance(String url) {
@@ -72,8 +103,6 @@ public class YouTubePlayerFragment extends Fragment implements OnInitializedList
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        videoId = Uri.parse(getUrl()).getQueryParameter("v");
-
         YouTubePlayerSupportFragment frag = YouTubePlayerSupportFragment.newInstance();
         frag.initialize(getString(R.string.key_youtube), this);
 
@@ -86,13 +115,15 @@ public class YouTubePlayerFragment extends Fragment implements OnInitializedList
     public void onInitializationSuccess(Provider provider, YouTubePlayer player,
             boolean wasRestored) {
         if (!wasRestored) {
-            player.loadVideo(videoId);
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "url: " + getUrl() + " videoId: " + getVideoId(getUrl()));
+            }
+            player.loadVideo(getVideoId(getUrl()));
         }
     }
 
     @Override
     public void onInitializationFailure(Provider provider, YouTubeInitializationResult result) {
-
     }
 
     private String getUrl() {

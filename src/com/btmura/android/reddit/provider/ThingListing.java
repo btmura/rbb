@@ -406,7 +406,8 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onPermaLink(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_PERMA_LINK, readString(reader, ""));
+        String url = formatter.formatNoSpans(context, readString(reader, "")).toString();
+        values.get(index).put(Things.COLUMN_PERMA_LINK, url);
     }
 
     @Override
@@ -445,7 +446,8 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onUrl(JsonReader reader, int index) throws IOException {
-        values.get(index).put(Things.COLUMN_URL, readString(reader, ""));
+        String url = formatter.formatNoSpans(context, readString(reader, "")).toString();
+        values.get(index).put(Things.COLUMN_URL, url);
     }
 
     @Override
