@@ -156,6 +156,8 @@ class MessageThingListController implements ThingListController {
 
         int position = ListViewUtils.getFirstCheckedPosition(listView);
         prepareAuthorActionItem(menu, listView, position);
+        prepareHideActionItems(menu, listView, position);
+        prepareShareActionItem(menu, listView, position);
         prepareSubredditActionItem(menu, listView, position);
     }
 
@@ -165,6 +167,21 @@ class MessageThingListController implements ThingListController {
         item.setVisible(isCheckedCount(listView, 1) && MenuHelper.isUserItemVisible(author));
         if (item.isVisible()) {
             item.setTitle(MenuHelper.getUserTitle(context, author));
+        }
+    }
+
+    private void prepareHideActionItems(Menu menu, ListView listView, int position) {
+        menu.findItem(R.id.menu_hide).setVisible(false);
+        menu.findItem(R.id.menu_unhide).setVisible(false);
+    }
+
+    private void prepareShareActionItem(Menu menu, ListView listView, int position) {
+        MenuItem item = menu.findItem(R.id.menu_share_thing);
+        item.setVisible(isCheckedCount(listView, 1));
+        if (item.isVisible()) {
+            String title = getMessageTitle(position);
+            CharSequence url = getMessageUrl(position);
+            MenuHelper.setShareProvider(item, title, url);
         }
     }
 
@@ -180,6 +197,13 @@ class MessageThingListController implements ThingListController {
     // More complex getters.
 
     private String getMessageTitle(int position) {
+        // Comment reply messages just have "comment reply" as subject so try to use the link title.
+        String linkTitle = getLinkTitle(position);
+        if (!TextUtils.isEmpty(linkTitle)) {
+            return linkTitle;
+        }
+
+        // Assume this is a message with a subject.
         return getSubject(position);
     }
 
@@ -221,7 +245,8 @@ class MessageThingListController implements ThingListController {
         }
 
         // We have a local pending action so use that to indicate if it's new.
-        return adapter.getInt(position, MessageThingLoader.INDEX_ACTION) == ReadActions.ACTION_UNREAD;
+        return adapter.getInt(position, MessageThingLoader.INDEX_ACTION)
+                == ReadActions.ACTION_UNREAD;
     }
 
     @Override
@@ -338,6 +363,10 @@ class MessageThingListController implements ThingListController {
         return adapter.getString(position, MessageThingLoader.INDEX_CONTEXT);
     }
 
+    private String getLinkTitle(int position) {
+        return adapter.getString(position, MessageThingLoader.INDEX_LINK_TITLE);
+    }
+
     private String getSubject(int position) {
         return adapter.getString(position, MessageThingLoader.INDEX_SUBJECT);
     }
@@ -347,7 +376,7 @@ class MessageThingListController implements ThingListController {
     }
 
     private String getThingId(int position) {
-        return adapter.getString(MessageThingLoader.INDEX_THING_ID, position);
+        return adapter.getString(position, MessageThingLoader.INDEX_THING_ID);
     }
 
     // Getters for extras.

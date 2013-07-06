@@ -31,6 +31,7 @@ public class Messages implements BaseColumns {
     public static final String COLUMN_CREATED_UTC = "createdUtc";
     public static final String COLUMN_DESTINATION = "destination";
     public static final String COLUMN_KIND = "kind";
+    public static final String COLUMN_LINK_TITLE = "linkTitle";
     public static final String COLUMN_MESSAGE_ACTION_ID = "messageActionId";
     public static final String COLUMN_NEW = "new";
     public static final String COLUMN_SESSION_ID = SharedColumns.COLUMN_SESSION_ID;
@@ -59,6 +60,7 @@ public class Messages implements BaseColumns {
                 + COLUMN_CREATED_UTC + " INTEGER DEFAULT 0,"
                 + COLUMN_DESTINATION + " TEXT,"
                 + COLUMN_KIND + " INTEGER NOT NULL,"
+                + COLUMN_LINK_TITLE + " TEXT,"
                 + COLUMN_MESSAGE_ACTION_ID + " INTEGER,"
                 + COLUMN_NEW + " INTEGER DEFAULT 0,"
                 + COLUMN_SESSION_ID + " TEXT,"

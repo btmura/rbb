@@ -33,6 +33,7 @@ public class MessageThingLoader extends AbstractSessionLoader {
             Messages.COLUMN_CREATED_UTC,
             Messages.COLUMN_DESTINATION,
             Messages.COLUMN_KIND,
+            Messages.COLUMN_LINK_TITLE,
             Messages.COLUMN_NEW,
             Messages.COLUMN_SUBJECT,
             Messages.COLUMN_SUBREDDIT,
@@ -49,12 +50,13 @@ public class MessageThingLoader extends AbstractSessionLoader {
     public static final int INDEX_CREATED_UTC = 4;
     public static final int INDEX_DESTINATION = 5;
     public static final int INDEX_KIND = 6;
-    public static final int INDEX_NEW = 7;
-    public static final int INDEX_SUBJECT = 8;
-    public static final int INDEX_SUBREDDIT = 9;
-    public static final int INDEX_THING_ID = 10;
-    public static final int INDEX_WAS_COMMENT = 11;
-    public static final int INDEX_ACTION = 12;
+    public static final int INDEX_LINK_TITLE = 7;
+    public static final int INDEX_NEW = 8;
+    public static final int INDEX_SUBJECT = 9;
+    public static final int INDEX_SUBREDDIT = 10;
+    public static final int INDEX_THING_ID = 11;
+    public static final int INDEX_WAS_COMMENT = 12;
+    public static final int INDEX_ACTION = 13;
 
     private final String accountName;
     private final int filter;

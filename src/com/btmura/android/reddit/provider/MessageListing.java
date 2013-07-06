@@ -177,11 +177,11 @@ class MessageListing extends JsonParser implements Listing {
 
     @Override
     public void onEntityStart(int index) {
-        values.add(newContentValues(11));
+        values.add(newContentValues(14));
     }
 
     private ContentValues newContentValues(int capacity) {
-        ContentValues values = new ContentValues(capacity + 1);
+        ContentValues values = new ContentValues(capacity);
         values.put(Messages.COLUMN_ACCOUNT, accountName);
         return values;
     }
@@ -214,6 +214,11 @@ class MessageListing extends JsonParser implements Listing {
     @Override
     public void onKind(JsonReader reader, int index) throws IOException {
         values.get(index).put(Messages.COLUMN_KIND, Kinds.parseKind(reader.nextString()));
+    }
+
+    @Override
+    public void onLinkTitle(JsonReader reader, int index) throws IOException {
+        values.get(index).put(Messages.COLUMN_LINK_TITLE, reader.nextString());
     }
 
     @Override
