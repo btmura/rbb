@@ -18,13 +18,13 @@
 
     <item
         android:id="@+id/menu_new_comment"
-        android:icon="?attr/menu_reply_icon"
-        android:showAsAction="ifRoom|withText"
+        android:icon="?attr/menu_edit_icon"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_reply"/>
     <item
         android:id="@+id/menu_author"
         android:icon="?attr/menu_profile_icon"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_author"/>
 
 </menu>
