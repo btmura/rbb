@@ -59,8 +59,8 @@ public class UserProfileActivity extends AbstractBrowserActivity implements OnNa
 
                 public void onLoadFinished(Loader<AccountInfoResult> loader,
                         AccountInfoResult result) {
-                    int[] linkKarma = result != null ? new int[result.linkKarma] : null;
-                    int[] commentKarma = result != null ? new int[result.commentKarma] : null;
+                    int[] linkKarma = result != null ? new int[] {result.linkKarma} : null;
+                    int[] commentKarma = result != null ? new int[] {result.commentKarma} : null;
                     adapter.setAccountInfo(Array.of(currentUser), linkKarma, commentKarma, null);
                 }
 
