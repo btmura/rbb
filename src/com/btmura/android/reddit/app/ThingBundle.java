@@ -236,11 +236,11 @@ public class ThingBundle extends BundleSupport implements Parcelable {
     }
 
     public boolean hasCommentsUrl() {
-        return true;
+        return getKind() == Kinds.KIND_LINK;
     }
 
     public boolean hasLinkUrl() {
-        return !isSelf();
+        return getKind() == Kinds.KIND_LINK && !isSelf();
     }
 
     // Simple getters that return attributes as they are

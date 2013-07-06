@@ -152,9 +152,12 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
             return; // Bail out if the menu hasn't been created.
         }
 
-        linkItem.setVisible(thingData.parent.hasLinkUrl()
+        boolean hasLinkAndComments = thingData.parent.hasLinkUrl()
+                && thingData.parent.hasCommentsUrl();
+
+        linkItem.setVisible(hasLinkAndComments
                 && !isCurrentPageType(ThingPagerAdapter.TYPE_LINK));
-        commentsItem.setVisible(thingData.parent.hasLinkUrl() && thingData.parent.hasCommentsUrl()
+        commentsItem.setVisible(hasLinkAndComments
                 && !isCurrentPageType(ThingPagerAdapter.TYPE_COMMENTS));
 
         savedItem.setVisible(thingData.isParentSaveable() && thingData.isParentSaved());
