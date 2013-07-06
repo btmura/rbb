@@ -144,6 +144,11 @@ public class MessageThreadListController implements ActionModeController {
                 mode.finish();
                 return true;
 
+            case R.id.menu_author:
+                handleAuthor(listView);
+                mode.finish();
+                return true;
+
             default:
                 return false;
         }
@@ -164,6 +169,11 @@ public class MessageThreadListController implements ActionModeController {
 
         MenuHelper.startComposeActivity(context, ComposeActivity.MESSAGE_REPLY_TYPE_SET,
                 null, user, null, null, extras, false);
+    }
+
+    private void handleAuthor(ListView listView) {
+        int position = ListViewUtils.getFirstCheckedPosition(listView);
+        MenuHelper.startProfileActivity(context, adapter.getAuthor(position), -1);
     }
 
     @Override

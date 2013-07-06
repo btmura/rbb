@@ -23,14 +23,18 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.MessageThingLoader;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.ReadActions;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
+import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 import com.btmura.android.reddit.widget.MessageListAdapter;
 
@@ -54,7 +58,7 @@ class MessageThingListController implements ThingListController {
     private long sessionId;
 
     MessageThingListController(Context context, Bundle args) {
-        this.context = context.getApplicationContext();
+        this.context = context;
         this.adapter = new MessageListAdapter(context, getSingleChoiceExtra(args));
         this.accountName = getAccountNameExtra(args);
         this.messageUser = getMessageUserExtra(args);
@@ -108,7 +112,7 @@ class MessageThingListController implements ThingListController {
 
     @Override
     public void author(int position) {
-
+        MenuHelper.startProfileActivity(context, getAuthor(position), -1);
     }
 
     @Override
@@ -135,6 +139,7 @@ class MessageThingListController implements ThingListController {
 
     @Override
     public void subreddit(int position) {
+        MenuHelper.startSidebarActivity(context, getSubreddit(position));
     }
 
     @Override
@@ -146,6 +151,30 @@ class MessageThingListController implements ThingListController {
 
     @Override
     public void onPrepareActionMode(ActionMode mode, Menu menu, ListView listView) {
+        int count = listView.getCheckedItemCount();
+        mode.setTitle(context.getResources().getQuantityString(R.plurals.things, count, count));
+
+        int position = ListViewUtils.getFirstCheckedPosition(listView);
+        prepareAuthorActionItem(menu, listView, position);
+        prepareSubredditActionItem(menu, listView, position);
+    }
+
+    private void prepareAuthorActionItem(Menu menu, ListView listView, int position) {
+        String author = getAuthor(position);
+        MenuItem item = menu.findItem(R.id.menu_author);
+        item.setVisible(isCheckedCount(listView, 1) && MenuHelper.isUserItemVisible(author));
+        if (item.isVisible()) {
+            item.setTitle(MenuHelper.getUserTitle(context, author));
+        }
+    }
+
+    private void prepareSubredditActionItem(Menu menu, ListView listView, int position) {
+        String subreddit = getSubreddit(position);
+        MenuItem item = menu.findItem(R.id.menu_subreddit);
+        item.setVisible(isCheckedCount(listView, 1) && Subreddits.hasSidebar(subreddit));
+        if (item.isVisible()) {
+            item.setTitle(MenuHelper.getSubredditTitle(context, subreddit));
+        }
     }
 
     // More complex getters.
@@ -179,6 +208,10 @@ class MessageThingListController implements ThingListController {
     @Override
     public boolean hasNextMoreId() {
         return !TextUtils.isEmpty(getNextMoreId());
+    }
+
+    private boolean isCheckedCount(ListView listView, int checkedItemCount) {
+        return listView.getCheckedItemCount() == checkedItemCount;
     }
 
     private boolean isNew(int position) {
@@ -297,12 +330,20 @@ class MessageThingListController implements ThingListController {
 
     // Simple adapter getters.
 
+    private String getAuthor(int position) {
+        return adapter.getString(position, MessageThingLoader.INDEX_AUTHOR);
+    }
+
     private String getContext(int position) {
         return adapter.getString(position, MessageThingLoader.INDEX_CONTEXT);
     }
 
     private String getSubject(int position) {
         return adapter.getString(position, MessageThingLoader.INDEX_SUBJECT);
+    }
+
+    private String getSubreddit(int position) {
+        return adapter.getString(position, MessageThingLoader.INDEX_SUBREDDIT);
     }
 
     private String getThingId(int position) {
