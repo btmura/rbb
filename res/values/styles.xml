@@ -35,7 +35,6 @@
         <item name="menu_link_icon">@drawable/ic_action_link_light</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
-        <item name="menu_reply_icon">@drawable/ic_action_reply_light</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_light</item>
         <item name="menu_search_icon">@drawable/ic_action_search_light</item>
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
@@ -52,7 +51,6 @@
         <item name="menu_link_icon">@drawable/ic_action_link_light</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
-        <item name="menu_reply_icon">@drawable/ic_action_reply_light</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_light</item>
         <item name="menu_search_icon">@drawable/ic_action_search_light</item>
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
@@ -69,7 +67,6 @@
         <item name="menu_link_icon">@drawable/ic_action_link_light</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_light</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_light</item>
-        <item name="menu_reply_icon">@drawable/ic_action_reply_light</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_light</item>
         <item name="menu_search_icon">@drawable/ic_action_search_light</item>
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
@@ -86,7 +83,6 @@
         <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
-        <item name="menu_reply_icon">@drawable/ic_action_reply_dark</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
         <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
@@ -103,7 +99,6 @@
         <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
-        <item name="menu_reply_icon">@drawable/ic_action_reply_dark</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
         <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
@@ -120,7 +115,6 @@
         <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
         <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
         <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
-        <item name="menu_reply_icon">@drawable/ic_action_reply_dark</item>
         <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
         <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
