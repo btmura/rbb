@@ -34,6 +34,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.ThingDataLoader;
 import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
+import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.StringUtil;
 
@@ -58,6 +59,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
     private MenuItem openItem;
     private MenuItem copyUrlItem;
     private MenuItem userItem;
+    private MenuItem addSubredditItem;
     private MenuItem subredditItem;
 
     public static ThingFragment newInstance(String accountName, ThingBundle thingBundle) {
@@ -142,6 +144,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
         shareItem = menu.findItem(R.id.menu_share);
         copyUrlItem = menu.findItem(R.id.menu_copy_url);
         userItem = menu.findItem(R.id.menu_user);
+        addSubredditItem = menu.findItem(R.id.menu_thing_add_subreddit);
         subredditItem = menu.findItem(R.id.menu_thing_subreddit);
     }
 
@@ -154,7 +157,6 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
 
         boolean hasLinkAndComments = thingData.parent.hasLinkUrl()
                 && thingData.parent.hasCommentsUrl();
-
         linkItem.setVisible(hasLinkAndComments
                 && !isCurrentPageType(ThingPagerAdapter.TYPE_LINK));
         commentsItem.setVisible(hasLinkAndComments
@@ -176,8 +178,19 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
             MenuHelper.setShareProvider(shareItem, title, url);
         }
 
-        userItem.setTitle(getString(R.string.menu_user, thingData.parent.getAuthor()));
-        subredditItem.setTitle(getString(R.string.menu_subreddit, thingData.parent.getSubreddit()));
+        String user = thingData.parent.getAuthor();
+        userItem.setVisible(!TextUtils.isEmpty(user));
+        if (userItem.isVisible()) {
+            userItem.setTitle(getString(R.string.menu_user, user));
+        }
+
+        String subreddit = thingData.parent.getSubreddit();
+        boolean hasSidebar = Subreddits.hasSidebar(subreddit);
+        addSubredditItem.setVisible(hasSidebar);
+        subredditItem.setVisible(hasSidebar);
+        if (subredditItem.isVisible()) {
+            subredditItem.setTitle(getString(R.string.menu_subreddit, subreddit));
+        }
     }
 
     @Override

@@ -131,6 +131,7 @@ public class MessageListAdapter extends AbstractThingListAdapter {
             switch (getKind(position)) {
                 case Kinds.KIND_MESSAGE:
                     return ThingBundle.newMessageInstance(
+                            cursor.getString(MessageThingLoader.INDEX_AUTHOR),
                             cursor.getInt(MessageThingLoader.INDEX_KIND),
                             cursor.getString(MessageThingLoader.INDEX_THING_ID));
 

@@ -107,7 +107,7 @@ public class ThingBundle extends BundleSupport implements Parcelable {
             String title,
             int ups,
             String url) {
-        Bundle data = new Bundle(NUM_KEYS);
+        Bundle data = new Bundle(18);
         data.putString(KEY_AUTHOR, author);
         data.putLong(KEY_CREATED_UTC, createdUtc);
         data.putString(KEY_DOMAIN, domain);
@@ -149,7 +149,7 @@ public class ThingBundle extends BundleSupport implements Parcelable {
             String title,
             int ups,
             String url) {
-        Bundle data = new Bundle(NUM_KEYS);
+        Bundle data = new Bundle(20);
         data.putString(KEY_AUTHOR, author);
         data.putLong(KEY_CREATED_UTC, createdUtc);
         data.putString(KEY_DOMAIN, domain);
@@ -173,15 +173,18 @@ public class ThingBundle extends BundleSupport implements Parcelable {
         return new ThingBundle(data, TYPE_COMMENT);
     }
 
-    public static ThingBundle newMessageInstance(int kind, String thingId) {
-        Bundle data = new Bundle(NUM_KEYS);
+    public static ThingBundle newMessageInstance(String author,
+            int kind,
+            String thingId) {
+        Bundle data = new Bundle(3);
+        data.putString(KEY_AUTHOR, author);
         data.putInt(KEY_KIND, kind);
         data.putString(KEY_THING_ID, thingId);
         return new ThingBundle(data, TYPE_MESSAGE);
     }
 
     public static ThingBundle newLinkReference(String subreddit, String thingId) {
-        Bundle data = new Bundle(NUM_KEYS);
+        Bundle data = new Bundle(2);
         data.putString(KEY_SUBREDDIT, subreddit);
         data.putString(KEY_THING_ID, thingId);
         return new ThingBundle(data, TYPE_LINK_REFERENCE);
@@ -189,7 +192,7 @@ public class ThingBundle extends BundleSupport implements Parcelable {
 
     public static ThingBundle newCommentReference(String subreddit, String thingId,
             String linkId) {
-        Bundle data = new Bundle(NUM_KEYS);
+        Bundle data = new Bundle(3);
         data.putString(KEY_SUBREDDIT, subreddit);
         data.putString(KEY_THING_ID, thingId);
         data.putString(KEY_LINK_ID, linkId);
