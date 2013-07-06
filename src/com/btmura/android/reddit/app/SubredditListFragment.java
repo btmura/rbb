@@ -37,7 +37,7 @@ import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.SubredditView;
 
-abstract class SubredditListFragment<C extends SubredditListController<?>, AC extends SearchSubredditListActionModeController>
+abstract class SubredditListFragment<C extends SubredditListController<?>, AC extends ActionModeController>
         extends ListFragment
         implements LoaderCallbacks<Cursor>, OnSwipeDismissListener, MultiChoiceModeListener {
 

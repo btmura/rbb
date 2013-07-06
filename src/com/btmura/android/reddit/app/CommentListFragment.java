@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +32,7 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ListFragment implements
@@ -85,17 +85,19 @@ public class CommentListFragment extends ListFragment implements
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return controller.createLoader();
     }
 
+    @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (controller.swapCursor(cursor)) {
-            setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
-            setListShown(true);
-        }
+        controller.swapCursor(cursor);
+        setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
+        setListShown(true);
     }
 
+    @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         controller.swapCursor(null);
     }
@@ -105,11 +107,13 @@ public class CommentListFragment extends ListFragment implements
         controller.expandOrCollapse(position, id);
     }
 
+    @Override
     public void onVote(View view, int action) {
         int position = getListView().getPositionForView(view);
         controller.vote(action, position);
     }
 
+    @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         if (controller.getAdapter().getCursor() == null) {
             getListView().clearChoices();
@@ -120,26 +124,31 @@ public class CommentListFragment extends ListFragment implements
         return true;
     }
 
+    @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         int count = getListView().getCheckedItemCount();
         mode.setTitle(getResources().getQuantityString(R.plurals.comments, count, count));
-        controller.prepareActionMenu(menu, getListView(), getFirstCheckedPosition());
+        int position = ListViewUtils.getFirstCheckedPosition(getListView());
+        controller.prepareActionMenu(menu, getListView(), position);
         return true;
     }
 
+    @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         mode.invalidate();
     }
 
+    @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        int position = ListViewUtils.getFirstCheckedPosition(getListView());
         switch (item.getItemId()) {
             case R.id.menu_reply:
-                controller.reply(getFirstCheckedPosition());
+                controller.reply(position);
                 mode.finish();
                 return true;
 
             case R.id.menu_edit:
-                controller.edit(getFirstCheckedPosition());
+                controller.edit(position);
                 mode.finish();
                 return true;
 
@@ -149,12 +158,12 @@ public class CommentListFragment extends ListFragment implements
                 return true;
 
             case R.id.menu_author:
-                controller.author(getFirstCheckedPosition());
+                controller.author(position);
                 mode.finish();
                 return true;
 
             case R.id.menu_copy_url:
-                controller.copyUrl(getFirstCheckedPosition());
+                controller.copyUrl(position);
                 mode.finish();
                 return true;
 
@@ -163,6 +172,7 @@ public class CommentListFragment extends ListFragment implements
         }
     }
 
+    @Override
     public void onDestroyActionMode(ActionMode mode) {
     }
 
@@ -170,16 +180,5 @@ public class CommentListFragment extends ListFragment implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         controller.saveInstanceState(outState);
-    }
-
-    private int getFirstCheckedPosition() {
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        int size = controller.getAdapter().getCount();
-        for (int i = 0; i < size; i++) {
-            if (checked.get(i)) {
-                return i;
-            }
-        }
-        return -1;
     }
 }

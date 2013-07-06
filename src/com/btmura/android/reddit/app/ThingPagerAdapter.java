@@ -39,7 +39,7 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
     public static final int TYPE_LINK = 0;
     public static final int TYPE_COMMENTS = 1;
-    public static final int TYPE_MESSAGES = 2;
+    public static final int TYPE_MESSAGE = 2;
 
     public static final int PAGE_LINK = TYPE_LINK;
     public static final int PAGE_COMMENTS = TYPE_COMMENTS;
@@ -96,7 +96,7 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
                 break;
 
             case Kinds.KIND_MESSAGE:
-                addPage(TYPE_MESSAGES);
+                addPage(TYPE_MESSAGE);
                 break;
         }
     }
@@ -205,7 +205,7 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
                             null);
                 }
 
-            case TYPE_MESSAGES:
+            case TYPE_MESSAGE:
                 return MessageThreadListFragment.newInstance(accountName,
                         thingData.parent.getThingId());
 

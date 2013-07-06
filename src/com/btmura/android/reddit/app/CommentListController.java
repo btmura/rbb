@@ -76,16 +76,14 @@ class CommentListController implements CommentList {
         return new CommentLoader(context, accountName, thingId, linkId, sessionId);
     }
 
-    public boolean swapCursor(Cursor cursor) {
+    public void swapCursor(Cursor cursor) {
         if (adapter.getCursor() != cursor) {
             adapter.swapCursor(cursor);
             if (cursor != null && cursor.getExtras() != null) {
                 Bundle extras = cursor.getExtras();
                 sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
             }
-            return true;
         }
-        return false;
     }
 
     // Getters

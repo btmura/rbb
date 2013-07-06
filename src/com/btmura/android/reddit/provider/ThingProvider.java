@@ -306,10 +306,11 @@ public class ThingProvider extends BaseProvider {
     }
 
     public static final Bundle getMessageThreadSession(Context context, String accountName,
-            String thingId) {
-        Bundle extras = new Bundle(2);
+            String thingId, long sessionId) {
+        Bundle extras = new Bundle(3);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGE_THREAD);
         extras.putString(EXTRA_THING_ID, thingId);
+        extras.putLong(EXTRA_SESSION_ID, sessionId);
         return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
     }
 

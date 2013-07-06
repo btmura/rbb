@@ -21,7 +21,7 @@ import android.os.Bundle;
 
 public class SearchSubredditListFragment
         extends SubredditListFragment<SearchSubredditListController,
-        SearchSubredditListActionModeController> {
+        ActionModeController> {
 
     private AccountResultHolder accountResultHolder;
 
@@ -51,7 +51,7 @@ public class SearchSubredditListFragment
     }
 
     @Override
-    protected SearchSubredditListActionModeController createActionModeController(
+    protected ActionModeController createActionModeController(
             SearchSubredditListController controller) {
         return new SubredditSearchActionModeController(getActivity(), controller.getAdapter(),
                 accountResultHolder);

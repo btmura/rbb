@@ -18,57 +18,21 @@ package com.btmura.android.reddit.widget;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.btmura.android.reddit.database.Messages;
+import com.btmura.android.reddit.content.MessageThreadLoader;
 import com.btmura.android.reddit.text.Formatter;
 
-public class MessageThreadAdapter extends BaseLoaderAdapter {
-
-    private static final String[] PROJECTION = {
-            Messages._ID,
-            Messages.COLUMN_AUTHOR,
-            Messages.COLUMN_BODY,
-            Messages.COLUMN_CREATED_UTC,
-            Messages.COLUMN_KIND,
-            Messages.COLUMN_NEW,
-            Messages.COLUMN_SUBJECT,
-            Messages.TABLE_NAME + "." + Messages.COLUMN_THING_ID,
-    };
-
-    private static final int INDEX_AUTHOR = 1;
-    private static final int INDEX_BODY = 2;
-    private static final int INDEX_CREATED_UTC = 3;
-    private static final int INDEX_KIND = 4;
-    private static final int INDEX_NEW = 5;
-    private static final int INDEX_SUBJECT = 6;
-    private static final int INDEX_THING_ID = 7;
-
-    private long sessionId = -1;
-    private String accountName;
-    private String thingId;
+public class MessageThreadAdapter extends BaseCursorAdapter {
 
     private final Formatter formatter = new Formatter();
+    private String accountName;
+    private String thingId;
     private long nowTimeMs;
 
     public MessageThreadAdapter(Context context) {
         super(context, null, 0);
-    }
-
-    public boolean isLoadable() {
-        return accountName != null && thingId != null;
-    }
-
-    @Override
-    public Uri getLoaderUri() {
-        return null; // ThingProvider.messageThreadUri(accountName, thingId);
-    }
-
-    @Override
-    protected String[] getProjection() {
-        return PROJECTION;
     }
 
     @Override
@@ -84,14 +48,14 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        final String author = cursor.getString(INDEX_AUTHOR);
-        final String body = cursor.getString(INDEX_BODY);
-        final long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
+        final String author = cursor.getString(MessageThreadLoader.INDEX_AUTHOR);
+        final String body = cursor.getString(MessageThreadLoader.INDEX_BODY);
+        final long createdUtc = cursor.getLong(MessageThreadLoader.INDEX_CREATED_UTC);
         final String destination = null;
         final String domain = null;
         final int downs = 0;
         final boolean expanded = true;
-        final int kind = cursor.getInt(INDEX_KIND);
+        final int kind = cursor.getInt(MessageThreadLoader.INDEX_KIND);
         final int likes = 0;
         final String linkTitle = null;
         final int nesting = 0;
@@ -104,7 +68,8 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
         final int ups = 0;
 
         // Only show the subject on the header message.
-        final String title = cursor.getPosition() == 0 ? cursor.getString(INDEX_SUBJECT) : null;
+        final String title = cursor.getPosition() == 0
+                ? cursor.getString(MessageThreadLoader.INDEX_SUBJECT) : null;
 
         final boolean drawVotingArrows = false;
         final boolean showThumbnail = false;
@@ -113,7 +78,7 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_MESSAGE_THREAD_LIST);
         tv.setBody(body, false, formatter);
-        tv.setData(getAccountName(),
+        tv.setData(accountName,
                 author,
                 createdUtc,
                 destination,
@@ -139,43 +104,21 @@ public class MessageThreadAdapter extends BaseLoaderAdapter {
                 showStatusPoints);
     }
 
-    public long getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(long sessionId) {
-        this.sessionId = sessionId;
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 
     public String getAccountName() {
         return accountName;
     }
 
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
+    // Getters for attributes
 
-    public String getThingId() {
-        return thingId;
-    }
-
-    public void setThingId(String thingId) {
-        this.thingId = thingId;
-    }
-
-    public String getSubject() {
-        return getString(0, INDEX_SUBJECT);
-    }
-
-    public String getUser(int position) {
-        return getString(position, INDEX_AUTHOR);
+    public String getAuthor(int position) {
+        return getString(position, MessageThreadLoader.INDEX_AUTHOR);
     }
 
     public String getThingId(int position) {
-        return getString(position, INDEX_THING_ID);
-    }
-
-    public boolean isNew(int position) {
-        return getBoolean(position, INDEX_NEW);
+        return getString(position, MessageThreadLoader.INDEX_THING_ID);
     }
 }

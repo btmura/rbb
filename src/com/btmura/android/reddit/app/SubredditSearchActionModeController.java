@@ -39,8 +39,8 @@ import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.SearchSubredditAdapter;
 
-class SubredditSearchActionModeController implements SearchSubredditListActionModeController,
-        OnItemSelectedListener {
+class SubredditSearchActionModeController
+        implements ActionModeController, OnItemSelectedListener {
 
     private static final String EXTRA_ACTION_ACCOUNT_NAME = "actionAccountName";
 

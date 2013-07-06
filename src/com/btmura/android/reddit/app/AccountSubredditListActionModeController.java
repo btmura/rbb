@@ -31,13 +31,11 @@ import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 
-public class AccountSubredditListActionModeController
-        implements SearchSubredditListActionModeController {
+public class AccountSubredditListActionModeController implements ActionModeController {
 
     private final Context context;
     private final String accountName;
     private final AccountSubredditAdapter adapter;
-
     private ActionMode actionMode;
 
     public AccountSubredditListActionModeController(Context context,
