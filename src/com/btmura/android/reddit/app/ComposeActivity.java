@@ -58,14 +58,17 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
     /** Type when replying to some comment. */
     public static final int TYPE_COMMENT_REPLY = 3;
 
+    /** Type when replying to a message without a session. */
+    public static final int TYPE_DEFERRED_MESSAGE_REPLY = 4;
+
     /** Type of composition when replying to some message. */
-    public static final int TYPE_MESSAGE_REPLY = 4;
+    public static final int TYPE_MESSAGE_REPLY = 5;
 
     /** Type to use when editing a self post. */
-    public static final int TYPE_EDIT_POST = 5;
+    public static final int TYPE_EDIT_POST = 6;
 
     /** Type to use when editing a comment. */
-    public static final int TYPE_EDIT_COMMENT = 6;
+    public static final int TYPE_EDIT_COMMENT = 7;
 
     /** Default set of types supported when sharing something to the app. */
     public static final int[] DEFAULT_TYPE_SET = {
@@ -87,6 +90,12 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
     /** Set of types when replying to some comment. */
     public static final int[] COMMENT_REPLY_TYPE_SET = {
             TYPE_COMMENT_REPLY,
+            TYPE_MESSAGE,
+    };
+
+    /** Set of types when replying to some message without a session. */
+    public static final int[] DEFERRED_MESSAGE_TYPE_SET = {
+            TYPE_DEFERRED_MESSAGE_REPLY,
             TYPE_MESSAGE,
     };
 
@@ -230,6 +239,7 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
 
             case ComposeActivity.TYPE_DEFERRED_COMMENT_REPLY:
             case ComposeActivity.TYPE_COMMENT_REPLY:
+            case ComposeActivity.TYPE_DEFERRED_MESSAGE_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
                 return getString(R.string.compose_title_reply,
                         getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION));
@@ -288,6 +298,10 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
 
             case TYPE_COMMENT_REPLY:
                 handleCommentReply(accountName, text);
+                break;
+
+            case TYPE_DEFERRED_MESSAGE_REPLY:
+                handleDeferredMessageReply(accountName, text);
                 break;
 
             case TYPE_MESSAGE_REPLY:
@@ -368,6 +382,14 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
         long sessionId = extras.getLong(EXTRA_COMMENT_SESSION_ID, -1);
         Provider.commentReplyAsync(this, parentId, parentNumComments, parentThingId, replyThingId,
                 accountName, body, nesting, sequence, sessionId);
+        finish();
+    }
+
+    private void handleDeferredMessageReply(String accountName, String body) {
+        Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
+        String parentThingId = extras.getString(EXTRA_MESSAGE_PARENT_THING_ID);
+        String replyThingId = extras.getString(EXTRA_MESSAGE_THING_ID);
+        Provider.deferredMessageReplyAsync(this, accountName, body, parentThingId, replyThingId);
         finish();
     }
 

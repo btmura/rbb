@@ -219,6 +219,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
             case ComposeActivity.TYPE_DEFERRED_COMMENT_REPLY:
             case ComposeActivity.TYPE_COMMENT_REPLY:
+            case ComposeActivity.TYPE_DEFERRED_MESSAGE_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
             case ComposeActivity.TYPE_EDIT_POST:
             case ComposeActivity.TYPE_EDIT_COMMENT:
@@ -254,6 +255,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
             case ComposeActivity.TYPE_DEFERRED_COMMENT_REPLY:
             case ComposeActivity.TYPE_COMMENT_REPLY:
+            case ComposeActivity.TYPE_DEFERRED_MESSAGE_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
             case ComposeActivity.TYPE_EDIT_POST:
             case ComposeActivity.TYPE_EDIT_COMMENT:
@@ -284,6 +286,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
             case ComposeActivity.TYPE_DEFERRED_COMMENT_REPLY:
             case ComposeActivity.TYPE_COMMENT_REPLY:
+            case ComposeActivity.TYPE_DEFERRED_MESSAGE_REPLY:
             case ComposeActivity.TYPE_MESSAGE_REPLY:
             case ComposeActivity.TYPE_EDIT_POST:
             case ComposeActivity.TYPE_EDIT_COMMENT:

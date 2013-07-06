@@ -388,6 +388,36 @@ public class Provider {
         });
     }
 
+    public static void deferredMessageReplyAsync(Context context,
+            final String accountName,
+            final String body,
+            final String parentThingId,
+            final String thingId) {
+        final Context appContext = context.getApplicationContext();
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voidRay) {
+                ArrayList<ContentProviderOperation> ops =
+                        new ArrayList<ContentProviderOperation>(1);
+                ops.add(ContentProviderOperation.newInsert(ThingProvider.MESSAGE_ACTIONS_SYNC_URI)
+                        .withValue(MessageActions.COLUMN_ACCOUNT, accountName)
+                        .withValue(MessageActions.COLUMN_ACTION, CommentActions.ACTION_INSERT)
+                        .withValue(MessageActions.COLUMN_PARENT_THING_ID, parentThingId)
+                        .withValue(MessageActions.COLUMN_TEXT, body)
+                        .withValue(MessageActions.COLUMN_THING_ID, thingId)
+                        .build());
+                return applyOps(appContext, ThingProvider.AUTHORITY, ops);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                if (!success) {
+                    showErrorToast(appContext);
+                }
+            }
+        }.execute();
+    }
+
     /** Mark a message either read or unread. */
     public static void readMessageAsync(final Context context, final String accountName,
             final String thingId, final boolean read) {

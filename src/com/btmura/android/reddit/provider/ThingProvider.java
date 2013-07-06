@@ -103,6 +103,7 @@ public class ThingProvider extends BaseProvider {
     public static final Uri THINGS_SYNC_URI = makeSyncUri(THINGS_URI);
     public static final Uri MESSAGES_SYNC_URI = makeSyncUri(MESSAGES_URI);
     public static final Uri COMMENT_ACTIONS_SYNC_URI = makeSyncUri(COMMENT_ACTIONS_URI);
+    public static final Uri MESSAGE_ACTIONS_SYNC_URI = makeSyncUri(MESSAGE_ACTIONS_URI);
 
     public static final Uri THINGS_WITH_ACTIONS_URI = makeJoinUri(THINGS_URI);
     public static final Uri COMMENTS_WITH_ACTIONS_URI = makeJoinUri(COMMENTS_URI);

@@ -34,6 +34,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.ThingDataLoader;
 import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
+import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.StringUtil;
@@ -275,6 +276,21 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
     }
 
     private void handleNewComment() {
+        switch (thingData.parent.getKind()) {
+            case Kinds.KIND_LINK:
+                handleNewLinkComment();
+                break;
+
+            case Kinds.KIND_MESSAGE:
+                handleNewMessageComment();
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private void handleNewLinkComment() {
         String author = thingData.parent.getAuthor();
         // TODO: Put the code to format title in a common class and remove duplication.
         String title = StringUtil.ellipsize(thingData.parent.getTitle(), 50);
@@ -287,6 +303,22 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
 
         MenuHelper.startComposeActivity(getActivity(),
                 ComposeActivity.DEFERRED_COMMENT_REPLY_TYPE_SET,
+                null, author, title, null, args, true);
+    }
+
+    private void handleNewMessageComment() {
+        String author = thingData.parent.getAuthor();
+        // TODO: Put the code to format title in a common class and remove duplication.
+        String title = StringUtil.ellipsize(thingData.parent.getTitle(), 50);
+        String thingId = thingData.parent.getThingId();
+
+        Bundle args = new Bundle(3);
+        args.putString(ComposeActivity.EXTRA_MESSAGE_PARENT_THING_ID, thingId);
+        args.putString(ComposeActivity.EXTRA_MESSAGE_DESTINATION, author);
+        args.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, thingId);
+
+        MenuHelper.startComposeActivity(getActivity(),
+                ComposeActivity.DEFERRED_MESSAGE_TYPE_SET,
                 null, author, title, null, args, true);
     }
 
