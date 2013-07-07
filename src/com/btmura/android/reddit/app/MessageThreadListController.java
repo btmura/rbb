@@ -34,7 +34,8 @@ import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.MessageThreadAdapter;
 
-public class MessageThreadListController implements Controller, ActionModeController {
+public class MessageThreadListController
+        implements Controller<MessageThreadAdapter>, ActionModeController {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_THING_ID = "thingId";
@@ -62,6 +63,11 @@ public class MessageThreadListController implements Controller, ActionModeContro
     @Override
     public void saveInstanceState(Bundle outState) {
         outState.putLong(EXTRA_SESSION_ID, sessionId);
+    }
+
+    @Override
+    public boolean isLoadable() {
+        return accountName != null && !TextUtils.isEmpty(thingId);
     }
 
     @Override

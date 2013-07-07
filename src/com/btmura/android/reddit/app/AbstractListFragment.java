@@ -28,16 +28,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 
-abstract class AbstractListFragment<C extends Controller, AC extends ActionModeController>
+abstract class AbstractListFragment<C extends Controller<A>, AC extends ActionModeController, A extends ListAdapter>
         extends ListFragment
         implements LoaderCallbacks<Cursor>, MultiChoiceModeListener {
 
-    private C controller;
-    private AC actionModeController;
+    protected C controller;
+    protected AC actionModeController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,9 +51,9 @@ abstract class AbstractListFragment<C extends Controller, AC extends ActionModeC
         }
     }
 
-    abstract C createController();
+    protected abstract C createController();
 
-    abstract AC createActionModeController(C controller);
+    protected abstract AC createActionModeController(C controller);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,8 +69,18 @@ abstract class AbstractListFragment<C extends Controller, AC extends ActionModeC
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setListAdapter(controller.getAdapter());
-        setListShown(false);
-        getLoaderManager().initLoader(0, null, this);
+        setListShown(showInitialLoadingSpinner());
+        loadIfPossible();
+    }
+
+    protected boolean showInitialLoadingSpinner() {
+        return false;
+    }
+
+    public void loadIfPossible() {
+        if (controller.isLoadable()) {
+            getLoaderManager().initLoader(0, null, this);
+        }
     }
 
     @Override
@@ -80,11 +91,15 @@ abstract class AbstractListFragment<C extends Controller, AC extends ActionModeC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         controller.swapCursor(cursor);
-        setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
+        setEmptyText(getEmptyText(cursor));
         setListShown(true);
         if (cursor != null) {
             actionModeController.invalidateActionMode();
         }
+    }
+
+    protected String getEmptyText(Cursor cursor) {
+        return getString(cursor != null ? R.string.empty_list : R.string.error);
     }
 
     @Override

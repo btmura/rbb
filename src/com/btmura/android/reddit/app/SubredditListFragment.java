@@ -19,27 +19,21 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
+import com.btmura.android.reddit.widget.SubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditView;
 
-abstract class SubredditListFragment<C extends SubredditListController<?>, AC extends ActionModeController>
-        extends ListFragment
-        implements LoaderCallbacks<Cursor>, OnSwipeDismissListener, MultiChoiceModeListener {
+abstract class SubredditListFragment<C extends SubredditListController<A>, AC extends ActionModeController, A extends SubredditAdapter>
+        extends AbstractListFragment<C, AC, A>
+        implements OnSwipeDismissListener {
 
     public static final String TAG = "SubredditListFragment";
 
@@ -54,14 +48,7 @@ abstract class SubredditListFragment<C extends SubredditListController<?>, AC ex
         void onSubredditSelected(View view, String subreddit);
     }
 
-    protected C controller;
-    protected AC actionModeController;
-
     private OnSubredditSelectedListener listener;
-
-    protected abstract C createController();
-
-    protected abstract AC createActionModeController(C controller);
 
     @Override
     public void onAttach(Activity activity) {
@@ -72,23 +59,10 @@ abstract class SubredditListFragment<C extends SubredditListController<?>, AC ex
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        controller = createController();
-        actionModeController = createActionModeController(controller);
-        if (savedInstanceState != null) {
-            controller.restoreInstanceState(savedInstanceState);
-            actionModeController.restoreInstanceState(savedInstanceState);
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         ListView listView = (ListView) view.findViewById(android.R.id.list);
-        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        listView.setMultiChoiceModeListener(this);
 
         SwipeDismissTouchListener touchListener = new SwipeDismissTouchListener(listView, this);
         listView.setOnTouchListener(touchListener);
@@ -97,35 +71,14 @@ abstract class SubredditListFragment<C extends SubredditListController<?>, AC ex
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setListAdapter(controller.getAdapter());
-        // Only show the spinner if this is a single pane display since showing
-        // two spinners can be annoying.
-        setListShown(controller.isSingleChoice());
-        loadIfPossible();
+    protected boolean showInitialLoadingSpinner() {
+        // Only show the spinner if this is a single pane since showing two can be annoying.
+        return controller.isSingleChoice();
     }
 
-    public void loadIfPossible() {
-        if (controller.isLoadable()) {
-            getLoaderManager().initLoader(0, null, this);
-        }
-    }
-
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return controller.createLoader();
-    }
-
+    @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        controller.swapCursor(cursor);
-
-        setEmptyText(getEmptyText(cursor == null));
-        setListShown(true);
-
-        if (cursor != null) {
-            actionModeController.invalidateActionMode();
-        }
-
+        super.onLoadFinished(loader, cursor);
         if (listener != null) {
             if (cursor == null) {
                 listener.onInitialSubredditSelected(null, true);
@@ -137,15 +90,12 @@ abstract class SubredditListFragment<C extends SubredditListController<?>, AC ex
         }
     }
 
-    private String getEmptyText(boolean error) {
+    @Override
+    protected String getEmptyText(Cursor cursor) {
         if (controller.isSingleChoice()) {
             return ""; // Don't show duplicate message in multipane layout.
         }
-        return getString(error ? R.string.error : R.string.empty_list);
-    }
-
-    public void onLoaderReset(Loader<Cursor> loader) {
-        controller.swapCursor(null);
+        return super.getEmptyText(cursor);
     }
 
     @Override
@@ -167,33 +117,6 @@ abstract class SubredditListFragment<C extends SubredditListController<?>, AC ex
     @Override
     public void onSwipeDismiss(ListView listView, View view, int position) {
         Provider.removeSubredditAsync(getActivity(), getAccountName(), getSubreddit(position));
-    }
-
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        return actionModeController.onCreateActionMode(mode, menu, getListView());
-    }
-
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        return actionModeController.onPrepareActionMode(mode, menu, getListView());
-    }
-
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        actionModeController.onItemCheckedStateChanged(mode, position, id, checked);
-    }
-
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        return actionModeController.onActionItemClicked(mode, item, getListView());
-    }
-
-    public void onDestroyActionMode(ActionMode mode) {
-        actionModeController.onDestroyActionMode(mode);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        controller.saveInstanceState(outState);
-        actionModeController.saveInstanceState(outState);
     }
 
     public String getAccountName() {

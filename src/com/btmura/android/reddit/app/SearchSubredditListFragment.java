@@ -19,9 +19,12 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.btmura.android.reddit.widget.SearchSubredditAdapter;
+
 public class SearchSubredditListFragment
         extends SubredditListFragment<SearchSubredditListController,
-        ActionModeController> {
+        SearchSubredditActionModeController,
+        SearchSubredditAdapter> {
 
     private AccountResultHolder accountResultHolder;
 
@@ -51,9 +54,9 @@ public class SearchSubredditListFragment
     }
 
     @Override
-    protected ActionModeController createActionModeController(
+    protected SearchSubredditActionModeController createActionModeController(
             SearchSubredditListController controller) {
-        return new SubredditSearchActionModeController(getActivity(), controller.getAdapter(),
+        return new SearchSubredditActionModeController(getActivity(), controller.getAdapter(),
                 accountResultHolder);
     }
 

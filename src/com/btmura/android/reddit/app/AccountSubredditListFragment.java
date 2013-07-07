@@ -18,9 +18,12 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
+import com.btmura.android.reddit.widget.AccountSubredditAdapter;
+
 public class AccountSubredditListFragment
         extends SubredditListFragment<AccountSubredditListController,
-        AccountSubredditListActionModeController> {
+        AccountSubredditListActionModeController,
+        AccountSubredditAdapter> {
 
     public static AccountSubredditListFragment newInstance(String accountName,
             String selectedSubreddit, boolean singleChoice) {

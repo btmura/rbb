@@ -19,11 +19,15 @@ package com.btmura.android.reddit.app;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 
+import com.btmura.android.reddit.widget.MessageThreadAdapter;
+
 /**
  * {@link ListFragment} for showing the messages in a thread.
  */
 public class MessageThreadListFragment
-        extends AbstractListFragment<MessageThreadListController, MessageThreadListController> {
+        extends AbstractListFragment<MessageThreadListController,
+        MessageThreadListController,
+        MessageThreadAdapter> {
 
     public static MessageThreadListFragment newInstance(String accountName, String thingId) {
         Bundle args = new Bundle(2);
@@ -36,12 +40,13 @@ public class MessageThreadListFragment
     }
 
     @Override
-    MessageThreadListController createController() {
+    protected MessageThreadListController createController() {
         return new MessageThreadListController(getActivity(), getArguments());
     }
 
     @Override
-    MessageThreadListController createActionModeController(MessageThreadListController controller) {
+    protected MessageThreadListController createActionModeController(
+            MessageThreadListController controller) {
         return controller;
     }
 }

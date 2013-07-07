@@ -19,17 +19,23 @@ package com.btmura.android.reddit.app;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
 
-interface Controller {
+interface Controller<A extends ListAdapter> {
+
+    // Lifecycle methods
 
     void restoreInstanceState(Bundle savedInstanceState);
 
     void saveInstanceState(Bundle outState);
 
-    BaseAdapter getAdapter();
+    // Loader-related methods
+
+    boolean isLoadable();
 
     Loader<Cursor> createLoader();
 
     void swapCursor(Cursor cursor);
+
+    A getAdapter();
 }

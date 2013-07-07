@@ -16,29 +16,13 @@
 
 package com.btmura.android.reddit.app;
 
-import android.database.Cursor;
-import android.os.Bundle;
-import android.support.v4.content.Loader;
-
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
-interface SubredditListController<A extends SubredditAdapter> {
-
-    void restoreInstanceState(Bundle savedInstanceState);
-
-    void saveInstanceState(Bundle outState);
-
-    boolean isLoadable();
-
-    Loader<Cursor> createLoader();
-
-    void swapCursor(Cursor cursor);
+interface SubredditListController<A extends SubredditAdapter> extends Controller<A> {
 
     // Getters
 
     String getAccountName();
-
-    A getAdapter();
 
     String getSelectedSubreddit();
 
