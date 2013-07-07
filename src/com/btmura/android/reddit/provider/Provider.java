@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.OperationApplicationException;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
@@ -394,24 +395,16 @@ public class Provider {
             final String parentThingId,
             final String thingId) {
         final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Boolean>() {
+        new AsyncTask<Void, Void, Bundle>() {
             @Override
-            protected Boolean doInBackground(Void... voidRay) {
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(1);
-                ops.add(ContentProviderOperation.newInsert(ThingProvider.MESSAGE_ACTIONS_SYNC_URI)
-                        .withValue(MessageActions.COLUMN_ACCOUNT, accountName)
-                        .withValue(MessageActions.COLUMN_ACTION, CommentActions.ACTION_INSERT)
-                        .withValue(MessageActions.COLUMN_PARENT_THING_ID, parentThingId)
-                        .withValue(MessageActions.COLUMN_TEXT, body)
-                        .withValue(MessageActions.COLUMN_THING_ID, thingId)
-                        .build());
-                return applyOps(appContext, ThingProvider.AUTHORITY, ops);
+            protected Bundle doInBackground(Void... voidRay) {
+                return ThingProvider.insertMessage(appContext, accountName, body, parentThingId,
+                        thingId);
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
-                if (!success) {
+            protected void onPostExecute(Bundle result) {
+                if (result == null) {
                     showErrorToast(appContext);
                 }
             }

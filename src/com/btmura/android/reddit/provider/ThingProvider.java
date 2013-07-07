@@ -103,7 +103,6 @@ public class ThingProvider extends BaseProvider {
     public static final Uri THINGS_SYNC_URI = makeSyncUri(THINGS_URI);
     public static final Uri MESSAGES_SYNC_URI = makeSyncUri(MESSAGES_URI);
     public static final Uri COMMENT_ACTIONS_SYNC_URI = makeSyncUri(COMMENT_ACTIONS_URI);
-    public static final Uri MESSAGE_ACTIONS_SYNC_URI = makeSyncUri(MESSAGE_ACTIONS_URI);
 
     public static final Uri THINGS_WITH_ACTIONS_URI = makeJoinUri(THINGS_URI);
     public static final Uri COMMENTS_WITH_ACTIONS_URI = makeJoinUri(COMMENTS_URI);
@@ -199,6 +198,9 @@ public class ThingProvider extends BaseProvider {
 
     /** Method to insert a pending comment in a listing. */
     private static final String METHOD_INSERT_COMMENT = "insertComment";
+
+    /** Method to insert a pending message in a listing. */
+    private static final String METHOD_INSERT_MESSAGE = "insertMessage";
 
     // List of extras used throughout the provider code.
 
@@ -344,10 +346,18 @@ public class ThingProvider extends BaseProvider {
         return call(context, THINGS_URI, METHOD_INSERT_COMMENT, accountName, extras);
     }
 
+    public static final Bundle insertMessage(Context context, String accountName,
+            String body, String parentThingId, String thingId) {
+        Bundle extras = new Bundle(3);
+        extras.putString(EXTRA_BODY, body);
+        extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
+        extras.putString(EXTRA_THING_ID, thingId);
+        return call(context, MESSAGE_ACTIONS_URI, METHOD_INSERT_MESSAGE, accountName, extras);
+    }
+
     private static Bundle call(Context context, Uri uri, String method,
             String arg, Bundle extras) {
-        return context.getApplicationContext().getContentResolver().call(uri, method,
-                arg, extras);
+        return context.getApplicationContext().getContentResolver().call(uri, method, arg, extras);
     }
 
     public ThingProvider() {
@@ -412,6 +422,8 @@ public class ThingProvider extends BaseProvider {
                 return collapseComment(extras);
             } else if (METHOD_INSERT_COMMENT.equals(method)) {
                 return insertComment(arg, extras);
+            } else if (METHOD_INSERT_MESSAGE.equals(method)) {
+                return insertMessage(arg, extras);
             } else {
                 throw new IllegalArgumentException();
             }
@@ -629,14 +641,14 @@ public class ThingProvider extends BaseProvider {
     }
 
     private Bundle insertComment(String accountName, Bundle extras) {
-        String body = extras.getString(EXTRA_BODY);
+        String body = getBodyExtra(extras);
         int nesting = extras.getInt(EXTRA_NESTING);
         long parentId = extras.getLong(EXTRA_PARENT_ID);
         int parentNumComments = extras.getInt(EXTRA_PARENT_NUM_COMMENTS);
-        String parentThingId = extras.getString(EXTRA_PARENT_THING_ID);
+        String parentThingId = getParentThingId(extras);
         int sequence = extras.getInt(EXTRA_SEQUENCE);
         long sessionId = extras.getLong(EXTRA_SESSION_ID);
-        String thingId = extras.getString(EXTRA_THING_ID);
+        String thingId = getThingIdExtra(extras);
 
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
@@ -697,6 +709,48 @@ public class ThingProvider extends BaseProvider {
         cr.notifyChange(THINGS_URI, null, NO_SYNC);
         cr.notifyChange(COMMENTS_URI, null, SYNC);
         return null;
+    }
+
+    private Bundle insertMessage(String accountName, Bundle extras) {
+        String body = getBodyExtra(extras);
+        String parentThingId = getParentThingId(extras);
+        String thingId = getThingIdExtra(extras);
+
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues(3);
+            values.put(MessageActions.COLUMN_ACCOUNT, accountName);
+            values.put(MessageActions.COLUMN_ACTION, MessageActions.ACTION_INSERT);
+            values.put(MessageActions.COLUMN_PARENT_THING_ID, parentThingId);
+            values.put(MessageActions.COLUMN_TEXT, body);
+            values.put(MessageActions.COLUMN_THING_ID, thingId);
+
+            long id = db.insert(MessageActions.TABLE_NAME, null, values);
+            if (id == -1) {
+                return null;
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(MESSAGE_ACTIONS_URI, null, SYNC);
+        return Bundle.EMPTY;
+    }
+
+    private static String getBodyExtra(Bundle extras) {
+        return extras.getString(EXTRA_BODY);
+    }
+
+    private static String getParentThingId(Bundle extras) {
+        return extras.getString(EXTRA_PARENT_THING_ID);
+    }
+
+    private static String getThingIdExtra(Bundle extras) {
+        return extras.getString(EXTRA_THING_ID);
     }
 
     @Override
