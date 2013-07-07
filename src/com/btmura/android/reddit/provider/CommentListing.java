@@ -102,15 +102,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         this.linkId = linkId;
         this.numComments = numComments;
         this.cookie = cookie;
-        this.sessionTag = makeSessionTag();
-    }
-
-    private String makeSessionTag() {
-        StringBuilder tag = new StringBuilder(accountName).append("-").append(thingId);
-        if (!TextUtils.isEmpty(linkId)) {
-            tag.append("-").append(linkId);
-        }
-        return tag.toString();
+        this.sessionTag = !TextUtils.isEmpty(linkId) ? linkId : thingId;
     }
 
     @Override

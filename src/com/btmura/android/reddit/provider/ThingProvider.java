@@ -237,6 +237,7 @@ public class ThingProvider extends BaseProvider {
     private static final String[] SESSION_ID_PROJECTION = {
             Sessions._ID,
     };
+
     private static final int SESSION_INDEX_ID = 0;
 
     private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Comments.TABLE_NAME
@@ -750,6 +751,45 @@ public class ThingProvider extends BaseProvider {
                 return null;
             }
 
+            // TODO: Add account scoping to sessions table.
+
+            Cursor cursor = db.query(Sessions.TABLE_NAME, SESSION_ID_PROJECTION,
+                    Sessions.SELECT_BY_TYPE_AND_TAG,
+                    Array.of(Sessions.TYPE_COMMENTS, parentThingId),
+                    null, null, null);
+            try {
+                while (cursor.moveToNext()) {
+                    long sessionId = cursor.getLong(SESSION_INDEX_ID);
+
+                    int sequence = 0;
+                    Cursor cursor2 = db.rawQuery("SELECT MAX(" + Comments.COLUMN_SEQUENCE + ")"
+                            + " FROM " + Comments.TABLE_NAME
+                            + " WHERE " + Comments.COLUMN_SESSION_ID + "=?", Array.of(sessionId));
+                    if (cursor2.moveToNext()) {
+                        sequence = cursor2.getInt(0);
+                    }
+                    cursor2.close();
+
+                    int nesting = 0;
+
+                    values.clear();
+                    values.put(Comments.COLUMN_ACCOUNT, accountName);
+                    values.put(Comments.COLUMN_AUTHOR, accountName);
+                    values.put(Comments.COLUMN_BODY, body);
+                    values.put(Comments.COLUMN_COMMENT_ACTION_ID, actionId);
+                    values.put(Comments.COLUMN_KIND, Kinds.KIND_COMMENT);
+                    values.put(Comments.COLUMN_NESTING, nesting);
+                    values.put(Comments.COLUMN_SEQUENCE, sequence);
+                    values.put(Comments.COLUMN_SESSION_ID, sessionId);
+                    long commentId = db.insert(Comments.TABLE_NAME, null, values);
+                    if (commentId == -1) {
+                        return null;
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -781,7 +821,7 @@ public class ThingProvider extends BaseProvider {
                 return null;
             }
 
-            // TODO: Add account scoping to this table.
+            // TODO: Add account scoping to sessions table.
 
             Cursor cursor = db.query(Sessions.TABLE_NAME, SESSION_ID_PROJECTION,
                     Sessions.SELECT_BY_TYPE_AND_TAG,
@@ -820,18 +860,6 @@ public class ThingProvider extends BaseProvider {
         return Bundle.EMPTY;
     }
 
-    private static String getBodyExtra(Bundle extras) {
-        return extras.getString(EXTRA_BODY);
-    }
-
-    private static String getParentThingIdExtra(Bundle extras) {
-        return extras.getString(EXTRA_PARENT_THING_ID);
-    }
-
-    private static String getThingIdExtra(Bundle extras) {
-        return extras.getString(EXTRA_THING_ID);
-    }
-
     @Override
     protected void notifyChange(Uri uri) {
         super.notifyChange(uri);
@@ -847,5 +875,17 @@ public class ThingProvider extends BaseProvider {
         if (uri.getBooleanQueryParameter(PARAM_NOTIFY_MESSAGES, false)) {
             getContext().getContentResolver().notifyChange(MESSAGES_URI, null);
         }
+    }
+
+    private static String getBodyExtra(Bundle extras) {
+        return extras.getString(EXTRA_BODY);
+    }
+
+    private static String getParentThingIdExtra(Bundle extras) {
+        return extras.getString(EXTRA_PARENT_THING_ID);
+    }
+
+    private static String getThingIdExtra(Bundle extras) {
+        return extras.getString(EXTRA_THING_ID);
     }
 }
