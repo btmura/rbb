@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2012 Brian Muramatsu
+     Copyright (C) 2013 Brian Muramatsu
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -16,11 +16,6 @@
 -->
 <resources>
 
-    <integer name="bitmap_cache_size">10</integer>
-    <integer name="menu_order_account">1000</integer>
-    <integer name="menu_order_search">2000</integer>
-    <integer name="menu_order_thing">3000</integer>
-    <integer name="menu_order_subreddit">4000</integer>
-    <integer name="menu_order_last">5000</integer>
+    <integer name="bitmap_cache_size">20</integer>
 
 </resources>

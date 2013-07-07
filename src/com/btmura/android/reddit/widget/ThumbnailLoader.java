@@ -32,15 +32,32 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 
+import com.btmura.android.reddit.R;
+
 public class ThumbnailLoader {
 
     private static final String TAG = "ThumbnailLoader";
 
-    private static final BitmapCache BITMAP_CACHE = new BitmapCache(2 * 1024 * 1024);
+    static class BitmapCache extends LruCache<String, Bitmap> {
+
+        private static BitmapCache BITMAP_CACHE;
+
+        static BitmapCache getInstance(Context context) {
+            if (BITMAP_CACHE == null) {
+                int cacheSize = context.getResources().getInteger(R.integer.bitmap_cache_size);
+                BITMAP_CACHE = new BitmapCache(cacheSize);
+            }
+            return BITMAP_CACHE;
+        }
+
+        BitmapCache(int size) {
+            super(size);
+        }
+    }
 
     public void setThumbnail(Context context, ThingView v, String url) {
         if (!TextUtils.isEmpty(url)) {
-            Bitmap b = BITMAP_CACHE.get(url);
+            Bitmap b = BitmapCache.getInstance(context).get(url);
             v.setThumbnailBitmap(b, false);
             if (b != null) {
                 clearLoadThumbnailTask(v);
@@ -50,7 +67,7 @@ public class ThumbnailLoader {
                     if (task != null) {
                         task.cancel(true);
                     }
-                    task = new LoadThumbnailTask(context.getApplicationContext(), v, url);
+                    task = new LoadThumbnailTask(context, v, url);
                     v.setTag(task);
                     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
@@ -69,17 +86,6 @@ public class ThumbnailLoader {
         }
     }
 
-    static class BitmapCache extends LruCache<String, Bitmap> {
-        BitmapCache(int size) {
-            super(size);
-        }
-
-        @Override
-        protected int sizeOf(String key, Bitmap value) {
-            return value.getByteCount();
-        }
-    }
-
     class LoadThumbnailTask extends AsyncTask<Void, Void, Bitmap> {
 
         private final Context context;
@@ -87,7 +93,7 @@ public class ThumbnailLoader {
         private final String url;
 
         LoadThumbnailTask(Context context, ThingView v, String url) {
-            this.context = context;
+            this.context = context.getApplicationContext();
             this.ref = new WeakReference<ThingView>(v);
             this.url = url;
         }
@@ -135,7 +141,7 @@ public class ThumbnailLoader {
         @Override
         protected void onPostExecute(Bitmap b) {
             if (b != null) {
-                BITMAP_CACHE.put(url, b);
+                BitmapCache.getInstance(context).put(url, b);
             }
             ThingView v = ref.get();
             if (v != null && equals(v.getTag())) {
