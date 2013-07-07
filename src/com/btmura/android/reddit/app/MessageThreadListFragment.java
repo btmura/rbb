@@ -16,31 +16,14 @@
 
 package com.btmura.android.reddit.app;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
-import android.view.ActionMode;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.ListView;
-
-import com.btmura.android.reddit.R;
 
 /**
  * {@link ListFragment} for showing the messages in a thread.
  */
-public class MessageThreadListFragment extends ListFragment
-        implements LoaderCallbacks<Cursor>, MultiChoiceModeListener {
-
-    public static final String TAG = "MessageThreadListFragment";
-
-    private MessageThreadListController controller;
+public class MessageThreadListFragment
+        extends AbstractListFragment<MessageThreadListController, MessageThreadListController> {
 
     public static MessageThreadListFragment newInstance(String accountName, String thingId) {
         Bundle args = new Bundle(2);
@@ -53,80 +36,12 @@ public class MessageThreadListFragment extends ListFragment
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        controller = new MessageThreadListController(getActivity(), getArguments());
-        if (savedInstanceState != null) {
-            controller.restoreInstanceState(savedInstanceState);
-        }
+    MessageThreadListController createController() {
+        return new MessageThreadListController(getActivity(), getArguments());
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        ListView l = (ListView) v.findViewById(android.R.id.list);
-        l.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        l.setMultiChoiceModeListener(this);
-        return v;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setListAdapter(controller.getAdapter());
-        setListShown(false);
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return controller.createLoader();
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        controller.swapCursor(cursor);
-        setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
-        setListShown(true);
-        if (cursor != null) {
-            controller.invalidateActionMode();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        controller.swapCursor(null);
-    }
-
-    @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        return controller.onCreateActionMode(mode, menu, getListView());
-    }
-
-    @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        return controller.onPrepareActionMode(mode, menu, getListView());
-    }
-
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        controller.onItemCheckedStateChanged(mode, position, id, checked);
-    }
-
-    @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        return controller.onActionItemClicked(mode, item, getListView());
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-        controller.onDestroyActionMode(mode);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        controller.saveInstanceState(outState);
+    MessageThreadListController createActionModeController(MessageThreadListController controller) {
+        return controller;
     }
 }

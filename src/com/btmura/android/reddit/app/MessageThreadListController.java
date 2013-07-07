@@ -34,7 +34,7 @@ import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.MessageThreadAdapter;
 
-public class MessageThreadListController implements ActionModeController {
+public class MessageThreadListController implements Controller, ActionModeController {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_THING_ID = "thingId";
@@ -54,18 +54,22 @@ public class MessageThreadListController implements ActionModeController {
         this.adapter = new MessageThreadAdapter(context);
     }
 
+    @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
         this.sessionId = savedInstanceState.getLong(EXTRA_SESSION_ID);
     }
 
+    @Override
     public void saveInstanceState(Bundle outState) {
         outState.putLong(EXTRA_SESSION_ID, sessionId);
     }
 
+    @Override
     public Loader<Cursor> createLoader() {
         return new MessageThreadLoader(context, accountName, thingId, sessionId);
     }
 
+    @Override
     public void swapCursor(Cursor cursor) {
         if (adapter.getCursor() != cursor) {
             adapter.swapCursor(cursor);
@@ -78,6 +82,7 @@ public class MessageThreadListController implements ActionModeController {
 
     // Getters
 
+    @Override
     public MessageThreadAdapter getAdapter() {
         return adapter;
     }
