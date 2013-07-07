@@ -43,7 +43,8 @@ import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissLi
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingView;
 
-abstract class ThingListFragment<C extends ThingListController> extends ThingProviderListFragment
+abstract class ThingListFragment<C extends ThingListController<?>>
+        extends ThingProviderListFragment
         implements OnScrollListener, OnSwipeDismissListener, OnVoteListener,
         MultiChoiceModeListener {
 

@@ -16,26 +16,13 @@
 
 package com.btmura.android.reddit.app;
 
-import android.database.Cursor;
-import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 
-interface ThingListController {
-
-    boolean isLoadable();
-
-    void restoreInstanceState(Bundle state);
-
-    void saveInstanceState(Bundle state);
-
-    Loader<Cursor> createLoader();
-
-    void swapCursor(Cursor cursor);
+interface ThingListController<A extends AbstractThingListAdapter> extends Controller<A> {
 
     ThingBundle getThingBundle(int position);
 
@@ -58,8 +45,6 @@ interface ThingListController {
     // Getters.
 
     String getAccountName();
-
-    AbstractThingListAdapter getAdapter();
 
     int getEmptyText();
 

@@ -35,10 +35,9 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.ListViewUtils;
-import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 import com.btmura.android.reddit.widget.MessageListAdapter;
 
-class MessageThingListController implements ThingListController {
+class MessageThingListController implements ThingListController<MessageListAdapter> {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_MESSAGE_USER = "messageUser";
@@ -262,7 +261,7 @@ class MessageThingListController implements ThingListController {
     }
 
     @Override
-    public AbstractThingListAdapter getAdapter() {
+    public MessageListAdapter getAdapter() {
         return adapter;
     }
 

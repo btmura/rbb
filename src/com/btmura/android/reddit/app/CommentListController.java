@@ -41,7 +41,7 @@ import com.btmura.android.reddit.widget.OnVoteListener;
 /**
  * Controller that handles all the logic required by {@link CommentListFragment}.
  */
-class CommentListController implements CommentList {
+class CommentListController implements Controller<CommentAdapter>, CommentList {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_THING_ID = "thingId";
@@ -64,18 +64,27 @@ class CommentListController implements CommentList {
         this.adapter = new CommentAdapter(context, accountName, listener);
     }
 
+    @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
         this.sessionId = savedInstanceState.getLong(EXTRA_SESSION_ID);
     }
 
+    @Override
     public void saveInstanceState(Bundle outState) {
         outState.putLong(EXTRA_SESSION_ID, sessionId);
     }
 
+    @Override
+    public boolean isLoadable() {
+        return accountName != null && !TextUtils.isEmpty(thingId);
+    }
+
+    @Override
     public Loader<Cursor> createLoader() {
         return new CommentLoader(context, accountName, thingId, linkId, sessionId);
     }
 
+    @Override
     public void swapCursor(Cursor cursor) {
         if (adapter.getCursor() != cursor) {
             adapter.swapCursor(cursor);
@@ -86,8 +95,7 @@ class CommentListController implements CommentList {
         }
     }
 
-    // Getters
-
+    @Override
     public CommentAdapter getAdapter() {
         return adapter;
     }

@@ -36,12 +36,11 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.ListViewUtils;
-import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingListAdapter;
 
 abstract class AbstractThingTableListController
-        implements ThingListController, ThingProjection {
+        implements ThingListController<ThingListAdapter>, ThingProjection {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_PARENT_SUBREDDIT = "parentSubreddit";
@@ -385,7 +384,7 @@ abstract class AbstractThingTableListController
     }
 
     @Override
-    public AbstractThingListAdapter getAdapter() {
+    public ThingListAdapter getAdapter() {
         return adapter;
     }
 
