@@ -199,6 +199,9 @@ public class ThingProvider extends BaseProvider {
     /** Method to insert a pending comment in a listing. */
     private static final String METHOD_INSERT_COMMENT = "insertComment";
 
+    /** Method to insert a pending comment in a listing. */
+    private static final String METHOD_INSERT_COMMENT_2 = "insertComment2";
+
     /** Method to insert a pending message in a listing. */
     private static final String METHOD_INSERT_MESSAGE = "insertMessage";
 
@@ -351,6 +354,15 @@ public class ThingProvider extends BaseProvider {
         return call(context, THINGS_URI, METHOD_INSERT_COMMENT, accountName, extras);
     }
 
+    public static final Bundle insertComment2(Context context, String accountName,
+            String body, String parentThingId, String thingId) {
+        Bundle extras = new Bundle(3);
+        extras.putString(EXTRA_BODY, body);
+        extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
+        extras.putString(EXTRA_THING_ID, thingId);
+        return call(context, COMMENT_ACTIONS_URI, METHOD_INSERT_COMMENT_2, accountName, extras);
+    }
+
     public static final Bundle insertMessage(Context context, String accountName,
             String body, String parentThingId, String thingId) {
         Bundle extras = new Bundle(3);
@@ -427,6 +439,8 @@ public class ThingProvider extends BaseProvider {
                 return collapseComment(extras);
             } else if (METHOD_INSERT_COMMENT.equals(method)) {
                 return insertComment(arg, extras);
+            } else if (METHOD_INSERT_COMMENT_2.equals(method)) {
+                return insertComment2(arg, extras);
             } else if (METHOD_INSERT_MESSAGE.equals(method)) {
                 return insertMessage(arg, extras);
             } else {
@@ -650,7 +664,7 @@ public class ThingProvider extends BaseProvider {
         int nesting = extras.getInt(EXTRA_NESTING);
         long parentId = extras.getLong(EXTRA_PARENT_ID);
         int parentNumComments = extras.getInt(EXTRA_PARENT_NUM_COMMENTS);
-        String parentThingId = getParentThingId(extras);
+        String parentThingId = getParentThingIdExtra(extras);
         int sequence = extras.getInt(EXTRA_SEQUENCE);
         long sessionId = extras.getLong(EXTRA_SESSION_ID);
         String thingId = getThingIdExtra(extras);
@@ -716,9 +730,40 @@ public class ThingProvider extends BaseProvider {
         return null;
     }
 
+    private Bundle insertComment2(String accountName, Bundle extras) {
+        String body = getBodyExtra(extras);
+        String parentThingId = getParentThingIdExtra(extras);
+        String thingId = getThingIdExtra(extras);
+
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues(7);
+            values.put(CommentActions.COLUMN_ACCOUNT, accountName);
+            values.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
+            values.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
+            values.put(CommentActions.COLUMN_TEXT, body);
+            values.put(CommentActions.COLUMN_THING_ID, thingId);
+
+            long actionId = db.insert(CommentActions.TABLE_NAME, null, values);
+            if (actionId == -1) {
+                return null;
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(COMMENT_ACTIONS_URI, null, SYNC);
+        cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
+        return Bundle.EMPTY;
+    }
+
     private Bundle insertMessage(String accountName, Bundle extras) {
         String body = getBodyExtra(extras);
-        String parentThingId = getParentThingId(extras);
+        String parentThingId = getParentThingIdExtra(extras);
         String thingId = getThingIdExtra(extras);
 
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -779,7 +824,7 @@ public class ThingProvider extends BaseProvider {
         return extras.getString(EXTRA_BODY);
     }
 
-    private static String getParentThingId(Bundle extras) {
+    private static String getParentThingIdExtra(Bundle extras) {
         return extras.getString(EXTRA_PARENT_THING_ID);
     }
 

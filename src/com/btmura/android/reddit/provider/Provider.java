@@ -185,24 +185,16 @@ public class Provider {
             final String parentThingId,
             final String thingId) {
         final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Boolean>() {
+        new AsyncTask<Void, Void, Bundle>() {
             @Override
-            protected Boolean doInBackground(Void... voidRay) {
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(1);
-                ops.add(ContentProviderOperation.newInsert(ThingProvider.COMMENT_ACTIONS_SYNC_URI)
-                        .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
-                        .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT)
-                        .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentThingId)
-                        .withValue(CommentActions.COLUMN_TEXT, body)
-                        .withValue(CommentActions.COLUMN_THING_ID, thingId)
-                        .build());
-                return applyOps(appContext, ThingProvider.AUTHORITY, ops);
+            protected Bundle doInBackground(Void... voidRay) {
+                return ThingProvider.insertComment2(appContext, accountName, body, parentThingId,
+                        thingId);
             }
 
             @Override
-            protected void onPostExecute(Boolean success) {
-                if (!success) {
+            protected void onPostExecute(Bundle result) {
+                if (result == null) {
                     showErrorToast(appContext);
                 }
             }
