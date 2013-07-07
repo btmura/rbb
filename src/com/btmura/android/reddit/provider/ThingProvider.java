@@ -231,6 +231,11 @@ public class ThingProvider extends BaseProvider {
             Comments.COLUMN_NESTING,
     };
 
+    private static final String[] SESSION_ID_PROJECTION = {
+            Sessions._ID,
+    };
+    private static final int SESSION_INDEX_ID = 0;
+
     private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Comments.TABLE_NAME
             + " SET " + Comments.COLUMN_SEQUENCE + "=" + Comments.COLUMN_SEQUENCE + "+1"
             + " WHERE " + Comments.COLUMN_SESSION_ID + "=? AND " + Comments.COLUMN_SEQUENCE + ">=?";
@@ -719,16 +724,44 @@ public class ThingProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
-            ContentValues values = new ContentValues(3);
+            ContentValues values = new ContentValues(7);
             values.put(MessageActions.COLUMN_ACCOUNT, accountName);
             values.put(MessageActions.COLUMN_ACTION, MessageActions.ACTION_INSERT);
             values.put(MessageActions.COLUMN_PARENT_THING_ID, parentThingId);
             values.put(MessageActions.COLUMN_TEXT, body);
             values.put(MessageActions.COLUMN_THING_ID, thingId);
 
-            long id = db.insert(MessageActions.TABLE_NAME, null, values);
-            if (id == -1) {
+            long actionId = db.insert(MessageActions.TABLE_NAME, null, values);
+            if (actionId == -1) {
                 return null;
+            }
+
+            // TODO: Add account scoping to this table.
+
+            Cursor cursor = db.query(Sessions.TABLE_NAME, SESSION_ID_PROJECTION,
+                    Sessions.SELECT_BY_TYPE_AND_TAG,
+                    Array.of(Sessions.TYPE_MESSAGE_THREAD, thingId),
+                    null, null, null);
+            try {
+                while (cursor.moveToNext()) {
+                    long sessionId = cursor.getLong(SESSION_INDEX_ID);
+
+                    values.clear();
+                    values.put(Messages.COLUMN_ACCOUNT, accountName);
+                    values.put(Messages.COLUMN_AUTHOR, accountName);
+                    values.put(Messages.COLUMN_BODY, body);
+                    values.put(Messages.COLUMN_KIND, Kinds.KIND_MESSAGE);
+                    values.put(Messages.COLUMN_MESSAGE_ACTION_ID, actionId);
+                    values.put(Messages.COLUMN_SESSION_ID, sessionId);
+                    values.put(Messages.COLUMN_WAS_COMMENT, false);
+
+                    long messageId = db.insert(Messages.TABLE_NAME, null, values);
+                    if (messageId == -1) {
+                        return null;
+                    }
+                }
+            } finally {
+                cursor.close();
             }
 
             db.setTransactionSuccessful();
@@ -738,6 +771,7 @@ public class ThingProvider extends BaseProvider {
 
         ContentResolver cr = getContext().getContentResolver();
         cr.notifyChange(MESSAGE_ACTIONS_URI, null, SYNC);
+        cr.notifyChange(MESSAGES_URI, null, NO_SYNC);
         return Bundle.EMPTY;
     }
 

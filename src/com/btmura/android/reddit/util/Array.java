@@ -37,8 +37,8 @@ public class Array {
         return new String[] {oneLong.toString(), element};
     }
 
-    public static String[] of(String element, Integer oneInt) {
-        return new String[] {element, oneInt.toString()};
+    public static String[] of(int oneInt, String element) {
+        return new String[] {Integer.toString(oneInt), element};
     }
 
     public static String[] of(String... elements) {

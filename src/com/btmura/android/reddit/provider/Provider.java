@@ -37,9 +37,6 @@ import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.HideActions;
-import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.MessageActions;
-import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
@@ -355,41 +352,6 @@ public class Provider {
     }
 
     public static void messageReplyAsync(Context context,
-            final String accountName,
-            final String body,
-            final String parentThingId,
-            final long sessionId,
-            final String thingId) {
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            public void run() {
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(2);
-
-                ops.add(ContentProviderOperation.newInsert(ThingProvider.MESSAGE_ACTIONS_URI)
-                        .withValue(MessageActions.COLUMN_ACCOUNT, accountName)
-                        .withValue(MessageActions.COLUMN_ACTION, MessageActions.ACTION_INSERT)
-                        .withValue(MessageActions.COLUMN_PARENT_THING_ID, parentThingId)
-                        .withValue(MessageActions.COLUMN_TEXT, body)
-                        .withValue(MessageActions.COLUMN_THING_ID, thingId)
-                        .build());
-
-                ops.add(ContentProviderOperation.newInsert(ThingProvider.MESSAGES_SYNC_URI)
-                        .withValue(Messages.COLUMN_ACCOUNT, accountName)
-                        .withValue(Messages.COLUMN_AUTHOR, accountName)
-                        .withValue(Messages.COLUMN_BODY, body)
-                        .withValue(Messages.COLUMN_KIND, Kinds.KIND_MESSAGE)
-                        .withValue(Messages.COLUMN_SESSION_ID, sessionId)
-                        .withValue(Messages.COLUMN_WAS_COMMENT, false)
-                        .withValueBackReference(Messages.COLUMN_MESSAGE_ACTION_ID, 0)
-                        .build());
-
-                applyOps(appContext, ThingProvider.AUTHORITY, ops);
-            }
-        });
-    }
-
-    public static void deferredMessageReplyAsync(Context context,
             final String accountName,
             final String body,
             final String parentThingId,

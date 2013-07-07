@@ -317,8 +317,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
         args.putString(ComposeActivity.EXTRA_MESSAGE_DESTINATION, author);
         args.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, thingId);
 
-        MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.DEFERRED_MESSAGE_TYPE_SET,
+        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_TYPE_SET,
                 null, author, title, null, args, true);
     }
 

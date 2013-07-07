@@ -58,15 +58,15 @@ public class Sessions implements BaseColumns {
 
     public static final String SELECT_BY_ID = _ID + "=?";
 
-    public static final String SELECT_BY_TAG_AND_TYPE =
-            COLUMN_TAG + "=? AND " + COLUMN_TYPE + "=?";
+    public static final String SELECT_BY_TYPE_AND_TAG =
+            COLUMN_TYPE + "=? AND " + COLUMN_TAG + "=?";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_TAG + " TEXT NOT NULL,"
                 + COLUMN_TIMESTAMP + " INTEGER NOT NULL,"
-                + COLUMN_TYPE + ")");
+                + COLUMN_TYPE + " INTEGER NOT NULL)");
     }
 
     /** Creates the temporary table used in version 2. Kept for testing upgrades. */

@@ -61,6 +61,7 @@ public class ContentUriListFragment extends ListFragment {
         adapter.add(ThingProvider.THINGS_URI);
         adapter.add(ThingProvider.MESSAGES_URI);
         adapter.add(ThingProvider.SUBREDDITS_URI);
+        adapter.add(ThingProvider.SESSIONS_URI);
         adapter.add(ThingProvider.COMMENT_ACTIONS_URI);
         adapter.add(ThingProvider.HIDE_ACTIONS_URI);
         adapter.add(ThingProvider.MESSAGE_ACTIONS_URI);

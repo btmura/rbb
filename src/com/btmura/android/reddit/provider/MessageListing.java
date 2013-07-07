@@ -67,7 +67,6 @@ class MessageListing extends JsonParser implements Listing {
     private final String more;
     private final boolean mark;
     private final String cookie;
-    private final String sessionTag;
     private final SQLiteOpenHelper dbHelper;
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
 
@@ -99,13 +98,12 @@ class MessageListing extends JsonParser implements Listing {
         this.more = more;
         this.mark = mark;
         this.cookie = cookie;
-        this.sessionTag = accountName + "-" + thingId + "-" + filter;
         this.sessionType = sessionType;
     }
 
     @Override
     public String getSessionTag() {
-        return sessionTag;
+        return thingId;
     }
 
     @Override
