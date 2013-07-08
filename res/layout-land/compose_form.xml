@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2012 Brian Muramatsu
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+  
+          http://www.apache.org/licenses/LICENSE-2.0
+  
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <!--
+    TODO: Use ViewStub and split this out into a separate generic layout 
+    for a large text and action button.
+    -->
+
+    <LinearLayout
+        android:id="@+id/no_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <TextView
+            style="@android:style/TextAppearance.Holo.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/element_padding"
+            android:text="@string/error_account_required" />
+
+        <Button
+            android:id="@+id/add_account_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/compose_add_account" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/has_account"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:padding="@dimen/padding"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingRight="@dimen/element_padding" >
+
+            <Spinner
+                android:id="@+id/account_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/spinner_padding" />
+
+            <AutoCompleteTextView
+                android:id="@+id/destination_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/element_padding"
+                android:completionThreshold="1"
+                android:imeOptions="flagNoFullscreen"
+                android:inputType="textNoSuggestions"
+                android:singleLine="true" />
+
+            <EditText
+                android:id="@+id/title_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/element_padding"
+                android:gravity="top"
+                android:imeOptions="flagNoFullscreen"
+                android:inputType="textCapSentences|textAutoCorrect"
+                android:singleLine="true" />
+
+            <Switch
+                android:id="@+id/link_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/element_padding"
+                android:textOff="@string/compose_text"
+                android:textOn="@string/compose_link" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/text_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:gravity="top"
+            android:inputType="textCapSentences|textAutoCorrect|textMultiLine" />
+    </LinearLayout>
+
+</FrameLayout>
