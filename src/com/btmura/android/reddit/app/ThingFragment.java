@@ -296,13 +296,12 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
         String title = StringUtil.ellipsize(thingData.parent.getTitle(), 50);
         String thingId = thingData.parent.getThingId();
 
-        Bundle args = new Bundle(3);
+        Bundle args = new Bundle(2);
         args.putString(ComposeActivity.EXTRA_COMMENT_PARENT_THING_ID, thingId);
-        args.putString(ComposeActivity.EXTRA_COMMENT_AUTHOR, author);
         args.putString(ComposeActivity.EXTRA_COMMENT_THING_ID, thingId);
 
         MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.DEFERRED_COMMENT_REPLY_TYPE_SET,
+                ComposeActivity.COMMENT_REPLY_TYPE_SET,
                 null, author, title, null, args, true);
     }
 

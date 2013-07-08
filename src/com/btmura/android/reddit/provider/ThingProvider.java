@@ -199,9 +199,6 @@ public class ThingProvider extends BaseProvider {
     /** Method to insert a pending comment in a listing. */
     private static final String METHOD_INSERT_COMMENT = "insertComment";
 
-    /** Method to insert a pending comment in a listing. */
-    private static final String METHOD_INSERT_COMMENT_2 = "insertComment2";
-
     /** Method to insert a pending message in a listing. */
     private static final String METHOD_INSERT_MESSAGE = "insertMessage";
 
@@ -240,9 +237,29 @@ public class ThingProvider extends BaseProvider {
 
     private static final int SESSION_INDEX_ID = 0;
 
+    private static final String[] INSERT_COMMENT_PROJECTION = {
+            Comments._ID,
+            Comments.COLUMN_NESTING,
+            Comments.COLUMN_SEQUENCE,
+            Comments.COLUMN_THING_ID,
+    };
+
+    private static final int INSERT_COMMENT_ID_INDEX = 0;
+    private static final int INSERT_COMMENT_NESTING_INDEX = 1;
+    private static final int INSERT_COMMENT_SEQUENCE_INDEX = 2;
+    private static final int INSERT_COMMENT_THING_INDEX = 3;
+
     private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Comments.TABLE_NAME
             + " SET " + Comments.COLUMN_SEQUENCE + "=" + Comments.COLUMN_SEQUENCE + "+1"
             + " WHERE " + Comments.COLUMN_SESSION_ID + "=? AND " + Comments.COLUMN_SEQUENCE + ">=?";
+
+    private static final String UPDATE_NUM_COMMENTS_STATEMENT = "UPDATE " + Comments.TABLE_NAME
+            + " SET " + Comments.COLUMN_NUM_COMMENTS + "=" + Comments.COLUMN_NUM_COMMENTS + "+1"
+            + " WHERE " + Comments._ID + "=?";
+
+    private static final String UPDATE_NUM_COMMENTS_STATEMENT_2 = "UPDATE " + Things.TABLE_NAME
+            + " SET " + Things.COLUMN_NUM_COMMENTS + "=" + Things.COLUMN_NUM_COMMENTS + "+1"
+            + " WHERE " + Things.SELECT_BY_ACCOUNT_AND_THING_ID;
 
     private static final String SELECT_MORE_WITH_SESSION_ID = Kinds.COLUMN_KIND + "="
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
@@ -341,27 +358,12 @@ public class ThingProvider extends BaseProvider {
     }
 
     public static final Bundle insertComment(Context context, String accountName,
-            String body, int nesting, long parentId, int parentNumComments, String parentThingId,
-            int sequence, long sessionId, String thingId) {
-        Bundle extras = new Bundle(8);
-        extras.putString(EXTRA_BODY, body);
-        extras.putInt(EXTRA_NESTING, nesting);
-        extras.putLong(EXTRA_PARENT_ID, parentId);
-        extras.putInt(EXTRA_PARENT_NUM_COMMENTS, parentNumComments);
-        extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
-        extras.putInt(EXTRA_SEQUENCE, sequence);
-        extras.putLong(EXTRA_SESSION_ID, sessionId);
-        extras.putString(EXTRA_THING_ID, thingId);
-        return call(context, THINGS_URI, METHOD_INSERT_COMMENT, accountName, extras);
-    }
-
-    public static final Bundle insertComment2(Context context, String accountName,
             String body, String parentThingId, String thingId) {
         Bundle extras = new Bundle(3);
         extras.putString(EXTRA_BODY, body);
         extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
         extras.putString(EXTRA_THING_ID, thingId);
-        return call(context, COMMENT_ACTIONS_URI, METHOD_INSERT_COMMENT_2, accountName, extras);
+        return call(context, COMMENT_ACTIONS_URI, METHOD_INSERT_COMMENT, accountName, extras);
     }
 
     public static final Bundle insertMessage(Context context, String accountName,
@@ -440,8 +442,6 @@ public class ThingProvider extends BaseProvider {
                 return collapseComment(extras);
             } else if (METHOD_INSERT_COMMENT.equals(method)) {
                 return insertComment(arg, extras);
-            } else if (METHOD_INSERT_COMMENT_2.equals(method)) {
-                return insertComment2(arg, extras);
             } else if (METHOD_INSERT_MESSAGE.equals(method)) {
                 return insertMessage(arg, extras);
             } else {
@@ -662,83 +662,16 @@ public class ThingProvider extends BaseProvider {
 
     private Bundle insertComment(String accountName, Bundle extras) {
         String body = getBodyExtra(extras);
-        int nesting = extras.getInt(EXTRA_NESTING);
-        long parentId = extras.getLong(EXTRA_PARENT_ID);
-        int parentNumComments = extras.getInt(EXTRA_PARENT_NUM_COMMENTS);
         String parentThingId = getParentThingIdExtra(extras);
-        int sequence = extras.getInt(EXTRA_SEQUENCE);
-        long sessionId = extras.getLong(EXTRA_SESSION_ID);
         String thingId = getThingIdExtra(extras);
 
         SQLiteDatabase db = helper.getWritableDatabase();
+        SQLiteStatement updateNumComments = db.compileStatement(UPDATE_NUM_COMMENTS_STATEMENT);
+        SQLiteStatement updateNumComments2 = db.compileStatement(UPDATE_NUM_COMMENTS_STATEMENT_2);
+        SQLiteStatement updateSequence = db.compileStatement(UPDATE_SEQUENCE_STATEMENT);
         db.beginTransaction();
         try {
-            // Update the number of comments in the header comment.
-            ContentValues values = new ContentValues(8);
-            values.put(Comments.COLUMN_NUM_COMMENTS, parentNumComments + 1);
-            int count = db.update(Comments.TABLE_NAME, values, ID_SELECTION, Array.of(parentId));
-            if (count != 1) {
-                return null;
-            }
-
-            // Update the number of comments in any thing listings.
-            values.clear();
-            values.put(Things.COLUMN_NUM_COMMENTS, parentNumComments + 1);
-            db.update(Things.TABLE_NAME, values, Things.SELECT_BY_ACCOUNT_AND_THING_ID,
-                    Array.of(accountName, parentThingId));
-
             // Queue an action to sync back the comment to the server.
-            values.clear();
-            values.put(CommentActions.COLUMN_ACCOUNT, accountName);
-            values.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
-            values.put(CommentActions.COLUMN_TEXT, body);
-            values.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
-            values.put(CommentActions.COLUMN_THING_ID, thingId);
-            long commentActionId = db.insert(CommentActions.TABLE_NAME, null, values);
-            if (commentActionId == -1) {
-                return null;
-            }
-
-            // Increment the sequence numbers to make room for our comment.
-            SQLiteStatement sql = db.compileStatement(UPDATE_SEQUENCE_STATEMENT);
-            sql.bindLong(1, sessionId);
-            sql.bindLong(2, sequence);
-            sql.executeUpdateDelete();
-
-            // Insert the placeholder comment with the proper sequence number.
-            values.clear();
-            values.put(Comments.COLUMN_ACCOUNT, accountName);
-            values.put(Comments.COLUMN_AUTHOR, accountName);
-            values.put(Comments.COLUMN_BODY, body);
-            values.put(Comments.COLUMN_COMMENT_ACTION_ID, commentActionId);
-            values.put(Comments.COLUMN_KIND, Kinds.KIND_COMMENT);
-            values.put(Comments.COLUMN_NESTING, nesting);
-            values.put(Comments.COLUMN_SEQUENCE, sequence);
-            values.put(Comments.COLUMN_SESSION_ID, sessionId);
-            long commentId = db.insert(Comments.TABLE_NAME, null, values);
-            if (commentId == -1) {
-                return null;
-            }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
-
-        // Update observers and schedule a sync. Both URIs are backed by the same sync adapter.
-        ContentResolver cr = getContext().getContentResolver();
-        cr.notifyChange(THINGS_URI, null, NO_SYNC);
-        cr.notifyChange(COMMENTS_URI, null, SYNC);
-        return null;
-    }
-
-    private Bundle insertComment2(String accountName, Bundle extras) {
-        String body = getBodyExtra(extras);
-        String parentThingId = getParentThingIdExtra(extras);
-        String thingId = getThingIdExtra(extras);
-
-        SQLiteDatabase db = helper.getWritableDatabase();
-        db.beginTransaction();
-        try {
             ContentValues values = new ContentValues(7);
             values.put(CommentActions.COLUMN_ACCOUNT, accountName);
             values.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_INSERT);
@@ -761,17 +694,53 @@ public class ThingProvider extends BaseProvider {
                 while (cursor.moveToNext()) {
                     long sessionId = cursor.getLong(SESSION_INDEX_ID);
 
-                    int sequence = 0;
-                    Cursor cursor2 = db.rawQuery("SELECT MAX(" + Comments.COLUMN_SEQUENCE + ")"
-                            + " FROM " + Comments.TABLE_NAME
-                            + " WHERE " + Comments.COLUMN_SESSION_ID + "=?", Array.of(sessionId));
-                    if (cursor2.moveToNext()) {
-                        sequence = cursor2.getInt(0);
+                    // Get information from the session to figure out here to insert the comment.
+                    long parentId = -1;
+                    int position = -1;
+                    int nesting = -1;
+                    int sequence = -1;
+                    Cursor c = db.query(Comments.TABLE_NAME, INSERT_COMMENT_PROJECTION,
+                            Comments.SELECT_BY_SESSION_ID, Array.of(sessionId), null, null,
+                            Comments.SORT_BY_SEQUENCE_AND_ID);
+                    try {
+                        while (c.moveToNext()) {
+                            if (c.getPosition() == 0) {
+                                parentId = c.getLong(INSERT_COMMENT_ID_INDEX);
+                            }
+                            String targetThingId = c.getString(INSERT_COMMENT_THING_INDEX);
+                            if (targetThingId.equals(parentThingId)) {
+                                position = c.getPosition();
+                                break;
+                            }
+                        }
+                        if (parentId == -1 || position == -1) {
+                            continue;
+                        }
+
+                        CursorCommentList cl = new CursorCommentList(c,
+                                INSERT_COMMENT_ID_INDEX,
+                                INSERT_COMMENT_NESTING_INDEX,
+                                INSERT_COMMENT_SEQUENCE_INDEX);
+                        nesting = CommentLogic.getInsertNesting(cl, position);
+                        sequence = CommentLogic.getInsertSequence(cl, position);
+                    } finally {
+                        c.close();
                     }
-                    cursor2.close();
 
-                    int nesting = 0;
+                    // Update the number of comments in the header comment.
+                    updateNumComments.bindLong(1, parentId);
+                    updateNumComments.executeUpdateDelete();
 
+                    // Update the number of comments in any thing listings.
+                    updateNumComments2.bindString(1, accountName);
+                    updateNumComments2.bindString(2, parentThingId);
+
+                    // Increment the sequence numbers to make room for our comment
+                    updateSequence.bindLong(1, sessionId);
+                    updateSequence.bindLong(2, sequence);
+                    updateSequence.executeUpdateDelete();
+
+                    // Insert the placeholder comment with the proper sequence number.
                     values.clear();
                     values.put(Comments.COLUMN_ACCOUNT, accountName);
                     values.put(Comments.COLUMN_AUTHOR, accountName);
@@ -798,6 +767,7 @@ public class ThingProvider extends BaseProvider {
         ContentResolver cr = getContext().getContentResolver();
         cr.notifyChange(COMMENT_ACTIONS_URI, null, SYNC);
         cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
+        cr.notifyChange(THINGS_URI, null, NO_SYNC);
         return Bundle.EMPTY;
     }
 

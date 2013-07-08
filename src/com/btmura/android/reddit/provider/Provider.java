@@ -161,25 +161,6 @@ public class Provider {
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
     public static void commentReplyAsync(Context context,
-            final long parentId,
-            final int parentNumComments,
-            final String parentThingId,
-            final String thingId,
-            final String accountName,
-            final String body,
-            final int nesting,
-            final int sequence,
-            final long sessionId) {
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            public void run() {
-                ThingProvider.insertComment(appContext, accountName, body, nesting, parentId,
-                        parentNumComments, parentThingId, sequence, sessionId, thingId);
-            }
-        });
-    }
-
-    public static void deferredCommentReplyAsync(Context context,
             final String accountName,
             final String body,
             final String parentThingId,
@@ -188,7 +169,7 @@ public class Provider {
         new AsyncTask<Void, Void, Bundle>() {
             @Override
             protected Bundle doInBackground(Void... voidRay) {
-                return ThingProvider.insertComment2(appContext, accountName, body, parentThingId,
+                return ThingProvider.insertComment(appContext, accountName, body, parentThingId,
                         thingId);
             }
 

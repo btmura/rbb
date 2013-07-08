@@ -176,26 +176,13 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     }
 
     public void reply(int position) {
-        long parentId = getId(0);
-        int parentNumComments = getNumComments(0);
-        String parentThingId = getThingId(0);
-        long sessionId = getSessionId(0);
-
         String author = getAuthor(position);
+        String parentThingId = getThingId(0);
         String thingId = getThingId(position);
 
-        int nesting = CommentLogic.getInsertNesting(this, position);
-        int sequence = CommentLogic.getInsertSequence(this, position);
-
-        Bundle args = new Bundle(8);
-        args.putLong(ComposeActivity.EXTRA_COMMENT_PARENT_ID, parentId);
-        args.putInt(ComposeActivity.EXTRA_COMMENT_PARENT_NUM_COMMENTS, parentNumComments);
+        Bundle args = new Bundle(2);
         args.putString(ComposeActivity.EXTRA_COMMENT_PARENT_THING_ID, parentThingId);
-        args.putString(ComposeActivity.EXTRA_COMMENT_AUTHOR, author);
         args.putString(ComposeActivity.EXTRA_COMMENT_THING_ID, thingId);
-        args.putInt(ComposeActivity.EXTRA_COMMENT_NESTING, nesting);
-        args.putInt(ComposeActivity.EXTRA_COMMENT_SEQUENCE, sequence);
-        args.putLong(ComposeActivity.EXTRA_COMMENT_SESSION_ID, sessionId);
 
         MenuHelper.startComposeActivity(context, ComposeActivity.COMMENT_REPLY_TYPE_SET,
                 null, author, getCommentLabel(position), null, args, true);
