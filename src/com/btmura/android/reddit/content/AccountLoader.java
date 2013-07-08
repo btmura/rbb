@@ -158,6 +158,8 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
             }
             for (int i = 0; i < accounts.length; i++) {
                 String accountName = accountNames[i + offset];
+                linkKarma[i + offset] = -1;
+                commentKarma[i + offset] = -1;
                 for (c.moveToPosition(-1); c.moveToNext();) {
                     if (accountName.equals(c.getString(INDEX_ACCOUNT))) {
                         linkKarma[i + offset] = c.getInt(INDEX_LINK_KARMA);
