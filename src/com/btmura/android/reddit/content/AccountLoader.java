@@ -36,6 +36,7 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.AccountProvider;
+import com.btmura.android.reddit.util.Array;
 
 public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
         OnAccountsUpdateListener {
@@ -148,18 +149,11 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
         if (includeAccountInfo) {
             ContentResolver cr = getContext().getContentResolver();
             Cursor c = cr.query(AccountProvider.ACCOUNTS_URI, PROJECTION, null, null, null);
-            linkKarma = new int[length];
-            commentKarma = new int[length];
-            hasMail = new boolean[length];
-            if (includeNoAccount) {
-                linkKarma[0] = -1;
-                commentKarma[0] = -1;
-                hasMail[0] = false;
-            }
+            linkKarma = Array.newIntArray(length, -1);
+            commentKarma = Array.newIntArray(length, -1);
+            hasMail = Array.newBooleanArray(length, false);
             for (int i = 0; i < accounts.length; i++) {
                 String accountName = accountNames[i + offset];
-                linkKarma[i + offset] = -1;
-                commentKarma[i + offset] = -1;
                 for (c.moveToPosition(-1); c.moveToNext();) {
                     if (accountName.equals(c.getString(INDEX_ACCOUNT))) {
                         linkKarma[i + offset] = c.getInt(INDEX_LINK_KARMA);

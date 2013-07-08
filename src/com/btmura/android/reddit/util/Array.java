@@ -20,21 +20,12 @@ import java.util.Arrays;
 
 public class Array {
 
-    public static final String[] EMPTY_STRING_ARRAY = new String[0];
-
-    /**
-     * Returns true if the array is null or empty
-     */
-    public static <T> boolean isEmpty(T[] array) {
-        return array == null || array.length == 0;
+    public static String[] of(long oneLong) {
+        return new String[] {Long.toString(oneLong)};
     }
 
-    public static String[] of(Long oneLong) {
-        return new String[] {oneLong.toString()};
-    }
-
-    public static String[] of(Long oneLong, String element) {
-        return new String[] {oneLong.toString(), element};
+    public static String[] of(long oneLong, String element) {
+        return new String[] {Long.toString(oneLong), element};
     }
 
     public static String[] of(int oneInt, String element) {
@@ -43,6 +34,25 @@ public class Array {
 
     public static String[] of(String... elements) {
         return elements;
+    }
+
+    public static boolean[] newBooleanArray(int length, boolean fillValue) {
+        boolean[] array = new boolean[length];
+        Arrays.fill(array, fillValue);
+        return array;
+    }
+
+    public static int[] newIntArray(int length, int fillValue) {
+        int[] array = new int[length];
+        Arrays.fill(array, fillValue);
+        return array;
+    }
+
+    /**
+     * Returns true if the array is null or empty
+     */
+    public static <T> boolean isEmpty(T[] array) {
+        return array == null || array.length == 0;
     }
 
     public static String[] append(String[] original, String element) {
