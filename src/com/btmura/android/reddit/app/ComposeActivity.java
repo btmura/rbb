@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import java.util.ArrayList;
-
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,8 +27,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewStub;
 import android.widget.Toast;
 
 import com.btmura.android.reddit.R;
@@ -41,7 +37,6 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.provider.Provider;
 
 public class ComposeActivity extends FragmentActivity implements OnPageChangeListener,
-        OnClickListener,
         OnComposeFormListener,
         OnCaptchaGuessListener,
         OnComposeListener {
@@ -134,30 +129,16 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
     public static final String EXTRA_EDIT_SESSION_ID = "sessionId";
     public static final String EXTRA_EDIT_THING_ID = "thingId";
 
-    interface OnComposeActivityListener {
-        void onOkClicked(int id);
-    }
-
-    // TODO: Replace with String[] to reduce fingerprint.
-    private final ArrayList<OnComposeActivityListener> listeners =
-            new ArrayList<OnComposeActivityListener>(2);
-
     /** ViewPager that holds the pages to compose different things. */
     private ViewPager pager;
 
     /** Adapter of the ViewPager used to swipe between screens. */
     private ComposePagerAdapter adapter;
 
-    /** Ok button visible when this form is a dialog. */
-    private View ok;
-
-    /** Cancel button visible when this form is a dialog. */
-    private View cancel;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(ThemePrefs.getDialogWhenLargeTheme(this));
+        setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.compose);
         setupViews();
     }
@@ -189,15 +170,6 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
         PagerTabStrip pagerStrip = (PagerTabStrip) findViewById(R.id.pager_strip);
         pagerStrip.setTabIndicatorColorResource(android.R.color.holo_blue_light);
         pagerStrip.setVisibility(types.length > 1 ? View.VISIBLE : View.GONE);
-
-        if (getActionBar() == null) {
-            ViewStub vs = (ViewStub) findViewById(R.id.button_bar_stub);
-            View buttonBar = vs.inflate();
-            ok = buttonBar.findViewById(R.id.ok);
-            ok.setOnClickListener(this);
-            cancel = buttonBar.findViewById(R.id.cancel);
-            cancel.setOnClickListener(this);
-        }
     }
 
     public void onPageSelected(int position) {
@@ -232,21 +204,6 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
     }
 
     public void onPageScrollStateChanged(int state) {
-    }
-
-    public void onClick(View v) {
-        if (v == ok) {
-            int size = listeners.size();
-            for (int i = 0; i < size; i++) {
-                listeners.get(i).onOkClicked(pager.getCurrentItem());
-            }
-        } else if (v == cancel) {
-            finish();
-        }
-    }
-
-    public void addOnComposeActivityListener(OnComposeActivityListener listener) {
-        listeners.add(listener);
     }
 
     // TODO: Use bundle for onComposeForm.
@@ -347,6 +304,7 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
     private void handleEdit(String accountName, String body) {
         Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
         String parentThingId = extras.getString(EXTRA_EDIT_PARENT_THING_ID);
+        // TODO: Fix this to not require session like comment and message replies.
         long sessionId = extras.getLong(EXTRA_EDIT_SESSION_ID);
         String thingId = extras.getString(EXTRA_EDIT_THING_ID);
         Provider.editAsync(this, accountName, parentThingId, thingId, body, sessionId);

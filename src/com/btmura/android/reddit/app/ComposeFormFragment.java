@@ -44,7 +44,6 @@ import android.widget.Spinner;
 import android.widget.Switch;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.ComposeActivity.OnComposeActivityListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
@@ -60,7 +59,6 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         OnClickListener,
         OnItemSelectedListener,
         OnItemClickListener,
-        OnComposeActivityListener,
         TextWatcher {
 
     // This fragment only reports back the user's input and doesn't handle
@@ -164,9 +162,6 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         super.onAttach(activity);
         if (activity instanceof OnComposeFormListener) {
             listener = (OnComposeFormListener) activity;
-        }
-        if (activity instanceof ComposeActivity) {
-            ((ComposeActivity) activity).addOnComposeActivityListener(this);
         }
     }
 
