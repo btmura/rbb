@@ -244,10 +244,10 @@ public class ThingProvider extends BaseProvider {
             Comments.COLUMN_THING_ID,
     };
 
-    private static final int INSERT_COMMENT_ID_INDEX = 0;
-    private static final int INSERT_COMMENT_NESTING_INDEX = 1;
-    private static final int INSERT_COMMENT_SEQUENCE_INDEX = 2;
-    private static final int INSERT_COMMENT_THING_INDEX = 3;
+    private static final int INSERT_COMMENT_INDEX_ID = 0;
+    private static final int INSERT_COMMENT_INDEX_NESTING = 1;
+    private static final int INSERT_COMMENT_INDEX_SEQUENCE = 2;
+    private static final int INSERT_COMMENT_INDEX_THING = 3;
 
     private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Comments.TABLE_NAME
             + " SET " + Comments.COLUMN_SEQUENCE + "=" + Comments.COLUMN_SEQUENCE + "+1"
@@ -695,7 +695,7 @@ public class ThingProvider extends BaseProvider {
                     long sessionId = cursor.getLong(SESSION_INDEX_ID);
 
                     // Get information from the session to figure out here to insert the comment.
-                    long parentId = -1;
+                    long headerDbId = -1;
                     int position = -1;
                     int nesting = -1;
                     int sequence = -1;
@@ -705,22 +705,22 @@ public class ThingProvider extends BaseProvider {
                     try {
                         while (c.moveToNext()) {
                             if (c.getPosition() == 0) {
-                                parentId = c.getLong(INSERT_COMMENT_ID_INDEX);
+                                headerDbId = c.getLong(INSERT_COMMENT_INDEX_ID);
                             }
-                            String targetThingId = c.getString(INSERT_COMMENT_THING_INDEX);
-                            if (targetThingId.equals(parentThingId)) {
+                            String rowThingId = c.getString(INSERT_COMMENT_INDEX_THING);
+                            if (thingId.equals(rowThingId)) {
                                 position = c.getPosition();
                                 break;
                             }
                         }
-                        if (parentId == -1 || position == -1) {
+                        if (headerDbId == -1 || position == -1) {
                             continue;
                         }
 
                         CursorCommentList cl = new CursorCommentList(c,
-                                INSERT_COMMENT_ID_INDEX,
-                                INSERT_COMMENT_NESTING_INDEX,
-                                INSERT_COMMENT_SEQUENCE_INDEX);
+                                INSERT_COMMENT_INDEX_ID,
+                                INSERT_COMMENT_INDEX_NESTING,
+                                INSERT_COMMENT_INDEX_SEQUENCE);
                         nesting = CommentLogic.getInsertNesting(cl, position);
                         sequence = CommentLogic.getInsertSequence(cl, position);
                     } finally {
@@ -728,12 +728,13 @@ public class ThingProvider extends BaseProvider {
                     }
 
                     // Update the number of comments in the header comment.
-                    updateNumComments.bindLong(1, parentId);
+                    updateNumComments.bindLong(1, headerDbId);
                     updateNumComments.executeUpdateDelete();
 
                     // Update the number of comments in any thing listings.
                     updateNumComments2.bindString(1, accountName);
                     updateNumComments2.bindString(2, parentThingId);
+                    updateNumComments2.executeUpdateDelete();
 
                     // Increment the sequence numbers to make room for our comment
                     updateSequence.bindLong(1, sessionId);
