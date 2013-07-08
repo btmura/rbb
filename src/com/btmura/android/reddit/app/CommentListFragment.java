@@ -103,8 +103,8 @@ public class CommentListFragment extends ListFragment implements
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        controller.expandOrCollapse(position, id);
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        controller.onListItemClick(listView, view, position, id);
     }
 
     @Override

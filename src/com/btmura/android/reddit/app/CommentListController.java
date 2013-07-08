@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
@@ -165,7 +166,11 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
                 null, null, getCommentLabel(position), getBody(position), args, false);
     }
 
-    public void expandOrCollapse(int position, long id) {
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        if (position == 0) {
+            return; // Don't allow expanding or collapsing on the header comment.
+        }
+
         if (isExpanded(position)) {
             long[] childIds = CommentLogic.getChildren(this, position);
             Provider.collapseCommentAsync(context, id, childIds);
