@@ -257,10 +257,6 @@ public class ThingProvider extends BaseProvider {
             + " SET " + Comments.COLUMN_NUM_COMMENTS + "=" + Comments.COLUMN_NUM_COMMENTS + "+1"
             + " WHERE " + Comments._ID + "=?";
 
-    private static final String UPDATE_NUM_COMMENTS_STATEMENT_2 = "UPDATE " + Things.TABLE_NAME
-            + " SET " + Things.COLUMN_NUM_COMMENTS + "=" + Things.COLUMN_NUM_COMMENTS + "+1"
-            + " WHERE " + Things.SELECT_BY_ACCOUNT_AND_THING_ID;
-
     private static final String SELECT_MORE_WITH_SESSION_ID = Kinds.COLUMN_KIND + "="
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
 
@@ -667,7 +663,6 @@ public class ThingProvider extends BaseProvider {
 
         SQLiteDatabase db = helper.getWritableDatabase();
         SQLiteStatement updateNumComments = db.compileStatement(UPDATE_NUM_COMMENTS_STATEMENT);
-        SQLiteStatement updateNumComments2 = db.compileStatement(UPDATE_NUM_COMMENTS_STATEMENT_2);
         SQLiteStatement updateSequence = db.compileStatement(UPDATE_SEQUENCE_STATEMENT);
         db.beginTransaction();
         try {
@@ -730,11 +725,6 @@ public class ThingProvider extends BaseProvider {
                     // Update the number of comments in the header comment.
                     updateNumComments.bindLong(1, headerDbId);
                     updateNumComments.executeUpdateDelete();
-
-                    // Update the number of comments in any thing listings.
-                    updateNumComments2.bindString(1, accountName);
-                    updateNumComments2.bindString(2, parentThingId);
-                    updateNumComments2.executeUpdateDelete();
 
                     // Increment the sequence numbers to make room for our comment
                     updateSequence.bindLong(1, sessionId);
