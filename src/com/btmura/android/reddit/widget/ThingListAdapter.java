@@ -115,9 +115,8 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
             // Local votes take precedence over those from reddit.
             likes = cursor.getInt(ThingProjection.INDEX_VOTE_ACTION);
 
-            // Modify the score since the vote is still pending and don't go
-            // below 0 since reddit doesn't seem to do that.
-            score = Math.max(0, score + likes);
+            // Modify the score since the vote is still pending.
+            score += likes;
         }
 
         final boolean drawVotingArrows = AccountUtils.isAccount(accountName)

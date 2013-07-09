@@ -75,6 +75,7 @@ public class CommentAdapter extends BaseCursorAdapter {
             // Local votes take precedence over those from reddit.
             likes = cursor.getInt(CommentLoader.INDEX_VOTE_ACTION);
 
+            // Modify the score since the vote is still pending.
             score += likes;
         }
 
