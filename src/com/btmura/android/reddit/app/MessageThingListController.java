@@ -29,7 +29,6 @@ import android.widget.ListView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.MessageThingLoader;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
@@ -131,7 +130,7 @@ class MessageThingListController implements ThingListController<MessageListAdapt
 
     @Override
     public void select(int position) {
-        if (isNew(position)) {
+        if (adapter.isNew(position)) {
             Provider.readMessageAsync(context, accountName, getThingId(position), true);
         }
     }
@@ -235,17 +234,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
 
     private boolean isCheckedCount(ListView listView, int checkedItemCount) {
         return listView.getCheckedItemCount() == checkedItemCount;
-    }
-
-    private boolean isNew(int position) {
-        // If no local read actions are pending, then rely on what reddit thinks.
-        if (adapter.isNull(position, MessageThingLoader.INDEX_ACTION)) {
-            return adapter.getBoolean(position, MessageThingLoader.INDEX_NEW);
-        }
-
-        // We have a local pending action so use that to indicate if it's new.
-        return adapter.getInt(position, MessageThingLoader.INDEX_ACTION)
-                == ReadActions.ACTION_UNREAD;
     }
 
     @Override

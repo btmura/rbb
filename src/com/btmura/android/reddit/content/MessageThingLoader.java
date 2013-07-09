@@ -19,8 +19,8 @@ package com.btmura.android.reddit.content;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
+import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.provider.ThingProvider;
 
 public class MessageThingLoader extends AbstractSessionLoader {
@@ -40,8 +40,8 @@ public class MessageThingLoader extends AbstractSessionLoader {
             Messages.COLUMN_THING_ID,
             Messages.COLUMN_WAS_COMMENT,
 
-            // Following columns are from joined tables.
-            MessageActions.COLUMN_ACTION,
+            // Following columns are from joined tables at the end.
+            SharedColumns.COLUMN_READ_ACTION,
     };
 
     public static final int INDEX_AUTHOR = 1;
@@ -56,7 +56,9 @@ public class MessageThingLoader extends AbstractSessionLoader {
     public static final int INDEX_SUBREDDIT = 10;
     public static final int INDEX_THING_ID = 11;
     public static final int INDEX_WAS_COMMENT = 12;
-    public static final int INDEX_ACTION = 13;
+
+    // Following columns are from joined tables at the end.
+    public static final int INDEX_READ_ACTION = 13;
 
     private final String accountName;
     private final int filter;

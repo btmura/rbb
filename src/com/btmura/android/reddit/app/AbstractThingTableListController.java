@@ -351,8 +351,8 @@ abstract class AbstractThingTableListController
     }
 
     private boolean isHidden(int position) {
-        return !adapter.isNull(position, THING_HIDE_ACTION)
-                && adapter.getInt(position, THING_HIDE_ACTION) == HideActions.ACTION_HIDE
+        return !adapter.isNull(position, INDEX_HIDE_ACTION)
+                && adapter.getInt(position, INDEX_HIDE_ACTION) == HideActions.ACTION_HIDE
                 || adapter.getBoolean(position, INDEX_HIDDEN);
     }
 
@@ -362,17 +362,17 @@ abstract class AbstractThingTableListController
 
     private boolean isSaved(int position) {
         // If no local save actions are pending, then rely on server info.
-        if (adapter.isNull(position, THING_SAVE_ACTION)) {
+        if (adapter.isNull(position, INDEX_SAVE_ACTION)) {
             return adapter.getBoolean(position, INDEX_SAVED);
         }
 
         // We have a local pending action so use that to indicate if it's read.
-        return adapter.getInt(position, THING_SAVE_ACTION) == SaveActions.ACTION_SAVE;
+        return adapter.getInt(position, INDEX_SAVE_ACTION) == SaveActions.ACTION_SAVE;
     }
 
     private boolean isUnhidden(int position) {
-        return !adapter.isNull(position, THING_HIDE_ACTION)
-                && adapter.getInt(position, THING_HIDE_ACTION) == HideActions.ACTION_UNHIDE
+        return !adapter.isNull(position, INDEX_HIDE_ACTION)
+                && adapter.getInt(position, INDEX_HIDE_ACTION) == HideActions.ACTION_UNHIDE
                 || !adapter.getBoolean(position, INDEX_HIDDEN);
     }
 

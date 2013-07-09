@@ -25,6 +25,8 @@ public class SharedColumns {
 
     public static final String COLUMN_HIDE_ACTION = "hideAction";
 
+    public static final String COLUMN_READ_ACTION = "readAction";
+
     public static final String COLUMN_SAVE_ACTION = "saveAction";
 
     /** Long session id referring to the primary key in the sessions table. */

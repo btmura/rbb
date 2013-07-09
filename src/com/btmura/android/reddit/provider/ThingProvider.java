@@ -182,7 +182,7 @@ public class ThingProvider extends BaseProvider {
             + " LEFT OUTER JOIN (SELECT "
             + ReadActions.COLUMN_ACCOUNT + ", "
             + ReadActions.COLUMN_THING_ID + ", "
-            + ReadActions.COLUMN_ACTION
+            + ReadActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_READ_ACTION
             + " FROM " + ReadActions.TABLE_NAME + ") USING ("
             + ReadActions.COLUMN_ACCOUNT + ", "
             + SharedColumns.COLUMN_THING_ID + ")";

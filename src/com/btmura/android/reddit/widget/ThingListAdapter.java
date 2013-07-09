@@ -111,9 +111,9 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
 
         // Reconcile local and remote votes.
         int likes = cursor.getInt(ThingProjection.INDEX_LIKES);
-        if (!cursor.isNull(ThingProjection.THING_VOTE_ACTION)) {
+        if (!cursor.isNull(ThingProjection.INDEX_VOTE_ACTION)) {
             // Local votes take precedence over those from reddit.
-            likes = cursor.getInt(ThingProjection.THING_VOTE_ACTION);
+            likes = cursor.getInt(ThingProjection.INDEX_VOTE_ACTION);
 
             // Modify the score since the vote is still pending and don't go
             // below 0 since reddit doesn't seem to do that.
