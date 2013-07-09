@@ -40,10 +40,10 @@ class SubredditResultListing extends JsonParser implements Listing {
 
     public static final String TAG = "SubredditResultListing";
 
+    private final String sessionTag;
     private final String accountName;
     private final String query;
     private final String cookie;
-    private final String sessionTag;
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(25);
     private long networkTimeMs;
@@ -54,10 +54,10 @@ class SubredditResultListing extends JsonParser implements Listing {
     }
 
     SubredditResultListing(String accountName, String query, String cookie) {
+        this.sessionTag = query;
         this.accountName = accountName;
         this.query = query;
         this.cookie = cookie;
-        this.sessionTag = accountName + "-" + query;
     }
 
     @Override

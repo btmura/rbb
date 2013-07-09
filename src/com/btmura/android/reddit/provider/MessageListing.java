@@ -78,7 +78,7 @@ class MessageListing extends JsonParser implements Listing {
     /** Returns a listing of messages for inbox or sent. */
     static MessageListing newInstance(SQLiteOpenHelper dbHelper, String accountName, int filter,
             String more, boolean mark, String cookie) {
-        return new MessageListing(dbHelper, Sessions.TYPE_MESSAGES, accountName,
+        return new MessageListing(dbHelper, Sessions.TYPE_MESSAGES, accountName + "-" + filter,
                 accountName, null, filter, more, mark, cookie);
     }
 

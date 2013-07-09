@@ -65,22 +65,21 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private static final int INDEX_THING_ID = 3;
     private static final int INDEX_TEXT = 4;
 
-    // TODO: Pass estimate of size to CommentListing rather than doing this.
-    public final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
-    public long networkTimeMs;
-    public long parseTimeMs;
-
-    private final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
-    private final Formatter formatter = new Formatter();
     private final Context context;
     private final SQLiteOpenHelper dbHelper;
+    private final String sessionTag;
     private final String accountName;
     private final String thingId;
     private final String linkId;
     private final int numComments;
     private final String cookie;
+    private final Formatter formatter = new Formatter();
 
-    private final String sessionTag;
+    // TODO: Pass estimate of size to CommentListing rather than doing this.
+    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
+    private final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
+    private long networkTimeMs;
+    private long parseTimeMs;
 
     static CommentListing newInstance(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String thingId, String linkId, int numComments, String cookie) {
@@ -97,12 +96,12 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             String cookie) {
         this.context = context;
         this.dbHelper = dbHelper;
+        this.sessionTag = !TextUtils.isEmpty(linkId) ? linkId : thingId;
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;
         this.numComments = numComments;
         this.cookie = cookie;
-        this.sessionTag = !TextUtils.isEmpty(linkId) ? linkId : thingId;
     }
 
     @Override
