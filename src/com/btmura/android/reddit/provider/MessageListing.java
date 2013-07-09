@@ -60,50 +60,52 @@ class MessageListing extends JsonParser implements Listing {
     private static final String MERGE_SELECTION = MessageActions.COLUMN_ACCOUNT + "=? AND "
             + MessageActions.COLUMN_PARENT_THING_ID + "=?";
 
+    private final SQLiteOpenHelper dbHelper;
     private final int sessionType;
+    private final String sessionTag;
     private final String accountName;
     private final String thingId;
     private final int filter;
     private final String more;
     private final boolean mark;
     private final String cookie;
-    private final SQLiteOpenHelper dbHelper;
-    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
 
+    private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
     private long networkTimeMs;
     private long parseTimeMs;
-
     private String moreThingId;
 
     /** Returns a listing of messages for inbox or sent. */
     static MessageListing newInstance(SQLiteOpenHelper dbHelper, String accountName, int filter,
             String more, boolean mark, String cookie) {
         return new MessageListing(dbHelper, Sessions.TYPE_MESSAGES, accountName,
-                null, filter, more, mark, cookie);
+                accountName, null, filter, more, mark, cookie);
     }
 
     /** Returns an instance for a message thread. */
     static MessageListing newThreadInstance(SQLiteOpenHelper dbHelper, String accountName,
             String thingId, String cookie) {
-        return new MessageListing(dbHelper, Sessions.TYPE_MESSAGE_THREAD, accountName,
-                thingId, 0, null, false, cookie);
+        return new MessageListing(dbHelper, Sessions.TYPE_MESSAGE_THREAD, thingId,
+                accountName, thingId, 0, null, false, cookie);
     }
 
-    private MessageListing(SQLiteOpenHelper dbHelper, int sessionType, String accountName,
-            String thingId, int filter, String more, boolean mark, String cookie) {
+    private MessageListing(SQLiteOpenHelper dbHelper, int sessionType, String sessionTag,
+            String accountName, String thingId, int filter, String more, boolean mark,
+            String cookie) {
         this.dbHelper = dbHelper;
+        this.sessionType = sessionType;
+        this.sessionTag = sessionTag;
         this.accountName = accountName;
         this.thingId = thingId;
         this.filter = filter;
         this.more = more;
         this.mark = mark;
         this.cookie = cookie;
-        this.sessionType = sessionType;
     }
 
     @Override
     public String getSessionTag() {
-        return thingId;
+        return sessionTag;
     }
 
     @Override
