@@ -41,8 +41,6 @@ public class MessageListAdapter extends AbstractThingListAdapter {
             ThingView.DETAIL_SUBREDDIT,
     };
 
-    private String accountName;
-
     private final Formatter formatter = new Formatter();
 
     public MessageListAdapter(Context context, boolean singleChoice) {
@@ -70,6 +68,7 @@ public class MessageListAdapter extends AbstractThingListAdapter {
         final int nesting = 0; // No nesting for messages.
         final int numComments = 0; // No comments for messages.
         final boolean over18 = false; // No over18 for messages.
+        final String parentSubreddit = null; // No need for parentSubreddit for messages.
         final int score = 0; // No score for messages.
         final String subject = cursor.getString(MessageThingLoader.INDEX_SUBJECT);
         final String subreddit = cursor.getString(MessageThingLoader.INDEX_SUBREDDIT);
@@ -97,7 +96,7 @@ public class MessageListAdapter extends AbstractThingListAdapter {
                 nowTimeMs,
                 numComments,
                 over18,
-                null, // TODO: FIX parentSubreddit,
+                parentSubreddit,
                 score,
                 subreddit,
                 thingBodyWidth,

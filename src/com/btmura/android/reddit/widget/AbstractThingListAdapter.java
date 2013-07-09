@@ -138,7 +138,7 @@ public abstract class AbstractThingListAdapter extends BaseCursorAdapter {
         setSelectedThing(getThingId(position), getLinkId(position));
     }
 
-    // Abstract methods.
+    // Abstract methods for getting the kind and selection ids
 
     abstract int getKindIndex();
 
