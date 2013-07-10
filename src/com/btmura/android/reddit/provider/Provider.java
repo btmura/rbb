@@ -367,7 +367,6 @@ public class Provider {
             // Following parameters are for faking a thing.
             // TODO: Use a bundle argument for this instead.
             final String author,
-
             final long createdUtc,
             final String domain,
             final int downs,
@@ -432,9 +431,9 @@ public class Provider {
 
     public static void saveAsync(final Context context,
             final String accountName,
+
             // Following parameters are for faking a thing.
             final String author,
-
             final long createdUtc,
             final String domain,
             final int downs,
@@ -451,10 +450,10 @@ public class Provider {
             final int ups,
             final String url) {
 
-        final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Boolean>() {
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        AsyncTask.execute(new Runnable() {
             @Override
-            protected Boolean doInBackground(Void... voidRay) {
+            public void run() {
                 ContentValues v = new ContentValues(18);
                 v.put(SaveActions.COLUMN_ACCOUNT, accountName);
                 v.put(SaveActions.COLUMN_THING_ID, thingId);
@@ -477,50 +476,24 @@ public class Provider {
                 v.put(SaveActions.COLUMN_UPS, ups);
                 v.put(SaveActions.COLUMN_URL, url);
 
-                ContentResolver cr = appContext.getContentResolver();
-                return cr.insert(SAVE_URI, v) != null;
+                cr.insert(SAVE_URI, v);
             }
-
-            @Override
-            protected void onPostExecute(Boolean success) {
-                String msg;
-                if (success) {
-                    msg = appContext.getResources().getQuantityString(R.plurals.things_saved, 1, 1);
-                } else {
-                    msg = appContext.getString(R.string.error);
-                }
-                Toast.makeText(appContext, msg, Toast.LENGTH_SHORT).show();
-            }
-        }.execute();
+        });
     }
 
     public static void unsaveAsync(final Context context, final String accountName,
             final String thingId) {
-        final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Boolean>() {
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        AsyncTask.execute(new Runnable() {
             @Override
-            protected Boolean doInBackground(Void... drVoidberg) {
+            public void run() {
                 ContentValues v = new ContentValues(3);
                 v.put(SaveActions.COLUMN_ACCOUNT, accountName);
                 v.put(SaveActions.COLUMN_THING_ID, thingId);
                 v.put(SaveActions.COLUMN_ACTION, SaveActions.ACTION_UNSAVE);
-
-                ContentResolver cr = appContext.getContentResolver();
-                return cr.insert(SAVE_URI, v) != null;
+                cr.insert(SAVE_URI, v);
             }
-
-            @Override
-            protected void onPostExecute(Boolean result) {
-                String msg;
-                if (result) {
-                    msg = appContext.getResources()
-                            .getQuantityString(R.plurals.things_unsaved, 1, 1);
-                } else {
-                    msg = appContext.getString(R.string.error);
-                }
-                Toast.makeText(appContext, msg, Toast.LENGTH_SHORT).show();
-            }
-        }.execute();
+        });
     }
 
     /**
@@ -531,7 +504,6 @@ public class Provider {
             final String accountName,
             final int action,
             final String thingId) {
-
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
@@ -539,8 +511,6 @@ public class Provider {
                 v.put(VoteActions.COLUMN_ACCOUNT, accountName);
                 v.put(VoteActions.COLUMN_ACTION, action);
                 v.put(VoteActions.COLUMN_THING_ID, thingId);
-
-                // No toast needed, since the vote arrows will reflect success.
                 cr.insert(VOTE_URI, v);
             }
         });
@@ -571,7 +541,6 @@ public class Provider {
             final String title,
             final int ups,
             final String url) {
-
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             public void run() {
