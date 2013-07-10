@@ -14,13 +14,25 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
+
+    <!-- Main container -->
 
     <FrameLayout
         android:id="@+id/subreddit_list_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</merge>
+    <!-- Navigation drawer -->
+
+    <ListView
+        android:id="@+id/nav_drawer"
+        android:layout_width="@dimen/drawer_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#111" />
+
+</android.support.v4.widget.DrawerLayout>

@@ -190,7 +190,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     @Override
     protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
-        bar.setDisplayHomeAsUpEnabled(!hasSubredditList || thingBundle != null);
         adapter.setSubreddit(subreddit);
     }
 
@@ -362,6 +361,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             default:
                 return super.onOptionsItemSelected(item);
         }
+
     }
 
     private void handleProfile() {

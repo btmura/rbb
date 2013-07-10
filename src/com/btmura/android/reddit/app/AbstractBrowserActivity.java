@@ -24,10 +24,12 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
@@ -35,6 +37,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
@@ -45,6 +48,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.ThingView;
 
@@ -71,6 +75,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected boolean isSinglePane;
     private boolean isSingleChoice;
 
+    private ActionBarDrawerToggle drawerToggle;
     private View navContainer;
     private View subredditListContainer;
     private View thingListContainer;
@@ -122,6 +127,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void setupCommonViews() {
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawerLayout != null) {
+            drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
+                    ThemePrefs.getDrawerIcon(this), R.string.drawer_open, R.string.drawer_close);
+            drawerLayout.setDrawerListener(drawerToggle);
+            bar.setHomeButtonEnabled(true);
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
+
         if (!isSinglePane) {
             getSupportFragmentManager().addOnBackStackChangedListener(this);
 
@@ -143,6 +157,22 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected abstract void setupViews();
 
     protected abstract void setupActionBar(Bundle savedInstanceState);
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        if (drawerToggle != null) {
+            drawerToggle.syncState();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (drawerToggle != null) {
+            drawerToggle.onConfigurationChanged(newConfig);
+        }
+    }
 
     public abstract Loader<AccountResult> onCreateLoader(int id, Bundle args);
 
@@ -620,7 +650,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                handleHome();
+                handleHome(item);
                 return true;
 
             default:
@@ -628,10 +658,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    private void handleHome() {
+    private void handleHome(MenuItem item) {
         FragmentManager fm = getSupportFragmentManager();
         if (fm.getBackStackEntryCount() > 0) {
             fm.popBackStack();
+        } else if (drawerToggle != null) {
+            // There is a bug in the support library where this always returns false...
+            drawerToggle.onOptionsItemSelected(item);
         } else if ((bar.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP) != 0) {
             finish();
         }

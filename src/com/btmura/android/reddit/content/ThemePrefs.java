@@ -39,6 +39,12 @@ public class ThemePrefs extends Prefs {
                 R.style.Theme_Dark_DialogWhenLarge);
     }
 
+    public static final int getDrawerIcon(Context context) {
+        // The proper way is to check the current theme, but we take this lazy good enough approach.
+        return pick(context, R.drawable.ic_drawer_light,
+                R.drawable.ic_drawer_dark);
+    }
+
     public static final int getUnreadMessagesIcon(Context context) {
         // The proper way is to check the current theme, but we take this lazy good enough approach.
         return pick(context, R.drawable.ic_action_unread_messages_light,
