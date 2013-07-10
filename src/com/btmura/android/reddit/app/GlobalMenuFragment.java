@@ -40,12 +40,17 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
 
     private static final int REQUEST_SEARCH = 0;
 
-    public interface OnSearchQuerySubmittedListener {
-        boolean onSearchQuerySubmitted(String query);
+    /** Handler that will accept search queries and perform them. */
+    public interface SearchQueryHandler {
+        /** Submit a new search query to the handler. */
+        boolean submitQuery(String query);
+
+        /** Get the current search query to populate the search query box. */
+        String getQuery();
     }
 
     private SubredditNameHolder subredditNameHolder;
-    private OnSearchQuerySubmittedListener listener;
+    private SearchQueryHandler listener;
     private SearchView searchView;
     private MenuItem searchItem;
 
@@ -59,8 +64,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         if (activity instanceof SubredditNameHolder) {
             subredditNameHolder = (SubredditNameHolder) activity;
         }
-        if (activity instanceof OnSearchQuerySubmittedListener) {
-            listener = (OnSearchQuerySubmittedListener) activity;
+        if (activity instanceof SearchQueryHandler) {
+            listener = (SearchQueryHandler) activity;
         }
     }
 
@@ -130,6 +135,11 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
 
     public void handleSearch() {
         searchItem.expandActionView();
+
+        // Set this to the previous query. This MUST come after expandActionView to work.
+        if (listener != null) {
+            searchView.setQuery(listener.getQuery(), false);
+        }
     }
 
     private void handleDebug() {
@@ -147,7 +157,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     }
 
     public boolean onQueryTextSubmit(String query) {
-        if (listener != null && listener.onSearchQuerySubmitted(query)) {
+        if (listener != null && listener.submitQuery(query)) {
             searchItem.collapseActionView();
         } else {
             Intent intent = new Intent(getActivity(), SearchActivity.class);

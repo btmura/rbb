@@ -26,7 +26,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.GlobalMenuFragment.OnSearchQuerySubmittedListener;
+import com.btmura.android.reddit.app.GlobalMenuFragment.SearchQueryHandler;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
@@ -36,7 +36,7 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class SearchActivity extends AbstractBrowserActivity implements
         TabListener,
-        OnSearchQuerySubmittedListener,
+        SearchQueryHandler,
         AccountResultHolder {
 
     public static final String TAG = "SearchActivity";
@@ -212,11 +212,21 @@ public class SearchActivity extends AbstractBrowserActivity implements
         bar.setTitle(getQuery());
     }
 
-    public boolean onSearchQuerySubmitted(String query) {
+    @Override
+    public boolean submitQuery(String query) {
         setQuery(query);
         refreshActionBar(null, null);
         selectTab(bar.getSelectedTab());
         return true;
+    }
+
+    private void setQuery(String query) {
+        getIntent().putExtra(EXTRA_QUERY, query);
+    }
+
+    @Override
+    public String getQuery() {
+        return getIntent().getStringExtra(EXTRA_QUERY);
     }
 
     @Override
@@ -227,14 +237,6 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     private String getSubreddit() {
         return getIntent().getStringExtra(EXTRA_SUBREDDIT);
-    }
-
-    private String getQuery() {
-        return getIntent().getStringExtra(EXTRA_QUERY);
-    }
-
-    private void setQuery(String query) {
-        getIntent().putExtra(EXTRA_QUERY, query);
     }
 
     private boolean hasQuery() {
