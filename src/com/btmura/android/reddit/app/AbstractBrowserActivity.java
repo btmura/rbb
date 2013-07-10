@@ -36,6 +36,7 @@ import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
@@ -132,6 +133,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
                     ThemePrefs.getDrawerIcon(this), R.string.drawer_open, R.string.drawer_close);
             drawerLayout.setDrawerListener(drawerToggle);
+            drawerLayout.setDrawerShadow(ThemePrefs.getDrawerShadow(this), GravityCompat.START);
             bar.setHomeButtonEnabled(true);
             bar.setDisplayHomeAsUpEnabled(true);
         }
