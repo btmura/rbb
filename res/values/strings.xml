@@ -17,6 +17,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="account_app_storage">App storage</string>
+    <string name="account_category">Account</string>
     <string name="account_type">com.btmura.android.reddit.account</string>
     <string name="add_account">Add account</string>
     <string name="add_subreddit">Add subreddit</string>
@@ -116,6 +117,9 @@
     <string name="menu_user">/u/%1$s</string>
     <string name="nsfw">"NSFW"</string>
     <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
+    <string name="place_profile">Profile</string>
+    <string name="place_saved">Saved</string>
+    <string name="place_messages">Messages</string>
     <string name="provider_accounts">Accounts</string>
     <string name="provider_subreddits">Subreddits</string>
     <string name="provider_things">Things</string>

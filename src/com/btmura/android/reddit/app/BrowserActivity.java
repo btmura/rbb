@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
@@ -44,6 +45,7 @@ import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
+import com.btmura.android.reddit.widget.DrawerAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
@@ -58,6 +60,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     private AccountFilterAdapter adapter;
     private AccountAdapter mailAdapter;
+    private DrawerAdapter drawerAdapter;
 
     private LoaderCallbacks<Cursor> mailLoaderCallbacks = new LoaderCallbacks<Cursor>() {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -81,6 +84,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private MenuItem messagesItem;
     private MenuItem accountsItem;
     private MenuItem switchThemesItem;
+
+    private ListView navDrawer;
 
     @Override
     protected void setContentView() {
@@ -134,6 +139,11 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     protected void setupActionBar(Bundle savedInstanceState) {
         adapter = new AccountFilterAdapter(this);
         mailAdapter = new AccountAdapter(this);
+        drawerAdapter = new DrawerAdapter(this);
+
+        navDrawer = (ListView) findViewById(R.id.nav_drawer);
+        navDrawer.setAdapter(drawerAdapter);
+
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         bar.setListNavigationCallbacks(adapter, this);
@@ -151,6 +161,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
             adapter.addSubredditFilters(this);
         }
         adapter.setAccountInfo(result.accountNames, result.linkKarma, result.commentKarma,
+                result.hasMail);
+        drawerAdapter.setAccountInfo(result.accountNames, result.linkKarma, result.commentKarma,
                 result.hasMail);
 
         String accountName = result.getLastAccount(this);

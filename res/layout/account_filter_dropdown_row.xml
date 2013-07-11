@@ -28,6 +28,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
+        android:drawablePadding="@dimen/element_padding"
+        android:gravity="center_vertical"
         android:padding="@dimen/padding"
         tools:ignore="SelectableText" />
 

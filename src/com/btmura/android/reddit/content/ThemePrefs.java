@@ -54,6 +54,16 @@ public class ThemePrefs extends Prefs {
                 R.drawable.ic_action_unread_messages_dark);
     }
 
+    public static final int getProfileIcon(Context context) {
+        return pick(context, R.drawable.ic_action_profile_light,
+                R.drawable.ic_action_profile_dark);
+    }
+
+    public static final int getSavedIcon(Context context) {
+        return pick(context, R.drawable.ic_action_saved_light,
+                R.drawable.ic_action_saved_dark);
+    }
+
     public static final int getMessagesIcon(Context context) {
         return pick(context, R.drawable.ic_action_messages_light,
                 R.drawable.ic_action_messages_dark);
