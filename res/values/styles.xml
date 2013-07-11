@@ -234,7 +234,7 @@
     <style name="AccountListRowText" parent="@style/ListRowText" />
 
     <style name="ContentUriRowText" parent="@style/ListRowText">
-        <item name="android:ellipsize">middle</item>
+        <item name="android:ellipsize">start</item>
     </style>
 
     <style name="ContentRowText">
