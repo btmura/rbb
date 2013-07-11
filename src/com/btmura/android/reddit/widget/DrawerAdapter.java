@@ -65,6 +65,7 @@ public class DrawerAdapter extends BaseAdapter {
     public void setAccountInfo(String[] accountNames, int[] linkKarma, int[] commentKarma,
             boolean[] hasMail) {
         items.clear();
+        addItem(Item.TYPE_CATEGORY, R.string.account_category, 0);
         if (accountNames != null) {
             int count = accountNames.length;
             for (int i = 0; i < count; i++) {
@@ -74,7 +75,7 @@ public class DrawerAdapter extends BaseAdapter {
                 addItem(Item.TYPE_ACCOUNT_NAME, accountNames[i], text2, text3, value);
             }
         }
-        addItem(Item.TYPE_CATEGORY, R.string.account_category, 0);
+        addItem(Item.TYPE_CATEGORY, R.string.place_category, 0);
         addItem(Item.TYPE_PLACE, R.string.place_profile, ThemePrefs.getProfileIcon(context));
         addItem(Item.TYPE_PLACE, R.string.place_saved, ThemePrefs.getSavedIcon(context));
         addItem(Item.TYPE_PLACE, R.string.place_messages, ThemePrefs.getMessagesIcon(context));
