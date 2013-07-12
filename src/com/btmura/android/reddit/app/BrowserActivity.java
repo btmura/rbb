@@ -20,22 +20,26 @@ import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.ContentResolver;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.DrawerFragment.OnDrawerEventListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
@@ -43,12 +47,13 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
-import com.btmura.android.reddit.widget.DrawerAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
-public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
+public class BrowserActivity extends AbstractBrowserActivity
+        implements OnNavigationListener, OnDrawerEventListener {
 
     /** Requested subreddit from intent data to view. */
     private String requestedSubreddit;
@@ -58,9 +63,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
     private boolean hasSubredditList;
 
+    private ActionBarDrawerToggle drawerToggle;
     private AccountFilterAdapter adapter;
     private AccountAdapter mailAdapter;
-    private DrawerAdapter drawerAdapter;
 
     private LoaderCallbacks<Cursor> mailLoaderCallbacks = new LoaderCallbacks<Cursor>() {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -84,8 +89,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     private MenuItem messagesItem;
     private MenuItem accountsItem;
     private MenuItem switchThemesItem;
-
-    private ListView navDrawer;
 
     @Override
     protected void setContentView() {
@@ -139,15 +142,37 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     protected void setupActionBar(Bundle savedInstanceState) {
         adapter = new AccountFilterAdapter(this);
         mailAdapter = new AccountAdapter(this);
-        drawerAdapter = new DrawerAdapter(this);
 
-        navDrawer = (ListView) findViewById(R.id.nav_drawer);
-        navDrawer.setAdapter(drawerAdapter);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawerLayout != null) {
+            drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
+                    ThemePrefs.getDrawerIcon(this), R.string.drawer_open, R.string.drawer_close);
+            drawerLayout.setDrawerListener(drawerToggle);
+            drawerLayout.setDrawerShadow(ThemePrefs.getDrawerShadow(this), GravityCompat.START);
+            bar.setHomeButtonEnabled(true);
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
 
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         bar.setListNavigationCallbacks(adapter, this);
         getSupportLoaderManager().initLoader(1, null, mailLoaderCallbacks);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        if (drawerToggle != null) {
+            drawerToggle.syncState();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (drawerToggle != null) {
+            drawerToggle.onConfigurationChanged(newConfig);
+        }
     }
 
     @Override
@@ -160,25 +185,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         if (!isSinglePane) {
             adapter.addSubredditFilters(this);
         }
-        adapter.setAccountInfo(result.accountNames, result.linkKarma, result.commentKarma,
-                result.hasMail);
-        drawerAdapter.setAccountInfo(result.accountNames, result.linkKarma, result.commentKarma,
-                result.hasMail);
-
-        String accountName = result.getLastAccount(this);
-        adapter.setAccountName(accountName);
+        adapter.setOnlyFilters();
         adapter.setFilter(result.getLastSubredditFilter(this));
-
-        int index = adapter.findAccountName(accountName);
-
-        // If the selected navigation index is the same, then the action bar
-        // won't fire onNavigationItemSelected. Resetting the adapter and then
-        // calling setSelectedNavigationItem again seems to unjam it.
-        if (bar.getSelectedNavigationIndex() == index) {
-            bar.setListNavigationCallbacks(adapter, this);
-        }
-
-        bar.setSelectedNavigationItem(index);
     }
 
     @Override
@@ -205,25 +213,31 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
         adapter.setSubreddit(subreddit);
     }
 
+    @Override
+    public void onDrawerAccountSelected(View view, String accountName) {
+        drawerLayout.closeDrawer(view);
+        adapter.setAccountName(accountName);
+        updateFragments();
+    }
+
+    @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         adapter.updateState(itemPosition);
+        updateFragments();
+        return true;
+    }
 
-        final String accountName = adapter.getAccountName();
+    private void updateFragments() {
+        String accountName = adapter.getAccountName();
         AccountPrefs.setLastAccount(this, accountName);
 
         int filter = adapter.getFilter();
         AccountPrefs.setLastSubredditFilter(this, filter);
 
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onNavigationItemSelected itemPosition:" + itemPosition
-                    + " accountName:" + accountName
-                    + " filter:" + filter);
-        }
-
         AccountSubredditListFragment slf = getAccountSubredditListFragment();
         ThingListFragment<?> tlf = getThingListFragment();
 
-        if (slf == null || !slf.getAccountName().equals(accountName)) {
+        if (slf == null || !Objects.equals(slf.getAccountName(), accountName)) {
             // Set the subreddit to be the account's last visited subreddit.
             String subreddit = AccountPrefs.getLastSubreddit(this, accountName);
 
@@ -256,8 +270,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
 
         // Invalidate action bar icons when switching accounts.
         invalidateOptionsMenu();
-
-        return true;
     }
 
     @Override
@@ -350,6 +362,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                handleHome(item);
+                return true;
+
             case R.id.menu_profile:
                 handleProfile();
                 return true;
@@ -374,6 +390,14 @@ public class BrowserActivity extends AbstractBrowserActivity implements OnNaviga
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    private void handleHome(MenuItem item) {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            drawerToggle.onOptionsItemSelected(item);
+        } else {
+            super.onOptionsItemSelected(item);
+        }
     }
 
     private void handleProfile() {

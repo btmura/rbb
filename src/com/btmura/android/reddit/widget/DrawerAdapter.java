@@ -32,11 +32,11 @@ import com.btmura.android.reddit.content.ThemePrefs;
 
 public class DrawerAdapter extends BaseAdapter {
 
-    static class Item {
+    public static class Item {
         static final int NUM_TYPES = 3;
-        static final int TYPE_CATEGORY = 0;
-        static final int TYPE_ACCOUNT_NAME = 1;
-        static final int TYPE_PLACE = 2;
+        public static final int TYPE_CATEGORY = 0;
+        public static final int TYPE_ACCOUNT_NAME = 1;
+        public static final int TYPE_PLACE = 2;
 
         private final int type;
         private final String text1;
@@ -51,11 +51,20 @@ public class DrawerAdapter extends BaseAdapter {
             this.text3 = text3;
             this.value = value;
         }
+
+        public int getType() {
+            return type;
+        }
+
+        public String getAccountName() {
+            return text1;
+        }
     }
 
     private final Context context;
     private final LayoutInflater inflater;
     private final ArrayList<Item> items = new ArrayList<Item>();
+    private String accountName;
 
     public DrawerAdapter(Context context) {
         this.context = context;
@@ -95,6 +104,25 @@ public class DrawerAdapter extends BaseAdapter {
 
     private void addItem(int type, String text1, String text2, String text3, int value) {
         items.add(new Item(type, text1, text2, text3, value));
+    }
+
+    public int findAccountName(String accountName) {
+        int count = items.size();
+        for (int i = 0; i < count; i++) {
+            Item item = getItem(i);
+            if (item.type == Item.TYPE_ACCOUNT_NAME && accountName.equals(item.text1)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 
     @Override

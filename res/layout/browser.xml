@@ -28,11 +28,11 @@
 
     <!-- Navigation drawer -->
 
-    <ListView
-        android:id="@+id/nav_drawer"
+    <fragment
+        android:id="@+id/drawer"
+        android:name="com.btmura.android.reddit.app.DrawerFragment"
         android:layout_width="@dimen/drawer_width"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="?android:attr/windowBackground" />
+        android:layout_gravity="start" />
 
 </android.support.v4.widget.DrawerLayout>

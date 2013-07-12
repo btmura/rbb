@@ -101,6 +101,13 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         notifyDataSetChanged();
     }
 
+    public void setOnlyFilters() {
+        if (filters != null) {
+            items.addAll(filters);
+        }
+        notifyDataSetChanged();
+    }
+
     private String getKarmaCount(int[] karmaCounts, int index) {
         if (karmaCounts != null && karmaCounts[index] != -1) {
             return context.getString(R.string.karma_count, karmaCounts[index]);
@@ -132,6 +139,7 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
 
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+        notifyDataSetChanged();
     }
 
     public int findAccountName(String accountName) {
@@ -186,10 +194,12 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
         return getItemViewType(position) != Item.TYPE_CATEGORY;
     }
 
+    @Override
     public int getCount() {
         return items.size();
     }
 
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
