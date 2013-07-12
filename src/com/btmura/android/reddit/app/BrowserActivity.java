@@ -50,7 +50,6 @@ import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity
         implements OnNavigationListener, OnDrawerEventListener {
@@ -84,9 +83,6 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     private MenuItem newPostItem;
     private MenuItem addSubredditItem;
-    private MenuItem profileItem;
-    private MenuItem savedItem;
-    private MenuItem messagesItem;
     private MenuItem accountsItem;
     private MenuItem switchThemesItem;
 
@@ -302,9 +298,6 @@ public class BrowserActivity extends AbstractBrowserActivity
         getMenuInflater().inflate(R.menu.browser_menu, menu);
         newPostItem = menu.findItem(R.id.menu_browser_new_post);
         addSubredditItem = menu.findItem(R.id.menu_browser_add_subreddit);
-        profileItem = menu.findItem(R.id.menu_profile);
-        savedItem = menu.findItem(R.id.menu_profile_saved);
-        messagesItem = menu.findItem(R.id.menu_messages);
         accountsItem = menu.findItem(R.id.menu_accounts);
         switchThemesItem = menu.findItem(R.id.menu_switch_themes);
         return true;
@@ -321,14 +314,9 @@ public class BrowserActivity extends AbstractBrowserActivity
         }
 
         boolean showAccountItems = hasSubredditList && !hasThing();
-        menu.setGroupVisible(R.id.menu_group_account_items, showAccountItems);
-
         boolean hasAccount = hasAccount();
         newPostItem.setVisible(isSinglePane && hasAccount);
         addSubredditItem.setVisible(isSinglePane);
-        profileItem.setVisible(showAccountItems && hasAccount);
-        savedItem.setVisible(showAccountItems && hasAccount);
-        messagesItem.setVisible(showAccountItems && hasAccount);
         accountsItem.setVisible(showAccountItems);
         switchThemesItem.setVisible(showAccountItems);
 
@@ -341,16 +329,10 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     private void refreshMessagesIcon() {
-        if (messagesItem != null) {
-            int icon = hasUnreadMessages()
-                    ? ThemePrefs.getUnreadMessagesIcon(this)
-                    : ThemePrefs.getMessagesIcon(this);
-            messagesItem.setIcon(icon);
-        }
-    }
-
-    private int getMessagesFilter() {
-        return hasUnreadMessages() ? FilterAdapter.MESSAGE_UNREAD : -1;
+        int icon = hasUnreadMessages()
+                ? ThemePrefs.getUnreadMessagesIcon(this)
+                : ThemePrefs.getMessagesIcon(this);
+        // TODO: Show an icon when there are unread messages.
     }
 
     private boolean hasUnreadMessages() {
@@ -364,18 +346,6 @@ public class BrowserActivity extends AbstractBrowserActivity
         switch (item.getItemId()) {
             case android.R.id.home:
                 handleHome(item);
-                return true;
-
-            case R.id.menu_profile:
-                handleProfile();
-                return true;
-
-            case R.id.menu_profile_saved:
-                handleProfileSaved();
-                return true;
-
-            case R.id.menu_messages:
-                handleMessages();
                 return true;
 
             case R.id.menu_accounts:
@@ -398,18 +368,6 @@ public class BrowserActivity extends AbstractBrowserActivity
         } else {
             super.onOptionsItemSelected(item);
         }
-    }
-
-    private void handleProfile() {
-        MenuHelper.startSelfProfileActivity(this, getAccountName(), -1);
-    }
-
-    private void handleProfileSaved() {
-        MenuHelper.startSelfProfileActivity(this, getAccountName(), FilterAdapter.PROFILE_SAVED);
-    }
-
-    private void handleMessages() {
-        MenuHelper.startMessageActivity(this, getAccountName(), getMessagesFilter());
     }
 
     private void handleAccounts() {
