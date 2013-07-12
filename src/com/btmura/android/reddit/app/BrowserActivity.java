@@ -217,6 +217,24 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     @Override
+    public void onDrawerProfileSelected(View view) {
+        drawerLayout.closeDrawer(view);
+        setProfileThingListNavigation(R.id.thing_list_container, adapter.getAccountName());
+    }
+
+    @Override
+    public void onDrawerSavedSelected(View view) {
+        drawerLayout.closeDrawer(view);
+        setProfileThingListNavigation(R.id.thing_list_container, adapter.getAccountName());
+    }
+
+    @Override
+    public void onDrawerMessagesSelected(View view) {
+        drawerLayout.closeDrawer(view);
+        setMessageThingListNavigation(R.id.thing_list_container, adapter.getAccountName());
+    }
+
+    @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         adapter.updateState(itemPosition);
         updateFragments();

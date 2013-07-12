@@ -28,7 +28,6 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.util.Objects;
 
@@ -44,13 +43,31 @@ public class DrawerAdapter extends BaseAdapter {
         private final String text1;
         private final String text2;
         private final String text3;
+        private final int resId;
         private final int value;
 
-        Item(int type, String text1, String text2, String text3, int value) {
+        public static Item newCategory(Context context, int textResId) {
+            return new Item(TYPE_CATEGORY, context.getString(textResId), null, null,
+                    0, 0);
+        }
+
+        public static Item newAccount(Context context, String accountName, String linkKarma,
+                String commentKarma, int hasMail) {
+            return new Item(TYPE_ACCOUNT_NAME, accountName, linkKarma, commentKarma,
+                    0, hasMail);
+        }
+
+        public static Item newPlace(Context context, int textResId, int iconResId, int place) {
+            return new Item(TYPE_PLACE, context.getString(textResId), null, null,
+                    iconResId, place);
+        }
+
+        Item(int type, String text1, String text2, String text3, int resId, int value) {
             this.type = type;
             this.text1 = text1;
             this.text2 = text2;
             this.text3 = text3;
+            this.resId = resId;
             this.value = value;
         }
 
@@ -61,79 +78,32 @@ public class DrawerAdapter extends BaseAdapter {
         public String getAccountName() {
             return text1;
         }
+
+        public int getPlace() {
+            return value;
+        }
     }
 
     private final Context context;
     private final LayoutInflater inflater;
     private final ArrayList<Item> items = new ArrayList<Item>();
 
-    private AccountResult accountResult;
-    private String accountName;
-
     public DrawerAdapter(Context context) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
     }
 
-    public void setAccountResult(AccountResult result) {
-        this.accountResult = result;
-        this.accountName = result.getLastAccount(context);
-        updateItems();
-    }
-
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-        updateItems();
-    }
-
-    private void updateItems() {
+    public void clear() {
         items.clear();
-        addAccountNames();
-        addAccountPlaces();
         notifyDataSetChanged();
     }
 
-    private void addAccountNames() {
-        String[] accountNames = accountResult.accountNames;
-        int[] linkKarma = accountResult.linkKarma;
-        int[] commentKarma = accountResult.commentKarma;
-        boolean[] hasMail = accountResult.hasMail;
-        if (accountNames != null) {
-            int count = accountNames.length;
-            for (int i = 0; i < count; i++) {
-                String text2 = getKarmaCount(linkKarma, i);
-                String text3 = getKarmaCount(commentKarma, i);
-                int value = hasMail != null && hasMail[i] ? 1 : 0;
-                addItem(Item.TYPE_ACCOUNT_NAME, accountNames[i], text2, text3, value);
-            }
-        }
+    public void addItem(Item item) {
+        items.add(item);
+        notifyDataSetChanged();
     }
 
-    private String getKarmaCount(int[] karmaCounts, int index) {
-        if (karmaCounts != null && karmaCounts[index] != -1) {
-            return context.getString(R.string.karma_count, karmaCounts[index]);
-        }
-        return null;
-    }
-
-    private void addAccountPlaces() {
-        if (AccountUtils.isAccount(accountName)) {
-            addItem(Item.TYPE_CATEGORY, R.string.place_category, 0);
-            addItem(Item.TYPE_PLACE, R.string.place_profile, ThemePrefs.getProfileIcon(context));
-            addItem(Item.TYPE_PLACE, R.string.place_saved, ThemePrefs.getSavedIcon(context));
-            addItem(Item.TYPE_PLACE, R.string.place_messages, ThemePrefs.getMessagesIcon(context));
-        }
-    }
-
-    private void addItem(int type, int textResId, int resId) {
-        addItem(type, context.getString(textResId), null, null, resId);
-    }
-
-    private void addItem(int type, String text1, String text2, String text3, int value) {
-        items.add(new Item(type, text1, text2, text3, value));
-    }
-
-    public int getSelectedAccountIndex() {
+    public int findAccount(String accountName) {
         int count = items.size();
         for (int i = 0; i < count; i++) {
             Item item = getItem(i);
@@ -225,7 +195,7 @@ public class DrawerAdapter extends BaseAdapter {
 
             case Item.TYPE_PLACE:
                 vh.accountPlace.setText(item.text1);
-                vh.accountPlace.setCompoundDrawablesWithIntrinsicBounds(item.value, 0, 0, 0);
+                vh.accountPlace.setCompoundDrawablesWithIntrinsicBounds(item.resId, 0, 0, 0);
                 vh.accountPlace.setVisibility(View.VISIBLE);
                 vh.statusIcon.setVisibility(View.GONE);
                 vh.karmaCounts.setVisibility(View.GONE);
