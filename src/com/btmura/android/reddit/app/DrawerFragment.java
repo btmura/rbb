@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -32,6 +33,10 @@ import com.btmura.android.reddit.widget.DrawerAdapter;
 import com.btmura.android.reddit.widget.DrawerAdapter.Item;
 
 public class DrawerFragment extends ListFragment implements LoaderCallbacks<AccountResult> {
+
+    private static final int[] ATTRIBUTES = {
+            android.R.attr.windowBackground,
+    };
 
     public interface OnDrawerEventListener {
 
@@ -59,8 +64,16 @@ public class DrawerFragment extends ListFragment implements LoaderCallbacks<Acco
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
-        view.setBackgroundResource(android.R.color.background_dark);
+        view.setBackgroundResource(getBackgroundResource());
         return view;
+    }
+
+    // TODO(btmura): Replace this with a proper resource instead of window background.
+    private int getBackgroundResource() {
+        TypedArray array = getActivity().getTheme().obtainStyledAttributes(ATTRIBUTES);
+        int backgroundResId = array.getResourceId(0, 0);
+        array.recycle();
+        return backgroundResId;
     }
 
     @Override
