@@ -74,7 +74,6 @@ public class DrawerAdapter extends BaseAdapter {
     public void setAccountInfo(String[] accountNames, int[] linkKarma, int[] commentKarma,
             boolean[] hasMail) {
         items.clear();
-        addItem(Item.TYPE_CATEGORY, R.string.account_category, 0);
         if (accountNames != null) {
             int count = accountNames.length;
             for (int i = 0; i < count; i++) {
