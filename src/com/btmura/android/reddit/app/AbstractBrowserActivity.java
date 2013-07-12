@@ -190,7 +190,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.replace(containerId, frag, SubredditListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-        ft.commit();
+
+        // Hack to allow selecting of an account from the navigation drawer on initial loading.
+        ft.commitAllowingStateLoss();
     }
 
     private void setSubredditListNavigationMultiPane(SubredditListFragment<?, ?, ?> frag,
