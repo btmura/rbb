@@ -28,7 +28,9 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
+import com.btmura.android.reddit.util.Objects;
 
 public class DrawerAdapter extends BaseAdapter {
 
@@ -64,6 +66,8 @@ public class DrawerAdapter extends BaseAdapter {
     private final Context context;
     private final LayoutInflater inflater;
     private final ArrayList<Item> items = new ArrayList<Item>();
+
+    private AccountResult accountResult;
     private String accountName;
 
     public DrawerAdapter(Context context) {
@@ -71,9 +75,29 @@ public class DrawerAdapter extends BaseAdapter {
         this.inflater = LayoutInflater.from(context);
     }
 
-    public void setAccountInfo(String[] accountNames, int[] linkKarma, int[] commentKarma,
-            boolean[] hasMail) {
+    public void setAccountResult(AccountResult result) {
+        this.accountResult = result;
+        this.accountName = result.getLastAccount(context);
+        updateItems();
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+        updateItems();
+    }
+
+    private void updateItems() {
         items.clear();
+        addAccountNames();
+        addAccountPlaces();
+        notifyDataSetChanged();
+    }
+
+    private void addAccountNames() {
+        String[] accountNames = accountResult.accountNames;
+        int[] linkKarma = accountResult.linkKarma;
+        int[] commentKarma = accountResult.commentKarma;
+        boolean[] hasMail = accountResult.hasMail;
         if (accountNames != null) {
             int count = accountNames.length;
             for (int i = 0; i < count; i++) {
@@ -83,11 +107,6 @@ public class DrawerAdapter extends BaseAdapter {
                 addItem(Item.TYPE_ACCOUNT_NAME, accountNames[i], text2, text3, value);
             }
         }
-        addItem(Item.TYPE_CATEGORY, R.string.place_category, 0);
-        addItem(Item.TYPE_PLACE, R.string.place_profile, ThemePrefs.getProfileIcon(context));
-        addItem(Item.TYPE_PLACE, R.string.place_saved, ThemePrefs.getSavedIcon(context));
-        addItem(Item.TYPE_PLACE, R.string.place_messages, ThemePrefs.getMessagesIcon(context));
-        notifyDataSetChanged();
     }
 
     private String getKarmaCount(int[] karmaCounts, int index) {
@@ -95,6 +114,15 @@ public class DrawerAdapter extends BaseAdapter {
             return context.getString(R.string.karma_count, karmaCounts[index]);
         }
         return null;
+    }
+
+    private void addAccountPlaces() {
+        if (AccountUtils.isAccount(accountName)) {
+            addItem(Item.TYPE_CATEGORY, R.string.place_category, 0);
+            addItem(Item.TYPE_PLACE, R.string.place_profile, ThemePrefs.getProfileIcon(context));
+            addItem(Item.TYPE_PLACE, R.string.place_saved, ThemePrefs.getSavedIcon(context));
+            addItem(Item.TYPE_PLACE, R.string.place_messages, ThemePrefs.getMessagesIcon(context));
+        }
     }
 
     private void addItem(int type, int textResId, int resId) {
@@ -105,23 +133,15 @@ public class DrawerAdapter extends BaseAdapter {
         items.add(new Item(type, text1, text2, text3, value));
     }
 
-    public int findAccountName(String accountName) {
+    public int getSelectedAccountIndex() {
         int count = items.size();
         for (int i = 0; i < count; i++) {
             Item item = getItem(i);
-            if (item.type == Item.TYPE_ACCOUNT_NAME && accountName.equals(item.text1)) {
+            if (item.type == Item.TYPE_ACCOUNT_NAME && Objects.equals(accountName, item.text1)) {
                 return i;
             }
         }
         return -1;
-    }
-
-    public String getAccountName() {
-        return accountName;
-    }
-
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
     }
 
     @Override

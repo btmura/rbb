@@ -78,11 +78,8 @@ public class DrawerFragment extends ListFragment implements LoaderCallbacks<Acco
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        adapter.setAccountInfo(result.accountNames, result.linkKarma, result.commentKarma,
-                result.hasMail);
-        String accountName = result.getLastAccount(getActivity());
-        adapter.setAccountName(accountName);
-        selectItem(adapter.findAccountName(accountName));
+        adapter.setAccountResult(result);
+        selectItem(adapter.getSelectedAccountIndex());
         setListShown(true);
     }
 
@@ -100,6 +97,7 @@ public class DrawerFragment extends ListFragment implements LoaderCallbacks<Acco
             Item item = adapter.getItem(position);
             switch (item.getType()) {
                 case Item.TYPE_ACCOUNT_NAME:
+                    adapter.setAccountName(item.getAccountName());
                     listener.onDrawerAccountSelected(getView(), item.getAccountName());
                     break;
             }
