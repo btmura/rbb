@@ -33,6 +33,11 @@ public class Objects {
         return true;
     }
 
+    /** Check for int equality to make the code look more uniform and avoid autoboxing. */
+    public static boolean equals(int i1, int i2) {
+        return i1 == i2;
+    }
+
     /** Check for string equality without case sensitivity. */
     public static boolean equalsIgnoreCase(String s1, String s2) {
         if (s1 != null) {

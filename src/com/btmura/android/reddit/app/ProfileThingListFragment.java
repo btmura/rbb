@@ -18,6 +18,9 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
+import com.btmura.android.reddit.util.Arguments;
+import com.btmura.android.reddit.util.Arguments.ArgumentsHolder;
+
 public class ProfileThingListFragment extends ThingListFragment<ProfileThingListController> {
 
     public static ProfileThingListFragment newInstance(String accountName, String profileUser,
@@ -36,5 +39,17 @@ public class ProfileThingListFragment extends ThingListFragment<ProfileThingList
     @Override
     protected ProfileThingListController createController() {
         return new ProfileThingListController(getActivity(), getArguments(), this);
+    }
+
+    public String getProfileUser() {
+        return controller.getProfileUser();
+    }
+
+    @Override
+    public boolean isEqual(ArgumentsHolder o) {
+        return Arguments.baseEquals(this, o)
+                && Arguments.equalStrings(this, o, ProfileThingListController.EXTRA_ACCOUNT_NAME)
+                && Arguments.equalStrings(this, o, ProfileThingListController.EXTRA_PROFILE_USER)
+                && Arguments.equalInts(this, o, ProfileThingListController.EXTRA_FILTER);
     }
 }

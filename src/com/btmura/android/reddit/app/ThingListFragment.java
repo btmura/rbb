@@ -37,6 +37,7 @@ import android.widget.ListView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.util.Arguments.ArgumentsHolder;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
@@ -45,7 +46,7 @@ import com.btmura.android.reddit.widget.ThingView;
 
 abstract class ThingListFragment<C extends ThingListController<?>>
         extends ThingProviderListFragment
-        implements OnScrollListener, OnSwipeDismissListener, OnVoteListener,
+        implements ArgumentsHolder, OnScrollListener, OnSwipeDismissListener, OnVoteListener,
         MultiChoiceModeListener {
 
     public static final String TAG = "ThingListFragment";

@@ -18,6 +18,9 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
+import com.btmura.android.reddit.util.Arguments;
+import com.btmura.android.reddit.util.Arguments.ArgumentsHolder;
+
 public class MessageThingListFragment extends ThingListFragment<MessageThingListController> {
 
     public static MessageThingListFragment newInstance(String accountName, String messageUser,
@@ -36,5 +39,17 @@ public class MessageThingListFragment extends ThingListFragment<MessageThingList
     @Override
     protected MessageThingListController createController() {
         return new MessageThingListController(getActivity(), getArguments());
+    }
+
+    public String getMessageUser() {
+        return controller.getMessageUser();
+    }
+
+    @Override
+    public boolean isEqual(ArgumentsHolder o) {
+        return Arguments.baseEquals(this, o)
+                && Arguments.equalStrings(this, o, MessageThingListController.EXTRA_ACCOUNT_NAME)
+                && Arguments.equalStrings(this, o, MessageThingListController.EXTRA_MESSAGE_USER)
+                && Arguments.equalInts(this, o, MessageThingListController.EXTRA_FILTER);
     }
 }

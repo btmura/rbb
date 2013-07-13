@@ -47,6 +47,10 @@ class ProfileThingListController extends AbstractThingTableListController {
                 getMoreId(), getSessionId());
     }
 
+    public String getProfileUser() {
+        return profileUser;
+    }
+
     private String getProfileUserExtra(Bundle extras) {
         return extras.getString(EXTRA_PROFILE_USER);
     }

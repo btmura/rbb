@@ -106,6 +106,10 @@ class MessageThingListController implements ThingListController<MessageListAdapt
         return null;
     }
 
+    public String getMessageUser() {
+        return messageUser;
+    }
+
     // Actions
 
     @Override
@@ -118,6 +122,7 @@ class MessageThingListController implements ThingListController<MessageListAdapt
         MenuHelper.setClipAndToast(context, getMessageTitle(position), getMessageUrl(position));
     }
 
+    // TODO(btmura): Remove this methods rather than throwing an exception.
     @Override
     public void hide(int position, boolean hide) {
         throw new UnsupportedOperationException();

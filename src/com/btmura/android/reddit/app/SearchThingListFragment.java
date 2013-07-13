@@ -18,6 +18,9 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
+import com.btmura.android.reddit.util.Arguments;
+import com.btmura.android.reddit.util.Arguments.ArgumentsHolder;
+
 public class SearchThingListFragment extends ThingListFragment<SearchThingListController> {
 
     public static SearchThingListFragment newInstance(String accountName, String subreddit,
@@ -37,5 +40,13 @@ public class SearchThingListFragment extends ThingListFragment<SearchThingListCo
     @Override
     protected SearchThingListController createController() {
         return new SearchThingListController(getActivity(), getArguments(), this);
+    }
+
+    @Override
+    public boolean isEqual(ArgumentsHolder o) {
+        return Arguments.baseEquals(this, o)
+                && Arguments.equalStrings(this, o, SearchThingListController.EXTRA_ACCOUNT_NAME)
+                && Arguments.equalStrings(this, o, SearchThingListController.EXTRA_SUBREDDIT)
+                && Arguments.equalStrings(this, o, SearchThingListController.EXTRA_QUERY);
     }
 }

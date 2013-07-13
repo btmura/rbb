@@ -63,7 +63,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected ActionBar bar;
 
     protected boolean isSinglePane;
-    private boolean isSingleChoice;
+    protected boolean isSingleChoice;
 
     private View navContainer;
     private View subredditListContainer;
@@ -233,33 +233,32 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected void setSubredditThingListNavigation(int containerId, String subreddit) {
         SubredditThingListFragment frag = SubredditThingListFragment.newInstance(getAccountName(),
                 subreddit, getFilter(), isSingleChoice);
-        setThingListNavigation(frag, containerId, subreddit);
+        setThingListNavigation(frag, containerId);
     }
 
     protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
         SearchThingListFragment frag = SearchThingListFragment.newInstance(getAccountName(),
                 subreddit, query, isSingleChoice);
-        setThingListNavigation(frag, containerId, subreddit);
+        setThingListNavigation(frag, containerId);
     }
 
     protected void setProfileThingListNavigation(int containerId, String profileUser) {
         ProfileThingListFragment frag = ProfileThingListFragment.newInstance(getAccountName(),
                 profileUser, getFilter(), isSingleChoice);
-        setThingListNavigation(frag, containerId, null);
+        setThingListNavigation(frag, containerId);
     }
 
     protected void setMessageThingListNavigation(int containerId, String messageUser) {
         MessageThingListFragment frag = MessageThingListFragment.newInstance(getAccountName(),
                 messageUser, getFilter(), isSingleChoice);
-        setThingListNavigation(frag, containerId, null);
+        setThingListNavigation(frag, containerId);
     }
 
-    private void setThingListNavigation(ThingListFragment<?> frag, int containerId,
-            String subreddit) {
+    protected void setThingListNavigation(ThingListFragment<?> frag, int containerId) {
         if (isSinglePane) {
             setThingListNavigationSinglePane(frag, containerId);
         } else {
-            setThingListNavigationMultiPane(frag, containerId, subreddit);
+            setThingListNavigationMultiPane(frag, containerId);
         }
     }
 
@@ -274,8 +273,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.commitAllowingStateLoss();
     }
 
-    private void setThingListNavigationMultiPane(ThingListFragment<?> frag, int containerId,
-            String subreddit) {
+    private void setThingListNavigationMultiPane(ThingListFragment<?> frag, int containerId) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setThingListNavigationMultiPane");
         }
@@ -283,6 +281,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
+        String subreddit = frag.getSubreddit();
         int filter = getFilter();
         Fragment cf = ControlFragment.newInstance(accountName, subreddit, false, null, filter);
         Fragment sf = getSubredditListFragment();
@@ -331,10 +330,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (cf != null) {
             selectSubreddit(cf.getSubreddit(), cf.isRandom());
         }
-    }
-
-    protected void selectSubreddit(String subreddit) {
-        selectSubreddit(subreddit, Subreddits.isRandom(subreddit));
     }
 
     protected void selectSubreddit(String subreddit, boolean isRandom) {

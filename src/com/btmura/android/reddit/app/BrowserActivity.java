@@ -46,6 +46,7 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
+import com.btmura.android.reddit.util.Arguments;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
@@ -191,7 +192,7 @@ public class BrowserActivity extends AbstractBrowserActivity
     @Override
     public void onDrawerAccountSelected(String accountName, String subreddit) {
         this.accountName = accountName;
-        onSubredditSelected(null, subreddit);
+        selectSubreddit(subreddit);
     }
 
     @Override
@@ -200,16 +201,28 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     public void onSubredditSelected(View view, String subreddit) {
+        selectSubreddit(subreddit);
+    }
+
+    private void selectSubreddit(String subreddit) {
         drawerLayout.closeDrawers();
         filterAdapter.setTitle(subreddit);
         AccountPrefs.setLastSubreddit(this, accountName, subreddit);
-        selectSubreddit(subreddit);
+        replaceFragment(SubredditThingListFragment.newInstance(accountName, subreddit,
+                filter, isSingleChoice));
     }
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         filter = filterAdapter.getFilter(itemPosition);
         return true;
+    }
+
+    private void replaceFragment(ThingListFragment<?> candidate) {
+        ThingListFragment<?> current = getThingListFragment();
+        if (!Arguments.areEqual(candidate, current)) {
+            setThingListNavigation(candidate, R.id.thing_list_container);
+        }
     }
 
     private void updateFragments() {
