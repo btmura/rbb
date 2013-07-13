@@ -41,6 +41,16 @@ public class MessageThingListFragment extends ThingListFragment<MessageThingList
         return new MessageThingListController(getActivity(), getArguments());
     }
 
+    @Override
+    public MessageThingListFragment withFilter(int filter) {
+        Bundle args = new Bundle(getArguments());
+        args.putInt(MessageThingListController.EXTRA_FILTER, filter);
+
+        MessageThingListFragment frag = new MessageThingListFragment();
+        frag.setArguments(args);
+        return frag;
+    }
+
     public String getMessageUser() {
         return controller.getMessageUser();
     }

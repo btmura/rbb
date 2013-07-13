@@ -41,6 +41,16 @@ public class ProfileThingListFragment extends ThingListFragment<ProfileThingList
         return new ProfileThingListController(getActivity(), getArguments(), this);
     }
 
+    @Override
+    public ProfileThingListFragment withFilter(int filter) {
+        Bundle args = new Bundle(getArguments());
+        args.putInt(ProfileThingListController.EXTRA_FILTER, filter);
+
+        ProfileThingListFragment frag = new ProfileThingListFragment();
+        frag.setArguments(args);
+        return frag;
+    }
+
     public String getProfileUser() {
         return controller.getProfileUser();
     }

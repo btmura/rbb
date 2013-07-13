@@ -212,16 +212,25 @@ public class BrowserActivity extends AbstractBrowserActivity
                 filter, isSingleChoice));
     }
 
-    @Override
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        filter = filterAdapter.getFilter(itemPosition);
-        return true;
-    }
-
     private void replaceFragment(ThingListFragment<?> candidate) {
         ThingListFragment<?> current = getThingListFragment();
         if (!Arguments.areEqual(candidate, current)) {
             setThingListNavigation(candidate, R.id.thing_list_container);
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        filter = filterAdapter.getFilter(itemPosition);
+        AccountPrefs.setLastSubredditFilter(this, itemPosition);
+        replaceFilter(filter);
+        return true;
+    }
+
+    private void replaceFilter(int filter) {
+        ThingListFragment<?> current = getThingListFragment();
+        if (current != null) {
+            replaceFragment(current.withFilter(filter));
         }
     }
 
