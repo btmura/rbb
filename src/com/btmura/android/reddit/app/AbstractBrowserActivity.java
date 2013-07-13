@@ -274,7 +274,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.replace(containerId, frag, ThingListFragment.TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-        ft.commit();
+        ft.commitAllowingStateLoss();
     }
 
     private void setThingListNavigationMultiPane(ThingListFragment<?> frag, int containerId,

@@ -47,7 +47,7 @@ import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountAdapter;
-import com.btmura.android.reddit.widget.AccountFilterAdapter;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity
         implements OnNavigationListener, OnDrawerEventListener {
@@ -60,9 +60,11 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     private boolean hasSubredditList;
 
-    private ActionBarDrawerToggle drawerToggle;
-    private AccountFilterAdapter adapter;
+    private FilterAdapter filterAdapter;
     private AccountAdapter mailAdapter;
+    private ActionBarDrawerToggle drawerToggle;
+    private String accountName;
+    private int filter;
 
     private LoaderCallbacks<Cursor> mailLoaderCallbacks = new LoaderCallbacks<Cursor>() {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -79,8 +81,6 @@ public class BrowserActivity extends AbstractBrowserActivity
         }
     };
 
-    private MenuItem newPostItem;
-    private MenuItem addSubredditItem;
     private MenuItem accountsItem;
     private MenuItem switchThemesItem;
 
@@ -134,7 +134,7 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
-        adapter = new AccountFilterAdapter(this);
+        filterAdapter = new FilterAdapter(this);
         mailAdapter = new AccountAdapter(this);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -149,7 +149,7 @@ public class BrowserActivity extends AbstractBrowserActivity
 
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        bar.setListNavigationCallbacks(adapter, this);
+        bar.setListNavigationCallbacks(filterAdapter, this);
         getSupportLoaderManager().initLoader(1, null, mailLoaderCallbacks);
     }
 
@@ -171,12 +171,12 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     public String getAccountName() {
-        return adapter.getAccountName();
+        return accountName;
     }
 
     @Override
     protected int getFilter() {
-        return adapter.getFilter();
+        return filter;
     }
 
     @Override
@@ -186,48 +186,36 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
-        adapter.setSubreddit(subreddit);
     }
 
     @Override
-    public void onDrawerAccountSelected(View view, String accountName) {
-        drawerLayout.closeDrawer(view);
-        adapter.setAccountName(accountName);
-        updateFragments();
+    public void onDrawerSubredditSelected(String accountName, String subreddit, View drawer) {
+        drawerLayout.closeDrawer(drawer);
+        this.accountName = accountName;
+        setSubredditThingListNavigation(R.id.thing_list_container, subreddit);
     }
 
     @Override
-    public void onDrawerProfileSelected(View view) {
-        drawerLayout.closeDrawer(view);
-        setProfileThingListNavigation(R.id.thing_list_container, adapter.getAccountName());
+    public void onDrawerProfileSelected(String accountName, View drawer) {
+        drawerLayout.closeDrawer(drawer);
     }
 
     @Override
-    public void onDrawerSavedSelected(View view) {
-        drawerLayout.closeDrawer(view);
-        setProfileThingListNavigation(R.id.thing_list_container, adapter.getAccountName());
+    public void onDrawerSavedSelected(String accountName, View drawer) {
+        drawerLayout.closeDrawer(drawer);
     }
 
     @Override
-    public void onDrawerMessagesSelected(View view) {
-        drawerLayout.closeDrawer(view);
-        setMessageThingListNavigation(R.id.thing_list_container, adapter.getAccountName());
+    public void onDrawerMessagesSelected(String accountName, View drawer) {
+        drawerLayout.closeDrawer(drawer);
     }
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        adapter.updateState(itemPosition);
-        updateFragments();
         return true;
     }
 
     private void updateFragments() {
-        String accountName = adapter.getAccountName();
-        AccountPrefs.setLastAccount(this, accountName);
-
-        int filter = adapter.getFilter();
-        AccountPrefs.setLastSubredditFilter(this, filter);
-
         AccountSubredditListFragment slf = getAccountSubredditListFragment();
         ThingListFragment<?> tlf = getThingListFragment();
 
@@ -294,8 +282,6 @@ public class BrowserActivity extends AbstractBrowserActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
-        newPostItem = menu.findItem(R.id.menu_browser_new_post);
-        addSubredditItem = menu.findItem(R.id.menu_browser_add_subreddit);
         accountsItem = menu.findItem(R.id.menu_accounts);
         switchThemesItem = menu.findItem(R.id.menu_switch_themes);
         return true;
@@ -307,23 +293,16 @@ public class BrowserActivity extends AbstractBrowserActivity
             Log.d(TAG, "onPrepareOptionsMenu");
         }
         super.onPrepareOptionsMenu(menu);
-        if (addSubredditItem == null) {
+        if (accountsItem == null) {
             return true; // Check that onCreateOptionsMenu was called.
         }
 
         boolean showAccountItems = hasSubredditList && !hasThing();
-        boolean hasAccount = hasAccount();
-        newPostItem.setVisible(isSinglePane && hasAccount);
-        addSubredditItem.setVisible(isSinglePane);
         accountsItem.setVisible(showAccountItems);
         switchThemesItem.setVisible(showAccountItems);
 
         refreshMessagesIcon();
         return true;
-    }
-
-    private boolean hasAccount() {
-        return adapter != null && AccountUtils.isAccount(adapter.getAccountName());
     }
 
     private void refreshMessagesIcon() {
@@ -334,9 +313,7 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     private boolean hasUnreadMessages() {
-        return adapter != null
-                && mailAdapter != null
-                && mailAdapter.hasMessages(adapter.getAccountName());
+        return mailAdapter != null && mailAdapter.hasMessages(accountName);
     }
 
     @Override

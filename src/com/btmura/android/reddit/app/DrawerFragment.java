@@ -53,13 +53,13 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
 
     public interface OnDrawerEventListener {
 
-        void onDrawerAccountSelected(View view, String accountName);
+        void onDrawerSubredditSelected(String accountName, String subreddit, View drawer);
 
-        void onDrawerProfileSelected(View view);
+        void onDrawerProfileSelected(String accountName, View drawer);
 
-        void onDrawerSavedSelected(View view);
+        void onDrawerSavedSelected(String accountName, View drawer);
 
-        void onDrawerMessagesSelected(View view);
+        void onDrawerMessagesSelected(String accountName, View drawer);
     }
 
     private OnDrawerEventListener listener;
@@ -124,14 +124,16 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
         updateAdapter();
 
         String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
-        AccountSubredditListFragment frag =
-                AccountSubredditListFragment.newInstance(accountName, subreddit, true);
+        AccountSubredditListFragment frag = AccountSubredditListFragment.newInstance(accountName,
+                subreddit, true);
+
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.replace(R.id.subreddit_list_container, frag);
         ft.commit();
 
-        int index = adapter.findAccount(accountName);
-        selectItem(index);
+        if (listener != null) {
+            listener.onDrawerSubredditSelected(accountName, subreddit, getView());
+        }
     }
 
     private void updateAdapter() {
@@ -183,41 +185,5 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
 
     @Override
     public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
-        selectItem(position);
-    }
-
-    private void selectItem(int position) {
-        Item item = adapter.getItem(position);
-        switch (item.getType()) {
-            case Item.TYPE_ACCOUNT_NAME:
-                accountName = item.getAccountName();
-                updateAdapter();
-                if (listener != null) {
-                    listener.onDrawerAccountSelected(getView(), item.getAccountName());
-                }
-                break;
-
-            case Item.TYPE_PLACE:
-                switch (item.getPlace()) {
-                    case PLACE_PROFILE:
-                        if (listener != null) {
-                            listener.onDrawerProfileSelected(getView());
-                        }
-                        break;
-
-                    case PLACE_SAVED:
-                        if (listener != null) {
-                            listener.onDrawerSavedSelected(getView());
-                        }
-                        break;
-
-                    case PLACE_MESSAGES:
-                        if (listener != null) {
-                            listener.onDrawerMessagesSelected(getView());
-                        }
-                        break;
-                }
-                break;
-        }
     }
 }

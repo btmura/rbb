@@ -22,7 +22,7 @@
     <!-- Main container -->
 
     <FrameLayout
-        android:id="@+id/subreddit_list_container"
+        android:id="@+id/thing_list_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
