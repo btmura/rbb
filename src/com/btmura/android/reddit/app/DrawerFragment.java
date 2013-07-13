@@ -53,13 +53,7 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
 
     public interface OnDrawerEventListener {
 
-        void onDrawerSubredditSelected(String accountName, String subreddit, View drawer);
-
-        void onDrawerProfileSelected(String accountName, View drawer);
-
-        void onDrawerSavedSelected(String accountName, View drawer);
-
-        void onDrawerMessagesSelected(String accountName, View drawer);
+        void onDrawerAccountSelected(String accountName, String subreddit);
     }
 
     private OnDrawerEventListener listener;
@@ -85,7 +79,6 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adapter = new DrawerAdapter(getActivity());
-
     }
 
     @Override
@@ -124,15 +117,14 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
         updateAdapter();
 
         String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
-        AccountSubredditListFragment frag = AccountSubredditListFragment.newInstance(accountName,
-                subreddit, true);
+        Fragment frag = AccountSubredditListFragment.newInstance(accountName, subreddit, true);
 
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.replace(R.id.subreddit_list_container, frag);
         ft.commit();
 
         if (listener != null) {
-            listener.onDrawerSubredditSelected(accountName, subreddit, getView());
+            listener.onDrawerAccountSelected(accountName, subreddit);
         }
     }
 

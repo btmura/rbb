@@ -133,6 +133,8 @@ public class BrowserActivity extends AbstractBrowserActivity
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         filterAdapter = new FilterAdapter(this);
+        filterAdapter.addSubredditFilters(this);
+
         mailAdapter = new AccountAdapter(this);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -187,25 +189,9 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     @Override
-    public void onDrawerSubredditSelected(String accountName, String subreddit, View drawer) {
-        drawerLayout.closeDrawer(drawer);
+    public void onDrawerAccountSelected(String accountName, String subreddit) {
         this.accountName = accountName;
-        setSubredditThingListNavigation(R.id.thing_list_container, subreddit);
-    }
-
-    @Override
-    public void onDrawerProfileSelected(String accountName, View drawer) {
-        drawerLayout.closeDrawer(drawer);
-    }
-
-    @Override
-    public void onDrawerSavedSelected(String accountName, View drawer) {
-        drawerLayout.closeDrawer(drawer);
-    }
-
-    @Override
-    public void onDrawerMessagesSelected(String accountName, View drawer) {
-        drawerLayout.closeDrawer(drawer);
+        onSubredditSelected(null, subreddit);
     }
 
     @Override
@@ -215,15 +201,35 @@ public class BrowserActivity extends AbstractBrowserActivity
     @Override
     public void onSubredditSelected(View view, String subreddit) {
         drawerLayout.closeDrawers();
-        selectSubreddit(subreddit, Subreddits.isRandom(subreddit));
+        filterAdapter.setTitle(subreddit);
+        AccountPrefs.setLastSubreddit(this, accountName, subreddit);
+        selectSubreddit(subreddit);
     }
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        filter = filterAdapter.getFilter(itemPosition);
         return true;
     }
 
     private void updateFragments() {
+        if (isSinglePane) {
+            updateFragmentsSinglePane();
+        } else {
+            updateFragmentsMultiPane();
+        }
+    }
+
+    private void updateFragmentsSinglePane() {
+        ThingListFragment<?> tlf = getThingListFragment();
+        if (tlf == null || !Objects.equals(accountName, tlf.getAccountName())) {
+            String subreddit = AccountPrefs.getLastSubreddit(this, accountName);
+            boolean isRandom = Subreddits.isRandom(subreddit);
+            selectSubreddit(subreddit, isRandom);
+        }
+    }
+
+    private void updateFragmentsMultiPane() {
         AccountSubredditListFragment slf = getAccountSubredditListFragment();
         ThingListFragment<?> tlf = getThingListFragment();
 

@@ -326,21 +326,37 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
+    protected void refreshSubreddit() {
+        ControlFragment cf = getControlFragment();
+        if (cf != null) {
+            selectSubreddit(cf.getSubreddit(), cf.isRandom());
+        }
+    }
+
+    protected void selectSubreddit(String subreddit) {
+        selectSubreddit(subreddit, Subreddits.isRandom(subreddit));
+    }
+
     protected void selectSubreddit(String subreddit, boolean isRandom) {
         if (isSinglePane) {
-            selectSubredditSinglePane(subreddit);
+            selectSubredditSinglePane(subreddit, isRandom);
         } else {
             selectSubredditMultiPane(subreddit, isRandom);
         }
     }
 
-    private void selectSubredditSinglePane(String subreddit) {
-        SubredditThingListFragment frag = SubredditThingListFragment.newInstance(getAccountName(),
-                subreddit, getFilter(), isSingleChoice);
+    private void selectSubredditSinglePane(String subreddit, boolean isRandom) {
+        String accountName = getAccountName();
+        int filter = getFilter();
+
+        Fragment cf = ControlFragment.newInstance(accountName, subreddit, isRandom, null, filter);
+        Fragment tlf = SubredditThingListFragment.newInstance(accountName, subreddit, filter,
+                isSingleChoice);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
-        ft.commit();
+        ft.add(cf, ControlFragment.TAG);
+        ft.replace(R.id.thing_list_container, tlf, ThingListFragment.TAG);
+        ft.commitAllowingStateLoss();
     }
 
     private void selectSubredditMultiPane(String subreddit, boolean isRandom) {
