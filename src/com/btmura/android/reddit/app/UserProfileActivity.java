@@ -42,7 +42,9 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 /**
  * {@link Activity} for viewing a user's profile.
  */
-public class UserProfileActivity extends AbstractBrowserActivity implements OnNavigationListener {
+public class UserProfileActivity extends AbstractBrowserActivity implements
+        LoaderCallbacks<AccountResult>,
+        OnNavigationListener {
 
     private static final String STATE_FILTER = "filter";
 

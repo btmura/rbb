@@ -32,8 +32,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
@@ -45,12 +43,10 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.ThingView;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
-        LoaderCallbacks<AccountResult>,
         OnSubredditSelectedListener,
         OnSubredditEventListener,
         OnThingSelectedListener,
@@ -102,7 +98,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             setupCommonViews();
             setupViews();
             setupActionBar(savedInstanceState);
-            getSupportLoaderManager().initLoader(0, null, this);
         }
     }
 
@@ -146,12 +141,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected abstract void setupViews();
 
     protected abstract void setupActionBar(Bundle savedInstanceState);
-
-    public abstract Loader<AccountResult> onCreateLoader(int id, Bundle args);
-
-    public abstract void onLoadFinished(Loader<AccountResult> loader, AccountResult result);
-
-    public abstract void onLoaderReset(Loader<AccountResult> loader);
 
     public abstract String getAccountName();
 
@@ -243,6 +232,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     // Methods for setting the content of the right hand thing list pane.
+
+    protected void setSubredditThingListNavigation(int containerId, String subreddit) {
+        SubredditThingListFragment frag = SubredditThingListFragment.newInstance(getAccountName(),
+                subreddit, getFilter(), isSingleChoice);
+        setThingListNavigation(frag, containerId, subreddit);
+    }
 
     protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
         SearchThingListFragment frag = SearchThingListFragment.newInstance(getAccountName(),

@@ -20,23 +20,28 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.widget.DrawerAdapter;
 import com.btmura.android.reddit.widget.DrawerAdapter.Item;
 
-public class DrawerFragment extends ListFragment implements LoaderCallbacks<AccountResult> {
+public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountResult>,
+        OnItemClickListener {
 
     private static final int[] ATTRIBUTES = {
             android.R.attr.windowBackground,
@@ -59,8 +64,14 @@ public class DrawerFragment extends ListFragment implements LoaderCallbacks<Acco
 
     private OnDrawerEventListener listener;
     private DrawerAdapter adapter;
+    private ListView accountList;
+
     private AccountResult accountResult;
     private String accountName;
+
+    public static DrawerFragment newInstance() {
+        return new DrawerFragment();
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -74,13 +85,16 @@ public class DrawerFragment extends ListFragment implements LoaderCallbacks<Acco
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adapter = new DrawerAdapter(getActivity());
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.drawer, container, false);
         view.setBackgroundResource(getBackgroundResource());
+        accountList = (ListView) view.findViewById(R.id.account_list);
+        accountList.setOnItemClickListener(this);
         return view;
     }
 
@@ -95,8 +109,6 @@ public class DrawerFragment extends ListFragment implements LoaderCallbacks<Acco
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setListAdapter(adapter);
-        setListShown(false);
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -111,10 +123,15 @@ public class DrawerFragment extends ListFragment implements LoaderCallbacks<Acco
         this.accountName = accountResult.getLastAccount(getActivity());
         updateAdapter();
 
+        String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
+        AccountSubredditListFragment frag =
+                AccountSubredditListFragment.newInstance(accountName, subreddit, true);
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        ft.replace(R.id.subreddit_list_container, frag);
+        ft.commit();
+
         int index = adapter.findAccount(accountName);
         selectItem(index);
-
-        setListShown(true);
     }
 
     private void updateAdapter() {
@@ -165,7 +182,7 @@ public class DrawerFragment extends ListFragment implements LoaderCallbacks<Acco
     }
 
     @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
+    public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
         selectItem(position);
     }
 

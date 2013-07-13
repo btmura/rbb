@@ -117,27 +117,9 @@ public class MenuHelper {
         context.startActivity(Intent.createChooser(intent, context.getString(R.string.menu_open)));
     }
 
-    public static void startMessageActivity(Context context, String user, int filter) {
-        Intent intent = new Intent(context, MessageActivity.class);
-        intent.putExtra(MessageActivity.EXTRA_USER, user);
-        if (filter != -1) {
-            intent.putExtra(MessageActivity.EXTRA_FILTER, filter);
-        }
-        context.startActivity(intent);
-    }
-
     public static void startProfileActivity(Context context, String user, int filter) {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.setData(Uri.parse(Urls.user(user, filter, null, Urls.TYPE_HTML).toString()));
-        context.startActivity(intent);
-    }
-
-    public static void startSelfProfileActivity(Context context, String user, int filter) {
-        Intent intent = new Intent(context, SelfProfileActivity.class);
-        intent.putExtra(MessageActivity.EXTRA_USER, user);
-        if (filter != -1) {
-            intent.putExtra(MessageActivity.EXTRA_FILTER, filter);
-        }
         context.startActivity(intent);
     }
 

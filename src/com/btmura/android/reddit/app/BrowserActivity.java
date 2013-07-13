@@ -40,8 +40,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.DrawerFragment.OnDrawerEventListener;
-import com.btmura.android.reddit.content.AccountLoader;
-import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
@@ -169,24 +167,6 @@ public class BrowserActivity extends AbstractBrowserActivity
         if (drawerToggle != null) {
             drawerToggle.onConfigurationChanged(newConfig);
         }
-    }
-
-    @Override
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true, true);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        if (!isSinglePane) {
-            adapter.addSubredditFilters(this);
-        }
-        adapter.setOnlyFilters();
-        adapter.setFilter(result.getLastSubredditFilter(this));
-    }
-
-    @Override
-    public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
     @Override

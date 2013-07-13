@@ -21,6 +21,7 @@ import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
@@ -35,6 +36,7 @@ import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class SearchActivity extends AbstractBrowserActivity implements
+        LoaderCallbacks<AccountResult>,
         TabListener,
         SearchQueryHandler,
         AccountResultHolder {
