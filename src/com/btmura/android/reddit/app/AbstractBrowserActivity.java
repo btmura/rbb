@@ -22,7 +22,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
@@ -41,13 +40,11 @@ import android.view.View;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.ThingView;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
-        OnSubredditSelectedListener,
         OnSubredditEventListener,
         OnThingSelectedListener,
         OnThingEventListener,
@@ -309,12 +306,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshViews(null);
     }
 
-    public void onInitialSubredditSelected(String subreddit, boolean error) {
-        if (!isSinglePane) {
-            selectInitialSubredditMultiPane(subreddit, error);
-        }
-    }
-
     private void selectInitialSubredditMultiPane(String subreddit, boolean error) {
         ControlFragment cf = getControlFragment();
         if (cf != null && cf.getSubreddit() == null) {
@@ -335,29 +326,21 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    public void onSubredditSelected(View view, String subreddit) {
-        selectSubreddit(view, subreddit, Subreddits.isRandom(subreddit), 0);
-    }
-
-    protected void selectSubreddit(View view, String subreddit, boolean isRandom, int flags) {
+    protected void selectSubreddit(String subreddit, boolean isRandom) {
         if (isSinglePane) {
-            selectSubredditSinglePane(view, subreddit, flags);
+            selectSubredditSinglePane(subreddit);
         } else {
             selectSubredditMultiPane(subreddit, isRandom);
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void selectSubredditSinglePane(View view, String subreddit, int flags) {
-        Intent intent = new Intent(this, ThingListActivity.class);
-        intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, subreddit);
-        intent.putExtra(ThingListActivity.EXTRA_FLAGS, flags);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && view != null) {
-            startActivity(intent, ActivityOptions.makeScaleUpAnimation(view, 0, 0,
-                    view.getWidth(), view.getHeight()).toBundle());
-        } else {
-            startActivity(intent);
-        }
+    private void selectSubredditSinglePane(String subreddit) {
+        SubredditThingListFragment frag = SubredditThingListFragment.newInstance(getAccountName(),
+                subreddit, getFilter(), isSingleChoice);
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.thing_list_container, frag, ThingListFragment.TAG);
+        ft.commit();
     }
 
     private void selectSubredditMultiPane(String subreddit, boolean isRandom) {

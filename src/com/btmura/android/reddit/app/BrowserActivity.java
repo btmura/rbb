@@ -40,6 +40,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.DrawerFragment.OnDrawerEventListener;
+import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
@@ -50,7 +51,7 @@ import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity
-        implements OnNavigationListener, OnDrawerEventListener {
+        implements OnNavigationListener, OnDrawerEventListener, OnSubredditSelectedListener {
 
     /** Requested subreddit from intent data to view. */
     private String requestedSubreddit;
@@ -116,10 +117,7 @@ public class BrowserActivity extends AbstractBrowserActivity
                 finish();
                 return true;
             } else if (!TextUtils.isEmpty(requestedSubreddit)) {
-                selectSubreddit(null,
-                        requestedSubreddit,
-                        Subreddits.isRandom(requestedSubreddit),
-                        ThingListActivity.FLAG_INSERT_HOME);
+                selectSubreddit(requestedSubreddit, Subreddits.isRandom(requestedSubreddit));
                 finish();
                 return true;
             }
@@ -211,6 +209,16 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     @Override
+    public void onInitialSubredditSelected(String subreddit, boolean error) {
+    }
+
+    @Override
+    public void onSubredditSelected(View view, String subreddit) {
+        drawerLayout.closeDrawers();
+        selectSubreddit(subreddit, Subreddits.isRandom(subreddit));
+    }
+
+    @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         return true;
     }
@@ -252,12 +260,6 @@ public class BrowserActivity extends AbstractBrowserActivity
 
         // Invalidate action bar icons when switching accounts.
         invalidateOptionsMenu();
-    }
-
-    @Override
-    public void onSubredditSelected(View view, String subreddit) {
-        super.onSubredditSelected(view, subreddit);
-        AccountPrefs.setLastSubreddit(this, getAccountName(), subreddit);
     }
 
     @Override
