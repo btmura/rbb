@@ -207,7 +207,7 @@ public class BrowserActivity extends AbstractBrowserActivity
     private void selectSubreddit(String subreddit) {
         drawerLayout.closeDrawers();
 
-        filterAdapter.setTitle(subreddit);
+        filterAdapter.setTitle(Subreddits.getTitle(this, subreddit));
         AccountPrefs.setLastSubreddit(this, accountName, subreddit);
         setSubredditThingListNavigation(R.id.thing_list_container, subreddit, filter);
 
