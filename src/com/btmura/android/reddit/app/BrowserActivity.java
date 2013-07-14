@@ -34,12 +34,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
+import com.btmura.android.reddit.app.NavigationFragment.OnNavigationEventListener;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
@@ -49,7 +48,7 @@ import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity
-        implements OnNavigationListener, OnSubredditSelectedListener {
+        implements OnNavigationListener, OnNavigationEventListener {
 
     /** Requested subreddit from intent data to view. */
     private String requestedSubreddit;
@@ -166,19 +165,9 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     @Override
-    public void onInitialSubredditSelected(String subreddit, boolean error) {
-        selectSubreddit(subreddit);
-    }
-
-    @Override
-    public void onSubredditSelected(View view, String subreddit) {
-        selectSubreddit(subreddit);
-    }
-
-    private void selectSubreddit(String subreddit) {
+    public void onSubredditSelected(String accountName, String subreddit) {
         drawerLayout.closeDrawers();
-        AccountPrefs.setLastSubreddit(this, accountName, subreddit);
-        setSubredditThingListNavigation(R.id.thing_list_container, subreddit, filter);
+        setSubredditThingListNavigation(R.id.thing_list_container, accountName, subreddit, filter);
     }
 
     @Override
