@@ -33,11 +33,11 @@ import com.btmura.android.reddit.content.ThemePrefs;
 
 public class NavigationAdapter extends BaseAdapter {
 
-    static class Item {
+    public static class Item {
         static final int NUM_TYPES = 3;
-        static final int TYPE_CATEGORY = 0;
-        static final int TYPE_ACCOUNT_NAME = 1;
-        static final int TYPE_FILTER = 2;
+        public static final int TYPE_CATEGORY = 0;
+        public static final int TYPE_ACCOUNT_NAME = 1;
+        public static final int TYPE_FILTER = 2;
 
         private final int type;
         private final String text1;
@@ -51,6 +51,14 @@ public class NavigationAdapter extends BaseAdapter {
             this.text2 = text2;
             this.text3 = text3;
             this.value = value;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public String getAccountName() {
+            return text1;
         }
     }
 

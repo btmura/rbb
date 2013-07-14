@@ -121,6 +121,36 @@ public class MergeAdapter extends BaseAdapter {
         return null;
     }
 
+    public int getAdapterIndex(int position) {
+        int start = 0;
+        int end = 0;
+        int adapterCount = adapters.size();
+        for (int i = 0; i < adapterCount; i++) {
+            ListAdapter adapter = adapters.get(i);
+            end = start + adapter.getCount();
+            if (position >= start && position < end) {
+                return i;
+            }
+            start += adapter.getCount();
+        }
+        return -1;
+    }
+
+    public int getAdapterPosition(int position) {
+        int start = 0;
+        int end = 0;
+        int adapterCount = adapters.size();
+        for (int i = 0; i < adapterCount; i++) {
+            ListAdapter adapter = adapters.get(i);
+            end = start + adapter.getCount();
+            if (position >= start && position < end) {
+                return position - start;
+            }
+            start += adapter.getCount();
+        }
+        return -1;
+    }
+
     class AdapterObserver extends DataSetObserver {
 
         @Override

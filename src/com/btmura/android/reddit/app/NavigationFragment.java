@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.Activity;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -33,9 +34,15 @@ import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
 import com.btmura.android.reddit.widget.NavigationAdapter;
+import com.btmura.android.reddit.widget.NavigationAdapter.Item;
 
 public class NavigationFragment extends ListFragment
         implements LoaderCallbacks<AccountResult> {
+
+    public interface OnNavigationEventListener {
+
+        void onSubredditSelected(String accountName, String subreddit);
+    }
 
     private static final int[] ATTRIBUTES = {
             android.R.attr.windowBackground,
@@ -46,9 +53,18 @@ public class NavigationFragment extends ListFragment
     private final AccountSubredditLoaderCallbacks subredditLoaderCallbacks =
             new AccountSubredditLoaderCallbacks();
 
+    private OnNavigationEventListener listener;
     private NavigationAdapter accountAdapter;
     private AccountSubredditAdapter subredditAdapter;
     private MergeAdapter mergeAdapter;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnNavigationEventListener) {
+            listener = (OnNavigationEventListener) activity;
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,6 +123,24 @@ public class NavigationFragment extends ListFragment
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        int adapterIndex = mergeAdapter.getAdapterIndex(position);
+        int adapterPosition = mergeAdapter.getAdapterPosition(position);
+        switch (adapterIndex) {
+            case 0:
+                handleAccountAdapterClick(adapterPosition);
+                break;
+        }
+    }
+
+    private void handleAccountAdapterClick(int position) {
+        Item item = accountAdapter.getItem(position);
+        switch (item.getType()) {
+            case Item.TYPE_ACCOUNT_NAME:
+                Bundle args = new Bundle(1);
+                args.putString(LOADER_ARG_ACCOUNT_NAME, item.getAccountName());
+                getLoaderManager().restartLoader(1, args, subredditLoaderCallbacks);
+                break;
+        }
     }
 
     class AccountSubredditLoaderCallbacks implements LoaderCallbacks<Cursor> {
