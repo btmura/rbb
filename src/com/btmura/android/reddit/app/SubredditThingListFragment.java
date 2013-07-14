@@ -43,16 +43,6 @@ public class SubredditThingListFragment extends ThingListFragment<SubredditThing
     }
 
     @Override
-    public SubredditThingListFragment withFilter(int filter) {
-        Bundle args = new Bundle(getArguments());
-        args.putInt(SubredditThingListController.EXTRA_FILTER, filter);
-
-        SubredditThingListFragment frag = new SubredditThingListFragment();
-        frag.setArguments(args);
-        return frag;
-    }
-
-    @Override
     public boolean isEqual(ArgumentsHolder o) {
         return Arguments.baseEquals(this, o)
                 && Arguments.equalStrings(this, o, SubredditThingListController.EXTRA_ACCOUNT_NAME)

@@ -39,7 +39,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.NavigationFragment.OnNavigationEventListener;
-import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
@@ -49,6 +48,10 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity
         implements OnNavigationListener, OnNavigationEventListener {
+
+    public interface OnFilterSelectedListener {
+        void onFilterSelected(int filter);
+    }
 
     /** Requested subreddit from intent data to view. */
     private String requestedSubreddit;
@@ -130,7 +133,6 @@ public class BrowserActivity extends AbstractBrowserActivity
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         filterAdapter = new FilterAdapter(this);
-        filterAdapter.addSubredditFilters(this);
 
         mailAdapter = new AccountAdapter(this);
 
@@ -145,6 +147,7 @@ public class BrowserActivity extends AbstractBrowserActivity
         }
 
         bar.setDisplayShowTitleEnabled(false);
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         getSupportLoaderManager().initLoader(1, null, mailLoaderCallbacks);
     }
 
@@ -165,32 +168,26 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     @Override
-    public void onSubredditSelected(String accountName, String subreddit) {
+    public void onSubredditSelected(String accountName, String subreddit, int filter) {
         drawerLayout.closeDrawers();
         setSubredditThingListNavigation(R.id.thing_list_container, accountName, subreddit, filter);
+
+        filterAdapter.clear();
+        filterAdapter.addSubredditFilters(this);
+        bar.setListNavigationCallbacks(filterAdapter, this);
+        bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
     }
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        int newFilter = filterAdapter.getFilter(itemPosition);
-        if (filter != newFilter) {
-            filter = newFilter;
-            AccountPrefs.setLastSubredditFilter(this, filter);
-            refreshThingListNavigation(R.id.thing_list_container, filter);
-        }
+        NavigationFragment frag = getNavigationFragment();
+        frag.onFilterSelected(filterAdapter.getFilter(itemPosition));
         return true;
     }
 
     @Override
     protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
         filterAdapter.setTitle(Subreddits.getTitle(this, subreddit));
-        // Don't change the action bar to the list until we know the correct filter or else the
-        // action bar will select the first index by default.
-        if (bar.getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST) {
-            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-            bar.setListNavigationCallbacks(filterAdapter, this);
-            bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
-        }
     }
 
     @Override

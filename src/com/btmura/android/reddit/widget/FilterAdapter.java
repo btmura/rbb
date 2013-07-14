@@ -38,7 +38,7 @@ public class FilterAdapter extends BaseFilterAdapter {
     }
 
     @Override
-    protected void clear() {
+    public void clear() {
         names.clear();
         values.clear();
     }

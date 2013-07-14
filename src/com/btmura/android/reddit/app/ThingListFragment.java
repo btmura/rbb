@@ -69,8 +69,6 @@ abstract class ThingListFragment<C extends ThingListController<?>>
 
     protected abstract C createController();
 
-    public abstract ThingListFragment<C> withFilter(int filter);
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

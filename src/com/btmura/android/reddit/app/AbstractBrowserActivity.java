@@ -250,15 +250,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         setThingListNavigation(frag, containerId, getAccountName(), null, filter);
     }
 
-    protected void refreshThingListNavigation(int containerId, int filter) {
-        ThingListFragment<?> current = getThingListFragment();
-        if (current != null) {
-            ControlFragment cf = getControlFragment();
-            setThingListNavigation(current.withFilter(filter), containerId,
-                    getAccountName(), cf.getSubreddit(), filter);
-        }
-    }
-
     private void setThingListNavigation(ThingListFragment<?> candidate, int containerId,
             String accountName, String subreddit, int filter) {
         if (BuildConfig.DEBUG) {
@@ -638,6 +629,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private ControlFragment getControlFragment() {
         return (ControlFragment) getSupportFragmentManager()
                 .findFragmentByTag(ControlFragment.TAG);
+    }
+
+    protected NavigationFragment getNavigationFragment() {
+        return (NavigationFragment) getSupportFragmentManager()
+                .findFragmentByTag(NavigationFragment.TAG);
     }
 
     protected SearchSubredditListFragment getSubredditSearchFragment() {

@@ -28,22 +28,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.app.BrowserActivity.OnFilterSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
+import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
 import com.btmura.android.reddit.widget.NavigationAdapter;
 import com.btmura.android.reddit.widget.NavigationAdapter.Item;
 
 public class NavigationFragment extends ListFragment
-        implements LoaderCallbacks<AccountResult> {
+        implements LoaderCallbacks<AccountResult>, OnFilterSelectedListener {
 
-    public interface OnNavigationEventListener {
-
-        void onSubredditSelected(String accountName, String subreddit);
-    }
+    public static final String TAG = "NavigationFragment";
 
     private static final int[] ATTRIBUTES = {
             android.R.attr.windowBackground,
@@ -60,6 +59,10 @@ public class NavigationFragment extends ListFragment
     private static final boolean LOADER_INIT = false;
     private static final boolean LOADER_RESTART = true;
 
+    public interface OnNavigationEventListener {
+        void onSubredditSelected(String accountName, String subreddit, int filter);
+    }
+
     private final AccountSubredditLoaderCallbacks subredditLoaderCallbacks =
             new AccountSubredditLoaderCallbacks();
 
@@ -67,7 +70,10 @@ public class NavigationFragment extends ListFragment
     private NavigationAdapter accountAdapter;
     private AccountSubredditAdapter subredditAdapter;
     private MergeAdapter mergeAdapter;
+
     private String accountName;
+    private String subreddit;
+    private int filter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -156,7 +162,7 @@ public class NavigationFragment extends ListFragment
 
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
-        selectSubreddit(subreddit);
+        selectSubreddit(subreddit, filter);
     }
 
     private void selectAccount(String accountName, boolean restartLoader) {
@@ -165,7 +171,9 @@ public class NavigationFragment extends ListFragment
         refreshSubredditLoader(accountName, restartLoader);
 
         String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
-        selectSubreddit(subreddit);
+        int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
+                FilterAdapter.SUBREDDIT_HOT);
+        selectSubreddit(subreddit, filter);
     }
 
     private void refreshSubredditLoader(String accountName, boolean restartLoader) {
@@ -178,9 +186,20 @@ public class NavigationFragment extends ListFragment
         }
     }
 
-    private void selectSubreddit(String subreddit) {
+    private void selectSubreddit(String subreddit, int filter) {
+        this.subreddit = subreddit;
+        this.filter = filter;
+        AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
+        AccountPrefs.setLastSubredditFilter(getActivity(), filter);
         if (listener != null) {
-            listener.onSubredditSelected(accountName, subreddit);
+            listener.onSubredditSelected(accountName, subreddit, filter);
+        }
+    }
+
+    @Override
+    public void onFilterSelected(int newFilter) {
+        if (filter != newFilter) {
+            selectSubreddit(subreddit, newFilter);
         }
     }
 

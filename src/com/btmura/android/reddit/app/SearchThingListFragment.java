@@ -43,11 +43,6 @@ public class SearchThingListFragment extends ThingListFragment<SearchThingListCo
     }
 
     @Override
-    public SearchThingListFragment withFilter(int filter) {
-        return this;
-    }
-
-    @Override
     public boolean isEqual(ArgumentsHolder o) {
         return Arguments.baseEquals(this, o)
                 && Arguments.equalStrings(this, o, SearchThingListController.EXTRA_ACCOUNT_NAME)
