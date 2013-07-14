@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.FilterQueryProvider;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.util.Array;
@@ -50,12 +51,25 @@ public class AccountSubredditAdapter extends SubredditAdapter {
         PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM);
     }
 
+    private final MatrixCursor accountCursor;
     private final boolean showPresets;
     private Cursor originalCursor;
 
-    public AccountSubredditAdapter(Context context, boolean showPresets, boolean addFilter,
-            boolean singleChoice) {
+    /** Creates an adapter for use with AutoCompleteTextView. */
+    public static AccountSubredditAdapter newAutoCompleteInstance(Context context) {
+        // Don't make it single choice for AutoCompleteTextView.
+        return new AccountSubredditAdapter(context, false, true, null, false);
+    }
+
+    public static AccountSubredditAdapter newAccountInstance(Context context,
+            AccountResult accountResult, boolean singleChoice) {
+        return new AccountSubredditAdapter(context, true, false, accountResult, singleChoice);
+    }
+
+    private AccountSubredditAdapter(Context context, boolean showPresets, boolean addFilter,
+            AccountResult accountResult, boolean singleChoice) {
         super(context, singleChoice);
+        this.accountCursor = createAccountCursor(accountResult);
         this.showPresets = showPresets;
         if (addFilter) {
             // Attach filter that executes a query as the user types.
@@ -68,12 +82,27 @@ public class AccountSubredditAdapter extends SubredditAdapter {
         }
     }
 
+    private MatrixCursor createAccountCursor(AccountResult result) {
+        if (result != null && result.accountNames.length > 1) {
+            MatrixCursor cursor = new MatrixCursor(PROJECTION, 3);
+            int count = result.accountNames.length;
+            for (int i = 0; i < count; i++) {
+                cursor.newRow().add(-4 - i).add(result.accountNames[i]);
+            }
+            return cursor;
+        }
+        return null;
+    }
+
     @Override
     public Cursor swapCursor(Cursor newCursor) {
         if (originalCursor != newCursor) {
             originalCursor = newCursor;
             if (showPresets) {
-                newCursor = new MergeCursor(new Cursor[] {PRESETS_CURSOR, newCursor});
+                Cursor[] cursors = accountCursor != null
+                        ? new Cursor[] {accountCursor, PRESETS_CURSOR, newCursor}
+                        : new Cursor[] {PRESETS_CURSOR, newCursor};
+                newCursor = new MergeCursor(cursors);
             }
             return super.swapCursor(newCursor);
         }

@@ -18,6 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 
 public class AccountSubredditListFragment
@@ -25,9 +26,10 @@ public class AccountSubredditListFragment
         AccountSubredditListActionModeController,
         AccountSubredditAdapter> {
 
-    public static AccountSubredditListFragment newInstance(String accountName,
-            String selectedSubreddit, boolean singleChoice) {
-        Bundle args = new Bundle(3);
+    public static AccountSubredditListFragment newInstance(AccountResult accountResult,
+            String accountName, String selectedSubreddit, boolean singleChoice) {
+        Bundle args = new Bundle(4);
+        args.putParcelable(AccountSubredditListController.EXTRA_ACCOUNT_RESULT, accountResult);
         args.putString(AccountSubredditListController.EXTRA_ACCOUNT_NAME, accountName);
         args.putString(AccountSubredditListController.EXTRA_SELECTED_SUBREDDIT, selectedSubreddit);
         args.putBoolean(AccountSubredditListController.EXTRA_SINGLE_CHOICE, singleChoice);

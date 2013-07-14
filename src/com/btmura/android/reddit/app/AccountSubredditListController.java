@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
@@ -28,6 +29,7 @@ import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 class AccountSubredditListController
         implements SubredditListController<AccountSubredditAdapter> {
 
+    static final String EXTRA_ACCOUNT_RESULT = "accountResult";
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
     static final String EXTRA_SINGLE_CHOICE = "singleChoice";
@@ -42,7 +44,8 @@ class AccountSubredditListController
 
     AccountSubredditListController(Context context, Bundle args) {
         this.context = context;
-        this.adapter = new AccountSubredditAdapter(context, true, false,
+        this.adapter = AccountSubredditAdapter.newAccountInstance(context,
+                getAccountResultExtra(args),
                 getSingleChoiceExtra(args));
         restoreInstanceState(args);
     }
@@ -123,6 +126,10 @@ class AccountSubredditListController
     }
 
     // Getters for extras.
+
+    private static AccountResult getAccountResultExtra(Bundle extras) {
+        return extras.getParcelable(EXTRA_ACCOUNT_RESULT);
+    }
 
     private static String getAccountNameExtra(Bundle extras) {
         return extras.getString(EXTRA_ACCOUNT_NAME);

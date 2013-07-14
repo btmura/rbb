@@ -194,7 +194,7 @@ public class BrowserActivity extends AbstractBrowserActivity
         this.filter = AccountPrefs.getLastSubredditFilter(this, FilterAdapter.SUBREDDIT_HOT);
         String subreddit = AccountPrefs.getLastSubreddit(this, accountName);
         setAccountSubredditListNavigation(R.id.subreddit_list_container,
-                subreddit, Subreddits.isRandom(subreddit), null);
+                accountResult, subreddit, Subreddits.isRandom(subreddit), null);
         checkMailIfHasAccount();
         invalidateOptionsMenu();
     }

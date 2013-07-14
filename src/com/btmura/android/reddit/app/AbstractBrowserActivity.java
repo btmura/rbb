@@ -152,10 +152,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods for setting the content of the left hand subreddit pane.
 
-    protected void setAccountSubredditListNavigation(int containerId, String subreddit,
-            boolean isRandom, ThingBundle thingBundle) {
+    protected void setAccountSubredditListNavigation(int containerId, AccountResult accountResult,
+            String subreddit, boolean isRandom, ThingBundle thingBundle) {
         SubredditListFragment<?, ?, ?> frag = AccountSubredditListFragment.newInstance(
-                getAccountName(), subreddit, isSingleChoice);
+                accountResult, getAccountName(), subreddit, isSingleChoice);
         setSubredditListNavigation(frag, containerId, subreddit, isRandom, thingBundle);
     }
 

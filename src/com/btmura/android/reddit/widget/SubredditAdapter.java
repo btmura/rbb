@@ -36,12 +36,6 @@ public abstract class SubredditAdapter extends BaseCursorAdapter {
     protected String accountName;
     protected String selectedSubreddit;
 
-    /** Creates an adapter for use with AutoCompleteTextView. */
-    public static SubredditAdapter newAutoCompleteInstance(Context context) {
-        // Don't make it single choice for AutoCompleteTextView.
-        return new AccountSubredditAdapter(context, false, true, false);
-    }
-
     protected SubredditAdapter(Context context, boolean singleChoice) {
         super(context, null, 0);
         this.singleChoice = singleChoice;

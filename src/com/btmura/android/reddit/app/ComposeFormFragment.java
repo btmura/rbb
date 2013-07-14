@@ -50,6 +50,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
+import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
 /**
@@ -234,7 +235,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 destinationText.setHint(R.string.hint_subreddit);
                 destinationText.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
 
-                subredditAdapter = SubredditAdapter.newAutoCompleteInstance(getActivity());
+                subredditAdapter = AccountSubredditAdapter.newAutoCompleteInstance(getActivity());
                 destinationText.setAdapter(subredditAdapter);
                 destinationText.setOnItemClickListener(this);
                 break;
