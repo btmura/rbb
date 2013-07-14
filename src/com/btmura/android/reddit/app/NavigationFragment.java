@@ -88,10 +88,7 @@ public class NavigationFragment extends ListFragment
         super.onCreate(savedInstanceState);
         accountAdapter = new NavigationAdapter(getActivity());
         subredditAdapter = AccountSubredditAdapter.newAccountInstance(getActivity());
-
-        mergeAdapter = new MergeAdapter(2);
-        mergeAdapter.add(accountAdapter);
-        mergeAdapter.add(subredditAdapter);
+        mergeAdapter = new MergeAdapter(accountAdapter, subredditAdapter);
     }
 
     @Override

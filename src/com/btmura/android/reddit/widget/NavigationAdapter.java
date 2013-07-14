@@ -82,6 +82,8 @@ public class NavigationAdapter extends BaseAdapter {
                 addItem(Item.TYPE_ACCOUNT_NAME, result.accountNames[i], text2, text3, value);
             }
         }
+        addItem(Item.TYPE_CATEGORY, context.getString(R.string.subreddits_category),
+                null, null, 0);
         notifyDataSetChanged();
     }
 

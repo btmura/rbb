@@ -16,8 +16,6 @@
 
 package com.btmura.android.reddit.widget;
 
-import java.util.ArrayList;
-
 import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,33 +25,21 @@ import android.widget.ListAdapter;
 public class MergeAdapter extends BaseAdapter {
 
     private final AdapterObserver observer = new AdapterObserver();
-    private final ArrayList<ListAdapter> adapters;
+    private final ListAdapter[] adapters;
 
-    public MergeAdapter(int capacity) {
-        this.adapters = new ArrayList<ListAdapter>(capacity);
-    }
-
-    public void clear() {
-        int adapterCount = adapters.size();
-        for (int i = 0; i < adapterCount; i++) {
-            adapters.get(i).unregisterDataSetObserver(observer);
+    public MergeAdapter(ListAdapter... adapters) {
+        this.adapters = adapters;
+        for (int i = 0; i < adapters.length; i++) {
+            adapters[i].registerDataSetObserver(observer);
         }
-        adapters.clear();
-        notifyDataSetChanged();
-    }
-
-    public void add(ListAdapter adapter) {
-        adapter.registerDataSetObserver(observer);
-        adapters.add(adapter);
-        notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
         int count = 0;
-        int adapterCount = adapters.size();
+        int adapterCount = adapters.length;
         for (int i = 0; i < adapterCount; i++) {
-            count += adapters.get(i).getCount();
+            count += adapters[i].getCount();
         }
         return count;
     }
@@ -61,9 +47,9 @@ public class MergeAdapter extends BaseAdapter {
     @Override
     public int getViewTypeCount() {
         int count = 0;
-        int adapterCount = adapters.size();
+        int adapterCount = adapters.length;
         for (int i = 0; i < adapterCount; i++) {
-            count += adapters.get(i).getViewTypeCount();
+            count += adapters[i].getViewTypeCount();
         }
         return count;
     }
@@ -75,58 +61,48 @@ public class MergeAdapter extends BaseAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        int start = 0;
-        int end = 0;
-        int adapterCount = adapters.size();
-        for (int i = 0; i < adapterCount; i++) {
-            ListAdapter adapter = adapters.get(i);
-            end = start + adapter.getCount();
-            if (position >= start && position < end) {
-                return adapter.getItemViewType(position - start);
-            }
-            start += adapter.getCount();
+        int adapterIndex = getAdapterIndex(position);
+        int adapterPosition = getAdapterPosition(position);
+
+        int viewTypeOffset = 0;
+        for (int i = 0; i < adapterIndex; i++) {
+            viewTypeOffset += adapters[i].getViewTypeCount();
         }
-        return -1;
+        return viewTypeOffset + adapters[adapterIndex].getItemViewType(adapterPosition);
     }
 
     @Override
     public Object getItem(int position) {
-        int start = 0;
-        int end = 0;
-        int adapterCount = adapters.size();
-        for (int i = 0; i < adapterCount; i++) {
-            ListAdapter adapter = adapters.get(i);
-            end = start + adapter.getCount();
-            if (position >= start && position < end) {
-                return adapter.getItem(position - start);
-            }
-            start += adapter.getCount();
-        }
-        return null;
+        int adapterIndex = getAdapterIndex(position);
+        int adapterPosition = getAdapterPosition(position);
+        return adapters[adapterIndex].getItem(adapterPosition);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        int start = 0;
-        int end = 0;
-        int adapterCount = adapters.size();
-        for (int i = 0; i < adapterCount; i++) {
-            ListAdapter adapter = adapters.get(i);
-            end = start + adapter.getCount();
-            if (position >= start && position < end) {
-                return adapter.getView(position - start, convertView, parent);
-            }
-            start += adapter.getCount();
-        }
-        return null;
+        int adapterIndex = getAdapterIndex(position);
+        int adapterPosition = getAdapterPosition(position);
+        return adapters[adapterIndex].getView(adapterPosition, convertView, parent);
+    }
+
+    @Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        int adapterIndex = getAdapterIndex(position);
+        int adapterPosition = getAdapterPosition(position);
+        return adapters[adapterIndex].isEnabled(adapterPosition);
     }
 
     public int getAdapterIndex(int position) {
         int start = 0;
         int end = 0;
-        int adapterCount = adapters.size();
+        int adapterCount = adapters.length;
         for (int i = 0; i < adapterCount; i++) {
-            ListAdapter adapter = adapters.get(i);
+            ListAdapter adapter = adapters[i];
             end = start + adapter.getCount();
             if (position >= start && position < end) {
                 return i;
@@ -139,9 +115,9 @@ public class MergeAdapter extends BaseAdapter {
     public int getAdapterPosition(int position) {
         int start = 0;
         int end = 0;
-        int adapterCount = adapters.size();
+        int adapterCount = adapters.length;
         for (int i = 0; i < adapterCount; i++) {
-            ListAdapter adapter = adapters.get(i);
+            ListAdapter adapter = adapters[i];
             end = start + adapter.getCount();
             if (position >= start && position < end) {
                 return position - start;
