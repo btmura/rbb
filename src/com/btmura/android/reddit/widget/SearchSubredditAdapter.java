@@ -36,7 +36,7 @@ public class SearchSubredditAdapter extends SubredditAdapter {
         int subscribers = cursor.getInt(SubredditSearchLoader.INDEX_SUBSCRIBERS);
         boolean over18 = cursor.getInt(SubredditSearchLoader.INDEX_OVER_18) == 1;
         SubredditView v = (SubredditView) view;
-        v.setSubredditData(name, over18, subscribers);
+        v.setData(name, over18, subscribers);
         v.setChosen(singleChoice && Objects.equalsIgnoreCase(selectedSubreddit, name));
     }
 

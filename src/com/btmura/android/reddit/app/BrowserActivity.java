@@ -21,7 +21,6 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.ContentResolver;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -41,8 +40,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
-import com.btmura.android.reddit.content.AccountLoader;
-import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
@@ -53,10 +50,6 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity
         implements OnNavigationListener, OnSubredditSelectedListener {
-
-    private static final int[] ATTRIBUTES = {
-            android.R.attr.windowBackground,
-    };
 
     /** Requested subreddit from intent data to view. */
     private String requestedSubreddit;
@@ -150,21 +143,10 @@ public class BrowserActivity extends AbstractBrowserActivity
             drawerLayout.setDrawerShadow(ThemePrefs.getDrawerShadow(this), GravityCompat.START);
             bar.setHomeButtonEnabled(true);
             bar.setDisplayHomeAsUpEnabled(true);
-
-            View view = findViewById(R.id.subreddit_list_container);
-            view.setBackgroundResource(getBackgroundResource());
         }
 
         bar.setDisplayShowTitleEnabled(false);
         getSupportLoaderManager().initLoader(1, null, mailLoaderCallbacks);
-    }
-
-    // TODO(btmura): Replace this with a proper resource instead of window background.
-    private int getBackgroundResource() {
-        TypedArray array = getTheme().obtainStyledAttributes(ATTRIBUTES);
-        int backgroundResId = array.getResourceId(0, 0);
-        array.recycle();
-        return backgroundResId;
     }
 
     @Override
@@ -181,26 +163,6 @@ public class BrowserActivity extends AbstractBrowserActivity
         if (drawerToggle != null) {
             drawerToggle.onConfigurationChanged(newConfig);
         }
-    }
-
-    @Override
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true, true);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<AccountResult> loader, AccountResult accountResult) {
-        this.accountName = accountResult.getLastAccount(this);
-        this.filter = AccountPrefs.getLastSubredditFilter(this, FilterAdapter.SUBREDDIT_HOT);
-        String subreddit = AccountPrefs.getLastSubreddit(this, accountName);
-        setAccountSubredditListNavigation(R.id.subreddit_list_container,
-                accountResult, subreddit, Subreddits.isRandom(subreddit), null);
-        checkMailIfHasAccount();
-        invalidateOptionsMenu();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
     @Override

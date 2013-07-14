@@ -31,7 +31,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
@@ -42,13 +41,11 @@ import android.view.View;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Arguments;
 import com.btmura.android.reddit.widget.ThingView;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
-        LoaderCallbacks<AccountResult>,
         OnSubredditEventListener,
         OnThingSelectedListener,
         OnThingEventListener,
@@ -99,7 +96,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             setupCommonViews();
             setupViews();
             setupActionBar(savedInstanceState);
-            getSupportLoaderManager().initLoader(0, null, this);
         }
     }
 
@@ -151,13 +147,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected abstract boolean hasSubredditList();
 
     // Methods for setting the content of the left hand subreddit pane.
-
-    protected void setAccountSubredditListNavigation(int containerId, AccountResult accountResult,
-            String subreddit, boolean isRandom, ThingBundle thingBundle) {
-        SubredditListFragment<?, ?, ?> frag = AccountSubredditListFragment.newInstance(
-                accountResult, getAccountName(), subreddit, isSingleChoice);
-        setSubredditListNavigation(frag, containerId, subreddit, isRandom, thingBundle);
-    }
 
     protected void setSearchSubredditListNavigation(int containerId, String query) {
         SubredditListFragment<?, ?, ?> frag = SearchSubredditListFragment.newInstance(
@@ -650,11 +639,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private ControlFragment getControlFragment() {
         return (ControlFragment) getSupportFragmentManager()
                 .findFragmentByTag(ControlFragment.TAG);
-    }
-
-    protected AccountSubredditListFragment getAccountSubredditListFragment() {
-        return (AccountSubredditListFragment) getSupportFragmentManager()
-                .findFragmentByTag(SubredditListFragment.TAG);
     }
 
     protected SearchSubredditListFragment getSubredditSearchFragment() {

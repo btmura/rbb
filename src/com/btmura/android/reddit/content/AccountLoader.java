@@ -28,8 +28,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -45,19 +43,7 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
 
     public static final String TAG = "AccountLoader";
 
-    public static class AccountResult implements Parcelable {
-
-        public static final Parcelable.Creator<AccountResult> CREATOR =
-                new Parcelable.Creator<AccountResult>() {
-                    @Override
-                    public AccountResult createFromParcel(Parcel in) {
-                        return new AccountResult(in);
-                    }
-
-                    public AccountResult[] newArray(int size) {
-                        return new AccountResult[size];
-                    };
-                };
+    public static class AccountResult {
 
         public String[] accountNames;
         public int[] linkKarma;
@@ -70,33 +56,6 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
             this.linkKarma = linkKarma;
             this.commentKarma = commentKarma;
             this.hasMail = hasMail;
-        }
-
-        private AccountResult(Parcel in) {
-            int length = in.readInt();
-            this.accountNames = new String[length];
-            this.linkKarma = new int[length];
-            this.commentKarma = new int[length];
-            this.hasMail = new boolean[length];
-
-            in.readStringArray(accountNames);
-            in.readIntArray(linkKarma);
-            in.readIntArray(commentKarma);
-            in.readBooleanArray(hasMail);
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeInt(accountNames.length);
-            dest.writeStringArray(accountNames);
-            dest.writeIntArray(linkKarma);
-            dest.writeIntArray(commentKarma);
-            dest.writeBooleanArray(hasMail);
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
         }
 
         public String getLastAccount(Context context) {

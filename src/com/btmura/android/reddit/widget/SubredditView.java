@@ -30,7 +30,6 @@ import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 
@@ -61,21 +60,11 @@ public class SubredditView extends CustomView {
     }
 
     /**
-     * @param accountName of the account
-     */
-    public void setAccountData(String accountName) {
-        title = Accounts.getTitle(getContext(), accountName);
-        setStatusText(false, -1);
-        SwipeDismissTouchListener.resetAnimation(this);
-        requestLayout();
-    }
-
-    /**
      * @param name of the subreddit or empty string for front page
      * @param over18 of the subreddit's content
      * @param subscribers or -1 if no subscriber info available
      */
-    public void setSubredditData(String name, boolean over18, int subscribers) {
+    public void setData(String name, boolean over18, int subscribers) {
         title = Subreddits.getTitle(getContext(), name);
         setStatusText(over18, subscribers);
         SwipeDismissTouchListener.resetAnimation(this);
