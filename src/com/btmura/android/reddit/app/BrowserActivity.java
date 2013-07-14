@@ -46,8 +46,6 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
-import com.btmura.android.reddit.util.Arguments;
-import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
@@ -192,6 +190,8 @@ public class BrowserActivity extends AbstractBrowserActivity
         this.accountName = accountName;
         this.filter = filter;
         selectSubreddit(subreddit);
+        checkMailIfHasAccount();
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -209,9 +209,7 @@ public class BrowserActivity extends AbstractBrowserActivity
 
         filterAdapter.setTitle(subreddit);
         AccountPrefs.setLastSubreddit(this, accountName, subreddit);
-
-        replaceFragment(SubredditThingListFragment.newInstance(accountName, subreddit,
-                filter, isSingleChoice));
+        setSubredditThingListNavigation(R.id.thing_list_container, subreddit, filter);
 
         // Don't change the action bar to the list until we know the correct filter or else the
         // action bar will select the first index by default.
@@ -222,85 +220,15 @@ public class BrowserActivity extends AbstractBrowserActivity
         }
     }
 
-    private void replaceFragment(ThingListFragment<?> candidate) {
-        ThingListFragment<?> current = getThingListFragment();
-        if (!Arguments.areEqual(candidate, current)) {
-            setThingListNavigation(candidate, R.id.thing_list_container);
-        }
-    }
-
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         int newFilter = filterAdapter.getFilter(itemPosition);
         if (filter != newFilter) {
             filter = newFilter;
             AccountPrefs.setLastSubredditFilter(this, filter);
-            replaceFilter(filter);
+            refreshThingListNavigation(R.id.thing_list_container, filter);
         }
         return true;
-    }
-
-    private void replaceFilter(int filter) {
-        ThingListFragment<?> current = getThingListFragment();
-        if (current != null) {
-            replaceFragment(current.withFilter(filter));
-        }
-    }
-
-    private void updateFragments() {
-        if (isSinglePane) {
-            updateFragmentsSinglePane();
-        } else {
-            updateFragmentsMultiPane();
-        }
-    }
-
-    private void updateFragmentsSinglePane() {
-        ThingListFragment<?> tlf = getThingListFragment();
-        if (tlf == null || !Objects.equals(accountName, tlf.getAccountName())) {
-            String subreddit = AccountPrefs.getLastSubreddit(this, accountName);
-            boolean isRandom = Subreddits.isRandom(subreddit);
-            selectSubreddit(subreddit, isRandom);
-        }
-    }
-
-    private void updateFragmentsMultiPane() {
-        AccountSubredditListFragment slf = getAccountSubredditListFragment();
-        ThingListFragment<?> tlf = getThingListFragment();
-
-        if (slf == null || !Objects.equals(slf.getAccountName(), accountName)) {
-            // Set the subreddit to be the account's last visited subreddit.
-            String subreddit = AccountPrefs.getLastSubreddit(this, accountName);
-
-            // Reference to thingBundle that will often be null.
-            ThingBundle thingBundle = null;
-
-            // Override the subreddit and thing to the one requested by the
-            // intent. Single pane activities have launched another activity to
-            // handle intent URIs already.
-            if (!isSinglePane && !TextUtils.isEmpty(requestedSubreddit)) {
-                subreddit = requestedSubreddit;
-                thingBundle = requestedThingBundle;
-                requestedSubreddit = null;
-                requestedThingBundle = null;
-            }
-
-            // Check name to see if this is the random subreddit. We avoid the
-            // problem where the last visited subreddit is the resolved random
-            // subreddit, because we don't save the subreddit preference when
-            // changing filters or on resolving the subreddit!
-            boolean isRandom = Subreddits.isRandom(subreddit);
-            setAccountSubredditListNavigation(R.id.subreddit_list_container, subreddit, isRandom,
-                    thingBundle);
-        } else if (tlf != null && tlf.getFilter() != filter) {
-            replaceThingListFragmentMultiPane();
-        }
-
-        // Check mail if the user is using an account.
-        checkMailIfHasAccount();
-
-        // Invalidate action bar icons when switching accounts.
-        invalidateOptionsMenu();
     }
 
     @Override

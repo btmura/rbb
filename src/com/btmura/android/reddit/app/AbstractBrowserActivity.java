@@ -42,6 +42,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.util.Arguments;
 import com.btmura.android.reddit.widget.ThingView;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
@@ -63,7 +64,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected ActionBar bar;
 
     protected boolean isSinglePane;
-    protected boolean isSingleChoice;
+    private boolean isSingleChoice;
 
     private View navContainer;
     private View subredditListContainer;
@@ -230,71 +231,91 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods for setting the content of the right hand thing list pane.
 
-    protected void setSubredditThingListNavigation(int containerId, String subreddit) {
+    protected void setSubredditThingListNavigation(int containerId, String subreddit,
+            int filter) {
         SubredditThingListFragment frag = SubredditThingListFragment.newInstance(getAccountName(),
-                subreddit, getFilter(), isSingleChoice);
-        setThingListNavigation(frag, containerId);
+                subreddit, filter, isSingleChoice);
+        setThingListNavigation(frag, containerId, subreddit, filter);
     }
 
     protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
         SearchThingListFragment frag = SearchThingListFragment.newInstance(getAccountName(),
                 subreddit, query, isSingleChoice);
-        setThingListNavigation(frag, containerId);
+        setThingListNavigation(frag, containerId, subreddit, 0);
     }
 
-    protected void setProfileThingListNavigation(int containerId, String profileUser) {
+    protected void setProfileThingListNavigation(int containerId, String profileUser,
+            int filter) {
         ProfileThingListFragment frag = ProfileThingListFragment.newInstance(getAccountName(),
-                profileUser, getFilter(), isSingleChoice);
-        setThingListNavigation(frag, containerId);
+                profileUser, filter, isSingleChoice);
+        setThingListNavigation(frag, containerId, null, filter);
     }
 
-    protected void setMessageThingListNavigation(int containerId, String messageUser) {
+    protected void setMessageThingListNavigation(int containerId, String messageUser,
+            int filter) {
         MessageThingListFragment frag = MessageThingListFragment.newInstance(getAccountName(),
-                messageUser, getFilter(), isSingleChoice);
-        setThingListNavigation(frag, containerId);
+                messageUser, filter, isSingleChoice);
+        setThingListNavigation(frag, containerId, null, filter);
     }
 
-    protected void setThingListNavigation(ThingListFragment<?> frag, int containerId) {
+    protected void refreshThingListNavigation(int containerId, int filter) {
+        ThingListFragment<?> current = getThingListFragment();
+        if (current != null) {
+            ControlFragment cf = getControlFragment();
+            setThingListNavigation(current.withFilter(filter), containerId,
+                    cf.getSubreddit(), filter);
+        }
+    }
+
+    private void setThingListNavigation(ThingListFragment<?> candidate, int containerId,
+            String subreddit, int filter) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "setThingListNavigation");
+        }
         if (isSinglePane) {
-            setThingListNavigationSinglePane(frag, containerId);
+            setThingListNavigationSinglePane(candidate, containerId, subreddit, filter);
         } else {
-            setThingListNavigationMultiPane(frag, containerId);
+            setThingListNavigationMultiPane(candidate, containerId, subreddit, filter);
         }
     }
 
-    private void setThingListNavigationSinglePane(ThingListFragment<?> frag, int containerId) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "setThingListNavigationSinglePane");
+    private void setThingListNavigationSinglePane(ThingListFragment<?> candidate,
+            int containerId, String subreddit, int filter) {
+        ThingListFragment<?> current = getThingListFragment();
+        if (!Arguments.areEqual(current, candidate)) {
+            String accountName = getAccountName();
+
+            Fragment cf = ControlFragment.newInstance(accountName, subreddit,
+                    Subreddits.isRandom(subreddit), null, filter);
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(cf, ControlFragment.TAG);
+            ft.replace(containerId, candidate, ThingListFragment.TAG);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                    | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+            ft.commitAllowingStateLoss();
         }
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(containerId, frag, ThingListFragment.TAG);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
-                | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-        ft.commitAllowingStateLoss();
     }
 
-    private void setThingListNavigationMultiPane(ThingListFragment<?> frag, int containerId) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "setThingListNavigationMultiPane");
-        }
-
+    private void setThingListNavigationMultiPane(ThingListFragment<?> candidate,
+            int containerId, String subreddit, int filter) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
-        String subreddit = frag.getSubreddit();
-        int filter = getFilter();
-        Fragment cf = ControlFragment.newInstance(accountName, subreddit, false, null, filter);
+
+        Fragment cf = ControlFragment.newInstance(accountName, subreddit,
+                Subreddits.isRandom(subreddit), null, filter);
         Fragment sf = getSubredditListFragment();
-        Fragment mf = getThingFragment();
+        Fragment tf = getThingFragment();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, ControlFragment.TAG);
         if (sf != null) {
             ft.remove(sf);
         }
-        ft.replace(containerId, frag, ThingListFragment.TAG);
-        if (mf != null) {
-            ft.remove(mf);
+        ft.replace(containerId, candidate, ThingListFragment.TAG);
+        if (tf != null) {
+            ft.remove(tf);
         }
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
