@@ -16,8 +16,12 @@
 
 package com.btmura.android.reddit.database;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 
 /**
  * Database table for information returned by the /api/me.
@@ -42,6 +46,12 @@ public class Accounts implements BaseColumns {
     public static final String COLUMN_HAS_MAIL = "hasMail";
 
     public static final String SELECT_BY_ACCOUNT = SharedColumns.SELECT_BY_ACCOUNT;
+
+    public static String getTitle(Context context, String accountName) {
+        return !AccountUtils.isAccount(accountName)
+                ? context.getString(R.string.account_app_storage)
+                : accountName;
+    }
 
     static void createTable(SQLiteDatabase db) {
         // Account is a unique column.

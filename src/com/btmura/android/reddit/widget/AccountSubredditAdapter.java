@@ -27,6 +27,7 @@ import android.widget.FilterQueryProvider;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.util.Array;
@@ -35,7 +36,15 @@ import com.btmura.android.reddit.util.Objects;
 /** {@link SubredditAdapter} that lists a user's subreddits. */
 public class AccountSubredditAdapter extends SubredditAdapter {
 
-    private static final String[] PROJECTION = {
+    private static final String[] ACCOUNT_PROJECTION = {
+            Accounts._ID,
+            Accounts.COLUMN_ACCOUNT,
+            Accounts.COLUMN_LINK_KARMA,
+            Accounts.COLUMN_COMMENT_KARMA,
+            Accounts.COLUMN_HAS_MAIL,
+    };
+
+    private static final String[] SUBREDDIT_PROJECTION = {
             Subreddits._ID,
             Subreddits.COLUMN_NAME
     };
@@ -43,12 +52,15 @@ public class AccountSubredditAdapter extends SubredditAdapter {
     private static final int INDEX_ID = 0;
     private static final int INDEX_NAME = 1;
 
-    private static final MatrixCursor PRESETS_CURSOR = new MatrixCursor(PROJECTION, 3);
+    private static final int ID_ACCOUNT = -1;
+    private static final int ID_PRESET = -2;
+
+    private static final MatrixCursor PRESETS_CURSOR = new MatrixCursor(SUBREDDIT_PROJECTION, 3);
     static {
         // Use negative IDs for presets. See isDeletable.
-        PRESETS_CURSOR.newRow().add(-1).add(Subreddits.NAME_FRONT_PAGE);
-        PRESETS_CURSOR.newRow().add(-2).add(Subreddits.NAME_ALL);
-        PRESETS_CURSOR.newRow().add(-3).add(Subreddits.NAME_RANDOM);
+        PRESETS_CURSOR.newRow().add(ID_PRESET).add(Subreddits.NAME_FRONT_PAGE);
+        PRESETS_CURSOR.newRow().add(ID_PRESET).add(Subreddits.NAME_ALL);
+        PRESETS_CURSOR.newRow().add(ID_PRESET).add(Subreddits.NAME_RANDOM);
     }
 
     private final MatrixCursor accountCursor;
@@ -61,6 +73,7 @@ public class AccountSubredditAdapter extends SubredditAdapter {
         return new AccountSubredditAdapter(context, false, true, null, false);
     }
 
+    /** Creates an adapter that displays accounts and the selected account's subreddits. */
     public static AccountSubredditAdapter newAccountInstance(Context context,
             AccountResult accountResult, boolean singleChoice) {
         return new AccountSubredditAdapter(context, true, false, accountResult, singleChoice);
@@ -84,10 +97,14 @@ public class AccountSubredditAdapter extends SubredditAdapter {
 
     private MatrixCursor createAccountCursor(AccountResult result) {
         if (result != null && result.accountNames.length > 1) {
-            MatrixCursor cursor = new MatrixCursor(PROJECTION, 3);
             int count = result.accountNames.length;
+            MatrixCursor cursor = new MatrixCursor(ACCOUNT_PROJECTION, count);
             for (int i = 0; i < count; i++) {
-                cursor.newRow().add(-4 - i).add(result.accountNames[i]);
+                cursor.newRow().add(ID_ACCOUNT)
+                        .add(result.accountNames[i])
+                        .add(result.linkKarma[i])
+                        .add(result.commentKarma[i])
+                        .add(result.hasMail[i]);
             }
             return cursor;
         }
@@ -111,10 +128,16 @@ public class AccountSubredditAdapter extends SubredditAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        String name = cursor.getString(INDEX_NAME);
         SubredditView v = (SubredditView) view;
-        v.setData(name, false, -1);
-        v.setChosen(singleChoice && Objects.equalsIgnoreCase(selectedSubreddit, name));
+        long id = cursor.getLong(INDEX_ID);
+        String name = cursor.getString(INDEX_NAME);
+        if (id == ID_ACCOUNT) {
+            v.setAccountData(name);
+            v.setChosen(false);
+        } else {
+            v.setSubredditData(name, false, -1);
+            v.setChosen(singleChoice && Objects.equalsIgnoreCase(selectedSubreddit, name));
+        }
     }
 
     @Override
@@ -132,7 +155,7 @@ public class AccountSubredditAdapter extends SubredditAdapter {
         if (AccountUtils.isAccount(accountName) && !TextUtils.isEmpty(constraint)) {
             String namePattern = new StringBuilder(constraint).append("%").toString();
             ContentResolver cr = context.getApplicationContext().getContentResolver();
-            return cr.query(SubredditProvider.SUBREDDITS_URI, PROJECTION,
+            return cr.query(SubredditProvider.SUBREDDITS_URI, SUBREDDIT_PROJECTION,
                     Subreddits.SELECT_NOT_DELETED_BY_ACCOUNT_AND_LIKE_NAME,
                     Array.of(accountName, namePattern),
                     Subreddits.SORT_BY_NAME);

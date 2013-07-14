@@ -24,11 +24,13 @@ import android.text.BoringLayout;
 import android.text.Layout.Alignment;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 
@@ -59,11 +61,21 @@ public class SubredditView extends CustomView {
     }
 
     /**
+     * @param accountName of the account
+     */
+    public void setAccountData(String accountName) {
+        title = Accounts.getTitle(getContext(), accountName);
+        setStatusText(false, -1);
+        SwipeDismissTouchListener.resetAnimation(this);
+        requestLayout();
+    }
+
+    /**
      * @param name of the subreddit or empty string for front page
      * @param over18 of the subreddit's content
      * @param subscribers or -1 if no subscriber info available
      */
-    public void setData(String name, boolean over18, int subscribers) {
+    public void setSubredditData(String name, boolean over18, int subscribers) {
         title = Subreddits.getTitle(getContext(), name);
         setStatusText(over18, subscribers);
         SwipeDismissTouchListener.resetAnimation(this);
@@ -89,6 +101,11 @@ public class SubredditView extends CustomView {
             }
 
             statusText.append(r.getQuantityString(R.plurals.subscribers, subscribers, subscribers));
+        } else {
+            if (statusText != null) {
+                statusText.clear();
+                statusText.clearSpans();
+            }
         }
     }
 
@@ -136,7 +153,7 @@ public class SubredditView extends CustomView {
     protected void onDraw(Canvas c) {
         c.translate(PADDING, PADDING);
         titleLayout.draw(c);
-        if (statusText != null) {
+        if (!TextUtils.isEmpty(statusText)) {
             c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
             statusLayout.draw(c);
         }
