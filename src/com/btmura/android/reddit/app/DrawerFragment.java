@@ -88,6 +88,7 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
         View view = inflater.inflate(R.layout.drawer, container, false);
         view.setBackgroundResource(getBackgroundResource());
         accountList = (ListView) view.findViewById(R.id.account_list);
+        accountList.setAdapter(adapter);
         accountList.setOnItemClickListener(this);
         return view;
     }
@@ -115,11 +116,22 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult accountResult) {
         this.accountResult = accountResult;
         this.accountName = accountResult.getLastAccount(getActivity());
-        updateAdapter();
+        updateDrawer();
+    }
 
-        String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
-        int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
-                FilterAdapter.SUBREDDIT_HOT);
+    private void updateDrawer() {
+        adapter.clear();
+        addAccountNames(accountResult);
+        if (AccountUtils.isAccount(accountName)) {
+            addAccountPlaces();
+        }
+
+        Context context = getActivity();
+        adapter.addItem(Item.newCategory(context, R.string.subreddits_category));
+
+        AccountPrefs.setLastAccount(context, accountName);
+        String subreddit = AccountPrefs.getLastSubreddit(context, accountName);
+        int filter = AccountPrefs.getLastSubredditFilter(context, FilterAdapter.SUBREDDIT_HOT);
 
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.replace(R.id.subreddit_list_container,
@@ -128,14 +140,6 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
 
         if (listener != null) {
             listener.onDrawerAccountSelected(accountName, subreddit, filter);
-        }
-    }
-
-    private void updateAdapter() {
-        adapter.clear();
-        addAccountNames(accountResult);
-        if (AccountUtils.isAccount(accountName)) {
-            addAccountPlaces();
         }
     }
 
@@ -180,5 +184,7 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
 
     @Override
     public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
+        accountName = adapter.getItem(position).getAccountName();
+        updateDrawer();
     }
 }
