@@ -21,6 +21,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.ContentResolver;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -39,8 +40,9 @@ import android.view.View;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.app.DrawerFragment.OnDrawerEventListener;
 import com.btmura.android.reddit.app.SubredditListFragment.OnSubredditSelectedListener;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
@@ -50,7 +52,11 @@ import com.btmura.android.reddit.widget.AccountAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity
-        implements OnNavigationListener, OnDrawerEventListener, OnSubredditSelectedListener {
+        implements OnNavigationListener, OnSubredditSelectedListener {
+
+    private static final int[] ATTRIBUTES = {
+            android.R.attr.windowBackground,
+    };
 
     /** Requested subreddit from intent data to view. */
     private String requestedSubreddit;
@@ -144,10 +150,21 @@ public class BrowserActivity extends AbstractBrowserActivity
             drawerLayout.setDrawerShadow(ThemePrefs.getDrawerShadow(this), GravityCompat.START);
             bar.setHomeButtonEnabled(true);
             bar.setDisplayHomeAsUpEnabled(true);
+
+            View view = findViewById(R.id.subreddit_list_container);
+            view.setBackgroundResource(getBackgroundResource());
         }
 
         bar.setDisplayShowTitleEnabled(false);
         getSupportLoaderManager().initLoader(1, null, mailLoaderCallbacks);
+    }
+
+    // TODO(btmura): Replace this with a proper resource instead of window background.
+    private int getBackgroundResource() {
+        TypedArray array = getTheme().obtainStyledAttributes(ATTRIBUTES);
+        int backgroundResId = array.getResourceId(0, 0);
+        array.recycle();
+        return backgroundResId;
     }
 
     @Override
@@ -167,36 +184,28 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     @Override
-    public String getAccountName() {
-        return accountName;
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(this, true, true);
     }
 
     @Override
-    protected int getFilter() {
-        return filter;
-    }
-
-    @Override
-    protected boolean hasSubredditList() {
-        return hasSubredditList;
-    }
-
-    @Override
-    protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
-    }
-
-    @Override
-    public void onDrawerAccountSelected(String accountName, String subreddit, int filter) {
-        this.accountName = accountName;
-        this.filter = filter;
-        selectSubreddit(subreddit);
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult accountResult) {
+        this.accountName = accountResult.getLastAccount(this);
+        this.filter = AccountPrefs.getLastSubredditFilter(this, FilterAdapter.SUBREDDIT_HOT);
+        String subreddit = AccountPrefs.getLastSubreddit(this, accountName);
+        setAccountSubredditListNavigation(R.id.subreddit_list_container,
+                subreddit, Subreddits.isRandom(subreddit), null);
         checkMailIfHasAccount();
         invalidateOptionsMenu();
     }
 
     @Override
+    public void onLoaderReset(Loader<AccountResult> loader) {
+    }
+
+    @Override
     public void onInitialSubredditSelected(String subreddit, boolean error) {
-        // We will always know the initial subreddit to select, so we don't need to react to this.
+        selectSubreddit(subreddit);
     }
 
     @Override
@@ -206,18 +215,8 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     private void selectSubreddit(String subreddit) {
         drawerLayout.closeDrawers();
-
-        filterAdapter.setTitle(Subreddits.getTitle(this, subreddit));
         AccountPrefs.setLastSubreddit(this, accountName, subreddit);
         setSubredditThingListNavigation(R.id.thing_list_container, subreddit, filter);
-
-        // Don't change the action bar to the list until we know the correct filter or else the
-        // action bar will select the first index by default.
-        if (bar.getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST) {
-            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-            bar.setListNavigationCallbacks(filterAdapter, this);
-            bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
-        }
     }
 
     @Override
@@ -229,6 +228,18 @@ public class BrowserActivity extends AbstractBrowserActivity
             refreshThingListNavigation(R.id.thing_list_container, filter);
         }
         return true;
+    }
+
+    @Override
+    protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
+        filterAdapter.setTitle(Subreddits.getTitle(this, subreddit));
+        // Don't change the action bar to the list until we know the correct filter or else the
+        // action bar will select the first index by default.
+        if (bar.getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST) {
+            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            bar.setListNavigationCallbacks(filterAdapter, this);
+            bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
+        }
     }
 
     @Override
@@ -247,6 +258,21 @@ public class BrowserActivity extends AbstractBrowserActivity
                 }
             });
         }
+    }
+
+    @Override
+    public String getAccountName() {
+        return accountName;
+    }
+
+    @Override
+    protected int getFilter() {
+        return filter;
+    }
+
+    @Override
+    protected boolean hasSubredditList() {
+        return hasSubredditList;
     }
 
     @Override

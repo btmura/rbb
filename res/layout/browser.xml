@@ -28,9 +28,8 @@
 
     <!-- Navigation drawer -->
 
-    <fragment
-        android:id="@+id/drawer"
-        android:name="com.btmura.android.reddit.app.DrawerFragment"
+    <FrameLayout
+        android:id="@+id/subreddit_list_container"
         android:layout_width="@dimen/drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start" />

@@ -31,6 +31,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
@@ -41,11 +42,13 @@ import android.view.View;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Arguments;
 import com.btmura.android.reddit.widget.ThingView;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
+        LoaderCallbacks<AccountResult>,
         OnSubredditEventListener,
         OnThingSelectedListener,
         OnThingEventListener,
@@ -96,6 +99,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             setupCommonViews();
             setupViews();
             setupActionBar(savedInstanceState);
+            getSupportLoaderManager().initLoader(0, null, this);
         }
     }
 
@@ -226,7 +230,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshActionBar(subreddit, thingBundle);
         refreshThingBodyWidthMeasurement();
         refreshViews(thingBundle);
-        refreshThingPager(thingBundle, -1);
     }
 
     // Methods for setting the content of the right hand thing list pane.
@@ -294,6 +297,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                     | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
             ft.commitAllowingStateLoss();
+
+            refreshActionBar(subreddit, null);
         }
     }
 
@@ -447,8 +452,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.replace(R.id.thing_container, tf, ThingFragment.TAG);
         ft.addToBackStack(null);
         ft.commit();
-
-        refreshThingPager(thingBundle, pageType);
     }
 
     @Override
@@ -496,15 +499,16 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if (!isSinglePane && savedInstanceState != null) {
+        if (savedInstanceState != null) {
             ControlFragment cf = getControlFragment();
             if (cf != null) {
                 String subreddit = cf.getSubreddit();
                 ThingBundle thingBundle = cf.getThingBundle();
-                refreshThingPager(thingBundle, -1);
                 refreshActionBar(subreddit, thingBundle);
-                refreshViews(thingBundle);
-                refreshCheckedItems();
+                if (!isSinglePane) {
+                    refreshViews(thingBundle);
+                    refreshCheckedItems();
+                }
             }
         }
     }
@@ -551,16 +555,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 }
                 thingContainer.setVisibility(nextThingVisibility);
             }
-            if (!hasThing) {
-                // Avoid nested executePendingTransactions that would occur by
-                // doing popBackStack. This is a hack to get around stale
-                // adapter issues with the ViewPager after orientation changes.
-                thingContainer.post(new Runnable() {
-                    public void run() {
-                        refreshThingPager(null, -1);
-                    }
-                });
-            }
         }
     }
 
@@ -583,9 +577,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 tf.setSelectedThing(null, null);
             }
         }
-    }
-
-    private void refreshThingPager(ThingBundle thingBundle, int pageType) {
     }
 
     protected void refreshSubredditListVisibility() {
@@ -743,7 +734,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 navContainer.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingContainer.setLayerType(View.LAYER_TYPE_NONE, null);
                 thingContainer.setVisibility(View.GONE);
-                refreshThingPager(null, -1);
             }
         });
         return as;

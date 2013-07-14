@@ -85,7 +85,7 @@ abstract class SubredditListFragment<C extends SubredditListController<A>, AC ex
             } else if (cursor.getCount() == 0) {
                 listener.onInitialSubredditSelected(null, false);
             } else {
-                listener.onInitialSubredditSelected(getSubreddit(0), false);
+                listener.onInitialSubredditSelected(controller.getSelectedSubreddit(), false);
             }
         }
     }
