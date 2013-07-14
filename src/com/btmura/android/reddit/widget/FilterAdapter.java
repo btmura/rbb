@@ -30,6 +30,7 @@ public class FilterAdapter extends BaseFilterAdapter {
 
     private final LayoutInflater inflater;
     private final ArrayList<String> names = new ArrayList<String>(7);
+    private final ArrayList<Integer> values = new ArrayList<Integer>(7);
     private CharSequence title;
 
     public FilterAdapter(Context context) {
@@ -39,15 +40,27 @@ public class FilterAdapter extends BaseFilterAdapter {
     @Override
     protected void clear() {
         names.clear();
+        values.clear();
     }
 
     @Override
     protected void add(Context context, int resId, int value) {
         names.add(context.getString(resId));
+        values.add(value);
+    }
+
+    public int findFilter(int filter) {
+        int count = values.size();
+        for (int i = 0; i < count; i++) {
+            if (values.get(i) == filter) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public int getFilter(int position) {
-        return position;
+        return values.get(position);
     }
 
     public int getCount() {

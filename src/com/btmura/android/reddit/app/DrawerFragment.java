@@ -39,6 +39,7 @@ import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.widget.DrawerAdapter;
 import com.btmura.android.reddit.widget.DrawerAdapter.Item;
+import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountResult>,
         OnItemClickListener {
@@ -53,7 +54,7 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
 
     public interface OnDrawerEventListener {
 
-        void onDrawerAccountSelected(String accountName, String subreddit);
+        void onDrawerAccountSelected(String accountName, String subreddit, int filter);
     }
 
     private OnDrawerEventListener listener;
@@ -117,14 +118,16 @@ public class DrawerFragment extends Fragment implements LoaderCallbacks<AccountR
         updateAdapter();
 
         String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
-        Fragment frag = AccountSubredditListFragment.newInstance(accountName, subreddit, true);
+        int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
+                FilterAdapter.SUBREDDIT_HOT);
 
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-        ft.replace(R.id.subreddit_list_container, frag);
+        ft.replace(R.id.subreddit_list_container,
+                AccountSubredditListFragment.newInstance(accountName, subreddit, true));
         ft.commit();
 
         if (listener != null) {
-            listener.onDrawerAccountSelected(accountName, subreddit);
+            listener.onDrawerAccountSelected(accountName, subreddit, filter);
         }
     }
 

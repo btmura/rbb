@@ -149,8 +149,6 @@ public class BrowserActivity extends AbstractBrowserActivity
         }
 
         bar.setDisplayShowTitleEnabled(false);
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        bar.setListNavigationCallbacks(filterAdapter, this);
         getSupportLoaderManager().initLoader(1, null, mailLoaderCallbacks);
     }
 
@@ -190,13 +188,15 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     @Override
-    public void onDrawerAccountSelected(String accountName, String subreddit) {
+    public void onDrawerAccountSelected(String accountName, String subreddit, int filter) {
         this.accountName = accountName;
+        this.filter = filter;
         selectSubreddit(subreddit);
     }
 
     @Override
     public void onInitialSubredditSelected(String subreddit, boolean error) {
+        // We will always know the initial subreddit to select, so we don't need to react to this.
     }
 
     @Override
@@ -206,10 +206,20 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     private void selectSubreddit(String subreddit) {
         drawerLayout.closeDrawers();
+
         filterAdapter.setTitle(subreddit);
         AccountPrefs.setLastSubreddit(this, accountName, subreddit);
+
         replaceFragment(SubredditThingListFragment.newInstance(accountName, subreddit,
                 filter, isSingleChoice));
+
+        // Don't change the action bar to the list until we know the correct filter or else the
+        // action bar will select the first index by default.
+        if (bar.getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST) {
+            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            bar.setListNavigationCallbacks(filterAdapter, this);
+            bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
+        }
     }
 
     private void replaceFragment(ThingListFragment<?> candidate) {
@@ -221,9 +231,12 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        filter = filterAdapter.getFilter(itemPosition);
-        AccountPrefs.setLastSubredditFilter(this, itemPosition);
-        replaceFilter(filter);
+        int newFilter = filterAdapter.getFilter(itemPosition);
+        if (filter != newFilter) {
+            filter = newFilter;
+            AccountPrefs.setLastSubredditFilter(this, filter);
+            replaceFilter(filter);
+        }
         return true;
     }
 
