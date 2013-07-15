@@ -223,51 +223,48 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods for setting the content of the right hand thing list pane.
 
-    protected void setSubredditThingListNavigation(int containerId, String accountName,
-            String subreddit, int filter) {
-        SubredditThingListFragment frag = SubredditThingListFragment.newInstance(accountName,
-                subreddit, filter, isSingleChoice);
-        setThingListNavigation(frag, containerId, accountName, subreddit, filter);
+    protected void setSubredditThingListNavigation(int containerId, String subreddit) {
+        SubredditThingListFragment frag = SubredditThingListFragment.newInstance(getAccountName(),
+                subreddit, getFilter(), isSingleChoice);
+        setThingListNavigation(frag, containerId, subreddit);
     }
 
-    protected void setProfileThingListNavigation(int containerId, String accountName,
-            String profileUser, int filter) {
-        ProfileThingListFragment frag = ProfileThingListFragment.newInstance(accountName,
-                profileUser, filter, isSingleChoice);
-        setThingListNavigation(frag, containerId, accountName, null, filter);
+    protected void setProfileThingListNavigation(int containerId, String profileUser) {
+        ProfileThingListFragment frag = ProfileThingListFragment.newInstance(getAccountName(),
+                profileUser, getFilter(), isSingleChoice);
+        setThingListNavigation(frag, containerId, null);
     }
 
-    protected void setMessageThingListNavigation(int containerId, String accountName,
-            String messageUser, int filter) {
-        MessageThingListFragment frag = MessageThingListFragment.newInstance(accountName,
-                messageUser, filter, isSingleChoice);
-        setThingListNavigation(frag, containerId, accountName, null, filter);
+    protected void setMessageThingListNavigation(int containerId, String messageUser) {
+        MessageThingListFragment frag = MessageThingListFragment.newInstance(getAccountName(),
+                messageUser, getFilter(), isSingleChoice);
+        setThingListNavigation(frag, containerId, null);
     }
 
-    protected void setSearchThingListNavigation(int containerId, String accountName,
-            String subreddit, String query) {
-        SearchThingListFragment frag = SearchThingListFragment.newInstance(accountName,
+    protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
+        SearchThingListFragment frag = SearchThingListFragment.newInstance(getAccountName(),
                 subreddit, query, isSingleChoice);
-        setThingListNavigation(frag, containerId, accountName, subreddit, 0);
+        setThingListNavigation(frag, containerId, subreddit);
     }
 
     private void setThingListNavigation(ThingListFragment<?> candidate, int containerId,
-            String accountName, String subreddit, int filter) {
+            String subreddit) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "setThingListNavigation");
         }
         if (isSinglePane) {
-            setThingListNavigationSinglePane(candidate, containerId, accountName, subreddit,
-                    filter);
+            setThingListNavigationSinglePane(candidate, containerId, subreddit);
         } else {
-            setThingListNavigationMultiPane(candidate, containerId, subreddit, filter);
+            setThingListNavigationMultiPane(candidate, containerId, subreddit);
         }
     }
 
     private void setThingListNavigationSinglePane(ThingListFragment<?> candidate,
-            int containerId, String accountName, String subreddit, int filter) {
+            int containerId, String subreddit) {
         ThingListFragment<?> current = getThingListFragment();
         if (!Arguments.areEqual(current, candidate)) {
+            String accountName = getAccountName();
+            int filter = getFilter();
             Fragment cf = ControlFragment.newInstance(accountName, subreddit,
                     Subreddits.isRandom(subreddit), null, filter);
 
@@ -282,10 +279,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void setThingListNavigationMultiPane(ThingListFragment<?> candidate,
-            int containerId, String subreddit, int filter) {
+            int containerId, String subreddit) {
         safePopBackStackImmediate();
 
         String accountName = getAccountName();
+        int filter = getFilter();
 
         Fragment cf = ControlFragment.newInstance(accountName, subreddit,
                 Subreddits.isRandom(subreddit), null, filter);

@@ -149,8 +149,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
         if (frag == null
                 || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != currentFilter) {
-            setProfileThingListNavigation(R.id.thing_list_container, accountName,
-                    currentUser, currentFilter);
+            setProfileThingListNavigation(R.id.thing_list_container, currentUser);
         }
         return true;
     }

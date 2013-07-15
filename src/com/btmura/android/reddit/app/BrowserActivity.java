@@ -171,8 +171,9 @@ public class BrowserActivity extends AbstractBrowserActivity
     @Override
     public void onSubredditSelected(String accountName, String subreddit, int filter) {
         this.accountName = accountName;
+        this.filter = filter;
         drawerLayout.closeDrawers();
-        setSubredditThingListNavigation(R.id.thing_list_container, accountName, subreddit, filter);
+        setSubredditThingListNavigation(R.id.thing_list_container, subreddit);
 
         filterAdapter.clear();
         filterAdapter.addSubredditFilters(this);
@@ -183,8 +184,9 @@ public class BrowserActivity extends AbstractBrowserActivity
     @Override
     public void onProfileSelected(String accountName, int filter) {
         this.accountName = accountName;
+        this.filter = filter;
         drawerLayout.closeDrawers();
-        setProfileThingListNavigation(R.id.thing_list_container, accountName, accountName, filter);
+        setProfileThingListNavigation(R.id.thing_list_container, accountName);
 
         filterAdapter.clear();
         filterAdapter.addProfileFilters(this, AccountUtils.isAccount(accountName));
@@ -200,8 +202,9 @@ public class BrowserActivity extends AbstractBrowserActivity
     @Override
     public void onMessagesSelected(String accountName, int filter) {
         this.accountName = accountName;
+        this.filter = filter;
         drawerLayout.closeDrawers();
-        setMessageThingListNavigation(R.id.thing_list_container, accountName, accountName, filter);
+        setMessageThingListNavigation(R.id.thing_list_container, accountName);
 
         filterAdapter.clear();
         filterAdapter.addMessageFilters(this);
