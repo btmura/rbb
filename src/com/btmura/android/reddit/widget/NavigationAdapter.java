@@ -37,7 +37,7 @@ public class NavigationAdapter extends BaseAdapter {
         static final int NUM_TYPES = 3;
         public static final int TYPE_CATEGORY = 0;
         public static final int TYPE_ACCOUNT_NAME = 1;
-        public static final int TYPE_FILTER = 2;
+        public static final int TYPE_PLACE = 2;
 
         private final int type;
         private final String text1;
@@ -82,8 +82,18 @@ public class NavigationAdapter extends BaseAdapter {
                 addItem(Item.TYPE_ACCOUNT_NAME, result.accountNames[i], text2, text3, value);
             }
         }
-        addItem(Item.TYPE_CATEGORY, context.getString(R.string.subreddits_category),
-                null, null, 0);
+        notifyDataSetChanged();
+    }
+
+    public void setAccountPlaces(String accountName) {
+        items.clear();
+        if (AccountUtils.isAccount(accountName)) {
+            addCategory(R.string.place_category);
+            addPlace(R.string.place_profile, ThemePrefs.getProfileIcon(context));
+            addPlace(R.string.place_saved, ThemePrefs.getSavedIcon(context));
+            addPlace(R.string.place_messages, ThemePrefs.getMessagesIcon(context));
+        }
+        addCategory(R.string.subreddits_category);
         notifyDataSetChanged();
     }
 
@@ -92,6 +102,14 @@ public class NavigationAdapter extends BaseAdapter {
             return context.getString(R.string.karma_count, karmaCounts[index]);
         }
         return null;
+    }
+
+    private void addCategory(int textResId) {
+        addItem(Item.TYPE_CATEGORY, context.getString(textResId), null, null, 0);
+    }
+
+    private void addPlace(int textResId, int iconResId) {
+        addItem(Item.TYPE_PLACE, context.getString(textResId), null, null, iconResId);
     }
 
     private void addItem(int type, String text1, String text2, String text3, int value) {
@@ -171,6 +189,7 @@ public class NavigationAdapter extends BaseAdapter {
             case Item.TYPE_ACCOUNT_NAME:
                 vh.accountFilter.setText(getTitle(item.text1, true));
                 vh.accountFilter.setVisibility(View.VISIBLE);
+                vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
                 if (item.value == 1) {
                     vh.statusIcon.setImageResource(ThemePrefs.getMessagesIcon(view.getContext()));
@@ -185,9 +204,10 @@ public class NavigationAdapter extends BaseAdapter {
                 vh.category.setVisibility(View.GONE);
                 break;
 
-            case Item.TYPE_FILTER:
+            case Item.TYPE_PLACE:
                 vh.accountFilter.setText(item.text1);
                 vh.accountFilter.setVisibility(View.VISIBLE);
+                vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(item.value, 0, 0, 0);
                 vh.statusIcon.setVisibility(View.GONE);
                 vh.karmaCounts.setVisibility(View.GONE);
                 vh.category.setVisibility(View.GONE);
@@ -195,6 +215,7 @@ public class NavigationAdapter extends BaseAdapter {
 
             case Item.TYPE_CATEGORY:
                 vh.accountFilter.setVisibility(View.GONE);
+                vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                 vh.statusIcon.setVisibility(View.GONE);
                 vh.karmaCounts.setVisibility(View.GONE);
                 vh.category.setText(item.text1);

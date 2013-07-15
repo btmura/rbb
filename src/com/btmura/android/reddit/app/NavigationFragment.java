@@ -49,7 +49,8 @@ public class NavigationFragment extends ListFragment
     };
 
     private static final int ADAPTER_ACCOUNTS = 0;
-    private static final int ADAPTER_SUBREDDITS = 1;
+    private static final int ADAPTER_PLACES = 1;
+    private static final int ADAPTER_SUBREDDITS = 2;
 
     private static final String LOADER_ARG_ACCOUNT_NAME = "accountName";
 
@@ -68,6 +69,7 @@ public class NavigationFragment extends ListFragment
 
     private OnNavigationEventListener listener;
     private NavigationAdapter accountAdapter;
+    private NavigationAdapter placesAdapter;
     private AccountSubredditAdapter subredditAdapter;
     private MergeAdapter mergeAdapter;
 
@@ -87,8 +89,9 @@ public class NavigationFragment extends ListFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountAdapter = new NavigationAdapter(getActivity());
+        placesAdapter = new NavigationAdapter(getActivity());
         subredditAdapter = AccountSubredditAdapter.newAccountInstance(getActivity());
-        mergeAdapter = new MergeAdapter(accountAdapter, subredditAdapter);
+        mergeAdapter = new MergeAdapter(accountAdapter, placesAdapter, subredditAdapter);
     }
 
     @Override
@@ -165,6 +168,7 @@ public class NavigationFragment extends ListFragment
     private void selectAccount(String accountName, boolean restartLoader) {
         this.accountName = accountName;
         AccountPrefs.setLastAccount(getActivity(), accountName);
+        placesAdapter.setAccountPlaces(accountName);
         refreshSubredditLoader(accountName, restartLoader);
 
         String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
