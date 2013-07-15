@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.BrowserActivity.OnFilterSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
@@ -139,6 +140,28 @@ public class NavigationFragment extends ListFragment
         selectAccount(accountName, LOADER_INIT);
     }
 
+    private void selectAccount(String accountName, boolean restartLoader) {
+        this.accountName = accountName;
+        AccountPrefs.setLastAccount(getActivity(), accountName);
+        placesAdapter.setAccountPlaces(accountName);
+        refreshSubredditLoader(accountName, restartLoader);
+
+        int place = AccountUtils.isAccount(accountName)
+                ? AccountPrefs.getLastPlace(getActivity(), Item.PLACE_SUBREDDIT)
+                : Item.PLACE_SUBREDDIT;
+        selectPlaceWithDefaultFilter(place);
+    }
+
+    private void refreshSubredditLoader(String accountName, boolean restartLoader) {
+        Bundle args = new Bundle(1);
+        args.putString(LOADER_ARG_ACCOUNT_NAME, accountName);
+        if (restartLoader) {
+            getLoaderManager().restartLoader(LOADER_SUBREDDITS, args, subredditLoaderCallbacks);
+        } else {
+            getLoaderManager().initLoader(LOADER_SUBREDDITS, args, subredditLoaderCallbacks);
+        }
+    }
+
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
@@ -175,88 +198,81 @@ public class NavigationFragment extends ListFragment
         Item item = placesAdapter.getItem(position);
         switch (item.getType()) {
             case Item.TYPE_PLACE:
-                selectPlace(item.getPlace());
+                selectPlaceWithDefaultFilter(item.getPlace());
+                break;
+        }
+    }
+
+    private void selectPlaceWithDefaultFilter(int place) {
+        switch (place) {
+            case Item.PLACE_PROFILE:
+                selectPlace(place, null, FilterAdapter.PROFILE_OVERVIEW);
+                break;
+
+            case Item.PLACE_SAVED:
+                selectPlace(place, null, FilterAdapter.PROFILE_SAVED);
+                break;
+
+            case Item.PLACE_MESSAGES:
+                selectPlace(place, null, FilterAdapter.MESSAGE_INBOX);
+                break;
+
+            case Item.PLACE_SUBREDDIT:
+                String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
+                int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
+                        FilterAdapter.SUBREDDIT_HOT);
+                selectPlace(Item.PLACE_SUBREDDIT, subreddit, filter);
+                break;
+        }
+    }
+
+    private void selectPlace(int place, String subreddit, int filter) {
+        this.place = place;
+        this.subreddit = subreddit;
+        this.filter = filter;
+        AccountPrefs.setLastPlace(getActivity(), place);
+        switch (place) {
+            case Item.PLACE_PROFILE:
+                subredditAdapter.setSelectedSubreddit(null);
+                if (listener != null) {
+                    listener.onProfileSelected(accountName, filter);
+                }
+                break;
+
+            case Item.PLACE_SAVED:
+                subredditAdapter.setSelectedSubreddit(null);
+                if (listener != null) {
+                    listener.onSavedSelected(accountName, filter);
+                }
+                break;
+
+            case Item.PLACE_MESSAGES:
+                subredditAdapter.setSelectedSubreddit(null);
+                if (listener != null) {
+                    listener.onMessagesSelected(accountName, filter);
+                }
+                break;
+
+            case Item.PLACE_SUBREDDIT:
+                subredditAdapter.setSelectedSubreddit(subreddit);
+                AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
+                AccountPrefs.setLastSubredditFilter(getActivity(), filter);
+                if (listener != null) {
+                    listener.onSubredditSelected(accountName, subreddit, filter);
+                }
                 break;
         }
     }
 
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
-        selectSubreddit(subreddit, filter);
-    }
-
-    private void selectAccount(String accountName, boolean restartLoader) {
-        this.accountName = accountName;
-        AccountPrefs.setLastAccount(getActivity(), accountName);
-        placesAdapter.setAccountPlaces(accountName);
-        refreshSubredditLoader(accountName, restartLoader);
-
-        int place = AccountPrefs.getLastPlace(getActivity(), Item.PLACE_SUBREDDIT);
-        switch (place) {
-            case Item.PLACE_PROFILE:
-            case Item.PLACE_SAVED:
-            case Item.PLACE_MESSAGES:
-                selectPlace(place);
-                break;
-
-            default:
-                String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
-                int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
-                        FilterAdapter.SUBREDDIT_HOT);
-                selectSubreddit(subreddit, filter);
-                break;
-        }
-    }
-
-    private void refreshSubredditLoader(String accountName, boolean restartLoader) {
-        Bundle args = new Bundle(1);
-        args.putString(LOADER_ARG_ACCOUNT_NAME, accountName);
-        if (restartLoader) {
-            getLoaderManager().restartLoader(LOADER_SUBREDDITS, args, subredditLoaderCallbacks);
-        } else {
-            getLoaderManager().initLoader(LOADER_SUBREDDITS, args, subredditLoaderCallbacks);
-        }
-    }
-
-    private void selectPlace(int place) {
-        this.place = place;
-        AccountPrefs.setLastPlace(getActivity(), place);
-        if (listener != null) {
-            switch (place) {
-                case Item.PLACE_PROFILE:
-                    listener.onProfileSelected(accountName, FilterAdapter.PROFILE_OVERVIEW);
-                    break;
-
-                case Item.PLACE_SAVED:
-                    listener.onSavedSelected(accountName, FilterAdapter.PROFILE_SAVED);
-                    break;
-
-                case Item.PLACE_MESSAGES:
-                    listener.onMessagesSelected(accountName, FilterAdapter.MESSAGE_INBOX);
-                    break;
-            }
-        }
-    }
-
-    private void selectSubreddit(String subreddit, int filter) {
-        this.place = Item.PLACE_SUBREDDIT;
-
-        this.subreddit = subreddit;
-        subredditAdapter.setSelectedSubreddit(subreddit);
-        AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
-
-        this.filter = filter;
-        AccountPrefs.setLastSubredditFilter(getActivity(), filter);
-
-        if (listener != null) {
-            listener.onSubredditSelected(accountName, subreddit, filter);
-        }
+        selectPlace(Item.PLACE_SUBREDDIT, subreddit, filter);
     }
 
     @Override
     public void onFilterSelected(int newFilter) {
-        if (place == Item.PLACE_SUBREDDIT && filter != newFilter) {
-            selectSubreddit(subreddit, newFilter);
+        if (filter != newFilter) {
+            selectPlace(place, subreddit, newFilter);
         }
     }
 

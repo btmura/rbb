@@ -277,9 +277,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                     | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
             ft.commitAllowingStateLoss();
-
-            refreshActionBar(subreddit, null);
         }
+        refreshActionBar(subreddit, null);
     }
 
     private void setThingListNavigationMultiPane(ThingListFragment<?> candidate,
