@@ -25,6 +25,9 @@ public class AccountPrefs extends Prefs {
     /** Global preference for the last selected account. */
     private static final String GLOBAL_LAST_ACCOUNT = "lastAccount";
 
+    /** Global preference for the last selected place. */
+    private static final String GLOBAL_LAST_PLACE = "lastPlace";
+
     /** Global preference for the last selected filter by any account. */
     private static final String GLOBAL_LAST_SUBREDDIT_FILTER = "lastSubredditFilter";
 
@@ -37,6 +40,14 @@ public class AccountPrefs extends Prefs {
 
     public static void setLastAccount(Context context, String accountName) {
         getPrefsInstance(context).edit().putString(GLOBAL_LAST_ACCOUNT, accountName).apply();
+    }
+
+    public static int getLastPlace(Context context, int defValue) {
+        return getPrefsInstance(context).getInt(GLOBAL_LAST_PLACE, defValue);
+    }
+
+    public static void setLastPlace(Context context, int place) {
+        getPrefsInstance(context).edit().putInt(GLOBAL_LAST_PLACE, place).apply();
     }
 
     public static int getLastSubredditFilter(Context context, int defValue) {

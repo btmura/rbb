@@ -191,10 +191,21 @@ public class NavigationFragment extends ListFragment
         placesAdapter.setAccountPlaces(accountName);
         refreshSubredditLoader(accountName, restartLoader);
 
-        String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
-        int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
-                FilterAdapter.SUBREDDIT_HOT);
-        selectSubreddit(subreddit, filter);
+        int place = AccountPrefs.getLastPlace(getActivity(), Item.PLACE_SUBREDDIT);
+        switch (place) {
+            case Item.PLACE_PROFILE:
+            case Item.PLACE_SAVED:
+            case Item.PLACE_MESSAGES:
+                selectPlace(place);
+                break;
+
+            default:
+                String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
+                int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
+                        FilterAdapter.SUBREDDIT_HOT);
+                selectSubreddit(subreddit, filter);
+                break;
+        }
     }
 
     private void refreshSubredditLoader(String accountName, boolean restartLoader) {
@@ -209,6 +220,7 @@ public class NavigationFragment extends ListFragment
 
     private void selectPlace(int place) {
         this.place = place;
+        AccountPrefs.setLastPlace(getActivity(), place);
         if (listener != null) {
             switch (place) {
                 case Item.PLACE_PROFILE:
