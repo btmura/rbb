@@ -280,28 +280,31 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void setThingListNavigationMultiPane(ThingListFragment<?> candidate,
             int containerId, String subreddit) {
-        safePopBackStackImmediate();
+        ThingListFragment<?> current = getThingListFragment();
+        if (!Arguments.areEqual(current, candidate)) {
+            safePopBackStackImmediate();
 
-        String accountName = getAccountName();
-        int filter = getFilter();
+            String accountName = getAccountName();
+            int filter = getFilter();
 
-        Fragment cf = ControlFragment.newInstance(accountName, subreddit,
-                Subreddits.isRandom(subreddit), null, filter);
-        Fragment sf = getSubredditListFragment();
-        Fragment tf = getThingFragment();
+            Fragment cf = ControlFragment.newInstance(accountName, subreddit,
+                    Subreddits.isRandom(subreddit), null, filter);
+            Fragment sf = getSubredditListFragment();
+            Fragment tf = getThingFragment();
 
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(cf, ControlFragment.TAG);
-        if (sf != null) {
-            ft.remove(sf);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(cf, ControlFragment.TAG);
+            if (sf != null) {
+                ft.remove(sf);
+            }
+            ft.replace(containerId, candidate, ThingListFragment.TAG);
+            if (tf != null) {
+                ft.remove(tf);
+            }
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                    | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+            ft.commitAllowingStateLoss();
         }
-        ft.replace(containerId, candidate, ThingListFragment.TAG);
-        if (tf != null) {
-            ft.remove(tf);
-        }
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
-                | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-        ft.commit();
 
         refreshActionBar(subreddit, null);
         refreshThingBodyWidthMeasurement();

@@ -14,54 +14,38 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_layout"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <!-- Main container -->
-
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:paddingLeft="@dimen/element_padding"
-        android:paddingRight="@dimen/element_padding" >
-
-        <FrameLayout
-            android:id="@+id/subreddit_list_container"
-            android:layout_width="@dimen/subreddit_list_width"
-            android:layout_height="match_parent"
-            android:paddingLeft="@dimen/element_padding"
-            android:paddingRight="@dimen/element_padding" />
-
-        <FrameLayout
-            android:id="@+id/thing_list_container"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingLeft="@dimen/element_padding"
-            android:paddingRight="@dimen/element_padding" />
-
-        <FrameLayout
-            android:id="@+id/thing_container"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.5"
-            android:paddingLeft="@dimen/element_padding"
-            android:paddingRight="@dimen/element_padding"
-            android:visibility="gone" />
-    </LinearLayout>
-
-    <!-- Navigation drawer -->
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/element_padding"
+    android:paddingRight="@dimen/element_padding" >
 
     <fragment
-        android:id="@+id/drawer"
-        android:name="com.btmura.android.reddit.app.DrawerFragment"
-        android:layout_width="@dimen/drawer_width"
+        android:id="@+id/subreddit_list_container"
+        android:name="com.btmura.android.reddit.app.NavigationFragment"
+        android:layout_width="@dimen/subreddit_list_width"
         android:layout_height="match_parent"
-        android:layout_gravity="start" />
+        android:paddingLeft="@dimen/element_padding"
+        android:paddingRight="@dimen/element_padding"
+        android:tag="NavigationFragment" />
 
-</android.support.v4.widget.DrawerLayout>
+    <FrameLayout
+        android:id="@+id/thing_list_container"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:paddingLeft="@dimen/element_padding"
+        android:paddingRight="@dimen/element_padding" />
+
+    <FrameLayout
+        android:id="@+id/thing_container"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1.5"
+        android:paddingLeft="@dimen/element_padding"
+        android:paddingRight="@dimen/element_padding"
+        android:visibility="gone" />
+
+</LinearLayout>
