@@ -18,8 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnCount="3"
-    android:rowCount="2" >
+    android:columnCount="4" >
 
     <TextView
         android:id="@+id/text1"
@@ -27,7 +26,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_rowSpan="2"
         android:ellipsize="end"
         android:singleLine="true"
         tools:ignore="SelectableText" />
@@ -36,35 +34,32 @@
         android:id="@+id/divider"
         android:layout_width="1dp"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/element_padding"
+        android:layout_marginBottom="@dimen/element_padding"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/element_padding"
-        android:layout_rowSpan="2"
         android:background="@android:color/darker_gray" />
 
     <TextView
         android:id="@+id/text2"
-        style="@android:style/TextAppearance.Holo.Widget.ActionBar.Subtitle"
+        style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:layout_marginRight="@dimen/element_padding"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="?android:attr/textColorPrimary"
-        android:translationY="3sp"
         tools:ignore="SelectableText" />
 
     <TextView
         android:id="@+id/text3"
-        style="@android:style/TextAppearance.Holo.Widget.ActionBar.Subtitle"
+        style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:ellipsize="end"
         android:singleLine="true"
         android:textColor="?android:attr/textColorSecondary"
-        android:translationY="-3sp"
         tools:ignore="SelectableText" />
 
 </GridLayout>

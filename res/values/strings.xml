@@ -128,6 +128,8 @@
     <string name="show_password">Show password</string>
     <string name="submit_link_submitting">Submitting…</string>
     <string name="subreddits_category">Subreddits</string>
+    <string name="subtitle_profile">profile</string>
+    <string name="subtitle_messages">messages</string>
     <string name="tab_posts">Posts</string>
     <string name="tab_subreddits">Subreddits</string>
 

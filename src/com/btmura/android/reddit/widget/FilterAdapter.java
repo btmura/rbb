@@ -19,6 +19,7 @@ package com.btmura.android.reddit.widget;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ public class FilterAdapter extends BaseFilterAdapter {
     private final ArrayList<String> names = new ArrayList<String>(7);
     private final ArrayList<Integer> values = new ArrayList<Integer>(7);
     private CharSequence title;
+    private CharSequence subtitle;;
 
     public FilterAdapter(Context context) {
         inflater = LayoutInflater.from(context);
@@ -80,9 +82,15 @@ public class FilterAdapter extends BaseFilterAdapter {
         notifyDataSetChanged();
     }
 
+    public void setSubtitle(CharSequence subtitle) {
+        this.subtitle = subtitle;
+        notifyDataSetChanged();
+    }
+
     static class ViewHolder {
         TextView text1;
         TextView text2;
+        TextView text3;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -93,7 +101,13 @@ public class FilterAdapter extends BaseFilterAdapter {
 
         ViewHolder h = (ViewHolder) v.getTag();
         h.text1.setText(title);
-        h.text2.setText(getItem(position));
+        if (!TextUtils.isEmpty(subtitle)) {
+            h.text2.setText(subtitle);
+            h.text2.setVisibility(View.VISIBLE);
+        } else {
+            h.text2.setVisibility(View.GONE);
+        }
+        h.text3.setText(getItem(position));
         return v;
     }
 
@@ -102,6 +116,7 @@ public class FilterAdapter extends BaseFilterAdapter {
         ViewHolder h = new ViewHolder();
         h.text1 = (TextView) v.findViewById(R.id.text1);
         h.text2 = (TextView) v.findViewById(R.id.text2);
+        h.text3 = (TextView) v.findViewById(R.id.text3);
         v.setTag(h);
         return v;
     }

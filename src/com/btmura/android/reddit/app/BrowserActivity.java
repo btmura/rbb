@@ -40,7 +40,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.NavigationFragment.OnNavigationEventListener;
 import com.btmura.android.reddit.content.ThemePrefs;
-import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
@@ -170,8 +169,9 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     public void onSubredditSelected(String accountName, String subreddit, int filter) {
-        updatePrereqState(accountName, filter);
+        preUpdate(accountName, filter);
         setSubredditThingListNavigation(R.id.thing_list_container, subreddit);
+        postUpdate(Subreddits.getTitle(this, subreddit));
 
         filterAdapter.clear();
         filterAdapter.addSubredditFilters(this);
@@ -179,18 +179,11 @@ public class BrowserActivity extends AbstractBrowserActivity
         bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
     }
 
-    private void updatePrereqState(String accountName, int filter) {
-        this.accountName = accountName;
-        this.filter = filter;
-        if (drawerLayout != null) {
-            drawerLayout.closeDrawers();
-        }
-    }
-
     @Override
     public void onProfileSelected(String accountName, int filter) {
-        updatePrereqState(accountName, filter);
+        preUpdate(accountName, filter);
         setProfileThingListNavigation(R.id.thing_list_container, accountName);
+        postUpdate(getString(R.string.subtitle_profile));
 
         filterAdapter.clear();
         filterAdapter.addProfileFilters(this, AccountUtils.isAccount(accountName));
@@ -205,13 +198,28 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     public void onMessagesSelected(String accountName, int filter) {
-        updatePrereqState(accountName, filter);
+        preUpdate(accountName, filter);
         setMessageThingListNavigation(R.id.thing_list_container, accountName);
+        postUpdate(getString(R.string.subtitle_messages));
 
         filterAdapter.clear();
         filterAdapter.addMessageFilters(this);
         bar.setListNavigationCallbacks(filterAdapter, this);
         bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
+    }
+
+    private void preUpdate(String accountName, int filter) {
+        this.accountName = accountName;
+        this.filter = filter;
+        if (drawerLayout != null) {
+            drawerLayout.closeDrawers();
+        }
+    }
+
+    private void postUpdate(String subtitle) {
+        String title = !TextUtils.isEmpty(accountName) ? accountName : getString(R.string.app_name);
+        filterAdapter.setTitle(title);
+        filterAdapter.setSubtitle(subtitle);
     }
 
     @Override
@@ -223,10 +231,6 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
-        String title = subreddit != null
-                ? Subreddits.getTitle(this, subreddit)
-                : Accounts.getTitle(this, accountName);
-        filterAdapter.setTitle(title);
         bar.setDisplayHomeAsUpEnabled(isSinglePane || thingBundle != null);
     }
 
