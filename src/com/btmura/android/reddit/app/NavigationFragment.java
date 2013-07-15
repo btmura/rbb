@@ -189,9 +189,12 @@ public class NavigationFragment extends ListFragment
 
     private void selectSubreddit(String subreddit, int filter) {
         this.subreddit = subreddit;
-        this.filter = filter;
+        subredditAdapter.setSelectedSubreddit(subreddit);
         AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
+
+        this.filter = filter;
         AccountPrefs.setLastSubredditFilter(getActivity(), filter);
+
         if (listener != null) {
             listener.onSubredditSelected(accountName, subreddit, filter);
         }
