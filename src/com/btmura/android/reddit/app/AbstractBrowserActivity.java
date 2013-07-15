@@ -230,24 +230,25 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         setThingListNavigation(frag, containerId, accountName, subreddit, filter);
     }
 
-    protected void setSearchThingListNavigation(int containerId, String subreddit, String query) {
-        SearchThingListFragment frag = SearchThingListFragment.newInstance(getAccountName(),
-                subreddit, query, isSingleChoice);
-        setThingListNavigation(frag, containerId, getAccountName(), subreddit, 0);
-    }
-
-    protected void setProfileThingListNavigation(int containerId, String profileUser,
-            int filter) {
-        ProfileThingListFragment frag = ProfileThingListFragment.newInstance(getAccountName(),
+    protected void setProfileThingListNavigation(int containerId, String accountName,
+            String profileUser, int filter) {
+        ProfileThingListFragment frag = ProfileThingListFragment.newInstance(accountName,
                 profileUser, filter, isSingleChoice);
-        setThingListNavigation(frag, containerId, getAccountName(), null, filter);
+        setThingListNavigation(frag, containerId, accountName, null, filter);
     }
 
-    protected void setMessageThingListNavigation(int containerId, String messageUser,
-            int filter) {
-        MessageThingListFragment frag = MessageThingListFragment.newInstance(getAccountName(),
+    protected void setMessageThingListNavigation(int containerId, String accountName,
+            String messageUser, int filter) {
+        MessageThingListFragment frag = MessageThingListFragment.newInstance(accountName,
                 messageUser, filter, isSingleChoice);
-        setThingListNavigation(frag, containerId, getAccountName(), null, filter);
+        setThingListNavigation(frag, containerId, accountName, null, filter);
+    }
+
+    protected void setSearchThingListNavigation(int containerId, String accountName,
+            String subreddit, String query) {
+        SearchThingListFragment frag = SearchThingListFragment.newInstance(accountName,
+                subreddit, query, isSingleChoice);
+        setThingListNavigation(frag, containerId, accountName, subreddit, 0);
     }
 
     private void setThingListNavigation(ThingListFragment<?> candidate, int containerId,

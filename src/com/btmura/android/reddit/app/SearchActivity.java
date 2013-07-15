@@ -188,7 +188,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     private void refreshThingList(String subreddit, String query) {
         if (isThingListDifferent(subreddit, query)) {
             int containerId = isSinglePane ? R.id.search_container : R.id.thing_list_container;
-            setSearchThingListNavigation(containerId, subreddit, query);
+            setSearchThingListNavigation(containerId, accountName, subreddit, query);
         } else {
             refreshSubredditListVisibility();
         }

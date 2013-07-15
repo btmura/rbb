@@ -62,6 +62,12 @@ public class NavigationFragment extends ListFragment
 
     public interface OnNavigationEventListener {
         void onSubredditSelected(String accountName, String subreddit, int filter);
+
+        void onProfileSelected(String accountName, int filter);
+
+        void onSavedSelected(String accountName, int filter);
+
+        void onMessagesSelected(String accountName, int filter);
     }
 
     private final AccountSubredditLoaderCallbacks subredditLoaderCallbacks =
@@ -74,6 +80,7 @@ public class NavigationFragment extends ListFragment
     private MergeAdapter mergeAdapter;
 
     private String accountName;
+    private int place;
     private String subreddit;
     private int filter;
 
@@ -145,6 +152,10 @@ public class NavigationFragment extends ListFragment
                 handleAccountClick(adapterPosition);
                 break;
 
+            case ADAPTER_PLACES:
+                handlePlaceClick(adapterPosition);
+                break;
+
             case ADAPTER_SUBREDDITS:
                 handleSubredditClick(adapterPosition);
                 break;
@@ -156,6 +167,15 @@ public class NavigationFragment extends ListFragment
         switch (item.getType()) {
             case Item.TYPE_ACCOUNT_NAME:
                 selectAccount(item.getAccountName(), LOADER_RESTART);
+                break;
+        }
+    }
+
+    private void handlePlaceClick(int position) {
+        Item item = placesAdapter.getItem(position);
+        switch (item.getType()) {
+            case Item.TYPE_PLACE:
+                selectPlace(item.getPlace());
                 break;
         }
     }
@@ -187,7 +207,28 @@ public class NavigationFragment extends ListFragment
         }
     }
 
+    private void selectPlace(int place) {
+        this.place = place;
+        if (listener != null) {
+            switch (place) {
+                case Item.PLACE_PROFILE:
+                    listener.onProfileSelected(accountName, FilterAdapter.PROFILE_OVERVIEW);
+                    break;
+
+                case Item.PLACE_SAVED:
+                    listener.onSavedSelected(accountName, FilterAdapter.PROFILE_SAVED);
+                    break;
+
+                case Item.PLACE_MESSAGES:
+                    listener.onMessagesSelected(accountName, FilterAdapter.MESSAGE_INBOX);
+                    break;
+            }
+        }
+    }
+
     private void selectSubreddit(String subreddit, int filter) {
+        this.place = Item.PLACE_SUBREDDIT;
+
         this.subreddit = subreddit;
         subredditAdapter.setSelectedSubreddit(subreddit);
         AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
@@ -202,7 +243,7 @@ public class NavigationFragment extends ListFragment
 
     @Override
     public void onFilterSelected(int newFilter) {
-        if (filter != newFilter) {
+        if (place == Item.PLACE_SUBREDDIT && filter != newFilter) {
             selectSubreddit(subreddit, newFilter);
         }
     }

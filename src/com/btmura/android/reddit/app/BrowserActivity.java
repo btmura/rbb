@@ -179,6 +179,33 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     @Override
+    public void onProfileSelected(String accountName, int filter) {
+        drawerLayout.closeDrawers();
+        setProfileThingListNavigation(R.id.thing_list_container, accountName, accountName, filter);
+
+        filterAdapter.clear();
+        filterAdapter.addProfileFilters(this, AccountUtils.isAccount(accountName));
+        bar.setListNavigationCallbacks(filterAdapter, this);
+        bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
+    }
+
+    @Override
+    public void onSavedSelected(String accountName, int filter) {
+        onProfileSelected(accountName, filter);
+    }
+
+    @Override
+    public void onMessagesSelected(String accountName, int filter) {
+        drawerLayout.closeDrawers();
+        setMessageThingListNavigation(R.id.thing_list_container, accountName, accountName, filter);
+
+        filterAdapter.clear();
+        filterAdapter.addMessageFilters(this);
+        bar.setListNavigationCallbacks(filterAdapter, this);
+        bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
+    }
+
+    @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         NavigationFragment frag = getNavigationFragment();
         frag.onFilterSelected(filterAdapter.getFilter(itemPosition));
