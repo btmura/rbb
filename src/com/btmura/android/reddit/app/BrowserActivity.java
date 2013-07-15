@@ -227,6 +227,7 @@ public class BrowserActivity extends AbstractBrowserActivity
                 ? Subreddits.getTitle(this, subreddit)
                 : Accounts.getTitle(this, accountName);
         filterAdapter.setTitle(title);
+        bar.setDisplayHomeAsUpEnabled(isSinglePane || thingBundle != null);
     }
 
     @Override
