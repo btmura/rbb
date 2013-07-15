@@ -40,6 +40,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.NavigationFragment.OnNavigationEventListener;
 import com.btmura.android.reddit.content.ThemePrefs;
+import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
@@ -172,6 +173,7 @@ public class BrowserActivity extends AbstractBrowserActivity
         drawerLayout.closeDrawers();
         setSubredditThingListNavigation(R.id.thing_list_container, accountName, subreddit, filter);
 
+        this.accountName = accountName;
         filterAdapter.clear();
         filterAdapter.addSubredditFilters(this);
         bar.setListNavigationCallbacks(filterAdapter, this);
@@ -183,6 +185,7 @@ public class BrowserActivity extends AbstractBrowserActivity
         drawerLayout.closeDrawers();
         setProfileThingListNavigation(R.id.thing_list_container, accountName, accountName, filter);
 
+        this.accountName = accountName;
         filterAdapter.clear();
         filterAdapter.addProfileFilters(this, AccountUtils.isAccount(accountName));
         bar.setListNavigationCallbacks(filterAdapter, this);
@@ -199,6 +202,7 @@ public class BrowserActivity extends AbstractBrowserActivity
         drawerLayout.closeDrawers();
         setMessageThingListNavigation(R.id.thing_list_container, accountName, accountName, filter);
 
+        this.accountName = accountName;
         filterAdapter.clear();
         filterAdapter.addMessageFilters(this);
         bar.setListNavigationCallbacks(filterAdapter, this);
@@ -214,7 +218,10 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
-        filterAdapter.setTitle(Subreddits.getTitle(this, subreddit));
+        String title = subreddit != null
+                ? Subreddits.getTitle(this, subreddit)
+                : Accounts.getTitle(this, accountName);
+        filterAdapter.setTitle(title);
     }
 
     @Override
