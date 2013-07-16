@@ -146,7 +146,16 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract boolean hasSubredditList();
 
-    // Methods for setting the content of the left hand subreddit pane.
+    // Methods for setting the content of the left hand pane.
+
+    protected void setNavigation(int containerId) {
+        NavigationFragment frag = NavigationFragment.newInstance();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(containerId, frag, NavigationFragment.TAG);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+        ft.commit();
+    }
 
     protected void setSearchSubredditListNavigation(int containerId, String query) {
         SubredditListFragment<?, ?, ?> frag = SearchSubredditListFragment.newInstance(

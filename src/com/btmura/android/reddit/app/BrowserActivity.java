@@ -149,6 +149,10 @@ public class BrowserActivity extends AbstractBrowserActivity
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         getSupportLoaderManager().initLoader(1, null, mailLoaderCallbacks);
+
+        if (savedInstanceState == null) {
+            setNavigation(R.id.subreddit_list_container);
+        }
     }
 
     @Override

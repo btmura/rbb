@@ -22,14 +22,12 @@
     android:paddingLeft="@dimen/element_padding"
     android:paddingRight="@dimen/element_padding" >
 
-    <fragment
+    <FrameLayout
         android:id="@+id/subreddit_list_container"
-        android:name="com.btmura.android.reddit.app.NavigationFragment"
         android:layout_width="@dimen/subreddit_list_width"
         android:layout_height="match_parent"
         android:paddingLeft="@dimen/element_padding"
-        android:paddingRight="@dimen/element_padding"
-        android:tag="NavigationFragment" />
+        android:paddingRight="@dimen/element_padding" />
 
     <FrameLayout
         android:id="@+id/thing_list_container"

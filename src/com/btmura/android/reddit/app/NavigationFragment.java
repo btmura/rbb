@@ -17,15 +17,12 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
-import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
@@ -46,10 +43,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         OnPlaceSelectedListener, OnFilterSelectedListener {
 
     public static final String TAG = "NavigationFragment";
-
-    private static final int[] ATTRIBUTES = {
-            android.R.attr.windowBackground,
-    };
 
     private static final int ADAPTER_ACCOUNTS = 0;
     private static final int ADAPTER_PLACES = 1;
@@ -87,6 +80,10 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     private String subreddit;
     private int filter;
 
+    public static NavigationFragment newInstance() {
+        return new NavigationFragment();
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -102,22 +99,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         placesAdapter = new AccountPlaceAdapter(getActivity(), this);
         subredditAdapter = AccountSubredditAdapter.newAccountInstance(getActivity());
         mergeAdapter = new MergeAdapter(accountAdapter, placesAdapter, subredditAdapter);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        view.setBackgroundResource(getBackgroundResource());
-        return view;
-    }
-
-    // TODO(btmura): Replace this with a proper resource instead of window background.
-    private int getBackgroundResource() {
-        TypedArray array = getActivity().getTheme().obtainStyledAttributes(ATTRIBUTES);
-        int backgroundResId = array.getResourceId(0, 0);
-        array.recycle();
-        return backgroundResId;
     }
 
     @Override
