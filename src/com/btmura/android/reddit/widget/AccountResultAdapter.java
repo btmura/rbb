@@ -31,7 +31,7 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Accounts;
 
-public class NavigationAdapter extends BaseAdapter {
+public class AccountResultAdapter extends BaseAdapter {
 
     public static class Item {
 
@@ -71,7 +71,7 @@ public class NavigationAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     private final ArrayList<Item> items = new ArrayList<Item>();
 
-    public NavigationAdapter(Context context) {
+    public AccountResultAdapter(Context context) {
         this.context = context.getApplicationContext();
         this.inflater = LayoutInflater.from(context);
     }

@@ -36,8 +36,8 @@ import com.btmura.android.reddit.widget.AccountPlaceAdapter.OnPlaceSelectedListe
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
-import com.btmura.android.reddit.widget.NavigationAdapter;
-import com.btmura.android.reddit.widget.NavigationAdapter.Item;
+import com.btmura.android.reddit.widget.AccountResultAdapter;
+import com.btmura.android.reddit.widget.AccountResultAdapter.Item;
 
 public class NavigationFragment extends ListFragment implements LoaderCallbacks<AccountResult>,
         OnPlaceSelectedListener, OnFilterSelectedListener {
@@ -70,7 +70,7 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
             new AccountSubredditLoaderCallbacks();
 
     private OnNavigationEventListener listener;
-    private NavigationAdapter accountAdapter;
+    private AccountResultAdapter accountAdapter;
     private AccountPlaceAdapter placesAdapter;
     private AccountSubredditAdapter subredditAdapter;
     private MergeAdapter mergeAdapter;
@@ -95,7 +95,7 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        accountAdapter = new NavigationAdapter(getActivity());
+        accountAdapter = new AccountResultAdapter(getActivity());
         placesAdapter = new AccountPlaceAdapter(getActivity(), this);
         subredditAdapter = AccountSubredditAdapter.newAccountInstance(getActivity());
         mergeAdapter = new MergeAdapter(accountAdapter, placesAdapter, subredditAdapter);
