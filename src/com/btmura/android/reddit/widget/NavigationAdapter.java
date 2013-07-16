@@ -27,52 +27,34 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
+import com.btmura.android.reddit.database.Accounts;
 
 public class NavigationAdapter extends BaseAdapter {
 
     public static class Item {
 
-        static final int NUM_TYPES = 3;
+        static final int NUM_TYPES = 1;
 
-        public static final int TYPE_CATEGORY = 0;
-        public static final int TYPE_ACCOUNT_NAME = 1;
-        public static final int TYPE_PLACE = 2;
-
-        public static final int PLACE_PROFILE = 0;
-        public static final int PLACE_SAVED = 1;
-        public static final int PLACE_MESSAGES = 2;
-        public static final int PLACE_SUBREDDIT = 3;
+        public static final int TYPE_ACCOUNT_NAME = 0;
 
         private final int type;
         private final String text1;
         private final String text2;
         private final String text3;
-        private final int resId;
         private final int value;
-
-        static Item newCategory(Context context, int textResId) {
-            return new Item(TYPE_CATEGORY, context.getString(textResId), null, null, 0, 0);
-        }
 
         static Item newAccount(Context context, String name, String linkKarma,
                 String commentKarma, int hasMail) {
-            return new Item(TYPE_ACCOUNT_NAME, name, linkKarma, commentKarma, 0, hasMail);
+            return new Item(TYPE_ACCOUNT_NAME, name, linkKarma, commentKarma, hasMail);
         }
 
-        static Item newPlace(Context context, int textResId, int iconResId, int value) {
-            return new Item(TYPE_PLACE, context.getString(textResId), null, null,
-                    iconResId, value);
-        }
-
-        private Item(int type, String text1, String text2, String text3, int resId, int value) {
+        private Item(int type, String text1, String text2, String text3, int value) {
             this.type = type;
             this.text1 = text1;
             this.text2 = text2;
             this.text3 = text3;
-            this.resId = resId;
             this.value = value;
         }
 
@@ -82,10 +64,6 @@ public class NavigationAdapter extends BaseAdapter {
 
         public String getAccountName() {
             return text1;
-        }
-
-        public int getPlace() {
-            return value;
         }
     }
 
@@ -100,7 +78,7 @@ public class NavigationAdapter extends BaseAdapter {
 
     public void setAccountResult(AccountResult result) {
         items.clear();
-        if (result.accountNames != null) {
+        if (result.accountNames != null && result.accountNames.length > 1) {
             int count = result.accountNames.length;
             for (int i = 0; i < count; i++) {
                 String text2 = getKarmaCount(result.linkKarma, i);
@@ -109,21 +87,6 @@ public class NavigationAdapter extends BaseAdapter {
                 addItem(Item.newAccount(context, result.accountNames[i], text2, text3, value));
             }
         }
-        notifyDataSetChanged();
-    }
-
-    public void setAccountPlaces(String accountName) {
-        items.clear();
-        if (AccountUtils.isAccount(accountName)) {
-            addItem(Item.newCategory(context, R.string.place_category));
-            addItem(Item.newPlace(context, R.string.place_profile,
-                    ThemePrefs.getProfileIcon(context), Item.PLACE_PROFILE));
-            addItem(Item.newPlace(context, R.string.place_saved,
-                    ThemePrefs.getSavedIcon(context), Item.PLACE_SAVED));
-            addItem(Item.newPlace(context, R.string.place_messages,
-                    ThemePrefs.getMessagesIcon(context), Item.PLACE_MESSAGES));
-        }
-        addItem(Item.newCategory(context, R.string.subreddits_category));
         notifyDataSetChanged();
     }
 
@@ -168,11 +131,6 @@ public class NavigationAdapter extends BaseAdapter {
     }
 
     @Override
-    public boolean isEnabled(int position) {
-        return getItemViewType(position) != Item.TYPE_CATEGORY;
-    }
-
-    @Override
     public int getCount() {
         return items.size();
     }
@@ -183,21 +141,19 @@ public class NavigationAdapter extends BaseAdapter {
         View karmaCounts;
         TextView linkKarma;
         TextView commentKarma;
-        TextView category;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
-            v = inflater.inflate(R.layout.account_filter_dropdown_row, parent, false);
+            v = inflater.inflate(R.layout.account_row, parent, false);
             ViewHolder vh = new ViewHolder();
             vh.accountFilter = (TextView) v.findViewById(R.id.account_filter);
             vh.statusIcon = (ImageView) v.findViewById(R.id.status_icon);
             vh.karmaCounts = v.findViewById(R.id.karma_counts);
             vh.linkKarma = (TextView) v.findViewById(R.id.link_karma);
             vh.commentKarma = (TextView) v.findViewById(R.id.comment_karma);
-            vh.category = (TextView) v.findViewById(R.id.category);
             v.setTag(vh);
         }
         setView(v, position);
@@ -209,11 +165,11 @@ public class NavigationAdapter extends BaseAdapter {
         Item item = getItem(position);
         switch (item.type) {
             case Item.TYPE_ACCOUNT_NAME:
-                vh.accountFilter.setText(getTitle(item.text1, true));
+                vh.accountFilter.setText(Accounts.getTitle(context, item.text1));
                 vh.accountFilter.setVisibility(View.VISIBLE);
                 vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
-                if (item.resId == 1) {
+                if (item.value == 1) {
                     vh.statusIcon.setImageResource(ThemePrefs.getMessagesIcon(view.getContext()));
                     vh.statusIcon.setVisibility(View.VISIBLE);
                 } else {
@@ -223,40 +179,10 @@ public class NavigationAdapter extends BaseAdapter {
                 vh.karmaCounts.setVisibility(View.VISIBLE);
                 vh.linkKarma.setText(item.text2);
                 vh.commentKarma.setText(item.text3);
-                vh.category.setVisibility(View.GONE);
-                break;
-
-            case Item.TYPE_PLACE:
-                vh.accountFilter.setText(item.text1);
-                vh.accountFilter.setVisibility(View.VISIBLE);
-                vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(item.resId, 0, 0, 0);
-                vh.statusIcon.setVisibility(View.GONE);
-                vh.karmaCounts.setVisibility(View.GONE);
-                vh.category.setVisibility(View.GONE);
-                break;
-
-            case Item.TYPE_CATEGORY:
-                vh.accountFilter.setVisibility(View.GONE);
-                vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-                vh.statusIcon.setVisibility(View.GONE);
-                vh.karmaCounts.setVisibility(View.GONE);
-                vh.category.setText(item.text1);
-                vh.category.setVisibility(View.VISIBLE);
                 break;
 
             default:
                 throw new IllegalArgumentException();
-
-        }
-    }
-
-    private String getTitle(String accountName, boolean dropdown) {
-        if (AccountUtils.isAccount(accountName)) {
-            return accountName;
-        } else if (dropdown) {
-            return context.getString(R.string.account_app_storage);
-        } else {
-            return context.getString(R.string.app_name);
         }
     }
 }

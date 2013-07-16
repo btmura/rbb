@@ -30,7 +30,7 @@
 
     <fragment
         android:id="@+id/subreddit_list_container"
-        android:layout_width="@dimen/drawer_width"
+        android:layout_width="@dimen/subreddit_list_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         class="com.btmura.android.reddit.app.NavigationFragment"
