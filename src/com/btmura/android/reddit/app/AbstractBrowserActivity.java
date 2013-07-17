@@ -320,26 +320,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshViews(null);
     }
 
-    private void selectInitialSubredditMultiPane(String subreddit, boolean error) {
-        ControlFragment cf = getControlFragment();
-        if (cf != null && cf.getSubreddit() == null) {
-            cf.setSubreddit(subreddit);
-
-            SubredditListFragment<?, ?, ?> sf = getSubredditListFragment();
-            sf.setSelectedSubreddit(subreddit);
-
-            ThingListFragment<?> tf = getThingListFragment();
-            if (subreddit != null) {
-                tf.setSubreddit(subreddit);
-                tf.loadIfPossible();
-            } else {
-                tf.setEmpty(error);
-            }
-
-            refreshActionBar(subreddit, null);
-        }
-    }
-
     protected void refreshSubreddit() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {

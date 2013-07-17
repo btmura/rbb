@@ -22,12 +22,10 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 
 public class AccountFilterAdapter extends BaseFilterAdapter {
@@ -246,7 +244,6 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
 
     static class DropDownViewHolder {
         TextView accountFilter;
-        ImageView statusIcon;
         View karmaCounts;
         TextView linkKarma;
         TextView commentKarma;
@@ -260,7 +257,6 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
             v = inflater.inflate(R.layout.account_filter_dropdown_row, parent, false);
             DropDownViewHolder vh = new DropDownViewHolder();
             vh.accountFilter = (TextView) v.findViewById(R.id.account_filter);
-            vh.statusIcon = (ImageView) v.findViewById(R.id.status_icon);
             vh.karmaCounts = v.findViewById(R.id.karma_counts);
             vh.linkKarma = (TextView) v.findViewById(R.id.link_karma);
             vh.commentKarma = (TextView) v.findViewById(R.id.comment_karma);
@@ -279,13 +275,6 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
                 vh.accountFilter.setText(getTitle(item.text1, true));
                 vh.accountFilter.setVisibility(View.VISIBLE);
 
-                if (item.value == 1) {
-                    vh.statusIcon.setImageResource(ThemePrefs.getMessagesIcon(view.getContext()));
-                    vh.statusIcon.setVisibility(View.VISIBLE);
-                } else {
-                    vh.statusIcon.setVisibility(View.GONE);
-                }
-
                 vh.karmaCounts.setVisibility(View.VISIBLE);
                 vh.linkKarma.setText(item.text2);
                 vh.commentKarma.setText(item.text3);
@@ -295,14 +284,12 @@ public class AccountFilterAdapter extends BaseFilterAdapter {
             case Item.TYPE_FILTER:
                 vh.accountFilter.setText(item.text1);
                 vh.accountFilter.setVisibility(View.VISIBLE);
-                vh.statusIcon.setVisibility(View.GONE);
                 vh.karmaCounts.setVisibility(View.GONE);
                 vh.category.setVisibility(View.GONE);
                 break;
 
             case Item.TYPE_CATEGORY:
                 vh.accountFilter.setVisibility(View.GONE);
-                vh.statusIcon.setVisibility(View.GONE);
                 vh.karmaCounts.setVisibility(View.GONE);
                 vh.category.setText(item.text1);
                 vh.category.setVisibility(View.VISIBLE);

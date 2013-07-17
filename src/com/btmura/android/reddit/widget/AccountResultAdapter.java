@@ -28,7 +28,6 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.util.Objects;
 
@@ -176,16 +175,11 @@ public class AccountResultAdapter extends BaseAdapter {
                 vh.accountFilter.setVisibility(View.VISIBLE);
                 vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
+                vh.statusIcon.setVisibility(item.value == 1 ? View.VISIBLE : View.GONE);
                 vh.karmaCounts.setVisibility(View.VISIBLE);
+
                 vh.linkKarma.setText(item.text2);
                 vh.commentKarma.setText(item.text3);
-
-                if (item.value == 1) {
-                    vh.statusIcon.setImageResource(ThemePrefs.getMessagesIcon(view.getContext()));
-                    vh.statusIcon.setVisibility(View.VISIBLE);
-                } else {
-                    vh.statusIcon.setVisibility(View.GONE);
-                }
 
                 boolean activated = Objects.equals(selectedAccountName, item.text1);
                 vh.accountFilter.setActivated(activated);

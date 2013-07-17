@@ -49,26 +49,6 @@ public class ThemePrefs extends Prefs {
                 R.drawable.drawer_shadow_dark);
     }
 
-    public static final int getUnreadMessagesIcon(Context context) {
-        return pick(context, R.drawable.ic_action_unread_messages_light,
-                R.drawable.ic_action_unread_messages_dark);
-    }
-
-    public static final int getProfileIcon(Context context) {
-        return pick(context, R.drawable.ic_action_profile_light,
-                R.drawable.ic_action_profile_dark);
-    }
-
-    public static final int getSavedIcon(Context context) {
-        return pick(context, R.drawable.ic_action_saved_light,
-                R.drawable.ic_action_saved_dark);
-    }
-
-    public static final int getMessagesIcon(Context context) {
-        return pick(context, R.drawable.ic_action_messages_light,
-                R.drawable.ic_action_messages_dark);
-    }
-
     public static final void switchTheme(Context context) {
         // TODO: Check the current theme rather than using preferences.
         int otherTheme = pick(context, THEME_DARK, THEME_LIGHT);

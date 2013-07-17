@@ -21,13 +21,10 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.ContentResolver;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
@@ -43,7 +40,6 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
-import com.btmura.android.reddit.widget.AccountMailAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity
@@ -62,25 +58,9 @@ public class BrowserActivity extends AbstractBrowserActivity
     private boolean hasSubredditList;
 
     private FilterAdapter filterAdapter;
-    private AccountMailAdapter mailAdapter;
     private ActionBarDrawerToggle drawerToggle;
     private String accountName;
     private int filter;
-
-    private LoaderCallbacks<Cursor> mailLoaderCallbacks = new LoaderCallbacks<Cursor>() {
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return AccountMailAdapter.getLoader(BrowserActivity.this);
-        }
-
-        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-            mailAdapter.swapCursor(cursor);
-            refreshMessagesIcon();
-        }
-
-        public void onLoaderReset(Loader<Cursor> loader) {
-            mailAdapter.swapCursor(null);
-        }
-    };
 
     private MenuItem accountsItem;
     private MenuItem switchThemesItem;
@@ -134,8 +114,6 @@ public class BrowserActivity extends AbstractBrowserActivity
     protected void setupActionBar(Bundle savedInstanceState) {
         filterAdapter = new FilterAdapter(this);
 
-        mailAdapter = new AccountMailAdapter(this);
-
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
             drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
@@ -148,7 +126,6 @@ public class BrowserActivity extends AbstractBrowserActivity
 
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        getSupportLoaderManager().initLoader(1, null, mailLoaderCallbacks);
 
         if (savedInstanceState == null) {
             setNavigation(R.id.subreddit_list_container);
@@ -293,20 +270,7 @@ public class BrowserActivity extends AbstractBrowserActivity
         boolean showAccountItems = hasSubredditList && !hasThing();
         accountsItem.setVisible(showAccountItems);
         switchThemesItem.setVisible(showAccountItems);
-
-        refreshMessagesIcon();
         return true;
-    }
-
-    private void refreshMessagesIcon() {
-        int icon = hasUnreadMessages()
-                ? ThemePrefs.getUnreadMessagesIcon(this)
-                : ThemePrefs.getMessagesIcon(this);
-        // TODO: Show an icon when there are unread messages.
-    }
-
-    private boolean hasUnreadMessages() {
-        return mailAdapter != null && mailAdapter.hasMessages(accountName);
     }
 
     @Override

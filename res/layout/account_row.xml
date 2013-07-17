@@ -34,12 +34,15 @@
         android:textColor="?attr/primary_activatable_text"
         tools:ignore="SelectableText" />
 
+    <!-- TODO: Fix content description and id to reflect mail meanning. -->
+
     <ImageView
         android:id="@+id/status_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:contentDescription="@string/content_desc_status" />
+        android:contentDescription="@string/content_desc_status"
+        android:src="?attr/menu_messages_icon" />
 
     <LinearLayout
         android:id="@+id/karma_counts"
