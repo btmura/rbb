@@ -17,7 +17,6 @@
 <resources>
 
     <integer name="bitmap_cache_size">10</integer>
-    <integer name="menu_order_account">1000</integer>
     <integer name="menu_order_search">2000</integer>
     <integer name="menu_order_thing">3000</integer>
     <integer name="menu_order_subreddit">4000</integer>

@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/place_background"
-            android:contentDescription="@string/menu_subreddit"
+            android:contentDescription="@string/place_subreddits"
             android:src="?attr/menu_link_icon" />
 
         <ImageButton
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/place_background"
-            android:contentDescription="@string/menu_profile"
+            android:contentDescription="@string/place_profile"
             android:src="?attr/menu_profile_icon" />
 
         <ImageButton
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/place_background"
-            android:contentDescription="@string/menu_saved"
+            android:contentDescription="@string/place_saved"
             android:src="?attr/menu_saved_icon" />
 
         <ImageButton
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/place_background"
-            android:contentDescription="@string/menu_messages"
+            android:contentDescription="@string/place_messages"
             android:src="?attr/menu_messages_icon" />
     </LinearLayout>
 
