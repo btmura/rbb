@@ -33,6 +33,7 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.AccountSubredditListLoader;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter.OnPlaceSelectedListener;
 import com.btmura.android.reddit.widget.AccountResultAdapter;
@@ -50,13 +51,8 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     private static final int ADAPTER_PLACES = 1;
     private static final int ADAPTER_SUBREDDITS = 2;
 
-    private static final String LOADER_ARG_ACCOUNT_NAME = "accountName";
-
     private static final int LOADER_ACCOUNTS = 0;
     private static final int LOADER_SUBREDDITS = 1;
-
-    private static final boolean LOADER_INIT = false;
-    private static final boolean LOADER_RESTART = true;
 
     public interface OnNavigationEventListener {
         void onSubredditSelected(String accountName, String subreddit, int filter);
@@ -132,7 +128,8 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         setListShown(true);
 
         String accountName = result.getLastAccount(getActivity());
-        selectAccount(accountName, LOADER_INIT);
+        boolean restart = !Objects.equals(this.accountName, accountName);
+        selectAccount(accountName, restart);
     }
 
     private void selectAccount(String accountName, boolean restartLoader) {
@@ -150,12 +147,10 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     }
 
     private void refreshSubredditLoader(String accountName, boolean restartLoader) {
-        Bundle args = new Bundle(1);
-        args.putString(LOADER_ARG_ACCOUNT_NAME, accountName);
         if (restartLoader) {
-            getLoaderManager().restartLoader(LOADER_SUBREDDITS, args, subredditLoaderCallbacks);
+            getLoaderManager().restartLoader(LOADER_SUBREDDITS, null, subredditLoaderCallbacks);
         } else {
-            getLoaderManager().initLoader(LOADER_SUBREDDITS, args, subredditLoaderCallbacks);
+            getLoaderManager().initLoader(LOADER_SUBREDDITS, null, subredditLoaderCallbacks);
         }
     }
 
@@ -185,7 +180,7 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         Item item = accountAdapter.getItem(position);
         switch (item.getType()) {
             case Item.TYPE_ACCOUNT_NAME:
-                selectAccount(item.getAccountName(), LOADER_RESTART);
+                selectAccount(item.getAccountName(), true);
                 break;
         }
     }
@@ -273,7 +268,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            String accountName = args.getString(LOADER_ARG_ACCOUNT_NAME);
             return new AccountSubredditListLoader(getActivity(), accountName);
         }
 
