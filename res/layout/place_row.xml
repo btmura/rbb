@@ -29,6 +29,16 @@
         <!-- TODO: Make a style for these buttons and clean up strings. -->
 
         <ImageButton
+            android:id="@+id/subreddit_button"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/activatedBackgroundIndicator"
+            android:contentDescription="@string/menu_subreddit"
+            android:src="?attr/menu_link_icon" />
+
+        <ImageButton
             android:id="@+id/profile_button"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"

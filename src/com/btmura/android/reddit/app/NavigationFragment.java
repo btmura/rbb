@@ -22,7 +22,9 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
@@ -102,6 +104,16 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        ListView listView = (ListView) v.findViewById(android.R.id.list);
+        listView.setVerticalScrollBarEnabled(false);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        return v;
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setListAdapter(mergeAdapter);
@@ -127,8 +139,8 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         this.accountName = accountName;
         AccountPrefs.setLastAccount(getActivity(), accountName);
         accountAdapter.setSelectedAccountName(accountName);
-        placesAdapter.setAccountPlaces(AccountUtils.isAccount(accountName),
-                accountAdapter.getCount() > 1);
+        placesAdapter.setAccountPlaces(accountAdapter.getCount() > 1,
+                AccountUtils.isAccount(accountName));
         refreshSubredditLoader(accountName, restartLoader);
 
         int place = AccountUtils.isAccount(accountName)
@@ -180,6 +192,13 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
 
     private void selectPlaceWithDefaultFilter(int place) {
         switch (place) {
+            case PLACE_SUBREDDIT:
+                String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
+                int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
+                        FilterAdapter.SUBREDDIT_HOT);
+                selectPlace(place, subreddit, filter);
+                break;
+
             case PLACE_PROFILE:
                 selectPlace(place, null, FilterAdapter.PROFILE_OVERVIEW);
                 break;
@@ -191,13 +210,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
             case PLACE_MESSAGES:
                 selectPlace(place, null, FilterAdapter.MESSAGE_INBOX);
                 break;
-
-            case PLACE_SUBREDDIT:
-                String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
-                int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
-                        FilterAdapter.SUBREDDIT_HOT);
-                selectPlace(PLACE_SUBREDDIT, subreddit, filter);
-                break;
         }
     }
 
@@ -208,6 +220,15 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         placesAdapter.setSelectedPlace(place);
         AccountPrefs.setLastPlace(getActivity(), place);
         switch (place) {
+            case PLACE_SUBREDDIT:
+                subredditAdapter.setSelectedSubreddit(subreddit);
+                AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
+                AccountPrefs.setLastSubredditFilter(getActivity(), filter);
+                if (listener != null) {
+                    listener.onSubredditSelected(accountName, subreddit, filter);
+                }
+                break;
+
             case PLACE_PROFILE:
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
@@ -226,15 +247,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
                     listener.onMessagesSelected(accountName, filter);
-                }
-                break;
-
-            case PLACE_SUBREDDIT:
-                subredditAdapter.setSelectedSubreddit(subreddit);
-                AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
-                AccountPrefs.setLastSubredditFilter(getActivity(), filter);
-                if (listener != null) {
-                    listener.onSubredditSelected(accountName, subreddit, filter);
                 }
                 break;
         }

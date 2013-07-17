@@ -56,10 +56,10 @@ public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener 
 
     public interface OnPlaceSelectedListener {
 
-        public static final int PLACE_PROFILE = 0;
-        public static final int PLACE_SAVED = 1;
-        public static final int PLACE_MESSAGES = 2;
-        public static final int PLACE_SUBREDDIT = 3;
+        public static final int PLACE_SUBREDDIT = 0;
+        public static final int PLACE_PROFILE = 1;
+        public static final int PLACE_SAVED = 2;
+        public static final int PLACE_MESSAGES = 3;
 
         void onPlaceSelected(int place);
     }
@@ -81,13 +81,13 @@ public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener 
         notifyDataSetChanged();
     }
 
-    public void setAccountPlaces(boolean showPlaces, boolean showDivider) {
+    public void setAccountPlaces(boolean showDivider, boolean showPlaces) {
         items.clear();
-        if (showPlaces) {
-            addItem(PlaceItem.newCategory(context, R.string.place_category));
-            addItem(PlaceItem.newPlaceButtons());
-        } else if (showDivider) {
+        if (showDivider) {
             addItem(PlaceItem.newCategory(context, R.string.subreddits_category));
+        }
+        if (showPlaces) {
+            addItem(PlaceItem.newPlaceButtons());
         }
         notifyDataSetChanged();
     }
@@ -127,6 +127,8 @@ public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener 
     static class ViewHolder {
         TextView category;
         View placeButtons;
+
+        View subredditButton;
         View profileButton;
         View savedButton;
         View messagesButton;
@@ -139,6 +141,7 @@ public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener 
             v = inflater.inflate(R.layout.place_row, parent, false);
             ViewHolder vh = new ViewHolder();
             vh.placeButtons = v.findViewById(R.id.place_buttons);
+            vh.subredditButton = vh.placeButtons.findViewById(R.id.subreddit_button);
             vh.profileButton = vh.placeButtons.findViewById(R.id.profile_button);
             vh.savedButton = vh.placeButtons.findViewById(R.id.saved_button);
             vh.messagesButton = vh.placeButtons.findViewById(R.id.messages_button);
@@ -157,10 +160,12 @@ public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener 
                 vh.placeButtons.setVisibility(View.VISIBLE);
                 vh.category.setVisibility(View.GONE);
 
+                vh.subredditButton.setOnClickListener(this);
                 vh.profileButton.setOnClickListener(this);
                 vh.savedButton.setOnClickListener(this);
                 vh.messagesButton.setOnClickListener(this);
 
+                vh.subredditButton.setActivated(isPlace(OnPlaceSelectedListener.PLACE_SUBREDDIT));
                 vh.profileButton.setActivated(isPlace(OnPlaceSelectedListener.PLACE_PROFILE));
                 vh.savedButton.setActivated(isPlace(OnPlaceSelectedListener.PLACE_SAVED));
                 vh.messagesButton.setActivated(isPlace(OnPlaceSelectedListener.PLACE_MESSAGES));
@@ -185,6 +190,10 @@ public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener 
     public void onClick(View v) {
         if (listener != null) {
             switch (v.getId()) {
+                case R.id.subreddit_button:
+                    listener.onPlaceSelected(OnPlaceSelectedListener.PLACE_SUBREDDIT);
+                    break;
+
                 case R.id.profile_button:
                     listener.onPlaceSelected(OnPlaceSelectedListener.PLACE_PROFILE);
                     break;
