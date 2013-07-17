@@ -27,7 +27,7 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.util.Objects;
 
-/** {@link BaseLoaderAdapter} that handles lists of subreddits. */
+/** BaseAdapter that handles lists of subreddits. */
 public abstract class SubredditAdapter extends BaseCursorAdapter {
 
     public static final String TAG = "SubredditAdapter";
