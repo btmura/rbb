@@ -34,7 +34,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="?android:attr/activatedBackgroundIndicator"
+            android:background="@drawable/place_background"
             android:contentDescription="@string/menu_subreddit"
             android:src="?attr/menu_link_icon" />
 
@@ -44,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="?android:attr/activatedBackgroundIndicator"
+            android:background="@drawable/place_background"
             android:contentDescription="@string/menu_profile"
             android:src="?attr/menu_profile_icon" />
 
@@ -54,7 +54,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="?android:attr/activatedBackgroundIndicator"
+            android:background="@drawable/place_background"
             android:contentDescription="@string/menu_saved"
             android:src="?attr/menu_saved_icon" />
 
@@ -64,7 +64,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="?android:attr/activatedBackgroundIndicator"
+            android:background="@drawable/place_background"
             android:contentDescription="@string/menu_messages"
             android:src="?attr/menu_messages_icon" />
     </LinearLayout>
