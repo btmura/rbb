@@ -43,7 +43,7 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
-import com.btmura.android.reddit.widget.AccountAdapter;
+import com.btmura.android.reddit.widget.AccountMailAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity
@@ -62,14 +62,14 @@ public class BrowserActivity extends AbstractBrowserActivity
     private boolean hasSubredditList;
 
     private FilterAdapter filterAdapter;
-    private AccountAdapter mailAdapter;
+    private AccountMailAdapter mailAdapter;
     private ActionBarDrawerToggle drawerToggle;
     private String accountName;
     private int filter;
 
     private LoaderCallbacks<Cursor> mailLoaderCallbacks = new LoaderCallbacks<Cursor>() {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return AccountAdapter.getLoader(BrowserActivity.this);
+            return AccountMailAdapter.getLoader(BrowserActivity.this);
         }
 
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
@@ -134,7 +134,7 @@ public class BrowserActivity extends AbstractBrowserActivity
     protected void setupActionBar(Bundle savedInstanceState) {
         filterAdapter = new FilterAdapter(this);
 
-        mailAdapter = new AccountAdapter(this);
+        mailAdapter = new AccountMailAdapter(this);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {

@@ -27,7 +27,10 @@ import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Objects;
 
-public class AccountAdapter extends BaseCursorAdapter {
+/**
+ * Adapter that does not create views and is only used to check mail.
+ */
+public class AccountMailAdapter extends BaseCursorAdapter {
 
     private static final String[] PROJECTION = {
             Accounts._ID,
@@ -43,7 +46,7 @@ public class AccountAdapter extends BaseCursorAdapter {
                 PROJECTION, null, null, null);
     }
 
-    public AccountAdapter(Context context) {
+    public AccountMailAdapter(Context context) {
         super(context, null, 0);
     }
 
