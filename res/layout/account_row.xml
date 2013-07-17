@@ -31,6 +31,7 @@
         android:drawablePadding="@dimen/padding"
         android:gravity="center_vertical"
         android:padding="@dimen/padding"
+        android:textColor="?attr/primary_activatable_text"
         tools:ignore="SelectableText" />
 
     <ImageView
@@ -54,6 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
+            android:textColor="?attr/primary_activatable_text"
             tools:ignore="SelectableText" />
 
         <TextView
@@ -61,6 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
+            android:textColor="?attr/primary_activatable_text"
             tools:ignore="SelectableText" />
     </LinearLayout>
 

@@ -30,6 +30,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Accounts;
+import com.btmura.android.reddit.util.Objects;
 
 public class AccountResultAdapter extends BaseAdapter {
 
@@ -67,13 +68,19 @@ public class AccountResultAdapter extends BaseAdapter {
         }
     }
 
+    private final ArrayList<Item> items = new ArrayList<Item>();
     private final Context context;
     private final LayoutInflater inflater;
-    private final ArrayList<Item> items = new ArrayList<Item>();
+    private String selectedAccountName;
 
     public AccountResultAdapter(Context context) {
-        this.context = context.getApplicationContext();
+        this.context = context;
         this.inflater = LayoutInflater.from(context);
+    }
+
+    public void setSelectedAccountName(String accountName) {
+        this.selectedAccountName = accountName;
+        notifyDataSetChanged();
     }
 
     public void setAccountResult(AccountResult result) {
@@ -169,6 +176,10 @@ public class AccountResultAdapter extends BaseAdapter {
                 vh.accountFilter.setVisibility(View.VISIBLE);
                 vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
+                vh.karmaCounts.setVisibility(View.VISIBLE);
+                vh.linkKarma.setText(item.text2);
+                vh.commentKarma.setText(item.text3);
+
                 if (item.value == 1) {
                     vh.statusIcon.setImageResource(ThemePrefs.getMessagesIcon(view.getContext()));
                     vh.statusIcon.setVisibility(View.VISIBLE);
@@ -176,9 +187,10 @@ public class AccountResultAdapter extends BaseAdapter {
                     vh.statusIcon.setVisibility(View.GONE);
                 }
 
-                vh.karmaCounts.setVisibility(View.VISIBLE);
-                vh.linkKarma.setText(item.text2);
-                vh.commentKarma.setText(item.text3);
+                boolean activated = Objects.equals(selectedAccountName, item.text1);
+                vh.accountFilter.setActivated(activated);
+                vh.linkKarma.setActivated(activated);
+                vh.commentKarma.setActivated(activated);
                 break;
 
             default:

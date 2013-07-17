@@ -33,11 +33,11 @@ import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter.OnPlaceSelectedListener;
+import com.btmura.android.reddit.widget.AccountResultAdapter;
+import com.btmura.android.reddit.widget.AccountResultAdapter.Item;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
-import com.btmura.android.reddit.widget.AccountResultAdapter;
-import com.btmura.android.reddit.widget.AccountResultAdapter.Item;
 
 public class NavigationFragment extends ListFragment implements LoaderCallbacks<AccountResult>,
         OnPlaceSelectedListener, OnFilterSelectedListener {
@@ -126,6 +126,7 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     private void selectAccount(String accountName, boolean restartLoader) {
         this.accountName = accountName;
         AccountPrefs.setLastAccount(getActivity(), accountName);
+        accountAdapter.setSelectedAccountName(accountName);
         placesAdapter.setAccountPlaces(AccountUtils.isAccount(accountName),
                 accountAdapter.getCount() > 1);
         refreshSubredditLoader(accountName, restartLoader);

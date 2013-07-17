@@ -31,6 +31,7 @@
         <attr name="menu_search_icon" format="reference" />
         <attr name="menu_send_icon" format="reference" />
         <attr name="menu_unsaved_icon" format="reference" />
+        <attr name="primary_activatable_text" format="reference" />
         <attr name="nesting_line_color" format="reference" />
     </declare-styleable>
     <declare-styleable name="CustomViewStates">

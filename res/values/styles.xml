@@ -41,6 +41,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
         <item name="nesting_line_color">@android:color/holo_blue_dark</item>
+        <item name="primary_activatable_text">@color/primary_activatable_text_light</item>
     </style>
 
     <style name="Theme.Light.Dialog" parent="@android:style/Theme.Holo.Light.Dialog">
@@ -58,6 +59,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
         <item name="nesting_line_color">@android:color/holo_blue_dark</item>
+        <item name="primary_activatable_text">@color/primary_activatable_text_light</item>
     </style>
 
     <style name="Theme.Light.DialogWhenLarge" parent="@android:style/Theme.Holo.Light.DialogWhenLarge">
@@ -75,6 +77,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
         <item name="nesting_line_color">@android:color/holo_blue_dark</item>
+        <item name="primary_activatable_text">@color/primary_activatable_text_light</item>
     </style>
 
     <style name="Theme.Dark" parent="@android:style/Theme.Holo">
@@ -92,6 +95,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
         <item name="nesting_line_color">@android:color/holo_blue_bright</item>
+        <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
     </style>
 
     <style name="Theme.Dark.Dialog" parent="@android:style/Theme.Holo.Dialog">
@@ -109,6 +113,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
         <item name="nesting_line_color">@android:color/holo_blue_bright</item>
+        <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
     </style>
 
     <style name="Theme.Dark.DialogWhenLarge" parent="@android:style/Theme.Holo.DialogWhenLarge">
@@ -126,6 +131,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
         <item name="nesting_line_color">@android:color/holo_blue_bright</item>
+        <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
     </style>
 
     <style name="AccountNameText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title" />
@@ -156,7 +162,7 @@
     <style name="PagerTabStrip">
         <item name="android:textAppearance">@android:style/TextAppearance.Holo.Widget.ActionBar.Menu</item>
     </style>
-
+    
     <style name="SlimProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
         <item name="android:minHeight">4dp</item>
         <item name="android:maxHeight">4dp</item>

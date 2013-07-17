@@ -68,7 +68,6 @@ public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener 
     private final Context context;
     private final LayoutInflater inflater;
     private final OnPlaceSelectedListener listener;
-
     private int selectedPlace;
 
     public AccountPlaceAdapter(Context context, OnPlaceSelectedListener listener) {
@@ -77,8 +76,8 @@ public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener 
         this.listener = listener;
     }
 
-    public void setSelectedPlace(int selectedPlace) {
-        this.selectedPlace = selectedPlace;
+    public void setSelectedPlace(int place) {
+        this.selectedPlace = place;
         notifyDataSetChanged();
     }
 
