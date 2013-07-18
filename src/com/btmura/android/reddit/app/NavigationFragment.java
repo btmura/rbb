@@ -22,17 +22,28 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.BrowserActivity.OnFilterSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.AccountSubredditListLoader;
+import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter.OnPlaceSelectedListener;
@@ -43,7 +54,7 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
 
 public class NavigationFragment extends ListFragment implements LoaderCallbacks<AccountResult>,
-        OnPlaceSelectedListener, OnFilterSelectedListener {
+        OnPlaceSelectedListener, OnFilterSelectedListener, MultiChoiceModeListener {
 
     public static final String TAG = "NavigationFragment";
 
@@ -104,8 +115,8 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
             Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         ListView listView = (ListView) v.findViewById(android.R.id.list);
-        listView.setVerticalScrollBarEnabled(false);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(this);
         return v;
     }
 
@@ -262,6 +273,140 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         if (filter != newFilter) {
             selectPlace(place, subreddit, newFilter);
         }
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.navigation_action_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        int count = getListView().getCheckedItemCount();
+        boolean aboutItemVisible = count == 1;
+        boolean shareItemsVisible = count == 1;
+        boolean deleteItemVisible = true;
+
+        SparseBooleanArray checked = getListView().getCheckedItemPositions();
+        int size = checked.size();
+        for (int i = 0; i < size; i++) {
+            if (checked.valueAt(i)) {
+                int position = checked.keyAt(i);
+                int adapterIndex = mergeAdapter.getAdapterIndex(position);
+                switch (adapterIndex) {
+                    case ADAPTER_ACCOUNTS:
+                    case ADAPTER_PLACES:
+                        aboutItemVisible = shareItemsVisible = deleteItemVisible = false;
+                        break;
+
+                    case ADAPTER_SUBREDDITS:
+                        int adapterPosition = mergeAdapter.getAdapterPosition(position);
+                        String subreddit = subredditAdapter.getName(adapterPosition);
+                        boolean hasSidebar = Subreddits.hasSidebar(subreddit);
+                        aboutItemVisible &= hasSidebar;
+                        shareItemsVisible &= hasSidebar;
+                        deleteItemVisible &= hasSidebar;
+                        break;
+                }
+            }
+        }
+
+        if (aboutItemVisible || shareItemsVisible || deleteItemVisible) {
+            mode.setTitle(getResources().getQuantityString(R.plurals.subreddits, count, count));
+            menu.findItem(R.id.menu_subreddit).setVisible(aboutItemVisible);
+            menu.findItem(R.id.menu_delete).setVisible(deleteItemVisible);
+            prepareShareItems(menu, shareItemsVisible);
+        } else {
+            mode.finish();
+        }
+
+        return true;
+    }
+
+    private void prepareShareItems(Menu menu, boolean visible) {
+        MenuItem shareItem = menu.findItem(R.id.menu_share);
+        shareItem.setVisible(visible);
+
+        MenuItem copyUrlItem = menu.findItem(R.id.menu_copy_url);
+        copyUrlItem.setVisible(visible);
+
+        if (visible) {
+            String subreddit = getFirstCheckedSubreddit();
+            CharSequence url = Urls.subreddit(subreddit, -1, null, Urls.TYPE_HTML);
+            MenuHelper.setShareProvider(shareItem, subreddit, url);
+        }
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_subreddit:
+                handleSubreddit();
+                mode.finish();
+                return true;
+
+            case R.id.menu_delete:
+                handleDelete();
+                mode.finish();
+                return true;
+
+            case R.id.menu_copy_url:
+                handleCopyUrl();
+                mode.finish();
+                return true;
+        }
+        return false;
+    }
+
+    private void handleSubreddit() {
+        MenuHelper.startSidebarActivity(getActivity(), getFirstCheckedSubreddit());
+    }
+
+    private String getFirstCheckedSubreddit() {
+        int position = ListViewUtils.getFirstCheckedPosition(getListView());
+        int adapterPosition = mergeAdapter.getAdapterPosition(position);
+        return subredditAdapter.getName(adapterPosition);
+    }
+
+    private void handleDelete() {
+        String[] subreddits = getCheckedSubreddits();
+        Provider.removeSubredditAsync(getActivity(), accountName, subreddits);
+    }
+
+    private String[] getCheckedSubreddits() {
+        ListView listView = getListView();
+        int checkedCount = listView.getCheckedItemCount();
+        String[] subreddits = new String[checkedCount];
+
+        SparseBooleanArray checked = listView.getCheckedItemPositions();
+        int size = checked.size();
+        int j = 0;
+        for (int i = 0; i < size; i++) {
+            if (checked.valueAt(i)) {
+                int position = checked.keyAt(i);
+                int adapterPosition = mergeAdapter.getAdapterPosition(position);
+                subreddits[j++] = subredditAdapter.getName(adapterPosition);
+            }
+        }
+        return subreddits;
+    }
+
+    private void handleCopyUrl() {
+        String subreddit = getFirstCheckedSubreddit();
+        CharSequence url = Urls.subreddit(subreddit, -1, null, Urls.TYPE_HTML);
+        MenuHelper.setClipAndToast(getActivity(), subreddit, url);
+    }
+
+    @Override
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+            boolean checked) {
+        mode.invalidate();
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
     }
 
     class AccountSubredditLoaderCallbacks implements LoaderCallbacks<Cursor> {
