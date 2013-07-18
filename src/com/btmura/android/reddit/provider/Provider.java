@@ -26,12 +26,9 @@ import android.content.Context;
 import android.content.OperationApplicationException;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentActions;
@@ -134,23 +131,10 @@ public class Provider {
             @Override
             protected void onPostExecute(Boolean success) {
                 if (success) {
-                    showChangeToast(appContext, add, subreddits.length);
                     scheduleBackup(appContext, accountName);
-                } else {
-                    showErrorToast(appContext);
                 }
             }
         }.execute();
-    }
-
-    private static void showChangeToast(Context context, boolean added, int count) {
-        int resId = added ? R.plurals.added : R.plurals.deleted;
-        CharSequence text = context.getResources().getQuantityString(resId, count, count);
-        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
-    }
-
-    private static void showErrorToast(Context context) {
-        Toast.makeText(context, R.string.error, Toast.LENGTH_SHORT).show();
     }
 
     private static void scheduleBackup(Context context, String accountName) {
@@ -166,20 +150,12 @@ public class Provider {
             final String parentThingId,
             final String thingId) {
         final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Bundle>() {
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
-            protected Bundle doInBackground(Void... voidRay) {
-                return ThingProvider.insertComment(appContext, accountName, body, parentThingId,
-                        thingId);
+            public void run() {
+                ThingProvider.insertComment(appContext, accountName, body, parentThingId, thingId);
             }
-
-            @Override
-            protected void onPostExecute(Bundle result) {
-                if (result == null) {
-                    showErrorToast(appContext);
-                }
-            }
-        }.execute();
+        });
     }
 
     // TODO: Move this to ThingProvider#call like commentReplyAsync.
@@ -193,6 +169,7 @@ public class Provider {
             final boolean[] hasChildren) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
             public void run() {
                 int count = ids.length;
                 ArrayList<ContentProviderOperation> ops =
@@ -266,6 +243,7 @@ public class Provider {
             final long sessionId) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
             public void run() {
                 ArrayList<ContentProviderOperation> ops =
                         new ArrayList<ContentProviderOperation>(2);
@@ -293,6 +271,7 @@ public class Provider {
     public static void expandCommentAsync(Context context, final long id, final long sessionId) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
             public void run() {
                 ThingProvider.expandComment(appContext, id, sessionId);
             }
@@ -303,6 +282,7 @@ public class Provider {
             final long[] childIds) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
             public void run() {
                 ThingProvider.collapseComment(appContext, id, childIds);
             }
@@ -313,6 +293,7 @@ public class Provider {
             final boolean hasMail) {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
             public void run() {
                 // Update the existing row. If there isn't such a row, it will
                 // be created upon sync, where it will have the proper value.
@@ -330,20 +311,12 @@ public class Provider {
             final String parentThingId,
             final String thingId) {
         final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Bundle>() {
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
-            protected Bundle doInBackground(Void... voidRay) {
-                return ThingProvider.insertMessage(appContext, accountName, body, parentThingId,
-                        thingId);
+            public void run() {
+                ThingProvider.insertMessage(appContext, accountName, body, parentThingId, thingId);
             }
-
-            @Override
-            protected void onPostExecute(Bundle result) {
-                if (result == null) {
-                    showErrorToast(appContext);
-                }
-            }
-        }.execute();
+        });
     }
 
     /** Mark a message either read or unread. */
@@ -351,6 +324,7 @@ public class Provider {
             final String thingId, final boolean read) {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
             public void run() {
                 int action = read ? ReadActions.ACTION_READ : ReadActions.ACTION_UNREAD;
                 ContentValues v = new ContentValues(3);
@@ -506,6 +480,7 @@ public class Provider {
             final String thingId) {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
             public void run() {
                 ContentValues v = new ContentValues(3);
                 v.put(VoteActions.COLUMN_ACCOUNT, accountName);
@@ -543,6 +518,7 @@ public class Provider {
             final String url) {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
             public void run() {
                 ContentValues v = new ContentValues(19);
                 v.put(VoteActions.COLUMN_ACCOUNT, accountName);
