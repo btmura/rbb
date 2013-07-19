@@ -19,6 +19,8 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
@@ -36,6 +38,7 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.content.CursorExtras;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Arguments.ArgumentsHolder;
 import com.btmura.android.reddit.util.Objects;
@@ -44,10 +47,9 @@ import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissLi
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingView;
 
-abstract class ThingListFragment<C extends ThingListController<?>>
-        extends ThingProviderListFragment
-        implements ArgumentsHolder, OnScrollListener, OnSwipeDismissListener, OnVoteListener,
-        MultiChoiceModeListener {
+abstract class ThingListFragment<C extends ThingListController<?>> extends ListFragment
+        implements LoaderCallbacks<Cursor>, ArgumentsHolder, OnScrollListener,
+        OnSwipeDismissListener, OnVoteListener, MultiChoiceModeListener {
 
     public static final String TAG = "ThingListFragment";
 
@@ -161,11 +163,16 @@ abstract class ThingListFragment<C extends ThingListController<?>>
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         controller.swapCursor(cursor);
-
-        // TODO: Remove dependency on ThingProviderListFragment.
-        super.onLoadFinished(loader, cursor);
-
         scrollLoading = false;
+
+        String subreddit = CursorExtras.getResolvedSubreddit(cursor);
+        if (!TextUtils.isEmpty(subreddit)) {
+            controller.setParentSubreddit(subreddit);
+            controller.setSubreddit(subreddit);
+            if (eventListener != null) {
+                eventListener.onSubredditDiscovery(subreddit);
+            }
+        }
 
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
@@ -174,15 +181,6 @@ abstract class ThingListFragment<C extends ThingListController<?>>
 
     public void onLoaderReset(Loader<Cursor> loader) {
         controller.swapCursor(null);
-    }
-
-    @Override
-    protected void onSubredditLoaded(String subreddit) {
-        controller.setParentSubreddit(subreddit);
-        controller.setSubreddit(subreddit);
-        if (eventListener != null) {
-            eventListener.onSubredditDiscovery(subreddit);
-        }
     }
 
     public void onScrollStateChanged(AbsListView view, int scrollState) {
