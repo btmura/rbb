@@ -62,8 +62,6 @@ interface ThingListController<A extends AbstractThingListAdapter> extends Contro
 
     String getSelectedThingId();
 
-    long getSessionId();
-
     String getSubreddit();
 
     boolean hasAccountName();
@@ -89,8 +87,6 @@ interface ThingListController<A extends AbstractThingListAdapter> extends Contro
     void setMoreId(String moreId);
 
     void setParentSubreddit(String parentSubreddit);
-
-    void setSessionId(long sessionId);
 
     void setSelectedPosition(int position);
 

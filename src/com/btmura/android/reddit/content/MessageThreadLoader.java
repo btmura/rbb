@@ -47,9 +47,9 @@ public class MessageThreadLoader extends AbstractSessionLoader {
     private final String thingId;
 
     public MessageThreadLoader(Context context, String accountName, String thingId,
-            long sessionId) {
+            Bundle cursorExtras) {
         super(context, ThingProvider.MESSAGES_WITH_ACTIONS_URI, PROJECTION,
-                Messages.SELECT_BY_SESSION_ID, null, sessionId, null);
+                Messages.SELECT_BY_SESSION_ID, null, cursorExtras, null);
         this.accountName = accountName;
         this.thingId = thingId;
     }

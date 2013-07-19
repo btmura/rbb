@@ -32,9 +32,9 @@ public class SubredditThingLoader extends AbstractSessionLoader implements Thing
     private final int filter;
 
     public SubredditThingLoader(Context context, String accountName, String subreddit, int filter,
-            String more, long sessionId) {
+            String more, Bundle cursorExtras) {
         super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
-                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, null, sessionId, more);
+                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, null, cursorExtras, more);
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.filter = filter;

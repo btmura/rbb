@@ -30,9 +30,9 @@ public class ProfileThingLoader extends AbstractSessionLoader implements ThingPr
     private final int filter;
 
     public ProfileThingLoader(Context context, String accountName, String profileUser, int filter,
-            String more, long sessionId) {
+            String more, Bundle cursorExtras) {
         super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
-                getSelectionStatement(filter), null, sessionId, more);
+                getSelectionStatement(filter), null, cursorExtras, more);
         this.accountName = accountName;
         this.profileUser = profileUser;
         this.filter = filter;

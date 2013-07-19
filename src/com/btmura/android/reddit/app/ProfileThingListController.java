@@ -44,7 +44,7 @@ class ProfileThingListController extends AbstractThingTableListController {
     @Override
     public Loader<Cursor> createLoader() {
         return new ProfileThingLoader(context, getAccountName(), profileUser, getFilter(),
-                getMoreId(), getSessionId());
+                getMoreId(), getCursorExtras());
     }
 
     public String getProfileUser() {

@@ -94,10 +94,10 @@ public class CommentLoader extends AbstractSessionLoader {
     private final String linkId;
 
     public CommentLoader(Context context, String accountName, String thingId, String linkId,
-            long sessionId) {
+            Bundle cursorExtras) {
         super(context, ThingProvider.COMMENTS_WITH_ACTIONS_URI, PROJECTION,
-                Comments.SELECT_VISIBLE_BY_SESSION_ID, Comments.SORT_BY_SEQUENCE_AND_ID, sessionId,
-                null);
+                Comments.SELECT_VISIBLE_BY_SESSION_ID, Comments.SORT_BY_SEQUENCE_AND_ID,
+                cursorExtras, null);
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;

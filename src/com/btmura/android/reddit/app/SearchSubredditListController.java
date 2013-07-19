@@ -23,7 +23,6 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 
 import com.btmura.android.reddit.content.SubredditSearchLoader;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.widget.SearchSubredditAdapter;
 
 class SearchSubredditListController implements SubredditListController<SearchSubredditAdapter> {
@@ -32,15 +31,14 @@ class SearchSubredditListController implements SubredditListController<SearchSub
     static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
     static final String EXTRA_QUERY = "query";
     static final String EXTRA_SINGLE_CHOICE = "singleChoice";
-
-    private static final String EXTRA_SESSION_ID = "sessionId";
+    static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
     private final Context context;
     private final SearchSubredditAdapter adapter;
 
     private String accountName;
     private String query;
-    private long sessionId;
+    private Bundle cursorExtras;
 
     SearchSubredditListController(Context context, Bundle args) {
         this.context = context;
@@ -53,7 +51,7 @@ class SearchSubredditListController implements SubredditListController<SearchSub
         setAccountName(getAccountNameExtra(savedInstanceState));
         setSelectedSubreddit(getSelectedSubredditExtra(savedInstanceState));
         this.query = getQueryExtra(savedInstanceState);
-        this.sessionId = getSessionIdExtra(savedInstanceState);
+        this.cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
     @Override
@@ -61,7 +59,7 @@ class SearchSubredditListController implements SubredditListController<SearchSub
         outState.putString(EXTRA_ACCOUNT_NAME, accountName);
         outState.putString(EXTRA_SELECTED_SUBREDDIT, getSelectedSubreddit());
         outState.putString(EXTRA_QUERY, query);
-        outState.putLong(EXTRA_SESSION_ID, sessionId);
+        outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
     }
 
     // Loader related methods.
@@ -73,15 +71,14 @@ class SearchSubredditListController implements SubredditListController<SearchSub
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new SubredditSearchLoader(context, accountName, query, sessionId);
+        return new SubredditSearchLoader(context, accountName, query, cursorExtras);
     }
 
     @Override
     public void swapCursor(Cursor cursor) {
         adapter.swapCursor(cursor);
         if (cursor != null && cursor.getExtras() != null) {
-            Bundle extras = cursor.getExtras();
-            sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+            cursorExtras = cursor.getExtras();
         }
     }
 
@@ -147,10 +144,6 @@ class SearchSubredditListController implements SubredditListController<SearchSub
 
     private static String getQueryExtra(Bundle extras) {
         return extras.getString(EXTRA_QUERY);
-    }
-
-    private static long getSessionIdExtra(Bundle extras) {
-        return extras.getLong(EXTRA_SESSION_ID);
     }
 
     private static boolean getSingleChoiceExtra(Bundle extras) {

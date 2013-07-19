@@ -29,7 +29,6 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.MessageThreadLoader;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.MessageThreadAdapter;
@@ -39,13 +38,13 @@ public class MessageThreadListController
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_THING_ID = "thingId";
-    static final String EXTRA_SESSION_ID = "sessionId";
+    static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
     private final Context context;
     private final String accountName;
     private final String thingId;
     private final MessageThreadAdapter adapter;
-    private long sessionId;
+    private Bundle cursorExtras;
     private ActionMode actionMode;
 
     MessageThreadListController(Context context, Bundle args) {
@@ -57,12 +56,12 @@ public class MessageThreadListController
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        this.sessionId = savedInstanceState.getLong(EXTRA_SESSION_ID);
+        cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
     @Override
     public void saveInstanceState(Bundle outState) {
-        outState.putLong(EXTRA_SESSION_ID, sessionId);
+        outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
     }
 
     @Override
@@ -72,7 +71,7 @@ public class MessageThreadListController
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new MessageThreadLoader(context, accountName, thingId, sessionId);
+        return new MessageThreadLoader(context, accountName, thingId, cursorExtras);
     }
 
     @Override
@@ -80,8 +79,7 @@ public class MessageThreadListController
         if (adapter.getCursor() != cursor) {
             adapter.swapCursor(cursor);
             if (cursor != null && cursor.getExtras() != null) {
-                Bundle extras = cursor.getExtras();
-                sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+                cursorExtras = cursor.getExtras();
             }
         }
     }

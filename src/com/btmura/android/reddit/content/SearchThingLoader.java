@@ -29,9 +29,9 @@ public class SearchThingLoader extends AbstractSessionLoader implements ThingPro
     private final String query;
 
     public SearchThingLoader(Context context, String accountName, String subreddit, String query,
-            long sessionId) {
+            Bundle cursorExtras) {
         super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
-                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, null, sessionId, null);
+                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, null, cursorExtras, null);
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;

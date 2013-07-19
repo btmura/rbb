@@ -38,6 +38,6 @@ class SubredditThingListController extends AbstractThingTableListController {
     @Override
     public Loader<Cursor> createLoader() {
         return new SubredditThingLoader(context, getAccountName(), getSubreddit(), getFilter(),
-                getMoreId(), getSessionId());
+                getMoreId(), getCursorExtras());
     }
 }

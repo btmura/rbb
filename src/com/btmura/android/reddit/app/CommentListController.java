@@ -34,7 +34,6 @@ import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
@@ -47,15 +46,14 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_THING_ID = "thingId";
     static final String EXTRA_LINK_ID = "linkId";
-    static final String EXTRA_SESSION_ID = "sessionId";
+    static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
     private final Context context;
     private final String accountName;
     private final String thingId;
     private final String linkId;
     private final CommentAdapter adapter;
-
-    private long sessionId;
+    private Bundle cursorExtras;
 
     CommentListController(Context context, Bundle args, OnVoteListener listener) {
         this.context = context;
@@ -67,12 +65,12 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        this.sessionId = savedInstanceState.getLong(EXTRA_SESSION_ID);
+        this.cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
     @Override
     public void saveInstanceState(Bundle outState) {
-        outState.putLong(EXTRA_SESSION_ID, sessionId);
+        outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
     }
 
     @Override
@@ -82,7 +80,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new CommentLoader(context, accountName, thingId, linkId, sessionId);
+        return new CommentLoader(context, accountName, thingId, linkId, cursorExtras);
     }
 
     @Override
@@ -90,8 +88,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         if (adapter.getCursor() != cursor) {
             adapter.swapCursor(cursor);
             if (cursor != null && cursor.getExtras() != null) {
-                Bundle extras = cursor.getExtras();
-                sessionId = extras.getLong(ThingProvider.EXTRA_SESSION_ID);
+                cursorExtras = cursor.getExtras();
             }
         }
     }

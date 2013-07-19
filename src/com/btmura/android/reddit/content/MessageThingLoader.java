@@ -64,9 +64,9 @@ public class MessageThingLoader extends AbstractSessionLoader {
     private final int filter;
 
     public MessageThingLoader(Context context, String accountName, int filter, String more,
-            long sessionId) {
+            Bundle cursorExtras) {
         super(context, ThingProvider.MESSAGES_WITH_ACTIONS_URI, PROJECTION,
-                Messages.SELECT_BY_SESSION_ID, null, sessionId, more);
+                Messages.SELECT_BY_SESSION_ID, null, cursorExtras, more);
         this.accountName = accountName;
         this.filter = filter;
     }

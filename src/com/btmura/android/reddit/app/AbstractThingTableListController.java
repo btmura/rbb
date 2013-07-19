@@ -34,7 +34,6 @@ import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingListAdapter;
@@ -49,7 +48,7 @@ abstract class AbstractThingTableListController
     static final String EXTRA_SINGLE_CHOICE = "singleChoice";
     static final String EXTRA_SELECTED_LINK_ID = "selectedLinkId";
     static final String EXTRA_SELECTED_THING_ID = "selectedThingId";
-    static final String EXTRA_SESSION_ID = "sessionId";
+    static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
     static final String EXTRA_EMPTY_TEXT = "emptyText";
 
     protected final Context context;
@@ -59,7 +58,7 @@ abstract class AbstractThingTableListController
     private int emptyText;
     private int filter;
     private String moreId;
-    private long sessionId;
+    private Bundle cursorExtras;
 
     AbstractThingTableListController(Context context, Bundle args, OnVoteListener listener) {
         this.context = context;
@@ -76,7 +75,7 @@ abstract class AbstractThingTableListController
         setEmptyText(getEmptyTextExtra(savedInstanceState));
         setSelectedThing(getSelectedThingId(savedInstanceState),
                 getSelectedLinkId(savedInstanceState));
-        this.sessionId = getSessionIdExtra(savedInstanceState);
+        cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
     @Override
@@ -87,8 +86,9 @@ abstract class AbstractThingTableListController
         state.putString(EXTRA_PARENT_SUBREDDIT, getParentSubreddit());
         state.putString(EXTRA_SELECTED_LINK_ID, getSelectedLinkId());
         state.putString(EXTRA_SELECTED_THING_ID, getSelectedThingId());
-        state.putLong(EXTRA_SESSION_ID, getSessionId());
+        state.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
         state.putString(EXTRA_SUBREDDIT, getSubreddit());
+
     }
 
     @Override
@@ -96,8 +96,7 @@ abstract class AbstractThingTableListController
         setMoreId(null);
         adapter.swapCursor(cursor);
         if (cursor != null && cursor.getExtras() != null) {
-            Bundle extras = cursor.getExtras();
-            setSessionId(extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+            cursorExtras = cursor.getExtras();
         }
     }
 
@@ -425,11 +424,6 @@ abstract class AbstractThingTableListController
     }
 
     @Override
-    public long getSessionId() {
-        return sessionId;
-    }
-
-    @Override
     public String getSubreddit() {
         return adapter.getSubreddit();
     }
@@ -437,6 +431,10 @@ abstract class AbstractThingTableListController
     @Override
     public boolean hasQuery() {
         return !TextUtils.isEmpty(getQuery());
+    }
+
+    protected Bundle getCursorExtras() {
+        return cursorExtras;
     }
 
     // Simple setters for state members.
@@ -475,11 +473,6 @@ abstract class AbstractThingTableListController
     @Override
     public void setSelectedThing(String thingId, String linkId) {
         adapter.setSelectedThing(thingId, linkId);
-    }
-
-    @Override
-    public void setSessionId(long sessionId) {
-        this.sessionId = sessionId;
     }
 
     @Override
@@ -598,10 +591,6 @@ abstract class AbstractThingTableListController
 
     private static String getSelectedLinkId(Bundle extras) {
         return extras.getString(EXTRA_SELECTED_LINK_ID);
-    }
-
-    private static long getSessionIdExtra(Bundle extras) {
-        return extras.getLong(EXTRA_SESSION_ID);
     }
 
     private static int getEmptyTextExtra(Bundle extras) {

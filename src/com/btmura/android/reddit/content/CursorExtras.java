@@ -25,22 +25,18 @@ public class CursorExtras {
     private static final String EXTRA_SESSION_ID = "sessionId";
 
     public static String getResolvedSubreddit(Cursor cursor) {
-        if (cursor != null) {
-            Bundle extras = cursor.getExtras();
-            if (extras != null) {
-                return extras.getString(EXTRA_RESOLVED_SUBREDDIT);
-            }
-        }
-        return null;
+        return cursor != null ? getResolvedSubreddit(cursor.getExtras()) : null;
+    }
+
+    public static String getResolvedSubreddit(Bundle extras) {
+        return extras != null ? extras.getString(EXTRA_RESOLVED_SUBREDDIT) : null;
     }
 
     public static long getSessionId(Cursor cursor) {
-        if (cursor != null) {
-            Bundle extras = cursor.getExtras();
-            if (extras != null) {
-                return extras.getLong(EXTRA_SESSION_ID);
-            }
-        }
-        return -1;
+        return cursor != null ? getSessionId(cursor.getExtras()) : 0;
+    }
+
+    public static long getSessionId(Bundle extras) {
+        return extras != null ? extras.getLong(EXTRA_SESSION_ID) : 0;
     }
 }

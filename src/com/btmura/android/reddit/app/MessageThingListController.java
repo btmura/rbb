@@ -32,7 +32,6 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.widget.MessageListAdapter;
 
@@ -42,8 +41,7 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     static final String EXTRA_MESSAGE_USER = "messageUser";
     static final String EXTRA_FILTER = "filter";
     static final String EXTRA_SINGLE_CHOICE = "singleChoice";
-
-    private static final String EXTRA_SESSION_ID = "sessionId";
+    static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
     private final Context context;
     private final MessageListAdapter adapter;
@@ -53,7 +51,7 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     private int emptyText;
     private int filter;
     private String moreId;
-    private long sessionId;
+    private Bundle cursorExtras;
 
     MessageThingListController(Context context, Bundle args) {
         this.context = context;
@@ -66,13 +64,13 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
         setAccountName(getAccountNameExtra(savedInstanceState));
-        setSessionId(getSessionIdExtra(savedInstanceState));
+        cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
     @Override
     public void saveInstanceState(Bundle outState) {
         outState.putString(EXTRA_ACCOUNT_NAME, getAccountName());
-        outState.putLong(EXTRA_SESSION_ID, getSessionId());
+        outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
     }
 
     // Loader related methods.
@@ -84,7 +82,7 @@ class MessageThingListController implements ThingListController<MessageListAdapt
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new MessageThingLoader(context, accountName, filter, moreId, sessionId);
+        return new MessageThingLoader(context, accountName, filter, moreId, cursorExtras);
     }
 
     @Override
@@ -92,8 +90,7 @@ class MessageThingListController implements ThingListController<MessageListAdapt
         setMoreId(null);
         adapter.swapCursor(cursor);
         if (cursor != null && cursor.getExtras() != null) {
-            Bundle extras = cursor.getExtras();
-            setSessionId(extras.getLong(ThingProvider.EXTRA_SESSION_ID));
+            cursorExtras = cursor.getExtras();
         }
     }
 
@@ -284,11 +281,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     }
 
     @Override
-    public long getSessionId() {
-        return sessionId;
-    }
-
-    @Override
     public boolean hasAccountName() {
         return !TextUtils.isEmpty(getAccountName());
     }
@@ -333,11 +325,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     @Override
     public void setSelectedThing(String thingId, String linkId) {
         adapter.setSelectedThing(thingId, linkId);
-    }
-
-    @Override
-    public void setSessionId(long sessionId) {
-        this.sessionId = sessionId;
     }
 
     @Override
@@ -387,10 +374,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
 
     private static boolean getSingleChoiceExtra(Bundle extras) {
         return extras.getBoolean(EXTRA_SINGLE_CHOICE);
-    }
-
-    private static long getSessionIdExtra(Bundle extras) {
-        return extras.getLong(EXTRA_SESSION_ID);
     }
 
     // Unfinished business...
