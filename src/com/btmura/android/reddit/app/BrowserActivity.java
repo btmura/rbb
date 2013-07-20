@@ -295,7 +295,8 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     private void handleHome(MenuItem item) {
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+        if (drawerToggle != null && getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            // TODO: Use return value when support library is fixed to not always return false.
             drawerToggle.onOptionsItemSelected(item);
         } else {
             super.onOptionsItemSelected(item);
