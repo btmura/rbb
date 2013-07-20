@@ -86,7 +86,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
 
     private OnNavigationEventListener listener;
     private AccountResultAdapter accountAdapter;
-    private AccountNameAdapter accountNameAdapter;
     private AccountPlaceAdapter placesAdapter;
     private AccountSubredditAdapter subredditAdapter;
     private MergeAdapter mergeAdapter;
@@ -96,6 +95,9 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     private String subreddit;
     private int filter;
 
+    // Member fields for contextual action bar
+
+    private AccountNameAdapter accountNameAdapter;
     private ActionMode actionMode;
     private TextView subredditCountText;
     private Spinner accountSpinner;
@@ -297,12 +299,11 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
             return false;
         }
 
-        actionMode = mode;
-
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View view = inflater.inflate(R.layout.subreddit_cab, null, false);
         mode.setCustomView(view);
 
+        actionMode = mode;
         subredditCountText = (TextView) view.findViewById(R.id.subreddit_count);
         accountSpinner = (Spinner) view.findViewById(R.id.account_spinner);
         accountSpinner.setAdapter(accountNameAdapter);
@@ -310,7 +311,7 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         addSubredditButton.setOnClickListener(this);
 
         MenuInflater menuInflater = mode.getMenuInflater();
-        menuInflater.inflate(R.menu.navigation_action_menu, menu);
+        menuInflater.inflate(R.menu.subreddit_action_menu, menu);
         return true;
     }
 
@@ -387,15 +388,20 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     private void prepareShareItems(Menu menu, boolean visible) {
         MenuItem shareItem = menu.findItem(R.id.menu_share);
         shareItem.setVisible(visible);
+        if (visible) {
+            MenuHelper.setShareProvider(shareItem, getClipLabel(), getClipText());
+        }
 
         MenuItem copyUrlItem = menu.findItem(R.id.menu_copy_url);
         copyUrlItem.setVisible(visible);
+    }
 
-        if (visible) {
-            String subreddit = getFirstCheckedSubreddit();
-            CharSequence url = Urls.subreddit(subreddit, -1, null, Urls.TYPE_HTML);
-            MenuHelper.setShareProvider(shareItem, subreddit, url);
-        }
+    private String getClipLabel() {
+        return getFirstCheckedSubreddit();
+    }
+
+    private CharSequence getClipText() {
+        return Urls.subreddit(getFirstCheckedSubreddit(), -1, null, Urls.TYPE_HTML);
     }
 
     @Override
@@ -459,9 +465,7 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     }
 
     private void handleCopyUrl() {
-        String subreddit = getFirstCheckedSubreddit();
-        CharSequence url = Urls.subreddit(subreddit, -1, null, Urls.TYPE_HTML);
-        MenuHelper.setClipAndToast(getActivity(), subreddit, url);
+        MenuHelper.setClipAndToast(getActivity(), getClipLabel(), getClipText());
     }
 
     @Override

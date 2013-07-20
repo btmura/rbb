@@ -57,7 +57,7 @@ public class SearchSubredditListFragment
     protected SearchSubredditActionModeController createActionModeController(
             SearchSubredditListController controller) {
         return new SearchSubredditActionModeController(getActivity(), controller.getAdapter(),
-                accountResultHolder);
+                accountResultHolder, this);
     }
 
     public String getQuery() {

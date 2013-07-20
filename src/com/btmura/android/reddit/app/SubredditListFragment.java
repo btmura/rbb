@@ -20,12 +20,15 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.app.SearchSubredditActionModeController.CheckedSubredditProvider;
 import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.SubredditAdapter;
@@ -33,7 +36,7 @@ import com.btmura.android.reddit.widget.SubredditView;
 
 abstract class SubredditListFragment<C extends SubredditListController<A>, AC extends ActionModeController, A extends SubredditAdapter>
         extends AbstractListFragment<C, AC, A>
-        implements OnSwipeDismissListener {
+        implements OnSwipeDismissListener, CheckedSubredditProvider {
 
     public static final String TAG = "SubredditListFragment";
 
@@ -117,6 +120,30 @@ abstract class SubredditListFragment<C extends SubredditListController<A>, AC ex
     @Override
     public void onSwipeDismiss(ListView listView, View view, int position) {
         Provider.removeSubredditAsync(getActivity(), getAccountName(), getSubreddit(position));
+    }
+
+    @Override
+    public String getFirstCheckedSubreddit() {
+        int position = ListViewUtils.getFirstCheckedPosition(getListView());
+        return controller.getAdapter().getName(position);
+    }
+
+    @Override
+    public String[] getCheckedSubreddits() {
+        ListView listView = getListView();
+        int checkedCount = listView.getCheckedItemCount();
+        String[] subreddits = new String[checkedCount];
+
+        SparseBooleanArray checked = listView.getCheckedItemPositions();
+        int size = checked.size();
+        int j = 0;
+        for (int i = 0; i < size; i++) {
+            if (checked.valueAt(i)) {
+                int position = checked.keyAt(i);
+                subreddits[j++] = controller.getAdapter().getName(position);
+            }
+        }
+        return subreddits;
     }
 
     public String getAccountName() {
