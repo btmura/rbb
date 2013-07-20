@@ -20,12 +20,16 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SidebarLoader;
 import com.btmura.android.reddit.net.SidebarResult;
+import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.widget.SidebarAdapter;
 
 public class SidebarFragment extends ListFragment implements LoaderCallbacks<SidebarResult> {
@@ -47,6 +51,7 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sid
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adapter = new SidebarAdapter(getActivity());
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -57,16 +62,19 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sid
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
     public Loader<SidebarResult> onCreateLoader(int id, Bundle args) {
         return new SidebarLoader(getActivity().getApplicationContext(), getSubredditArgument());
     }
 
+    @Override
     public void onLoadFinished(Loader<SidebarResult> loader, SidebarResult data) {
         adapter.swapData(data);
         setEmptyText(getString(data != null ? R.string.empty_list : R.string.error));
         setListShown(true);
     }
 
+    @Override
     public void onLoaderReset(Loader<SidebarResult> loader) {
         adapter.swapData(null);
     }
@@ -74,6 +82,41 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sid
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         MenuHelper.startSubredditActivity(getActivity(), getSubredditArgument());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.sidebar_menu, menu);
+        prepareShareItems(menu);
+    }
+
+    private void prepareShareItems(Menu menu) {
+        MenuItem shareItem = menu.findItem(R.id.menu_share);
+        MenuHelper.setShareProvider(shareItem, getClipLabel(), getClipText());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_copy_url:
+                handleCopyUrl();
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void handleCopyUrl() {
+        MenuHelper.setClipAndToast(getActivity(), getClipLabel(), getClipText());
+    }
+
+    private String getClipLabel() {
+        return getSubredditArgument();
+    }
+
+    private CharSequence getClipText() {
+        return Urls.subreddit(getSubredditArgument(), -1, null, Urls.TYPE_HTML);
     }
 
     private String getSubredditArgument() {

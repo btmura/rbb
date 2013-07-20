@@ -16,17 +16,15 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.widget.SidebarPagerAdapter;
 
 public class SidebarActivity extends FragmentActivity implements SubredditNameHolder {
@@ -41,36 +39,24 @@ public class SidebarActivity extends FragmentActivity implements SubredditNameHo
         super.onCreate(savedInstanceState);
         setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.sidebar);
-        setupViews();
+        setup(savedInstanceState);
     }
 
-    private void setupViews() {
-        ActionBar bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
+    private void setup(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
+            ft.commit();
+        }
 
-        String subreddit = getSubreddit();
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        String subreddit = getSubredditName();
         setTitle(Subreddits.getTitle(this, subreddit));
 
         adapter = new SidebarPagerAdapter(getSupportFragmentManager(), subreddit);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.sidebar_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        MenuItem shareItem = menu.findItem(R.id.menu_share_subreddit);
-        String title = getSubreddit();
-        CharSequence url = Urls.subreddit(getSubreddit(), -1, null, Urls.TYPE_HTML);
-        MenuHelper.setShareProvider(shareItem, title, url);
-        return true;
     }
 
     @Override
@@ -80,24 +66,13 @@ public class SidebarActivity extends FragmentActivity implements SubredditNameHo
                 finish();
                 return true;
 
-            case R.id.menu_add_subreddit:
-                handleAddSubreddit();
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getSupportFragmentManager(), getSubreddit());
-    }
-
-    private String getSubreddit() {
-        return getIntent().getStringExtra(EXTRA_SUBREDDIT);
-    }
-
+    @Override
     public String getSubredditName() {
-        return adapter.getPageTitle(pager.getCurrentItem()).toString();
+        return getIntent().getStringExtra(EXTRA_SUBREDDIT);
     }
 }
