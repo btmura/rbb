@@ -25,12 +25,24 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
+        android:ellipsize="end"
+        android:singleLine="true"
         android:textIsSelectable="true" />
 
     <Spinner
         android:id="@+id/account_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:paddingLeft="@dimen/spinner_padding" />
+
+    <ImageButton
+        android:id="@+id/add_subreddit_button"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/menu_add"
+        android:src="?attr/menu_add_icon" />
 
 </LinearLayout>
