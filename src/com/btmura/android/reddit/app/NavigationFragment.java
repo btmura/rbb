@@ -29,13 +29,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
@@ -49,7 +45,6 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter.OnPlaceSelectedListener;
 import com.btmura.android.reddit.widget.AccountResultAdapter;
@@ -59,8 +54,7 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
 
 public class NavigationFragment extends ListFragment implements LoaderCallbacks<AccountResult>,
-        OnPlaceSelectedListener, OnFilterSelectedListener, MultiChoiceModeListener,
-        OnClickListener {
+        OnPlaceSelectedListener, OnFilterSelectedListener, MultiChoiceModeListener {
 
     public static final String TAG = "NavigationFragment";
 
@@ -95,14 +89,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     private String subreddit;
     private int filter;
 
-    // Member fields for contextual action bar
-
-    private AccountNameAdapter accountNameAdapter;
-    private ActionMode actionMode;
-    private TextView subredditCountText;
-    private Spinner accountSpinner;
-    private ImageButton addSubredditButton;
-
     public static NavigationFragment newInstance() {
         return new NavigationFragment();
     }
@@ -119,7 +105,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         accountAdapter = new AccountResultAdapter(getActivity());
-        accountNameAdapter = new AccountNameAdapter(getActivity(), R.layout.account_name_row);
         placesAdapter = new AccountPlaceAdapter(getActivity(), this);
         subredditAdapter = AccountSubredditAdapter.newAccountInstance(getActivity());
         mergeAdapter = new MergeAdapter(accountAdapter, placesAdapter, subredditAdapter);
@@ -151,8 +136,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountAdapter.setAccountResult(result);
-        accountNameAdapter.clear();
-        accountNameAdapter.addAll(result.accountNames);
         setListShown(true);
 
         String accountName = result.getLastAccount(getActivity());
@@ -299,17 +282,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
             return false;
         }
 
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View view = inflater.inflate(R.layout.subreddit_cab, null, false);
-        mode.setCustomView(view);
-
-        actionMode = mode;
-        subredditCountText = (TextView) view.findViewById(R.id.subreddit_count);
-        accountSpinner = (Spinner) view.findViewById(R.id.account_spinner);
-        accountSpinner.setAdapter(accountNameAdapter);
-        addSubredditButton = (ImageButton) view.findViewById(R.id.add_subreddit_button);
-        addSubredditButton.setOnClickListener(this);
-
         MenuInflater menuInflater = mode.getMenuInflater();
         menuInflater.inflate(R.menu.subreddit_action_menu, menu);
         return true;
@@ -347,7 +319,7 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         }
 
         if (aboutItemVisible || shareItemsVisible || deleteItemVisible) {
-            prepareModeCustomView(count);
+            prepareModeCustomView(mode, count);
             prepareAboutItem(menu, aboutItemVisible);
             prepareDeleteItem(menu, deleteItemVisible);
             prepareShareItems(menu, shareItemsVisible);
@@ -358,18 +330,9 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         return true;
     }
 
-    private void prepareModeCustomView(int checkedCount) {
-        subredditCountText.setText(getResources().getQuantityString(R.plurals.subreddits,
+    private void prepareModeCustomView(ActionMode mode, int checkedCount) {
+        mode.setTitle(getResources().getQuantityString(R.plurals.subreddits,
                 checkedCount, checkedCount));
-        if (accountAdapter.getCount() > 1) {
-            int position = accountNameAdapter.findAccountName(accountName);
-            accountSpinner.setSelection(position);
-            accountSpinner.setVisibility(View.VISIBLE);
-            addSubredditButton.setVisibility(View.VISIBLE);
-        } else {
-            accountSpinner.setVisibility(View.GONE);
-            addSubredditButton.setVisibility(View.GONE);
-        }
     }
 
     private void prepareAboutItem(Menu menu, boolean visible) {
@@ -413,6 +376,11 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_add_subreddit:
+                handleAddSubreddit();
+                mode.finish();
+                return true;
+
             case R.id.menu_subreddit:
                 handleSubreddit();
                 mode.finish();
@@ -429,6 +397,10 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
                 return true;
         }
         return false;
+    }
+
+    private void handleAddSubreddit() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), getCheckedSubreddits());
     }
 
     private void handleSubreddit() {
@@ -470,17 +442,6 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-        actionMode = null;
-        subredditCountText = null;
-        accountSpinner = null;
-        addSubredditButton = null;
-    }
-
-    @Override
-    public void onClick(View v) {
-        String accountName = accountNameAdapter.getItem(accountSpinner.getSelectedItemPosition());
-        Provider.addSubredditAsync(getActivity(), accountName, getCheckedSubreddits());
-        actionMode.finish();
     }
 
     class AccountSubredditLoaderCallbacks implements LoaderCallbacks<Cursor> {

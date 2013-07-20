@@ -17,6 +17,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_add_subreddit"
+        android:icon="?attr/menu_add_icon"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_add_subreddit"/>
+    <item
         android:id="@+id/menu_subreddit"
         android:icon="?attr/menu_about_icon"
         android:showAsAction="ifRoom"

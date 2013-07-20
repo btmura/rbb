@@ -20,6 +20,7 @@
     <string name="account_type">com.btmura.android.reddit.account</string>
     <string name="add_account">Add account</string>
     <string name="add_subreddit">Add subreddit</string>
+    <string name="add_subreddits">Add subreddits</string>
     <string name="app_name">reddit by brian</string>
     <string name="authority_accounts">com.btmura.android.reddit.provider.accounts</string>
     <string name="authority_subreddits">com.btmura.android.reddit.provider.subreddits</string>

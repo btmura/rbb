@@ -18,56 +18,33 @@ package com.btmura.android.reddit.app;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.widget.AccountNameAdapter;
+import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.widget.SearchSubredditAdapter;
 
-class SearchSubredditActionModeController implements ActionModeController, OnClickListener {
-
-    // TODO: Use this in NavigationFragment to remove code duplication for action mode.
-    public interface CheckedSubredditProvider {
-        String getFirstCheckedSubreddit();
-
-        String[] getCheckedSubreddits();
-    }
+class SearchSubredditActionModeController implements ActionModeController {
 
     private final Context context;
+    private final FragmentManager fragmentManager;
     private final SearchSubredditAdapter adapter;
-    private final AccountResultHolder accountResultHolder;
-    private final CheckedSubredditProvider checkedProvider;
 
-    private final AccountNameAdapter accountNameAdapter;
     private ActionMode actionMode;
-    private TextView subredditCountText;
-    private Spinner accountSpinner;
-    private ImageButton addSubredditButton;
 
-    SearchSubredditActionModeController(Context context,
-            SearchSubredditAdapter adapter,
-            AccountResultHolder accountResultHolder,
-            CheckedSubredditProvider subredditProvider) {
+    SearchSubredditActionModeController(Context context, FragmentManager fragmentManager,
+            SearchSubredditAdapter adapter) {
         this.context = context;
+        this.fragmentManager = fragmentManager;
         this.adapter = adapter;
-        this.accountResultHolder = accountResultHolder;
-        this.checkedProvider = subredditProvider;
-        this.accountNameAdapter = new AccountNameAdapter(context, R.layout.account_name_row);
     }
 
     @Override
@@ -87,16 +64,7 @@ class SearchSubredditActionModeController implements ActionModeController, OnCli
             return false;
         }
 
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.subreddit_cab, null, false);
-        mode.setCustomView(view);
-
         actionMode = mode;
-        subredditCountText = (TextView) view.findViewById(R.id.subreddit_count);
-        accountSpinner = (Spinner) view.findViewById(R.id.account_spinner);
-        accountSpinner.setAdapter(accountNameAdapter);
-        addSubredditButton = (ImageButton) view.findViewById(R.id.add_subreddit_button);
-        addSubredditButton.setOnClickListener(this);
 
         MenuInflater menuInflater = mode.getMenuInflater();
         menuInflater.inflate(R.menu.subreddit_action_menu, menu);
@@ -129,25 +97,8 @@ class SearchSubredditActionModeController implements ActionModeController, OnCli
     }
 
     private void prepareModeCustomView(int checkedCount) {
-        subredditCountText.setText(context.getResources().getQuantityString(R.plurals.subreddits,
+        actionMode.setTitle(context.getResources().getQuantityString(R.plurals.subreddits,
                 checkedCount, checkedCount));
-
-        accountNameAdapter.clear();
-        AccountResult result = accountResultHolder.getAccountResult();
-        if (result != null) {
-            accountNameAdapter.addAll(result.accountNames);
-        }
-
-        if (accountNameAdapter.getCount() > 1) {
-            String accountName = result.getLastAccount(context);
-            int position = accountNameAdapter.findAccountName(accountName);
-            accountSpinner.setSelection(position);
-            accountSpinner.setVisibility(View.VISIBLE);
-            addSubredditButton.setVisibility(View.VISIBLE);
-        } else {
-            accountSpinner.setVisibility(View.GONE);
-            addSubredditButton.setVisibility(View.GONE);
-        }
     }
 
     private void prepareAboutItem(Menu menu, ListView listView, boolean visible) {
@@ -155,8 +106,13 @@ class SearchSubredditActionModeController implements ActionModeController, OnCli
         aboutItem.setVisible(visible);
         if (visible) {
             aboutItem.setTitle(context.getString(R.string.menu_subreddit,
-                    checkedProvider.getFirstCheckedSubreddit()));
+                    getFirstCheckedSubreddit(listView)));
         }
+    }
+
+    private String getFirstCheckedSubreddit(ListView listView) {
+        int position = ListViewUtils.getFirstCheckedPosition(listView);
+        return adapter.getName(position);
     }
 
     private void prepareDeleteItem(Menu menu) {
@@ -175,12 +131,11 @@ class SearchSubredditActionModeController implements ActionModeController, OnCli
     }
 
     private String getClipLabel(ListView listView) {
-        return checkedProvider.getFirstCheckedSubreddit();
+        return getFirstCheckedSubreddit(listView);
     }
 
     private CharSequence getClipText(ListView listView) {
-        return Urls.subreddit(checkedProvider.getFirstCheckedSubreddit(), -1, null,
-                Urls.TYPE_HTML);
+        return Urls.subreddit(getFirstCheckedSubreddit(listView), -1, null, Urls.TYPE_HTML);
     }
 
     @Override
@@ -192,6 +147,11 @@ class SearchSubredditActionModeController implements ActionModeController, OnCli
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView listView) {
         switch (item.getItemId()) {
+            case R.id.menu_add_subreddit:
+                handleAddSubreddit(listView);
+                mode.finish();
+                return true;
+
             case R.id.menu_subreddit:
                 handleSubreddit(listView);
                 mode.finish();
@@ -205,8 +165,28 @@ class SearchSubredditActionModeController implements ActionModeController, OnCli
         return false;
     }
 
+    private void handleAddSubreddit(ListView listView) {
+        MenuHelper.showAddSubredditDialog(fragmentManager, getCheckedSubreddits(listView));
+    }
+
+    private String[] getCheckedSubreddits(ListView listView) {
+        int checkedCount = listView.getCheckedItemCount();
+        String[] subreddits = new String[checkedCount];
+
+        SparseBooleanArray checked = listView.getCheckedItemPositions();
+        int size = checked.size();
+        int j = 0;
+        for (int i = 0; i < size; i++) {
+            if (checked.valueAt(i)) {
+                int position = checked.keyAt(i);
+                subreddits[j++] = adapter.getName(position);
+            }
+        }
+        return subreddits;
+    }
+
     private void handleSubreddit(ListView listView) {
-        MenuHelper.startSidebarActivity(context, checkedProvider.getFirstCheckedSubreddit());
+        MenuHelper.startSidebarActivity(context, getFirstCheckedSubreddit(listView));
     }
 
     private void handleCopyUrl(ListView listView) {
@@ -216,16 +196,6 @@ class SearchSubredditActionModeController implements ActionModeController, OnCli
     @Override
     public void onDestroyActionMode(ActionMode mode) {
         actionMode = null;
-        subredditCountText = null;
-        accountSpinner = null;
-        addSubredditButton = null;
-    }
-
-    @Override
-    public void onClick(View v) {
-        String accountName = accountNameAdapter.getItem(accountSpinner.getSelectedItemPosition());
-        Provider.addSubredditAsync(context, accountName, checkedProvider.getCheckedSubreddits());
-        actionMode.finish();
     }
 
     @Override

@@ -16,33 +16,22 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
-
-    <TextView
-        android:id="@+id/subreddit_count"
-        style="@android:style/TextAppearance.Holo.Widget.ActionBar.Title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-        android:ellipsize="end"
-        android:singleLine="true"
-        android:textIsSelectable="true" />
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
     <Spinner
         android:id="@+id/account_spinner"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
         android:paddingLeft="@dimen/spinner_padding" />
 
-    <ImageButton
-        android:id="@+id/add_subreddit_button"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="wrap_content"
+    <include
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:contentDescription="@string/menu_add"
-        android:src="?attr/menu_add_icon" />
+        layout="@layout/ok_button_bar" />
 
 </LinearLayout>

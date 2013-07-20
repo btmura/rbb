@@ -43,6 +43,7 @@ public class AddSubredditFragment extends DialogFragment
     public static final String TAG = "AddSubredditFragment";
 
     private static final String ARG_SUBREDDIT = "subreddit";
+    private static final String ARG_MULTIPLE_SUBREDDITS = "multipleSubreddits";
 
     private AccountNameAdapter adapter;
     private boolean restoringState;
@@ -54,7 +55,16 @@ public class AddSubredditFragment extends DialogFragment
     public static AddSubredditFragment newInstance(String subreddit) {
         Bundle args = new Bundle(1);
         args.putString(ARG_SUBREDDIT, subreddit);
+        return newFragment(args);
+    }
 
+    public static AddSubredditFragment newInstance(String[] subreddits) {
+        Bundle args = new Bundle(1);
+        args.putStringArray(ARG_MULTIPLE_SUBREDDITS, subreddits);
+        return newFragment(args);
+    }
+
+    private static AddSubredditFragment newFragment(Bundle args) {
         AddSubredditFragment frag = new AddSubredditFragment();
         frag.setArguments(args);
         return frag;
@@ -71,22 +81,27 @@ public class AddSubredditFragment extends DialogFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        getDialog().setTitle(R.string.add_subreddit);
-        View v = inflater.inflate(R.layout.add_subreddit, container, false);
+        boolean multiple = isAddingMultipleSubreddits();
 
+        getDialog().setTitle(multiple ? R.string.add_subreddits : R.string.add_subreddit);
+
+        int layout = multiple ? R.layout.add_multiple_subreddits : R.layout.add_subreddit;
+        View v = inflater.inflate(layout, container, false);
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
         accountSpinner.setEnabled(false);
         accountSpinner.setAdapter(adapter);
 
-        String name = getArguments().getString(ARG_SUBREDDIT);
-        if (!Subreddits.hasSidebar(name)) {
-            name = null;
+        if (!multiple) {
+            String subreddit = getSubredditArgument();
+            if (!Subreddits.hasSidebar(subreddit)) {
+                subreddit = null;
+            }
+            int length = subreddit != null ? subreddit.length() : 0;
+            nameField = (EditText) v.findViewById(R.id.subreddit_name);
+            nameField.setText(subreddit);
+            nameField.setSelection(length, length);
+            nameField.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
         }
-        int length = name != null ? name.length() : 0;
-        nameField = (EditText) v.findViewById(R.id.subreddit_name);
-        nameField.setText(name);
-        nameField.setSelection(length, length);
-        nameField.setFilters(InputFilters.SUBREDDIT_NAME_FILTERS);
 
         cancel = (Button) v.findViewById(R.id.cancel);
         cancel.setOnClickListener(this);
@@ -104,10 +119,12 @@ public class AddSubredditFragment extends DialogFragment
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
         return new AccountLoader(getActivity(), true, false);
     }
 
+    @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         int visiblility = result.accountNames.length > 1 ? View.VISIBLE : View.GONE;
         accountSpinner.setVisibility(visiblility);
@@ -121,10 +138,12 @@ public class AddSubredditFragment extends DialogFragment
         }
     }
 
+    @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
         adapter.clear();
     }
 
+    @Override
     public void onClick(View v) {
         if (v == cancel) {
             handleCancel();
@@ -138,14 +157,42 @@ public class AddSubredditFragment extends DialogFragment
     }
 
     private void handleOk() {
+        if (isAddingMultipleSubreddits()) {
+            addMultipleSubreddits();
+        } else {
+            addSubreddit();
+        }
+    }
+
+    private void addMultipleSubreddits() {
+        Provider.addSubredditAsync(getActivity(), getSelectedAccountName(),
+                getMultipleSubredditsArgument());
+        dismiss();
+    }
+
+    private String getSelectedAccountName() {
+        return adapter.getItem(accountSpinner.getSelectedItemPosition());
+    }
+
+    private void addSubreddit() {
         String subreddit = nameField.getText().toString();
         if (TextUtils.isEmpty(subreddit)) {
             nameField.setError(getString(R.string.error_blank_field));
             return;
         }
-
-        String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
-        Provider.addSubredditAsync(getActivity(), accountName, subreddit);
+        Provider.addSubredditAsync(getActivity(), getSelectedAccountName(), subreddit);
         dismiss();
+    }
+
+    private boolean isAddingMultipleSubreddits() {
+        return getMultipleSubredditsArgument() != null;
+    }
+
+    private String getSubredditArgument() {
+        return getArguments().getString(ARG_SUBREDDIT);
+    }
+
+    private String[] getMultipleSubredditsArgument() {
+        return getArguments().getStringArray(ARG_MULTIPLE_SUBREDDITS);
     }
 }

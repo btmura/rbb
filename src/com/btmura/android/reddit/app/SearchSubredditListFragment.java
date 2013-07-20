@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.widget.SearchSubredditAdapter;
@@ -25,8 +24,6 @@ public class SearchSubredditListFragment
         extends SubredditListFragment<SearchSubredditListController,
         SearchSubredditActionModeController,
         SearchSubredditAdapter> {
-
-    private AccountResultHolder accountResultHolder;
 
     public static SearchSubredditListFragment newInstance(String accountName, String query,
             boolean singleChoice) {
@@ -41,14 +38,6 @@ public class SearchSubredditListFragment
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof AccountResultHolder) {
-            accountResultHolder = (AccountResultHolder) activity;
-        }
-    }
-
-    @Override
     protected SearchSubredditListController createController() {
         return new SearchSubredditListController(getActivity(), getArguments());
     }
@@ -56,8 +45,8 @@ public class SearchSubredditListFragment
     @Override
     protected SearchSubredditActionModeController createActionModeController(
             SearchSubredditListController controller) {
-        return new SearchSubredditActionModeController(getActivity(), controller.getAdapter(),
-                accountResultHolder, this);
+        return new SearchSubredditActionModeController(getActivity(), getFragmentManager(),
+                controller.getAdapter());
     }
 
     public String getQuery() {

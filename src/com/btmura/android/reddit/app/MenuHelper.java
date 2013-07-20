@@ -83,6 +83,10 @@ public class MenuHelper {
         AddSubredditFragment.newInstance(subreddit).show(fm, AddSubredditFragment.TAG);
     }
 
+    public static void showAddSubredditDialog(FragmentManager fm, String[] subreddits) {
+        AddSubredditFragment.newInstance(subreddits).show(fm, AddSubredditFragment.TAG);
+    }
+
     public static void startAccountListActivity(Context context) {
         context.startActivity(new Intent(context, AccountListActivity.class));
     }
