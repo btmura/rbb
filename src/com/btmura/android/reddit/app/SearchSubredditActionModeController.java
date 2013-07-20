@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.ListViewUtils;
@@ -37,14 +38,16 @@ class SearchSubredditActionModeController implements ActionModeController {
     private final Context context;
     private final FragmentManager fragmentManager;
     private final SearchSubredditAdapter adapter;
+    private final AccountResultHolder accountResultHolder;
 
     private ActionMode actionMode;
 
     SearchSubredditActionModeController(Context context, FragmentManager fragmentManager,
-            SearchSubredditAdapter adapter) {
+            SearchSubredditAdapter adapter, AccountResultHolder accountResultHolder) {
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.adapter = adapter;
+        this.accountResultHolder = accountResultHolder;
     }
 
     @Override
@@ -89,16 +92,23 @@ class SearchSubredditActionModeController implements ActionModeController {
             }
         }
 
-        prepareModeCustomView(count);
+        prepareMode(count);
+        prepareAddItem(menu);
         prepareAboutItem(menu, listView, aboutItemVisible);
         prepareDeleteItem(menu);
         prepareShareItems(menu, listView, shareItemsVisible);
         return true;
     }
 
-    private void prepareModeCustomView(int checkedCount) {
+    private void prepareMode(int checkedCount) {
         actionMode.setTitle(context.getResources().getQuantityString(R.plurals.subreddits,
                 checkedCount, checkedCount));
+    }
+
+    private void prepareAddItem(Menu menu) {
+        AccountResult result = accountResultHolder.getAccountResult();
+        MenuItem addItem = menu.findItem(R.id.menu_add_subreddit);
+        addItem.setVisible(result != null && result.accountNames.length > 1);
     }
 
     private void prepareAboutItem(Menu menu, ListView listView, boolean visible) {

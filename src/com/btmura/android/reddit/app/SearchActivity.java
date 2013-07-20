@@ -38,7 +38,8 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 public class SearchActivity extends AbstractBrowserActivity implements
         LoaderCallbacks<AccountResult>,
         TabListener,
-        SearchQueryHandler {
+        SearchQueryHandler,
+        AccountResultHolder {
 
     public static final String TAG = "SearchActivity";
 
@@ -50,6 +51,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     private static final String STATE_SELECTED_TAB = "selectedTab";
 
+    private AccountResult accountResult;
     private String accountName;
     private Tab tabPosts;
     private Tab tabSubreddits;
@@ -110,6 +112,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        accountResult = result;
         accountName = result.getLastAccount(this);
         SearchSubredditListFragment sf = getSubredditSearchFragment();
         if (sf != null && sf.getAccountName() == null) {
@@ -125,6 +128,11 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
+    }
+
+    @Override
+    public AccountResult getAccountResult() {
+        return accountResult;
     }
 
     @Override

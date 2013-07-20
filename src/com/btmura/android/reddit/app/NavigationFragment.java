@@ -282,8 +282,8 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
             return false;
         }
 
-        MenuInflater menuInflater = mode.getMenuInflater();
-        menuInflater.inflate(R.menu.subreddit_action_menu, menu);
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.subreddit_action_menu, menu);
         return true;
     }
 
@@ -319,7 +319,8 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         }
 
         if (aboutItemVisible || shareItemsVisible || deleteItemVisible) {
-            prepareModeCustomView(mode, count);
+            prepareMode(mode, count);
+            prepareAddItem(menu);
             prepareAboutItem(menu, aboutItemVisible);
             prepareDeleteItem(menu, deleteItemVisible);
             prepareShareItems(menu, shareItemsVisible);
@@ -330,9 +331,14 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
         return true;
     }
 
-    private void prepareModeCustomView(ActionMode mode, int checkedCount) {
+    private void prepareMode(ActionMode mode, int checkedCount) {
         mode.setTitle(getResources().getQuantityString(R.plurals.subreddits,
                 checkedCount, checkedCount));
+    }
+
+    private void prepareAddItem(Menu menu) {
+        MenuItem addItem = menu.findItem(R.id.menu_add_subreddit);
+        addItem.setVisible(accountAdapter.getCount() > 1);
     }
 
     private void prepareAboutItem(Menu menu, boolean visible) {
