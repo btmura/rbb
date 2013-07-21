@@ -45,6 +45,8 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 public class BrowserActivity extends AbstractBrowserActivity
         implements OnNavigationListener, OnNavigationEventListener {
 
+    public static final String EXTRA_SUBREDDIT = "subreddit";
+
     public interface OnFilterSelectedListener {
         void onFilterSelected(int filter);
     }

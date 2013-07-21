@@ -140,9 +140,8 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     private void handleHome() {
         if (insertBackStack()) {
-            Intent intent = new Intent(this, ThingListActivity.class);
-            intent.putExtra(ThingListActivity.EXTRA_SUBREDDIT, getSubredditName());
-            intent.putExtra(ThingListActivity.EXTRA_FLAGS, ThingListActivity.FLAG_INSERT_HOME);
+            Intent intent = new Intent(this, BrowserActivity.class);
+            intent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getSubredditName());
             startActivity(intent);
         }
         finish();

@@ -94,9 +94,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:uiOptions="splitActionBarWhenNarrow" />
         <activity
-            android:name=".app.ThingListActivity"
-            android:uiOptions="splitActionBarWhenNarrow" />
-        <activity
             android:name=".app.UserProfileActivity"
             tools:ignore="ExportedActivity" >
             <intent-filter>
