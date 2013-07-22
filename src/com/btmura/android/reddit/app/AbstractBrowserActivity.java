@@ -31,7 +31,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -320,13 +319,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshViews(null);
     }
 
-    protected void refreshSubreddit() {
-        ControlFragment cf = getControlFragment();
-        if (cf != null) {
-            selectSubreddit(cf.getSubreddit(), cf.isRandom());
-        }
-    }
-
     protected void selectSubreddit(String subreddit, boolean isRandom) {
         if (isSinglePane) {
             selectSubredditSinglePane(subreddit, isRandom);
@@ -374,11 +366,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshViews(null);
     }
 
-    protected void replaceThingListFragmentMultiPane() {
-        ControlFragment cf = getControlFragment();
-        selectSubredditMultiPane(cf.getSubreddit(), cf.isRandom());
-    }
-
+    @Override
     public void onThingSelected(View view, ThingBundle thingBundle, int pageType) {
         selectThing(view, thingBundle, 0, pageType);
     }
@@ -437,10 +425,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public void onThingTitleDiscovery(String title) {
     }
 
-    public ViewPager getThingPager() {
-        return null;
-    }
-
     private void safePopBackStackImmediate() {
         FragmentManager fm = getSupportFragmentManager();
         if (fm.getBackStackEntryCount() > 0) {
@@ -450,6 +434,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
+    @Override
     public int onMeasureThingBody() {
         return thingBodyWidth;
     }
@@ -571,6 +556,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
+    @Override
     public String getSubredditName() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
@@ -583,6 +569,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         return null;
     }
 
+    @Override
     public ThingBundle getThingBundle() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
