@@ -32,7 +32,6 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class SearchActivity extends AbstractBrowserActivity implements
@@ -56,7 +55,6 @@ public class SearchActivity extends AbstractBrowserActivity implements
     private Tab tabPosts;
     private Tab tabSubreddits;
     private Tab tabInSubreddit;
-    private boolean tabListenerEnabled;
 
     @Override
     protected void setContentView() {
@@ -80,23 +78,21 @@ public class SearchActivity extends AbstractBrowserActivity implements
     protected void setupActionBar(Bundle savedInstanceState) {
         bar.setTitle(getQuery());
         bar.setDisplayHomeAsUpEnabled(true);
+        setupTabs(savedInstanceState);
+        getSupportLoaderManager().initLoader(0, null, this);
+    }
 
+    private void setupTabs(Bundle savedInstanceState) {
         if (Subreddits.hasSidebar(getSubreddit())) {
             tabInSubreddit = addTab(MenuHelper.getSubredditTitle(this, getSubreddit()));
         }
         tabPosts = addTab(getString(R.string.tab_posts));
         tabSubreddits = addTab(getString(R.string.tab_subreddits));
 
-        // Prevent listener being called twice after a configuration change.
-        tabListenerEnabled = savedInstanceState == null
-                || savedInstanceState.getInt(STATE_SELECTED_TAB) == 0;
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        if (!tabListenerEnabled) {
-            tabListenerEnabled = true;
+        if (savedInstanceState != null) {
             bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_SELECTED_TAB));
         }
-
-        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     private Tab addTab(CharSequence text) {
@@ -119,6 +115,8 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
+        accountResult = null;
+        accountName = null;
     }
 
     @Override
@@ -131,10 +129,6 @@ public class SearchActivity extends AbstractBrowserActivity implements
         return accountName;
     }
 
-    protected int getFilter() {
-        return FilterAdapter.SUBREDDIT_HOT;
-    }
-
     @Override
     protected boolean hasSubredditList() {
         return bar.getSelectedTab() == tabSubreddits;
@@ -143,63 +137,46 @@ public class SearchActivity extends AbstractBrowserActivity implements
     @Override
     public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onTabSelected tab:" + tab.getText() + " enabled:" + tabListenerEnabled);
+            Log.d(TAG, "onTabSelected tab:" + tab.getText());
         }
-        if (tabListenerEnabled) {
-            selectTab(tab);
-        }
+        selectTab(tab);
     }
 
     @Override
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onTabReselected tab:" + tab.getText() + " enabled:" + tabListenerEnabled);
+            Log.d(TAG, "onTabReselected tab:" + tab.getText());
         }
-        if (tabListenerEnabled && !isSinglePane) {
+        if (!isSinglePane) {
             getFragmentManager().popBackStack();
         }
     }
 
     private void selectTab(Tab tab) {
-        String query = getQuery();
-        if (tab == tabSubreddits) {
-            refreshSubredditList(query);
-        } else if (tab == tabPosts) {
-            refreshThingList(null, query);
-        } else if (tab == tabInSubreddit) {
-            refreshThingList(getSubreddit(), query);
+        if (accountName != null) {
+            String query = getQuery();
+            if (tab == tabInSubreddit) {
+                refreshThingList(getSubreddit(), query);
+            } else if (tab == tabPosts) {
+                refreshThingList(null, query);
+            } else if (tab == tabSubreddits) {
+                refreshSubredditList(query);
+            }
         }
     }
 
     private void refreshSubredditList(String query) {
-        if (isSubredditListDifferent(query)) {
-            int containerId = isSinglePane ? R.id.search_container : R.id.subreddit_list_container;
-            setSearchSubredditsFragments(containerId, query);
-        } else {
-            refreshSubredditListVisibility();
-        }
+        int containerId = isSinglePane ? R.id.search_container : R.id.subreddit_list_container;
+        setSearchSubredditsFragments(containerId, accountName, query,
+                FilterAdapter.SUBREDDIT_HOT);
+        refreshSubredditListVisibility();
     }
 
     private void refreshThingList(String subreddit, String query) {
-        if (isThingListDifferent(subreddit, query)) {
-            int containerId = isSinglePane ? R.id.search_container : R.id.thing_list_container;
-            setSearchThingsFragments(containerId, accountName, subreddit, query,
-                    FilterAdapter.SUBREDDIT_HOT);
-        } else {
-            refreshSubredditListVisibility();
-        }
-    }
-
-    private boolean isSubredditListDifferent(String query) {
-        SearchSubredditListFragment frag = getSubredditSearchFragment();
-        return frag == null || !Objects.equals(query, frag.getQuery());
-    }
-
-    private boolean isThingListDifferent(String subreddit, String query) {
-        ThingListFragment<?> frag = getThingListFragment();
-        return frag == null
-                || !Objects.equals(subreddit, frag.getSubreddit())
-                || !Objects.equals(query, frag.getQuery());
+        int containerId = isSinglePane ? R.id.search_container : R.id.thing_list_container;
+        setSearchThingsFragments(containerId, accountName, subreddit, query,
+                FilterAdapter.SUBREDDIT_HOT);
+        refreshSubredditListVisibility();
     }
 
     @Override

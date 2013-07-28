@@ -85,7 +85,15 @@
         <activity
             android:name=".app.ContentBrowserActivity"
             android:label="@string/content_browser" />
-        <activity android:name=".app.SearchActivity" />
+        <activity
+            android:name=".app.SearchActivity"
+            tools:ignore="ExportedActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".app.SidebarActivity"
             android:uiOptions="splitActionBarWhenNarrow" />

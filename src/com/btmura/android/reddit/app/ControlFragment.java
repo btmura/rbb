@@ -37,6 +37,7 @@ public class ControlFragment extends Fragment {
     private static final String ARG_IS_RANDOM = "isRandom";
     private static final String ARG_PROFILE_USER = "profileUser";
     private static final String ARG_MESSAGE_USER = "messageUser";
+    private static final String ARG_QUERY = "query";
     private static final String ARG_THING_BUNDLE = "thingBundle";
     private static final String ARG_FILTER = "filter";
 
@@ -74,6 +75,27 @@ public class ControlFragment extends Fragment {
         args.putInt(ARG_NAVIGATION, NAVIGATION_MESSAGES);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_MESSAGE_USER, accountName);
+        args.putInt(ARG_FILTER, filter);
+        return newFragment(args);
+    }
+
+    public static ControlFragment newSearchThingsInstance(String accountName, String subreddit,
+            String query, int filter) {
+        Bundle args = new Bundle(4);
+        args.putInt(ARG_NAVIGATION, NAVIGATION_SEARCH_THINGS);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_SUBREDDIT, subreddit);
+        args.putString(ARG_QUERY, query);
+        args.putInt(ARG_FILTER, filter);
+        return newFragment(args);
+    }
+
+    public static ControlFragment newUserProfileInstance(String accountName, String profileUser,
+            int filter) {
+        Bundle args = new Bundle(4);
+        args.putInt(ARG_NAVIGATION, NAVIGATION_PROFILE);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_PROFILE_USER, profileUser);
         args.putInt(ARG_FILTER, filter);
         return newFragment(args);
     }

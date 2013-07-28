@@ -154,7 +154,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         setLeftFragment(containerId, NavigationFragment.newInstance());
     }
 
-    protected void setSearchSubredditsFragments(int containerId, String query) {
+    protected void setSearchSubredditsFragments(int containerId, String accountName,
+            String query, int filter) {
+        selectAccountWithFilter(accountName, filter);
         setLeftFragment(containerId, SearchSubredditListFragment
                 .newInstance(accountName, query, isSingleChoice));
     }
@@ -203,15 +205,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected void setSearchThingsFragments(int containerId, String accountName,
             String subreddit, String query, int filter) {
         selectAccountWithFilter(accountName, filter);
-        setCenterFragment(containerId, SearchThingListFragment
-                .newInstance(accountName, subreddit, query, isSingleChoice));
+        setCenterFragment(containerId,
+                ControlFragment.newSearchThingsInstance(accountName, subreddit, query, filter),
+                SearchThingListFragment
+                        .newInstance(accountName, subreddit, query, isSingleChoice));
     }
 
     protected void setUserProfileFragments(int containerId, String accountName,
             String profileUser, int filter) {
         selectAccountWithFilter(accountName, 0);
-        setCenterFragment(containerId, ProfileThingListFragment
-                .newInstance(accountName, profileUser, filter, isSingleChoice));
+        setCenterFragment(containerId,
+                ControlFragment.newUserProfileInstance(accountName, profileUser, filter),
+                ProfileThingListFragment
+                        .newInstance(accountName, profileUser, filter, isSingleChoice));
     }
 
     // Methods for setting the fragments on the screen.
@@ -231,24 +237,36 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         removeFragment(ft, RIGHT_FRAGMENT_TAG);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                 | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-        ft.commit();
+        ft.commitAllowingStateLoss();
     }
 
-    private void setRightFragment(int containerId, ControlFragment controlFrag,
-            ThingListFragment<?> rightFrag) {
+    private void setCenterFragment(int containerId,
+            ControlFragment controlFrag, ThingListFragment<?> rightFrag) {
         if (isSinglePane) {
-            setRightFragmentSinglePane(containerId, controlFrag, rightFrag);
+            setRightFragmentSinglePane(containerId, controlFrag, rightFrag, true);
         } else {
-            setRightFragmentMultiPane(containerId, controlFrag, rightFrag);
+            setRightFragmentMultiPane(containerId, controlFrag, rightFrag, true);
+        }
+    }
+
+    private void setRightFragment(int containerId,
+            ControlFragment controlFrag, ThingListFragment<?> rightFrag) {
+        if (isSinglePane) {
+            setRightFragmentSinglePane(containerId, controlFrag, rightFrag, false);
+        } else {
+            setRightFragmentMultiPane(containerId, controlFrag, rightFrag, false);
         }
     }
 
     private void setRightFragmentSinglePane(int containerId,
-            ControlFragment controlFrag, ThingListFragment<?> rightFrag) {
+            ControlFragment controlFrag, ThingListFragment<?> rightFrag, boolean removeLeft) {
         ThingListFragment<?> current = getThingListFragment();
         if (!Arguments.areEqual(current, rightFrag)) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(controlFrag, CONTROL_FRAGMENT_TAG);
+            if (removeLeft) {
+                removeFragment(ft, LEFT_FRAGMENT_TAG);
+            }
             ft.replace(containerId, rightFrag, RIGHT_FRAGMENT_TAG);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                     | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
@@ -258,12 +276,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void setRightFragmentMultiPane(int containerId,
-            ControlFragment controlFrag, ThingListFragment<?> rightFrag) {
+            ControlFragment controlFrag, ThingListFragment<?> rightFrag, boolean removeLeft) {
         ThingListFragment<?> current = getThingListFragment();
         if (!Arguments.areEqual(current, rightFrag)) {
             safePopBackStackImmediate();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(controlFrag, CONTROL_FRAGMENT_TAG);
+            if (removeLeft) {
+                removeFragment(ft, LEFT_FRAGMENT_TAG);
+            }
             ft.replace(containerId, rightFrag, RIGHT_FRAGMENT_TAG);
             removeFragment(ft, ThingFragment.TAG);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
@@ -274,15 +295,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshActionBar(controlFrag);
         refreshThingBodyWidthMeasurement();
         refreshViews(null);
-    }
-
-    private void setCenterFragment(int containerId, Fragment frag) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        removeFragment(ft, LEFT_FRAGMENT_TAG);
-        ft.replace(containerId, frag, RIGHT_FRAGMENT_TAG);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
-                | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-        ft.commit();
     }
 
     private void removeFragment(FragmentTransaction ft, String tag) {
