@@ -85,6 +85,7 @@
         <activity
             android:name=".app.ContentBrowserActivity"
             android:label="@string/content_browser" />
+        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.SearchActivity"
             tools:ignore="ExportedActivity" >
@@ -101,6 +102,7 @@
             android:name=".app.ThingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:uiOptions="splitActionBarWhenNarrow" />
+        <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.UserProfileActivity"
             tools:ignore="ExportedActivity" >

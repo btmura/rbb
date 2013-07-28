@@ -35,7 +35,6 @@ import com.btmura.android.reddit.content.UserInfoLoader;
 import com.btmura.android.reddit.net.AccountInfoResult;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.util.Array;
-import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountFilterAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
@@ -118,13 +117,13 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
         }
         adapter.setFilter(currentFilter);
 
-        // Start loading the user's karma count.
-        getSupportLoaderManager().initLoader(1, null, karmaLoaderCallbacks);
-
         bar.setListNavigationCallbacks(adapter, this);
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(1, null, karmaLoaderCallbacks);
     }
 
     @Override
@@ -141,30 +140,24 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
         bar.setSelectedNavigationItem(0);
     }
 
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        adapter.updateState(itemPosition);
-        currentFilter = adapter.getFilter();
+    @Override
+    public void onLoaderReset(Loader<AccountResult> loader) {
+    }
 
-        ThingListFragment<?> frag = getThingListFragment();
-        if (frag == null
-                || !Objects.equals(frag.getAccountName(), accountName)
-                || frag.getFilter() != currentFilter) {
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        if (accountName != null) {
+            adapter.updateState(itemPosition);
+            currentFilter = adapter.getFilter();
             setUserProfileFragments(R.id.thing_list_container, accountName, currentUser,
                     currentFilter);
         }
         return true;
     }
 
-    public void onLoaderReset(Loader<AccountResult> loader) {
-    }
-
     @Override
     public String getAccountName() {
         return accountName;
-    }
-
-    protected int getFilter() {
-        return adapter.getFilter();
     }
 
     @Override
