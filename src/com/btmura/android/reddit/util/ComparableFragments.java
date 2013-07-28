@@ -16,34 +16,19 @@
 
 package com.btmura.android.reddit.util;
 
-import android.os.Bundle;
+import com.btmura.android.reddit.app.ComparableFragment;
 
-public class Arguments {
+public class ComparableFragments {
 
-    public interface ArgumentsHolder {
-        Bundle getArguments();
-
-        boolean isEqual(ArgumentsHolder o);
-    }
-
-    public static boolean areEqual(ArgumentsHolder o1, ArgumentsHolder o2) {
-        if (o1 != null) {
-            return o1.isEqual(o2);
-        } else if (o2 != null) {
-            return o2.isEqual(o1);
-        }
-        return true;
-    }
-
-    public static boolean baseEquals(ArgumentsHolder o1, ArgumentsHolder o2) {
+    public static boolean baseEquals(ComparableFragment o1, ComparableFragment o2) {
         return o1 != null && o2 != null && o1.getClass() == o2.getClass();
     }
 
-    public static boolean equalStrings(ArgumentsHolder o1, ArgumentsHolder o2, String key) {
+    public static boolean equalStrings(ComparableFragment o1, ComparableFragment o2, String key) {
         return Objects.equals(o1.getArguments().getString(key), o2.getArguments().getString(key));
     }
 
-    public static boolean equalInts(ArgumentsHolder o1, ArgumentsHolder o2, String key) {
+    public static boolean equalInts(ComparableFragment o1, ComparableFragment o2, String key) {
         return Objects.equals(o1.getArguments().getInt(key), o2.getArguments().getInt(key));
     }
 }

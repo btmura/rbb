@@ -18,8 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-import com.btmura.android.reddit.util.Arguments;
-import com.btmura.android.reddit.util.Arguments.ArgumentsHolder;
+import com.btmura.android.reddit.util.ComparableFragments;
 
 public class SubredditThingListFragment extends ThingListFragment<SubredditThingListController> {
 
@@ -43,10 +42,13 @@ public class SubredditThingListFragment extends ThingListFragment<SubredditThing
     }
 
     @Override
-    public boolean isEqual(ArgumentsHolder o) {
-        return Arguments.baseEquals(this, o)
-                && Arguments.equalStrings(this, o, SubredditThingListController.EXTRA_ACCOUNT_NAME)
-                && Arguments.equalStrings(this, o, SubredditThingListController.EXTRA_SUBREDDIT)
-                && Arguments.equalInts(this, o, SubredditThingListController.EXTRA_FILTER);
+    public boolean fragmentEquals(ComparableFragment o) {
+        return ComparableFragments.baseEquals(this, o)
+                && ComparableFragments.equalStrings(this, o,
+                        SubredditThingListController.EXTRA_ACCOUNT_NAME)
+                && ComparableFragments.equalStrings(this, o,
+                        SubredditThingListController.EXTRA_SUBREDDIT)
+                && ComparableFragments.equalInts(this, o,
+                        SubredditThingListController.EXTRA_FILTER);
     }
 }

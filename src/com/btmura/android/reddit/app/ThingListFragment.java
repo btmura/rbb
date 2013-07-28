@@ -40,16 +40,20 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.CursorExtras;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.util.Arguments.ArgumentsHolder;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingView;
 
-abstract class ThingListFragment<C extends ThingListController<?>> extends ListFragment
-        implements LoaderCallbacks<Cursor>, ArgumentsHolder, OnScrollListener,
-        OnSwipeDismissListener, OnVoteListener, MultiChoiceModeListener {
+abstract class ThingListFragment<C extends ThingListController<?>>
+        extends ListFragment
+        implements LoaderCallbacks<Cursor>,
+        ComparableFragment,
+        OnScrollListener,
+        OnSwipeDismissListener,
+        OnVoteListener,
+        MultiChoiceModeListener {
 
     /** String argument that is used to paginate things. */
     private static final String LOADER_MORE_ID = "moreId";

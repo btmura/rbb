@@ -18,8 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-import com.btmura.android.reddit.util.Arguments;
-import com.btmura.android.reddit.util.Arguments.ArgumentsHolder;
+import com.btmura.android.reddit.util.ComparableFragments;
 
 public class ProfileThingListFragment extends ThingListFragment<ProfileThingListController> {
 
@@ -46,10 +45,13 @@ public class ProfileThingListFragment extends ThingListFragment<ProfileThingList
     }
 
     @Override
-    public boolean isEqual(ArgumentsHolder o) {
-        return Arguments.baseEquals(this, o)
-                && Arguments.equalStrings(this, o, ProfileThingListController.EXTRA_ACCOUNT_NAME)
-                && Arguments.equalStrings(this, o, ProfileThingListController.EXTRA_PROFILE_USER)
-                && Arguments.equalInts(this, o, ProfileThingListController.EXTRA_FILTER);
+    public boolean fragmentEquals(ComparableFragment o) {
+        return ComparableFragments.baseEquals(this, o)
+                && ComparableFragments.equalStrings(this, o,
+                        ProfileThingListController.EXTRA_ACCOUNT_NAME)
+                && ComparableFragments.equalStrings(this, o,
+                        ProfileThingListController.EXTRA_PROFILE_USER)
+                && ComparableFragments.equalInts(this, o,
+                        ProfileThingListController.EXTRA_FILTER);
     }
 }

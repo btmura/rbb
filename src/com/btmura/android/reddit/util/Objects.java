@@ -18,6 +18,8 @@ package com.btmura.android.reddit.util;
 
 import android.os.Bundle;
 
+import com.btmura.android.reddit.app.ComparableFragment;
+
 /**
  * Utility class for handling {@link Object}s and other types.
  */
@@ -44,6 +46,16 @@ public class Objects {
             return s1.equalsIgnoreCase(s2);
         } else if (s2 != null) {
             return s2.equalsIgnoreCase(s1);
+        }
+        return true;
+    }
+
+    /** Check for fragment equality. */
+    public static boolean fragmentEquals(ComparableFragment f1, ComparableFragment f2) {
+        if (f1 != null) {
+            return f1.fragmentEquals(f2);
+        } else if (f2 != null) {
+            return f2.fragmentEquals(f1);
         }
         return true;
     }

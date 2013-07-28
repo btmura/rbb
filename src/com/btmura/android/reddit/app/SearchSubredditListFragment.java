@@ -19,12 +19,14 @@ package com.btmura.android.reddit.app;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.widget.SearchSubredditAdapter;
 
 public class SearchSubredditListFragment
         extends SubredditListFragment<SearchSubredditListController,
         SearchSubredditActionModeController,
-        SearchSubredditAdapter> {
+        SearchSubredditAdapter>
+        implements ComparableFragment {
 
     private AccountResultHolder accountResultHolder;
 
@@ -38,6 +40,15 @@ public class SearchSubredditListFragment
         SearchSubredditListFragment frag = new SearchSubredditListFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    public boolean fragmentEquals(ComparableFragment o) {
+        return ComparableFragments.baseEquals(this, o)
+                && ComparableFragments.equalStrings(this, o,
+                        SearchSubredditListController.EXTRA_ACCOUNT_NAME)
+                && ComparableFragments.equalStrings(this, o,
+                        SearchSubredditListController.EXTRA_QUERY);
     }
 
     @Override

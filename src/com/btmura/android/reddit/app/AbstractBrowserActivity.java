@@ -41,7 +41,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.NavigationFragment.OnNavigationEventListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.util.Arguments;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingView;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
@@ -230,14 +230,17 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    private void setLeftFragment(int containerId, Fragment frag) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        removeFragment(ft, CONTROL_FRAGMENT_TAG);
-        ft.replace(containerId, frag, LEFT_FRAGMENT_TAG);
-        removeFragment(ft, RIGHT_FRAGMENT_TAG);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
-                | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-        ft.commitAllowingStateLoss();
+    private <F extends Fragment & ComparableFragment>
+            void setLeftFragment(int containerId, F frag) {
+        if (!Objects.fragmentEquals(frag, getLeftComparableFragment())) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            removeFragment(ft, CONTROL_FRAGMENT_TAG);
+            ft.replace(containerId, frag, LEFT_FRAGMENT_TAG);
+            removeFragment(ft, RIGHT_FRAGMENT_TAG);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                    | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+            ft.commitAllowingStateLoss();
+        }
     }
 
     private void setCenterFragment(int containerId,
@@ -249,25 +252,25 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    private void setRightFragment(int containerId,
-            ControlFragment controlFrag, ThingListFragment<?> rightFrag) {
+    private <F extends Fragment & ComparableFragment>
+            void setRightFragment(int containerId, ControlFragment controlFrag, F frag) {
         if (isSinglePane) {
-            setRightFragmentSinglePane(containerId, controlFrag, rightFrag, false);
+            setRightFragmentSinglePane(containerId, controlFrag, frag, false);
         } else {
-            setRightFragmentMultiPane(containerId, controlFrag, rightFrag, false);
+            setRightFragmentMultiPane(containerId, controlFrag, frag, false);
         }
     }
 
-    private void setRightFragmentSinglePane(int containerId,
-            ControlFragment controlFrag, ThingListFragment<?> rightFrag, boolean removeLeft) {
-        ThingListFragment<?> current = getThingListFragment();
-        if (!Arguments.areEqual(current, rightFrag)) {
+    private <F extends Fragment & ComparableFragment>
+            void setRightFragmentSinglePane(int containerId, ControlFragment controlFrag, F frag,
+                    boolean removeLeft) {
+        if (!Objects.fragmentEquals(frag, getRightComparableFragment())) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(controlFrag, CONTROL_FRAGMENT_TAG);
             if (removeLeft) {
                 removeFragment(ft, LEFT_FRAGMENT_TAG);
             }
-            ft.replace(containerId, rightFrag, RIGHT_FRAGMENT_TAG);
+            ft.replace(containerId, frag, RIGHT_FRAGMENT_TAG);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                     | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
             ft.commitAllowingStateLoss();
@@ -275,23 +278,22 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         refreshActionBar(controlFrag);
     }
 
-    private void setRightFragmentMultiPane(int containerId,
-            ControlFragment controlFrag, ThingListFragment<?> rightFrag, boolean removeLeft) {
-        ThingListFragment<?> current = getThingListFragment();
-        if (!Arguments.areEqual(current, rightFrag)) {
+    private <F extends Fragment & ComparableFragment>
+            void setRightFragmentMultiPane(int containerId, ControlFragment controlFrag, F frag,
+                    boolean removeLeft) {
+        if (!Objects.fragmentEquals(frag, getRightComparableFragment())) {
             safePopBackStackImmediate();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(controlFrag, CONTROL_FRAGMENT_TAG);
             if (removeLeft) {
                 removeFragment(ft, LEFT_FRAGMENT_TAG);
             }
-            ft.replace(containerId, rightFrag, RIGHT_FRAGMENT_TAG);
+            ft.replace(containerId, frag, RIGHT_FRAGMENT_TAG);
             removeFragment(ft, ThingFragment.TAG);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                     | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
             ft.commitAllowingStateLoss();
         }
-
         refreshActionBar(controlFrag);
         refreshThingBodyWidthMeasurement();
         refreshViews(null);
@@ -548,13 +550,18 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 .findFragmentByTag(CONTROL_FRAGMENT_TAG);
     }
 
-    protected NavigationFragment getNavigationFragment() {
-        return (NavigationFragment) getSupportFragmentManager()
+    private ComparableFragment getLeftComparableFragment() {
+        return (ComparableFragment) getSupportFragmentManager()
                 .findFragmentByTag(LEFT_FRAGMENT_TAG);
     }
 
-    protected SearchSubredditListFragment getSubredditSearchFragment() {
-        return (SearchSubredditListFragment) getSupportFragmentManager()
+    private ComparableFragment getRightComparableFragment() {
+        return (ComparableFragment) getSupportFragmentManager()
+                .findFragmentByTag(RIGHT_FRAGMENT_TAG);
+    }
+
+    protected NavigationFragment getNavigationFragment() {
+        return (NavigationFragment) getSupportFragmentManager()
                 .findFragmentByTag(LEFT_FRAGMENT_TAG);
     }
 

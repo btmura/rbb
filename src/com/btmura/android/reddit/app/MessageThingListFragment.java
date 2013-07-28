@@ -18,8 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-import com.btmura.android.reddit.util.Arguments;
-import com.btmura.android.reddit.util.Arguments.ArgumentsHolder;
+import com.btmura.android.reddit.util.ComparableFragments;
 
 public class MessageThingListFragment extends ThingListFragment<MessageThingListController> {
 
@@ -46,10 +45,13 @@ public class MessageThingListFragment extends ThingListFragment<MessageThingList
     }
 
     @Override
-    public boolean isEqual(ArgumentsHolder o) {
-        return Arguments.baseEquals(this, o)
-                && Arguments.equalStrings(this, o, MessageThingListController.EXTRA_ACCOUNT_NAME)
-                && Arguments.equalStrings(this, o, MessageThingListController.EXTRA_MESSAGE_USER)
-                && Arguments.equalInts(this, o, MessageThingListController.EXTRA_FILTER);
+    public boolean fragmentEquals(ComparableFragment o) {
+        return ComparableFragments.baseEquals(this, o)
+                && ComparableFragments.equalStrings(this, o,
+                        MessageThingListController.EXTRA_ACCOUNT_NAME)
+                && ComparableFragments.equalStrings(this, o,
+                        MessageThingListController.EXTRA_MESSAGE_USER)
+                && ComparableFragments.equalInts(this, o,
+                        MessageThingListController.EXTRA_FILTER);
     }
 }

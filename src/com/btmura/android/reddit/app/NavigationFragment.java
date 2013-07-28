@@ -43,6 +43,7 @@ import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter;
@@ -53,8 +54,12 @@ import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
 
-public class NavigationFragment extends ListFragment implements LoaderCallbacks<AccountResult>,
-        OnPlaceSelectedListener, OnFilterSelectedListener, MultiChoiceModeListener {
+public class NavigationFragment extends ListFragment implements
+        ComparableFragment,
+        LoaderCallbacks<AccountResult>,
+        OnPlaceSelectedListener,
+        OnFilterSelectedListener,
+        MultiChoiceModeListener {
 
     public static final String TAG = "NavigationFragment";
 
@@ -91,6 +96,11 @@ public class NavigationFragment extends ListFragment implements LoaderCallbacks<
 
     public static NavigationFragment newInstance() {
         return new NavigationFragment();
+    }
+
+    @Override
+    public boolean fragmentEquals(ComparableFragment o) {
+        return ComparableFragments.baseEquals(this, o);
     }
 
     @Override

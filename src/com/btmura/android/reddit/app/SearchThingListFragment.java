@@ -18,8 +18,7 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 
-import com.btmura.android.reddit.util.Arguments;
-import com.btmura.android.reddit.util.Arguments.ArgumentsHolder;
+import com.btmura.android.reddit.util.ComparableFragments;
 
 public class SearchThingListFragment extends ThingListFragment<SearchThingListController> {
 
@@ -43,10 +42,13 @@ public class SearchThingListFragment extends ThingListFragment<SearchThingListCo
     }
 
     @Override
-    public boolean isEqual(ArgumentsHolder o) {
-        return Arguments.baseEquals(this, o)
-                && Arguments.equalStrings(this, o, SearchThingListController.EXTRA_ACCOUNT_NAME)
-                && Arguments.equalStrings(this, o, SearchThingListController.EXTRA_SUBREDDIT)
-                && Arguments.equalStrings(this, o, SearchThingListController.EXTRA_QUERY);
+    public boolean fragmentEquals(ComparableFragment o) {
+        return ComparableFragments.baseEquals(this, o)
+                && ComparableFragments.equalStrings(this, o,
+                        SearchThingListController.EXTRA_ACCOUNT_NAME)
+                && ComparableFragments.equalStrings(this, o,
+                        SearchThingListController.EXTRA_SUBREDDIT)
+                && ComparableFragments.equalStrings(this, o,
+                        SearchThingListController.EXTRA_QUERY);
     }
 }
