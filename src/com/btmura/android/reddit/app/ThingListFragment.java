@@ -51,8 +51,6 @@ abstract class ThingListFragment<C extends ThingListController<?>> extends ListF
         implements LoaderCallbacks<Cursor>, ArgumentsHolder, OnScrollListener,
         OnSwipeDismissListener, OnVoteListener, MultiChoiceModeListener {
 
-    public static final String TAG = "ThingListFragment";
-
     /** String argument that is used to paginate things. */
     private static final String LOADER_MORE_ID = "moreId";
 

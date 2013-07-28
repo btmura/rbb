@@ -23,86 +23,100 @@ import com.btmura.android.reddit.database.Subreddits;
 
 public class ControlFragment extends Fragment {
 
-    public static final String TAG = "ControlFragment";
+    public static final int NAVIGATION_SUBREDDIT = 0;
+    public static final int NAVIGATION_PROFILE = 1;
+    public static final int NAVIGATION_SAVED = 2;
+    public static final int NAVIGATION_MESSAGES = 3;
+    public static final int NAVIGATION_SEARCH_THINGS = 4;
+    public static final int NAVIGATION_SEARCH_SUBREDDITS = 5;
+    public static final int NAVIGATION_USER_PROFILE = 6;
 
+    private static final String ARG_NAVIGATION = "navigation";
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_SUBREDDIT = "subreddit";
     private static final String ARG_IS_RANDOM = "isRandom";
+    private static final String ARG_PROFILE_USER = "profileUser";
+    private static final String ARG_MESSAGE_USER = "messageUser";
     private static final String ARG_THING_BUNDLE = "thingBundle";
     private static final String ARG_FILTER = "filter";
 
-    private String accountName;
-    private String subreddit;
-    private boolean isRandom;
-    private ThingBundle thingBundle;
-    private int filter;
+    public static ControlFragment
+            newSubredditInstance(String accountName, String subreddit, int filter) {
+        Bundle args = new Bundle(4);
+        args.putInt(ARG_NAVIGATION, NAVIGATION_SUBREDDIT);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_SUBREDDIT, subreddit);
+        args.putBoolean(ARG_IS_RANDOM, Subreddits.isRandom(subreddit));
+        args.putInt(ARG_FILTER, filter);
+        return newFragment(args);
+    }
+
+    public static ControlFragment newProfileInstance(String accountName, int filter) {
+        Bundle args = new Bundle(4);
+        args.putInt(ARG_NAVIGATION, NAVIGATION_PROFILE);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_PROFILE_USER, accountName);
+        args.putInt(ARG_FILTER, filter);
+        return newFragment(args);
+    }
+
+    public static ControlFragment newSavedInstance(String accountName, int filter) {
+        Bundle args = new Bundle(4);
+        args.putInt(ARG_NAVIGATION, NAVIGATION_SAVED);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_PROFILE_USER, accountName);
+        args.putInt(ARG_FILTER, filter);
+        return newFragment(args);
+    }
+
+    public static ControlFragment newMessagesInstance(String accountName, int filter) {
+        Bundle args = new Bundle(4);
+        args.putInt(ARG_NAVIGATION, NAVIGATION_MESSAGES);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_MESSAGE_USER, accountName);
+        args.putInt(ARG_FILTER, filter);
+        return newFragment(args);
+    }
 
     public static ControlFragment newInstance(String accountName, String subreddit,
             boolean isRandom, ThingBundle thingBundle, int filter) {
-        Bundle b = new Bundle(5);
-        b.putString(ARG_ACCOUNT_NAME, accountName);
-        b.putString(ARG_SUBREDDIT, subreddit);
-        b.putBoolean(ARG_IS_RANDOM, isRandom);
-        b.putParcelable(ARG_THING_BUNDLE, thingBundle);
-        b.putInt(ARG_FILTER, filter);
+        Bundle args = new Bundle(5);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_SUBREDDIT, subreddit);
+        args.putBoolean(ARG_IS_RANDOM, isRandom);
+        args.putParcelable(ARG_THING_BUNDLE, thingBundle);
+        args.putInt(ARG_FILTER, filter);
 
+        return newFragment(args);
+    }
+
+    private static ControlFragment newFragment(Bundle args) {
         ControlFragment frag = new ControlFragment();
-        frag.setArguments(b);
+        frag.setArguments(args);
         return frag;
     }
 
+    public int getNavigation() {
+        return getArguments().getInt(ARG_NAVIGATION);
+    }
+
     public String getAccountName() {
-        return accountName;
+        return getArguments().getString(ARG_ACCOUNT_NAME);
     }
 
     public String getSubreddit() {
-        return subreddit;
+        return getArguments().getString(ARG_SUBREDDIT);
     }
 
     public boolean isRandom() {
-        return isRandom;
-    }
-
-    public void setSubreddit(String subreddit) {
-        this.subreddit = subreddit;
-        this.isRandom = Subreddits.isRandom(subreddit);
-    }
-
-    public void setIsRandom(boolean isRandom) {
-        this.isRandom = isRandom;
+        return getArguments().getBoolean(ARG_IS_RANDOM);
     }
 
     public ThingBundle getThingBundle() {
-        return thingBundle;
-    }
-
-    public void setThingBundle(ThingBundle thingBundle) {
-        this.thingBundle = thingBundle;
+        return getArguments().getParcelable(ARG_THING_BUNDLE);
     }
 
     public int getFilter() {
-        return filter;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Bundle b = savedInstanceState != null ? savedInstanceState : getArguments();
-        accountName = b.getString(ARG_ACCOUNT_NAME);
-        subreddit = b.getString(ARG_SUBREDDIT);
-        isRandom = b.getBoolean(ARG_IS_RANDOM);
-        thingBundle = b.getParcelable(ARG_THING_BUNDLE);
-        filter = b.getInt(ARG_FILTER);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(ARG_ACCOUNT_NAME, accountName);
-        outState.putString(ARG_SUBREDDIT, subreddit);
-        outState.putBoolean(ARG_IS_RANDOM, isRandom);
-        outState.putParcelable(ARG_THING_BUNDLE, thingBundle);
-        outState.putInt(ARG_FILTER, filter);
+        return getArguments().getInt(ARG_FILTER);
     }
 }

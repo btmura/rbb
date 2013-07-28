@@ -114,16 +114,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountResult = result;
         accountName = result.getLastAccount(this);
-        SearchSubredditListFragment sf = getSubredditSearchFragment();
-        if (sf != null && sf.getAccountName() == null) {
-            sf.setAccountName(accountName);
-            sf.loadIfPossible();
-        }
-        ThingListFragment<?> tf = getThingListFragment();
-        if (tf != null && tf.getAccountName() == null) {
-            tf.setAccountName(accountName);
-            tf.loadIfPossible();
-        }
+        selectTab(bar.getSelectedTab());
     }
 
     @Override
@@ -140,7 +131,6 @@ public class SearchActivity extends AbstractBrowserActivity implements
         return accountName;
     }
 
-    @Override
     protected int getFilter() {
         return FilterAdapter.SUBREDDIT_HOT;
     }
@@ -150,6 +140,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
         return bar.getSelectedTab() == tabSubreddits;
     }
 
+    @Override
     public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onTabSelected tab:" + tab.getText() + " enabled:" + tabListenerEnabled);
@@ -159,6 +150,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
         }
     }
 
+    @Override
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "onTabReselected tab:" + tab.getText() + " enabled:" + tabListenerEnabled);
@@ -182,7 +174,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     private void refreshSubredditList(String query) {
         if (isSubredditListDifferent(query)) {
             int containerId = isSinglePane ? R.id.search_container : R.id.subreddit_list_container;
-            setSearchSubredditListNavigation(containerId, query);
+            setSearchSubredditsFragments(containerId, query);
         } else {
             refreshSubredditListVisibility();
         }
@@ -191,7 +183,8 @@ public class SearchActivity extends AbstractBrowserActivity implements
     private void refreshThingList(String subreddit, String query) {
         if (isThingListDifferent(subreddit, query)) {
             int containerId = isSinglePane ? R.id.search_container : R.id.thing_list_container;
-            setSearchThingListNavigation(containerId, subreddit, query);
+            setSearchThingsFragments(containerId, accountName, subreddit, query,
+                    FilterAdapter.SUBREDDIT_HOT);
         } else {
             refreshSubredditListVisibility();
         }
@@ -209,18 +202,19 @@ public class SearchActivity extends AbstractBrowserActivity implements
                 || !Objects.equals(query, frag.getQuery());
     }
 
+    @Override
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
     }
 
     @Override
-    protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
+    protected void refreshActionBar(ControlFragment controlFrag) {
         bar.setTitle(getQuery());
     }
 
     @Override
     public boolean submitQuery(String query) {
         setQuery(query);
-        refreshActionBar(null, null);
+        refreshActionBar(null);
         selectTab(bar.getSelectedTab());
         return true;
     }

@@ -149,7 +149,8 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
         if (frag == null
                 || !Objects.equals(frag.getAccountName(), accountName)
                 || frag.getFilter() != currentFilter) {
-            setProfileThingListNavigation(R.id.thing_list_container, currentUser);
+            setUserProfileFragments(R.id.thing_list_container, accountName, currentUser,
+                    currentFilter);
         }
         return true;
     }
@@ -162,7 +163,6 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
         return accountName;
     }
 
-    @Override
     protected int getFilter() {
         return adapter.getFilter();
     }
@@ -173,7 +173,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
+    protected void refreshActionBar(ControlFragment controlFrag) {
     }
 
     @Override

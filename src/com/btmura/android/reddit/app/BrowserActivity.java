@@ -61,8 +61,6 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     private FilterAdapter filterAdapter;
     private ActionBarDrawerToggle drawerToggle;
-    private String accountName;
-    private int filter;
 
     private MenuItem accountsItem;
     private MenuItem switchThemesItem;
@@ -99,7 +97,6 @@ public class BrowserActivity extends AbstractBrowserActivity
                 finish();
                 return true;
             } else if (!TextUtils.isEmpty(requestedSubreddit)) {
-                selectSubreddit(requestedSubreddit, Subreddits.isRandom(requestedSubreddit));
                 finish();
                 return true;
             }
@@ -130,7 +127,7 @@ public class BrowserActivity extends AbstractBrowserActivity
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         if (savedInstanceState == null) {
-            setNavigation(R.id.subreddit_list_container);
+            setBrowserFragments(R.id.subreddit_list_container);
         }
     }
 
@@ -151,70 +148,64 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     @Override
-    public void onSubredditSelected(String accountName, String subreddit, int filter) {
-        preUpdate(accountName, filter);
-        setSubredditThingListNavigation(R.id.thing_list_container, subreddit);
-        postUpdate(Subreddits.getTitle(this, subreddit));
-
-        filterAdapter.clear();
-        filterAdapter.addSubredditFilters(this);
-        bar.setListNavigationCallbacks(filterAdapter, this);
-        bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
-    }
-
-    @Override
-    public void onProfileSelected(String accountName, int filter) {
-        preUpdate(accountName, filter);
-        setProfileThingListNavigation(R.id.thing_list_container, accountName);
-        postUpdate(getString(R.string.subtitle_profile));
-
-        filterAdapter.clear();
-        filterAdapter.addProfileFilters(this, AccountUtils.isAccount(accountName));
-        bar.setListNavigationCallbacks(filterAdapter, this);
-        bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
-    }
-
-    @Override
-    public void onSavedSelected(String accountName, int filter) {
-        onProfileSelected(accountName, filter);
-    }
-
-    @Override
-    public void onMessagesSelected(String accountName, int filter) {
-        preUpdate(accountName, filter);
-        setMessageThingListNavigation(R.id.thing_list_container, accountName);
-        postUpdate(getString(R.string.subtitle_messages));
-
-        filterAdapter.clear();
-        filterAdapter.addMessageFilters(this);
-        bar.setListNavigationCallbacks(filterAdapter, this);
-        bar.setSelectedNavigationItem(filterAdapter.findFilter(filter));
-    }
-
-    private void preUpdate(String accountName, int filter) {
-        this.accountName = accountName;
-        this.filter = filter;
-        if (drawerLayout != null) {
-            drawerLayout.closeDrawers();
-        }
-    }
-
-    private void postUpdate(String subtitle) {
-        String title = !TextUtils.isEmpty(accountName) ? accountName : getString(R.string.app_name);
-        filterAdapter.setTitle(title);
-        filterAdapter.setSubtitle(subtitle);
-    }
-
-    @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        NavigationFragment frag = getNavigationFragment();
-        frag.onFilterSelected(filterAdapter.getFilter(itemPosition));
+        getNavigationFragment().onFilterSelected(filterAdapter.getFilter(itemPosition));
         return true;
     }
 
     @Override
-    protected void refreshActionBar(String subreddit, ThingBundle thingBundle) {
-        bar.setDisplayHomeAsUpEnabled(isSinglePane || thingBundle != null);
+    protected void refreshActionBar(ControlFragment controlFrag) {
+        bar.setDisplayHomeAsUpEnabled(isSinglePane || controlFrag.getThingBundle() != null);
+        switch (controlFrag.getNavigation()) {
+            case ControlFragment.NAVIGATION_SUBREDDIT:
+                updateSubredditActionBar(controlFrag);
+                break;
+
+            case ControlFragment.NAVIGATION_PROFILE:
+            case ControlFragment.NAVIGATION_SAVED:
+                updateProfileActionBar(controlFrag);
+                break;
+
+            case ControlFragment.NAVIGATION_MESSAGES:
+                updateMessagesActionBar(controlFrag);
+                break;
+        }
+    }
+
+    private void updateSubredditActionBar(ControlFragment controlFrag) {
+        String accountName = controlFrag.getAccountName();
+        setActionBarTitle(accountName, Subreddits.getTitle(this, controlFrag.getSubreddit()));
+
+        filterAdapter.clear();
+        filterAdapter.addSubredditFilters(this);
+        bar.setListNavigationCallbacks(filterAdapter, this);
+        bar.setSelectedNavigationItem(filterAdapter.findFilter(controlFrag.getFilter()));
+    }
+
+    private void updateProfileActionBar(ControlFragment controlFrag) {
+        String accountName = controlFrag.getAccountName();
+        setActionBarTitle(accountName, getString(R.string.subtitle_profile));
+
+        filterAdapter.clear();
+        filterAdapter.addProfileFilters(this, AccountUtils.isAccount(accountName));
+        bar.setListNavigationCallbacks(filterAdapter, this);
+        bar.setSelectedNavigationItem(filterAdapter.findFilter(controlFrag.getFilter()));
+    }
+
+    private void updateMessagesActionBar(ControlFragment controlFrag) {
+        String accountName = controlFrag.getAccountName();
+        setActionBarTitle(accountName, getString(R.string.subtitle_profile));
+
+        filterAdapter.clear();
+        filterAdapter.addMessageFilters(this);
+        bar.setListNavigationCallbacks(filterAdapter, this);
+        bar.setSelectedNavigationItem(filterAdapter.findFilter(controlFrag.getFilter()));
+    }
+
+    private void setActionBarTitle(String accountName, String subtitle) {
+        String title = !TextUtils.isEmpty(accountName) ? accountName : getString(R.string.app_name);
+        filterAdapter.setTitle(title);
+        filterAdapter.setSubtitle(subtitle);
     }
 
     @Override
@@ -233,16 +224,6 @@ public class BrowserActivity extends AbstractBrowserActivity
                 }
             });
         }
-    }
-
-    @Override
-    public String getAccountName() {
-        return accountName;
-    }
-
-    @Override
-    protected int getFilter() {
-        return filter;
     }
 
     @Override
