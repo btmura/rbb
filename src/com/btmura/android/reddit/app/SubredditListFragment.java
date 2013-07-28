@@ -16,10 +16,8 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,27 +34,6 @@ abstract class SubredditListFragment<C extends SubredditListController<A>, AC ex
         implements OnSwipeDismissListener {
 
     public static final String TAG = "SubredditListFragment";
-
-    public interface OnSubredditSelectedListener {
-        /**
-         * Notifies the listener of the first subreddit in the loaded list. If there are no
-         * subreddits, then subreddit is null. If there was an error, then subreddit is null but
-         * error is true. Otherwise, subreddit is non-null with error set to false.
-         */
-        void onInitialSubredditSelected(String subreddit, boolean error);
-
-        void onSubredditSelected(View view, String subreddit);
-    }
-
-    private OnSubredditSelectedListener listener;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof OnSubredditSelectedListener) {
-            listener = (OnSubredditSelectedListener) activity;
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,20 +54,6 @@ abstract class SubredditListFragment<C extends SubredditListController<A>, AC ex
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        super.onLoadFinished(loader, cursor);
-        if (listener != null) {
-            if (cursor == null) {
-                listener.onInitialSubredditSelected(null, true);
-            } else if (cursor.getCount() == 0) {
-                listener.onInitialSubredditSelected(null, false);
-            } else {
-                listener.onInitialSubredditSelected(controller.getSelectedSubreddit(), false);
-            }
-        }
-    }
-
-    @Override
     protected String getEmptyText(Cursor cursor) {
         if (controller.isSingleChoice()) {
             return ""; // Don't show duplicate message in multipane layout.
@@ -100,12 +63,9 @@ abstract class SubredditListFragment<C extends SubredditListController<A>, AC ex
 
     @Override
     public void onListItemClick(ListView l, View view, int position, long id) {
-        String selectedSubreddit = controller.setSelectedPosition(position);
+        controller.setSelectedPosition(position);
         if (controller.isSingleChoice() && view instanceof SubredditView) {
             ((SubredditView) view).setChosen(true);
-        }
-        if (listener != null) {
-            listener.onSubredditSelected(view, selectedSubreddit);
         }
     }
 

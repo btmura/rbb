@@ -42,7 +42,6 @@ public class ThingActivity extends GlobalMenuActivity implements
     public static final String TAG = "ThingActivity";
 
     public static final String EXTRA_THING_BUNDLE = "thingBundle";
-    public static final String EXTRA_PAGE_TYPE = "pageType";
     public static final String EXTRA_FLAGS = "flags";
 
     public static final int FLAG_INSERT_HOME = 0x1;

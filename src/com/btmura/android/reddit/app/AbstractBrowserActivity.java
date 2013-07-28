@@ -39,6 +39,7 @@ import android.view.View;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.NavigationFragment.OnNavigationEventListener;
+import com.btmura.android.reddit.app.SearchSubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
@@ -47,6 +48,7 @@ import com.btmura.android.reddit.widget.ThingView;
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         OnNavigationEventListener,
         OnSubredditEventListener,
+        OnSubredditSelectedListener,
         OnThingSelectedListener,
         OnThingEventListener,
         OnBackStackChangedListener,
@@ -200,6 +202,18 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                         .newInstance(accountName, accountName, filter, isSingleChoice));
     }
 
+    @Override
+    public void onSubredditSelected(View view, String subreddit, boolean onLoad) {
+        if (!onLoad || !isSinglePane) {
+            selectSubreddit(view, subreddit);
+        }
+    }
+
+    @Override
+    public void onThingSelected(View view, ThingBundle thingBundle, int pageType) {
+        selectThing(view, thingBundle);
+    }
+
     // Methods that set the center fragments
 
     protected void setSearchThingsFragments(int containerId, String accountName,
@@ -306,34 +320,47 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    @Override
-    public void onThingSelected(View view, ThingBundle thingBundle, int pageType) {
-        selectThing(view, thingBundle, 0, pageType);
-    }
+    // Methods to select a subreddit
 
-    protected void selectThing(View view, ThingBundle thingBundle, int flags, int pageType) {
+    private void selectSubreddit(View view, String subreddit) {
         if (isSinglePane) {
-            selectThingSinglePane(view, thingBundle, pageType, 0);
+            selectSubredditSinglePane(view, subreddit);
         } else {
-            selectThingMultiPane(thingBundle, pageType);
+            selectSubredditMultiPane(subreddit);
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void selectThingSinglePane(View view, ThingBundle thingBundle, int pageType,
-            int flags) {
+    private void selectSubredditSinglePane(View view, String subreddit) {
+        Intent intent = new Intent(this, BrowserActivity.class);
+        intent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, subreddit);
+        launchActivity(view, intent);
+    }
+
+    private void selectSubredditMultiPane(String subreddit) {
+        setRightFragmentMultiPane(R.id.thing_list_container,
+                ControlFragment.newSubredditInstance(accountName, subreddit, filter),
+                SubredditThingListFragment
+                        .newInstance(accountName, subreddit, filter, isSingleChoice),
+                false);
+    }
+
+    // Methods to select a thing
+
+    protected void selectThing(View view, ThingBundle thingBundle) {
+        if (isSinglePane) {
+            selectThingSinglePane(view, thingBundle);
+        } else {
+            selectThingMultiPane(thingBundle);
+        }
+    }
+
+    private void selectThingSinglePane(View view, ThingBundle thingBundle) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
-        intent.putExtra(ThingActivity.EXTRA_PAGE_TYPE, pageType);
-        Bundle options = ThingView.makeActivityOptions(view);
-        if (options != null) {
-            startActivity(intent, options);
-        } else {
-            startActivity(intent);
-        }
+        launchActivity(view, intent);
     }
 
-    private void selectThingMultiPane(ThingBundle thingBundle, int pageType) {
+    private void selectThingMultiPane(ThingBundle thingBundle) {
         safePopBackStackImmediate();
 
         String subreddit = getControlFragment().getSubreddit();
@@ -346,6 +373,16 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ft.replace(R.id.thing_container, tf, ThingFragment.TAG);
         ft.addToBackStack(null);
         ft.commit();
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private void launchActivity(View view, Intent intent) {
+        Bundle options = ThingView.makeActivityOptions(view);
+        if (options != null) {
+            startActivity(intent, options);
+        } else {
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -452,15 +489,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected abstract void refreshActionBar(ControlFragment controlFrag);
 
     private void refreshCheckedItems() {
-        ControlFragment cf = getControlFragment();
-
-        SubredditListFragment<?, ?, ?> sf = getSubredditListFragment();
-        if (sf != null) {
-            sf.setSelectedSubreddit(cf.isRandom() ? Subreddits.NAME_RANDOM : cf.getSubreddit());
-        }
-
         ThingListFragment<?> tf = getThingListFragment();
         if (tf != null) {
+            ControlFragment cf = getControlFragment();
             ThingBundle thingBundle = cf.getThingBundle();
             if (thingBundle != null) {
                 tf.setSelectedThing(thingBundle.getThingId(), thingBundle.getLinkId());
@@ -562,11 +593,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected NavigationFragment getNavigationFragment() {
         return (NavigationFragment) getSupportFragmentManager()
-                .findFragmentByTag(LEFT_FRAGMENT_TAG);
-    }
-
-    private SubredditListFragment<?, ?, ?> getSubredditListFragment() {
-        return (SubredditListFragment<?, ?, ?>) getSupportFragmentManager()
                 .findFragmentByTag(LEFT_FRAGMENT_TAG);
     }
 

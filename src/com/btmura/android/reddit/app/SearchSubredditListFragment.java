@@ -17,16 +17,28 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.content.Loader;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.ListView;
 
 import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.widget.SearchSubredditAdapter;
+import com.btmura.android.reddit.widget.SubredditAdapter;
 
 public class SearchSubredditListFragment
         extends SubredditListFragment<SearchSubredditListController,
         SearchSubredditActionModeController,
         SearchSubredditAdapter>
         implements ComparableFragment {
+
+    public interface OnSubredditSelectedListener {
+        void onSubredditSelected(View view, String subreddit, boolean onLoad);
+    }
+
+    private OnSubredditSelectedListener listener;
 
     private AccountResultHolder accountResultHolder;
 
@@ -54,8 +66,33 @@ public class SearchSubredditListFragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        if (activity instanceof OnSubredditSelectedListener) {
+            listener = (OnSubredditSelectedListener) activity;
+        }
         if (activity instanceof AccountResultHolder) {
             accountResultHolder = (AccountResultHolder) activity;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        super.onLoadFinished(loader, cursor);
+        SubredditAdapter adapter = controller.getAdapter();
+        if (adapter.getCursor() != null && adapter.getCount() > 0
+                && TextUtils.isEmpty(controller.getSelectedSubreddit())) {
+            String subreddit = adapter.getName(0);
+            controller.setSelectedSubreddit(subreddit);
+            if (listener != null) {
+                listener.onSubredditSelected(null, subreddit, true);
+            }
+        }
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View view, int position, long id) {
+        super.onListItemClick(l, view, position, id);
+        if (listener != null) {
+            listener.onSubredditSelected(view, controller.getSelectedSubreddit(), false);
         }
     }
 
