@@ -267,6 +267,7 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         }
     }
 
+    @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         if (!controller.hasCursor()) {
             getListView().clearChoices();
@@ -277,15 +278,18 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         return true;
     }
 
+    @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         controller.onPrepareActionMode(mode, menu, getListView());
         return true;
     }
 
+    @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         mode.invalidate();
     }
 
+    @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_saved:
@@ -337,6 +341,7 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         selectThing(null, getFirstCheckedPosition(), ThingPagerAdapter.TYPE_COMMENTS);
     }
 
+    @Override
     public void onDestroyActionMode(ActionMode mode) {
     }
 
@@ -348,10 +353,6 @@ abstract class ThingListFragment<C extends ThingListController<?>>
 
     private int getThingBodyWidth() {
         return listener != null ? listener.onMeasureThingBody() : 0;
-    }
-
-    public void setAccountName(String accountName) {
-        controller.setAccountName(accountName);
     }
 
     public String getAccountName() {
@@ -366,22 +367,12 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         return controller.getSubreddit();
     }
 
-    public void setSubreddit(String subreddit) {
-        if (!Objects.equalsIgnoreCase(subreddit, controller.getSubreddit())) {
-            controller.setSubreddit(subreddit);
-        }
-    }
-
     public String getQuery() {
         return controller.getQuery();
     }
 
     public boolean isQuery() {
         return !TextUtils.isEmpty(getQuery());
-    }
-
-    public int getFilter() {
-        return controller.getFilter();
     }
 
     private int getFirstCheckedPosition() {
