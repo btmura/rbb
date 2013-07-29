@@ -32,20 +32,4 @@ abstract class SubredditListFragment<C extends SubredditListController<A>, AC ex
             ((SubredditView) view).setChosen(true);
         }
     }
-
-    public String getAccountName() {
-        return controller.getAccountName();
-    }
-
-    public void setAccountName(String accountName) {
-        controller.setAccountName(accountName);
-    }
-
-    public String getSelectedSubreddit() {
-        return controller.getSelectedSubreddit();
-    }
-
-    public void setSelectedSubreddit(String subreddit) {
-        controller.setSelectedSubreddit(subreddit);
-    }
 }
