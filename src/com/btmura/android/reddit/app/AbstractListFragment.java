@@ -69,12 +69,8 @@ abstract class AbstractListFragment<C extends Controller<A>, AC extends ActionMo
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setListAdapter(controller.getAdapter());
-        setListShown(showInitialLoadingSpinner());
+        setListShown(false);
         loadIfPossible();
-    }
-
-    protected boolean showInitialLoadingSpinner() {
-        return false;
     }
 
     public void loadIfPossible() {
@@ -98,7 +94,7 @@ abstract class AbstractListFragment<C extends Controller<A>, AC extends ActionMo
         }
     }
 
-    protected String getEmptyText(Cursor cursor) {
+    private String getEmptyText(Cursor cursor) {
         return getString(cursor != null ? R.string.empty_list : R.string.error);
     }
 

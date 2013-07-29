@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.database.Cursor;
 import android.view.View;
 import android.widget.ListView;
 
@@ -25,22 +24,6 @@ import com.btmura.android.reddit.widget.SubredditView;
 
 abstract class SubredditListFragment<C extends SubredditListController<A>, AC extends ActionModeController, A extends SubredditAdapter>
         extends AbstractListFragment<C, AC, A> {
-
-    public static final String TAG = "SubredditListFragment";
-
-    @Override
-    protected boolean showInitialLoadingSpinner() {
-        // Only show the spinner if this is a single pane since showing two can be annoying.
-        return controller.isSingleChoice();
-    }
-
-    @Override
-    protected String getEmptyText(Cursor cursor) {
-        if (controller.isSingleChoice()) {
-            return ""; // Don't show duplicate message in multipane layout.
-        }
-        return super.getEmptyText(cursor);
-    }
 
     @Override
     public void onListItemClick(ListView l, View view, int position, long id) {
