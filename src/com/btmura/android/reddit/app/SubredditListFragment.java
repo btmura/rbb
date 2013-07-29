@@ -17,35 +17,16 @@
 package com.btmura.android.reddit.app;
 
 import android.database.Cursor;
-import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.view.SwipeDismissTouchListener;
-import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditView;
 
 abstract class SubredditListFragment<C extends SubredditListController<A>, AC extends ActionModeController, A extends SubredditAdapter>
-        extends AbstractListFragment<C, AC, A>
-        implements OnSwipeDismissListener {
+        extends AbstractListFragment<C, AC, A> {
 
     public static final String TAG = "SubredditListFragment";
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        ListView listView = (ListView) view.findViewById(android.R.id.list);
-
-        SwipeDismissTouchListener touchListener = new SwipeDismissTouchListener(listView, this);
-        listView.setOnTouchListener(touchListener);
-        listView.setOnScrollListener(touchListener.makeScrollListener());
-        return view;
-    }
 
     @Override
     protected boolean showInitialLoadingSpinner() {
@@ -69,16 +50,6 @@ abstract class SubredditListFragment<C extends SubredditListController<A>, AC ex
         }
     }
 
-    @Override
-    public boolean isSwipeDismissable(int position) {
-        return controller.isSwipeDismissable(position);
-    }
-
-    @Override
-    public void onSwipeDismiss(ListView listView, View view, int position) {
-        Provider.removeSubredditAsync(getActivity(), getAccountName(), getSubreddit(position));
-    }
-
     public String getAccountName() {
         return controller.getAccountName();
     }
@@ -93,9 +64,5 @@ abstract class SubredditListFragment<C extends SubredditListController<A>, AC ex
 
     public void setSelectedSubreddit(String subreddit) {
         controller.setSelectedSubreddit(subreddit);
-    }
-
-    private String getSubreddit(int position) {
-        return controller.getAdapter().getName(position);
     }
 }
