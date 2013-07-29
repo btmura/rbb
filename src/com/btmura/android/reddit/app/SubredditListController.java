@@ -22,17 +22,11 @@ interface SubredditListController<A extends SubredditAdapter> extends Controller
 
     // Getters
 
-    String getAccountName();
-
     String getSelectedSubreddit();
 
     boolean isSingleChoice();
 
-    boolean isSwipeDismissable(int position);
-
     // Setters
-
-    void setAccountName(String accountName);
 
     String setSelectedPosition(int position);
 

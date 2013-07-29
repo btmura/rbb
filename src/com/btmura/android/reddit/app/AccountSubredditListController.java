@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.content.AccountSubredditListLoader;
-import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 
 class AccountSubredditListController
@@ -45,7 +44,7 @@ class AccountSubredditListController
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        setAccountName(getAccountNameExtra(savedInstanceState));
+        this.accountName = getAccountNameExtra(savedInstanceState);
         setSelectedSubreddit(getSelectedSubredditExtra(savedInstanceState));
     }
 
@@ -75,11 +74,6 @@ class AccountSubredditListController
     // Getters
 
     @Override
-    public String getAccountName() {
-        return accountName;
-    }
-
-    @Override
     public AccountSubredditAdapter getAdapter() {
         return adapter;
     }
@@ -94,17 +88,7 @@ class AccountSubredditListController
         return adapter.isSingleChoice();
     }
 
-    @Override
-    public boolean isSwipeDismissable(int position) {
-        return Subreddits.hasSidebar(adapter.getName(position));
-    }
-
     // Setters
-
-    @Override
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
 
     @Override
     public String setSelectedPosition(int position) {

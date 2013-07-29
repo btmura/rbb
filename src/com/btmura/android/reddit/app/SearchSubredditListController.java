@@ -48,7 +48,7 @@ class SearchSubredditListController implements SubredditListController<SearchSub
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        setAccountName(getAccountNameExtra(savedInstanceState));
+        this.accountName = getAccountNameExtra(savedInstanceState);
         setSelectedSubreddit(getSelectedSubredditExtra(savedInstanceState));
         this.query = getQueryExtra(savedInstanceState);
         this.cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
@@ -91,11 +91,6 @@ class SearchSubredditListController implements SubredditListController<SearchSub
     // Getters
 
     @Override
-    public String getAccountName() {
-        return accountName;
-    }
-
-    @Override
     public SearchSubredditAdapter getAdapter() {
         return adapter;
     }
@@ -110,17 +105,7 @@ class SearchSubredditListController implements SubredditListController<SearchSub
         return adapter.isSingleChoice();
     }
 
-    @Override
-    public boolean isSwipeDismissable(int position) {
-        return false;
-    }
-
     // Setters
-
-    @Override
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
 
     @Override
     public String setSelectedPosition(int position) {

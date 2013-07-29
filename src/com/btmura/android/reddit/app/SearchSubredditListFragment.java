@@ -107,8 +107,4 @@ public class SearchSubredditListFragment
         return new SearchSubredditActionModeController(getActivity(), getFragmentManager(),
                 controller.getAdapter(), accountResultHolder);
     }
-
-    public String getQuery() {
-        return controller.getQuery();
-    }
 }
