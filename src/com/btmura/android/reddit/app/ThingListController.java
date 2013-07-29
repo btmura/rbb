@@ -78,11 +78,7 @@ interface ThingListController<A extends AbstractThingListAdapter> extends Contro
 
     // Setters.
 
-    void setAccountName(String accountName);
-
     void setEmptyText(int emptyText);
-
-    void setFilter(int filter);
 
     void setMoreId(String moreId);
 

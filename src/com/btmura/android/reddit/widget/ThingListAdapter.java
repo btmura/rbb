@@ -51,8 +51,9 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
     private String parentSubreddit;
     private String subreddit;
 
-    public ThingListAdapter(Context context, OnVoteListener listener, boolean singleChoice) {
-        super(context, singleChoice);
+    public ThingListAdapter(Context context, String accountName, OnVoteListener listener,
+            boolean singleChoice) {
+        super(context, accountName, singleChoice);
         this.listener = listener;
     }
 

@@ -37,13 +37,10 @@ public abstract class AbstractThingListAdapter extends BaseCursorAdapter {
     protected String selectedLinkId;
     protected boolean singleChoice;
 
-    AbstractThingListAdapter(Context context, boolean singleChoice) {
+    AbstractThingListAdapter(Context context, String accountName, boolean singleChoice) {
         super(context, null, 0);
-        this.singleChoice = singleChoice;
-    }
-
-    public void setAccountName(String accountName) {
         this.accountName = accountName;
+        this.singleChoice = singleChoice;
     }
 
     public void setParentSubreddit(String parentSubreddit) {

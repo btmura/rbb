@@ -34,31 +34,27 @@ class SearchSubredditListController implements SubredditListController<SearchSub
     static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
     private final Context context;
+    private final String accountName;
+    private final String query;
     private final SearchSubredditAdapter adapter;
-
-    private String accountName;
-    private String query;
     private Bundle cursorExtras;
 
     SearchSubredditListController(Context context, Bundle args) {
         this.context = context;
+        this.accountName = getAccountNameExtra(args);
+        this.query = getQueryExtra(args);
         this.adapter = new SearchSubredditAdapter(context, getSingleChoiceExtra(args));
-        restoreInstanceState(args);
     }
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        this.accountName = getAccountNameExtra(savedInstanceState);
         setSelectedSubreddit(getSelectedSubredditExtra(savedInstanceState));
-        this.query = getQueryExtra(savedInstanceState);
         this.cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
     @Override
     public void saveInstanceState(Bundle outState) {
-        outState.putString(EXTRA_ACCOUNT_NAME, accountName);
         outState.putString(EXTRA_SELECTED_SUBREDDIT, getSelectedSubreddit());
-        outState.putString(EXTRA_QUERY, query);
         outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
     }
 

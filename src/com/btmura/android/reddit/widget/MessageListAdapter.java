@@ -43,8 +43,8 @@ public class MessageListAdapter extends AbstractThingListAdapter {
 
     private final Formatter formatter = new Formatter();
 
-    public MessageListAdapter(Context context, boolean singleChoice) {
-        super(context, singleChoice);
+    public MessageListAdapter(Context context, String accountName, boolean singleChoice) {
+        super(context, accountName, singleChoice);
     }
 
     @Override

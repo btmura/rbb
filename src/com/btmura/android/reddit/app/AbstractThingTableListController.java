@@ -54,7 +54,7 @@ abstract class AbstractThingTableListController
     protected final Context context;
     protected final ThingListAdapter adapter;
 
-    private String accountName;
+    private final String accountName;
     private int emptyText;
     private int filter;
     private String moreId;
@@ -62,16 +62,17 @@ abstract class AbstractThingTableListController
 
     AbstractThingTableListController(Context context, Bundle args, OnVoteListener listener) {
         this.context = context;
-        this.adapter = new ThingListAdapter(context, listener, getSingleChoiceExtra(args));
+        this.accountName = getAccountNameExtra(args);
+        this.filter = getFilterExtra(args);
+        this.adapter = new ThingListAdapter(context, accountName, listener,
+                getSingleChoiceExtra(args));
         restoreInstanceState(args);
     }
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        setAccountName(getAccountNameExtra(savedInstanceState));
         setParentSubreddit(getParentSubredditExtra(savedInstanceState));
         setSubreddit(getSubredditExtra(savedInstanceState));
-        setFilter(getFilterExtra(savedInstanceState));
         setEmptyText(getEmptyTextExtra(savedInstanceState));
         setSelectedThing(getSelectedThingId(savedInstanceState),
                 getSelectedLinkId(savedInstanceState));
@@ -80,15 +81,12 @@ abstract class AbstractThingTableListController
 
     @Override
     public void saveInstanceState(Bundle state) {
-        state.putString(EXTRA_ACCOUNT_NAME, getAccountName());
         state.putInt(EXTRA_EMPTY_TEXT, getEmptyText());
-        state.putInt(EXTRA_FILTER, getFilter());
         state.putString(EXTRA_PARENT_SUBREDDIT, getParentSubreddit());
         state.putString(EXTRA_SELECTED_LINK_ID, getSelectedLinkId());
         state.putString(EXTRA_SELECTED_THING_ID, getSelectedThingId());
         state.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
         state.putString(EXTRA_SUBREDDIT, getSubreddit());
-
     }
 
     @Override
@@ -440,19 +438,8 @@ abstract class AbstractThingTableListController
     // Simple setters for state members.
 
     @Override
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-        adapter.setAccountName(accountName);
-    }
-
-    @Override
     public void setEmptyText(int emptyText) {
         this.emptyText = emptyText;
-    }
-
-    @Override
-    public void setFilter(int filter) {
-        this.filter = filter;
     }
 
     @Override

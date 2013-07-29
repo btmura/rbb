@@ -44,32 +44,30 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
     private final Context context;
-    private final MessageListAdapter adapter;
+    private final String accountName;
     private final String messageUser;
+    private final int filter;
+    private final MessageListAdapter adapter;
 
-    private String accountName;
     private int emptyText;
-    private int filter;
     private String moreId;
     private Bundle cursorExtras;
 
     MessageThingListController(Context context, Bundle args) {
         this.context = context;
-        this.adapter = new MessageListAdapter(context, getSingleChoiceExtra(args));
         this.accountName = getAccountNameExtra(args);
         this.messageUser = getMessageUserExtra(args);
         this.filter = getFilterExtra(args);
+        this.adapter = new MessageListAdapter(context, accountName, getSingleChoiceExtra(args));
     }
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        setAccountName(getAccountNameExtra(savedInstanceState));
         cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
     @Override
     public void saveInstanceState(Bundle outState) {
-        outState.putString(EXTRA_ACCOUNT_NAME, getAccountName());
         outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
     }
 
@@ -298,18 +296,8 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     // Simple setters.
 
     @Override
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
-    }
-
-    @Override
     public void setEmptyText(int emptyText) {
         this.emptyText = emptyText;
-    }
-
-    @Override
-    public void setFilter(int filter) {
-        this.filter = filter;
     }
 
     @Override
