@@ -47,6 +47,6 @@ public class ProfileThingLoader extends AbstractSessionLoader implements ThingPr
     @Override
     protected Bundle createSession(long sessionId, String more) {
         return ThingProvider.getProfileSession(getContext(), accountName, profileUser,
-                filter, more, sessionId);
+                filter, sessionId, more);
     }
 }

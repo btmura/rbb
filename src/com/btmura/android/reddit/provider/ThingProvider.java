@@ -265,24 +265,24 @@ public class ThingProvider extends BaseProvider {
     private static final boolean NO_SYNC = false;
 
     public static final Bundle getSubredditSession(Context context, String accountName,
-            String subreddit, int filter, String more, long sessionId) {
+            String subreddit, int filter, long sessionId, String more) {
         Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_SUBREDDIT);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
         extras.putInt(EXTRA_FILTER, filter);
-        extras.putString(EXTRA_MORE, more);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
+        extras.putString(EXTRA_MORE, more);
         return call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getProfileSession(Context context, String accountName,
-            String profileUser, int filter, String more, long sessionId) {
+            String profileUser, int filter, long sessionId, String more) {
         Bundle extras = new Bundle(4);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_USER);
         extras.putString(EXTRA_USER, profileUser);
         extras.putInt(EXTRA_FILTER, filter);
-        extras.putString(EXTRA_MORE, more);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
+        extras.putString(EXTRA_MORE, more);
         return call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
@@ -298,11 +298,12 @@ public class ThingProvider extends BaseProvider {
     }
 
     public static final Bundle getThingSearchSession(Context context, String accountName,
-            String subreddit, String query, long sessionId) {
-        Bundle extras = new Bundle(4);
+            String subreddit, String query, long sessionId, String more) {
+        Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_THING_SEARCH);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
         extras.putString(EXTRA_QUERY, query);
+        extras.putString(EXTRA_MORE, more);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
         return call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
@@ -316,7 +317,7 @@ public class ThingProvider extends BaseProvider {
     }
 
     public static final Bundle getMessageSession(Context context, String accountName,
-            int filter, String more, long sessionId) {
+            int filter, long sessionId, String more) {
         Bundle extras = new Bundle(4);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGES);
         extras.putInt(EXTRA_FILTER, filter);
@@ -498,7 +499,7 @@ public class ThingProvider extends BaseProvider {
 
                 case Sessions.TYPE_THING_SEARCH:
                     listing = ThingListing.newSearchInstance(context, helper, accountName,
-                            subreddit, query, cookie);
+                            subreddit, query, more, cookie);
                     break;
 
                 case Sessions.TYPE_SUBREDDIT_SEARCH:

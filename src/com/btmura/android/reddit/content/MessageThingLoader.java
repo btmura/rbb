@@ -73,7 +73,7 @@ public class MessageThingLoader extends AbstractSessionLoader {
 
     @Override
     protected Bundle createSession(long sessionId, String more) {
-        return ThingProvider.getMessageSession(getContext(), accountName, filter, more,
-                sessionId);
+        return ThingProvider.getMessageSession(getContext(), accountName, filter, sessionId,
+                more);
     }
 }

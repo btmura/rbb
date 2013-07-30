@@ -185,9 +185,6 @@ class ThingListing extends JsonParser implements Listing {
     private final String cookie;
     private final Formatter formatter = new Formatter();
 
-    /** Whether to prune more things from the listing. */
-    private final boolean ignoreMoreThings;
-
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
     private long networkTimeMs;
     private long parseTimeMs;
@@ -196,29 +193,29 @@ class ThingListing extends JsonParser implements Listing {
     private String moreThingId;
 
     static ThingListing newSearchInstance(Context context, SQLiteOpenHelper dbHelper,
-            String accountName, String subreddit, String query, String cookie) {
+            String accountName, String subreddit, String query, String more, String cookie) {
         String sessionTag = subreddit + "-" + query;
         return new ThingListing(context, dbHelper, Sessions.TYPE_THING_SEARCH, sessionTag,
-                accountName, subreddit, query, null, 0, null, cookie, true);
+                accountName, subreddit, query, null, 0, more, cookie);
     }
 
     static ThingListing newSubredditInstance(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String subreddit, int filter, String more, String cookie) {
         String sessionTag = subreddit + "-" + filter;
         return new ThingListing(context, dbHelper, Sessions.TYPE_SUBREDDIT, sessionTag,
-                accountName, subreddit, null, null, filter, more, cookie, false);
+                accountName, subreddit, null, null, filter, more, cookie);
     }
 
     static ThingListing newUserInstance(Context context, SQLiteOpenHelper dbHelper,
             String accountName, String profileUser, int filter, String more, String cookie) {
         String sessionTag = profileUser + "-" + filter;
         return new ThingListing(context, dbHelper, Sessions.TYPE_USER, sessionTag, accountName,
-                null, null, profileUser, filter, more, cookie, false);
+                null, null, profileUser, filter, more, cookie);
     }
 
     private ThingListing(Context context, SQLiteOpenHelper dbHelper, int sessionType,
             String sessionTag, String accountName, String subreddit, String query,
-            String profileUser, int filter, String more, String cookie, boolean ignoreMoreThings) {
+            String profileUser, int filter, String more, String cookie) {
         this.context = context;
         this.dbHelper = dbHelper;
         this.sessionType = sessionType;
@@ -230,7 +227,6 @@ class ThingListing extends JsonParser implements Listing {
         this.filter = filter;
         this.more = more;
         this.cookie = cookie;
-        this.ignoreMoreThings = ignoreMoreThings;
     }
 
     @Override
@@ -481,7 +477,7 @@ class ThingListing extends JsonParser implements Listing {
             }
         }
 
-        if (!ignoreMoreThings && !TextUtils.isEmpty(moreThingId)) {
+        if (!TextUtils.isEmpty(moreThingId)) {
             values.add(newContentValues(Kinds.KIND_MORE, moreThingId, 1));
         }
     }

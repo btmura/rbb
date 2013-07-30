@@ -43,6 +43,6 @@ public class SubredditThingLoader extends AbstractSessionLoader implements Thing
     @Override
     protected Bundle createSession(long sessionId, String more) {
         return ThingProvider.getSubredditSession(getContext(), accountName, subreddit, filter,
-                more, sessionId);
+                sessionId, more);
     }
 }
