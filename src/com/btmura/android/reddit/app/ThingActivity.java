@@ -39,14 +39,14 @@ public class ThingActivity extends GlobalMenuActivity implements
         AccountNameHolder,
         SubredditNameHolder {
 
-    public static final String TAG = "ThingActivity";
-
     public static final String EXTRA_THING_BUNDLE = "thingBundle";
     public static final String EXTRA_FLAGS = "flags";
 
     public static final int FLAG_INSERT_HOME = 0x1;
 
     private static final String STATE_THING_BUNDLE = EXTRA_THING_BUNDLE;
+
+    private static final String THING_FRAGMENT_TAG = "thing";
 
     private final Formatter formatter = new Formatter();
     private ThingBundle thingBundle;
@@ -91,10 +91,12 @@ public class ThingActivity extends GlobalMenuActivity implements
         setTitle(StringUtil.safeString(formatter.formatAll(this, title)));
     }
 
+    @Override
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
         return new AccountLoader(this, true, false);
     }
 
+    @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountName = result.getLastAccount(this);
 
@@ -102,13 +104,14 @@ public class ThingActivity extends GlobalMenuActivity implements
         if (getThingFragment() == null) {
             Fragment thingFrag = ThingFragment.newInstance(accountName, thingBundle);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.thing_container, thingFrag, ThingFragment.TAG);
+            ft.replace(R.id.thing_container, thingFrag, THING_FRAGMENT_TAG);
             ft.commitAllowingStateLoss();
         }
 
         invalidateOptionsMenu();
     }
 
+    @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
@@ -117,10 +120,12 @@ public class ThingActivity extends GlobalMenuActivity implements
         refreshTitle(title);
     }
 
+    @Override
     public String getAccountName() {
         return accountName;
     }
 
+    @Override
     public String getSubredditName() {
         return thingBundle.getSubreddit();
     }
@@ -158,6 +163,6 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     private ThingFragment getThingFragment() {
-        return (ThingFragment) getSupportFragmentManager().findFragmentByTag(ThingFragment.TAG);
+        return (ThingFragment) getSupportFragmentManager().findFragmentByTag(THING_FRAGMENT_TAG);
     }
 }

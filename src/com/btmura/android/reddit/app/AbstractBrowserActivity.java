@@ -61,6 +61,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private static final String CONTROL_FRAGMENT_TAG = "control";
     private static final String LEFT_FRAGMENT_TAG = "left";
     private static final String RIGHT_FRAGMENT_TAG = "right";
+    private static final String THING_FRAGMENT_TAG = "thing";
 
     private static final int ANIMATION_OPEN_NAV = 0;
     private static final int ANIMATION_CLOSE_NAV = 1;
@@ -304,7 +305,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 removeFragment(ft, LEFT_FRAGMENT_TAG);
             }
             ft.replace(containerId, frag, RIGHT_FRAGMENT_TAG);
-            removeFragment(ft, ThingFragment.TAG);
+            removeFragment(ft, THING_FRAGMENT_TAG);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                     | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
             ft.commitAllowingStateLoss();
@@ -371,7 +372,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(cf, CONTROL_FRAGMENT_TAG);
-        ft.replace(R.id.thing_container, tf, ThingFragment.TAG);
+        ft.replace(R.id.thing_container, tf, THING_FRAGMENT_TAG);
         ft.addToBackStack(null);
         ft.commit();
     }
@@ -604,7 +605,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private ThingFragment getThingFragment() {
         return (ThingFragment) getSupportFragmentManager()
-                .findFragmentByTag(ThingFragment.TAG);
+                .findFragmentByTag(THING_FRAGMENT_TAG);
     }
 
     private void startAnimation(int type) {

@@ -41,8 +41,6 @@ import com.btmura.android.reddit.util.StringUtil;
 
 public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData> {
 
-    static final String TAG = "ThingFragment";
-
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_BUNDLE = "thingBundle";
 
