@@ -34,6 +34,11 @@
             android:layout_weight="1"
             android:text="@android:string/cancel" />
 
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="?android:attr/dividerVertical" />
+
         <Button
             android:id="@+id/ok"
             style="@style/ButtonBarButton"
