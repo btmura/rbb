@@ -14,15 +14,15 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:columnCount="1" >
+    android:layout_height="wrap_content" >
 
     <EditText
         android:id="@+id/login"
-        android:layout_gravity="fill_horizontal"
-        android:layout_marginBottom="@dimen/element_padding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
         android:layout_marginTop="@dimen/padding"
@@ -33,10 +33,12 @@
 
     <EditText
         android:id="@+id/password"
-        android:layout_gravity="fill_horizontal"
-        android:layout_marginBottom="@dimen/element_padding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/login"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
         android:hint="@string/hint_password"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textPassword"
@@ -44,14 +46,29 @@
 
     <CheckBox
         android:id="@+id/show_password"
-        android:layout_marginBottom="@dimen/padding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/password"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/element_padding"
         android:text="@string/show_password" />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/show_password"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:indeterminate="true"
+        android:visibility="visible" />
 
     <include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/progress"
         layout="@layout/ok_button_bar" />
 
-</GridLayout>
+</RelativeLayout>

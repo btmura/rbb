@@ -39,6 +39,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountAuthenticator;
@@ -65,9 +66,12 @@ public class AddAccountFragment extends Fragment implements
     }
 
     private OnAccountAddedListener listener;
+    private LoginTask task;
 
     private EditText login;
     private EditText password;
+    private CheckBox showPassword;
+    private ProgressBar progress;
     private Button ok;
     private Button cancel;
 
@@ -81,12 +85,6 @@ public class AddAccountFragment extends Fragment implements
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         if (activity instanceof OnAccountAddedListener) {
@@ -95,9 +93,9 @@ public class AddAccountFragment extends Fragment implements
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
@@ -114,8 +112,10 @@ public class AddAccountFragment extends Fragment implements
             password.requestFocus();
         }
 
-        CheckBox showPassword = (CheckBox) v.findViewById(R.id.show_password);
+        showPassword = (CheckBox) v.findViewById(R.id.show_password);
         showPassword.setOnCheckedChangeListener(this);
+
+        progress = (ProgressBar) v.findViewById(R.id.progress);
 
         cancel = (Button) v.findViewById(R.id.cancel);
         cancel.setOnClickListener(this);
@@ -123,9 +123,22 @@ public class AddAccountFragment extends Fragment implements
         ok = (Button) v.findViewById(R.id.ok);
         ok.setOnClickListener(this);
 
+        hideProgress();
+
         return v;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (task != null) {
+            showProgress();
+        } else {
+            hideProgress();
+        }
+    }
+
+    @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         TransformationMethod method = null;
         if (!isChecked) {
@@ -134,6 +147,7 @@ public class AddAccountFragment extends Fragment implements
         password.setTransformationMethod(method);
     }
 
+    @Override
     public void onClick(View v) {
         if (v == cancel) {
             handleCancel();
@@ -158,8 +172,30 @@ public class AddAccountFragment extends Fragment implements
             return;
         }
         if (login.getError() == null && password.getError() == null && listener != null) {
-            new LoginTask(getActivity(), login.getText().toString(), password.getText().toString()).execute();
+            if (task != null) {
+                task.cancel(true);
+            }
+            task = new LoginTask(getActivity(), login.getText(), password.getText());
+            task.execute();
         }
+    }
+
+    private void showProgress() {
+        progress.setVisibility(View.VISIBLE);
+        login.setEnabled(false);
+        password.setEnabled(false);
+        showPassword.setEnabled(false);
+        cancel.setEnabled(false);
+        ok.setEnabled(false);
+    }
+
+    private void hideProgress() {
+        progress.setVisibility(View.INVISIBLE);
+        login.setEnabled(true);
+        password.setEnabled(true);
+        showPassword.setEnabled(true);
+        cancel.setEnabled(true);
+        ok.setEnabled(true);
     }
 
     class LoginTask extends AsyncTask<Void, Integer, Bundle> {
@@ -168,16 +204,15 @@ public class AddAccountFragment extends Fragment implements
         private final String login;
         private final String password;
 
-        LoginTask(Context context, String login, String password) {
+        LoginTask(Context context, CharSequence login, CharSequence password) {
             this.context = context.getApplicationContext();
-            this.login = login;
-            this.password = password;
+            this.login = login.toString();
+            this.password = password.toString();
         }
 
         @Override
         protected void onPreExecute() {
-            ProgressDialogFragment.showDialog(getFragmentManager(),
-                    context.getString(R.string.login_logging_in));
+            showProgress();
         }
 
         @Override
@@ -188,8 +223,6 @@ public class AddAccountFragment extends Fragment implements
                     return errorBundle(R.string.reddit_error, result.error);
                 }
 
-                publishProgress(R.string.login_importing);
-
                 // Initialize database data for the account. If somehow we fail
                 // to add the account later to the AccountManager, then this
                 // data will just sit there in the db. If there is an existing
@@ -198,8 +231,6 @@ public class AddAccountFragment extends Fragment implements
                 if (!AccountProvider.initializeAccount(context, login, result.cookie)) {
                     return errorBundle(R.string.login_importing_error);
                 }
-
-                publishProgress(R.string.login_adding_account);
 
                 // Set this account as the last account to make the UI switch to
                 // the new account after the user returns to the app. If somehow
@@ -232,25 +263,19 @@ public class AddAccountFragment extends Fragment implements
         }
 
         @Override
-        protected void onProgressUpdate(Integer... resIds) {
-            ProgressDialogFragment.showDialog(getFragmentManager(), context.getString(resIds[0]));
-        }
-
-        @Override
         protected void onCancelled(Bundle result) {
-            ProgressDialogFragment.dismissDialog(getFragmentManager());
+            hideProgress();
         }
 
         @Override
         protected void onPostExecute(Bundle result) {
-            ProgressDialogFragment.dismissDialog(getFragmentManager());
-
             String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
             if (error != null) {
                 MessageDialogFragment.showMessage(getFragmentManager(), error);
             } else if (listener != null) {
                 listener.onAccountAdded(result);
             }
+            hideProgress();
         }
 
         private Bundle errorBundle(int resId, String... formatArgs) {

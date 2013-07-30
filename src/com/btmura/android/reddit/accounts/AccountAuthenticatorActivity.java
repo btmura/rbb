@@ -28,8 +28,6 @@ import com.btmura.android.reddit.content.ThemePrefs;
 public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorActivity
         implements OnAccountAddedListener {
 
-    public static final String TAG = "AccountAuthenticatorActivity";
-
     public static final String EXTRA_LOGIN = "login";
 
     @Override
@@ -46,12 +44,14 @@ public class AccountAuthenticatorActivity extends SupportAccountAuthenticatorAct
         }
     }
 
+    @Override
     public void onAccountAdded(Bundle result) {
         setAccountAuthenticatorResult(result);
         setResult(RESULT_OK);
         finish();
     }
 
+    @Override
     public void onAccountCancelled() {
         finish();
     }
