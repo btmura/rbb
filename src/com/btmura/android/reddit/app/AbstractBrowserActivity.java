@@ -247,6 +247,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private <F extends Fragment & ComparableFragment>
             void setLeftFragment(int containerId, F frag) {
         if (!Objects.fragmentEquals(frag, getLeftComparableFragment())) {
+            safePopBackStackImmediate();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             removeFragment(ft, CONTROL_FRAGMENT_TAG);
             ft.replace(containerId, frag, LEFT_FRAGMENT_TAG);
