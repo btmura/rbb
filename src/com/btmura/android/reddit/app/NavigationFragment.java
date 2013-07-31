@@ -35,7 +35,6 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.app.BrowserActivity.OnFilterSelectedListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
@@ -58,7 +57,6 @@ public class NavigationFragment extends ListFragment implements
         ComparableFragment,
         LoaderCallbacks<AccountResult>,
         OnPlaceSelectedListener,
-        OnFilterSelectedListener,
         MultiChoiceModeListener {
 
     public static final String TAG = "NavigationFragment";
@@ -278,11 +276,12 @@ public class NavigationFragment extends ListFragment implements
         selectPlaceWithDefaultFilter(place);
     }
 
-    @Override
-    public void onFilterSelected(int newFilter) {
-        if (filter != newFilter) {
-            selectPlace(place, subreddit, newFilter);
-        }
+    public int getFilter() {
+        return filter;
+    }
+
+    public void setFilter(int filter) {
+        selectPlace(place, subreddit, filter);
     }
 
     @Override

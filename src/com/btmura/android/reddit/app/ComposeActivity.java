@@ -257,7 +257,7 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
 
     public void onComposeCaptchaFailure(String captchaId, Bundle extras) {
         CaptchaFragment.newInstance(captchaId, extras)
-                .show(getFragmentManager(), CaptchaFragment.TAG);
+                .show(getSupportFragmentManager(), CaptchaFragment.TAG);
     }
 
     // TODO: Do we need these?

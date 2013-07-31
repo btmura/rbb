@@ -16,16 +16,16 @@
 
 package com.btmura.android.reddit.app;
 
-import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.widget.ContentAdapter;
-
-import android.app.ListFragment;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.widget.ContentAdapter;
 
 public class ContentRowListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
 
@@ -57,17 +57,20 @@ public class ContentRowListFragment extends ListFragment implements LoaderCallba
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri uri = Uri.parse(getArguments().getString(ARG_URI));
         return new CursorLoader(getActivity(), uri, null, null, null, null);
     }
 
+    @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         adapter.swapCursor(cursor);
         setListShown(true);
         setEmptyText(getString(R.string.empty_list));
     }
 
+    @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
         // No ListView available at this time to update.

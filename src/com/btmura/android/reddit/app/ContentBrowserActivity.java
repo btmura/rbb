@@ -16,12 +16,12 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -29,7 +29,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ContentUriListFragment.OnUriClickListener;
 import com.btmura.android.reddit.content.ThemePrefs;
 
-public class ContentBrowserActivity extends Activity implements OnUriClickListener {
+public class ContentBrowserActivity extends FragmentActivity implements OnUriClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +39,14 @@ public class ContentBrowserActivity extends Activity implements OnUriClickListen
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (savedInstanceState == null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_browser_container, ContentUriListFragment.newInstance());
             ft.commit();
         }
     }
 
     public void onUriClick(Uri uri) {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_browser_container, ContentRowListFragment.newInstance(uri));
         ft.addToBackStack(null);
         ft.commit();

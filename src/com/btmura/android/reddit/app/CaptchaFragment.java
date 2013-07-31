@@ -17,10 +17,10 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Loader;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;

@@ -148,7 +148,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
             Log.d(TAG, "onTabReselected tab:" + tab.getText());
         }
         if (!isSinglePane) {
-            getFragmentManager().popBackStack();
+            getSupportFragmentManager().popBackStack();
         }
     }
 

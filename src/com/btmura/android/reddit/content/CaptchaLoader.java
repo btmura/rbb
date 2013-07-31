@@ -18,9 +18,9 @@ package com.btmura.android.reddit.content;
 
 import java.io.IOException;
 
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.btmura.android.reddit.content.CaptchaLoader.CaptchaResult;

@@ -217,6 +217,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods that set the center fragments
 
+    protected void setSubredditFragments(int containerId, String accountName, String subreddit,
+            ThingBundle thingBundle, int filter) {
+        selectAccountWithFilter(accountName, filter);
+        setCenterFragment(containerId,
+                ControlFragment.newSubredditInstance(accountName, subreddit, filter),
+                SubredditThingListFragment
+                        .newInstance(accountName, subreddit, filter, isSingleChoice));
+    }
+
     protected void setSearchThingsFragments(int containerId, String accountName,
             String subreddit, String query, int filter) {
         selectAccountWithFilter(accountName, filter);
@@ -290,8 +299,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                     | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
             ft.commitAllowingStateLoss();
+            refreshActionBar(controlFrag);
         }
-        refreshActionBar(controlFrag);
     }
 
     private <F extends Fragment & ComparableFragment>
@@ -299,6 +308,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                     boolean removeLeft) {
         if (!Objects.fragmentEquals(frag, getRightComparableFragment())) {
             safePopBackStackImmediate();
+
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(controlFrag, CONTROL_FRAGMENT_TAG);
             if (removeLeft) {
@@ -309,10 +319,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
                     | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
             ft.commitAllowingStateLoss();
+
+            refreshActionBar(controlFrag);
+            refreshThingBodyWidthMeasurement();
+            refreshViews(null);
         }
-        refreshActionBar(controlFrag);
-        refreshThingBodyWidthMeasurement();
-        refreshViews(null);
     }
 
     private void removeFragment(FragmentTransaction ft, String tag) {
@@ -419,6 +430,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         return thingBodyWidth;
     }
 
+    @Override
     public void onBackStackChanged() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
@@ -578,7 +590,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         return getThingFragment() != null;
     }
 
-    private ControlFragment getControlFragment() {
+    protected ControlFragment getControlFragment() {
         return (ControlFragment) getSupportFragmentManager()
                 .findFragmentByTag(CONTROL_FRAGMENT_TAG);
     }

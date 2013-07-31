@@ -20,11 +20,14 @@ import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
@@ -35,21 +38,19 @@ import android.view.MenuItem;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.app.NavigationFragment.OnNavigationEventListener;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
-public class BrowserActivity extends AbstractBrowserActivity
-        implements OnNavigationListener, OnNavigationEventListener {
+public class BrowserActivity extends AbstractBrowserActivity implements
+        LoaderCallbacks<AccountResult>,
+        OnNavigationListener {
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
-
-    public interface OnFilterSelectedListener {
-        void onFilterSelected(int filter);
-    }
 
     /** Requested subreddit from intent data to view. */
     private String requestedSubreddit;
@@ -57,7 +58,7 @@ public class BrowserActivity extends AbstractBrowserActivity
     /** Requested thing bundle from intent data. */
     private ThingBundle requestedThingBundle;
 
-    private boolean hasSubredditList;
+    private boolean hasLeftFragment;
 
     private FilterAdapter filterAdapter;
     private ActionBarDrawerToggle drawerToggle;
@@ -73,34 +74,16 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     protected boolean skipSetup() {
-        // Process the intent's data if available.
-        Uri data = getIntent().getData();
+        Intent intent = getIntent();
+        Uri data = intent.getData();
         if (data != null) {
             requestedSubreddit = UriHelper.getSubreddit(data);
             requestedThingBundle = UriHelper.getThingBundle(data);
+        } else if (intent.hasExtra(EXTRA_SUBREDDIT)) {
+            requestedSubreddit = intent.getStringExtra(EXTRA_SUBREDDIT);
         }
 
-        // TODO: Do more sanity checks on the url data.
-
-        // TODO: The line below hides the subreddit list but there is still one. Fix this to not
-        // actually build the subreddit list.
-
-        // Hide the subreddit list when previewing another subreddit or link.
-        hasSubredditList = TextUtils.isEmpty(requestedSubreddit);
-
-        // Single pane browser only shows subreddits, so start another activity
-        // and finish this one.
-        if (isSinglePane) {
-            if (requestedThingBundle != null) {
-                selectThing(null, requestedThingBundle);
-                finish();
-                return true;
-            } else if (!TextUtils.isEmpty(requestedSubreddit)) {
-                finish();
-                return true;
-            }
-        }
-
+        hasLeftFragment = TextUtils.isEmpty(requestedSubreddit);
         return false;
     }
 
@@ -126,30 +109,55 @@ public class BrowserActivity extends AbstractBrowserActivity
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         if (savedInstanceState == null) {
-            setBrowserFragments(R.id.subreddit_list_container);
+            if (requestedSubreddit != null) {
+                getSupportLoaderManager().initLoader(0, null, this);
+            } else {
+                setBrowserFragments(R.id.subreddit_list_container);
+            }
         }
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        if (drawerToggle != null) {
-            drawerToggle.syncState();
-        }
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(this, true, false);
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (drawerToggle != null) {
-            drawerToggle.onConfigurationChanged(newConfig);
-        }
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        String accountName = result.getLastAccount(this);
+        int filter = result.getLastSubredditFilter(this);
+        setSubredditFragments(R.id.thing_list_container,
+                accountName,
+                requestedSubreddit,
+                requestedThingBundle,
+                filter);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        getNavigationFragment().onFilterSelected(filterAdapter.getFilter(itemPosition));
-        return true;
+        int newFilter = filterAdapter.getFilter(itemPosition);
+
+        NavigationFragment navFrag = getNavigationFragment();
+        if (navFrag != null && navFrag.getFilter() != newFilter) {
+            navFrag.setFilter(newFilter);
+            return true;
+        }
+
+        ControlFragment controlFrag = getControlFragment();
+        if (controlFrag != null && controlFrag.getFilter() != newFilter) {
+            setSubredditFragments(R.id.thing_list_container,
+                    controlFrag.getAccountName(),
+                    controlFrag.getSubreddit(),
+                    controlFrag.getThingBundle(),
+                    newFilter);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -208,6 +216,22 @@ public class BrowserActivity extends AbstractBrowserActivity
     }
 
     @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        if (drawerToggle != null) {
+            drawerToggle.syncState();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (drawerToggle != null) {
+            drawerToggle.onConfigurationChanged(newConfig);
+        }
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         checkMailIfHasAccount();
@@ -227,7 +251,7 @@ public class BrowserActivity extends AbstractBrowserActivity
 
     @Override
     protected boolean hasSubredditList() {
-        return hasSubredditList;
+        return hasLeftFragment;
     }
 
     @Override
@@ -249,7 +273,7 @@ public class BrowserActivity extends AbstractBrowserActivity
             return true; // Check that onCreateOptionsMenu was called.
         }
 
-        boolean showAccountItems = hasSubredditList && !hasThing();
+        boolean showAccountItems = hasLeftFragment && !hasThing();
         accountsItem.setVisible(showAccountItems);
         switchThemesItem.setVisible(showAccountItems);
         return true;
