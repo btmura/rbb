@@ -75,14 +75,13 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     @Override
     protected boolean skipSetup() {
         Intent intent = getIntent();
-        Uri data = intent.getData();
-        if (data != null) {
+        if (intent.hasExtra(EXTRA_SUBREDDIT)) {
+            requestedSubreddit = intent.getStringExtra(EXTRA_SUBREDDIT);
+        } else if (intent.getData() != null) {
+            Uri data = intent.getData();
             requestedSubreddit = UriHelper.getSubreddit(data);
             requestedThingBundle = UriHelper.getThingBundle(data);
-        } else if (intent.hasExtra(EXTRA_SUBREDDIT)) {
-            requestedSubreddit = intent.getStringExtra(EXTRA_SUBREDDIT);
         }
-
         hasLeftFragment = TextUtils.isEmpty(requestedSubreddit);
         return false;
     }
@@ -97,10 +96,18 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
-            drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-                    ThemePrefs.getDrawerIcon(this), R.string.drawer_open, R.string.drawer_close);
-            drawerLayout.setDrawerListener(drawerToggle);
-            drawerLayout.setDrawerShadow(ThemePrefs.getDrawerShadow(this), GravityCompat.START);
+            if (hasLeftFragment) {
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                drawerToggle = new ActionBarDrawerToggle(this,
+                        drawerLayout,
+                        ThemePrefs.getDrawerIcon(this),
+                        R.string.drawer_open,
+                        R.string.drawer_close);
+                drawerLayout.setDrawerListener(drawerToggle);
+                drawerLayout.setDrawerShadow(ThemePrefs.getDrawerShadow(this), GravityCompat.START);
+            } else {
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            }
             bar.setHomeButtonEnabled(true);
             bar.setDisplayHomeAsUpEnabled(true);
         }
