@@ -17,11 +17,13 @@
 package com.btmura.android.reddit.app;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.Loader;
 import android.view.MenuItem;
 
@@ -133,7 +135,15 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     private void handleHome() {
-        NavUtils.navigateUpFromSameTask(this);
+        Intent upIntent = NavUtils.getParentActivityIntent(this);
+        upIntent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getSubredditName());
+        if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+            TaskStackBuilder.create(this)
+                    .addNextIntentWithParentStack(upIntent)
+                    .startActivities();
+        } else {
+            NavUtils.navigateUpFromSameTask(this);
+        }
     }
 
     private ThingFragment getThingFragment() {

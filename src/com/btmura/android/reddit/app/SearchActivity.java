@@ -130,7 +130,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected boolean hasSubredditList() {
+    protected boolean hasLeftFragment() {
         return bar.getSelectedTab() == tabSubreddits;
     }
 

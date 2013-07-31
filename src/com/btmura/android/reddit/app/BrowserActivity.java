@@ -82,7 +82,13 @@ public class BrowserActivity extends AbstractBrowserActivity implements
             requestedSubreddit = UriHelper.getSubreddit(data);
             requestedThingBundle = UriHelper.getThingBundle(data);
         }
+
         hasLeftFragment = TextUtils.isEmpty(requestedSubreddit);
+        if (isSinglePane && requestedThingBundle != null) {
+            launchThingActivity(requestedThingBundle);
+            finish();
+            return true;
+        }
         return false;
     }
 
@@ -257,7 +263,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected boolean hasSubredditList() {
+    protected boolean hasLeftFragment() {
         return hasLeftFragment;
     }
 

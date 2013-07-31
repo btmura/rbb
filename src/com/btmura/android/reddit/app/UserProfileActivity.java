@@ -161,7 +161,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected boolean hasSubredditList() {
+    protected boolean hasLeftFragment() {
         return false;
     }
 

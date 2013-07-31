@@ -149,7 +149,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract void setupActionBar(Bundle savedInstanceState);
 
-    protected abstract boolean hasSubredditList();
+    protected abstract boolean hasLeftFragment();
 
     // Methods that set the left fragments
 
@@ -359,7 +359,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods to select a thing
 
-    protected void selectThing(View view, ThingBundle thingBundle) {
+    protected void launchThingActivity(ThingBundle thingBundle) {
+        selectThingSinglePane(null, thingBundle);
+    }
+
+    private void selectThing(View view, ThingBundle thingBundle) {
         if (isSinglePane) {
             selectThingSinglePane(view, thingBundle);
         } else {
@@ -459,7 +463,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         boolean hasThing = thingBundle != null;
         int nextThingVisibility = hasThing ?
                 View.VISIBLE : View.GONE;
-        int nextSubredditListVisiblility = hasSubredditList() && !hasThing ?
+        int nextSubredditListVisiblility = hasLeftFragment() && !hasThing ?
                 View.VISIBLE : View.GONE;
 
         if (navContainer != null) {
@@ -477,7 +481,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 subredditListContainer.setVisibility(nextSubredditListVisiblility);
             }
         } else {
-            if (hasSubredditList() && subredditListContainer != null) {
+            if (hasLeftFragment() && subredditListContainer != null) {
                 int currVisibility = subredditListContainer.getVisibility();
                 if (currVisibility != nextSubredditListVisiblility) {
                     if (nextSubredditListVisiblility == View.VISIBLE) {
@@ -518,7 +522,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected void refreshSubredditListVisibility() {
         // Only multi pane activities have a distinct subreddit list.
         if (!isSinglePane) {
-            boolean showSubreddits = hasSubredditList();
+            boolean showSubreddits = hasLeftFragment();
             if (subredditListContainer != null) {
                 subredditListContainer.setVisibility(showSubreddits ? View.VISIBLE : View.GONE);
             }
@@ -527,7 +531,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void refreshThingBodyWidthMeasurement() {
-        int newWidth = hasSubredditList() ? subredditListWidth : 0;
+        int newWidth = hasLeftFragment() ? subredditListWidth : 0;
         Resources r = getResources();
         DisplayMetrics dm = r.getDisplayMetrics();
         int padding = r.getDimensionPixelSize(R.dimen.element_padding);
