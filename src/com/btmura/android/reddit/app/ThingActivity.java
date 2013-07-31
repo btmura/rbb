@@ -17,11 +17,11 @@
 package com.btmura.android.reddit.app;
 
 import android.app.ActionBar;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.view.MenuItem;
 
@@ -30,7 +30,6 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.text.Formatter;
-import com.btmura.android.reddit.util.Flag;
 import com.btmura.android.reddit.util.StringUtil;
 
 public class ThingActivity extends GlobalMenuActivity implements
@@ -40,11 +39,6 @@ public class ThingActivity extends GlobalMenuActivity implements
         SubredditNameHolder {
 
     public static final String EXTRA_THING_BUNDLE = "thingBundle";
-    public static final String EXTRA_FLAGS = "flags";
-
-    public static final int FLAG_INSERT_HOME = 0x1;
-
-    private static final String STATE_THING_BUNDLE = EXTRA_THING_BUNDLE;
 
     private static final String THING_FRAGMENT_TAG = "thing";
 
@@ -64,11 +58,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     private void setupPrereqs(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            thingBundle = getIntent().getParcelableExtra(EXTRA_THING_BUNDLE);
-        } else {
-            thingBundle = savedInstanceState.getParcelable(STATE_THING_BUNDLE);
-        }
+        thingBundle = getIntent().getParcelableExtra(EXTRA_THING_BUNDLE);
     }
 
     private void setupFragments(Bundle savedInstanceState) {
@@ -143,23 +133,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     private void handleHome() {
-        if (insertBackStack()) {
-            Intent intent = new Intent(this, BrowserActivity.class);
-            intent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getSubredditName());
-            startActivity(intent);
-        }
-        finish();
-    }
-
-    private boolean insertBackStack() {
-        int flags = getIntent().getIntExtra(EXTRA_FLAGS, 0);
-        return Flag.isEnabled(flags, FLAG_INSERT_HOME);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(STATE_THING_BUNDLE, thingBundle);
+        NavUtils.navigateUpFromSameTask(this);
     }
 
     private ThingFragment getThingFragment() {

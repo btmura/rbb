@@ -104,7 +104,14 @@
         <activity
             android:name=".app.ThingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow" />
+            android:parentActivityName="com.btmura.android.reddit.app.BrowserActivity"
+            android:uiOptions="splitActionBarWhenNarrow" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.btmura.android.reddit.app.BrowserActivity" />
+        </activity>
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.UserProfileActivity"
