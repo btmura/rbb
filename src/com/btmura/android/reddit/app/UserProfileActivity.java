@@ -149,8 +149,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
         if (accountName != null) {
             adapter.updateState(itemPosition);
             currentFilter = adapter.getFilter();
-            setUserProfileFragments(R.id.thing_list_container, accountName, currentUser,
-                    currentFilter);
+            setUserProfileFragments(accountName, currentUser, currentFilter);
         }
         return true;
     }

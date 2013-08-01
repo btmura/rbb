@@ -31,11 +31,9 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader;
@@ -84,8 +82,8 @@ public class BrowserActivity extends AbstractBrowserActivity implements
         }
 
         hasLeftFragment = TextUtils.isEmpty(requestedSubreddit);
-        if (isSinglePane && requestedThingBundle != null) {
-            launchThingActivity(requestedThingBundle);
+        if (isSinglePane && requestedSubreddit != null && requestedThingBundle != null) {
+            selectThing(null, requestedSubreddit, requestedThingBundle);
             finish();
             return true;
         }
@@ -125,7 +123,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
             if (requestedSubreddit != null) {
                 getSupportLoaderManager().initLoader(0, null, this);
             } else {
-                setBrowserFragments(R.id.subreddit_list_container);
+                setBrowserFragments();
             }
         }
     }
@@ -139,8 +137,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         String accountName = result.getLastAccount(this);
         int filter = result.getLastSubredditFilter(this);
-        setSubredditFragments(R.id.thing_list_container,
-                accountName,
+        setSubredditFragments(accountName,
                 requestedSubreddit,
                 requestedThingBundle,
                 filter);
@@ -162,8 +159,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
         ControlFragment controlFrag = getControlFragment();
         if (controlFrag != null && controlFrag.getFilter() != newFilter) {
-            setSubredditFragments(R.id.thing_list_container,
-                    controlFrag.getAccountName(),
+            setSubredditFragments(controlFrag.getAccountName(),
                     controlFrag.getSubreddit(),
                     controlFrag.getThingBundle(),
                     newFilter);
@@ -278,9 +274,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onPrepareOptionsMenu");
-        }
         super.onPrepareOptionsMenu(menu);
         if (accountsItem == null) {
             return true; // Check that onCreateOptionsMenu was called.

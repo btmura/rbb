@@ -41,13 +41,14 @@ public class ControlFragment extends Fragment {
     private static final String ARG_THING_BUNDLE = "thingBundle";
     private static final String ARG_FILTER = "filter";
 
-    public static ControlFragment
-            newSubredditInstance(String accountName, String subreddit, int filter) {
-        Bundle args = new Bundle(4);
+    public static ControlFragment newSubredditInstance(String accountName, String subreddit,
+            ThingBundle thingBundle, int filter) {
+        Bundle args = new Bundle(6);
         args.putInt(ARG_NAVIGATION, NAVIGATION_SUBREDDIT);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putBoolean(ARG_IS_RANDOM, Subreddits.isRandom(subreddit));
+        args.putParcelable(ARG_THING_BUNDLE, thingBundle);
         args.putInt(ARG_FILTER, filter);
         return newFragment(args);
     }
@@ -90,6 +91,16 @@ public class ControlFragment extends Fragment {
         return newFragment(args);
     }
 
+    public static ControlFragment newSearchSubredditsInstance(String accountName, String query,
+            int filter) {
+        Bundle args = new Bundle(4);
+        args.putInt(ARG_NAVIGATION, NAVIGATION_SEARCH_SUBREDDITS);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_QUERY, query);
+        args.putInt(ARG_FILTER, filter);
+        return newFragment(args);
+    }
+
     public static ControlFragment newUserProfileInstance(String accountName, String profileUser,
             int filter) {
         Bundle args = new Bundle(4);
@@ -97,18 +108,6 @@ public class ControlFragment extends Fragment {
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_PROFILE_USER, profileUser);
         args.putInt(ARG_FILTER, filter);
-        return newFragment(args);
-    }
-
-    public static ControlFragment newInstance(String accountName, String subreddit,
-            boolean isRandom, ThingBundle thingBundle, int filter) {
-        Bundle args = new Bundle(5);
-        args.putString(ARG_ACCOUNT_NAME, accountName);
-        args.putString(ARG_SUBREDDIT, subreddit);
-        args.putBoolean(ARG_IS_RANDOM, isRandom);
-        args.putParcelable(ARG_THING_BUNDLE, thingBundle);
-        args.putInt(ARG_FILTER, filter);
-
         return newFragment(args);
     }
 

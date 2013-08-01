@@ -56,8 +56,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         SubredditNameHolder,
         ThingBundleHolder {
 
-    public static final String TAG = "AbstractBrowserActivity";
-
     private static final String CONTROL_FRAGMENT_TAG = "control";
     private static final String LEFT_FRAGMENT_TAG = "left";
     private static final String RIGHT_FRAGMENT_TAG = "right";
@@ -69,9 +67,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private static final int ANIMATION_CLOSE_SUBREDDIT_LIST = 3;
 
     protected ActionBar bar;
-
     protected boolean isSinglePane;
-    protected boolean isSingleChoice;
+    private boolean isSingleChoice;
 
     private View navContainer;
     private View subredditListContainer;
@@ -151,27 +148,63 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected abstract boolean hasLeftFragment();
 
-    // Methods that set the left fragments
+    // Methods used to setup the initial fragments.
 
-    protected void setBrowserFragments(int containerId) {
-        setLeftFragment(containerId, NavigationFragment.newInstance());
+    protected void setBrowserFragments() {
+        setLeftFragment(R.id.subreddit_list_container,
+                NavigationFragment.newInstance());
     }
 
-    protected void setSearchSubredditsFragments(int containerId, String accountName,
-            String query, int filter) {
+    protected void setSubredditFragments(String accountName, String subreddit,
+            ThingBundle thingBundle, int filter) {
         selectAccountWithFilter(accountName, filter);
-        setLeftFragment(containerId, SearchSubredditListFragment
-                .newInstance(accountName, query, isSingleChoice));
+        setCenterFragment(R.id.thing_list_container,
+                ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
+                SubredditThingListFragment
+                        .newInstance(accountName, subreddit, filter, isSingleChoice));
+        if (thingBundle != null) {
+            selectThing(null, subreddit, thingBundle);
+        }
     }
 
-    // Callbacks that set the right fragments in response to the left fragments
-    // Methods for setting the content of the right hand thing list pane.
+    protected void setSearchThingsFragments(String accountName,
+            String subreddit, String query, int filter) {
+        selectAccountWithFilter(accountName, filter);
+        setCenterFragment(R.id.thing_list_container,
+                ControlFragment.newSearchThingsInstance(accountName, subreddit, query, filter),
+                SearchThingListFragment
+                        .newInstance(accountName, subreddit, query, isSingleChoice));
+    }
+
+    protected void setSearchSubredditsFragments(String accountName, String query, int filter) {
+        selectAccountWithFilter(accountName, filter);
+        if (isSinglePane) {
+            setCenterFragment(R.id.thing_list_container,
+                    ControlFragment.newSearchSubredditsInstance(accountName, query, filter),
+                    SearchSubredditListFragment
+                            .newInstance(accountName, query, isSingleChoice));
+        } else {
+            setLeftFragment(R.id.subreddit_list_container,
+                    SearchSubredditListFragment
+                            .newInstance(accountName, query, isSingleChoice));
+        }
+    }
+
+    protected void setUserProfileFragments(String accountName, String profileUser, int filter) {
+        selectAccountWithFilter(accountName, 0);
+        setCenterFragment(R.id.thing_list_container,
+                ControlFragment.newUserProfileInstance(accountName, profileUser, filter),
+                ProfileThingListFragment
+                        .newInstance(accountName, profileUser, filter, isSingleChoice));
+    }
+
+    // Callbacks triggered by calling one of the initial methods that select fragments.
 
     @Override
     public void onSubredditSelected(String accountName, String subreddit, int filter) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.thing_list_container,
-                ControlFragment.newSubredditInstance(accountName, subreddit, filter),
+                ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice));
     }
@@ -212,124 +245,16 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     @Override
     public void onThingSelected(View view, ThingBundle thingBundle, int pageType) {
-        selectThing(view, thingBundle);
+        selectThing(view, getControlFragment().getSubreddit(), thingBundle);
     }
 
-    // Methods that set the center fragments
-
-    protected void setSubredditFragments(int containerId, String accountName, String subreddit,
-            ThingBundle thingBundle, int filter) {
-        selectAccountWithFilter(accountName, filter);
-        setCenterFragment(containerId,
-                ControlFragment.newSubredditInstance(accountName, subreddit, filter),
-                SubredditThingListFragment
-                        .newInstance(accountName, subreddit, filter, isSingleChoice));
-    }
-
-    protected void setSearchThingsFragments(int containerId, String accountName,
-            String subreddit, String query, int filter) {
-        selectAccountWithFilter(accountName, filter);
-        setCenterFragment(containerId,
-                ControlFragment.newSearchThingsInstance(accountName, subreddit, query, filter),
-                SearchThingListFragment
-                        .newInstance(accountName, subreddit, query, isSingleChoice));
-    }
-
-    protected void setUserProfileFragments(int containerId, String accountName,
-            String profileUser, int filter) {
-        selectAccountWithFilter(accountName, 0);
-        setCenterFragment(containerId,
-                ControlFragment.newUserProfileInstance(accountName, profileUser, filter),
-                ProfileThingListFragment
-                        .newInstance(accountName, profileUser, filter, isSingleChoice));
-    }
-
-    // Methods for setting the fragments on the screen.
+    // Method to set state in this activity.
 
     private void selectAccountWithFilter(String accountName, int filter) {
         this.accountName = accountName;
         this.filter = filter;
         if (drawerLayout != null) {
             drawerLayout.closeDrawers();
-        }
-    }
-
-    private <F extends Fragment & ComparableFragment>
-            void setLeftFragment(int containerId, F frag) {
-        if (!Objects.fragmentEquals(frag, getLeftComparableFragment())) {
-            safePopBackStackImmediate();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            removeFragment(ft, CONTROL_FRAGMENT_TAG);
-            ft.replace(containerId, frag, LEFT_FRAGMENT_TAG);
-            removeFragment(ft, RIGHT_FRAGMENT_TAG);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
-                    | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-            ft.commitAllowingStateLoss();
-        }
-    }
-
-    private void setCenterFragment(int containerId,
-            ControlFragment controlFrag, ThingListFragment<?> rightFrag) {
-        if (isSinglePane) {
-            setRightFragmentSinglePane(containerId, controlFrag, rightFrag, true);
-        } else {
-            setRightFragmentMultiPane(containerId, controlFrag, rightFrag, true);
-        }
-    }
-
-    private <F extends Fragment & ComparableFragment>
-            void setRightFragment(int containerId, ControlFragment controlFrag, F frag) {
-        if (isSinglePane) {
-            setRightFragmentSinglePane(containerId, controlFrag, frag, false);
-        } else {
-            setRightFragmentMultiPane(containerId, controlFrag, frag, false);
-        }
-    }
-
-    private <F extends Fragment & ComparableFragment>
-            void setRightFragmentSinglePane(int containerId, ControlFragment controlFrag, F frag,
-                    boolean removeLeft) {
-        if (!Objects.fragmentEquals(frag, getRightComparableFragment())) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(controlFrag, CONTROL_FRAGMENT_TAG);
-            if (removeLeft) {
-                removeFragment(ft, LEFT_FRAGMENT_TAG);
-            }
-            ft.replace(containerId, frag, RIGHT_FRAGMENT_TAG);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
-                    | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-            ft.commitAllowingStateLoss();
-            refreshActionBar(controlFrag);
-        }
-    }
-
-    private <F extends Fragment & ComparableFragment>
-            void setRightFragmentMultiPane(int containerId, ControlFragment controlFrag, F frag,
-                    boolean removeLeft) {
-        if (!Objects.fragmentEquals(frag, getRightComparableFragment())) {
-            safePopBackStackImmediate();
-
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(controlFrag, CONTROL_FRAGMENT_TAG);
-            if (removeLeft) {
-                removeFragment(ft, LEFT_FRAGMENT_TAG);
-            }
-            ft.replace(containerId, frag, RIGHT_FRAGMENT_TAG);
-            removeFragment(ft, THING_FRAGMENT_TAG);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
-                    | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-            ft.commitAllowingStateLoss();
-
-            refreshActionBar(controlFrag);
-            refreshThingBodyWidthMeasurement();
-            refreshViews(null);
-        }
-    }
-
-    private void removeFragment(FragmentTransaction ft, String tag) {
-        Fragment f = getSupportFragmentManager().findFragmentByTag(tag);
-        if (f != null) {
-            ft.remove(f);
         }
     }
 
@@ -350,8 +275,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void selectSubredditMultiPane(String subreddit) {
-        setRightFragmentMultiPane(R.id.thing_list_container,
-                ControlFragment.newSubredditInstance(accountName, subreddit, filter),
+        setRightFragment(R.id.thing_list_container,
+                ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice),
                 false);
@@ -359,15 +284,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods to select a thing
 
-    protected void launchThingActivity(ThingBundle thingBundle) {
-        selectThingSinglePane(null, thingBundle);
-    }
-
-    private void selectThing(View view, ThingBundle thingBundle) {
+    protected void selectThing(View view, String subreddit, ThingBundle thingBundle) {
         if (isSinglePane) {
             selectThingSinglePane(view, thingBundle);
         } else {
-            selectThingMultiPane(thingBundle);
+            selectThingMultiPane(subreddit, thingBundle);
         }
     }
 
@@ -377,19 +298,18 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         launchActivity(view, intent);
     }
 
-    private void selectThingMultiPane(ThingBundle thingBundle) {
+    private void selectThingMultiPane(String subreddit, ThingBundle thingBundle) {
+        ControlFragment controlFrag =
+                ControlFragment.newSubredditInstance(accountName, subreddit, thingBundle, filter);
+        ThingFragment thingFrag =
+                ThingFragment.newInstance(accountName, thingBundle);
+
         safePopBackStackImmediate();
-
-        String subreddit = getControlFragment().getSubreddit();
-        Fragment cf = ControlFragment.newInstance(accountName, subreddit,
-                Subreddits.isRandom(subreddit), thingBundle, filter);
-        Fragment tf = ThingFragment.newInstance(accountName, thingBundle);
-
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(cf, CONTROL_FRAGMENT_TAG);
-        ft.replace(R.id.thing_container, tf, THING_FRAGMENT_TAG);
+        ft.add(controlFrag, CONTROL_FRAGMENT_TAG);
+        ft.replace(R.id.thing_container, thingFrag, THING_FRAGMENT_TAG);
         ft.addToBackStack(null);
-        ft.commit();
+        ft.commitAllowingStateLoss();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -407,7 +327,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         ControlFragment controlFrag = getControlFragment();
         if (Subreddits.isRandom(controlFrag.getSubreddit())) {
             ControlFragment newControlFrag = ControlFragment
-                    .newSubredditInstance(controlFrag.getAccountName(), subreddit,
+                    .newSubredditInstance(controlFrag.getAccountName(),
+                            subreddit,
+                            controlFrag.getThingBundle(),
                             controlFrag.getFilter());
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(newControlFrag, CONTROL_FRAGMENT_TAG);
@@ -420,12 +342,70 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public void onThingTitleDiscovery(String title) {
     }
 
+    // Methods for setting the fragments on the screen.
+
+    private <F extends Fragment & ComparableFragment>
+            void setLeftFragment(int containerId, F frag) {
+        if (!Objects.fragmentEquals(frag, getLeftComparableFragment())) {
+            safePopBackStackImmediate();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            removeFragment(ft, CONTROL_FRAGMENT_TAG);
+            ft.replace(containerId, frag, LEFT_FRAGMENT_TAG);
+            removeFragment(ft, RIGHT_FRAGMENT_TAG);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                    | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+            ft.commitAllowingStateLoss();
+        }
+    }
+
+    private <F extends Fragment & ComparableFragment>
+            void setCenterFragment(int containerId, ControlFragment controlFrag, F centerFrag) {
+        setRightFragment(containerId, controlFrag, centerFrag, true);
+    }
+
+    private <F extends Fragment & ComparableFragment>
+            void setRightFragment(int containerId, ControlFragment controlFrag, F rightFrag) {
+        setRightFragment(containerId, controlFrag, rightFrag, false);
+    }
+
+    private <F extends Fragment & ComparableFragment>
+            void setRightFragment(int containerId, ControlFragment controlFrag,
+                    F rightFrag, boolean removeLeft) {
+        if (!Objects.fragmentEquals(rightFrag, getRightComparableFragment())) {
+            safePopBackStackImmediate();
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(controlFrag, CONTROL_FRAGMENT_TAG);
+            if (removeLeft) {
+                removeFragment(ft, LEFT_FRAGMENT_TAG);
+            }
+            ft.replace(containerId, rightFrag, RIGHT_FRAGMENT_TAG);
+            removeFragment(ft, THING_FRAGMENT_TAG);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                    | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+            ft.commitAllowingStateLoss();
+
+            refreshActionBar(controlFrag);
+            if (!isSinglePane) {
+                refreshThingBodyWidthMeasurement();
+                refreshViews(controlFrag.getThingBundle());
+            }
+        }
+    }
+
     private void safePopBackStackImmediate() {
         FragmentManager fm = getSupportFragmentManager();
         if (fm.getBackStackEntryCount() > 0) {
             fm.removeOnBackStackChangedListener(this);
             fm.popBackStackImmediate();
             fm.addOnBackStackChangedListener(this);
+        }
+    }
+
+    private void removeFragment(FragmentTransaction ft, String tag) {
+        Fragment f = getSupportFragmentManager().findFragmentByTag(tag);
+        if (f != null) {
+            ft.remove(f);
         }
     }
 

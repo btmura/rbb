@@ -166,16 +166,12 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     private void refreshSubredditList(String query) {
-        int containerId = isSinglePane ? R.id.search_container : R.id.subreddit_list_container;
-        setSearchSubredditsFragments(containerId, accountName, query,
-                FilterAdapter.SUBREDDIT_HOT);
+        setSearchSubredditsFragments(accountName, query, FilterAdapter.SUBREDDIT_HOT);
         refreshSubredditListVisibility();
     }
 
     private void refreshThingList(String subreddit, String query) {
-        int containerId = isSinglePane ? R.id.search_container : R.id.thing_list_container;
-        setSearchThingsFragments(containerId, accountName, subreddit, query,
-                FilterAdapter.SUBREDDIT_HOT);
+        setSearchThingsFragments(accountName, subreddit, query, FilterAdapter.SUBREDDIT_HOT);
         refreshSubredditListVisibility();
     }
 
