@@ -98,7 +98,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     protected void setupActionBar(Bundle savedInstanceState) {
         filterAdapter = new FilterAdapter(this);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
             if (hasLeftFragment) {
                 drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -171,7 +170,9 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void refreshActionBar(ControlFragment controlFrag) {
-        bar.setDisplayHomeAsUpEnabled(isSinglePane || controlFrag.getThingBundle() != null);
+        bar.setDisplayHomeAsUpEnabled(isSinglePane
+                || drawerLayout != null
+                || controlFrag.getThingBundle() != null);
         switch (controlFrag.getNavigation()) {
             case ControlFragment.NAVIGATION_SUBREDDIT:
                 updateSubredditActionBar(controlFrag);

@@ -127,6 +127,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (!isSinglePane) {
             getSupportFragmentManager().addOnBackStackChangedListener(this);
 
+            drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
             navContainer = findViewById(R.id.nav_container);
             subredditListContainer = findViewById(R.id.subreddit_list_container);
             thingListContainer = findViewById(R.id.thing_list_container);
@@ -386,10 +387,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ft.commitAllowingStateLoss();
 
             refreshActionBar(controlFrag);
-            if (!isSinglePane) {
-                refreshThingBodyWidthMeasurement();
-                refreshViews(controlFrag.getThingBundle());
-            }
+            refreshThingBodyWidthMeasurement();
+            refreshViews(controlFrag.getThingBundle());
         }
     }
 
@@ -431,15 +430,17 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             ControlFragment cf = getControlFragment();
             if (cf != null) {
                 refreshActionBar(cf);
-                if (!isSinglePane) {
-                    refreshViews(cf.getThingBundle());
-                    refreshCheckedItems();
-                }
+                refreshViews(cf.getThingBundle());
+                refreshCheckedItems();
             }
         }
     }
 
     private void refreshViews(ThingBundle thingBundle) {
+        if (isSinglePane) {
+            return;
+        }
+
         boolean hasThing = thingBundle != null;
         int nextThingVisibility = hasThing ?
                 View.VISIBLE : View.GONE;
@@ -511,14 +512,20 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void refreshThingBodyWidthMeasurement() {
-        int newWidth = hasLeftFragment() ? subredditListWidth : 0;
-        Resources r = getResources();
-        DisplayMetrics dm = r.getDisplayMetrics();
-        int padding = r.getDimensionPixelSize(R.dimen.element_padding);
-        if (navContainer != null) {
-            thingBodyWidth = dm.widthPixels - newWidth - padding * 2;
+        // 1. Phones should use the entire width for the thing body.
+        // 2. Smaller tablets in portrait mode should also use the entire width.
+        if (isSinglePane || drawerLayout != null && navContainer != null) {
+            thingBodyWidth = 0;
         } else {
-            thingBodyWidth = dm.widthPixels / 5 * 2 - padding * 3;
+            int newWidth = hasLeftFragment() ? subredditListWidth : 0;
+            Resources r = getResources();
+            DisplayMetrics dm = r.getDisplayMetrics();
+            int padding = r.getDimensionPixelSize(R.dimen.element_padding);
+            if (navContainer != null) {
+                thingBodyWidth = dm.widthPixels - newWidth - padding * 2;
+            } else {
+                thingBodyWidth = dm.widthPixels / 5 * 2 - padding * 3;
+            }
         }
     }
 
