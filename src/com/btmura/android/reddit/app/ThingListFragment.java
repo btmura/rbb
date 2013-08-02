@@ -61,7 +61,7 @@ abstract class ThingListFragment<C extends ThingListController<?>>
     public interface OnThingSelectedListener {
         void onThingSelected(View view, ThingBundle thingBundle, int pageType);
 
-        int onMeasureThingBody();
+        int onThingBodyMeasure();
     }
 
     protected C controller;
@@ -352,7 +352,7 @@ abstract class ThingListFragment<C extends ThingListController<?>>
     }
 
     private int getThingBodyWidth() {
-        return listener != null ? listener.onMeasureThingBody() : 0;
+        return listener != null ? listener.onThingBodyMeasure() : 0;
     }
 
     public String getAccountName() {

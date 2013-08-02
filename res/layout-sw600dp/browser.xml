@@ -39,20 +39,18 @@
             android:visibility="gone"
             tools:ignore="InconsistentLayout" />
 
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/nav_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:baselineAligned="false" >
+            android:layout_height="match_parent" >
 
             <FrameLayout
                 android:id="@+id/thing_list_container"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:paddingLeft="@dimen/element_padding"
                 android:paddingRight="@dimen/element_padding" />
-        </LinearLayout>
+        </FrameLayout>
     </FrameLayout>
 
     <FrameLayout

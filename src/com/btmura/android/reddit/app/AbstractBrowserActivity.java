@@ -249,6 +249,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         selectThing(view, getControlFragment().getSubreddit(), thingBundle);
     }
 
+    @Override
+    public int onThingBodyMeasure() {
+        return thingBodyWidth;
+    }
+
     // Method to set state in this activity.
 
     private void selectAccountWithFilter(String accountName, int filter) {
@@ -409,11 +414,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     @Override
-    public int onMeasureThingBody() {
-        return thingBodyWidth;
-    }
-
-    @Override
     public void onBackStackChanged() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
@@ -442,10 +442,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
 
         boolean hasThing = thingBundle != null;
-        int nextThingVisibility = hasThing ?
-                View.VISIBLE : View.GONE;
-        int nextSubredditListVisiblility = hasLeftFragment() && !hasThing ?
-                View.VISIBLE : View.GONE;
+        int nextSubredditListVisiblility =
+                hasLeftFragment() && !hasThing ? View.VISIBLE : View.GONE;
 
         if (navContainer != null) {
             int currVisibility = navContainer.getVisibility();
@@ -462,6 +460,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 subredditListContainer.setVisibility(nextSubredditListVisiblility);
             }
         } else {
+            int nextThingVisibility = hasThing ? View.VISIBLE : View.GONE;
             if (hasLeftFragment() && subredditListContainer != null) {
                 int currVisibility = subredditListContainer.getVisibility();
                 if (currVisibility != nextSubredditListVisiblility) {
@@ -512,8 +511,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void refreshThingBodyWidthMeasurement() {
-        // 1. Phones should use the entire width for the thing body.
-        // 2. Smaller tablets in portrait mode should also use the entire width.
         if (isSinglePane || drawerLayout != null && navContainer != null) {
             thingBodyWidth = 0;
         } else {

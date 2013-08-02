@@ -211,7 +211,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
     private void updateMessagesActionBar(ControlFragment controlFrag) {
         String accountName = controlFrag.getAccountName();
-        setActionBarTitle(accountName, getString(R.string.subtitle_profile));
+        setActionBarTitle(accountName, getString(R.string.subtitle_messages));
 
         filterAdapter.clear();
         filterAdapter.addMessageFilters(this);
