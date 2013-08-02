@@ -20,17 +20,9 @@
         <item quantity="one">1 account</item>
         <item quantity="other">%1$,d accounts</item>
     </plurals>
-    <plurals name="added">
-        <item quantity="one">1 added</item>
-        <item quantity="other">%1$,d added</item>
-    </plurals>
     <plurals name="comments">
         <item quantity="one">1 comment</item>
         <item quantity="other">%1$,d comments</item>
-    </plurals>
-    <plurals name="deleted">
-        <item quantity="one">1 deleted</item>
-        <item quantity="other">%1$,d deleted</item>
     </plurals>
     <plurals name="messages">
         <item quantity="one">1 message</item>

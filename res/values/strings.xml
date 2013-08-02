@@ -80,11 +80,11 @@
     <string name="karma_count">%1$,d</string>
     <string name="label_accounts">Accounts</string>
     <string name="loading">Loading…</string>
-    <string name="login_adding_account">Adding account…</string>
+
     <string name="login_error">There was a problem: %1$s</string>
-    <string name="login_importing">Importing subreddits…</string>
+
     <string name="login_importing_error">There was a problem importing your subreddits…</string>
-    <string name="login_logging_in">Logging in…</string>
+
     <string name="menu_accounts">Accounts</string>
     <string name="menu_add">Add</string>
     <string name="menu_add_account">Add account</string>
