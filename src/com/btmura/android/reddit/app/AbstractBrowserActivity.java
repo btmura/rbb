@@ -490,7 +490,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                             : ANIMATION_COLLAPSE_RIGHT);
                 } else {
                     startAnimation(hasLeftFragment
-                            ? ANIMATION_COLLAPSE_RIGHT
+                            ? ANIMATION_EXPAND_LEFT
                             : ANIMATION_EXPAND_RIGHT);
                 }
             }
