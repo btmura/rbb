@@ -42,6 +42,7 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
+import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity implements
@@ -57,6 +58,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     private ThingBundle requestedThingBundle;
 
     private boolean hasLeftFragment;
+    private boolean showDrawer;
 
     private FilterAdapter filterAdapter;
     private ActionBarDrawerToggle drawerToggle;
@@ -74,14 +76,16 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     protected boolean skipSetup() {
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_SUBREDDIT)) {
-            requestedSubreddit = intent.getStringExtra(EXTRA_SUBREDDIT);
+            requestedSubreddit = StringUtil.emptyToNull(intent.getStringExtra(EXTRA_SUBREDDIT));
         } else if (intent.getData() != null) {
             Uri data = intent.getData();
-            requestedSubreddit = UriHelper.getSubreddit(data);
+            requestedSubreddit = StringUtil.emptyToNull(UriHelper.getSubreddit(data));
             requestedThingBundle = UriHelper.getThingBundle(data);
         }
 
-        hasLeftFragment = TextUtils.isEmpty(requestedSubreddit);
+        hasLeftFragment = !isSinglePane && drawerLayout == null && requestedSubreddit == null;
+        showDrawer = drawerLayout != null && requestedSubreddit == null;
+
         if (isSinglePane && requestedSubreddit != null && requestedThingBundle != null) {
             selectThing(null, requestedSubreddit, requestedThingBundle);
             finish();
@@ -96,10 +100,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
-        filterAdapter = new FilterAdapter(this);
-
         if (drawerLayout != null) {
-            if (hasLeftFragment) {
+            if (hasLeftFragment || !showDrawer) {
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            } else {
                 drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 drawerToggle = new ActionBarDrawerToggle(this,
                         drawerLayout,
@@ -108,13 +112,12 @@ public class BrowserActivity extends AbstractBrowserActivity implements
                         R.string.drawer_close);
                 drawerLayout.setDrawerListener(drawerToggle);
                 drawerLayout.setDrawerShadow(ThemePrefs.getDrawerShadow(this), GravityCompat.START);
-            } else {
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                bar.setHomeButtonEnabled(true);
+                bar.setDisplayHomeAsUpEnabled(true);
             }
-            bar.setHomeButtonEnabled(true);
-            bar.setDisplayHomeAsUpEnabled(true);
         }
 
+        filterAdapter = new FilterAdapter(this);
         bar.setDisplayShowTitleEnabled(false);
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 

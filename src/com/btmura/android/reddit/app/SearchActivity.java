@@ -167,12 +167,10 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     private void refreshSubredditList(String query) {
         setSearchSubredditsFragments(accountName, query, FilterAdapter.SUBREDDIT_HOT);
-        refreshSubredditListVisibility();
     }
 
     private void refreshThingList(String subreddit, String query) {
         setSearchThingsFragments(accountName, subreddit, query, FilterAdapter.SUBREDDIT_HOT);
-        refreshSubredditListVisibility();
     }
 
     @Override

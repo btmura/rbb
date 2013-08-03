@@ -16,6 +16,8 @@
 
 package com.btmura.android.reddit.util;
 
+import android.text.TextUtils;
+
 public class StringUtil {
 
     public static String ellipsize(String text, int maxLength) {
@@ -28,5 +30,9 @@ public class StringUtil {
 
     public static String safeString(Object object) {
         return object != null ? object.toString() : null;
+    }
+
+    public static String emptyToNull(String string) {
+        return TextUtils.isEmpty(string) ? null : string;
     }
 }

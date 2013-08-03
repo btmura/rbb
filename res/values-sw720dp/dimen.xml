@@ -18,5 +18,6 @@
 
     <!-- Width of a cell containing some details about a thing. Padding not included. -->
     <dimen name="details_cell_width">150dp</dimen>
+    <dimen name="subreddit_list_width">200dp</dimen>
 
 </resources>
