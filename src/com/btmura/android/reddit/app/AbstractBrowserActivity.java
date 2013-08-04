@@ -536,11 +536,18 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public String getSubredditName() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
+            ThingBundle thingBundle = cf.getThingBundle();
+            if (thingBundle != null) {
+                String subreddit = thingBundle.getSubreddit();
+                if (subreddit != null) {
+                    return subreddit;
+                }
+            }
+
             String subreddit = cf.getSubreddit();
             if (subreddit != null) {
                 return subreddit;
             }
-            return cf.getThingBundle().getSubreddit();
         }
         return null;
     }
