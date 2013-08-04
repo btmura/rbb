@@ -31,11 +31,6 @@ class SubredditThingListController extends AbstractThingTableListController {
     }
 
     @Override
-    public boolean isLoadable() {
-        return getAccountName() != null && getSubreddit() != null;
-    }
-
-    @Override
     public Loader<Cursor> createLoader() {
         return new SubredditThingLoader(context, getAccountName(), getSubreddit(), getFilter(),
                 getMoreId(), getCursorExtras());

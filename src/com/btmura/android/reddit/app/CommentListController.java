@@ -74,11 +74,6 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     }
 
     @Override
-    public boolean isLoadable() {
-        return accountName != null && !TextUtils.isEmpty(thingId);
-    }
-
-    @Override
     public Loader<Cursor> createLoader() {
         return new CommentLoader(context, accountName, thingId, linkId, cursorExtras);
     }

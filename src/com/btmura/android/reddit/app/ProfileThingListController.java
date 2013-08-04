@@ -37,11 +37,6 @@ class ProfileThingListController extends AbstractThingTableListController {
     }
 
     @Override
-    public boolean isLoadable() {
-        return getAccountName() != null && profileUser != null;
-    }
-
-    @Override
     public Loader<Cursor> createLoader() {
         return new ProfileThingLoader(context, getAccountName(), profileUser, getFilter(),
                 getMoreId(), getCursorExtras());

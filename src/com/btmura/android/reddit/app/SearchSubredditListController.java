@@ -20,7 +20,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.TextUtils;
 
 import com.btmura.android.reddit.content.SubredditSearchLoader;
 import com.btmura.android.reddit.widget.SearchSubredditAdapter;
@@ -59,11 +58,6 @@ class SearchSubredditListController implements SubredditListController<SearchSub
     }
 
     // Loader related methods.
-
-    @Override
-    public boolean isLoadable() {
-        return accountName != null && !TextUtils.isEmpty(query);
-    }
 
     @Override
     public Loader<Cursor> createLoader() {

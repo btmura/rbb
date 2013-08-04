@@ -37,11 +37,6 @@ class SearchThingListController extends AbstractThingTableListController {
     }
 
     @Override
-    public boolean isLoadable() {
-        return getAccountName() != null && getQuery() != null;
-    }
-
-    @Override
     public Loader<Cursor> createLoader() {
         return new SearchThingLoader(context, getAccountName(), getSubreddit(), getQuery(),
                 getMoreId(), getCursorExtras());

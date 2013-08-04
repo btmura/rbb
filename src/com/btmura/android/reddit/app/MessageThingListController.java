@@ -74,11 +74,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     // Loader related methods.
 
     @Override
-    public boolean isLoadable() {
-        return accountName != null && messageUser != null;
-    }
-
-    @Override
     public Loader<Cursor> createLoader() {
         return new MessageThingLoader(context, accountName, filter, moreId, cursorExtras);
     }

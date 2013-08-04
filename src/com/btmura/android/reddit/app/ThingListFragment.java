@@ -134,15 +134,9 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         setListAdapter(controller.getAdapter());
         setListShown(false);
         if (controller.getEmptyText() == 0) {
-            loadIfPossible();
+            getLoaderManager().initLoader(0, null, this);
         } else {
             showEmpty();
-        }
-    }
-
-    public void loadIfPossible() {
-        if (controller.isLoadable()) {
-            getLoaderManager().initLoader(0, null, this);
         }
     }
 

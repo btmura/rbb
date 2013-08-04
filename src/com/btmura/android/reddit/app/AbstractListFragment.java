@@ -70,13 +70,7 @@ abstract class AbstractListFragment<C extends Controller<A>, AC extends ActionMo
         super.onActivityCreated(savedInstanceState);
         setListAdapter(controller.getAdapter());
         setListShown(false);
-        loadIfPossible();
-    }
-
-    public void loadIfPossible() {
-        if (controller.isLoadable()) {
-            getLoaderManager().initLoader(0, null, this);
-        }
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override

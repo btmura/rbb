@@ -31,8 +31,6 @@ interface Controller<A extends ListAdapter> {
 
     // Loader-related methods
 
-    boolean isLoadable();
-
     Loader<Cursor> createLoader();
 
     void swapCursor(Cursor cursor);

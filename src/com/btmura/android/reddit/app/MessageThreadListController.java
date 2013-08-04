@@ -65,11 +65,6 @@ public class MessageThreadListController
     }
 
     @Override
-    public boolean isLoadable() {
-        return accountName != null && !TextUtils.isEmpty(thingId);
-    }
-
-    @Override
     public Loader<Cursor> createLoader() {
         return new MessageThreadLoader(context, accountName, thingId, cursorExtras);
     }
