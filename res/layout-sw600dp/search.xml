@@ -36,7 +36,7 @@
 
         <FrameLayout
             android:id="@+id/left_container"
-            android:layout_width="@dimen/subreddit_list_width"
+            android:layout_width="@dimen/left_width"
             android:layout_height="match_parent"
             android:paddingLeft="@dimen/element_padding"
             android:paddingRight="@dimen/element_padding" />

@@ -73,10 +73,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private boolean isSingleChoice;
 
     private View navContainer;
-    private View subredditListContainer;
-    private View thingListContainer;
+    private View leftContainer;
+    private View rightContainer;
     private View thingContainer;
-    private int subredditListWidth;
+    private int leftWidth;
     private int thingBodyWidth;
 
     private int fullNavWidth;
@@ -134,11 +134,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             getSupportFragmentManager().addOnBackStackChangedListener(this);
 
             navContainer = findViewById(R.id.nav_container);
-            subredditListContainer = findViewById(R.id.left_container);
-            thingListContainer = findViewById(R.id.right_container);
+            leftContainer = findViewById(R.id.left_container);
+            rightContainer = findViewById(R.id.right_container);
 
             Resources r = getResources();
-            subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
+            leftWidth = r.getDimensionPixelSize(R.dimen.left_width);
             fullNavWidth = r.getDisplayMetrics().widthPixels;
         }
 
@@ -457,7 +457,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         DisplayMetrics dm = r.getDisplayMetrics();
         int padding = r.getDimensionPixelSize(R.dimen.element_padding);
         if (navContainer != null) {
-            int newWidth = hasLeftFragment() ? subredditListWidth : 0;
+            int newWidth = hasLeftFragment() ? leftWidth : 0;
             thingBodyWidth = dm.widthPixels - newWidth - padding * 2;
         } else {
             thingBodyWidth = dm.widthPixels / 5 * 2 - padding * 3;
@@ -469,8 +469,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         boolean hasThing = thingBundle != null;
         if (navContainer != null) {
             // Refresh the subreddit list container which is inside the navigation container.
-            if (subredditListContainer != null) {
-                subredditListContainer.setVisibility(getVisibility(hasLeftFragment));
+            if (leftContainer != null) {
+                leftContainer.setVisibility(getVisibility(hasLeftFragment));
             }
             int cnv = navContainer.getVisibility();
             int nnv = getVisibility(!hasThing);
@@ -494,9 +494,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                             ? ANIMATION_EXPAND_LEFT
                             : ANIMATION_EXPAND_RIGHT);
                 }
-            } else if (subredditListContainer != null) {
+            } else if (leftContainer != null) {
                 // Refresh the subreddit list container if the animations don't take care of it.
-                subredditListContainer.setVisibility(getVisibility(hasLeftFragment && !hasThing));
+                leftContainer.setVisibility(getVisibility(hasLeftFragment && !hasThing));
             }
         }
     }
@@ -654,10 +654,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private AnimatorSet newOpenNavAnimator() {
-        ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer,
-                "translationX", -fullNavWidth, 0);
-        ObjectAnimator tpTransX = ObjectAnimator.ofFloat(thingContainer,
-                "translationX", 0, fullNavWidth);
+        ObjectAnimator ncTransX = ObjectAnimator
+                .ofFloat(navContainer, "translationX", -fullNavWidth, 0);
+        ObjectAnimator tpTransX = ObjectAnimator
+                .ofFloat(thingContainer, "translationX", 0, fullNavWidth);
 
         AnimatorSet as = new AnimatorSet();
         as.setDuration(durationMs).play(ncTransX).with(tpTransX);
@@ -681,8 +681,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private AnimatorSet newCloseNavAnimator() {
-        ObjectAnimator ncTransX = ObjectAnimator.ofFloat(navContainer,
-                "translationX", 0, -subredditListWidth);
+        ObjectAnimator ncTransX = ObjectAnimator
+                .ofFloat(navContainer, "translationX", 0, -leftWidth);
 
         AnimatorSet as = new AnimatorSet();
         as.setDuration(durationMs).play(ncTransX);
@@ -709,28 +709,28 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private AnimatorSet newCollapseLeftAnimator() {
         ObjectAnimator slTransX = ObjectAnimator
-                .ofFloat(subredditListContainer, "translationX", 0, -subredditListWidth);
+                .ofFloat(leftContainer, "translationX", 0, -leftWidth);
         ObjectAnimator tlTransX = ObjectAnimator
-                .ofFloat(thingListContainer, "translationX", 0, -subredditListWidth);
+                .ofFloat(rightContainer, "translationX", 0, -leftWidth);
 
         AnimatorSet as = new AnimatorSet();
         as.setDuration(durationMs).play(slTransX).with(tlTransX);
         as.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                subredditListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-                subredditListContainer.setVisibility(View.VISIBLE);
-                thingListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-                thingListContainer.setVisibility(View.VISIBLE);
+                leftContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                leftContainer.setVisibility(View.VISIBLE);
+                rightContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                rightContainer.setVisibility(View.VISIBLE);
                 thingContainer.setVisibility(View.GONE);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                subredditListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-                subredditListContainer.setVisibility(View.GONE);
-                thingListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-                thingListContainer.setTranslationX(0);
+                leftContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                leftContainer.setVisibility(View.GONE);
+                rightContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                rightContainer.setTranslationX(0);
                 thingContainer.setVisibility(View.VISIBLE);
             }
         });
@@ -739,26 +739,26 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private AnimatorSet newExpandLeftAnimator() {
         ObjectAnimator slTransX = ObjectAnimator
-                .ofFloat(subredditListContainer, "translationX", -subredditListWidth, 0);
+                .ofFloat(leftContainer, "translationX", -leftWidth, 0);
         ObjectAnimator tlTransX = ObjectAnimator
-                .ofFloat(thingListContainer, "translationX", -subredditListWidth, 0);
+                .ofFloat(rightContainer, "translationX", -leftWidth, 0);
 
         AnimatorSet as = new AnimatorSet();
         as.setDuration(durationMs).play(slTransX).with(tlTransX);
         as.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                subredditListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-                subredditListContainer.setVisibility(View.VISIBLE);
-                thingListContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-                thingListContainer.setVisibility(View.VISIBLE);
+                leftContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                leftContainer.setVisibility(View.VISIBLE);
+                rightContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                rightContainer.setVisibility(View.VISIBLE);
                 thingContainer.setVisibility(View.GONE);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                subredditListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
-                thingListContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                leftContainer.setLayerType(View.LAYER_TYPE_NONE, null);
+                rightContainer.setLayerType(View.LAYER_TYPE_NONE, null);
             }
         });
         return as;
@@ -766,7 +766,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private AnimatorSet newCollapseRightAnimator() {
         ObjectAnimator tcTransX = ObjectAnimator
-                .ofFloat(thingContainer, "translationX", subredditListWidth, 0);
+                .ofFloat(thingContainer, "translationX", leftWidth, 0);
 
         AnimatorSet as = new AnimatorSet();
         as.setDuration(durationMs).play(tcTransX);
@@ -785,7 +785,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private AnimatorSet newExpandRightAnimator() {
         ObjectAnimator tcTransX = ObjectAnimator
-                .ofFloat(thingContainer, "translationX", 0, subredditListWidth);
+                .ofFloat(thingContainer, "translationX", 0, leftWidth);
 
         AnimatorSet as = new AnimatorSet();
         as.setDuration(durationMs).play(tcTransX);
