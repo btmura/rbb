@@ -30,21 +30,29 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.SidebarLoader;
 import com.btmura.android.reddit.net.SidebarResult;
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.widget.SidebarAdapter;
 
-public class SidebarFragment extends ListFragment implements LoaderCallbacks<SidebarResult> {
+public class SidebarFragment extends ListFragment
+        implements ComparableFragment, LoaderCallbacks<SidebarResult> {
 
-    private static final String ARGS_SUBREDDIT = "subreddit";
+    private static final String EXTRA_SUBREDDIT = "subreddit";
 
     private SidebarAdapter adapter;
 
     public static SidebarFragment newInstance(String subreddit) {
         Bundle b = new Bundle(1);
-        b.putString(ARGS_SUBREDDIT, subreddit);
+        b.putString(EXTRA_SUBREDDIT, subreddit);
 
         SidebarFragment frag = new SidebarFragment();
         frag.setArguments(b);
         return frag;
+    }
+
+    @Override
+    public boolean fragmentEquals(ComparableFragment o) {
+        return ComparableFragments.baseEquals(this, o)
+                && ComparableFragments.equalStrings(this, o, EXTRA_SUBREDDIT);
     }
 
     @Override
@@ -120,6 +128,6 @@ public class SidebarFragment extends ListFragment implements LoaderCallbacks<Sid
     }
 
     private String getSubredditArgument() {
-        return getArguments().getString(ARGS_SUBREDDIT);
+        return getArguments().getString(EXTRA_SUBREDDIT);
     }
 }

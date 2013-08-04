@@ -100,7 +100,13 @@
         </activity>
         <activity
             android:name=".app.SidebarActivity"
-            android:uiOptions="splitActionBarWhenNarrow" />
+            android:uiOptions="splitActionBarWhenNarrow" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".app.ThingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

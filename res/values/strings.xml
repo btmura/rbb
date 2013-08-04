@@ -125,7 +125,9 @@
     <string name="subreddits_category">Subreddits</string>
     <string name="subtitle_profile">profile</string>
     <string name="subtitle_messages">messages</string>
+    <string name="tab_about">About</string>
     <string name="tab_posts">Posts</string>
+    <string name="tab_related">Related</string>
     <string name="tab_subreddits">Subreddits</string>
 
 </resources>

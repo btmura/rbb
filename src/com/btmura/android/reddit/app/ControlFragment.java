@@ -30,6 +30,7 @@ public class ControlFragment extends Fragment {
     public static final int NAVIGATION_SEARCH_THINGS = 4;
     public static final int NAVIGATION_SEARCH_SUBREDDITS = 5;
     public static final int NAVIGATION_USER_PROFILE = 6;
+    public static final int NAVIGATION_SIDEBAR = 7;
 
     private static final String ARG_NAVIGATION = "navigation";
     private static final String ARG_ACCOUNT_NAME = "accountName";
@@ -108,6 +109,14 @@ public class ControlFragment extends Fragment {
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_PROFILE_USER, profileUser);
         args.putInt(ARG_FILTER, filter);
+        return newFragment(args);
+    }
+
+    public static ControlFragment newSidebarInstance(String accountName, String subreddit) {
+        Bundle args = new Bundle(3);
+        args.putInt(ARG_NAVIGATION, NAVIGATION_SIDEBAR);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_SUBREDDIT, subreddit);
         return newFragment(args);
     }
 

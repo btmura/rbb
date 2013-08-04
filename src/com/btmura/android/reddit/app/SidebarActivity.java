@@ -16,47 +16,83 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.widget.SidebarPagerAdapter;
 
-public class SidebarActivity extends FragmentActivity implements SubredditNameHolder {
+public class SidebarActivity extends AbstractBrowserActivity
+        implements TabListener, SubredditNameHolder {
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
 
-    private SidebarPagerAdapter adapter;
-    private ViewPager pager;
+    private Tab aboutTab;
+    private Tab relatedTab;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void setContentView() {
         setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.sidebar);
-        setup(savedInstanceState);
     }
 
-    private void setup(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(GlobalMenuFragment.newInstance(), GlobalMenuFragment.TAG);
-            ft.commit();
+    @Override
+    protected boolean skipSetup() {
+        return false;
+    }
+
+    @Override
+    protected void setupViews() {
+        if (!hasSubredditName()) {
+            setSubredditName("android");
         }
+    }
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+    @Override
+    protected void setupActionBar(Bundle savedInstanceState) {
+        bar.setDisplayHomeAsUpEnabled(true);
+        setupTabs(savedInstanceState);
+    }
 
-        String subreddit = getSubredditName();
-        setTitle(Subreddits.getTitle(this, subreddit));
+    private void setupTabs(Bundle savedInstanceState) {
+        aboutTab = addTab(getString(R.string.tab_about));
+        relatedTab = addTab(getString(R.string.tab_related));
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+    }
 
-        adapter = new SidebarPagerAdapter(getSupportFragmentManager(), subreddit);
-        pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(adapter);
+    private Tab addTab(CharSequence text) {
+        Tab tab = bar.newTab().setText(text).setTabListener(this);
+        bar.addTab(tab);
+        return tab;
+    }
+
+    @Override
+    public void onTabSelected(Tab tab, android.app.FragmentTransaction ft) {
+        if (tab == aboutTab) {
+            setSidebarFragments(Subreddits.ACCOUNT_NONE, getSubredditName());
+        }
+    }
+
+    @Override
+    public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) {
+    }
+
+    @Override
+    public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
+    }
+
+    @Override
+    protected void refreshActionBar(ControlFragment controlFrag) {
+        setTitle(Subreddits.getTitle(this, getSubredditName()));
+    }
+
+    @Override
+    protected boolean hasLeftFragment() {
+        return false;
     }
 
     @Override
@@ -74,5 +110,13 @@ public class SidebarActivity extends FragmentActivity implements SubredditNameHo
     @Override
     public String getSubredditName() {
         return getIntent().getStringExtra(EXTRA_SUBREDDIT);
+    }
+
+    private boolean hasSubredditName() {
+        return getIntent().hasExtra(EXTRA_SUBREDDIT);
+    }
+
+    private void setSubredditName(String subreddit) {
+        getIntent().putExtra(EXTRA_SUBREDDIT, subreddit);
     }
 }

@@ -197,11 +197,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void setUserProfileFragments(String accountName, String profileUser, int filter) {
-        selectAccountWithFilter(accountName, 0);
+        selectAccountWithFilter(accountName, filter);
         setCenterFragment(R.id.right_container,
                 ControlFragment.newUserProfileInstance(accountName, profileUser, filter),
                 ProfileThingListFragment
                         .newInstance(accountName, profileUser, filter, isSingleChoice));
+    }
+
+    protected void setSidebarFragments(String accountName, String subreddit) {
+        selectAccountWithFilter(accountName, 0);
+        setCenterFragment(R.id.right_container,
+                ControlFragment.newSidebarInstance(accountName, subreddit),
+                SidebarFragment.newInstance(subreddit));
+
     }
 
     // Callbacks triggered by calling one of the initial methods that select fragments.
