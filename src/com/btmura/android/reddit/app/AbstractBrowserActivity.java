@@ -155,8 +155,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     // Methods used to setup the initial fragments.
 
     protected void setBrowserFragments() {
-        setLeftFragment(R.id.subreddit_list_container,
-                NavigationFragment.newInstance());
+        int containerId = drawerLayout != null
+                ? R.id.drawer_container
+                : R.id.subreddit_list_container;
+        setLeftFragment(containerId, NavigationFragment.newInstance());
     }
 
     protected void setSubredditFragments(String accountName, String subreddit,
@@ -464,13 +466,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void updateVisibility(ThingBundle thingBundle) {
         boolean hasLeftFragment = hasLeftFragment();
-        if (subredditListContainer != null) {
-            subredditListContainer
-                    .setVisibility(getVisibility(drawerLayout != null || hasLeftFragment));
-        }
-
         boolean hasThing = thingBundle != null;
         if (navContainer != null) {
+            // Refresh the subreddit list container which is inside the navigation container.
+            if (subredditListContainer != null) {
+                subredditListContainer.setVisibility(getVisibility(hasLeftFragment));
+            }
             int cnv = navContainer.getVisibility();
             int nnv = getVisibility(!hasThing);
             if (cnv != nnv) {
@@ -482,9 +483,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             }
         } else {
             int ctv = thingContainer.getVisibility();
-            int nnv = getVisibility(hasThing);
-            if (ctv != nnv) {
-                if (isVisible(nnv)) {
+            int ntv = getVisibility(hasThing);
+            if (ctv != ntv) {
+                if (isVisible(ntv)) {
                     startAnimation(hasLeftFragment
                             ? ANIMATION_COLLAPSE_LEFT
                             : ANIMATION_COLLAPSE_RIGHT);
@@ -493,6 +494,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                             ? ANIMATION_EXPAND_LEFT
                             : ANIMATION_EXPAND_RIGHT);
                 }
+            } else if (subredditListContainer != null) {
+                // Refresh the subreddit list container if the animations don't take care of it.
+                subredditListContainer.setVisibility(getVisibility(hasLeftFragment && !hasThing));
             }
         }
     }

@@ -24,6 +24,7 @@
     <!-- Width of a cell containing some details about a thing. Padding not included. -->
     <dimen name="details_cell_width">100dp</dimen>
     <dimen name="dialog_min_height">250dp</dimen>
+    <dimen name="drawer_width">200dp</dimen>
     <dimen name="score_total_height">34dp</dimen>
     <dimen name="scoreless_total_height">14dp</dimen>
     <dimen name="spinner_padding">12dp</dimen>
