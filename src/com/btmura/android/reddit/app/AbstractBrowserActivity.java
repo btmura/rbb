@@ -169,7 +169,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice));
         if (thingBundle != null) {
-            selectThing(null, subreddit, thingBundle);
+            selectThing(null, thingBundle);
         }
     }
 
@@ -251,7 +251,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     @Override
     public void onThingSelected(View view, ThingBundle thingBundle, int pageType) {
-        selectThing(view, getControlFragment().getSubreddit(), thingBundle);
+        selectThing(view, thingBundle);
     }
 
     @Override
@@ -295,11 +295,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods to select a thing
 
-    protected void selectThing(View view, String subreddit, ThingBundle thingBundle) {
+    protected void selectThing(View view, ThingBundle thingBundle) {
         if (isSinglePane) {
             selectThingSinglePane(view, thingBundle);
         } else {
-            selectThingMultiPane(subreddit, thingBundle);
+            selectThingMultiPane(thingBundle);
         }
     }
 
@@ -309,9 +309,9 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         launchActivity(view, intent);
     }
 
-    private void selectThingMultiPane(String subreddit, ThingBundle thingBundle) {
+    private void selectThingMultiPane(ThingBundle thingBundle) {
         ControlFragment controlFrag =
-                ControlFragment.newSubredditInstance(accountName, subreddit, thingBundle, filter);
+                getControlFragment().withThingBundle(thingBundle);
         ThingFragment thingFrag =
                 ThingFragment.newInstance(accountName, thingBundle);
 

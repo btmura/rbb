@@ -87,7 +87,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
         showDrawer = drawerLayout != null && requestedSubreddit == null;
 
         if (isSinglePane && requestedSubreddit != null && requestedThingBundle != null) {
-            selectThing(null, requestedSubreddit, requestedThingBundle);
+            selectThing(null, requestedThingBundle);
             finish();
             return true;
         }

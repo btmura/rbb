@@ -111,6 +111,12 @@ public class ControlFragment extends Fragment {
         return newFragment(args);
     }
 
+    public ControlFragment withThingBundle(ThingBundle thingBundle) {
+        Bundle args = new Bundle(getArguments());
+        args.putParcelable(ARG_THING_BUNDLE, thingBundle);
+        return newFragment(args);
+    }
+
     private static ControlFragment newFragment(Bundle args) {
         ControlFragment frag = new ControlFragment();
         frag.setArguments(args);
