@@ -134,8 +134,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             getSupportFragmentManager().addOnBackStackChangedListener(this);
 
             navContainer = findViewById(R.id.nav_container);
-            subredditListContainer = findViewById(R.id.subreddit_list_container);
-            thingListContainer = findViewById(R.id.thing_list_container);
+            subredditListContainer = findViewById(R.id.left_container);
+            thingListContainer = findViewById(R.id.right_container);
 
             Resources r = getResources();
             subredditListWidth = r.getDimensionPixelSize(R.dimen.subreddit_list_width);
@@ -157,14 +157,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected void setBrowserFragments() {
         int containerId = drawerLayout != null
                 ? R.id.drawer_container
-                : R.id.subreddit_list_container;
+                : R.id.left_container;
         setLeftFragment(containerId, NavigationFragment.newInstance());
     }
 
     protected void setSubredditFragments(String accountName, String subreddit,
             ThingBundle thingBundle, int filter) {
         selectAccountWithFilter(accountName, filter);
-        setCenterFragment(R.id.thing_list_container,
+        setCenterFragment(R.id.right_container,
                 ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice));
@@ -176,7 +176,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected void setSearchThingsFragments(String accountName,
             String subreddit, String query, int filter) {
         selectAccountWithFilter(accountName, filter);
-        setCenterFragment(R.id.thing_list_container,
+        setCenterFragment(R.id.right_container,
                 ControlFragment.newSearchThingsInstance(accountName, subreddit, query, filter),
                 SearchThingListFragment
                         .newInstance(accountName, subreddit, query, isSingleChoice));
@@ -185,12 +185,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected void setSearchSubredditsFragments(String accountName, String query, int filter) {
         selectAccountWithFilter(accountName, filter);
         if (isSinglePane) {
-            setCenterFragment(R.id.thing_list_container,
+            setCenterFragment(R.id.right_container,
                     ControlFragment.newSearchSubredditsInstance(accountName, query, filter),
                     SearchSubredditListFragment
                             .newInstance(accountName, query, isSingleChoice));
         } else {
-            setLeftFragment(R.id.subreddit_list_container,
+            setLeftFragment(R.id.left_container,
                     SearchSubredditListFragment
                             .newInstance(accountName, query, isSingleChoice));
         }
@@ -198,7 +198,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected void setUserProfileFragments(String accountName, String profileUser, int filter) {
         selectAccountWithFilter(accountName, 0);
-        setCenterFragment(R.id.thing_list_container,
+        setCenterFragment(R.id.right_container,
                 ControlFragment.newUserProfileInstance(accountName, profileUser, filter),
                 ProfileThingListFragment
                         .newInstance(accountName, profileUser, filter, isSingleChoice));
@@ -209,7 +209,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     @Override
     public void onSubredditSelected(String accountName, String subreddit, int filter) {
         selectAccountWithFilter(accountName, filter);
-        setRightFragment(R.id.thing_list_container,
+        setRightFragment(R.id.right_container,
                 ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice));
@@ -218,7 +218,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     @Override
     public void onProfileSelected(String accountName, int filter) {
         selectAccountWithFilter(accountName, filter);
-        setRightFragment(R.id.thing_list_container,
+        setRightFragment(R.id.right_container,
                 ControlFragment.newProfileInstance(accountName, filter),
                 ProfileThingListFragment
                         .newInstance(accountName, accountName, filter, isSingleChoice));
@@ -227,7 +227,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     @Override
     public void onSavedSelected(String accountName, int filter) {
         selectAccountWithFilter(accountName, filter);
-        setRightFragment(R.id.thing_list_container,
+        setRightFragment(R.id.right_container,
                 ControlFragment.newSavedInstance(accountName, filter),
                 ProfileThingListFragment
                         .newInstance(accountName, accountName, filter, isSingleChoice));
@@ -236,7 +236,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     @Override
     public void onMessagesSelected(String accountName, int filter) {
         selectAccountWithFilter(accountName, filter);
-        setRightFragment(R.id.thing_list_container,
+        setRightFragment(R.id.right_container,
                 ControlFragment.newMessagesInstance(accountName, filter),
                 MessageThingListFragment
                         .newInstance(accountName, accountName, filter, isSingleChoice));
@@ -286,7 +286,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void selectSubredditMultiPane(String subreddit) {
-        setRightFragment(R.id.thing_list_container,
+        setRightFragment(R.id.right_container,
                 ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice),

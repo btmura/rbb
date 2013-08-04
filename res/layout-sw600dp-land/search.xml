@@ -28,18 +28,18 @@
         android:layout_weight="1" >
 
         <FrameLayout
-            android:id="@+id/subreddit_list_container"
+            android:id="@+id/left_container"
             android:layout_width="@dimen/subreddit_list_width"
             android:layout_height="match_parent"
             android:paddingRight="@dimen/padding" />
 
         <FrameLayout
-            android:id="@+id/thing_list_container"
+            android:id="@+id/right_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_alignWithParentIfMissing="true"
-            android:layout_toRightOf="@+id/subreddit_list_container" />
+            android:layout_toRightOf="@+id/left_container" />
     </RelativeLayout>
 
     <FrameLayout

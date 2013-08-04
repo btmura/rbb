@@ -23,7 +23,7 @@
     android:paddingRight="@dimen/padding" >
 
     <FrameLayout
-        android:id="@+id/thing_list_container"
+        android:id="@+id/right_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1" />
