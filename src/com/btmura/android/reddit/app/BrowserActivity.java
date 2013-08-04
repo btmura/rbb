@@ -173,22 +173,24 @@ public class BrowserActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void refreshActionBar(ControlFragment controlFrag) {
-        bar.setDisplayHomeAsUpEnabled(isSinglePane
-                || drawerLayout != null
-                || controlFrag.getThingBundle() != null);
-        switch (controlFrag.getNavigation()) {
-            case ControlFragment.NAVIGATION_SUBREDDIT:
-                updateSubredditActionBar(controlFrag);
-                break;
+        if (controlFrag != null) {
+            bar.setDisplayHomeAsUpEnabled(isSinglePane
+                    || drawerLayout != null
+                    || controlFrag.getThingBundle() != null);
+            switch (controlFrag.getNavigation()) {
+                case ControlFragment.NAVIGATION_SUBREDDIT:
+                    updateSubredditActionBar(controlFrag);
+                    break;
 
-            case ControlFragment.NAVIGATION_PROFILE:
-            case ControlFragment.NAVIGATION_SAVED:
-                updateProfileActionBar(controlFrag);
-                break;
+                case ControlFragment.NAVIGATION_PROFILE:
+                case ControlFragment.NAVIGATION_SAVED:
+                    updateProfileActionBar(controlFrag);
+                    break;
 
-            case ControlFragment.NAVIGATION_MESSAGES:
-                updateMessagesActionBar(controlFrag);
-                break;
+                case ControlFragment.NAVIGATION_MESSAGES:
+                    updateMessagesActionBar(controlFrag);
+                    break;
+            }
         }
     }
 
