@@ -29,7 +29,7 @@ import com.btmura.android.reddit.net.SidebarResult;
  */
 public class SidebarLoader extends BaseAsyncTaskLoader<SidebarResult> {
 
-    public static final String TAG = "SidebarLoader";
+    private static final String TAG = "SidebarLoader";
 
     private final String subreddit;
 
