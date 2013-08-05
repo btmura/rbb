@@ -805,13 +805,17 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         as.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                leftContainer.setVisibility(View.GONE);
+                if (leftContainer != null) {
+                    leftContainer.setVisibility(View.GONE);
+                }
                 rightContainer.setVisibility(View.VISIBLE);
+                thingContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 thingContainer.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                thingContainer.setLayerType(View.LAYER_TYPE_NONE, null);
             }
         });
         return as;
@@ -826,9 +830,17 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         as.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                leftContainer.setVisibility(View.GONE);
+                if (leftContainer != null) {
+                    leftContainer.setVisibility(View.GONE);
+                }
                 rightContainer.setVisibility(View.VISIBLE);
+                thingContainer.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 thingContainer.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                thingContainer.setLayerType(View.LAYER_TYPE_NONE, null);
             }
         });
         return as;
