@@ -805,6 +805,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         as.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
+                leftContainer.setVisibility(View.GONE);
+                rightContainer.setVisibility(View.VISIBLE);
                 thingContainer.setVisibility(View.VISIBLE);
             }
 
@@ -824,6 +826,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         as.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
+                leftContainer.setVisibility(View.GONE);
+                rightContainer.setVisibility(View.VISIBLE);
                 thingContainer.setVisibility(View.GONE);
             }
         });
