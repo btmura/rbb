@@ -39,7 +39,6 @@ import android.view.View;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.NavigationFragment.OnNavigationEventListener;
-import com.btmura.android.reddit.app.SearchSubredditListFragment.OnSubredditSelectedListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
@@ -67,6 +66,13 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private static final int ANIMATION_COLLAPSE_LEFT = 3;
     private static final int ANIMATION_EXPAND_RIGHT = 4;
     private static final int ANIMATION_COLLAPSE_RIGHT = 5;
+
+    interface LeftFragment extends ComparableFragment {
+    }
+
+    interface RightFragment extends ComparableFragment {
+        void setSelectedThing(String thingId, String linkId);
+    }
 
     protected ActionBar bar;
     protected boolean isSinglePane;
@@ -155,10 +161,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     // Methods used to setup the initial fragments.
 
     protected void setBrowserFragments() {
-        int containerId = drawerLayout != null
-                ? R.id.drawer_container
-                : R.id.left_container;
-        setLeftFragment(containerId, NavigationFragment.newInstance());
+        int containerId = drawerLayout != null ? R.id.drawer_container : R.id.left_container;
+        setLeftFragment(containerId,
+                ControlFragment.newDrawerInstance(),
+                NavigationFragment.newInstance());
     }
 
     protected void setSubredditFragments(String accountName, String subreddit,
@@ -182,20 +188,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                         .newInstance(accountName, subreddit, query, isSingleChoice));
     }
 
-    protected void setSearchSubredditsFragments(String accountName, String query, int filter) {
-        selectAccountWithFilter(accountName, filter);
-        if (isSinglePane) {
-            setCenterFragment(R.id.right_container,
-                    ControlFragment.newSearchSubredditsInstance(accountName, query, filter),
-                    SearchSubredditListFragment
-                            .newInstance(accountName, query, isSingleChoice));
-        } else {
-            setLeftFragment(R.id.left_container,
-                    SearchSubredditListFragment
-                            .newInstance(accountName, query, isSingleChoice));
-        }
-    }
-
     protected void setUserProfileFragments(String accountName, String profileUser, int filter) {
         selectAccountWithFilter(accountName, filter);
         setCenterFragment(R.id.right_container,
@@ -209,7 +201,34 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         setCenterFragment(R.id.right_container,
                 ControlFragment.newSidebarInstance(accountName, subreddit),
                 SidebarFragment.newInstance(subreddit));
+    }
 
+    protected void setSearchSubredditsFragments(String accountName, String query, int filter) {
+        selectAccountWithFilter(accountName, filter);
+        if (isSinglePane) {
+            setCenterFragment(R.id.right_container,
+                    ControlFragment.newSearchSubredditsInstance(accountName, query, filter),
+                    SearchSubredditListFragment
+                            .newInstance(accountName, query, isSingleChoice));
+        } else {
+            setLeftFragment(R.id.left_container,
+                    ControlFragment.newSearchSubredditsInstance(accountName, query, filter),
+                    SearchSubredditListFragment
+                            .newInstance(accountName, query, isSingleChoice));
+        }
+    }
+
+    protected void setRelatedSubredditsFragments(String accountName, String subreddit) {
+        selectAccountWithFilter(accountName, 0);
+        if (isSinglePane) {
+            setCenterFragment(R.id.right_container,
+                    ControlFragment.newRelatedSubredditsInstance(accountName, subreddit),
+                    RelatedSubredditListFragment.newInstance(subreddit, isSingleChoice));
+        } else {
+            setLeftFragment(R.id.left_container,
+                    ControlFragment.newRelatedSubredditsInstance(accountName, subreddit),
+                    RelatedSubredditListFragment.newInstance(subreddit, isSingleChoice));
+        }
     }
 
     // Callbacks triggered by calling one of the initial methods that select fragments.
@@ -295,7 +314,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void selectSubredditMultiPane(String subreddit) {
         setRightFragment(R.id.right_container,
-                ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
+                getControlFragment().withSubreddit(subreddit),
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice),
                 false);
@@ -363,12 +382,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods for setting the fragments on the screen.
 
-    private <F extends Fragment & ComparableFragment>
-            void setLeftFragment(int containerId, F frag) {
-        if (!Objects.fragmentEquals(frag, getLeftComparableFragment())) {
+    private <F extends Fragment & LeftFragment>
+            void setLeftFragment(int containerId, ControlFragment controlFrag, F frag) {
+        if (!Objects.fragmentEquals(frag, getLeftFragment())) {
             safePopBackStackImmediate();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            removeFragment(ft, TAG_CONTROL_FRAGMENT);
+            ft.add(controlFrag, TAG_CONTROL_FRAGMENT);
             ft.replace(containerId, frag, TAG_LEFT_FRAGMENT);
             removeFragment(ft, TAG_RIGHT_FRAGMENT);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
@@ -380,20 +399,20 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    private <F extends Fragment & ComparableFragment>
+    private <F extends Fragment & RightFragment>
             void setCenterFragment(int containerId, ControlFragment controlFrag, F centerFrag) {
         setRightFragment(containerId, controlFrag, centerFrag, true);
     }
 
-    private <F extends Fragment & ComparableFragment>
+    private <F extends Fragment & RightFragment>
             void setRightFragment(int containerId, ControlFragment controlFrag, F rightFrag) {
         setRightFragment(containerId, controlFrag, rightFrag, false);
     }
 
-    private <F extends Fragment & ComparableFragment>
+    private <F extends Fragment & RightFragment>
             void setRightFragment(int containerId, ControlFragment controlFrag,
                     F rightFrag, boolean removeLeft) {
-        if (!Objects.fragmentEquals(rightFrag, getRightComparableFragment())) {
+        if (!Objects.fragmentEquals(rightFrag, getRightFragment())) {
             safePopBackStackImmediate();
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -522,14 +541,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private void refreshCheckedItems() {
         if (!isSinglePane) {
-            ThingListFragment<?> tf = getThingListFragment();
-            if (tf != null) {
+            RightFragment rf = getRightFragment();
+            if (rf != null) {
                 ControlFragment cf = getControlFragment();
                 ThingBundle thingBundle = cf.getThingBundle();
                 if (thingBundle != null) {
-                    tf.setSelectedThing(thingBundle.getThingId(), thingBundle.getLinkId());
+                    rf.setSelectedThing(thingBundle.getThingId(), thingBundle.getLinkId());
                 } else {
-                    tf.setSelectedThing(null, null);
+                    rf.setSelectedThing(null, null);
                 }
             }
         }
@@ -599,24 +618,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 .findFragmentByTag(TAG_CONTROL_FRAGMENT);
     }
 
-    private ComparableFragment getLeftComparableFragment() {
-        return (ComparableFragment) getSupportFragmentManager()
+    private LeftFragment getLeftFragment() {
+        return (LeftFragment) getSupportFragmentManager()
                 .findFragmentByTag(TAG_LEFT_FRAGMENT);
     }
 
-    private ComparableFragment getRightComparableFragment() {
-        return (ComparableFragment) getSupportFragmentManager()
+    private RightFragment getRightFragment() {
+        return (RightFragment) getSupportFragmentManager()
                 .findFragmentByTag(TAG_RIGHT_FRAGMENT);
     }
 
     protected NavigationFragment getNavigationFragment() {
         return (NavigationFragment) getSupportFragmentManager()
                 .findFragmentByTag(TAG_LEFT_FRAGMENT);
-    }
-
-    protected ThingListFragment<?> getThingListFragment() {
-        return (ThingListFragment<?>) getSupportFragmentManager()
-                .findFragmentByTag(TAG_RIGHT_FRAGMENT);
     }
 
     private ThingFragment getThingFragment() {

@@ -38,6 +38,7 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.AbstractBrowserActivity.RightFragment;
 import com.btmura.android.reddit.content.CursorExtras;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
@@ -49,7 +50,7 @@ import com.btmura.android.reddit.widget.ThingView;
 abstract class ThingListFragment<C extends ThingListController<?>>
         extends ListFragment
         implements LoaderCallbacks<Cursor>,
-        ComparableFragment,
+        RightFragment,
         OnScrollListener,
         OnSwipeDismissListener,
         OnVoteListener,
@@ -353,6 +354,7 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         return controller.getAccountName();
     }
 
+    @Override
     public void setSelectedThing(String thingId, String linkId) {
         controller.setSelectedThing(thingId, linkId);
     }

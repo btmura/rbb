@@ -16,6 +16,10 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.Activity;
+import android.database.Cursor;
+import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ListView;
 
@@ -25,11 +29,38 @@ import com.btmura.android.reddit.widget.SubredditView;
 abstract class SubredditListFragment<C extends SubredditListController<A>, AC extends ActionModeController, A extends SubredditAdapter>
         extends AbstractListFragment<C, AC, A> {
 
+    private OnSubredditSelectedListener listener;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnSubredditSelectedListener) {
+            listener = (OnSubredditSelectedListener) activity;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        super.onLoadFinished(loader, cursor);
+        SubredditAdapter adapter = controller.getAdapter();
+        if (adapter.getCursor() != null && adapter.getCount() > 0
+                && TextUtils.isEmpty(controller.getSelectedSubreddit())) {
+            String subreddit = adapter.getName(0);
+            controller.setSelectedSubreddit(subreddit);
+            if (listener != null) {
+                listener.onSubredditSelected(null, subreddit, true);
+            }
+        }
+    }
+
     @Override
     public void onListItemClick(ListView l, View view, int position, long id) {
         controller.setSelectedPosition(position);
         if (controller.isSingleChoice() && view instanceof SubredditView) {
             ((SubredditView) view).setChosen(true);
+        }
+        if (listener != null) {
+            listener.onSubredditSelected(view, controller.getSelectedSubreddit(), false);
         }
     }
 }

@@ -22,24 +22,23 @@ import android.os.Bundle;
 import com.btmura.android.reddit.app.AbstractBrowserActivity.LeftFragment;
 import com.btmura.android.reddit.app.AbstractBrowserActivity.RightFragment;
 import com.btmura.android.reddit.util.ComparableFragments;
-import com.btmura.android.reddit.widget.SearchSubredditAdapter;
+import com.btmura.android.reddit.widget.RelatedSubredditAdapter;
 
-public class SearchSubredditListFragment
-        extends SubredditListFragment<SearchSubredditListController,
+public class RelatedSubredditListFragment
+        extends SubredditListFragment<RelatedSubredditListController,
         SubredditActionModeController,
-        SearchSubredditAdapter>
+        RelatedSubredditAdapter>
         implements LeftFragment, RightFragment {
 
     private AccountResultHolder accountResultHolder;
 
-    public static SearchSubredditListFragment newInstance(String accountName, String query,
-            boolean singleChoice) {
-        Bundle args = new Bundle(3);
-        args.putString(SearchSubredditListController.EXTRA_ACCOUNT_NAME, accountName);
-        args.putString(SearchSubredditListController.EXTRA_QUERY, query);
-        args.putBoolean(SearchSubredditListController.EXTRA_SINGLE_CHOICE, singleChoice);
+    public static RelatedSubredditListFragment
+            newInstance(String subreddit, boolean singleChoice) {
+        Bundle args = new Bundle(2);
+        args.putString(RelatedSubredditListController.EXTRA_SIDEBAR_SUBREDDIT, subreddit);
+        args.putBoolean(RelatedSubredditListController.EXTRA_SINGLE_CHOICE, singleChoice);
 
-        SearchSubredditListFragment frag = new SearchSubredditListFragment();
+        RelatedSubredditListFragment frag = new RelatedSubredditListFragment();
         frag.setArguments(args);
         return frag;
     }
@@ -48,9 +47,7 @@ public class SearchSubredditListFragment
     public boolean fragmentEquals(ComparableFragment o) {
         return ComparableFragments.baseEquals(this, o)
                 && ComparableFragments.equalStrings(this, o,
-                        SearchSubredditListController.EXTRA_ACCOUNT_NAME)
-                && ComparableFragments.equalStrings(this, o,
-                        SearchSubredditListController.EXTRA_QUERY);
+                        RelatedSubredditListController.EXTRA_SIDEBAR_SUBREDDIT);
     }
 
     @Override
@@ -62,13 +59,13 @@ public class SearchSubredditListFragment
     }
 
     @Override
-    protected SearchSubredditListController createController() {
-        return new SearchSubredditListController(getActivity(), getArguments());
+    protected RelatedSubredditListController createController() {
+        return new RelatedSubredditListController(getActivity(), getArguments());
     }
 
     @Override
     protected SubredditActionModeController createActionModeController(
-            SearchSubredditListController controller) {
+            RelatedSubredditListController controller) {
         return new SubredditActionModeController(getActivity(), getFragmentManager(),
                 controller.getAdapter(), accountResultHolder);
     }

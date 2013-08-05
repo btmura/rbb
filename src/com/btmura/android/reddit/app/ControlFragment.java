@@ -23,14 +23,16 @@ import com.btmura.android.reddit.database.Subreddits;
 
 public class ControlFragment extends Fragment {
 
-    public static final int NAVIGATION_SUBREDDIT = 0;
-    public static final int NAVIGATION_PROFILE = 1;
-    public static final int NAVIGATION_SAVED = 2;
-    public static final int NAVIGATION_MESSAGES = 3;
-    public static final int NAVIGATION_SEARCH_THINGS = 4;
-    public static final int NAVIGATION_SEARCH_SUBREDDITS = 5;
-    public static final int NAVIGATION_USER_PROFILE = 6;
-    public static final int NAVIGATION_SIDEBAR = 7;
+    public static final int NAVIGATION_DRAWER = 0;
+    public static final int NAVIGATION_SUBREDDIT = 1;
+    public static final int NAVIGATION_PROFILE = 2;
+    public static final int NAVIGATION_SAVED = 3;
+    public static final int NAVIGATION_MESSAGES = 4;
+    public static final int NAVIGATION_SEARCH_THINGS = 5;
+    public static final int NAVIGATION_SEARCH_SUBREDDITS = 6;
+    public static final int NAVIGATION_USER_PROFILE = 7;
+    public static final int NAVIGATION_SIDEBAR = 8;
+    public static final int NAVIGATION_RELATED_SUBREDDITS = 9;
 
     private static final String ARG_NAVIGATION = "navigation";
     private static final String ARG_ACCOUNT_NAME = "accountName";
@@ -41,6 +43,12 @@ public class ControlFragment extends Fragment {
     private static final String ARG_QUERY = "query";
     private static final String ARG_THING_BUNDLE = "thingBundle";
     private static final String ARG_FILTER = "filter";
+
+    public static ControlFragment newDrawerInstance() {
+        Bundle args = new Bundle(1);
+        args.putInt(ARG_NAVIGATION, NAVIGATION_DRAWER);
+        return newFragment(args);
+    }
 
     public static ControlFragment newSubredditInstance(String accountName, String subreddit,
             ThingBundle thingBundle, int filter) {
@@ -116,6 +124,21 @@ public class ControlFragment extends Fragment {
         Bundle args = new Bundle(3);
         args.putInt(ARG_NAVIGATION, NAVIGATION_SIDEBAR);
         args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_SUBREDDIT, subreddit);
+        return newFragment(args);
+    }
+
+    public static ControlFragment
+            newRelatedSubredditsInstance(String accountName, String subreddit) {
+        Bundle args = new Bundle(3);
+        args.putInt(ARG_NAVIGATION, NAVIGATION_RELATED_SUBREDDITS);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
+        args.putString(ARG_SUBREDDIT, subreddit);
+        return newFragment(args);
+    }
+
+    public ControlFragment withSubreddit(String subreddit) {
+        Bundle args = new Bundle(getArguments());
         args.putString(ARG_SUBREDDIT, subreddit);
         return newFragment(args);
     }

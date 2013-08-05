@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.app.AbstractBrowserActivity.RightFragment;
 import com.btmura.android.reddit.content.SidebarLoader;
 import com.btmura.android.reddit.net.SidebarResult;
 import com.btmura.android.reddit.net.Urls;
@@ -34,7 +35,7 @@ import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.widget.SidebarAdapter;
 
 public class SidebarFragment extends ListFragment
-        implements ComparableFragment, LoaderCallbacks<SidebarResult> {
+        implements RightFragment, LoaderCallbacks<SidebarResult> {
 
     private static final String EXTRA_SUBREDDIT = "subreddit";
 
@@ -90,6 +91,10 @@ public class SidebarFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         MenuHelper.startSubredditActivity(getActivity(), getSubredditArgument());
+    }
+
+    @Override
+    public void setSelectedThing(String thingId, String linkId) {
     }
 
     @Override

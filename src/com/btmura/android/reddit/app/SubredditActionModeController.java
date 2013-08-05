@@ -31,19 +31,19 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.util.ListViewUtils;
-import com.btmura.android.reddit.widget.SearchSubredditAdapter;
+import com.btmura.android.reddit.widget.SubredditAdapter;
 
-class SearchSubredditActionModeController implements ActionModeController {
+class SubredditActionModeController implements ActionModeController {
 
     private final Context context;
     private final FragmentManager fragmentManager;
-    private final SearchSubredditAdapter adapter;
+    private final SubredditAdapter adapter;
     private final AccountResultHolder accountResultHolder;
 
     private ActionMode actionMode;
 
-    SearchSubredditActionModeController(Context context, FragmentManager fragmentManager,
-            SearchSubredditAdapter adapter, AccountResultHolder accountResultHolder) {
+    SubredditActionModeController(Context context, FragmentManager fragmentManager,
+            SubredditAdapter adapter, AccountResultHolder accountResultHolder) {
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.adapter = adapter;

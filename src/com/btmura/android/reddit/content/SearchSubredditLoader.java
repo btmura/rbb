@@ -22,7 +22,7 @@ import android.os.Bundle;
 import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.provider.ThingProvider;
 
-public class SubredditSearchLoader extends AbstractSessionLoader {
+public class SearchSubredditLoader extends AbstractSessionLoader {
 
     public static final int INDEX_NAME = 1;
     public static final int INDEX_SUBSCRIBERS = 2;
@@ -38,7 +38,7 @@ public class SubredditSearchLoader extends AbstractSessionLoader {
     private final String accountName;
     private final String query;
 
-    public SubredditSearchLoader(Context context, String accountName, String query,
+    public SearchSubredditLoader(Context context, String accountName, String query,
             Bundle cursorExtras) {
         super(context, ThingProvider.SUBREDDITS_URI, PROJECTION,
                 SubredditResults.SELECT_BY_SESSION_ID, SubredditResults.SORT_BY_NAME, cursorExtras,

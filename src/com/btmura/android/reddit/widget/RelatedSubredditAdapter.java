@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Brian Muramatsu
+ * Copyright (C) 2013 Brian Muramatsu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,28 +20,25 @@ import android.content.Context;
 import android.database.Cursor;
 import android.view.View;
 
-import com.btmura.android.reddit.content.SearchSubredditLoader;
+import com.btmura.android.reddit.content.RelatedSubredditLoader;
 import com.btmura.android.reddit.util.Objects;
 
-/** {@link SubredditAdapter} that handles searching for subreddits. */
-public class SearchSubredditAdapter extends SubredditAdapter {
+public class RelatedSubredditAdapter extends SubredditAdapter {
 
-    public SearchSubredditAdapter(Context context, boolean singleChoice) {
+    public RelatedSubredditAdapter(Context context, boolean singleChoice) {
         super(context, singleChoice);
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        String name = cursor.getString(SearchSubredditLoader.INDEX_NAME);
-        int subscribers = cursor.getInt(SearchSubredditLoader.INDEX_SUBSCRIBERS);
-        boolean over18 = cursor.getInt(SearchSubredditLoader.INDEX_OVER_18) == 1;
+        String name = cursor.getString(RelatedSubredditLoader.INDEX_NAME);
         SubredditView v = (SubredditView) view;
-        v.setData(name, over18, subscribers);
+        v.setData(name, false, -1);
         v.setChosen(singleChoice && Objects.equalsIgnoreCase(selectedSubreddit, name));
     }
 
     @Override
     public String getName(int position) {
-        return getString(position, SearchSubredditLoader.INDEX_NAME);
+        return getString(position, RelatedSubredditLoader.INDEX_NAME);
     }
 }

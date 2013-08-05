@@ -20,19 +20,37 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.MenuItem;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountLoader;
+import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 
-public class SidebarActivity extends AbstractBrowserActivity
-        implements TabListener, SubredditNameHolder {
+public class SidebarActivity extends AbstractBrowserActivity implements
+        LoaderCallbacks<AccountResult>,
+        TabListener,
+        AccountResultHolder,
+        SubredditNameHolder {
+
+    private static final String TAG = "SidebarActivity";
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
 
-    private Tab aboutTab;
-    private Tab relatedTab;
+    private static final String STATE_SELECTED_TAB_INDEX = "selectedTabIndex";
+
+    private AccountResult accountResult;
+    private String accountName;
+
+    private int savedSelectedTabIndex;
+    private boolean tabListenerDisabled;
+    private Tab tabAbout;
+    private Tab tabRelated;
 
     @Override
     protected void setContentView() {
@@ -55,13 +73,41 @@ public class SidebarActivity extends AbstractBrowserActivity
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         bar.setDisplayHomeAsUpEnabled(true);
-        setupTabs(savedInstanceState);
+        if (savedInstanceState != null) {
+            savedSelectedTabIndex = savedInstanceState.getInt(STATE_SELECTED_TAB_INDEX);
+        }
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
-    private void setupTabs(Bundle savedInstanceState) {
-        aboutTab = addTab(getString(R.string.tab_about));
-        relatedTab = addTab(getString(R.string.tab_related));
+    @Override
+    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
+        return new AccountLoader(this, true, false);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
+        accountResult = result;
+        accountName = result.getLastAccount(this);
+        if (bar.getNavigationMode() != ActionBar.NAVIGATION_MODE_TABS) {
+            setupTabs();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<AccountResult> loader) {
+        accountResult = null;
+        accountName = null;
+    }
+
+    private void setupTabs() {
+        tabAbout = addTab(getString(R.string.tab_about));
+        tabRelated = addTab(getString(R.string.tab_related));
+        tabListenerDisabled = savedSelectedTabIndex != 0;
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        tabListenerDisabled = false;
+        if (savedSelectedTabIndex != 0) {
+            bar.setSelectedNavigationItem(savedSelectedTabIndex);
+        }
     }
 
     private Tab addTab(CharSequence text) {
@@ -72,13 +118,27 @@ public class SidebarActivity extends AbstractBrowserActivity
 
     @Override
     public void onTabSelected(Tab tab, android.app.FragmentTransaction ft) {
-        if (tab == aboutTab) {
-            setSidebarFragments(Subreddits.ACCOUNT_NONE, getSubredditName());
-        }
+        selectTab(tab);
     }
 
     @Override
     public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) {
+        if (!isSinglePane) {
+            getSupportFragmentManager().popBackStack();
+        }
+    }
+
+    private void selectTab(Tab tab) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "selectTab tab: " + tab.getText() + " disabled: " + tabListenerDisabled);
+        }
+        if (!tabListenerDisabled) {
+            if (tab == tabAbout) {
+                setSidebarFragments(accountName, getSubredditName());
+            } else if (tab == tabRelated) {
+                setRelatedSubredditsFragments(accountName, getSubredditName());
+            }
+        }
     }
 
     @Override
@@ -87,12 +147,12 @@ public class SidebarActivity extends AbstractBrowserActivity
 
     @Override
     protected void refreshActionBar(ControlFragment controlFrag) {
-        setTitle(Subreddits.getTitle(this, getSubredditName()));
+        bar.setTitle(Subreddits.getTitle(this, getSubredditName()));
     }
 
     @Override
     protected boolean hasLeftFragment() {
-        return false;
+        return bar.getSelectedTab() == tabRelated;
     }
 
     @Override
@@ -105,6 +165,17 @@ public class SidebarActivity extends AbstractBrowserActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_SELECTED_TAB_INDEX, bar.getSelectedNavigationIndex());
+    }
+
+    @Override
+    public AccountResult getAccountResult() {
+        return accountResult;
     }
 
     @Override

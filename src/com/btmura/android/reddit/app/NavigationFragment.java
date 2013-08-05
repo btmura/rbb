@@ -35,6 +35,7 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.AbstractBrowserActivity.LeftFragment;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
@@ -54,7 +55,7 @@ import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
 
 public class NavigationFragment extends ListFragment implements
-        ComparableFragment,
+        LeftFragment,
         LoaderCallbacks<AccountResult>,
         OnPlaceSelectedListener,
         MultiChoiceModeListener {

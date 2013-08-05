@@ -48,10 +48,13 @@ public class SearchActivity extends AbstractBrowserActivity implements
     /** Required string search query. */
     public static final String EXTRA_QUERY = "query";
 
-    private static final String STATE_SELECTED_TAB = "selectedTab";
+    private static final String STATE_SELECTED_TAB_INDEX = "selectedTabIndex";
 
     private AccountResult accountResult;
     private String accountName;
+
+    private int savedSelectedTabIndex;
+    private boolean tabListenerDisabled;
     private Tab tabPosts;
     private Tab tabSubreddits;
     private Tab tabInSubreddit;
@@ -76,29 +79,11 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
-        bar.setTitle(getQuery());
         bar.setDisplayHomeAsUpEnabled(true);
-        setupTabs(savedInstanceState);
-        getSupportLoaderManager().initLoader(0, null, this);
-    }
-
-    private void setupTabs(Bundle savedInstanceState) {
-        if (Subreddits.hasSidebar(getSubreddit())) {
-            tabInSubreddit = addTab(MenuHelper.getSubredditTitle(this, getSubreddit()));
-        }
-        tabPosts = addTab(getString(R.string.tab_posts));
-        tabSubreddits = addTab(getString(R.string.tab_subreddits));
-
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         if (savedInstanceState != null) {
-            bar.setSelectedNavigationItem(savedInstanceState.getInt(STATE_SELECTED_TAB));
+            savedSelectedTabIndex = savedInstanceState.getInt(STATE_SELECTED_TAB_INDEX);
         }
-    }
-
-    private Tab addTab(CharSequence text) {
-        Tab tab = bar.newTab().setText(text).setTabListener(this);
-        bar.addTab(tab);
-        return tab;
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -110,7 +95,9 @@ public class SearchActivity extends AbstractBrowserActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountResult = result;
         accountName = result.getLastAccount(this);
-        selectTab(bar.getSelectedTab());
+        if (bar.getNavigationMode() != ActionBar.NAVIGATION_MODE_TABS) {
+            setupTabs();
+        }
     }
 
     @Override
@@ -119,48 +106,48 @@ public class SearchActivity extends AbstractBrowserActivity implements
         accountName = null;
     }
 
-    @Override
-    public AccountResult getAccountResult() {
-        return accountResult;
+    private void setupTabs() {
+        if (Subreddits.hasSidebar(getSubreddit())) {
+            tabInSubreddit = addTab(MenuHelper.getSubredditTitle(this, getSubreddit()));
+        }
+        tabPosts = addTab(getString(R.string.tab_posts));
+        tabSubreddits = addTab(getString(R.string.tab_subreddits));
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        tabListenerDisabled = false;
+        if (savedSelectedTabIndex != 0) {
+            bar.setSelectedNavigationItem(savedSelectedTabIndex);
+        }
     }
 
-    @Override
-    public String getAccountName() {
-        return accountName;
-    }
-
-    @Override
-    protected boolean hasLeftFragment() {
-        return bar.getSelectedTab() == tabSubreddits;
+    private Tab addTab(CharSequence text) {
+        Tab tab = bar.newTab().setText(text).setTabListener(this);
+        bar.addTab(tab);
+        return tab;
     }
 
     @Override
     public void onTabSelected(Tab tab, FragmentTransaction fragmentTransaction) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onTabSelected tab:" + tab.getText());
-        }
         selectTab(tab);
     }
 
     @Override
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "onTabReselected tab:" + tab.getText());
-        }
         if (!isSinglePane) {
             getSupportFragmentManager().popBackStack();
         }
     }
 
     private void selectTab(Tab tab) {
-        if (accountName != null) {
-            String query = getQuery();
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "selectTab tab: " + tab.getText() + " disabled: " + tabListenerDisabled);
+        }
+        if (!tabListenerDisabled) {
             if (tab == tabInSubreddit) {
-                refreshThingList(getSubreddit(), query);
+                refreshThingList(getSubreddit(), getQuery());
             } else if (tab == tabPosts) {
-                refreshThingList(null, query);
+                refreshThingList(null, getQuery());
             } else if (tab == tabSubreddits) {
-                refreshSubredditList(query);
+                refreshSubredditList(getQuery());
             }
         }
     }
@@ -183,6 +170,11 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     @Override
+    protected boolean hasLeftFragment() {
+        return bar.getSelectedTab() == tabSubreddits;
+    }
+
+    @Override
     public boolean submitQuery(String query) {
         setQuery(query);
         refreshActionBar(null);
@@ -190,8 +182,19 @@ public class SearchActivity extends AbstractBrowserActivity implements
         return true;
     }
 
-    private void setQuery(String query) {
-        getIntent().putExtra(EXTRA_QUERY, query);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_SELECTED_TAB_INDEX, bar.getSelectedNavigationIndex());
+    }
+
+    @Override
+    public AccountResult getAccountResult() {
+        return accountResult;
+    }
+
+    private String getSubreddit() {
+        return getIntent().getStringExtra(EXTRA_SUBREDDIT);
     }
 
     @Override
@@ -199,17 +202,11 @@ public class SearchActivity extends AbstractBrowserActivity implements
         return getIntent().getStringExtra(EXTRA_QUERY);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_TAB, bar.getSelectedNavigationIndex());
-    }
-
-    private String getSubreddit() {
-        return getIntent().getStringExtra(EXTRA_SUBREDDIT);
-    }
-
     private boolean hasQuery() {
         return getIntent().hasExtra(EXTRA_QUERY);
+    }
+
+    private void setQuery(String query) {
+        getIntent().putExtra(EXTRA_QUERY, query);
     }
 }

@@ -21,67 +21,51 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
-import com.btmura.android.reddit.content.SearchSubredditLoader;
-import com.btmura.android.reddit.widget.SearchSubredditAdapter;
+import com.btmura.android.reddit.content.RelatedSubredditLoader;
+import com.btmura.android.reddit.widget.RelatedSubredditAdapter;
 
-class SearchSubredditListController implements SubredditListController<SearchSubredditAdapter> {
+class RelatedSubredditListController implements SubredditListController<RelatedSubredditAdapter> {
 
-    static final String EXTRA_ACCOUNT_NAME = "accountName";
+    static final String EXTRA_SIDEBAR_SUBREDDIT = "sidebarSubreddit";
     static final String EXTRA_SELECTED_SUBREDDIT = "selectedSubreddit";
-    static final String EXTRA_QUERY = "query";
     static final String EXTRA_SINGLE_CHOICE = "singleChoice";
-    static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
     private final Context context;
-    private final String accountName;
-    private final String query;
-    private final SearchSubredditAdapter adapter;
-    private Bundle cursorExtras;
+    private final String sidebarSubreddit;
+    private final RelatedSubredditAdapter adapter;
 
-    SearchSubredditListController(Context context, Bundle args) {
+    RelatedSubredditListController(Context context, Bundle args) {
         this.context = context;
-        this.accountName = getAccountNameExtra(args);
-        this.query = getQueryExtra(args);
-        this.adapter = new SearchSubredditAdapter(context, getSingleChoiceExtra(args));
+        this.sidebarSubreddit = getSidebarSubredditExtra(args);
+        this.adapter = new RelatedSubredditAdapter(context, getSingleChoiceExtra(args));
     }
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
         setSelectedSubreddit(getSelectedSubredditExtra(savedInstanceState));
-        this.cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
     @Override
     public void saveInstanceState(Bundle outState) {
         outState.putString(EXTRA_SELECTED_SUBREDDIT, getSelectedSubreddit());
-        outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
     }
 
     // Loader related methods
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new SearchSubredditLoader(context, accountName, query, cursorExtras);
+        return new RelatedSubredditLoader(context, sidebarSubreddit);
     }
 
     @Override
     public void swapCursor(Cursor cursor) {
         adapter.swapCursor(cursor);
-        if (cursor != null && cursor.getExtras() != null) {
-            cursorExtras = cursor.getExtras();
-        }
-    }
-
-    // Search-specific getters
-
-    public String getQuery() {
-        return query;
     }
 
     // Getters
 
     @Override
-    public SearchSubredditAdapter getAdapter() {
+    public RelatedSubredditAdapter getAdapter() {
         return adapter;
     }
 
@@ -99,7 +83,7 @@ class SearchSubredditListController implements SubredditListController<SearchSub
 
     @Override
     public String setSelectedPosition(int position) {
-        return adapter.setSelectedPosition(position);
+        return adapter.getSelectedSubreddit();
     }
 
     @Override
@@ -109,16 +93,12 @@ class SearchSubredditListController implements SubredditListController<SearchSub
 
     // Getters for extras.
 
-    private static String getAccountNameExtra(Bundle extras) {
-        return extras.getString(EXTRA_ACCOUNT_NAME);
+    private static String getSidebarSubredditExtra(Bundle extras) {
+        return extras.getString(EXTRA_SIDEBAR_SUBREDDIT);
     }
 
     private static String getSelectedSubredditExtra(Bundle extras) {
         return extras.getString(EXTRA_SELECTED_SUBREDDIT);
-    }
-
-    private static String getQueryExtra(Bundle extras) {
-        return extras.getString(EXTRA_QUERY);
     }
 
     private static boolean getSingleChoiceExtra(Bundle extras) {
