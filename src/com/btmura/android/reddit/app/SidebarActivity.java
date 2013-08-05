@@ -49,7 +49,7 @@ public class SidebarActivity extends AbstractBrowserActivity implements
 
     private int savedSelectedTabIndex;
     private boolean tabListenerDisabled;
-    private Tab tabAbout;
+    private Tab tabDescription;
     private Tab tabRelated;
 
     @Override
@@ -100,8 +100,9 @@ public class SidebarActivity extends AbstractBrowserActivity implements
     }
 
     private void setupTabs() {
-        tabAbout = addTab(getString(R.string.tab_about));
+        tabDescription = addTab(getString(R.string.tab_description));
         tabRelated = addTab(getString(R.string.tab_related));
+
         tabListenerDisabled = savedSelectedTabIndex != 0;
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         tabListenerDisabled = false;
@@ -133,7 +134,7 @@ public class SidebarActivity extends AbstractBrowserActivity implements
             Log.d(TAG, "selectTab tab: " + tab.getText() + " disabled: " + tabListenerDisabled);
         }
         if (!tabListenerDisabled) {
-            if (tab == tabAbout) {
+            if (tab == tabDescription) {
                 setSidebarFragments(accountName, getSubredditName());
             } else if (tab == tabRelated) {
                 setRelatedSubredditsFragments(accountName, getSubredditName());
