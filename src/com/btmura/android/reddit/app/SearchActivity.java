@@ -112,6 +112,9 @@ public class SearchActivity extends AbstractBrowserActivity implements
         }
         tabPosts = addTab(getString(R.string.tab_posts));
         tabSubreddits = addTab(getString(R.string.tab_subreddits));
+
+        // TODO: Extract this code into a tab controller to reduce code up with SidebarActivity.
+        tabListenerDisabled = savedSelectedTabIndex != 0;
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         tabListenerDisabled = false;
         if (savedSelectedTabIndex != 0) {
