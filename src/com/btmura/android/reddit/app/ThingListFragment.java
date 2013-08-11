@@ -23,7 +23,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,6 +40,7 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.AbstractBrowserActivity.RightFragment;
 import com.btmura.android.reddit.content.CursorExtras;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
@@ -151,6 +151,7 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         setListShown(true);
     }
 
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         args = Objects.nullToEmpty(args);
         controller.setMoreId(args.getString(LOADER_MORE_ID));
@@ -176,13 +177,16 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         getActivity().invalidateOptionsMenu();
     }
 
+    @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         controller.swapCursor(null);
     }
 
+    @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
     }
 
+    @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
             int totalItemCount) {
         if (visibleItemCount <= 0 || scrollLoading) {
@@ -350,35 +354,28 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         return listener != null ? listener.onThingBodyMeasure() : 0;
     }
 
-    public String getAccountName() {
-        return controller.getAccountName();
-    }
-
     @Override
     public void setSelectedThing(String thingId, String linkId) {
         controller.setSelectedThing(thingId, linkId);
     }
 
-    public String getSubreddit() {
+    private String getAccountName() {
+        return controller.getAccountName();
+    }
+
+    private String getSubreddit() {
         return controller.getSubreddit();
     }
 
-    public String getQuery() {
+    private String getQuery() {
         return controller.getQuery();
     }
 
-    public boolean isQuery() {
+    private boolean isQuery() {
         return !TextUtils.isEmpty(getQuery());
     }
 
     private int getFirstCheckedPosition() {
-        SparseBooleanArray checked = getListView().getCheckedItemPositions();
-        int size = controller.getAdapter().getCount();
-        for (int i = 0; i < size; i++) {
-            if (checked.get(i)) {
-                return i;
-            }
-        }
-        return -1;
+        return ListViewUtils.getFirstCheckedPosition(getListView());
     }
 }
