@@ -245,6 +245,8 @@ abstract class ThingListFragment<C extends ThingListController<?>>
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
+        // TODO: Refactor this code into the controller classes.
+
         String subreddit = getSubreddit();
         boolean isQuery = isQuery();
         boolean hasAccount = AccountUtils.isAccount(getAccountName());
@@ -264,6 +266,23 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         if (showSubreddit) {
             subredditItem.setTitle(MenuHelper.getSubredditTitle(getActivity(), subreddit));
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // TODO: Refactor this code into the controller classes.
+
+        switch (item.getItemId()) {
+            case R.id.menu_subreddit:
+                handleSubreddit();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void handleSubreddit() {
+        MenuHelper.startSidebarActivity(getActivity(), getSubreddit());
     }
 
     @Override

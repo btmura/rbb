@@ -34,6 +34,8 @@ import com.btmura.android.reddit.R;
 public class GlobalMenuFragment extends Fragment implements OnFocusChangeListener,
         OnQueryTextListener {
 
+    // TODO: Split this apart into separate fragments.
+
     public static final String TAG = "GlobalMenuFragment";
 
     private static final boolean SHOW_DEBUG = BuildConfig.DEBUG && true;
@@ -96,14 +98,6 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
                 handleNewPost();
                 return true;
 
-            case R.id.menu_add_subreddit:
-                handleAddSubreddit();
-                return true;
-
-            case R.id.menu_subreddit:
-                handleSubreddit();
-                return true;
-
             case R.id.menu_search:
                 handleSearch();
                 return true;
@@ -120,15 +114,6 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     private void handleNewPost() {
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.DEFAULT_TYPE_SET,
                 subredditNameHolder.getSubredditName(), null, null, null, null, false);
-    }
-
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager(),
-                subredditNameHolder.getSubredditName());
-    }
-
-    private void handleSubreddit() {
-        MenuHelper.startSidebarActivity(getActivity(), subredditNameHolder.getSubredditName());
     }
 
     public void handleSearch() {
