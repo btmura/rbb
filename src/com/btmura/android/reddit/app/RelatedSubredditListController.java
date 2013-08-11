@@ -83,7 +83,7 @@ class RelatedSubredditListController implements SubredditListController<RelatedS
 
     @Override
     public String setSelectedPosition(int position) {
-        return adapter.getSelectedSubreddit();
+        return adapter.setSelectedPosition(position);
     }
 
     @Override
