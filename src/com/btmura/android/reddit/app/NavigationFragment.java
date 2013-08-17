@@ -62,6 +62,8 @@ public class NavigationFragment extends ListFragment implements
 
     public static final String TAG = "NavigationFragment";
 
+    private static final String STATE_ACCOUNT_NAME = "accountName";
+
     private static final int ADAPTER_ACCOUNTS = 0;
     private static final int ADAPTER_PLACES = 1;
     private static final int ADAPTER_SUBREDDITS = 2;
@@ -113,6 +115,9 @@ public class NavigationFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
+        }
         accountAdapter = new AccountResultAdapter(getActivity());
         placesAdapter = new AccountPlaceAdapter(getActivity(), this);
         subredditAdapter = AccountSubredditAdapter.newAccountInstance(getActivity());
@@ -458,6 +463,12 @@ public class NavigationFragment extends ListFragment implements
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_ACCOUNT_NAME, accountName);
     }
 
     class AccountSubredditLoaderCallbacks implements LoaderCallbacks<Cursor> {
