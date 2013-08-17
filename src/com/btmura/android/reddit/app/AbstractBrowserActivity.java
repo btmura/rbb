@@ -234,7 +234,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     // Callbacks triggered by calling one of the initial methods that select fragments.
 
     @Override
-    public void onSubredditSelected(String accountName, String subreddit, int filter) {
+    public void onNavigationSubredditSelected(String accountName, String subreddit, int filter) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.right_container,
                 ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
@@ -243,7 +243,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     @Override
-    public void onProfileSelected(String accountName, int filter) {
+    public void onNavigationProfileSelected(String accountName, int filter) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.right_container,
                 ControlFragment.newProfileInstance(accountName, filter),
@@ -252,7 +252,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     @Override
-    public void onSavedSelected(String accountName, int filter) {
+    public void onNavigationSavedSelected(String accountName, int filter) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.right_container,
                 ControlFragment.newSavedInstance(accountName, filter),
@@ -261,7 +261,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     @Override
-    public void onMessagesSelected(String accountName, int filter) {
+    public void onNavigationMessagesSelected(String accountName, int filter) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.right_container,
                 ControlFragment.newMessagesInstance(accountName, filter),

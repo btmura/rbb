@@ -72,13 +72,13 @@ public class NavigationFragment extends ListFragment implements
     private static final int LOADER_SUBREDDITS = 1;
 
     public interface OnNavigationEventListener {
-        void onSubredditSelected(String accountName, String subreddit, int filter);
+        void onNavigationSubredditSelected(String accountName, String subreddit, int filter);
 
-        void onProfileSelected(String accountName, int filter);
+        void onNavigationProfileSelected(String accountName, int filter);
 
-        void onSavedSelected(String accountName, int filter);
+        void onNavigationSavedSelected(String accountName, int filter);
 
-        void onMessagesSelected(String accountName, int filter);
+        void onNavigationMessagesSelected(String accountName, int filter);
     }
 
     private final AccountSubredditLoaderCallbacks subredditLoaderCallbacks =
@@ -245,28 +245,28 @@ public class NavigationFragment extends ListFragment implements
                 AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
                 AccountPrefs.setLastSubredditFilter(getActivity(), filter);
                 if (listener != null) {
-                    listener.onSubredditSelected(accountName, subreddit, filter);
+                    listener.onNavigationSubredditSelected(accountName, subreddit, filter);
                 }
                 break;
 
             case PLACE_PROFILE:
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    listener.onProfileSelected(accountName, filter);
+                    listener.onNavigationProfileSelected(accountName, filter);
                 }
                 break;
 
             case PLACE_SAVED:
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    listener.onSavedSelected(accountName, filter);
+                    listener.onNavigationSavedSelected(accountName, filter);
                 }
                 break;
 
             case PLACE_MESSAGES:
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    listener.onMessagesSelected(accountName, filter);
+                    listener.onNavigationMessagesSelected(accountName, filter);
                 }
                 break;
         }
