@@ -72,13 +72,14 @@ public class NavigationFragment extends ListFragment implements
     private static final int LOADER_SUBREDDITS = 1;
 
     public interface OnNavigationEventListener {
-        void onNavigationSubredditSelected(String accountName, String subreddit, int filter);
+        void onNavigationSubredditSelected(String accountName, String subreddit, int filter,
+                boolean force);
 
-        void onNavigationProfileSelected(String accountName, int filter);
+        void onNavigationProfileSelected(String accountName, int filter, boolean force);
 
-        void onNavigationSavedSelected(String accountName, int filter);
+        void onNavigationSavedSelected(String accountName, int filter, boolean force);
 
-        void onNavigationMessagesSelected(String accountName, int filter);
+        void onNavigationMessagesSelected(String accountName, int filter, boolean force);
     }
 
     private final AccountSubredditLoaderCallbacks subredditLoaderCallbacks =
@@ -216,24 +217,24 @@ public class NavigationFragment extends ListFragment implements
                 String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
                 int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
                         FilterAdapter.SUBREDDIT_HOT);
-                selectPlace(place, subreddit, filter);
+                selectPlace(place, subreddit, filter, false);
                 break;
 
             case PLACE_PROFILE:
-                selectPlace(place, null, FilterAdapter.PROFILE_OVERVIEW);
+                selectPlace(place, null, FilterAdapter.PROFILE_OVERVIEW, false);
                 break;
 
             case PLACE_SAVED:
-                selectPlace(place, null, FilterAdapter.PROFILE_SAVED);
+                selectPlace(place, null, FilterAdapter.PROFILE_SAVED, false);
                 break;
 
             case PLACE_MESSAGES:
-                selectPlace(place, null, FilterAdapter.MESSAGE_INBOX);
+                selectPlace(place, null, FilterAdapter.MESSAGE_INBOX, false);
                 break;
         }
     }
 
-    private void selectPlace(int place, String subreddit, int filter) {
+    private void selectPlace(int place, String subreddit, int filter, boolean force) {
         this.place = place;
         this.subreddit = subreddit;
         this.filter = filter;
@@ -245,28 +246,28 @@ public class NavigationFragment extends ListFragment implements
                 AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
                 AccountPrefs.setLastSubredditFilter(getActivity(), filter);
                 if (listener != null) {
-                    listener.onNavigationSubredditSelected(accountName, subreddit, filter);
+                    listener.onNavigationSubredditSelected(accountName, subreddit, filter, force);
                 }
                 break;
 
             case PLACE_PROFILE:
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    listener.onNavigationProfileSelected(accountName, filter);
+                    listener.onNavigationProfileSelected(accountName, filter, force);
                 }
                 break;
 
             case PLACE_SAVED:
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    listener.onNavigationSavedSelected(accountName, filter);
+                    listener.onNavigationSavedSelected(accountName, filter, force);
                 }
                 break;
 
             case PLACE_MESSAGES:
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    listener.onNavigationMessagesSelected(accountName, filter);
+                    listener.onNavigationMessagesSelected(accountName, filter, force);
                 }
                 break;
         }
@@ -274,7 +275,7 @@ public class NavigationFragment extends ListFragment implements
 
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
-        selectPlace(PLACE_SUBREDDIT, subreddit, filter);
+        selectPlace(PLACE_SUBREDDIT, subreddit, filter, true);
     }
 
     @Override
@@ -287,7 +288,7 @@ public class NavigationFragment extends ListFragment implements
     }
 
     public void setFilter(int filter) {
-        selectPlace(place, subreddit, filter);
+        selectPlace(place, subreddit, filter, false);
     }
 
     @Override

@@ -173,7 +173,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         setCenterFragment(R.id.right_container,
                 ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
                 SubredditThingListFragment
-                        .newInstance(accountName, subreddit, filter, isSingleChoice));
+                        .newInstance(accountName, subreddit, filter, isSingleChoice),
+                false);
         if (thingBundle != null) {
             selectThing(null, thingBundle);
         }
@@ -185,7 +186,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         setCenterFragment(R.id.right_container,
                 ControlFragment.newSearchThingsInstance(accountName, subreddit, query, filter),
                 SearchThingListFragment
-                        .newInstance(accountName, subreddit, query, isSingleChoice));
+                        .newInstance(accountName, subreddit, query, isSingleChoice),
+                false);
     }
 
     protected void setUserProfileFragments(String accountName, String profileUser, int filter) {
@@ -193,14 +195,16 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         setCenterFragment(R.id.right_container,
                 ControlFragment.newUserProfileInstance(accountName, profileUser, filter),
                 ProfileThingListFragment
-                        .newInstance(accountName, profileUser, filter, isSingleChoice));
+                        .newInstance(accountName, profileUser, filter, isSingleChoice),
+                false);
     }
 
     protected void setSidebarFragments(String accountName, String subreddit) {
         selectAccountWithFilter(accountName, 0);
         setCenterFragment(R.id.right_container,
                 ControlFragment.newSidebarInstance(accountName, subreddit),
-                SidebarFragment.newInstance(subreddit));
+                SidebarFragment.newInstance(subreddit),
+                false);
     }
 
     protected void setSearchSubredditsFragments(String accountName, String query, int filter) {
@@ -209,7 +213,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             setCenterFragment(R.id.right_container,
                     ControlFragment.newSearchSubredditsInstance(accountName, query, filter),
                     SearchSubredditListFragment
-                            .newInstance(accountName, query, isSingleChoice));
+                            .newInstance(accountName, query, isSingleChoice),
+                    false);
         } else {
             setLeftFragment(R.id.left_container,
                     ControlFragment.newSearchSubredditsInstance(accountName, query, filter),
@@ -223,7 +228,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (isSinglePane) {
             setCenterFragment(R.id.right_container,
                     ControlFragment.newRelatedSubredditsInstance(accountName, subreddit),
-                    RelatedSubredditListFragment.newInstance(subreddit, isSingleChoice));
+                    RelatedSubredditListFragment.newInstance(subreddit, isSingleChoice),
+                    false);
         } else {
             setLeftFragment(R.id.left_container,
                     ControlFragment.newRelatedSubredditsInstance(accountName, subreddit),
@@ -234,45 +240,50 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     // Callbacks triggered by calling one of the initial methods that select fragments.
 
     @Override
-    public void onNavigationSubredditSelected(String accountName, String subreddit, int filter) {
+    public void onNavigationSubredditSelected(String accountName, String subreddit, int filter,
+            boolean force) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.right_container,
                 ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
                 SubredditThingListFragment
-                        .newInstance(accountName, subreddit, filter, isSingleChoice));
+                        .newInstance(accountName, subreddit, filter, isSingleChoice),
+                force);
     }
 
     @Override
-    public void onNavigationProfileSelected(String accountName, int filter) {
+    public void onNavigationProfileSelected(String accountName, int filter, boolean force) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.right_container,
                 ControlFragment.newProfileInstance(accountName, filter),
                 ProfileThingListFragment
-                        .newInstance(accountName, accountName, filter, isSingleChoice));
+                        .newInstance(accountName, accountName, filter, isSingleChoice),
+                force);
     }
 
     @Override
-    public void onNavigationSavedSelected(String accountName, int filter) {
+    public void onNavigationSavedSelected(String accountName, int filter, boolean force) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.right_container,
                 ControlFragment.newSavedInstance(accountName, filter),
                 ProfileThingListFragment
-                        .newInstance(accountName, accountName, filter, isSingleChoice));
+                        .newInstance(accountName, accountName, filter, isSingleChoice),
+                force);
     }
 
     @Override
-    public void onNavigationMessagesSelected(String accountName, int filter) {
+    public void onNavigationMessagesSelected(String accountName, int filter, boolean force) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.right_container,
                 ControlFragment.newMessagesInstance(accountName, filter),
                 MessageThingListFragment
-                        .newInstance(accountName, accountName, filter, isSingleChoice));
+                        .newInstance(accountName, accountName, filter, isSingleChoice),
+                force);
     }
 
     @Override
     public void onSubredditSelected(View view, String subreddit, boolean onLoad) {
         if (!onLoad || !isSinglePane) {
-            selectSubreddit(view, subreddit);
+            selectSubreddit(view, subreddit, !onLoad);
         }
     }
 
@@ -298,11 +309,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods to select a subreddit
 
-    private void selectSubreddit(View view, String subreddit) {
+    private void selectSubreddit(View view, String subreddit, boolean force) {
         if (isSinglePane) {
             selectSubredditSinglePane(view, subreddit);
         } else {
-            selectSubredditMultiPane(subreddit);
+            selectSubredditMultiPane(subreddit, force);
         }
     }
 
@@ -312,12 +323,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         launchActivity(view, intent);
     }
 
-    private void selectSubredditMultiPane(String subreddit) {
+    private void selectSubredditMultiPane(String subreddit, boolean force) {
         setRightFragment(R.id.right_container,
                 getControlFragment().withSubreddit(subreddit),
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice),
-                false);
+                force);
     }
 
     // Methods to select a thing
@@ -400,19 +411,21 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private <F extends Fragment & RightFragment>
-            void setCenterFragment(int containerId, ControlFragment controlFrag, F centerFrag) {
+            void setCenterFragment(int containerId, ControlFragment controlFrag, F centerFrag,
+                    boolean force) {
         setRightFragment(containerId, controlFrag, centerFrag, true);
     }
 
     private <F extends Fragment & RightFragment>
-            void setRightFragment(int containerId, ControlFragment controlFrag, F rightFrag) {
-        setRightFragment(containerId, controlFrag, rightFrag, false);
+            void setRightFragment(int containerId, ControlFragment controlFrag, F rightFrag,
+                    boolean force) {
+        setRightFragment(containerId, controlFrag, rightFrag, force, false);
     }
 
     private <F extends Fragment & RightFragment>
             void setRightFragment(int containerId, ControlFragment controlFrag,
-                    F rightFrag, boolean removeLeft) {
-        if (!Objects.fragmentEquals(rightFrag, getRightFragment())) {
+                    F rightFrag, boolean force, boolean removeLeft) {
+        if (force || !Objects.fragmentEquals(rightFrag, getRightFragment())) {
             safePopBackStackImmediate();
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
