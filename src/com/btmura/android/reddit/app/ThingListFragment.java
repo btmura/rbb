@@ -71,6 +71,7 @@ abstract class ThingListFragment<C extends ThingListController<?>>
     private OnSubredditEventListener eventListener;
     private ThingBundleHolder thingBundleHolder;
     private boolean scrollLoading;
+    private ActionMode actionMode;
 
     protected abstract C createController();
 
@@ -220,7 +221,7 @@ abstract class ThingListFragment<C extends ThingListController<?>>
 
     @Override
     public boolean isSwipeDismissable(int position) {
-        return controller.isSwipeDismissable(position);
+        return actionMode == null && controller.isSwipeDismissable(position);
     }
 
     @Override
@@ -291,6 +292,7 @@ abstract class ThingListFragment<C extends ThingListController<?>>
             getListView().clearChoices();
             return false;
         }
+        actionMode = mode;
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.thing_action_menu, menu);
         return true;
@@ -361,6 +363,7 @@ abstract class ThingListFragment<C extends ThingListController<?>>
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
+        actionMode = null;
     }
 
     @Override
