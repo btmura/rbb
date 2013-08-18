@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+
 interface ThingActionModeController extends ActionModeController {
 
     boolean isHidable(int position);
@@ -23,4 +24,5 @@ interface ThingActionModeController extends ActionModeController {
     void hide(int position, boolean hide);
 
     void vote(int position, int action);
+
 }

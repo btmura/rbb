@@ -45,8 +45,13 @@ public class SubredditThingListFragment
     @Override
     protected ThingTableActionModeController createActionModeController(
             SubredditThingListController controller) {
-        return new ThingTableActionModeController(getActivity(), controller.getAccountName(),
-                controller.getAdapter());
+        return new ThingTableActionModeController(getActivity(),
+                getFragmentManager(),
+                controller.getAccountName(),
+                controller.getSubreddit(),
+                controller.getQuery(),
+                controller.getAdapter(),
+                thingBundleHolder);
     }
 
     @Override

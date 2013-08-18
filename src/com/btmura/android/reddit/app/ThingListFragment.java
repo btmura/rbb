@@ -36,10 +36,8 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.AbstractBrowserActivity.RightFragment;
 import com.btmura.android.reddit.content.CursorExtras;
-import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
@@ -69,7 +67,7 @@ abstract class ThingListFragment<C extends ThingListController<?>, AC extends Th
 
     private OnThingSelectedListener listener;
     private OnSubredditEventListener eventListener;
-    private ThingBundleHolder thingBundleHolder;
+    protected ThingBundleHolder thingBundleHolder;
     private boolean scrollLoading;
 
     @Override
@@ -240,59 +238,19 @@ abstract class ThingListFragment<C extends ThingListController<?>, AC extends Th
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.thing_list_menu, menu);
+        actionModeController.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-
-        // TODO: Refactor this code into the controller classes.
-
-        String subreddit = getSubreddit();
-        boolean isQuery = isQuery();
-        boolean hasAccount = AccountUtils.isAccount(getAccountName());
-        boolean hasSubreddit = subreddit != null;
-        boolean hasThing = thingBundleHolder != null && thingBundleHolder.getThingBundle() != null;
-        boolean hasSidebar = Subreddits.hasSidebar(subreddit);
-
-        boolean showNewPost = !isQuery && hasAccount && hasSubreddit && !hasThing;
-        boolean showAddSubreddit = !isQuery && hasSubreddit && !hasThing;
-        boolean showSubreddit = !isQuery && hasSubreddit && !hasThing && hasSidebar;
-
-        menu.findItem(R.id.menu_new_post).setVisible(showNewPost);
-        menu.findItem(R.id.menu_add_subreddit).setVisible(showAddSubreddit);
-
-        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
-        subredditItem.setVisible(showSubreddit);
-        if (showSubreddit) {
-            subredditItem.setTitle(MenuHelper.getSubredditTitle(getActivity(), subreddit));
-        }
+        actionModeController.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        // TODO: Refactor this code into the controller classes.
-
-        switch (item.getItemId()) {
-            case R.id.menu_add_subreddit:
-                handleAddSubreddit();
-                return true;
-
-            case R.id.menu_subreddit:
-                handleSubreddit();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
-    }
-
-    private void handleSubreddit() {
-        MenuHelper.startSidebarActivity(getActivity(), getSubreddit());
+        return actionModeController.onOptionsItemSelected(item)
+                || super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -306,7 +264,8 @@ abstract class ThingListFragment<C extends ThingListController<?>, AC extends Th
     }
 
     @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+            boolean checked) {
         actionModeController.onItemCheckedStateChanged(mode, position, id, checked);
     }
 
@@ -334,21 +293,5 @@ abstract class ThingListFragment<C extends ThingListController<?>, AC extends Th
     @Override
     public void setSelectedThing(String thingId, String linkId) {
         controller.setSelectedThing(thingId, linkId);
-    }
-
-    private String getAccountName() {
-        return controller.getAccountName();
-    }
-
-    private String getSubreddit() {
-        return controller.getSubreddit();
-    }
-
-    private String getQuery() {
-        return controller.getQuery();
-    }
-
-    private boolean isQuery() {
-        return !TextUtils.isEmpty(getQuery());
     }
 }
