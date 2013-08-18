@@ -200,7 +200,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
                 return true;
 
             case R.id.menu_comments:
-                handleCommentsItem();
+                handleComments();
                 return true;
 
             case R.id.menu_saved:
@@ -216,23 +216,23 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
                 return true;
 
             case R.id.menu_open:
-                handleOpenItem();
+                handleOpen();
                 return true;
 
             case R.id.menu_copy_url:
-                handleCopyUrlItem();
+                handleCopyUrl();
                 return true;
 
             case R.id.menu_thing_add_subreddit:
-                handleAddSubredditItem();
+                handleAddSubreddit();
                 return true;
 
             case R.id.menu_user:
-                handleUserItem();
+                handleUser();
                 return true;
 
             case R.id.menu_thing_subreddit:
-                handleSubredditItem();
+                handleSubreddit();
                 return true;
 
             default:
@@ -244,13 +244,12 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
         setCurrentPageType(ThingPagerAdapter.PAGE_LINK, true);
     }
 
-    private void handleCommentsItem() {
+    private void handleComments() {
         setCurrentPageType(ThingPagerAdapter.PAGE_COMMENTS, true);
     }
 
     private void handleSaved() {
-        Provider.unsaveAsync(getActivity(), getAccountName(),
-                thingData.parent.getThingId());
+        Provider.unsaveAsync(getActivity(), getAccountName(), thingData.parent.getThingId());
     }
 
     private void handleUnsaved() {
@@ -318,24 +317,23 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
                 null, author, title, null, args, true);
     }
 
-    private void handleOpenItem() {
+    private void handleOpen() {
         MenuHelper.startIntentChooser(getActivity(), getUrl());
     }
 
-    private void handleCopyUrlItem() {
-        MenuHelper.setClipAndToast(getActivity(),
-                thingData.parent.getTitle(), getUrl());
+    private void handleCopyUrl() {
+        MenuHelper.setClipAndToast(getActivity(), thingData.parent.getTitle(), getUrl());
     }
 
-    private void handleAddSubredditItem() {
+    private void handleAddSubreddit() {
         MenuHelper.showAddSubredditDialog(getFragmentManager(), thingData.parent.getSubreddit());
     }
 
-    private void handleUserItem() {
+    private void handleUser() {
         MenuHelper.startProfileActivity(getActivity(), thingData.parent.getAuthor(), -1);
     }
 
-    private void handleSubredditItem() {
+    private void handleSubreddit() {
         MenuHelper.startSidebarActivity(getActivity(), thingData.parent.getSubreddit());
     }
 
