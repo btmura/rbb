@@ -39,7 +39,6 @@ class SubredditActionModeController implements ActionModeController {
     private final FragmentManager fragmentManager;
     private final SubredditAdapter adapter;
     private final AccountResultHolder accountResultHolder;
-
     private ActionMode actionMode;
 
     SubredditActionModeController(Context context, FragmentManager fragmentManager,
@@ -61,12 +60,18 @@ class SubredditActionModeController implements ActionModeController {
     }
 
     @Override
+    public void invalidateActionMode() {
+        if (actionMode != null) {
+            actionMode.invalidate();
+        }
+    }
+
+    @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu, ListView listView) {
         if (adapter.getCursor() == null) {
             listView.clearChoices();
             return false;
         }
-
         actionMode = mode;
 
         MenuInflater menuInflater = mode.getMenuInflater();
@@ -206,12 +211,5 @@ class SubredditActionModeController implements ActionModeController {
     @Override
     public void onDestroyActionMode(ActionMode mode) {
         actionMode = null;
-    }
-
-    @Override
-    public void invalidateActionMode() {
-        if (actionMode != null) {
-            actionMode.invalidate();
-        }
     }
 }

@@ -20,7 +20,8 @@ import android.os.Bundle;
 
 import com.btmura.android.reddit.util.ComparableFragments;
 
-public class ProfileThingListFragment extends ThingListFragment<ProfileThingListController> {
+public class ProfileThingListFragment
+        extends ThingListFragment<ProfileThingListController, ThingTableActionModeController> {
 
     public static ProfileThingListFragment newInstance(String accountName, String profileUser,
             int filter, boolean singleChoice) {
@@ -38,6 +39,13 @@ public class ProfileThingListFragment extends ThingListFragment<ProfileThingList
     @Override
     protected ProfileThingListController createController() {
         return new ProfileThingListController(getActivity(), getArguments(), this);
+    }
+
+    @Override
+    protected ThingTableActionModeController createActionModeController(
+            ProfileThingListController controller) {
+        return new ThingTableActionModeController(getActivity(), controller.getAccountName(),
+                controller.getAdapter());
     }
 
     public String getProfileUser() {

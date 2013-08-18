@@ -21,18 +21,10 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.view.ActionMode;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.ListView;
 
-import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.MessageThingLoader;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.widget.MessageListAdapter;
 
 class MessageThingListController implements ThingListController<MessageListAdapter> {
@@ -103,113 +95,13 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     // Actions
 
     @Override
-    public void author(int position) {
-        MenuHelper.startProfileActivity(context, getAuthor(position), -1);
-    }
-
-    @Override
-    public void copyUrl(int position) {
-        MenuHelper.setClipAndToast(context, getMessageTitle(position), getMessageUrl(position));
-    }
-
-    // TODO(btmura): Remove this methods rather than throwing an exception.
-    @Override
-    public void hide(int position, boolean hide) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void save(int position, boolean save) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void select(int position) {
+    public void onThingSelected(int position) {
         if (adapter.isNew(position)) {
             Provider.readMessageAsync(context, accountName, getThingId(position), true);
         }
     }
 
-    @Override
-    public void subreddit(int position) {
-        MenuHelper.startSidebarActivity(context, getSubreddit(position));
-    }
-
-    @Override
-    public void vote(int position, int action) {
-        throw new UnsupportedOperationException();
-    }
-
-    // Menu preparation methods.
-
-    @Override
-    public void onPrepareActionMode(ActionMode mode, Menu menu, ListView listView) {
-        int count = listView.getCheckedItemCount();
-        mode.setTitle(context.getResources().getQuantityString(R.plurals.things, count, count));
-
-        int position = ListViewUtils.getFirstCheckedPosition(listView);
-        prepareAuthorActionItem(menu, listView, position);
-        prepareHideActionItems(menu, listView, position);
-        prepareShareActionItem(menu, listView, position);
-        prepareSubredditActionItem(menu, listView, position);
-    }
-
-    private void prepareAuthorActionItem(Menu menu, ListView listView, int position) {
-        String author = getAuthor(position);
-        MenuItem item = menu.findItem(R.id.menu_author);
-        item.setVisible(isCheckedCount(listView, 1) && MenuHelper.isUserItemVisible(author));
-        if (item.isVisible()) {
-            item.setTitle(MenuHelper.getUserTitle(context, author));
-        }
-    }
-
-    private void prepareHideActionItems(Menu menu, ListView listView, int position) {
-        menu.findItem(R.id.menu_hide).setVisible(false);
-        menu.findItem(R.id.menu_unhide).setVisible(false);
-    }
-
-    private void prepareShareActionItem(Menu menu, ListView listView, int position) {
-        MenuItem item = menu.findItem(R.id.menu_share_thing);
-        item.setVisible(isCheckedCount(listView, 1));
-        if (item.isVisible()) {
-            String title = getMessageTitle(position);
-            CharSequence url = getMessageUrl(position);
-            MenuHelper.setShareProvider(item, title, url);
-        }
-    }
-
-    private void prepareSubredditActionItem(Menu menu, ListView listView, int position) {
-        String subreddit = getSubreddit(position);
-        MenuItem item = menu.findItem(R.id.menu_subreddit);
-        item.setVisible(isCheckedCount(listView, 1) && Subreddits.hasSidebar(subreddit));
-        if (item.isVisible()) {
-            item.setTitle(MenuHelper.getSubredditTitle(context, subreddit));
-        }
-    }
-
     // More complex getters.
-
-    private String getMessageTitle(int position) {
-        // Comment reply messages just have "comment reply" as subject so try to use the link title.
-        String linkTitle = getLinkTitle(position);
-        if (!TextUtils.isEmpty(linkTitle)) {
-            return linkTitle;
-        }
-
-        // Assume this is a message with a subject.
-        return getSubject(position);
-    }
-
-    private CharSequence getMessageUrl(int position) {
-        // Comment reply messages have a context url we can use.
-        String context = getContext(position);
-        if (!TextUtils.isEmpty(context)) {
-            return Urls.perma(context, null);
-        }
-
-        // Assume this is a raw message.
-        return Urls.messageThread(getThingId(position), Urls.TYPE_HTML);
-    }
 
     @Override
     public String getNextMoreId() {
@@ -225,15 +117,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     @Override
     public boolean hasNextMoreId() {
         return !TextUtils.isEmpty(getNextMoreId());
-    }
-
-    private boolean isCheckedCount(ListView listView, int checkedItemCount) {
-        return listView.getCheckedItemCount() == checkedItemCount;
-    }
-
-    @Override
-    public boolean isSwipeDismissable(int position) {
-        return false;
     }
 
     // Getters
@@ -316,26 +199,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     }
 
     // Simple adapter getters.
-
-    private String getAuthor(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_AUTHOR);
-    }
-
-    private String getContext(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_CONTEXT);
-    }
-
-    private String getLinkTitle(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_LINK_TITLE);
-    }
-
-    private String getSubject(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_SUBJECT);
-    }
-
-    private String getSubreddit(int position) {
-        return adapter.getString(position, MessageThingLoader.INDEX_SUBREDDIT);
-    }
 
     private String getThingId(int position) {
         return adapter.getString(position, MessageThingLoader.INDEX_THING_ID);

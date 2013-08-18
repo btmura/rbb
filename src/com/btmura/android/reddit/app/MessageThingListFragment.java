@@ -20,7 +20,8 @@ import android.os.Bundle;
 
 import com.btmura.android.reddit.util.ComparableFragments;
 
-public class MessageThingListFragment extends ThingListFragment<MessageThingListController> {
+public class MessageThingListFragment
+        extends ThingListFragment<MessageThingListController, MessageThingActionModeController> {
 
     public static MessageThingListFragment newInstance(String accountName, String messageUser,
             int filter, boolean singleChoice) {
@@ -38,6 +39,12 @@ public class MessageThingListFragment extends ThingListFragment<MessageThingList
     @Override
     protected MessageThingListController createController() {
         return new MessageThingListController(getActivity(), getArguments());
+    }
+
+    @Override
+    protected MessageThingActionModeController createActionModeController(
+            MessageThingListController controller) {
+        return new MessageThingActionModeController(getActivity(), controller.getAdapter());
     }
 
     public String getMessageUser() {

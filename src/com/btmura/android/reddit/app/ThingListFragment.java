@@ -40,14 +40,13 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.AbstractBrowserActivity.RightFragment;
 import com.btmura.android.reddit.content.CursorExtras;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.util.ListViewUtils;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingView;
 
-abstract class ThingListFragment<C extends ThingListController<?>>
+abstract class ThingListFragment<C extends ThingListController<?>, AC extends ThingActionModeController>
         extends ListFragment
         implements LoaderCallbacks<Cursor>,
         RightFragment,
@@ -66,14 +65,12 @@ abstract class ThingListFragment<C extends ThingListController<?>>
     }
 
     protected C controller;
+    protected AC actionModeController;
 
     private OnThingSelectedListener listener;
     private OnSubredditEventListener eventListener;
     private ThingBundleHolder thingBundleHolder;
     private boolean scrollLoading;
-    private ActionMode actionMode;
-
-    protected abstract C createController();
 
     @Override
     public void onAttach(Activity activity) {
@@ -89,12 +86,18 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         }
     }
 
+    protected abstract C createController();
+
+    protected abstract AC createActionModeController(C controller);
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controller = createController();
+        actionModeController = createActionModeController(controller);
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
+            actionModeController.restoreInstanceState(savedInstanceState);
         }
         setHasOptionsMenu(true);
     }
@@ -216,24 +219,22 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         if (listener != null) {
             listener.onThingSelected(v, controller.getThingBundle(position), pageType);
         }
-        controller.select(position);
+        controller.onThingSelected(position);
     }
 
     @Override
     public boolean isSwipeDismissable(int position) {
-        return actionMode == null && controller.isSwipeDismissable(position);
+        return actionModeController.isHidable(position);
     }
 
     @Override
     public void onSwipeDismiss(ListView listView, View view, int position) {
-        controller.hide(position, true);
+        actionModeController.hide(position, true);
     }
 
     public void onVote(View v, int action) {
-        if (controller.hasAccountName()) {
-            int position = getListView().getPositionForView(v);
-            controller.vote(position, action);
-        }
+        int position = getListView().getPositionForView(v);
+        actionModeController.vote(position, action);
     }
 
     @Override
@@ -296,88 +297,34 @@ abstract class ThingListFragment<C extends ThingListController<?>>
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        if (!controller.hasCursor()) {
-            getListView().clearChoices();
-            return false;
-        }
-        actionMode = mode;
-        MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.thing_action_menu, menu);
-        return true;
+        return actionModeController.onCreateActionMode(mode, menu, getListView());
     }
 
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        controller.onPrepareActionMode(mode, menu, getListView());
-        return true;
+        return actionModeController.onPrepareActionMode(mode, menu, getListView());
     }
 
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        mode.invalidate();
+        actionModeController.onItemCheckedStateChanged(mode, position, id, checked);
     }
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_saved:
-                controller.save(getFirstCheckedPosition(), false);
-                mode.finish();
-                return true;
-
-            case R.id.menu_unsaved:
-                controller.save(getFirstCheckedPosition(), true);
-                mode.finish();
-                return true;
-
-            case R.id.menu_hide:
-                controller.hide(getFirstCheckedPosition(), true);
-                mode.finish();
-                return true;
-
-            case R.id.menu_unhide:
-                controller.hide(getFirstCheckedPosition(), false);
-                mode.finish();
-                return true;
-
-            case R.id.menu_comments:
-                handleComments();
-                mode.finish();
-                return true;
-
-            case R.id.menu_copy_url:
-                controller.copyUrl(getFirstCheckedPosition());
-                mode.finish();
-                return true;
-
-            case R.id.menu_author:
-                controller.author(getFirstCheckedPosition());
-                mode.finish();
-                return true;
-
-            case R.id.menu_subreddit:
-                controller.subreddit(getFirstCheckedPosition());
-                mode.finish();
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    private void handleComments() {
-        selectThing(null, getFirstCheckedPosition(), ThingPagerAdapter.TYPE_COMMENTS);
+        return actionModeController.onActionItemClicked(mode, item, getListView());
     }
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-        actionMode = null;
+        actionModeController.onDestroyActionMode(mode);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         controller.saveInstanceState(outState);
+        actionModeController.saveInstanceState(outState);
     }
 
     private int getThingBodyWidth() {
@@ -403,9 +350,5 @@ abstract class ThingListFragment<C extends ThingListController<?>>
 
     private boolean isQuery() {
         return !TextUtils.isEmpty(getQuery());
-    }
-
-    private int getFirstCheckedPosition() {
-        return ListViewUtils.getFirstCheckedPosition(getListView());
     }
 }

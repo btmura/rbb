@@ -16,31 +16,13 @@
 
 package com.btmura.android.reddit.app;
 
-import android.view.ActionMode;
-import android.view.Menu;
-import android.widget.ListView;
-
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 
 interface ThingListController<A extends AbstractThingListAdapter> extends Controller<A> {
 
     ThingBundle getThingBundle(int position);
 
-    // Actions on things.
-
-    void author(int position);
-
-    void copyUrl(int position);
-
-    void hide(int position, boolean hide);
-
-    void save(int position, boolean save);
-
-    void select(int position);
-
-    void subreddit(int position);
-
-    void vote(int position, int action);
+    void onThingSelected(int position);
 
     // Getters.
 
@@ -74,8 +56,6 @@ interface ThingListController<A extends AbstractThingListAdapter> extends Contro
 
     boolean isSingleChoice();
 
-    boolean isSwipeDismissable(int position);
-
     // Setters.
 
     void setEmptyText(int emptyText);
@@ -91,8 +71,4 @@ interface ThingListController<A extends AbstractThingListAdapter> extends Contro
     void setSubreddit(String subreddit);
 
     void setThingBodyWidth(int thingBodyWidth);
-
-    // Menu preparation methods.
-
-    void onPrepareActionMode(ActionMode mode, Menu menu, ListView listView);
 }

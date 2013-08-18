@@ -20,7 +20,8 @@ import android.os.Bundle;
 
 import com.btmura.android.reddit.util.ComparableFragments;
 
-public class SubredditThingListFragment extends ThingListFragment<SubredditThingListController> {
+public class SubredditThingListFragment
+        extends ThingListFragment<SubredditThingListController, ThingTableActionModeController> {
 
     public static SubredditThingListFragment newInstance(String accountName, String subreddit,
             int filter, boolean singleChoice) {
@@ -39,6 +40,13 @@ public class SubredditThingListFragment extends ThingListFragment<SubredditThing
     @Override
     protected SubredditThingListController createController() {
         return new SubredditThingListController(getActivity(), getArguments(), this);
+    }
+
+    @Override
+    protected ThingTableActionModeController createActionModeController(
+            SubredditThingListController controller) {
+        return new ThingTableActionModeController(getActivity(), controller.getAccountName(),
+                controller.getAdapter());
     }
 
     @Override
