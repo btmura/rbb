@@ -82,7 +82,7 @@ public class MessageThingActionModeController implements ThingActionModeControll
         actionMode = mode;
 
         MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.thing_action_menu, menu);
+        inflater.inflate(R.menu.message_action_menu, menu);
         return true;
     }
 
@@ -93,7 +93,6 @@ public class MessageThingActionModeController implements ThingActionModeControll
 
         int position = ListViewUtils.getFirstCheckedPosition(listView);
         prepareAuthorActionItem(menu, listView, position);
-        prepareHideActionItems(menu, listView, position);
         prepareShareActionItem(menu, listView, position);
         prepareSubredditActionItem(menu, listView, position);
         return true;
@@ -106,11 +105,6 @@ public class MessageThingActionModeController implements ThingActionModeControll
         if (item.isVisible()) {
             item.setTitle(MenuHelper.getUserTitle(context, author));
         }
-    }
-
-    private void prepareHideActionItems(Menu menu, ListView listView, int position) {
-        menu.findItem(R.id.menu_hide).setVisible(false);
-        menu.findItem(R.id.menu_unhide).setVisible(false);
     }
 
     private void prepareShareActionItem(Menu menu, ListView listView, int position) {
