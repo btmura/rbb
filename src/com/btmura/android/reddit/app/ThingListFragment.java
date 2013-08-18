@@ -275,11 +275,19 @@ abstract class ThingListFragment<C extends ThingListController<?>>
         // TODO: Refactor this code into the controller classes.
 
         switch (item.getItemId()) {
+            case R.id.menu_add_subreddit:
+                handleAddSubreddit();
+                return true;
+
             case R.id.menu_subreddit:
                 handleSubreddit();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void handleAddSubreddit() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
     private void handleSubreddit() {
