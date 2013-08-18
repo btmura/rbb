@@ -51,13 +51,12 @@ public class ControlFragment extends Fragment {
     }
 
     public static ControlFragment newSubredditInstance(String accountName, String subreddit,
-            ThingBundle thingBundle, int filter) {
-        Bundle args = new Bundle(6);
+            int filter) {
+        Bundle args = new Bundle(5);
         args.putInt(ARG_NAVIGATION, NAVIGATION_SUBREDDIT);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_SUBREDDIT, subreddit);
         args.putBoolean(ARG_IS_RANDOM, Subreddits.isRandom(subreddit));
-        args.putParcelable(ARG_THING_BUNDLE, thingBundle);
         args.putInt(ARG_FILTER, filter);
         return newFragment(args);
     }

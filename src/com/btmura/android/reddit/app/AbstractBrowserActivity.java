@@ -170,13 +170,16 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     protected void setSubredditFragments(String accountName, String subreddit,
             ThingBundle thingBundle, int filter) {
         selectAccountWithFilter(accountName, filter);
+
+        ControlFragment controlFrag =
+                ControlFragment.newSubredditInstance(accountName, subreddit, filter);
         setCenterFragment(R.id.right_container,
-                ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
+                controlFrag,
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice),
                 false);
         if (thingBundle != null) {
-            selectThing(null, thingBundle);
+            setThingFragment(controlFrag.withThingBundle(thingBundle));
         }
     }
 
@@ -244,7 +247,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             boolean force) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.right_container,
-                ControlFragment.newSubredditInstance(accountName, subreddit, null, filter),
+                ControlFragment.newSubredditInstance(accountName, subreddit, filter),
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice),
                 force);
@@ -333,7 +336,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods to select a thing
 
-    protected void selectThing(View view, ThingBundle thingBundle) {
+    private void selectThing(View view, ThingBundle thingBundle) {
         if (isSinglePane) {
             selectThingSinglePane(view, thingBundle);
         } else {
@@ -341,19 +344,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         }
     }
 
-    private void selectThingSinglePane(View view, ThingBundle thingBundle) {
+    protected void selectThingSinglePane(View view, ThingBundle thingBundle) {
         Intent intent = new Intent(this, ThingActivity.class);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         launchActivity(view, intent);
     }
 
     private void selectThingMultiPane(ThingBundle thingBundle) {
-        ControlFragment controlFrag =
-                getControlFragment().withThingBundle(thingBundle);
-        ThingFragment thingFrag =
-                ThingFragment.newInstance(accountName, thingBundle);
+        setThingFragment(getControlFragment().withThingBundle(thingBundle));
+    }
 
-        safePopBackStackImmediate();
+    private void setThingFragment(ControlFragment controlFrag) {
+        ThingFragment thingFrag =
+                ThingFragment.newInstance(accountName, controlFrag.getThingBundle());
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(controlFrag, TAG_CONTROL_FRAGMENT);
         ft.replace(R.id.thing_container, thingFrag, TAG_THING_FRAGMENT);
@@ -375,15 +378,11 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public void onSubredditDiscovery(String subreddit) {
         ControlFragment controlFrag = getControlFragment();
         if (Subreddits.isRandom(controlFrag.getSubreddit())) {
-            ControlFragment newControlFrag = ControlFragment
-                    .newSubredditInstance(controlFrag.getAccountName(),
-                            subreddit,
-                            controlFrag.getThingBundle(),
-                            controlFrag.getFilter());
+            controlFrag = controlFrag.withSubreddit(subreddit);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(newControlFrag, TAG_CONTROL_FRAGMENT);
+            ft.add(controlFrag, TAG_CONTROL_FRAGMENT);
             ft.commitAllowingStateLoss();
-            refreshActionBar(newControlFrag);
+            refreshActionBar(controlFrag);
         }
     }
 
