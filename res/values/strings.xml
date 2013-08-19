@@ -99,6 +99,7 @@
     <string name="menu_new_message">New message</string>
     <string name="menu_new_post">New post</string>
     <string name="menu_open">Open in another app</string>
+    <string name="menu_refresh">Refresh</string>
     <string name="menu_reply">Reply</string>
     <string name="menu_save">Save</string>
     <string name="menu_search">Search</string>

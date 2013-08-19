@@ -27,6 +27,7 @@
         <attr name="menu_link_icon" format="reference" />
         <attr name="menu_messages_icon" format="reference" />
         <attr name="menu_profile_icon" format="reference" />
+        <attr name="menu_refresh_icon" format="reference" />
         <attr name="menu_saved_icon" format="reference" />
         <attr name="menu_search_icon" format="reference" />
         <attr name="menu_send_icon" format="reference" />
