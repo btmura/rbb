@@ -22,7 +22,9 @@ import android.os.Bundle;
 import com.btmura.android.reddit.util.ComparableFragments;
 
 public class ProfileThingListFragment
-        extends ThingListFragment<ProfileThingListController, ThingTableActionModeController> {
+        extends ThingListFragment<ProfileThingListController,
+        ThingTableMenuController,
+        ThingTableActionModeController> {
 
     private ThingBundleHolder thingBundleHolder;
 
@@ -53,15 +55,22 @@ public class ProfileThingListFragment
     }
 
     @Override
-    protected ThingTableActionModeController createActionModeController(
-            ProfileThingListController controller) {
-        return new ThingTableActionModeController(getActivity(),
+    protected ThingTableMenuController
+            createMenuController(ProfileThingListController controller) {
+        return new ThingTableMenuController(getActivity(),
                 getFragmentManager(),
                 controller.getAccountName(),
                 controller.getSubreddit(),
                 controller.getQuery(),
-                controller.getAdapter(),
                 thingBundleHolder);
+    }
+
+    @Override
+    protected ThingTableActionModeController
+            createActionModeController(ProfileThingListController controller) {
+        return new ThingTableActionModeController(getActivity(),
+                controller.getAccountName(),
+                controller.getAdapter());
     }
 
     public String getProfileUser() {

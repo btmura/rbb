@@ -26,6 +26,7 @@ import com.btmura.android.reddit.widget.SearchSubredditAdapter;
 
 public class SearchSubredditListFragment
         extends SubredditListFragment<SearchSubredditListController,
+        NoMenuController,
         SubredditActionModeController,
         SearchSubredditAdapter>
         implements LeftFragment, RightFragment {
@@ -67,10 +68,17 @@ public class SearchSubredditListFragment
     }
 
     @Override
-    protected SubredditActionModeController createActionModeController(
-            SearchSubredditListController controller) {
-        return new SubredditActionModeController(getActivity(), getFragmentManager(),
-                controller.getAdapter(), accountResultHolder);
+    protected NoMenuController createMenuController(SearchSubredditListController controller) {
+        return NoMenuController.INSTANCE;
+    }
+
+    @Override
+    protected SubredditActionModeController
+            createActionModeController(SearchSubredditListController controller) {
+        return new SubredditActionModeController(getActivity(),
+                getFragmentManager(),
+                controller.getAdapter(),
+                accountResultHolder);
     }
 
     @Override

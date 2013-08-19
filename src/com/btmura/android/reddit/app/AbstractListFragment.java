@@ -24,6 +24,7 @@ import android.support.v4.content.Loader;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,25 +34,30 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 
-abstract class AbstractListFragment<C extends Controller<A>, AC extends ActionModeController, A extends ListAdapter>
+abstract class AbstractListFragment<C extends Controller<A>, MC extends MenuController, AC extends ActionModeController, A extends ListAdapter>
         extends ListFragment
         implements LoaderCallbacks<Cursor>, MultiChoiceModeListener {
 
     protected C controller;
+    protected MC menuController;
     protected AC actionModeController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controller = createController();
+        menuController = createMenuController(controller);
         actionModeController = createActionModeController(controller);
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
+            menuController.restoreInstanceState(savedInstanceState);
             actionModeController.restoreInstanceState(savedInstanceState);
         }
     }
 
     protected abstract C createController();
+
+    protected abstract MC createMenuController(C controller);
 
     protected abstract AC createActionModeController(C controller);
 
@@ -98,6 +104,21 @@ abstract class AbstractListFragment<C extends Controller<A>, AC extends ActionMo
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menuController.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menuController.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return menuController.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         return actionModeController.onCreateActionMode(mode, menu, getListView());
     }
@@ -126,5 +147,7 @@ abstract class AbstractListFragment<C extends Controller<A>, AC extends ActionMo
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         controller.saveInstanceState(outState);
+        menuController.saveInstanceState(outState);
+        actionModeController.saveInstanceState(outState);
     }
 }

@@ -17,28 +17,21 @@
 package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
-import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ListView;
 
-interface ActionModeController {
+interface MenuController {
 
     void restoreInstanceState(Bundle savedInstanceState);
 
     void saveInstanceState(Bundle outState);
 
-    void invalidateActionMode();
+    // Menu handling methods
 
-    // ActionMode MultiChoiceModeListener-like methods
+    void onCreateOptionsMenu(Menu menu, MenuInflater inflater);
 
-    boolean onCreateActionMode(ActionMode mode, Menu menu, ListView listView);
+    void onPrepareOptionsMenu(Menu menu);
 
-    boolean onPrepareActionMode(ActionMode mode, Menu menu, ListView listView);
-
-    boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView listView);
-
-    void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked);
-
-    void onDestroyActionMode(ActionMode mode);
+    boolean onOptionsItemSelected(MenuItem item);
 }

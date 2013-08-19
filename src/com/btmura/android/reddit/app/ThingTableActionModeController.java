@@ -18,7 +18,6 @@ package com.btmura.android.reddit.app;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -41,28 +40,16 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 class ThingTableActionModeController implements ThingActionModeController, ThingProjection {
 
     private final Context context;
-    private final FragmentManager fragmentManager;
     private final String accountName;
-    private final String subreddit;
-    private final String query;
     private final ThingListAdapter adapter;
-    private final ThingBundleHolder thingBundleHolder;
     private ActionMode actionMode;
 
     ThingTableActionModeController(Context context,
-            FragmentManager fragmentManager,
             String accountName,
-            String subreddit,
-            String query,
-            ThingListAdapter adapter,
-            ThingBundleHolder thingBundleHolder) {
+            ThingListAdapter adapter) {
         this.context = context;
-        this.fragmentManager = fragmentManager;
         this.accountName = accountName;
-        this.subreddit = subreddit;
-        this.query = query;
         this.adapter = adapter;
-        this.thingBundleHolder = thingBundleHolder;
     }
 
     @Override
@@ -80,55 +67,6 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
         if (actionMode != null) {
             actionMode.invalidate();
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.thing_list_menu, menu);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        boolean isQuery = !TextUtils.isEmpty(query);
-        boolean hasAccount = AccountUtils.isAccount(accountName);
-        boolean hasSubreddit = subreddit != null;
-        boolean hasThing = thingBundleHolder != null && thingBundleHolder.getThingBundle() != null;
-        boolean hasSidebar = Subreddits.hasSidebar(subreddit);
-
-        boolean showNewPost = !isQuery && hasAccount && hasSubreddit && !hasThing;
-        boolean showAddSubreddit = !isQuery && hasSubreddit && !hasThing;
-        boolean showSubreddit = !isQuery && hasSubreddit && !hasThing && hasSidebar;
-
-        menu.findItem(R.id.menu_new_post).setVisible(showNewPost);
-        menu.findItem(R.id.menu_add_subreddit).setVisible(showAddSubreddit);
-
-        MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
-        subredditItem.setVisible(showSubreddit);
-        if (showSubreddit) {
-            subredditItem.setTitle(MenuHelper.getSubredditTitle(context, subreddit));
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_add_subreddit:
-                handleAddSubreddit();
-                return true;
-
-            case R.id.menu_subreddit:
-                handleSubreddit();
-                return true;
-        }
-        return false;
-    }
-
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(fragmentManager, subreddit);
-    }
-
-    private void handleSubreddit() {
-        MenuHelper.startSidebarActivity(context, subreddit);
     }
 
     @Override

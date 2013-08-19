@@ -100,19 +100,6 @@ public class MessageThreadListController
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return false;
-    }
-
-    @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu, ListView listView) {
         if (adapter.getCursor() == null) {
             listView.clearChoices();

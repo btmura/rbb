@@ -26,6 +26,7 @@ import com.btmura.android.reddit.widget.MessageThreadAdapter;
  */
 public class MessageThreadListFragment
         extends AbstractListFragment<MessageThreadListController,
+        NoMenuController,
         MessageThreadListController,
         MessageThreadAdapter> {
 
@@ -45,8 +46,13 @@ public class MessageThreadListFragment
     }
 
     @Override
-    protected MessageThreadListController createActionModeController(
-            MessageThreadListController controller) {
+    protected NoMenuController createMenuController(MessageThreadListController controller) {
+        return NoMenuController.INSTANCE;
+    }
+
+    @Override
+    protected MessageThreadListController
+            createActionModeController(MessageThreadListController controller) {
         return controller;
     }
 }

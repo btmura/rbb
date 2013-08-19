@@ -26,6 +26,7 @@ import com.btmura.android.reddit.widget.RelatedSubredditAdapter;
 
 public class RelatedSubredditListFragment
         extends SubredditListFragment<RelatedSubredditListController,
+        NoMenuController,
         SubredditActionModeController,
         RelatedSubredditAdapter>
         implements LeftFragment, RightFragment {
@@ -64,10 +65,17 @@ public class RelatedSubredditListFragment
     }
 
     @Override
-    protected SubredditActionModeController createActionModeController(
-            RelatedSubredditListController controller) {
-        return new SubredditActionModeController(getActivity(), getFragmentManager(),
-                controller.getAdapter(), accountResultHolder);
+    protected NoMenuController createMenuController(RelatedSubredditListController controller) {
+        return NoMenuController.INSTANCE;
+    }
+
+    @Override
+    protected SubredditActionModeController
+            createActionModeController(RelatedSubredditListController controller) {
+        return new SubredditActionModeController(getActivity(),
+                getFragmentManager(),
+                controller.getAdapter(),
+                accountResultHolder);
     }
 
     @Override

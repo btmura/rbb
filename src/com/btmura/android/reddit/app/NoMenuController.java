@@ -17,28 +17,32 @@
 package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
-import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ListView;
 
-interface ActionModeController {
+class NoMenuController implements MenuController {
 
-    void restoreInstanceState(Bundle savedInstanceState);
+    static final NoMenuController INSTANCE = new NoMenuController();
 
-    void saveInstanceState(Bundle outState);
+    @Override
+    public void restoreInstanceState(Bundle savedInstanceState) {
+    }
 
-    void invalidateActionMode();
+    @Override
+    public void saveInstanceState(Bundle outState) {
+    }
 
-    // ActionMode MultiChoiceModeListener-like methods
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    }
 
-    boolean onCreateActionMode(ActionMode mode, Menu menu, ListView listView);
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+    }
 
-    boolean onPrepareActionMode(ActionMode mode, Menu menu, ListView listView);
-
-    boolean onActionItemClicked(ActionMode mode, MenuItem item, ListView listView);
-
-    void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked);
-
-    void onDestroyActionMode(ActionMode mode);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return false;
+    }
 }

@@ -22,7 +22,9 @@ import android.os.Bundle;
 import com.btmura.android.reddit.util.ComparableFragments;
 
 public class SubredditThingListFragment
-        extends ThingListFragment<SubredditThingListController, ThingTableActionModeController> {
+        extends ThingListFragment<SubredditThingListController,
+        ThingTableMenuController,
+        ThingTableActionModeController> {
 
     private ThingBundleHolder thingBundleHolder;
 
@@ -54,15 +56,22 @@ public class SubredditThingListFragment
     }
 
     @Override
-    protected ThingTableActionModeController createActionModeController(
-            SubredditThingListController controller) {
-        return new ThingTableActionModeController(getActivity(),
+    protected ThingTableMenuController
+            createMenuController(SubredditThingListController controller) {
+        return new ThingTableMenuController(getActivity(),
                 getFragmentManager(),
                 controller.getAccountName(),
                 controller.getSubreddit(),
                 controller.getQuery(),
-                controller.getAdapter(),
                 thingBundleHolder);
+    }
+
+    @Override
+    protected ThingTableActionModeController
+            createActionModeController(SubredditThingListController controller) {
+        return new ThingTableActionModeController(getActivity(),
+                controller.getAccountName(),
+                controller.getAdapter());
     }
 
     @Override

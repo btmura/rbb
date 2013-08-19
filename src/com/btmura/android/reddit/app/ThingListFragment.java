@@ -44,7 +44,7 @@ import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissLi
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingView;
 
-abstract class ThingListFragment<C extends ThingListController<?>, AC extends ThingActionModeController>
+abstract class ThingListFragment<C extends ThingListController<?>, MC extends MenuController, AC extends ThingActionModeController>
         extends ListFragment
         implements LoaderCallbacks<Cursor>,
         RightFragment,
@@ -63,6 +63,7 @@ abstract class ThingListFragment<C extends ThingListController<?>, AC extends Th
     }
 
     protected C controller;
+    protected MC menuController;
     protected AC actionModeController;
 
     private OnThingSelectedListener listener;
@@ -82,15 +83,19 @@ abstract class ThingListFragment<C extends ThingListController<?>, AC extends Th
 
     protected abstract C createController();
 
+    protected abstract MC createMenuController(C controller);
+
     protected abstract AC createActionModeController(C controller);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controller = createController();
+        menuController = createMenuController(controller);
         actionModeController = createActionModeController(controller);
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
+            menuController.restoreInstanceState(savedInstanceState);
             actionModeController.restoreInstanceState(savedInstanceState);
         }
         setHasOptionsMenu(true);
@@ -234,18 +239,18 @@ abstract class ThingListFragment<C extends ThingListController<?>, AC extends Th
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        actionModeController.onCreateOptionsMenu(menu, inflater);
+        menuController.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        actionModeController.onPrepareOptionsMenu(menu);
+        menuController.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return actionModeController.onOptionsItemSelected(item)
+        return menuController.onOptionsItemSelected(item)
                 || super.onOptionsItemSelected(item);
     }
 
@@ -279,6 +284,7 @@ abstract class ThingListFragment<C extends ThingListController<?>, AC extends Th
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         controller.saveInstanceState(outState);
+        menuController.saveInstanceState(outState);
         actionModeController.saveInstanceState(outState);
     }
 

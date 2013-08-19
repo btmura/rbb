@@ -26,8 +26,8 @@ import android.widget.ListView;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditView;
 
-abstract class SubredditListFragment<C extends SubredditListController<A>, AC extends ActionModeController, A extends SubredditAdapter>
-        extends AbstractListFragment<C, AC, A> {
+abstract class SubredditListFragment<C extends SubredditListController<A>, MC extends MenuController, AC extends ActionModeController, A extends SubredditAdapter>
+        extends AbstractListFragment<C, MC, AC, A> {
 
     private OnSubredditSelectedListener listener;
 
