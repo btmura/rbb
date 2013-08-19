@@ -28,8 +28,6 @@ interface ThingListController<A extends AbstractThingListAdapter> extends Contro
 
     String getAccountName();
 
-    int getEmptyText();
-
     int getFilter();
 
     String getMoreId();
@@ -57,8 +55,6 @@ interface ThingListController<A extends AbstractThingListAdapter> extends Contro
     boolean isSingleChoice();
 
     // Setters.
-
-    void setEmptyText(int emptyText);
 
     void setMoreId(String moreId);
 

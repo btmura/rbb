@@ -137,21 +137,7 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
         controller.setThingBodyWidth(getThingBodyWidth());
         setListAdapter(controller.getAdapter());
         setListShown(false);
-        if (controller.getEmptyText() == 0) {
-            getLoaderManager().initLoader(0, null, this);
-        } else {
-            showEmpty();
-        }
-    }
-
-    public void setEmpty(boolean error) {
-        controller.setEmptyText(error ? R.string.error : R.string.empty_list);
-        showEmpty();
-    }
-
-    private void showEmpty() {
-        setEmptyText(getString(controller.getEmptyText()));
-        setListShown(true);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override

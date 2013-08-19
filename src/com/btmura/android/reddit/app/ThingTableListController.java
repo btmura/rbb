@@ -37,13 +37,11 @@ abstract class ThingTableListController
     static final String EXTRA_SELECTED_LINK_ID = "selectedLinkId";
     static final String EXTRA_SELECTED_THING_ID = "selectedThingId";
     static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
-    static final String EXTRA_EMPTY_TEXT = "emptyText";
 
     protected final Context context;
     protected final ThingListAdapter adapter;
 
     private final String accountName;
-    private int emptyText;
     private int filter;
     private String moreId;
     private Bundle cursorExtras;
@@ -61,7 +59,6 @@ abstract class ThingTableListController
     public void restoreInstanceState(Bundle savedInstanceState) {
         setParentSubreddit(getParentSubredditExtra(savedInstanceState));
         setSubreddit(getSubredditExtra(savedInstanceState));
-        setEmptyText(getEmptyTextExtra(savedInstanceState));
         setSelectedThing(getSelectedThingId(savedInstanceState),
                 getSelectedLinkId(savedInstanceState));
         cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
@@ -69,7 +66,6 @@ abstract class ThingTableListController
 
     @Override
     public void saveInstanceState(Bundle state) {
-        state.putInt(EXTRA_EMPTY_TEXT, getEmptyText());
         state.putString(EXTRA_PARENT_SUBREDDIT, getParentSubreddit());
         state.putString(EXTRA_SELECTED_LINK_ID, getSelectedLinkId());
         state.putString(EXTRA_SELECTED_THING_ID, getSelectedThingId());
@@ -143,11 +139,6 @@ abstract class ThingTableListController
     }
 
     @Override
-    public int getEmptyText() {
-        return emptyText;
-    }
-
-    @Override
     public int getFilter() {
         return filter;
     }
@@ -193,11 +184,6 @@ abstract class ThingTableListController
     }
 
     // Simple setters for state members.
-
-    @Override
-    public void setEmptyText(int emptyText) {
-        this.emptyText = emptyText;
-    }
 
     @Override
     public void setMoreId(String moreId) {
@@ -257,9 +243,5 @@ abstract class ThingTableListController
 
     private static String getSelectedLinkId(Bundle extras) {
         return extras.getString(EXTRA_SELECTED_LINK_ID);
-    }
-
-    private static int getEmptyTextExtra(Bundle extras) {
-        return extras.getInt(EXTRA_EMPTY_TEXT);
     }
 }

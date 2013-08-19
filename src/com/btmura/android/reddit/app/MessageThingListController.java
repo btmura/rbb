@@ -41,7 +41,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     private final int filter;
     private final MessageListAdapter adapter;
 
-    private int emptyText;
     private String moreId;
     private Bundle cursorExtras;
 
@@ -132,11 +131,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     }
 
     @Override
-    public int getEmptyText() {
-        return emptyText;
-    }
-
-    @Override
     public int getFilter() {
         return filter;
     }
@@ -172,11 +166,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     }
 
     // Simple setters.
-
-    @Override
-    public void setEmptyText(int emptyText) {
-        this.emptyText = emptyText;
-    }
 
     @Override
     public void setMoreId(String moreId) {
