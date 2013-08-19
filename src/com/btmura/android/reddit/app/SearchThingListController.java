@@ -54,7 +54,7 @@ class SearchThingListController extends ThingTableListController {
     @Override
     public void saveInstanceState(Bundle state) {
         super.saveInstanceState(state);
-        state.putString(EXTRA_QUERY, getQuery());
+        state.putString(EXTRA_QUERY, query);
     }
 
     private void setQuery(String query) {

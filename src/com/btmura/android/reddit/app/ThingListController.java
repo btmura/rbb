@@ -34,23 +34,11 @@ interface ThingListController<A extends AbstractThingListAdapter> extends Contro
 
     String getNextMoreId();
 
-    String getParentSubreddit();
-
     String getQuery();
-
-    String getSelectedLinkId();
-
-    String getSelectedThingId();
 
     String getSubreddit();
 
-    boolean hasAccountName();
-
-    boolean hasCursor();
-
     boolean hasNextMoreId();
-
-    boolean hasQuery();
 
     boolean isSingleChoice();
 

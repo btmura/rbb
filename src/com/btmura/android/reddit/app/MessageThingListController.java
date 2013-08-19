@@ -139,26 +139,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     }
 
     @Override
-    public String getSelectedLinkId() {
-        return adapter.getSelectedLinkId();
-    }
-
-    @Override
-    public String getSelectedThingId() {
-        return adapter.getSelectedThingId();
-    }
-
-    @Override
-    public boolean hasAccountName() {
-        return !TextUtils.isEmpty(getAccountName());
-    }
-
-    @Override
-    public boolean hasCursor() {
-        return adapter.getCursor() != null;
-    }
-
-    @Override
     public boolean isSingleChoice() {
         return adapter.isSingleChoice();
     }
@@ -212,11 +192,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     // TODO(btmura): Remove the need for these methods.
 
     @Override
-    public String getParentSubreddit() {
-        return null;
-    }
-
-    @Override
     public String getQuery() {
         return null;
     }
@@ -224,11 +199,6 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     @Override
     public String getSubreddit() {
         return null;
-    }
-
-    @Override
-    public boolean hasQuery() {
-        return false;
     }
 
     @Override

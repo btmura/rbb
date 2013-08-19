@@ -66,9 +66,9 @@ abstract class ThingTableListController
 
     @Override
     public void saveInstanceState(Bundle state) {
-        state.putString(EXTRA_PARENT_SUBREDDIT, getParentSubreddit());
-        state.putString(EXTRA_SELECTED_LINK_ID, getSelectedLinkId());
-        state.putString(EXTRA_SELECTED_THING_ID, getSelectedThingId());
+        state.putString(EXTRA_PARENT_SUBREDDIT, adapter.getParentSubreddit());
+        state.putString(EXTRA_SELECTED_LINK_ID, adapter.getSelectedLinkId());
+        state.putString(EXTRA_SELECTED_THING_ID, adapter.getSelectedThingId());
         state.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
         state.putString(EXTRA_SUBREDDIT, getSubreddit());
     }
@@ -103,16 +103,6 @@ abstract class ThingTableListController
     }
 
     @Override
-    public boolean hasAccountName() {
-        return !TextUtils.isEmpty(getAccountName());
-    }
-
-    @Override
-    public boolean hasCursor() {
-        return adapter.getCursor() != null;
-    }
-
-    @Override
     public boolean hasNextMoreId() {
         return !TextUtils.isEmpty(getNextMoreId());
     }
@@ -144,11 +134,6 @@ abstract class ThingTableListController
         return moreId;
     }
 
-    @Override
-    public String getParentSubreddit() {
-        return adapter.getParentSubreddit();
-    }
-
     // TODO: Remove this method.
     @Override
     public String getQuery() {
@@ -156,23 +141,8 @@ abstract class ThingTableListController
     }
 
     @Override
-    public String getSelectedLinkId() {
-        return adapter.getSelectedLinkId();
-    }
-
-    @Override
-    public String getSelectedThingId() {
-        return adapter.getSelectedThingId();
-    }
-
-    @Override
     public String getSubreddit() {
         return adapter.getSubreddit();
-    }
-
-    @Override
-    public boolean hasQuery() {
-        return !TextUtils.isEmpty(getQuery());
     }
 
     protected Bundle getCursorExtras() {
