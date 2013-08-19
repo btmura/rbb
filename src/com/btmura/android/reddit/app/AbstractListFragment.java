@@ -115,7 +115,8 @@ abstract class AbstractListFragment<C extends Controller<A>, MC extends MenuCont
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return menuController.onOptionsItemSelected(item);
+        return menuController.onOptionsItemSelected(item)
+                || super.onOptionsItemSelected(item);
     }
 
     @Override

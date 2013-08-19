@@ -16,17 +16,12 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.util.ComparableFragments;
 
 public class ProfileThingListFragment
-        extends ThingListFragment<ProfileThingListController,
-        ThingTableMenuController,
-        ThingTableActionModeController> {
-
-    private ThingBundleHolder thingBundleHolder;
+        extends ThingTableListFragment<ProfileThingListController> {
 
     public static ProfileThingListFragment newInstance(String accountName, String profileUser,
             int filter, boolean singleChoice) {
@@ -42,35 +37,8 @@ public class ProfileThingListFragment
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof ThingBundleHolder) {
-            thingBundleHolder = (ThingBundleHolder) activity;
-        }
-    }
-
-    @Override
     protected ProfileThingListController createController() {
         return new ProfileThingListController(getActivity(), getArguments(), this);
-    }
-
-    @Override
-    protected ThingTableMenuController
-            createMenuController(ProfileThingListController controller) {
-        return new ThingTableMenuController(getActivity(),
-                getFragmentManager(),
-                controller.getAccountName(),
-                controller.getSubreddit(),
-                controller.getQuery(),
-                thingBundleHolder);
-    }
-
-    @Override
-    protected ThingTableActionModeController
-            createActionModeController(ProfileThingListController controller) {
-        return new ThingTableActionModeController(getActivity(),
-                controller.getAccountName(),
-                controller.getAdapter());
     }
 
     public String getProfileUser() {

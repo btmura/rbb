@@ -26,7 +26,7 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingListAdapter;
 
-abstract class AbstractThingTableListController
+abstract class ThingTableListController
         implements ThingListController<ThingListAdapter>, ThingProjection {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
@@ -48,7 +48,7 @@ abstract class AbstractThingTableListController
     private String moreId;
     private Bundle cursorExtras;
 
-    AbstractThingTableListController(Context context, Bundle args, OnVoteListener listener) {
+    ThingTableListController(Context context, Bundle args, OnVoteListener listener) {
         this.context = context;
         this.accountName = getAccountNameExtra(args);
         this.filter = getFilterExtra(args);

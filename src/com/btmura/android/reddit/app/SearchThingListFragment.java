@@ -16,17 +16,12 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.util.ComparableFragments;
 
 public class SearchThingListFragment
-        extends ThingListFragment<SearchThingListController,
-        ThingTableMenuController,
-        ThingTableActionModeController> {
-
-    private ThingBundleHolder thingBundleHolder;
+        extends ThingTableListFragment<SearchThingListController> {
 
     public static SearchThingListFragment newInstance(String accountName, String subreddit,
             String query, boolean singleChoice) {
@@ -43,35 +38,8 @@ public class SearchThingListFragment
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof ThingBundleHolder) {
-            thingBundleHolder = (ThingBundleHolder) activity;
-        }
-    }
-
-    @Override
     protected SearchThingListController createController() {
         return new SearchThingListController(getActivity(), getArguments(), this);
-    }
-
-    @Override
-    protected ThingTableMenuController
-            createMenuController(SearchThingListController controller) {
-        return new ThingTableMenuController(getActivity(),
-                getFragmentManager(),
-                controller.getAccountName(),
-                controller.getSubreddit(),
-                controller.getQuery(),
-                thingBundleHolder);
-    }
-
-    @Override
-    protected ThingTableActionModeController
-            createActionModeController(SearchThingListController controller) {
-        return new ThingTableActionModeController(getActivity(),
-                controller.getAccountName(),
-                controller.getAdapter());
     }
 
     @Override

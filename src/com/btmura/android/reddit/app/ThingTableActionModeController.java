@@ -35,18 +35,18 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.ListViewUtils;
-import com.btmura.android.reddit.widget.ThingListAdapter;
+import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 
 class ThingTableActionModeController implements ThingActionModeController, ThingProjection {
 
     private final Context context;
     private final String accountName;
-    private final ThingListAdapter adapter;
+    private final AbstractThingListAdapter adapter;
     private ActionMode actionMode;
 
     ThingTableActionModeController(Context context,
             String accountName,
-            ThingListAdapter adapter) {
+            AbstractThingListAdapter adapter) {
         this.context = context;
         this.accountName = accountName;
         this.adapter = adapter;
