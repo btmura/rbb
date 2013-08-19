@@ -58,6 +58,8 @@ public class Sessions implements BaseColumns {
 
     public static final String SELECT_BY_ID = _ID + "=?";
 
+    public static final String SELECT_BY_TIMESTAMP = COLUMN_TIMESTAMP + "<?";
+
     public static final String SELECT_BY_TYPE_AND_TAG =
             COLUMN_TYPE + "=? AND " + COLUMN_TAG + "=?";
 

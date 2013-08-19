@@ -18,6 +18,7 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -187,14 +188,14 @@ public class ThingProvider extends BaseProvider {
             + ReadActions.COLUMN_ACCOUNT + ", "
             + SharedColumns.COLUMN_THING_ID + ")";
 
+    /** Method to create a listing session of some kind. */
+    private static final String METHOD_GET_SESSION = "getSession";
+
     /** Method to collapse a comment in a listing session. */
     private static final String METHOD_COLLAPSE_COMMENT = "collapseComment";
 
     /** Method to expand a comment in a listing session. */
     private static final String METHOD_EXPAND_COMMENT = "expandComment";
-
-    /** Method to create a listing session of some kind. */
-    private static final String METHOD_GET_SESSION = "getSession";
 
     /** Method to insert a pending comment in a listing. */
     private static final String METHOD_INSERT_COMMENT = "insertComment";
@@ -224,6 +225,14 @@ public class ThingProvider extends BaseProvider {
     public static final String EXTRA_SUBREDDIT = "subreddit";
     public static final String EXTRA_THING_ID = "thingId";
     public static final String EXTRA_USER = "user";
+
+    private static final String[] CLEAN_PROJECTION = {
+            Sessions._ID,
+            Sessions.COLUMN_TYPE,
+    };
+
+    private static final int CLEAN_INDEX_ID = 0;
+    private static final int CLEAN_INDEX_TYPE = 1;
 
     private static final String[] EXPAND_PROJECTION = {
             Comments._ID,
@@ -261,8 +270,9 @@ public class ThingProvider extends BaseProvider {
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
 
     private static final boolean SYNC = true;
-
     private static final boolean NO_SYNC = false;
+
+    private final AtomicBoolean needsCleaning = new AtomicBoolean(true);
 
     public static final Bundle getSubredditSession(Context context, String accountName,
             String subreddit, int filter, long sessionId, String more) {
@@ -429,14 +439,31 @@ public class ThingProvider extends BaseProvider {
     }
 
     @Override
+    protected void notifyChange(Uri uri) {
+        super.notifyChange(uri);
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_ACCOUNTS, false)) {
+            getContext().getContentResolver().notifyChange(AccountProvider.ACCOUNTS_URI, null);
+        }
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_COMMENTS, false)) {
+            getContext().getContentResolver().notifyChange(COMMENTS_URI, null);
+        }
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_THINGS, false)) {
+            getContext().getContentResolver().notifyChange(THINGS_URI, null);
+        }
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_MESSAGES, false)) {
+            getContext().getContentResolver().notifyChange(MESSAGES_URI, null);
+        }
+    }
+
+    @Override
     public Bundle call(String method, String arg, Bundle extras) {
         try {
             if (METHOD_GET_SESSION.equals(method)) {
                 return getSession(arg, extras);
-            } else if (METHOD_EXPAND_COMMENT.equals(method)) {
-                return expandComment(extras);
             } else if (METHOD_COLLAPSE_COMMENT.equals(method)) {
                 return collapseComment(extras);
+            } else if (METHOD_EXPAND_COMMENT.equals(method)) {
+                return expandComment(extras);
             } else if (METHOD_INSERT_COMMENT.equals(method)) {
                 return insertComment(arg, extras);
             } else if (METHOD_INSERT_MESSAGE.equals(method)) {
@@ -536,6 +563,11 @@ public class ThingProvider extends BaseProvider {
         // Get new values over the network.
         ArrayList<ContentValues> values = listing.getValues();
 
+        // TODO(btmura): Do this while getting values over network.
+        if (needsCleaning.getAndSet(false)) {
+            cleanSessions();
+        }
+
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
@@ -581,6 +613,66 @@ public class ThingProvider extends BaseProvider {
         } finally {
             db.endTransaction();
         }
+    }
+
+    private Bundle cleanSessions() {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "cleanSessions");
+        }
+
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+
+            Cursor cursor = db.query(Sessions.TABLE_NAME, CLEAN_PROJECTION,
+                    Sessions.SELECT_BY_TIMESTAMP, Array.of(System.currentTimeMillis()),
+                    null, null, null);
+            while (cursor.moveToNext()) {
+                long sessionId = cursor.getLong(CLEAN_INDEX_ID);
+                int type = cursor.getInt(CLEAN_INDEX_TYPE);
+
+                // TODO(btmura): Use listing objects to get target table name.
+                String tableName;
+                switch (type) {
+                    case Sessions.TYPE_SUBREDDIT:
+                    case Sessions.TYPE_THING_SEARCH:
+                    case Sessions.TYPE_USER:
+                        tableName = Things.TABLE_NAME;
+                        break;
+
+                    case Sessions.TYPE_COMMENTS:
+                        tableName = Comments.TABLE_NAME;
+                        break;
+
+                    case Sessions.TYPE_SUBREDDIT_SEARCH:
+                        tableName = SubredditResults.TABLE_NAME;
+                        break;
+
+                    case Sessions.TYPE_MESSAGES:
+                    case Sessions.TYPE_MESSAGE_THREAD:
+                        tableName = Messages.TABLE_NAME;
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException();
+                }
+
+                String[] selectionArgs = Array.of(sessionId);
+                int count = db.delete(tableName, SharedColumns.SELECT_BY_SESSION_ID, selectionArgs);
+                int count2 = db.delete(Sessions.TABLE_NAME, Sessions.SELECT_BY_ID, selectionArgs);
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "session type: " + type
+                            + " " + tableName + ": " + count
+                            + " sessions: " + count2);
+                }
+            }
+            cursor.close();
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        return null;
     }
 
     private Bundle expandComment(Bundle extras) {
@@ -820,23 +912,6 @@ public class ThingProvider extends BaseProvider {
         cr.notifyChange(MESSAGE_ACTIONS_URI, null, SYNC);
         cr.notifyChange(MESSAGES_URI, null, NO_SYNC);
         return Bundle.EMPTY;
-    }
-
-    @Override
-    protected void notifyChange(Uri uri) {
-        super.notifyChange(uri);
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_ACCOUNTS, false)) {
-            getContext().getContentResolver().notifyChange(AccountProvider.ACCOUNTS_URI, null);
-        }
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_COMMENTS, false)) {
-            getContext().getContentResolver().notifyChange(COMMENTS_URI, null);
-        }
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_THINGS, false)) {
-            getContext().getContentResolver().notifyChange(THINGS_URI, null);
-        }
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_MESSAGES, false)) {
-            getContext().getContentResolver().notifyChange(MESSAGES_URI, null);
-        }
     }
 
     private static String getBodyExtra(Bundle extras) {
