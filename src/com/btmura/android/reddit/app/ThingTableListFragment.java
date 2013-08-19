@@ -38,7 +38,8 @@ abstract class ThingTableListFragment<C extends ThingListController<?>>
                 controller.getAccountName(),
                 controller.getSubreddit(),
                 controller.getQuery(),
-                thingBundleHolder);
+                thingBundleHolder,
+                this);
     }
 
     @Override

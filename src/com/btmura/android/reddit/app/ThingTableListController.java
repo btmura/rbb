@@ -75,11 +75,9 @@ abstract class ThingTableListController
 
     @Override
     public void swapCursor(Cursor cursor) {
-        setMoreId(null);
+        moreId = null;
         adapter.swapCursor(cursor);
-        if (cursor != null && cursor.getExtras() != null) {
-            cursorExtras = cursor.getExtras();
-        }
+        cursorExtras = cursor != null ? cursor.getExtras() : null;
     }
 
     @Override
@@ -87,10 +85,8 @@ abstract class ThingTableListController
         return adapter.getThingBundle(position);
     }
 
-    // Actions to be done on things.
-
+    @Override
     public void onThingSelected(int position) {
-        // TODO: What was this for?
     }
 
     // Getters.

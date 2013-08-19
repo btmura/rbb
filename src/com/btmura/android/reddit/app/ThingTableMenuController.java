@@ -36,19 +36,22 @@ class ThingTableMenuController implements MenuController {
     private final String subreddit;
     private final String query;
     private final ThingBundleHolder thingBundleHolder;
+    private final Refreshable refreshable;
 
     ThingTableMenuController(Context context,
             FragmentManager fragmentManager,
             String accountName,
             String subreddit,
             String query,
-            ThingBundleHolder thingBundleHolder) {
+            ThingBundleHolder thingBundleHolder,
+            Refreshable refreshable) {
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;
         this.thingBundleHolder = thingBundleHolder;
+        this.refreshable = refreshable;
     }
 
     @Override
@@ -93,6 +96,10 @@ class ThingTableMenuController implements MenuController {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_refresh:
+                handleRefresh();
+                return true;
+
             case R.id.menu_add_subreddit:
                 handleAddSubreddit();
                 return true;
@@ -102,6 +109,10 @@ class ThingTableMenuController implements MenuController {
                 return true;
         }
         return false;
+    }
+
+    private void handleRefresh() {
+        refreshable.refresh();
     }
 
     private void handleAddSubreddit() {

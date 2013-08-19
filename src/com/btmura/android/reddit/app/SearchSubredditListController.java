@@ -67,9 +67,7 @@ class SearchSubredditListController implements SubredditListController<SearchSub
     @Override
     public void swapCursor(Cursor cursor) {
         adapter.swapCursor(cursor);
-        if (cursor != null && cursor.getExtras() != null) {
-            cursorExtras = cursor.getExtras();
-        }
+        cursorExtras = cursor != null ? cursor.getExtras() : null;
     }
 
     // Search-specific getters

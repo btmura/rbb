@@ -71,11 +71,9 @@ class MessageThingListController implements ThingListController<MessageListAdapt
 
     @Override
     public void swapCursor(Cursor cursor) {
-        setMoreId(null);
+        moreId = null;
         adapter.swapCursor(cursor);
-        if (cursor != null && cursor.getExtras() != null) {
-            cursorExtras = cursor.getExtras();
-        }
+        cursorExtras = cursor != null ? cursor.getExtras() : null;
     }
 
     @Override
@@ -211,7 +209,7 @@ class MessageThingListController implements ThingListController<MessageListAdapt
         return extras.getBoolean(EXTRA_SINGLE_CHOICE);
     }
 
-    // Unfinished business...
+    // TODO(btmura): Remove the need for these methods.
 
     @Override
     public String getParentSubreddit() {

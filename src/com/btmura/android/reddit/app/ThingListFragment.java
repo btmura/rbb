@@ -48,6 +48,7 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
         extends ListFragment
         implements LoaderCallbacks<Cursor>,
         RightFragment,
+        Refreshable,
         OnScrollListener,
         OnSwipeDismissListener,
         OnVoteListener,
@@ -138,6 +139,14 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
         setListAdapter(controller.getAdapter());
         setListShown(false);
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    @Override
+    public void refresh() {
+        controller.swapCursor(null);
+        setListAdapter(controller.getAdapter());
+        setListShown(false);
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override

@@ -80,12 +80,8 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
 
     @Override
     public void swapCursor(Cursor cursor) {
-        if (adapter.getCursor() != cursor) {
-            adapter.swapCursor(cursor);
-            if (cursor != null && cursor.getExtras() != null) {
-                cursorExtras = cursor.getExtras();
-            }
-        }
+        adapter.swapCursor(cursor);
+        cursorExtras = cursor != null ? cursor.getExtras() : null;
     }
 
     @Override
