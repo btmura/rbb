@@ -67,7 +67,6 @@ abstract class ThingListFragment<C extends ThingListController<?>, AC extends Th
 
     private OnThingSelectedListener listener;
     private OnSubredditEventListener eventListener;
-    protected ThingBundleHolder thingBundleHolder;
     private boolean scrollLoading;
 
     @Override
@@ -78,9 +77,6 @@ abstract class ThingListFragment<C extends ThingListController<?>, AC extends Th
         }
         if (activity instanceof OnSubredditEventListener) {
             eventListener = (OnSubredditEventListener) activity;
-        }
-        if (activity instanceof ThingBundleHolder) {
-            thingBundleHolder = (ThingBundleHolder) activity;
         }
     }
 

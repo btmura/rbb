@@ -16,12 +16,15 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.util.ComparableFragments;
 
 public class SearchThingListFragment
         extends ThingListFragment<SearchThingListController, ThingTableActionModeController> {
+
+    private ThingBundleHolder thingBundleHolder;
 
     public static SearchThingListFragment newInstance(String accountName, String subreddit,
             String query, boolean singleChoice) {
@@ -35,6 +38,14 @@ public class SearchThingListFragment
         SearchThingListFragment frag = new SearchThingListFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof ThingBundleHolder) {
+            thingBundleHolder = (ThingBundleHolder) activity;
+        }
     }
 
     @Override
