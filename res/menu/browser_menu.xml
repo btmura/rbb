@@ -16,7 +16,9 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <group android:orderInCategory="@integer/menu_order_last" >
+    <group
+        android:id="@+id/menu_group_last"
+        android:orderInCategory="@integer/menu_order_last" >
         <item
             android:id="@+id/menu_accounts"
             android:showAsAction="never"

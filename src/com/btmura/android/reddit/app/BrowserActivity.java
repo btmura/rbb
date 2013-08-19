@@ -63,9 +63,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     private FilterAdapter filterAdapter;
     private ActionBarDrawerToggle drawerToggle;
 
-    private MenuItem accountsItem;
-    private MenuItem switchThemesItem;
-
     @Override
     protected void setContentView() {
         setTheme(ThemePrefs.getTheme(this));
@@ -273,21 +270,13 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.browser_menu, menu);
-        accountsItem = menu.findItem(R.id.menu_accounts);
-        switchThemesItem = menu.findItem(R.id.menu_switch_themes);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if (accountsItem == null) {
-            return true; // Check that onCreateOptionsMenu was called.
-        }
-
-        boolean showAccountItems = hasLeftFragment && !hasThing();
-        accountsItem.setVisible(showAccountItems);
-        switchThemesItem.setVisible(showAccountItems);
+        menu.setGroupVisible(R.id.menu_group_last, !hasThing());
         return true;
     }
 
