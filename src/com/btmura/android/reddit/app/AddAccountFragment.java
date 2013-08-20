@@ -190,7 +190,7 @@ public class AddAccountFragment extends Fragment implements
     }
 
     private void hideProgress() {
-        progress.setVisibility(View.INVISIBLE);
+        progress.setVisibility(View.GONE);
         login.setEnabled(true);
         password.setEnabled(true);
         showPassword.setEnabled(true);
