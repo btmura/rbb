@@ -16,16 +16,26 @@
 
 package com.btmura.android.reddit.app;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,16 +48,22 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
+import com.btmura.android.reddit.net.RedditApi;
+import com.btmura.android.reddit.net.Result;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.text.InputFilters;
+import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.util.StringUtil;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
@@ -56,106 +72,92 @@ import com.btmura.android.reddit.widget.SubredditAdapter;
 /**
  * {@link Fragment} that displays a form for composing submissions and messages.
  */
-public class ComposeFormFragment extends Fragment implements LoaderCallbacks<AccountResult>,
+public class ComposeFormFragment extends Fragment implements
+        ComparableFragment,
+        LoaderCallbacks<AccountResult>,
+        OnCaptchaGuessListener,
         OnClickListener,
         OnItemSelectedListener,
         OnItemClickListener,
         TextWatcher {
 
-    // This fragment only reports back the user's input and doesn't handle
-    // modifying the database. The caller of this fragment should handle that.
+    public static final String TAG = "ComposeFragment";
 
-    /** Integer argument indicating the type of composition. */
-    public static final String ARG_TYPE = "composition";
+    private static final String ARG_TYPE = "type";
 
-    /** String extra to pre-fill the subreddit field for new posts. */
-    public static final String ARG_SUBREDDIT_DESTINATION = "subredditDestination";
+    private static final String ARG_SUBREDDIT_DESTINATION = "subredditDestination";
 
-    /** String extra to pre-fill the user name field for new messages. */
-    public static final String ARG_MESSAGE_DESTINATION = "messageDestination";
+    private static final String ARG_MESSAGE_DESTINATION = "messageDestination";
 
-    /** Optional string extra with suggested title. */
-    private static final String ARG_TITLE = "title";
+    private static final String ARG_TITLE = Intent.EXTRA_SUBJECT;
 
-    /** Optional string extra with suggested text. */
-    private static final String ARG_TEXT = "text";
+    private static final String ARG_TEXT = Intent.EXTRA_TEXT;
 
-    /** Optional boolean extra indicating whether this is a reply. */
     private static final String ARG_IS_REPLY = "isReply";
 
-    /** Integer ID that may be used to identify this fragment. */
-    private static final String ARG_ID = "id";
+    private static final String ARG_EXTRAS = "extras";
+
+    // The following extras should be passed for COMMENT_REPLY.
+
+    public static final String EXTRA_COMMENT_PARENT_THING_ID = "parentThingId";
+    public static final String EXTRA_COMMENT_THING_ID = "thingId";
+
+    // The following extras should be passed for MESSAGE_REPLY.
+
+    public static final String EXTRA_MESSAGE_PARENT_THING_ID = "parentThingId";
+    public static final String EXTRA_MESSAGE_THING_ID = "thingId";
+
+    // The following extras should be passed for EDIT.
+
+    public static final String EXTRA_EDIT_PARENT_THING_ID = "parentThingId";
+    public static final String EXTRA_EDIT_SESSION_ID = "sessionId";
+    public static final String EXTRA_EDIT_THING_ID = "thingId";
 
     public interface OnComposeFormListener {
 
-        /**
-         * Method fired when OK is pressed and basic validations has passed.
-         * 
-         * @param accountName of the account composing the message
-         * @param destination whether subreddit or user name
-         * @param title or subject of the composition
-         * @param text of the composition
-         * @param isLink is true if the text is a link
-         */
-        void onComposeForm(String accountName, String destination, String title, String text,
-                boolean isLink);
+        void onComposeFinished();
     }
 
-    /** Listener to notify on compose events. */
     private OnComposeFormListener listener;
+    private SubmitTask task;
+    private boolean isAccountNameInitialized;
 
-    /** Flag for initially setting account spinner once. */
-    private boolean restoringState;
-
-    /** One of the three main layouts. This one shows a loading symbol. */
     private View progressView;
-
-    /** ONe of the three main layouts. This one shows an error and button. */
     private View noAccountView;
-
-    /** One of the three main layouts. This shows the full form. */
     private View accountView;
-
-    /** {@link Button} that launches an add account activity. */
     private View addAccountButton;
 
-    /** Adapter of account names to select who will be composing. */
-    private AccountNameAdapter adapter;
-
-    /** {@link Spinner} containing all the acounts who can compose. */
     private Spinner accountSpinner;
-
-    /** {@link EditText} for either subreddit or username. */
     private AutoCompleteTextView destinationText;
-
-    /** {@link EditText} for either title or subject. */
     private EditText titleText;
-
-    /** {@link Switch} indicating text if off and link if on. */
     private Switch linkSwitch;
-
-    /** {@link EditText} for either submission text or message. */
     private EditText textText;
+    private ProgressBar submitProgress;
 
-    /** Matcher used to check whether the text is a link or not. */
+    private AccountNameAdapter adapter;
+    private SubredditAdapter subredditAdapter;
     private Matcher linkMatcher;
 
-    /** Adapter used to provide subreddit suggestions. */
-    private SubredditAdapter subredditAdapter;
-
     public static ComposeFormFragment newInstance(int type, String subredditDestination,
-            String messageDestination, String title, String text, boolean isReply, int id) {
-        Bundle args = new Bundle(6);
+            String messageDestination, String title, String text, boolean isReply, Bundle extras) {
+        Bundle args = new Bundle(7);
         args.putInt(ARG_TYPE, type);
         args.putString(ARG_SUBREDDIT_DESTINATION, subredditDestination);
         args.putString(ARG_MESSAGE_DESTINATION, messageDestination);
         args.putString(ARG_TITLE, title);
         args.putString(ARG_TEXT, text);
         args.putBoolean(ARG_IS_REPLY, isReply);
-        args.putInt(ARG_ID, id);
+        args.putBundle(ARG_EXTRAS, extras);
+
         ComposeFormFragment frag = new ComposeFormFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    public boolean fragmentEquals(ComparableFragment o) {
+        return ComparableFragments.baseEquals(this, o)
+                && ComparableFragments.equalInts(this, o, ARG_TYPE);
     }
 
     @Override
@@ -169,8 +171,8 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        restoringState = savedInstanceState != null;
         adapter = new AccountNameAdapter(getActivity(), R.layout.account_name_row);
+        setRetainInstance(true);
         setHasOptionsMenu(true);
     }
 
@@ -194,8 +196,9 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         titleText = (EditText) v.findViewById(R.id.title_text);
         linkSwitch = (Switch) v.findViewById(R.id.link_switch);
         textText = (EditText) v.findViewById(R.id.text_text);
+        submitProgress = (ProgressBar) v.findViewById(R.id.submit_progress);
 
-        int type = getArguments().getInt(ARG_TYPE);
+        int type = getType();
 
         // Set the title for all types.
         String title = StringUtil.ellipsize(getArguments().getString(ARG_TITLE), 100);
@@ -294,6 +297,12 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
             titleText.requestFocus();
         }
 
+        if (task != null) {
+            disableFields();
+        } else {
+            enableFields();
+        }
+
         return v;
     }
 
@@ -301,6 +310,24 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    private void disableFields() {
+        submitProgress.setVisibility(View.VISIBLE);
+        accountSpinner.setEnabled(false);
+        destinationText.setEnabled(false);
+        titleText.setEnabled(false);
+        textText.setEnabled(false);
+        linkSwitch.setEnabled(false);
+    }
+
+    private void enableFields() {
+        submitProgress.setVisibility(View.GONE);
+        accountSpinner.setEnabled(true);
+        destinationText.setEnabled(true);
+        titleText.setEnabled(true);
+        textText.setEnabled(true);
+        linkSwitch.setEnabled(true);
     }
 
     @Override
@@ -319,16 +346,12 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         adapter.clear();
         if (hasAccounts) {
             adapter.addAll(result.accountNames);
-
-            // Only setup spinner when not changing configs. Widget will handle
-            // selecting the last account on config changes on its own.
-            if (!restoringState) {
+            if (!isAccountNameInitialized) {
                 int index = adapter.findAccountName(result.getLastAccount(getActivity()));
                 accountSpinner.setSelection(index);
+                isAccountNameInitialized = true;
             }
         }
-
-        getActivity().invalidateOptionsMenu();
     }
 
     @Override
@@ -377,19 +400,20 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_submit:
-                return handleSubmit();
+                handleSubmit();
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private boolean handleSubmit() {
+    private void handleSubmit() {
         // Required an account to submit anything.
         if (adapter.isEmpty()) {
             // The UI should be showing a big error message, so it's ok not to
             // do anything here.
-            return true;
+            return;
         }
 
         // CommentActions don't have a choice of destination or title.
@@ -398,28 +422,264 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
                 || composition == ComposeActivity.TYPE_MESSAGE) {
             if (TextUtils.isEmpty(destinationText.getText())) {
                 destinationText.setError(getString(R.string.error_blank_field));
-                return true;
+                return;
             }
             if (TextUtils.isEmpty(titleText.getText())) {
                 titleText.setError(getString(R.string.error_blank_field));
-                return true;
+                return;
             }
         }
 
         if (TextUtils.isEmpty(textText.getText())) {
             textText.setError(getString(R.string.error_blank_field));
-            return true;
+            return;
         }
 
+        submit(null, null);
+    }
+
+    private void submit(String captchaId, String captchaGuess) {
+        onSubmitStarted();
+
+        String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
+        String destination = destinationText.getText().toString();
+        String title = titleText.getText().toString();
+        String text = textText.getText().toString();
+        boolean isLink = linkSwitch.isChecked();
+
+        int type = getType();
+        switch (type) {
+            case ComposeActivity.TYPE_POST:
+            case ComposeActivity.TYPE_MESSAGE:
+                handlePostOrMessage(accountName,
+                        destination,
+                        title,
+                        text,
+                        isLink,
+                        captchaId,
+                        captchaGuess);
+                break;
+
+            case ComposeActivity.TYPE_COMMENT_REPLY:
+                handleCommentReply(accountName, text);
+                break;
+
+            case ComposeActivity.TYPE_MESSAGE_REPLY:
+                handleMessageReply(accountName, text);
+                break;
+
+            case ComposeActivity.TYPE_EDIT_POST:
+            case ComposeActivity.TYPE_EDIT_COMMENT:
+                handleEdit(accountName, text);
+                break;
+        }
+    }
+
+    private void handlePostOrMessage(String accountName,
+            String destination,
+            String title,
+            String text,
+            boolean isLink,
+            String captchaId,
+            String captchaGuess) {
+        resetTask();
+        task = new SubmitTask(getActivity(),
+                accountName,
+                destination,
+                title,
+                text,
+                isLink,
+                captchaId,
+                captchaGuess);
+        task.execute();
+    }
+
+    private void handleCommentReply(String accountName, String text) {
+        Bundle extras = getExtras();
+        String parentThingId = extras.getString(EXTRA_COMMENT_PARENT_THING_ID);
+        String replyThingId = extras.getString(EXTRA_COMMENT_THING_ID);
+        Provider.commentReplyAsync(
+                getActivity(),
+                accountName,
+                text,
+                parentThingId,
+                replyThingId);
+        onSubmitFinished();
+    }
+
+    private void handleMessageReply(String accountName, String text) {
+        Bundle extras = getExtras();
+        String parentThingId = extras.getString(EXTRA_MESSAGE_PARENT_THING_ID);
+        String thingId = extras.getString(EXTRA_MESSAGE_THING_ID);
+        Provider.messageReplyAsync(
+                getActivity(),
+                accountName,
+                text,
+                parentThingId,
+                thingId);
+        onSubmitFinished();
+    }
+
+    private void handleEdit(String accountName, String text) {
+        Bundle extras = getExtras();
+        String parentThingId = extras.getString(EXTRA_EDIT_PARENT_THING_ID);
+        // TODO: Fix this to not require session like comment and message replies.
+        long sessionId = extras.getLong(EXTRA_EDIT_SESSION_ID);
+        String thingId = extras.getString(EXTRA_EDIT_THING_ID);
+        Provider.editAsync(
+                getActivity(),
+                accountName,
+                parentThingId,
+                thingId,
+                text,
+                sessionId);
+        onSubmitFinished();
+    }
+
+    @Override
+    public void onCaptchaGuess(String id, String guess) {
+        submit(id, guess);
+    }
+
+    @Override
+    public void onCaptchaCancelled() {
+        onSubmitCancelled();
+    }
+
+    private void onSubmitStarted() {
+        disableFields();
+    }
+
+    private void onSubmitCancelled() {
+        enableFields();
+        resetTask();
+    }
+
+    private void onSubmitError() {
+        enableFields();
+        resetTask();
+    }
+
+    private void resetTask() {
+        if (task != null) {
+            task.cancel(true);
+            task = null;
+        }
+    }
+
+    private void onSubmitFinished() {
         if (listener != null) {
-            listener.onComposeForm(adapter.getItem(accountSpinner.getSelectedItemPosition()),
-                    destinationText.getText().toString(),
-                    titleText.getText().toString(),
-                    textText.getText().toString(),
-                    linkSwitch.isChecked());
+            listener.onComposeFinished();
+        }
+    }
+
+    class SubmitTask extends AsyncTask<Void, Void, Result> {
+
+        private final Context context;
+        private final String accountName;
+        private final String destination;
+        private final String title;
+        private final String text;
+        private final boolean isLink;
+        private final String captchaId;
+        private final String captchaGuess;
+
+        SubmitTask(Context context,
+                String accountName,
+                String destination,
+                String title,
+                String text,
+                boolean isLink,
+                String captchaId,
+                String captchaGuess) {
+            this.context = context.getApplicationContext();
+            this.accountName = accountName;
+            this.destination = destination;
+            this.title = title;
+            this.text = text;
+            this.isLink = isLink;
+            this.captchaId = captchaId;
+            this.captchaGuess = captchaGuess;
         }
 
-        return true;
+        @Override
+        protected Result doInBackground(Void... voidRay) {
+            try {
+                AccountManager manager = AccountManager.get(context);
+                Account account = AccountUtils.getAccount(context, accountName);
+
+                // Get account cookie or bail out.
+                String cookie = AccountUtils.getCookie(manager, account);
+                if (cookie == null) {
+                    return null;
+                }
+
+                // Get account modhash or bail out.
+                String modhash = AccountUtils.getModhash(manager, account);
+                if (modhash == null) {
+                    return null;
+                }
+
+                switch (getType()) {
+                    case ComposeActivity.TYPE_POST:
+                        return RedditApi.submit(destination, title, text, isLink,
+                                captchaId, captchaGuess, cookie, modhash);
+
+                    case ComposeActivity.TYPE_MESSAGE:
+                        return RedditApi.compose(destination, title, text,
+                                captchaId, captchaGuess, cookie, modhash);
+
+                    default:
+                        throw new IllegalArgumentException();
+                }
+
+            } catch (OperationCanceledException e) {
+                Log.e(TAG, e.getMessage(), e);
+            } catch (AuthenticatorException e) {
+                Log.e(TAG, e.getMessage(), e);
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onCancelled() {
+            onSubmitCancelled();
+        }
+
+        @Override
+        protected void onPostExecute(Result result) {
+            if (result == null) {
+                showError(getString(R.string.error));
+            } else if (result.hasRateLimitError()) {
+                showError(result.getErrorMessage(context));
+            } else if (result.hasBadCaptchaError()) {
+                showCaptcha(result.captcha);
+            } else if (result.hasErrors()) {
+                showError(result.getErrorMessage(context));
+            } else {
+                finish();
+            }
+        }
+
+        private void showCaptcha(String captchaId) {
+            CaptchaFragment frag = CaptchaFragment.newInstance(captchaId);
+            frag.setTargetFragment(ComposeFormFragment.this, 0);
+
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(frag, CaptchaFragment.TAG);
+            ft.commit();
+        }
+
+        private void showError(CharSequence error) {
+            MessageDialogFragment.showMessage(getFragmentManager(), error);
+            onSubmitError();
+        }
+
+        private void finish() {
+            onSubmitFinished();
+        }
     }
 
     @Override
@@ -440,5 +700,40 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
     @Override
     public void afterTextChanged(Editable s) {
+    }
+
+    public String getTitle(Context context) {
+        switch (getType()) {
+            case ComposeActivity.TYPE_POST:
+                return context.getString(R.string.compose_title_post);
+
+            case ComposeActivity.TYPE_MESSAGE:
+                return context.getString(R.string.compose_title_message);
+
+            case ComposeActivity.TYPE_COMMENT_REPLY:
+            case ComposeActivity.TYPE_MESSAGE_REPLY:
+                return context.getString(R.string.compose_title_reply, getMessageDestination());
+
+            case ComposeActivity.TYPE_EDIT_POST:
+                return context.getString(R.string.compose_title_edit_post);
+
+            case ComposeActivity.TYPE_EDIT_COMMENT:
+                return context.getString(R.string.compose_title_edit_comment);
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private int getType() {
+        return getArguments().getInt(ARG_TYPE);
+    }
+
+    private String getMessageDestination() {
+        return getArguments().getString(ARG_MESSAGE_DESTINATION);
+    }
+
+    private Bundle getExtras() {
+        return getArguments().getBundle(ARG_EXTRAS);
     }
 }

@@ -17,29 +17,21 @@
 package com.btmura.android.reddit.app;
 
 import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerTabStrip;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
 import com.btmura.android.reddit.app.ComposeFormFragment.OnComposeFormListener;
-import com.btmura.android.reddit.app.ComposeFragment.OnComposeListener;
 import com.btmura.android.reddit.content.ThemePrefs;
-import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.util.Objects;
 
-public class ComposeActivity extends FragmentActivity implements OnPageChangeListener,
-        OnComposeFormListener,
-        OnCaptchaGuessListener,
-        OnComposeListener {
+public class ComposeActivity extends FragmentActivity
+        implements TabListener, OnComposeFormListener {
 
     /** Type of composition when submitting a link or text. */
     public static final int TYPE_POST = 0;
@@ -129,197 +121,102 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
     public static final String EXTRA_EDIT_SESSION_ID = "sessionId";
     public static final String EXTRA_EDIT_THING_ID = "thingId";
 
-    private ProgressBar progress;
+    private static final String STATE_SELECTED_TAB_INDEX = "selectedTabIndex";
 
-    /** ViewPager that holds the pages to compose different things. */
-    private ViewPager pager;
-
-    /** Adapter of the ViewPager used to swipe between screens. */
-    private ComposePagerAdapter adapter;
+    private int[] types;
+    private ActionBar bar;
+    private int savedSelectedTabIndex;
+    private boolean tabListenerDisabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.compose);
-        setupViews();
+        setup(savedInstanceState);
     }
 
-    private void setupViews() {
-        // No action bar will be available on large devices.
-        ActionBar bar = getActionBar();
-        if (bar != null) {
-            bar.setDisplayHomeAsUpEnabled(true);
-        }
-
-        int[] types = getIntent().getIntArrayExtra(EXTRA_TYPES);
+    private void setup(Bundle savedInstanceState) {
+        types = getIntent().getIntArrayExtra(EXTRA_TYPES);
         if (types == null) {
             types = DEFAULT_TYPE_SET;
         }
 
-        adapter = new ComposePagerAdapter(this, getSupportFragmentManager(), types,
-                getIntent().getStringExtra(EXTRA_SUBREDDIT_DESTINATION),
-                getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION),
-                getIntent().getStringExtra(EXTRA_TITLE),
-                getIntent().getStringExtra(EXTRA_TEXT),
-                getIntent().getBooleanExtra(EXTRA_IS_REPLY, false));
-
-        progress = (ProgressBar) findViewById(R.id.progress);
-
-        pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(adapter);
-        pager.setOnPageChangeListener(this);
-        onPageSelected(0);
-
-        PagerTabStrip pagerStrip = (PagerTabStrip) findViewById(R.id.pager_strip);
-        pagerStrip.setTabIndicatorColorResource(android.R.color.holo_blue_light);
-        pagerStrip.setVisibility(types.length > 1 ? View.VISIBLE : View.GONE);
+        bar = getActionBar();
+        bar.setDisplayHomeAsUpEnabled(true);
+        if (savedInstanceState != null) {
+            savedSelectedTabIndex = savedInstanceState.getInt(STATE_SELECTED_TAB_INDEX);
+        }
+        setupTabs();
     }
 
-    @Override
-    public void onPageSelected(int position) {
-        setTitle(getTitle(position));
-    }
+    private void setupTabs() {
+        for (int i = 0; i < types.length; i++) {
+            switch (types[i]) {
+                case ComposeActivity.TYPE_POST:
+                case ComposeActivity.TYPE_EDIT_POST:
+                    addTab(R.string.compose_tab_post);
+                    break;
 
-    private String getTitle(int position) {
-        switch (adapter.getType(position)) {
-            case ComposeActivity.TYPE_POST:
-                return getString(R.string.compose_title_post);
+                case ComposeActivity.TYPE_MESSAGE:
+                    addTab(R.string.compose_tab_message);
+                    break;
 
-            case ComposeActivity.TYPE_MESSAGE:
-                return getString(R.string.compose_title_message);
+                case ComposeActivity.TYPE_COMMENT_REPLY:
+                case ComposeActivity.TYPE_MESSAGE_REPLY:
+                case ComposeActivity.TYPE_EDIT_COMMENT:
+                    addTab(R.string.compose_tab_comment);
+                    break;
+            }
+        }
 
-            case ComposeActivity.TYPE_COMMENT_REPLY:
-            case ComposeActivity.TYPE_MESSAGE_REPLY:
-                return getString(R.string.compose_title_reply,
-                        getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION));
-
-            case ComposeActivity.TYPE_EDIT_POST:
-                return getString(R.string.compose_title_edit_post);
-
-            case ComposeActivity.TYPE_EDIT_COMMENT:
-                return getString(R.string.compose_title_edit_comment);
-
-            default:
-                throw new IllegalArgumentException();
+        tabListenerDisabled = savedSelectedTabIndex != 0;
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        tabListenerDisabled = false;
+        if (savedSelectedTabIndex != 0) {
+            bar.setSelectedNavigationItem(savedSelectedTabIndex);
         }
     }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    private Tab addTab(int titleResId) {
+        Tab tab = bar.newTab().setText(titleResId).setTabListener(this);
+        bar.addTab(tab);
+        return tab;
     }
 
     @Override
-    public void onPageScrollStateChanged(int state) {
-    }
+    public void onTabSelected(Tab tab, android.app.FragmentTransaction trans) {
+        if (!tabListenerDisabled) {
+            ComposeFormFragment frag = ComposeFormFragment.newInstance(types[tab.getPosition()],
+                    getIntent().getStringExtra(EXTRA_SUBREDDIT_DESTINATION),
+                    getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION),
+                    getIntent().getStringExtra(EXTRA_TITLE),
+                    getIntent().getStringExtra(EXTRA_TEXT),
+                    getIntent().getBooleanExtra(EXTRA_IS_REPLY, false),
+                    getIntent().getBundleExtra(EXTRA_EXTRAS));
+            bar.setTitle(frag.getTitle(this));
 
-    // TODO: Use bundle for onComposeForm.
-    @Override
-    public void onComposeForm(String accountName, String destination, String title, String text,
-            boolean isLink) {
-        // TODO: Don't rely on the current page.
-        int type = getCurrentType();
-        switch (type) {
-            case TYPE_POST:
-            case TYPE_MESSAGE:
-                Bundle extras = ComposeFragment
-                        .newExtras(accountName, destination, title, text, isLink);
-                Fragment frag = ComposeFragment.newInstance(type, extras, null, null);
+            if (!Objects.fragmentEquals(frag, getComposeFormFragment())) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.add(frag, ComposeFragment.TAG);
+                ft.replace(R.id.container, frag, ComposeFormFragment.TAG);
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+                        | FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
                 ft.commit();
-                break;
-
-            case TYPE_COMMENT_REPLY:
-                handleCommentReply(accountName, text);
-                break;
-
-            case TYPE_MESSAGE_REPLY:
-                handleMessageReply(accountName, text);
-                break;
-
-            case TYPE_EDIT_POST:
-            case TYPE_EDIT_COMMENT:
-                handleEdit(accountName, text);
-                break;
-        }
-    }
-
-    private void handleCommentReply(String accountName, String body) {
-        Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
-        String parentThingId = extras.getString(EXTRA_COMMENT_PARENT_THING_ID);
-        String replyThingId = extras.getString(EXTRA_COMMENT_THING_ID);
-        Provider.commentReplyAsync(this, accountName, body, parentThingId, replyThingId);
-        finish();
-    }
-
-    private void handleMessageReply(String accountName, String body) {
-        Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
-        String parentThingId = extras.getString(EXTRA_MESSAGE_PARENT_THING_ID);
-        String thingId = extras.getString(EXTRA_MESSAGE_THING_ID);
-        Provider.messageReplyAsync(this, accountName, body, parentThingId, thingId);
-        finish();
-    }
-
-    private void handleEdit(String accountName, String body) {
-        Bundle extras = getIntent().getBundleExtra(EXTRA_EXTRAS);
-        String parentThingId = extras.getString(EXTRA_EDIT_PARENT_THING_ID);
-        // TODO: Fix this to not require session like comment and message replies.
-        long sessionId = extras.getLong(EXTRA_EDIT_SESSION_ID);
-        String thingId = extras.getString(EXTRA_EDIT_THING_ID);
-        Provider.editAsync(this, accountName, parentThingId, thingId, body, sessionId);
-        finish();
-    }
-
-    @Override
-    public void onComposeStarted() {
-        progress.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onComposeEnded() {
-        progress.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onComposeSuccess(int type, String name, String url) {
-        switch (type) {
-            case TYPE_POST:
-            case TYPE_MESSAGE:
-                finish();
-                break;
-
-            default:
-                throw new IllegalArgumentException();
+            }
         }
     }
 
     @Override
-    public void onComposeCaptchaFailure(String captchaId, Bundle extras) {
-        CaptchaFragment.newInstance(captchaId, extras)
-                .show(getSupportFragmentManager(), CaptchaFragment.TAG);
+    public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) {
     }
 
     @Override
-    public void onCaptchaGuess(String id, String guess, Bundle extras) {
-        // TODO: Don't rely on the current page.
-        int type = getCurrentType();
-        switch (type) {
-            case TYPE_POST:
-            case TYPE_MESSAGE:
-                Fragment frag = ComposeFragment.newInstance(type, extras, id, guess);
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.add(frag, ComposeFragment.TAG);
-                ft.commit();
-                break;
-
-            default:
-                throw new IllegalArgumentException("type: " + type);
-        }
+    public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
     }
 
     @Override
-    public void onCaptchaCancelled() {
+    public void onComposeFinished() {
+        finish();
     }
 
     @Override
@@ -334,7 +231,14 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
         }
     }
 
-    private int getCurrentType() {
-        return adapter.getType(pager.getCurrentItem());
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_SELECTED_TAB_INDEX, bar.getSelectedNavigationIndex());
+    }
+
+    private ComparableFragment getComposeFormFragment() {
+        return (ComparableFragment) getSupportFragmentManager()
+                .findFragmentByTag(ComposeFormFragment.TAG);
     }
 }

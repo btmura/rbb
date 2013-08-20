@@ -36,8 +36,8 @@ import com.btmura.android.reddit.content.CaptchaLoader;
 import com.btmura.android.reddit.content.CaptchaLoader.CaptchaResult;
 import com.btmura.android.reddit.text.InputFilters;
 
-public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<CaptchaResult>,
-        OnClickListener {
+public class CaptchaFragment extends DialogFragment
+        implements LoaderCallbacks<CaptchaResult>, OnClickListener {
 
     public static final String TAG = "CaptchaFragment";
 
@@ -46,17 +46,15 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     };
 
     private static final String ARG_CAPTCHA_ID = "captchaId";
-    private static final String ARG_EXTRAS = "extras";
 
     public interface OnCaptchaGuessListener {
-        void onCaptchaGuess(String id, String guess, Bundle extras);
+        void onCaptchaGuess(String id, String guess);
 
         void onCaptchaCancelled();
     }
 
     private OnCaptchaGuessListener listener;
     private String captchaId;
-    private Bundle extras;
 
     private View progress;
     private ViewStub errorStub;
@@ -65,10 +63,9 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     private Button cancel;
     private Button ok;
 
-    public static CaptchaFragment newInstance(String captchaId, Bundle extras) {
-        Bundle args = new Bundle(2);
+    public static CaptchaFragment newInstance(String captchaId) {
+        Bundle args = new Bundle(1);
         args.putString(ARG_CAPTCHA_ID, captchaId);
-        args.putBundle(ARG_EXTRAS, extras);
 
         CaptchaFragment frag = new CaptchaFragment();
         frag.setArguments(args);
@@ -78,8 +75,8 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof OnCaptchaGuessListener) {
-            listener = (OnCaptchaGuessListener) activity;
+        if (getTargetFragment() instanceof OnCaptchaGuessListener) {
+            listener = (OnCaptchaGuessListener) getTargetFragment();
         }
     }
 
@@ -87,7 +84,6 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         captchaId = getArguments().getString(ARG_CAPTCHA_ID);
-        extras = getArguments().getBundle(ARG_EXTRAS);
     }
 
     @Override
@@ -166,7 +162,7 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
         }
         // TODO: Disable widgets if captcha image wasn't retrieved.
         if (listener != null) {
-            listener.onCaptchaGuess(captchaId, guess.getText().toString(), extras);
+            listener.onCaptchaGuess(captchaId, guess.getText().toString());
         }
         dismiss();
     }

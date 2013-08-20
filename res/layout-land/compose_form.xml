@@ -104,6 +104,14 @@
                 android:layout_marginTop="@dimen/element_padding"
                 android:textOff="@string/compose_text"
                 android:textOn="@string/compose_link" />
+
+            <ProgressBar
+                android:id="@+id/submit_progress"
+                style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="gone" />
         </LinearLayout>
 
         <EditText

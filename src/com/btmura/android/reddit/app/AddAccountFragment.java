@@ -138,6 +138,24 @@ public class AddAccountFragment extends Fragment implements
         }
     }
 
+    private void showProgress() {
+        progress.setVisibility(View.VISIBLE);
+        login.setEnabled(false);
+        password.setEnabled(false);
+        showPassword.setEnabled(false);
+        cancel.setEnabled(false);
+        ok.setEnabled(false);
+    }
+
+    private void hideProgress() {
+        progress.setVisibility(View.GONE);
+        login.setEnabled(true);
+        password.setEnabled(true);
+        showPassword.setEnabled(true);
+        cancel.setEnabled(true);
+        ok.setEnabled(true);
+    }
+
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         TransformationMethod method = null;
@@ -178,24 +196,6 @@ public class AddAccountFragment extends Fragment implements
             task = new LoginTask(getActivity(), login.getText(), password.getText());
             task.execute();
         }
-    }
-
-    private void showProgress() {
-        progress.setVisibility(View.VISIBLE);
-        login.setEnabled(false);
-        password.setEnabled(false);
-        showPassword.setEnabled(false);
-        cancel.setEnabled(false);
-        ok.setEnabled(false);
-    }
-
-    private void hideProgress() {
-        progress.setVisibility(View.GONE);
-        login.setEnabled(true);
-        password.setEnabled(true);
-        showPassword.setEnabled(true);
-        cancel.setEnabled(true);
-        ok.setEnabled(true);
     }
 
     class LoginTask extends AsyncTask<Void, Integer, Bundle> {
