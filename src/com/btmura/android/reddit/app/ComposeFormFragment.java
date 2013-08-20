@@ -303,11 +303,13 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
         // Create loader that doesn't show the app storage account.
         return new AccountLoader(getActivity(), false, false);
     }
 
+    @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         boolean hasAccounts = result.accountNames.length > 0;
         progressView.setVisibility(View.GONE);
@@ -329,15 +331,18 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         getActivity().invalidateOptionsMenu();
     }
 
+    @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
+    @Override
     public void onClick(View v) {
         if (v == addAccountButton) {
             MenuHelper.startAddAccountActivity(getActivity());
         }
     }
 
+    @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
         if (subredditAdapter != null) {
             String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
@@ -345,9 +350,11 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         }
     }
 
+    @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
     }
 
+    @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         String subreddit = subredditAdapter.getName(position);
         destinationText.setText(subreddit);
@@ -374,12 +381,6 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
 
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    public void onOkClicked(int id) {
-        if (getArguments().getInt(ARG_ID) == id) {
-            handleSubmit();
         }
     }
 
@@ -421,6 +422,7 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         return true;
     }
 
+    @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         validateText(s);
     }
@@ -432,9 +434,11 @@ public class ComposeFormFragment extends Fragment implements LoaderCallbacks<Acc
         linkSwitch.setChecked(linkMatcher.reset(s).matches());
     }
 
+    @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
     }
 
+    @Override
     public void afterTextChanged(Editable s) {
     }
 }

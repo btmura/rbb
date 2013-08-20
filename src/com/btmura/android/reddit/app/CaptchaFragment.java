@@ -118,10 +118,12 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
     public Loader<CaptchaResult> onCreateLoader(int id, Bundle args) {
         return new CaptchaLoader(getActivity(), captchaId);
     }
 
+    @Override
     public void onLoadFinished(Loader<CaptchaResult> loader, CaptchaResult result) {
         progress.setVisibility(View.GONE);
         if (result == null) {
@@ -136,10 +138,12 @@ public class CaptchaFragment extends DialogFragment implements LoaderCallbacks<C
         ok.setEnabled(true);
     }
 
+    @Override
     public void onLoaderReset(Loader<CaptchaResult> loader) {
         captcha.setImageBitmap(null);
     }
 
+    @Override
     public void onClick(View v) {
         if (v == cancel) {
             handleCancel();

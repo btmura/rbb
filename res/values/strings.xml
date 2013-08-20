@@ -37,7 +37,6 @@
     <string name="compose_title_post">New post</string>
     <string name="compose_title_reply">Reply to %s</string>
     <string name="compose_message_reply_title">re: %s</string>
-    <string name="compose_message_sent">Message sent</string>
     <string name="compose_link">LINK</string>
     <string name="compose_text">TEXT</string>
     <string name="content_browser">Content providers</string>
@@ -122,7 +121,6 @@
     <string name="reddit_error">Reddit says: %1$s</string>
     <string name="reddit_error_line">%1$s - %2$s</string>
     <string name="show_password">Show password</string>
-    <string name="submit_link_submitting">Submitting…</string>
     <string name="subreddits_category">Subreddits</string>
     <string name="subtitle_profile">profile</string>
     <string name="subtitle_messages">messages</string>

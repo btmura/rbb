@@ -27,7 +27,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.CaptchaFragment.OnCaptchaGuessListener;
@@ -129,6 +129,8 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
     public static final String EXTRA_EDIT_SESSION_ID = "sessionId";
     public static final String EXTRA_EDIT_THING_ID = "thingId";
 
+    private ProgressBar progress;
+
     /** ViewPager that holds the pages to compose different things. */
     private ViewPager pager;
 
@@ -162,6 +164,8 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
                 getIntent().getStringExtra(EXTRA_TEXT),
                 getIntent().getBooleanExtra(EXTRA_IS_REPLY, false));
 
+        progress = (ProgressBar) findViewById(R.id.progress);
+
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
         pager.setOnPageChangeListener(this);
@@ -172,6 +176,7 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
         pagerStrip.setVisibility(types.length > 1 ? View.VISIBLE : View.GONE);
     }
 
+    @Override
     public void onPageSelected(int position) {
         setTitle(getTitle(position));
     }
@@ -200,13 +205,16 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
         }
     }
 
+    @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
     }
 
+    @Override
     public void onPageScrollStateChanged(int state) {
     }
 
     // TODO: Use bundle for onComposeForm.
+    @Override
     public void onComposeForm(String accountName, String destination, String title, String text,
             boolean isLink) {
         // TODO: Don't rely on the current page.
@@ -214,8 +222,8 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
         switch (type) {
             case TYPE_POST:
             case TYPE_MESSAGE:
-                Bundle extras = ComposeFragment.newExtras(accountName, destination, title, text,
-                        isLink);
+                Bundle extras = ComposeFragment
+                        .newExtras(accountName, destination, title, text, isLink);
                 Fragment frag = ComposeFragment.newInstance(type, extras, null, null);
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.add(frag, ComposeFragment.TAG);
@@ -235,54 +243,6 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
                 handleEdit(accountName, text);
                 break;
         }
-    }
-
-    public void onComposeSuccess(int type, String name, String url) {
-        switch (type) {
-            case TYPE_POST:
-                Toast.makeText(getApplicationContext(), url, Toast.LENGTH_SHORT).show();
-                finish();
-                break;
-
-            case TYPE_MESSAGE:
-                Toast.makeText(getApplicationContext(), R.string.compose_message_sent,
-                        Toast.LENGTH_SHORT).show();
-                finish();
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-    public void onComposeCaptchaFailure(String captchaId, Bundle extras) {
-        CaptchaFragment.newInstance(captchaId, extras)
-                .show(getSupportFragmentManager(), CaptchaFragment.TAG);
-    }
-
-    // TODO: Do we need these?
-    public void onComposeCancelled() {
-    }
-
-    public void onCaptchaGuess(String id, String guess, Bundle extras) {
-        // TODO: Don't reply on the current page.
-        int type = getCurrentType();
-        switch (type) {
-            case TYPE_POST:
-            case TYPE_MESSAGE:
-                Fragment frag = ComposeFragment.newInstance(type, extras, id, guess);
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.add(frag, ComposeFragment.TAG);
-                ft.commit();
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-    // TODO: Do we need these?
-    public void onCaptchaCancelled() {
     }
 
     private void handleCommentReply(String accountName, String body) {
@@ -309,6 +269,57 @@ public class ComposeActivity extends FragmentActivity implements OnPageChangeLis
         String thingId = extras.getString(EXTRA_EDIT_THING_ID);
         Provider.editAsync(this, accountName, parentThingId, thingId, body, sessionId);
         finish();
+    }
+
+    @Override
+    public void onComposeStarted() {
+        progress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onComposeEnded() {
+        progress.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onComposeSuccess(int type, String name, String url) {
+        switch (type) {
+            case TYPE_POST:
+            case TYPE_MESSAGE:
+                finish();
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public void onComposeCaptchaFailure(String captchaId, Bundle extras) {
+        CaptchaFragment.newInstance(captchaId, extras)
+                .show(getSupportFragmentManager(), CaptchaFragment.TAG);
+    }
+
+    @Override
+    public void onCaptchaGuess(String id, String guess, Bundle extras) {
+        // TODO: Don't rely on the current page.
+        int type = getCurrentType();
+        switch (type) {
+            case TYPE_POST:
+            case TYPE_MESSAGE:
+                Fragment frag = ComposeFragment.newInstance(type, extras, id, guess);
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.add(frag, ComposeFragment.TAG);
+                ft.commit();
+                break;
+
+            default:
+                throw new IllegalArgumentException("type: " + type);
+        }
+    }
+
+    @Override
+    public void onCaptchaCancelled() {
     }
 
     @Override

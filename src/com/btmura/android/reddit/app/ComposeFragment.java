@@ -55,11 +55,14 @@ public class ComposeFragment extends Fragment {
     private static final String EXTRA_IS_LINK = "isLink";
 
     public interface OnComposeListener {
+
+        void onComposeStarted();
+
+        void onComposeEnded();
+
         void onComposeSuccess(int type, String name, String url);
 
         void onComposeCaptchaFailure(String captchaId, Bundle extras);
-
-        void onComposeCancelled();
     }
 
     private OnComposeListener listener;
@@ -100,14 +103,16 @@ public class ComposeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Retain instance to avoid cancelling ongoing RPC.
+        // Retain instance to avoid canceling ongoing RPC.
         setRetainInstance(true);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        if (listener != null) {
+            listener.onComposeStarted();
+        }
         if (task == null) {
             int type = getArguments().getInt(ARG_TYPE);
             Bundle extras = getArguments().getBundle(ARG_EXTRAS);
@@ -142,12 +147,6 @@ public class ComposeFragment extends Fragment {
             this.extras = extras;
             this.captchaId = captchaId;
             this.captchaGuess = captchaGuess;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            ProgressDialogFragment.showDialog(getFragmentManager(),
-                    getString(R.string.submit_link_submitting));
         }
 
         @Override
@@ -199,7 +198,10 @@ public class ComposeFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Result result) {
-            ProgressDialogFragment.dismissDialog(getFragmentManager());
+            if (listener != null) {
+                listener.onComposeEnded();
+            }
+
             if (result == null) {
                 showMessage(getString(R.string.error));
             } else if (result.hasRateLimitError()) {

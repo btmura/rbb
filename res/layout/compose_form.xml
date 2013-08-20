@@ -28,6 +28,7 @@
     TODO: Use ViewStub and split this out into a separate generic layout 
     for a large text and action button.
     -->
+
     <LinearLayout
         android:id="@+id/no_account"
         android:layout_width="match_parent"
