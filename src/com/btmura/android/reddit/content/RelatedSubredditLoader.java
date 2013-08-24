@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.content;
 
 import java.io.IOException;
+import java.text.Collator;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,7 +66,7 @@ public class RelatedSubredditLoader extends CursorLoader {
     }
 
     private TreeSet<String> findSubreddits(CharSequence description) {
-        TreeSet<String> subreddits = new TreeSet<String>();
+        TreeSet<String> subreddits = new TreeSet<String>(Collator.getInstance());
         Matcher matcher = SUBREDDIT_PATTERN.matcher(description);
         while (matcher.find()) {
             subreddits.add(matcher.group(1));
