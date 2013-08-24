@@ -19,6 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants"
     android:orientation="horizontal" >
 
     <TextView
@@ -36,8 +37,9 @@
 
     <!-- TODO: Fix content description and id to reflect mail meanning. -->
 
-    <ImageView
-        android:id="@+id/status_icon"
+    <ImageButton
+        android:id="@+id/status_button"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"

@@ -21,9 +21,10 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
@@ -31,7 +32,11 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.util.Objects;
 
-public class AccountResultAdapter extends BaseAdapter {
+public class AccountResultAdapter extends BaseAdapter implements OnClickListener {
+
+    public interface OnAccountMessagesSelectedListener {
+        void onAccountMessagesSelected(String accountName);
+    }
 
     public static class Item {
 
@@ -70,11 +75,13 @@ public class AccountResultAdapter extends BaseAdapter {
     private final ArrayList<Item> items = new ArrayList<Item>();
     private final Context context;
     private final LayoutInflater inflater;
+    private final OnAccountMessagesSelectedListener listener;
     private String selectedAccountName;
 
-    public AccountResultAdapter(Context context) {
+    public AccountResultAdapter(Context context, OnAccountMessagesSelectedListener listener) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
+        this.listener = listener;
     }
 
     public void setSelectedAccountName(String accountName) {
@@ -143,7 +150,7 @@ public class AccountResultAdapter extends BaseAdapter {
 
     static class ViewHolder {
         TextView accountFilter;
-        ImageView statusIcon;
+        ImageButton statusButton;
         View karmaCounts;
         TextView linkKarma;
         TextView commentKarma;
@@ -156,7 +163,7 @@ public class AccountResultAdapter extends BaseAdapter {
             v = inflater.inflate(R.layout.account_row, parent, false);
             ViewHolder vh = new ViewHolder();
             vh.accountFilter = (TextView) v.findViewById(R.id.account_filter);
-            vh.statusIcon = (ImageView) v.findViewById(R.id.status_icon);
+            vh.statusButton = (ImageButton) v.findViewById(R.id.status_button);
             vh.karmaCounts = v.findViewById(R.id.karma_counts);
             vh.linkKarma = (TextView) v.findViewById(R.id.link_karma);
             vh.commentKarma = (TextView) v.findViewById(R.id.comment_karma);
@@ -175,9 +182,11 @@ public class AccountResultAdapter extends BaseAdapter {
                 vh.accountFilter.setVisibility(View.VISIBLE);
                 vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
-                vh.statusIcon.setVisibility(item.value == 1 ? View.VISIBLE : View.GONE);
-                vh.karmaCounts.setVisibility(View.VISIBLE);
+                vh.statusButton.setVisibility(item.value == 1 ? View.VISIBLE : View.GONE);
+                vh.statusButton.setTag(item.text1);
+                vh.statusButton.setOnClickListener(this);
 
+                vh.karmaCounts.setVisibility(View.VISIBLE);
                 vh.linkKarma.setText(item.text2);
                 vh.commentKarma.setText(item.text3);
 
@@ -189,6 +198,14 @@ public class AccountResultAdapter extends BaseAdapter {
 
             default:
                 throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (listener != null) {
+            String accountName = (String) v.getTag();
+            listener.onAccountMessagesSelected(accountName);
         }
     }
 }

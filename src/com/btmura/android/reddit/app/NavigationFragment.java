@@ -50,6 +50,7 @@ import com.btmura.android.reddit.widget.AccountPlaceAdapter;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter.OnPlaceSelectedListener;
 import com.btmura.android.reddit.widget.AccountResultAdapter;
 import com.btmura.android.reddit.widget.AccountResultAdapter.Item;
+import com.btmura.android.reddit.widget.AccountResultAdapter.OnAccountMessagesSelectedListener;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
@@ -57,6 +58,7 @@ import com.btmura.android.reddit.widget.MergeAdapter;
 public class NavigationFragment extends ListFragment implements
         LeftFragment,
         LoaderCallbacks<AccountResult>,
+        OnAccountMessagesSelectedListener,
         OnPlaceSelectedListener,
         MultiChoiceModeListener {
 
@@ -119,7 +121,7 @@ public class NavigationFragment extends ListFragment implements
         if (savedInstanceState != null) {
             accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
         }
-        accountAdapter = new AccountResultAdapter(getActivity());
+        accountAdapter = new AccountResultAdapter(getActivity(), this);
         placesAdapter = new AccountPlaceAdapter(getActivity(), this);
         subredditAdapter = AccountSubredditAdapter.newAccountInstance(getActivity());
         mergeAdapter = new MergeAdapter(accountAdapter, placesAdapter, subredditAdapter);
@@ -276,6 +278,11 @@ public class NavigationFragment extends ListFragment implements
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
         selectPlace(PLACE_SUBREDDIT, subreddit, filter, true);
+    }
+
+    @Override
+    public void onAccountMessagesSelected(String accountName) {
+        selectPlaceWithDefaultFilter(PLACE_MESSAGES);
     }
 
     @Override
