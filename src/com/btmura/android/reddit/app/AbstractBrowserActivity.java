@@ -412,17 +412,17 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private <F extends Fragment & RightFragment>
             void setCenterFragment(int containerId, ControlFragment controlFrag, F centerFrag,
                     boolean force) {
-        setRightFragment(containerId, controlFrag, centerFrag, true);
+        setRightFragmentRemoveLeft(containerId, controlFrag, centerFrag, force, true);
     }
 
     private <F extends Fragment & RightFragment>
             void setRightFragment(int containerId, ControlFragment controlFrag, F rightFrag,
                     boolean force) {
-        setRightFragment(containerId, controlFrag, rightFrag, force, false);
+        setRightFragmentRemoveLeft(containerId, controlFrag, rightFrag, force, false);
     }
 
     private <F extends Fragment & RightFragment>
-            void setRightFragment(int containerId, ControlFragment controlFrag,
+            void setRightFragmentRemoveLeft(int containerId, ControlFragment controlFrag,
                     F rightFrag, boolean force, boolean removeLeft) {
         if (force || !Objects.fragmentEquals(rightFrag, getRightFragment())) {
             safePopBackStackImmediate();
