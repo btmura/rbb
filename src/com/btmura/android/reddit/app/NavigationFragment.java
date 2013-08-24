@@ -206,11 +206,7 @@ public class NavigationFragment extends ListFragment implements
 
     private void handleAccountClick(int position) {
         Item item = accountAdapter.getItem(position);
-        switch (item.getType()) {
-            case Item.TYPE_ACCOUNT_NAME:
-                selectAccount(item.getAccountName(), true);
-                break;
-        }
+        selectAccount(item.getAccountName(), true);
     }
 
     private void selectPlaceWithDefaultFilter(int place) {

@@ -40,35 +40,20 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
 
     public static class Item {
 
-        static final int NUM_TYPES = 1;
+        private final String accountName;
+        private final String linkKarma;
+        private final String commentKarma;
+        private final boolean hasMail;
 
-        public static final int TYPE_ACCOUNT_NAME = 0;
-
-        private final int type;
-        private final String text1;
-        private final String text2;
-        private final String text3;
-        private final int value;
-
-        static Item newAccount(Context context, String name, String linkKarma,
-                String commentKarma, int hasMail) {
-            return new Item(TYPE_ACCOUNT_NAME, name, linkKarma, commentKarma, hasMail);
-        }
-
-        private Item(int type, String text1, String text2, String text3, int value) {
-            this.type = type;
-            this.text1 = text1;
-            this.text2 = text2;
-            this.text3 = text3;
-            this.value = value;
-        }
-
-        public int getType() {
-            return type;
+        private Item(String accountName, String linkKarma, String commentKarma, boolean hasMail) {
+            this.accountName = accountName;
+            this.linkKarma = linkKarma;
+            this.commentKarma = commentKarma;
+            this.hasMail = hasMail;
         }
 
         public String getAccountName() {
-            return text1;
+            return accountName;
         }
     }
 
@@ -94,10 +79,10 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
         if (result.accountNames != null && result.accountNames.length > 1) {
             int count = result.accountNames.length;
             for (int i = 0; i < count; i++) {
-                String text2 = getKarmaCount(result.linkKarma, i);
-                String text3 = getKarmaCount(result.commentKarma, i);
-                int value = result.hasMail != null && result.hasMail[i] ? 1 : 0;
-                addItem(Item.newAccount(context, result.accountNames[i], text2, text3, value));
+                String linkKarma = getKarmaCount(result.linkKarma, i);
+                String commentKarma = getKarmaCount(result.commentKarma, i);
+                boolean hasMail = getHasMail(result.hasMail, i);
+                add(result.accountNames[i], linkKarma, commentKarma, hasMail);
             }
         }
         notifyDataSetChanged();
@@ -110,37 +95,33 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
         return null;
     }
 
-    private void addItem(Item item) {
-        items.add(item);
+    private boolean getHasMail(boolean[] hasMail, int index) {
+        return hasMail != null && hasMail[index];
+    }
+
+    private void add(String accountName, String linkKarma, String commentKarma, boolean hasMail) {
+        items.add(new Item(accountName, linkKarma, commentKarma, hasMail));
     }
 
     public int findAccountName(String accountName) {
         int count = items.size();
         for (int i = 0; i < count; i++) {
             Item item = getItem(i);
-            if (item.type == Item.TYPE_ACCOUNT_NAME && accountName.equals(item.text1)) {
+            if (accountName.equals(item.accountName)) {
                 return i;
             }
         }
         return -1;
     }
 
+    @Override
     public Item getItem(int position) {
         return items.get(position);
     }
 
+    @Override
     public long getItemId(int position) {
         return position;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return getItem(position).type;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return Item.NUM_TYPES;
     }
 
     @Override
@@ -150,8 +131,7 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
 
     static class ViewHolder {
         TextView accountFilter;
-        ImageButton statusButton;
-        View karmaCounts;
+        ImageButton messagesButton;
         TextView linkKarma;
         TextView commentKarma;
     }
@@ -162,9 +142,8 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
         if (v == null) {
             v = inflater.inflate(R.layout.account_row, parent, false);
             ViewHolder vh = new ViewHolder();
-            vh.accountFilter = (TextView) v.findViewById(R.id.account_filter);
-            vh.statusButton = (ImageButton) v.findViewById(R.id.status_button);
-            vh.karmaCounts = v.findViewById(R.id.karma_counts);
+            vh.accountFilter = (TextView) v.findViewById(R.id.account_name);
+            vh.messagesButton = (ImageButton) v.findViewById(R.id.messages_button);
             vh.linkKarma = (TextView) v.findViewById(R.id.link_karma);
             vh.commentKarma = (TextView) v.findViewById(R.id.comment_karma);
             v.setTag(vh);
@@ -174,31 +153,23 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
     }
 
     private void setView(View view, int position) {
-        ViewHolder vh = (ViewHolder) view.getTag();
         Item item = getItem(position);
-        switch (item.type) {
-            case Item.TYPE_ACCOUNT_NAME:
-                vh.accountFilter.setText(Accounts.getTitle(context, item.text1));
-                vh.accountFilter.setVisibility(View.VISIBLE);
-                vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
-                vh.statusButton.setVisibility(item.value == 1 ? View.VISIBLE : View.GONE);
-                vh.statusButton.setTag(item.text1);
-                vh.statusButton.setOnClickListener(this);
+        ViewHolder vh = (ViewHolder) view.getTag();
+        vh.accountFilter.setText(Accounts.getTitle(context, item.accountName));
+        vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
-                vh.karmaCounts.setVisibility(View.VISIBLE);
-                vh.linkKarma.setText(item.text2);
-                vh.commentKarma.setText(item.text3);
+        vh.messagesButton.setVisibility(item.hasMail ? View.VISIBLE : View.GONE);
+        vh.messagesButton.setTag(item.accountName);
+        vh.messagesButton.setOnClickListener(this);
 
-                boolean activated = Objects.equals(selectedAccountName, item.text1);
-                vh.accountFilter.setActivated(activated);
-                vh.linkKarma.setActivated(activated);
-                vh.commentKarma.setActivated(activated);
-                break;
+        vh.linkKarma.setText(item.linkKarma);
+        vh.commentKarma.setText(item.commentKarma);
 
-            default:
-                throw new IllegalArgumentException();
-        }
+        boolean activated = Objects.equals(selectedAccountName, item.accountName);
+        vh.accountFilter.setActivated(activated);
+        vh.linkKarma.setActivated(activated);
+        vh.commentKarma.setActivated(activated);
     }
 
     @Override

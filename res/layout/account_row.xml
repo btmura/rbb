@@ -23,7 +23,7 @@
     android:orientation="horizontal" >
 
     <TextView
-        android:id="@+id/account_filter"
+        android:id="@+id/account_name"
         style="@android:style/TextAppearance.Holo.Widget.TextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -35,19 +35,16 @@
         android:textColor="?attr/primary_activatable_text"
         tools:ignore="SelectableText" />
 
-    <!-- TODO: Fix content description and id to reflect mail meanning. -->
-
     <ImageButton
-        android:id="@+id/status_button"
+        android:id="@+id/messages_button"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:contentDescription="@string/content_desc_status"
+        android:contentDescription="@string/content_desc_new_messages"
         android:src="?attr/menu_messages_icon" />
 
     <LinearLayout
-        android:id="@+id/karma_counts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"

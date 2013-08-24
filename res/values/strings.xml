@@ -41,7 +41,7 @@
     <string name="compose_text">TEXT</string>
     <string name="content_browser">Content providers</string>
     <string name="content_desc_header">Header</string>
-    <string name="content_desc_status">Status</string>
+    <string name="content_desc_new_messages">New messages</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="empty_accounts">You have no accounts.</string>
