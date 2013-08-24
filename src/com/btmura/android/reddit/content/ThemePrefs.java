@@ -44,11 +44,6 @@ public class ThemePrefs extends Prefs {
                 R.drawable.ic_drawer_dark);
     }
 
-    public static final int getDrawerShadow(Context context) {
-        return pick(context, R.drawable.drawer_shadow_light,
-                R.drawable.drawer_shadow_dark);
-    }
-
     public static final void switchTheme(Context context) {
         // TODO: Check the current theme rather than using preferences.
         int otherTheme = pick(context, THEME_DARK, THEME_LIGHT);

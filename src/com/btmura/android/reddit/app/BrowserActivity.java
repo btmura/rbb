@@ -108,7 +108,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
                         R.string.drawer_open,
                         R.string.drawer_close);
                 drawerLayout.setDrawerListener(drawerToggle);
-                drawerLayout.setDrawerShadow(ThemePrefs.getDrawerShadow(this), GravityCompat.START);
+                drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
                 bar.setHomeButtonEnabled(true);
                 bar.setDisplayHomeAsUpEnabled(true);
             }
