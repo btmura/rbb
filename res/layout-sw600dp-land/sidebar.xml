@@ -15,6 +15,7 @@
      limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:baselineAligned="false"
@@ -31,7 +32,8 @@
             android:id="@+id/left_container"
             android:layout_width="@dimen/left_width"
             android:layout_height="match_parent"
-            android:paddingRight="@dimen/padding" />
+            android:paddingRight="@dimen/padding"
+            tools:ignore="InconsistentLayout" />
 
         <FrameLayout
             android:id="@+id/right_container"

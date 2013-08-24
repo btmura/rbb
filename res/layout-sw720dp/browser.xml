@@ -41,7 +41,8 @@
             android:layout_width="@dimen/left_width"
             android:layout_height="match_parent"
             android:paddingLeft="@dimen/element_padding"
-            android:paddingRight="@dimen/element_padding" />
+            android:paddingRight="@dimen/element_padding"
+            tools:ignore="InconsistentLayout" />
 
         <FrameLayout
             android:id="@+id/right_container"
