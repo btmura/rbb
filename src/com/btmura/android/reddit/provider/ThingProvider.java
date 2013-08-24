@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
@@ -188,19 +189,11 @@ public class ThingProvider extends BaseProvider {
             + ReadActions.COLUMN_ACCOUNT + ", "
             + SharedColumns.COLUMN_THING_ID + ")";
 
-    /** Method to create a listing session of some kind. */
     private static final String METHOD_GET_SESSION = "getSession";
-
-    /** Method to collapse a comment in a listing session. */
+    private static final String METHOD_CLEAN_SESSIONS = "cleanSessions";
     private static final String METHOD_COLLAPSE_COMMENT = "collapseComment";
-
-    /** Method to expand a comment in a listing session. */
     private static final String METHOD_EXPAND_COMMENT = "expandComment";
-
-    /** Method to insert a pending comment in a listing. */
     private static final String METHOD_INSERT_COMMENT = "insertComment";
-
-    /** Method to insert a pending message in a listing. */
     private static final String METHOD_INSERT_MESSAGE = "insertMessage";
 
     // List of extras used throughout the provider code.
@@ -261,10 +254,6 @@ public class ThingProvider extends BaseProvider {
     private static final String UPDATE_SEQUENCE_STATEMENT = "UPDATE " + Comments.TABLE_NAME
             + " SET " + Comments.COLUMN_SEQUENCE + "=" + Comments.COLUMN_SEQUENCE + "+1"
             + " WHERE " + Comments.COLUMN_SESSION_ID + "=? AND " + Comments.COLUMN_SEQUENCE + ">=?";
-
-    private static final String UPDATE_NUM_COMMENTS_STATEMENT = "UPDATE " + Comments.TABLE_NAME
-            + " SET " + Comments.COLUMN_NUM_COMMENTS + "=" + Comments.COLUMN_NUM_COMMENTS + "+1"
-            + " WHERE " + Comments._ID + "=?";
 
     private static final String SELECT_MORE_WITH_SESSION_ID = Kinds.COLUMN_KIND + "="
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
@@ -348,6 +337,10 @@ public class ThingProvider extends BaseProvider {
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
         return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
+    }
+
+    public static final Bundle cleanSessions(Context context) {
+        return call(context, THINGS_URI, METHOD_CLEAN_SESSIONS, null, null);
     }
 
     public static final void expandComment(Context context, long id, long sessionId) {
@@ -460,6 +453,8 @@ public class ThingProvider extends BaseProvider {
         try {
             if (METHOD_GET_SESSION.equals(method)) {
                 return getSession(arg, extras);
+            } else if (METHOD_CLEAN_SESSIONS.equals(method)) {
+                return cleanSessions();
             } else if (METHOD_COLLAPSE_COMMENT.equals(method)) {
                 return collapseComment(extras);
             } else if (METHOD_EXPAND_COMMENT.equals(method)) {
@@ -565,6 +560,7 @@ public class ThingProvider extends BaseProvider {
 
         // TODO(btmura): Do this while getting values over network.
         if (needsCleaning.getAndSet(false)) {
+            getContext().startService(new Intent(getContext(), SessionCleanerService.class));
             cleanSessions();
         }
 

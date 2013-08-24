@@ -212,6 +212,7 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/thing_sync_adapter" />
         </service>
+        <service android:name=".provider.SessionCleanerService" />
 
         <meta-data
             android:name="com.google.android.backup.api_key"
