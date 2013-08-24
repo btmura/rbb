@@ -73,7 +73,7 @@ public class SidebarFragment extends ListFragment
 
     @Override
     public Loader<SidebarResult> onCreateLoader(int id, Bundle args) {
-        return new SidebarLoader(getActivity().getApplicationContext(), getSubredditArgument());
+        return new SidebarLoader(getActivity().getApplicationContext(), getSubreddit());
     }
 
     @Override
@@ -90,7 +90,7 @@ public class SidebarFragment extends ListFragment
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        MenuHelper.startSubredditActivity(getActivity(), getSubredditArgument());
+        MenuHelper.startSubredditActivity(getActivity(), getSubreddit());
     }
 
     @Override
@@ -116,8 +116,13 @@ public class SidebarFragment extends ListFragment
                 handleCopyUrl();
                 return true;
 
+            case R.id.menu_add_subreddit:
+                handleAddSubreddit();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     private void handleCopyUrl() {
@@ -125,14 +130,18 @@ public class SidebarFragment extends ListFragment
     }
 
     private String getClipLabel() {
-        return getSubredditArgument();
+        return getSubreddit();
     }
 
     private CharSequence getClipText() {
-        return Urls.subreddit(getSubredditArgument(), -1, null, Urls.TYPE_HTML);
+        return Urls.subreddit(getSubreddit(), -1, null, Urls.TYPE_HTML);
     }
 
-    private String getSubredditArgument() {
+    private void handleAddSubreddit() {
+        MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
+    }
+
+    private String getSubreddit() {
         return getArguments().getString(EXTRA_SUBREDDIT);
     }
 }
