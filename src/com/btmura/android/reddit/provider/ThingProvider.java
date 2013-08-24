@@ -755,7 +755,6 @@ public class ThingProvider extends BaseProvider {
         String thingId = getThingIdExtra(extras);
 
         SQLiteDatabase db = helper.getWritableDatabase();
-        SQLiteStatement updateNumComments = db.compileStatement(UPDATE_NUM_COMMENTS_STATEMENT);
         SQLiteStatement updateSequence = db.compileStatement(UPDATE_SEQUENCE_STATEMENT);
         db.beginTransaction();
         try {
@@ -814,10 +813,6 @@ public class ThingProvider extends BaseProvider {
                     } finally {
                         c.close();
                     }
-
-                    // Update the number of comments in the header comment.
-                    updateNumComments.bindLong(1, headerDbId);
-                    updateNumComments.executeUpdateDelete();
 
                     // Increment the sequence numbers to make room for our comment
                     updateSequence.bindLong(1, sessionId);
