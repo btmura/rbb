@@ -42,6 +42,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
         <item name="nesting_line_color">@android:color/holo_blue_dark</item>
+        <item name="next_icon">@drawable/ic_next_light</item>
         <item name="primary_activatable_text">@color/primary_activatable_text_light</item>
     </style>
 
@@ -61,6 +62,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
         <item name="nesting_line_color">@android:color/holo_blue_dark</item>
+        <item name="next_icon">@drawable/ic_next_light</item>
         <item name="primary_activatable_text">@color/primary_activatable_text_light</item>
     </style>
 
@@ -80,6 +82,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_light</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_light</item>
         <item name="nesting_line_color">@android:color/holo_blue_dark</item>
+        <item name="next_icon">@drawable/ic_next_light</item>
         <item name="primary_activatable_text">@color/primary_activatable_text_light</item>
     </style>
 
@@ -99,6 +102,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
         <item name="nesting_line_color">@android:color/holo_blue_bright</item>
+        <item name="next_icon">@drawable/ic_next_dark</item>
         <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
     </style>
 
@@ -118,6 +122,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
         <item name="nesting_line_color">@android:color/holo_blue_bright</item>
+        <item name="next_icon">@drawable/ic_next_dark</item>
         <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
     </style>
 
@@ -137,6 +142,7 @@
         <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
         <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
         <item name="nesting_line_color">@android:color/holo_blue_bright</item>
+        <item name="next_icon">@drawable/ic_next_dark</item>
         <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
     </style>
 
