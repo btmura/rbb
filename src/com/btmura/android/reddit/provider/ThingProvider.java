@@ -559,12 +559,13 @@ public class ThingProvider extends BaseProvider {
             return sessionId;
         }
 
-        // Get new values over the network.
-        ArrayList<ContentValues> values = listing.getValues();
-
+        // Start cleaning service on separate thread before doing the network call.
         if (needsCleaning.getAndSet(false)) {
             getContext().startService(new Intent(getContext(), SessionCleanerService.class));
         }
+
+        // Get new values over the network.
+        ArrayList<ContentValues> values = listing.getValues();
 
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
