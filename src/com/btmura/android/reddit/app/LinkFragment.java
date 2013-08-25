@@ -47,6 +47,10 @@ public class LinkFragment extends Fragment {
     private static final Pattern PATTERN_IMAGE = Pattern.compile(".*\\.(jpg|png|gif)$",
             Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
+    // Use Nexus S JB-MR0 desktop mode user agent to get around redirect issues in 4.3.
+    private static final String USER_AGENT = "Mozilla/5.0 (X11;Linux x86_64) "
+            + "AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.34 Safari/534.24";
+
     private WebView webView;
     private ProgressBar progress;
 
@@ -78,6 +82,7 @@ public class LinkFragment extends Fragment {
         settings.setSupportZoom(true);
         settings.setPluginState(PluginState.ON_DEMAND);
         settings.setUseWideViewPort(true);
+        settings.setUserAgentString(USER_AGENT);
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -111,6 +116,10 @@ public class LinkFragment extends Fragment {
         } else {
             url = getUrlArgument();
         }
+        loadUrl(url);
+    }
+
+    private void loadUrl(String url) {
         if (PATTERN_IMAGE.matcher(url).matches()) {
             String img = String.format("<img src=\"%s\" width=\"100%%\" />", url);
             webView.loadData(img, "text/html", null);
