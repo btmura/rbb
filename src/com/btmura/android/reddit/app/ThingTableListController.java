@@ -39,7 +39,7 @@ abstract class ThingTableListController
     static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
     protected final Context context;
-    protected final ThingListAdapter adapter;
+    private final ThingListAdapter adapter;
 
     private final String accountName;
     private int filter;
@@ -50,7 +50,9 @@ abstract class ThingTableListController
         this.context = context;
         this.accountName = getAccountNameExtra(args);
         this.filter = getFilterExtra(args);
-        this.adapter = new ThingListAdapter(context, accountName, listener,
+        this.adapter = new ThingListAdapter(context,
+                accountName,
+                listener,
                 getSingleChoiceExtra(args));
         restoreInstanceState(args);
     }
@@ -195,7 +197,7 @@ abstract class ThingTableListController
         return extras.getString(EXTRA_SUBREDDIT);
     }
 
-    private static int getFilterExtra(Bundle extras) {
+    protected static int getFilterExtra(Bundle extras) {
         return extras.getInt(EXTRA_FILTER);
     }
 

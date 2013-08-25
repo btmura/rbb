@@ -32,7 +32,16 @@ class SubredditThingListController extends ThingTableListController {
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new SubredditThingLoader(context, getAccountName(), getSubreddit(), getFilter(),
-                getMoreId(), getCursorExtras());
+        return new SubredditThingLoader(context,
+                getAccountName(),
+                getSubreddit(),
+                getFilter(),
+                getMoreId(),
+                getCursorExtras());
+    }
+
+    @Override
+    public int getSwipeAction() {
+        return SWIPE_ACTION_HIDE;
     }
 }

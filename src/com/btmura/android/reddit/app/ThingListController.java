@@ -20,6 +20,10 @@ import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 
 interface ThingListController<A extends AbstractThingListAdapter> extends Controller<A> {
 
+    static final int SWIPE_ACTION_NONE = 0;
+    static final int SWIPE_ACTION_HIDE = 1;
+    static final int SWIPE_ACTION_UNHIDE = 2;
+
     ThingBundle getThingBundle(int position);
 
     void onThingSelected(int position);
@@ -41,6 +45,8 @@ interface ThingListController<A extends AbstractThingListAdapter> extends Contro
     boolean hasNextMoreId();
 
     boolean isSingleChoice();
+
+    int getSwipeAction();
 
     // Setters.
 

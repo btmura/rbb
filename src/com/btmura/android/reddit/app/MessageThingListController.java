@@ -143,6 +143,11 @@ class MessageThingListController implements ThingListController<MessageListAdapt
         return adapter.isSingleChoice();
     }
 
+    @Override
+    public int getSwipeAction() {
+        return SWIPE_ACTION_NONE;
+    }
+
     // Simple setters.
 
     @Override

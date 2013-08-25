@@ -183,12 +183,12 @@ public class MessageThingActionModeController implements ThingActionModeControll
     }
 
     @Override
-    public boolean isHidable(int position) {
+    public boolean isSwipeable(int position) {
         return false;
     }
 
     @Override
-    public void hide(int position, boolean hide) {
+    public void swipe(int position) {
     }
 
     @Override

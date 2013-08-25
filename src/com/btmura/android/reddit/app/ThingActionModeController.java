@@ -19,9 +19,9 @@ package com.btmura.android.reddit.app;
 
 interface ThingActionModeController extends ActionModeController {
 
-    boolean isHidable(int position);
+    boolean isSwipeable(int position);
 
-    void hide(int position, boolean hide);
+    void swipe(int position);
 
     void vote(int position, int action);
 

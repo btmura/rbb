@@ -218,12 +218,12 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
 
     @Override
     public boolean isSwipeDismissable(int position) {
-        return actionModeController.isHidable(position);
+        return actionModeController.isSwipeable(position);
     }
 
     @Override
     public void onSwipeDismiss(ListView listView, View view, int position) {
-        actionModeController.hide(position, true);
+        actionModeController.swipe(position);
     }
 
     public void onVote(View v, int action) {

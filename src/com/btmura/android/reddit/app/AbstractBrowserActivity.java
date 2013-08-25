@@ -357,11 +357,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private void setThingFragment(ControlFragment controlFrag) {
         safePopBackStackImmediate();
 
-        ThingFragment thingFrag =
-                ThingFragment.newInstance(accountName, controlFrag.getThingBundle());
+        ThingFragment frag = ThingFragment.newInstance(accountName, controlFrag.getThingBundle());
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(controlFrag, TAG_CONTROL_FRAGMENT);
-        ft.replace(R.id.thing_container, thingFrag, TAG_THING_FRAGMENT);
+        ft.replace(R.id.thing_container, frag, TAG_THING_FRAGMENT);
         ft.addToBackStack(null);
         ft.commitAllowingStateLoss();
     }

@@ -22,31 +22,53 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.content.ProfileThingLoader;
+import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
 class ProfileThingListController extends ThingTableListController {
 
-    /** String argument specifying the profileUser profile to load. */
     static final String EXTRA_PROFILE_USER = "profileUser";
+    static final String EXTRA_FILTER = "filter";
 
     private final String profileUser;
+    private final int swipeAction;
 
     ProfileThingListController(Context context, Bundle args, OnVoteListener listener) {
         super(context, args, listener);
         this.profileUser = getProfileUserExtra(args);
+        this.swipeAction = getSwipeActionExtra(args);
     }
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new ProfileThingLoader(context, getAccountName(), profileUser, getFilter(),
-                getMoreId(), getCursorExtras());
+        return new ProfileThingLoader(context,
+                getAccountName(),
+                profileUser,
+                getFilter(),
+                getMoreId(),
+                getCursorExtras());
     }
 
     public String getProfileUser() {
         return profileUser;
     }
 
+    @Override
+    public int getSwipeAction() {
+        return swipeAction;
+    }
+
     private String getProfileUserExtra(Bundle extras) {
         return extras.getString(EXTRA_PROFILE_USER);
+    }
+
+    private int getSwipeActionExtra(Bundle extras) {
+        switch (getFilterExtra(extras)) {
+            case FilterAdapter.PROFILE_HIDDEN:
+                return SWIPE_ACTION_UNHIDE;
+
+            default:
+                return SWIPE_ACTION_NONE;
+        }
     }
 }

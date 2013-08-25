@@ -46,7 +46,7 @@ abstract class ThingTableListFragment<C extends ThingListController<?>>
     protected ThingTableActionModeController createActionModeController(C controller) {
         return new ThingTableActionModeController(getActivity(),
                 controller.getAccountName(),
+                controller.getSwipeAction(),
                 controller.getAdapter());
     }
-
 }

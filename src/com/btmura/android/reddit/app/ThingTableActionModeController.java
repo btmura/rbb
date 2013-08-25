@@ -41,14 +41,17 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
 
     private final Context context;
     private final String accountName;
+    private final int swipeAction;
     private final AbstractThingListAdapter adapter;
     private ActionMode actionMode;
 
     ThingTableActionModeController(Context context,
             String accountName,
+            int swipeAction,
             AbstractThingListAdapter adapter) {
         this.context = context;
         this.accountName = accountName;
+        this.swipeAction = swipeAction;
         this.adapter = adapter;
     }
 
@@ -248,7 +251,8 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
     private void handleSave(ListView listView, boolean save) {
         int position = ListViewUtils.getFirstCheckedPosition(listView);
         if (save) {
-            Provider.saveAsync(context, accountName,
+            Provider.saveAsync(context,
+                    accountName,
                     getAuthor(position),
                     getCreatedUtc(position),
                     getDomain(position),
@@ -302,14 +306,28 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
     }
 
     @Override
-    public boolean isHidable(int position) {
-        return isHidable(context, position, true);
+    public boolean isSwipeable(int position) {
+        switch (swipeAction) {
+            case ThingListController.SWIPE_ACTION_HIDE:
+            case ThingListController.SWIPE_ACTION_UNHIDE:
+                return isHidable(context,
+                        position,
+                        swipeAction == ThingListController.SWIPE_ACTION_HIDE);
+
+            default:
+                return false;
+        }
     }
 
     @Override
-    public void hide(int position, boolean hide) {
+    public void swipe(int position) {
+        hide(position, swipeAction == ThingListController.SWIPE_ACTION_HIDE);
+    }
+
+    private void hide(int position, boolean hide) {
         if (hide) {
-            Provider.hideAsync(context, accountName,
+            Provider.hideAsync(context,
+                    accountName,
                     getAuthor(position),
                     getCreatedUtc(position),
                     getDomain(position),
@@ -333,7 +351,9 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
 
     @Override
     public void vote(int position, int action) {
-        Provider.voteAsync(context, accountName, action,
+        Provider.voteAsync(context,
+                accountName,
+                action,
                 getAuthor(position),
                 getCreatedUtc(position),
                 getDomain(position),

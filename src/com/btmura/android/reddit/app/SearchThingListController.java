@@ -38,8 +38,12 @@ class SearchThingListController extends ThingTableListController {
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new SearchThingLoader(context, getAccountName(), getSubreddit(), getQuery(),
-                getMoreId(), getCursorExtras());
+        return new SearchThingLoader(context,
+                getAccountName(),
+                getSubreddit(),
+                getQuery(),
+                getMoreId(),
+                getCursorExtras());
     }
 
     @Override
@@ -47,7 +51,7 @@ class SearchThingListController extends ThingTableListController {
         super.restoreInstanceState(state);
         state = Objects.nullToEmpty(state);
         if (state.containsKey(EXTRA_QUERY)) {
-            setQuery(state.getString(EXTRA_QUERY));
+            query = state.getString(EXTRA_QUERY);
         }
     }
 
@@ -57,12 +61,13 @@ class SearchThingListController extends ThingTableListController {
         state.putString(EXTRA_QUERY, query);
     }
 
-    private void setQuery(String query) {
-        this.query = query;
-    }
-
     @Override
     public String getQuery() {
         return query;
+    }
+
+    @Override
+    public int getSwipeAction() {
+        return SWIPE_ACTION_HIDE;
     }
 }
