@@ -22,7 +22,7 @@
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="17" />
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
