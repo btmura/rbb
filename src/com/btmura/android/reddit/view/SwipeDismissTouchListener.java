@@ -18,6 +18,7 @@ package com.btmura.android.reddit.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.res.Resources;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -26,6 +27,8 @@ import android.view.ViewConfiguration;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
+
+import com.btmura.android.reddit.R;
 
 /**
  * {@link OnTouchListener} for a {@link ListView} that has swipable views. {@link ListView}
@@ -40,6 +43,7 @@ public class SwipeDismissTouchListener implements OnTouchListener {
     private final int minFlingVelocity;
     private final int maxFlingVelocity;
     private final int animationTime;
+    private final int requiredFlingDistance;
     private final ListView listView;
     private final OnSwipeDismissListener dismissListener;
 
@@ -62,8 +66,11 @@ public class SwipeDismissTouchListener implements OnTouchListener {
         this.touchSlop = vc.getScaledTouchSlop();
         this.minFlingVelocity = vc.getScaledMinimumFlingVelocity();
         this.maxFlingVelocity = vc.getScaledMaximumFlingVelocity();
-        this.animationTime = listView.getResources()
-                .getInteger(android.R.integer.config_shortAnimTime);
+
+        Resources r = listView.getResources();
+        this.animationTime = r.getInteger(android.R.integer.config_shortAnimTime);
+        this.requiredFlingDistance = r.getDimensionPixelSize(R.dimen.required_fling_distance);
+
         this.listView = listView;
         this.dismissListener = dismissListener;
     }
@@ -182,7 +189,8 @@ public class SwipeDismissTouchListener implements OnTouchListener {
             if (Math.abs(deltaX) > downView.getWidth() / 2) {
                 dismiss = true;
                 dismissRight = deltaX > 0;
-            } else if (Math.abs(vx) >= minFlingVelocity
+            } else if (Math.abs(deltaX) > requiredFlingDistance
+                    && Math.abs(vx) >= minFlingVelocity
                     && Math.abs(vx) <= maxFlingVelocity
                     && Math.abs(vy) < Math.abs(vx)) {
                 dismiss = true;
