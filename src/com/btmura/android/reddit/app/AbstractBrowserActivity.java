@@ -355,6 +355,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     private void setThingFragment(ControlFragment controlFrag) {
+        safePopBackStackImmediate();
+
         ThingFragment thingFrag =
                 ThingFragment.newInstance(accountName, controlFrag.getThingBundle());
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -396,6 +398,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             void setLeftFragment(int containerId, ControlFragment controlFrag, F frag) {
         if (!Objects.fragmentEquals(frag, getLeftFragment())) {
             safePopBackStackImmediate();
+
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(controlFrag, TAG_CONTROL_FRAGMENT);
             ft.replace(containerId, frag, TAG_LEFT_FRAGMENT);
