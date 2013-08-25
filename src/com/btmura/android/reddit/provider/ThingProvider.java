@@ -227,6 +227,10 @@ public class ThingProvider extends BaseProvider {
     private static final int CLEAN_INDEX_ID = 0;
     private static final int CLEAN_INDEX_TYPE = 1;
 
+    private static final String CLEAN_SORT = Sessions._ID + " DESC";
+
+    private static final String CLEAN_OFFSET_LIMIT = "25, 1000"; // offset, limit
+
     private static final String[] EXPAND_PROJECTION = {
             Comments._ID,
             Comments.COLUMN_EXPANDED,
@@ -558,10 +562,8 @@ public class ThingProvider extends BaseProvider {
         // Get new values over the network.
         ArrayList<ContentValues> values = listing.getValues();
 
-        // TODO(btmura): Do this while getting values over network.
         if (needsCleaning.getAndSet(false)) {
             getContext().startService(new Intent(getContext(), SessionCleanerService.class));
-            cleanSessions();
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -619,10 +621,11 @@ public class ThingProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
-
-            Cursor cursor = db.query(Sessions.TABLE_NAME, CLEAN_PROJECTION,
-                    Sessions.SELECT_BY_TIMESTAMP, Array.of(System.currentTimeMillis()),
-                    null, null, null);
+            Cursor cursor = db.query(Sessions.TABLE_NAME,
+                    CLEAN_PROJECTION,
+                    null, null, null, null,
+                    CLEAN_SORT,
+                    CLEAN_OFFSET_LIMIT);
             while (cursor.moveToNext()) {
                 long sessionId = cursor.getLong(CLEAN_INDEX_ID);
                 int type = cursor.getInt(CLEAN_INDEX_TYPE);
@@ -657,9 +660,10 @@ public class ThingProvider extends BaseProvider {
                 int count = db.delete(tableName, SharedColumns.SELECT_BY_SESSION_ID, selectionArgs);
                 int count2 = db.delete(Sessions.TABLE_NAME, Sessions.SELECT_BY_ID, selectionArgs);
                 if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "session type: " + type
-                            + " " + tableName + ": " + count
-                            + " sessions: " + count2);
+                    Log.d(TAG, "session id: " + sessionId
+                            + " type: " + type
+                            + " table: " + tableName
+                            + " deleted: " + count2 + "," + count);
                 }
             }
             cursor.close();
