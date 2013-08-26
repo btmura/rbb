@@ -27,8 +27,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="@dimen/padding"
-        android:background="@android:color/white"
+        android:adjustViewBounds="true"
         android:contentDescription="@string/content_desc_header"
+        android:maxWidth="@dimen/sidebar_max_header_image_width"
         android:visibility="gone" />
 
     <!-- These TextViews are clickable, so we cannot make the text selectable. -->
@@ -37,6 +38,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:layout_marginRight="@dimen/padding"
         android:layout_weight="1"
         android:orientation="vertical" >
 
