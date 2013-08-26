@@ -63,7 +63,6 @@ public class CommentListFragment extends ListFragment implements
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
         }
-        setHasOptionsMenu(true);
     }
 
     @Override

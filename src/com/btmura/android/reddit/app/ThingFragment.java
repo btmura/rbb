@@ -108,12 +108,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
 
     @Override
     public void onLoadFinished(Loader<ThingData> loader, ThingData data) {
-        // Handle the fact that onLoadFinished is called twice after orientation changes.
-        if (thingData != data) {
-            thingData = data;
-            getActivity().invalidateOptionsMenu();
-        }
-
+        thingData = data;
         if (pagerAdapter == null) {
             pagerAdapter = new ThingPagerAdapter(getActivity(), getChildFragmentManager(),
                     getAccountName(), data);
@@ -123,6 +118,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
                 listener.onThingTitleDiscovery(thingData.parent.getTitle());
             }
         }
+        getActivity().invalidateOptionsMenu();
     }
 
     @Override
@@ -353,6 +349,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
     private void setCurrentPageType(int pageType, boolean smoothScroll) {
         int position = pagerAdapter.findPageType(pageType);
         pager.setCurrentItem(position, smoothScroll);
+        getActivity().invalidateOptionsMenu();
     }
 
     private int getCurrentPageType() {
