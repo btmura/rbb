@@ -59,6 +59,10 @@ public class SearchActivity extends AbstractBrowserActivity implements
     private Tab tabSubreddits;
     private Tab tabInSubreddit;
 
+    public SearchActivity() {
+        super(SearchThingActivity.class);
+    }
+
     @Override
     protected void setContentView() {
         setTheme(ThemePrefs.getTheme(this));

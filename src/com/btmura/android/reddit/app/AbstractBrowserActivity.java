@@ -22,6 +22,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
@@ -74,6 +75,8 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         void setSelectedThing(String thingId, String linkId);
     }
 
+    private final Class<? extends Activity> thingActivityClass;
+
     protected ActionBar bar;
     protected boolean isSinglePane;
     private boolean isSingleChoice;
@@ -98,6 +101,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private String accountName;
     private int filter;
     protected DrawerLayout drawerLayout;
+
+    AbstractBrowserActivity(Class<? extends Activity> thingActivityClass) {
+        this.thingActivityClass = thingActivityClass;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -345,7 +352,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     protected void selectThingSinglePane(View view, ThingBundle thingBundle) {
-        Intent intent = new Intent(this, ThingActivity.class);
+        Intent intent = new Intent(this, thingActivityClass);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         launchActivity(view, intent);
     }

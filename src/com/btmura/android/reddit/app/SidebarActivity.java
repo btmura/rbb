@@ -52,6 +52,10 @@ public class SidebarActivity extends AbstractBrowserActivity implements
     private Tab tabDescription;
     private Tab tabRelated;
 
+    public SidebarActivity() {
+        super(SidebarThingActivity.class);
+    }
+
     @Override
     protected void setContentView() {
         setTheme(ThemePrefs.getTheme(this));

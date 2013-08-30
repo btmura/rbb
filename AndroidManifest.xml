@@ -91,6 +91,7 @@
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.SearchActivity"
+            android:launchMode="singleTop"
             tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -99,13 +100,36 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".app.SearchThingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName="com.btmura.android.reddit.app.SearchActivity"
+            android:uiOptions="splitActionBarWhenNarrow" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.btmura.android.reddit.app.SearchActivity" />
+        </activity>
+        <activity
             android:name=".app.SidebarActivity"
+            android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.SidebarThingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName="com.btmura.android.reddit.app.SidebarActivity"
+            android:uiOptions="splitActionBarWhenNarrow" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.btmura.android.reddit.app.SidebarActivity" />
         </activity>
         <activity
             android:name=".app.ThingActivity"
@@ -121,6 +145,7 @@
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.UserProfileActivity"
+            android:launchMode="singleTop"
             tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -136,6 +161,17 @@
                     android:pathPrefix="/u"
                     android:scheme="http" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.UserProfileThingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName="com.btmura.android.reddit.app.UserProfileThingActivity"
+            android:uiOptions="splitActionBarWhenNarrow" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.btmura.android.reddit.app.UserProfileThingActivity" />
         </activity>
 
         <activity-alias

@@ -63,6 +63,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     private FilterAdapter filterAdapter;
     private ActionBarDrawerToggle drawerToggle;
 
+    public BrowserActivity() {
+        super(ThingActivity.class);
+    }
+
     @Override
     protected void setContentView() {
         setTheme(ThemePrefs.getTheme(this));

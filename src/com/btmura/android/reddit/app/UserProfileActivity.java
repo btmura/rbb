@@ -47,12 +47,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
 
     private static final String STATE_FILTER = "filter";
 
-    private String currentUser;
-    private int currentFilter = -1;
-    private AccountFilterAdapter adapter;
-    private String accountName;
-
-    private LoaderCallbacks<AccountInfoResult> karmaLoaderCallbacks =
+    private final LoaderCallbacks<AccountInfoResult> karmaLoaderCallbacks =
             new LoaderCallbacks<AccountInfoResult>() {
                 public Loader<AccountInfoResult> onCreateLoader(int id, Bundle args) {
                     return new UserInfoLoader(getApplicationContext(), currentUser);
@@ -68,6 +63,15 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
                 public void onLoaderReset(Loader<AccountInfoResult> loader) {
                 }
             };
+
+    private String currentUser;
+    private int currentFilter = -1;
+    private AccountFilterAdapter adapter;
+    private String accountName;
+
+    public UserProfileActivity() {
+        super(UserProfileThingActivity.class);
+    }
 
     @Override
     protected void setContentView() {
