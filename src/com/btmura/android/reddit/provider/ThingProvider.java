@@ -18,7 +18,7 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -223,13 +223,12 @@ public class ThingProvider extends BaseProvider {
             Sessions._ID,
             Sessions.COLUMN_TYPE,
     };
-
     private static final int CLEAN_INDEX_ID = 0;
     private static final int CLEAN_INDEX_TYPE = 1;
 
     private static final String CLEAN_SORT = Sessions._ID + " DESC";
-
-    private static final String CLEAN_OFFSET_LIMIT = "25, 1000"; // offset, limit
+    private static final String CLEAN_OFFSET_LIMIT = "10, 1000"; // offset, limit
+    private static final int CLEAN_CYCLE = 20;
 
     private static final String[] EXPAND_PROJECTION = {
             Comments._ID,
@@ -240,7 +239,6 @@ public class ThingProvider extends BaseProvider {
     private static final String[] SESSION_ID_PROJECTION = {
             Sessions._ID,
     };
-
     private static final int SESSION_INDEX_ID = 0;
 
     private static final String[] INSERT_COMMENT_PROJECTION = {
@@ -249,7 +247,6 @@ public class ThingProvider extends BaseProvider {
             Comments.COLUMN_SEQUENCE,
             Comments.COLUMN_THING_ID,
     };
-
     private static final int INSERT_COMMENT_INDEX_ID = 0;
     private static final int INSERT_COMMENT_INDEX_NESTING = 1;
     private static final int INSERT_COMMENT_INDEX_SEQUENCE = 2;
@@ -265,7 +262,7 @@ public class ThingProvider extends BaseProvider {
     private static final boolean SYNC = true;
     private static final boolean NO_SYNC = false;
 
-    private final AtomicBoolean needsCleaning = new AtomicBoolean(true);
+    private final AtomicInteger sessionCount = new AtomicInteger();
 
     public static final Bundle getSubredditSession(Context context, String accountName,
             String subreddit, int filter, long sessionId, String more) {
@@ -554,14 +551,14 @@ public class ThingProvider extends BaseProvider {
             Log.d(TAG, "getListingSession sessionId: " + sessionId);
         }
 
+        // Start cleaning service on separate thread before doing the network call.
+        if (sessionCount.getAndIncrement() % CLEAN_CYCLE == 0) {
+            getContext().startService(new Intent(getContext(), SessionCleanerService.class));
+        }
+
         // Don't get new values if the session appears valid.
         if (sessionId != 0 && !listing.isAppend()) {
             return sessionId;
-        }
-
-        // Start cleaning service on separate thread before doing the network call.
-        if (needsCleaning.getAndSet(false)) {
-            getContext().startService(new Intent(getContext(), SessionCleanerService.class));
         }
 
         // Get new values over the network.
@@ -658,8 +655,8 @@ public class ThingProvider extends BaseProvider {
                 }
 
                 String[] selectionArgs = Array.of(sessionId);
-                int count = db.delete(tableName, SharedColumns.SELECT_BY_SESSION_ID, selectionArgs);
                 int count2 = db.delete(Sessions.TABLE_NAME, Sessions.SELECT_BY_ID, selectionArgs);
+                int count = db.delete(tableName, SharedColumns.SELECT_BY_SESSION_ID, selectionArgs);
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "session id: " + sessionId
                             + " type: " + type
