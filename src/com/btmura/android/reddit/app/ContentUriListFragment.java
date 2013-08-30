@@ -59,6 +59,7 @@ public class ContentUriListFragment extends ListFragment {
         adapter.add(AccountProvider.ACCOUNTS_URI);
         adapter.add(SubredditProvider.SUBREDDITS_URI);
         adapter.add(ThingProvider.THINGS_URI);
+        adapter.add(ThingProvider.COMMENTS_URI);
         adapter.add(ThingProvider.MESSAGES_URI);
         adapter.add(ThingProvider.SUBREDDITS_URI);
         adapter.add(ThingProvider.SESSIONS_URI);
