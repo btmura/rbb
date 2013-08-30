@@ -276,7 +276,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.setGroupVisible(R.id.menu_group_last, !hasThing());
+        menu.setGroupVisible(R.id.menu_group_last, requestedSubreddit == null && !hasThing());
         return true;
     }
 
