@@ -22,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,7 +40,9 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.StringUtil;
 
-public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData> {
+public class ThingFragment extends Fragment implements
+        LoaderCallbacks<ThingData>,
+        OnPageChangeListener {
 
     private static final String ARG_ACCOUNT_NAME = "accountName";
     private static final String ARG_THING_BUNDLE = "thingBundle";
@@ -113,6 +116,7 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
             pagerAdapter = new ThingPagerAdapter(getActivity(), getChildFragmentManager(),
                     getAccountName(), data);
             pager.setAdapter(pagerAdapter);
+            pager.setOnPageChangeListener(this);
 
             if (listener != null) {
                 listener.onThingTitleDiscovery(thingData.parent.getTitle());
@@ -124,6 +128,19 @@ public class ThingFragment extends Fragment implements LoaderCallbacks<ThingData
     @Override
     public void onLoaderReset(Loader<ThingData> loader) {
         thingData = null;
+    }
+
+    @Override
+    public void onPageSelected(int page) {
+        getActivity().invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
     }
 
     @Override
