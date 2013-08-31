@@ -16,13 +16,10 @@
 
 package com.btmura.android.reddit.app;
 
-import java.util.regex.Pattern;
-
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,11 +38,6 @@ public class LinkFragment extends Fragment {
     public static final String TAG = "LinkFragment";
 
     private static final String ARG_URL = "url";
-
-    private static final String STATE_URL = "url";
-
-    private static final Pattern PATTERN_IMAGE = Pattern.compile(".*\\.(jpg|png|gif)$",
-            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
     private WebView webView;
     private ProgressBar progress;
@@ -82,13 +74,11 @@ public class LinkFragment extends Fragment {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
                 progress.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
                 progress.setVisibility(View.GONE);
             }
         });
@@ -96,7 +86,6 @@ public class LinkFragment extends Fragment {
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                super.onProgressChanged(view, newProgress);
                 progress.setProgress(newProgress);
             }
         });
@@ -105,21 +94,14 @@ public class LinkFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        String url;
         if (savedInstanceState != null) {
-            url = savedInstanceState.getString(STATE_URL);
+            webView.restoreState(savedInstanceState);
         } else {
-            url = getUrlArgument();
-        }
-        if (PATTERN_IMAGE.matcher(url).matches()) {
-            String img = String.format("<img src=\"%s\" width=\"100%%\" />", url);
-            webView.loadData(img, "text/html", null);
-        } else {
-            webView.loadUrl(url);
+            webView.loadUrl(getUrl());
         }
     }
 
-    private String getUrlArgument() {
+    private String getUrl() {
         return Strings.safeToString(getArguments().getCharSequence(ARG_URL));
     }
 
@@ -138,11 +120,7 @@ public class LinkFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_URL, getCurrentUrl());
-    }
-
-    private String getCurrentUrl() {
-        return !TextUtils.isEmpty(webView.getUrl()) ? webView.getUrl() : getUrlArgument();
+        webView.saveState(outState);
     }
 
     @Override
