@@ -117,8 +117,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         if (!skipSetup(savedInstanceState)) {
             setupCommonFragments(savedInstanceState);
             setupCommonViews();
-            setupViews();
-            setupActionBar(savedInstanceState);
+            doSetup(savedInstanceState);
         }
     }
 
@@ -158,10 +157,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         measureThingBodyWidth();
     }
 
-    // TODO: Do we need this method or can it be rolled into setupPrereqs?
-    protected abstract void setupViews();
-
-    protected abstract void setupActionBar(Bundle savedInstanceState);
+    protected abstract void doSetup(Bundle savedInstanceState);
 
     protected abstract boolean hasLeftFragment();
 

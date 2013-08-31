@@ -96,11 +96,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected void setupViews() {
-    }
-
-    @Override
-    protected void setupActionBar(Bundle savedInstanceState) {
+    protected void doSetup(Bundle savedInstanceState) {
         if (drawerLayout != null) {
             if (hasLeftFragment || !showDrawer) {
                 drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);

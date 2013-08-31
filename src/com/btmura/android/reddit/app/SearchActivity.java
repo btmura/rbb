@@ -83,14 +83,10 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected void setupViews() {
+    protected void doSetup(Bundle savedInstanceState) {
         if (!hasQuery()) {
             setQuery("android");
         }
-    }
-
-    @Override
-    protected void setupActionBar(Bundle savedInstanceState) {
         bar.setDisplayHomeAsUpEnabled(true);
         getSupportLoaderManager().initLoader(0, null, this);
     }

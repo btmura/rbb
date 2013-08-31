@@ -71,14 +71,10 @@ public class SidebarActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected void setupViews() {
+    protected void doSetup(Bundle savedInstanceState) {
         if (!hasSubredditName()) {
             setSubredditName("android");
         }
-    }
-
-    @Override
-    protected void setupActionBar(Bundle savedInstanceState) {
         bar.setDisplayHomeAsUpEnabled(true);
         getSupportLoaderManager().initLoader(0, null, this);
     }

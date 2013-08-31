@@ -99,11 +99,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected void setupViews() {
-    }
-
-    @Override
-    protected void setupActionBar(Bundle savedInstanceState) {
+    protected void doSetup(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             currentFilter = savedInstanceState.getInt(STATE_FILTER);
         }
