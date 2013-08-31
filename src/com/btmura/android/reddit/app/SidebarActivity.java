@@ -44,10 +44,12 @@ public class SidebarActivity extends AbstractBrowserActivity implements
 
     private static final String STATE_SELECTED_TAB_INDEX = "selectedTabIndex";
 
+    private static final int TAB_RELATED = 1;
+
     private AccountResult accountResult;
     private String accountName;
 
-    private int savedSelectedTabIndex;
+    private int selectedTabIndex;
     private boolean tabListenerDisabled;
     private Tab tabDescription;
     private Tab tabRelated;
@@ -78,7 +80,7 @@ public class SidebarActivity extends AbstractBrowserActivity implements
     protected void setupActionBar(Bundle savedInstanceState) {
         bar.setDisplayHomeAsUpEnabled(true);
         if (savedInstanceState != null) {
-            savedSelectedTabIndex = savedInstanceState.getInt(STATE_SELECTED_TAB_INDEX);
+            selectedTabIndex = savedInstanceState.getInt(STATE_SELECTED_TAB_INDEX);
         }
         getSupportLoaderManager().initLoader(0, null, this);
     }
@@ -107,11 +109,11 @@ public class SidebarActivity extends AbstractBrowserActivity implements
         tabDescription = addTab(getString(R.string.tab_description));
         tabRelated = addTab(getString(R.string.tab_related));
 
-        tabListenerDisabled = savedSelectedTabIndex != 0;
+        tabListenerDisabled = selectedTabIndex != 0;
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         tabListenerDisabled = false;
-        if (savedSelectedTabIndex != 0) {
-            bar.setSelectedNavigationItem(savedSelectedTabIndex);
+        if (selectedTabIndex != 0) {
+            bar.setSelectedNavigationItem(selectedTabIndex);
         }
     }
 
@@ -138,12 +140,21 @@ public class SidebarActivity extends AbstractBrowserActivity implements
             Log.d(TAG, "selectTab tab: " + tab.getText() + " disabled: " + tabListenerDisabled);
         }
         if (!tabListenerDisabled) {
+            selectedTabIndex = tab.getPosition();
             if (tab == tabDescription) {
-                setSidebarFragments(accountName, getSubredditName());
+                refreshSidebarFragments();
             } else if (tab == tabRelated) {
-                setRelatedSubredditsFragments(accountName, getSubredditName());
+                refreshRelatedSubredditFragments();
             }
         }
+    }
+
+    private void refreshSidebarFragments() {
+        setSidebarFragments(accountName, getSubredditName());
+    }
+
+    private void refreshRelatedSubredditFragments() {
+        setRelatedSubredditsFragments(accountName, getSubredditName());
     }
 
     @Override
@@ -157,7 +168,7 @@ public class SidebarActivity extends AbstractBrowserActivity implements
 
     @Override
     protected boolean hasLeftFragment() {
-        return bar.getSelectedTab() == tabRelated;
+        return selectedTabIndex == TAB_RELATED;
     }
 
     @Override

@@ -53,11 +53,12 @@ public class SearchActivity extends AbstractBrowserActivity implements
     private AccountResult accountResult;
     private String accountName;
 
-    private int savedSelectedTabIndex;
+    private int selectedTabIndex;
+    private int subredditsTabIndex;
     private boolean tabListenerDisabled;
+    private Tab tabPostsInSubreddit;
     private Tab tabPosts;
     private Tab tabSubreddits;
-    private Tab tabInSubreddit;
 
     public SearchActivity() {
         super(SearchThingActivity.class);
@@ -85,8 +86,9 @@ public class SearchActivity extends AbstractBrowserActivity implements
     protected void setupActionBar(Bundle savedInstanceState) {
         bar.setDisplayHomeAsUpEnabled(true);
         if (savedInstanceState != null) {
-            savedSelectedTabIndex = savedInstanceState.getInt(STATE_SELECTED_TAB_INDEX);
+            selectedTabIndex = savedInstanceState.getInt(STATE_SELECTED_TAB_INDEX);
         }
+        subredditsTabIndex = Subreddits.hasSidebar(getSubreddit()) ? 2 : 1;
         getSupportLoaderManager().initLoader(0, null, this);
     }
 
@@ -112,17 +114,17 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     private void setupTabs() {
         if (Subreddits.hasSidebar(getSubreddit())) {
-            tabInSubreddit = addTab(MenuHelper.getSubredditTitle(this, getSubreddit()));
+            tabPostsInSubreddit = addTab(MenuHelper.getSubredditTitle(this, getSubreddit()));
         }
         tabPosts = addTab(getString(R.string.tab_posts));
         tabSubreddits = addTab(getString(R.string.tab_subreddits));
 
         // TODO: Extract this code into a tab controller to reduce code up with SidebarActivity.
-        tabListenerDisabled = savedSelectedTabIndex != 0;
+        tabListenerDisabled = selectedTabIndex != 0;
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         tabListenerDisabled = false;
-        if (savedSelectedTabIndex != 0) {
-            bar.setSelectedNavigationItem(savedSelectedTabIndex);
+        if (selectedTabIndex != 0) {
+            bar.setSelectedNavigationItem(selectedTabIndex);
         }
     }
 
@@ -149,22 +151,23 @@ public class SearchActivity extends AbstractBrowserActivity implements
             Log.d(TAG, "selectTab tab: " + tab.getText() + " disabled: " + tabListenerDisabled);
         }
         if (!tabListenerDisabled) {
-            if (tab == tabInSubreddit) {
-                refreshThingList(getSubreddit(), getQuery());
+            selectedTabIndex = tab.getPosition();
+            if (tab == tabPostsInSubreddit) {
+                refreshThingList(getSubreddit());
             } else if (tab == tabPosts) {
-                refreshThingList(null, getQuery());
+                refreshThingList(null);
             } else if (tab == tabSubreddits) {
-                refreshSubredditList(getQuery());
+                refreshSubredditList();
             }
         }
     }
 
-    private void refreshSubredditList(String query) {
-        setSearchSubredditsFragments(accountName, query, FilterAdapter.SUBREDDIT_HOT);
+    private void refreshSubredditList() {
+        setSearchSubredditsFragments(accountName, getQuery(), FilterAdapter.SUBREDDIT_HOT);
     }
 
-    private void refreshThingList(String subreddit, String query) {
-        setSearchThingsFragments(accountName, subreddit, query, FilterAdapter.SUBREDDIT_HOT);
+    private void refreshThingList(String subreddit) {
+        setSearchThingsFragments(accountName, subreddit, getQuery(), FilterAdapter.SUBREDDIT_HOT);
     }
 
     @Override
@@ -178,7 +181,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     @Override
     protected boolean hasLeftFragment() {
-        return bar.getSelectedTab() == tabSubreddits;
+        return selectedTabIndex == subredditsTabIndex;
     }
 
     @Override
