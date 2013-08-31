@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
@@ -48,14 +47,10 @@ public class SearchActivity extends AbstractBrowserActivity implements
     /** Required string search query. */
     public static final String EXTRA_QUERY = "query";
 
-    private static final String STATE_SELECTED_TAB_INDEX = "selectedTabIndex";
-
     private AccountResult accountResult;
     private String accountName;
 
-    private int selectedTabIndex;
-    private int subredditsTabIndex;
-    private boolean tabListenerDisabled;
+    private TabController tabController;
     private Tab tabPostsInSubreddit;
     private Tab tabPosts;
     private Tab tabSubreddits;
@@ -71,8 +66,20 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected boolean skipSetup() {
+    protected boolean skipSetup(Bundle savedInstanceState) {
+        tabController = new TabController(bar, savedInstanceState);
+        if (Subreddits.hasSidebar(getSubreddit())) {
+            tabPostsInSubreddit = newTab(MenuHelper.getSubredditTitle(this, getSubreddit()));
+            tabController.addTab(tabPostsInSubreddit);
+        }
+        tabPosts = tabController.addTab(newTab(getString(R.string.tab_posts)));
+        tabSubreddits = tabController.addTab(newTab(getString(R.string.tab_subreddits)));
         return false;
+    }
+
+    private Tab newTab(CharSequence text) {
+        Tab tab = bar.newTab().setText(text).setTabListener(this);
+        return tab;
     }
 
     @Override
@@ -85,10 +92,6 @@ public class SearchActivity extends AbstractBrowserActivity implements
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         bar.setDisplayHomeAsUpEnabled(true);
-        if (savedInstanceState != null) {
-            selectedTabIndex = savedInstanceState.getInt(STATE_SELECTED_TAB_INDEX);
-        }
-        subredditsTabIndex = Subreddits.hasSidebar(getSubreddit()) ? 2 : 1;
         getSupportLoaderManager().initLoader(0, null, this);
     }
 
@@ -101,37 +104,13 @@ public class SearchActivity extends AbstractBrowserActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountResult = result;
         accountName = result.getLastAccount(this);
-        if (bar.getNavigationMode() != ActionBar.NAVIGATION_MODE_TABS) {
-            setupTabs();
-        }
+        tabController.setupTabs();
     }
 
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
         accountResult = null;
         accountName = null;
-    }
-
-    private void setupTabs() {
-        if (Subreddits.hasSidebar(getSubreddit())) {
-            tabPostsInSubreddit = addTab(MenuHelper.getSubredditTitle(this, getSubreddit()));
-        }
-        tabPosts = addTab(getString(R.string.tab_posts));
-        tabSubreddits = addTab(getString(R.string.tab_subreddits));
-
-        // TODO: Extract this code into a tab controller to reduce code up with SidebarActivity.
-        tabListenerDisabled = selectedTabIndex != 0;
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        tabListenerDisabled = false;
-        if (selectedTabIndex != 0) {
-            bar.setSelectedNavigationItem(selectedTabIndex);
-        }
-    }
-
-    private Tab addTab(CharSequence text) {
-        Tab tab = bar.newTab().setText(text).setTabListener(this);
-        bar.addTab(tab);
-        return tab;
     }
 
     @Override
@@ -148,10 +127,9 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     private void selectTab(Tab tab) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "selectTab tab: " + tab.getText() + " disabled: " + tabListenerDisabled);
+            Log.d(TAG, "selectTab tab: " + tab.getText());
         }
-        if (!tabListenerDisabled) {
-            selectedTabIndex = tab.getPosition();
+        if (tabController.selectTab(tab)) {
             if (tab == tabPostsInSubreddit) {
                 refreshThingList(getSubreddit());
             } else if (tab == tabPosts) {
@@ -181,7 +159,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
 
     @Override
     protected boolean hasLeftFragment() {
-        return selectedTabIndex == subredditsTabIndex;
+        return tabController.isTabSelected(tabSubreddits);
     }
 
     @Override
@@ -195,7 +173,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_TAB_INDEX, bar.getSelectedNavigationIndex());
+        tabController.saveInstanceState(outState);
     }
 
     @Override

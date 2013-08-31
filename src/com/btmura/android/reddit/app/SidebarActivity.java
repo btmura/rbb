@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.os.Bundle;
@@ -42,15 +41,10 @@ public class SidebarActivity extends AbstractBrowserActivity implements
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
 
-    private static final String STATE_SELECTED_TAB_INDEX = "selectedTabIndex";
-
-    private static final int TAB_RELATED = 1;
-
     private AccountResult accountResult;
     private String accountName;
 
-    private int selectedTabIndex;
-    private boolean tabListenerDisabled;
+    private TabController tabController;
     private Tab tabDescription;
     private Tab tabRelated;
 
@@ -65,8 +59,15 @@ public class SidebarActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected boolean skipSetup() {
+    protected boolean skipSetup(Bundle savedInstanceState) {
+        tabController = new TabController(bar, savedInstanceState);
+        tabDescription = tabController.addTab(newTab(getString(R.string.tab_description)));
+        tabRelated = tabController.addTab(newTab(getString(R.string.tab_related)));
         return false;
+    }
+
+    private Tab newTab(CharSequence text) {
+        return bar.newTab().setText(text).setTabListener(this);
     }
 
     @Override
@@ -79,9 +80,6 @@ public class SidebarActivity extends AbstractBrowserActivity implements
     @Override
     protected void setupActionBar(Bundle savedInstanceState) {
         bar.setDisplayHomeAsUpEnabled(true);
-        if (savedInstanceState != null) {
-            selectedTabIndex = savedInstanceState.getInt(STATE_SELECTED_TAB_INDEX);
-        }
         getSupportLoaderManager().initLoader(0, null, this);
     }
 
@@ -94,33 +92,13 @@ public class SidebarActivity extends AbstractBrowserActivity implements
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         accountResult = result;
         accountName = result.getLastAccount(this);
-        if (bar.getNavigationMode() != ActionBar.NAVIGATION_MODE_TABS) {
-            setupTabs();
-        }
+        tabController.setupTabs();
     }
 
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
         accountResult = null;
         accountName = null;
-    }
-
-    private void setupTabs() {
-        tabDescription = addTab(getString(R.string.tab_description));
-        tabRelated = addTab(getString(R.string.tab_related));
-
-        tabListenerDisabled = selectedTabIndex != 0;
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        tabListenerDisabled = false;
-        if (selectedTabIndex != 0) {
-            bar.setSelectedNavigationItem(selectedTabIndex);
-        }
-    }
-
-    private Tab addTab(CharSequence text) {
-        Tab tab = bar.newTab().setText(text).setTabListener(this);
-        bar.addTab(tab);
-        return tab;
     }
 
     @Override
@@ -137,10 +115,9 @@ public class SidebarActivity extends AbstractBrowserActivity implements
 
     private void selectTab(Tab tab) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "selectTab tab: " + tab.getText() + " disabled: " + tabListenerDisabled);
+            Log.d(TAG, "selectTab tab: " + tab.getText());
         }
-        if (!tabListenerDisabled) {
-            selectedTabIndex = tab.getPosition();
+        if (tabController.selectTab(tab)) {
             if (tab == tabDescription) {
                 refreshSidebarFragments();
             } else if (tab == tabRelated) {
@@ -168,7 +145,7 @@ public class SidebarActivity extends AbstractBrowserActivity implements
 
     @Override
     protected boolean hasLeftFragment() {
-        return selectedTabIndex == TAB_RELATED;
+        return tabController.isTabSelected(tabRelated);
     }
 
     @Override
@@ -186,7 +163,7 @@ public class SidebarActivity extends AbstractBrowserActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_TAB_INDEX, bar.getSelectedNavigationIndex());
+        tabController.saveInstanceState(outState);
     }
 
     @Override

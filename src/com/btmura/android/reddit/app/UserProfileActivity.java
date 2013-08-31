@@ -80,7 +80,7 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected boolean skipSetup() {
+    protected boolean skipSetup(Bundle savedInstanceState) {
         // Get the user from the intent data or extra.
         Uri data = getIntent().getData();
         if (data != null) {

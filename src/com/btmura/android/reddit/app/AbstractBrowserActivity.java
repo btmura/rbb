@@ -114,7 +114,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         super.onCreate(savedInstanceState);
         setContentView();
         setupPrereqs();
-        if (!skipSetup()) {
+        if (!skipSetup(savedInstanceState)) {
             setupCommonFragments(savedInstanceState);
             setupCommonViews();
             setupViews();
@@ -132,7 +132,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         isSingleChoice = !isSinglePane;
     }
 
-    protected abstract boolean skipSetup();
+    protected abstract boolean skipSetup(Bundle savedInstanceState);
 
     private void setupCommonFragments(Bundle savedInstanceState) {
         if (savedInstanceState == null) {

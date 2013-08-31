@@ -74,7 +74,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    protected boolean skipSetup() {
+    protected boolean skipSetup(Bundle savedInstanceState) {
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_SUBREDDIT)) {
             requestedSubreddit = StringUtil.emptyToNull(intent.getStringExtra(EXTRA_SUBREDDIT));
