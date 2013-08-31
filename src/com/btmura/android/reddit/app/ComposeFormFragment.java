@@ -64,7 +64,7 @@ import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.util.ComparableFragments;
-import com.btmura.android.reddit.util.StringUtil;
+import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
@@ -201,7 +201,7 @@ public class ComposeFormFragment extends Fragment implements
         int type = getType();
 
         // Set the title for all types.
-        String title = StringUtil.ellipsize(getArguments().getString(ARG_TITLE), 100);
+        String title = Strings.ellipsize(getArguments().getString(ARG_TITLE), 100);
         switch (type) {
             case ComposeActivity.TYPE_POST:
                 titleText.setText(title);

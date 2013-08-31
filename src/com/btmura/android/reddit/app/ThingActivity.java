@@ -32,7 +32,7 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.text.Formatter;
-import com.btmura.android.reddit.util.StringUtil;
+import com.btmura.android.reddit.util.Strings;
 
 public class ThingActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
@@ -80,7 +80,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     private void refreshTitle(String title) {
-        setTitle(StringUtil.safeString(formatter.formatAll(this, title)));
+        setTitle(Strings.safeToString(formatter.formatAll(this, title)));
     }
 
     @Override

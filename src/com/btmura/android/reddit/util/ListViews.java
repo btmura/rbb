@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Brian Muramatsu
+ * Copyright (C) 2013 Brian Muramatsu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,19 @@
 
 package com.btmura.android.reddit.util;
 
-import android.text.TextUtils;
+import android.util.SparseBooleanArray;
+import android.widget.ListView;
 
-public class StringUtil {
+public class ListViews {
 
-    public static String ellipsize(String text, int maxLength) {
-        if (text == null || text.length() <= maxLength) {
-            return text;
+    public static int getFirstCheckedPosition(ListView listView) {
+        SparseBooleanArray checked = listView.getCheckedItemPositions();
+        int size = listView.getCount();
+        for (int i = 0; i < size; i++) {
+            if (checked.get(i)) {
+                return i;
+            }
         }
-
-        return text.substring(0, maxLength) + "…";
-    }
-
-    public static String safeString(Object object) {
-        return object != null ? object.toString() : null;
-    }
-
-    public static String emptyToNull(String string) {
-        return TextUtils.isEmpty(string) ? null : string;
+        return -1;
     }
 }

@@ -44,7 +44,7 @@ import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.ComparableFragments;
-import com.btmura.android.reddit.util.ListViewUtils;
+import com.btmura.android.reddit.util.ListViews;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter;
 import com.btmura.android.reddit.widget.AccountPlaceAdapter.OnPlaceSelectedListener;
@@ -433,7 +433,7 @@ public class NavigationFragment extends ListFragment implements
     }
 
     private String getFirstCheckedSubreddit() {
-        int position = ListViewUtils.getFirstCheckedPosition(getListView());
+        int position = ListViews.getFirstCheckedPosition(getListView());
         int adapterPosition = mergeAdapter.getAdapterPosition(position);
         return subredditAdapter.getName(adapterPosition);
     }

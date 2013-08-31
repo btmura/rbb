@@ -38,7 +38,7 @@ import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.util.StringUtil;
+import com.btmura.android.reddit.util.Strings;
 
 public class ThingFragment extends Fragment implements
         LoaderCallbacks<ThingData>,
@@ -303,7 +303,7 @@ public class ThingFragment extends Fragment implements
     private void handleNewLinkComment() {
         String author = thingData.parent.getAuthor();
         // TODO: Put the code to format title in a common class and remove duplication.
-        String title = StringUtil.ellipsize(thingData.parent.getTitle(), 50);
+        String title = Strings.ellipsize(thingData.parent.getTitle(), 50);
         String thingId = thingData.parent.getThingId();
 
         Bundle args = new Bundle(2);
@@ -318,7 +318,7 @@ public class ThingFragment extends Fragment implements
     private void handleNewMessageComment() {
         String author = thingData.parent.getAuthor();
         // TODO: Put the code to format title in a common class and remove duplication.
-        String title = StringUtil.ellipsize(thingData.parent.getTitle(), 50);
+        String title = Strings.ellipsize(thingData.parent.getTitle(), 50);
         String thingId = thingData.parent.getThingId();
 
         Bundle args = new Bundle(3);

@@ -29,7 +29,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.MessageThingLoader;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.util.ListViewUtils;
+import com.btmura.android.reddit.util.ListViews;
 import com.btmura.android.reddit.widget.MessageListAdapter;
 
 public class MessageThingActionModeController implements ThingActionModeController {
@@ -78,7 +78,7 @@ public class MessageThingActionModeController implements ThingActionModeControll
         int count = listView.getCheckedItemCount();
         mode.setTitle(context.getResources().getQuantityString(R.plurals.things, count, count));
 
-        int position = ListViewUtils.getFirstCheckedPosition(listView);
+        int position = ListViews.getFirstCheckedPosition(listView);
         prepareAuthorActionItem(menu, listView, position);
         prepareShareActionItem(menu, listView, position);
         prepareSubredditActionItem(menu, listView, position);
@@ -157,17 +157,17 @@ public class MessageThingActionModeController implements ThingActionModeControll
     }
 
     private void handleCopyUrl(ListView listView) {
-        int position = ListViewUtils.getFirstCheckedPosition(listView);
+        int position = ListViews.getFirstCheckedPosition(listView);
         MenuHelper.setClipAndToast(context, getMessageTitle(position), getMessageUrl(position));
     }
 
     private void handleAuthor(ListView listView) {
-        int position = ListViewUtils.getFirstCheckedPosition(listView);
+        int position = ListViews.getFirstCheckedPosition(listView);
         MenuHelper.startProfileActivity(context, getAuthor(position), -1);
     }
 
     private void handleSubreddit(ListView listView) {
-        int position = ListViewUtils.getFirstCheckedPosition(listView);
+        int position = ListViews.getFirstCheckedPosition(listView);
         MenuHelper.startSidebarActivity(context, getSubreddit(position));
     }
 

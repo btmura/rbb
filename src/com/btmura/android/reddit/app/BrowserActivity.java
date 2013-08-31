@@ -42,7 +42,7 @@ import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.provider.AccountProvider;
-import com.btmura.android.reddit.util.StringUtil;
+import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class BrowserActivity extends AbstractBrowserActivity implements
@@ -77,10 +77,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     protected boolean skipSetup(Bundle savedInstanceState) {
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_SUBREDDIT)) {
-            requestedSubreddit = StringUtil.emptyToNull(intent.getStringExtra(EXTRA_SUBREDDIT));
+            requestedSubreddit = Strings.emptyToNull(intent.getStringExtra(EXTRA_SUBREDDIT));
         } else if (intent.getData() != null) {
             Uri data = intent.getData();
-            requestedSubreddit = StringUtil.emptyToNull(UriHelper.getSubreddit(data));
+            requestedSubreddit = Strings.emptyToNull(UriHelper.getSubreddit(data));
             requestedThingBundle = UriHelper.getThingBundle(data);
         }
 

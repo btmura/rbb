@@ -34,7 +34,7 @@ import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.util.StringUtil;
+import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.CommentAdapter;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
@@ -103,7 +103,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
 
     private String getCommentLabel(int position) {
         String label = position != 0 ? getBody(position) : getTitle(0);
-        return StringUtil.ellipsize(label, 50);
+        return Strings.ellipsize(label, 50);
     }
 
     private CharSequence getCommentUrl(int position) {

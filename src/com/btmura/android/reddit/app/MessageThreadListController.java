@@ -29,7 +29,7 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.MessageThreadLoader;
-import com.btmura.android.reddit.util.ListViewUtils;
+import com.btmura.android.reddit.util.ListViews;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.MessageThreadAdapter;
 
@@ -111,7 +111,7 @@ public class MessageThreadListController
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu, ListView listView) {
         int count = listView.getCheckedItemCount();
-        int position = ListViewUtils.getFirstCheckedPosition(listView);
+        int position = ListViews.getFirstCheckedPosition(listView);
 
         mode.setTitle(context.getResources().getQuantityString(R.plurals.messages, count, count));
         prepareReplyActionItem(menu, count, position);
@@ -155,7 +155,7 @@ public class MessageThreadListController
     }
 
     private void handleNewComment(ListView listView) {
-        int position = ListViewUtils.getFirstCheckedPosition(listView);
+        int position = ListViews.getFirstCheckedPosition(listView);
         String user = adapter.getAuthor(position);
 
         Bundle extras = new Bundle(2);
@@ -171,7 +171,7 @@ public class MessageThreadListController
     }
 
     private void handleAuthor(ListView listView) {
-        int position = ListViewUtils.getFirstCheckedPosition(listView);
+        int position = ListViews.getFirstCheckedPosition(listView);
         MenuHelper.startProfileActivity(context, adapter.getAuthor(position), -1);
     }
 

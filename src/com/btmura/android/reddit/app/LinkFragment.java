@@ -34,7 +34,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.util.StringUtil;
+import com.btmura.android.reddit.util.Strings;
 
 public class LinkFragment extends Fragment {
 
@@ -120,7 +120,7 @@ public class LinkFragment extends Fragment {
     }
 
     private String getUrlArgument() {
-        return StringUtil.safeString(getArguments().getCharSequence(ARG_URL));
+        return Strings.safeToString(getArguments().getCharSequence(ARG_URL));
     }
 
     @Override
