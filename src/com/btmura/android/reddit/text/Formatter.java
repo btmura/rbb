@@ -74,11 +74,9 @@ public class Formatter {
 
     static class Escaped {
 
-        // TODO(btmura): Support hexadecimal character references too.
-
         private static final Pattern AMP_PATTERN = Pattern.compile("&(amp);");
         private static final Pattern FULL_PATTERN =
-                Pattern.compile("&(gt|lt|amp|quot|apos|nbsp|mdash|#(\\d+));");
+                Pattern.compile("&(gt|lt|amp|quot|apos|nbsp|mdash|#(\\d+)|#([Xx])([0-9A-Za-z]+));");
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             return format(FULL_PATTERN, matcher, format(AMP_PATTERN, matcher, text));
@@ -115,12 +113,18 @@ public class Formatter {
                     s = Formatter.replace(s, start, end, "—");
                     deleted += 4;
                 } else {
-                    String r = String.valueOf(Character.toChars(Integer.parseInt(m.group(2))));
+                    String r = decodeReference(m);
                     s = Formatter.replace(s, start, end, r);
-                    deleted += m.group(1).length() - r.length();
+                    deleted += value.length() - r.length();
                 }
             }
             return s;
+        }
+
+        private static String decodeReference(Matcher m) {
+            int radix = m.group(3) == null ? 10 : 16;
+            String num = radix == 10 ? m.group(2) : m.group(4);
+            return String.valueOf(Character.toChars(Integer.parseInt(num, radix)));
         }
     }
 
