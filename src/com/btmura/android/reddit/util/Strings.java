@@ -20,12 +20,13 @@ import android.text.TextUtils;
 
 public class Strings {
 
-    public static String ellipsize(String text, int maxLength) {
-        if (text == null || text.length() <= maxLength) {
+    static final String ELLIPSIS = "…";
+
+    public static CharSequence ellipsize(CharSequence text, int maxLength) {
+        if (maxLength < 0 || TextUtils.isEmpty(text) || text.length() <= maxLength) {
             return text;
         }
-
-        return text.substring(0, maxLength) + "…";
+        return new StringBuilder(text.subSequence(0, maxLength)).append(ELLIPSIS);
     }
 
     public static String emptyToNull(String string) {

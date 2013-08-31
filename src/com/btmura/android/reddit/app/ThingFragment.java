@@ -303,7 +303,7 @@ public class ThingFragment extends Fragment implements
     private void handleNewLinkComment() {
         String author = thingData.parent.getAuthor();
         // TODO: Put the code to format title in a common class and remove duplication.
-        String title = Strings.ellipsize(thingData.parent.getTitle(), 50);
+        String title = Strings.safeToString(Strings.ellipsize(thingData.parent.getTitle(), 50));
         String thingId = thingData.parent.getThingId();
 
         Bundle args = new Bundle(2);
@@ -312,13 +312,18 @@ public class ThingFragment extends Fragment implements
 
         MenuHelper.startComposeActivity(getActivity(),
                 ComposeActivity.COMMENT_REPLY_TYPE_SET,
-                null, author, title, null, args, true);
+                null,
+                author,
+                title,
+                null,
+                args,
+                true);
     }
 
     private void handleNewMessageComment() {
         String author = thingData.parent.getAuthor();
         // TODO: Put the code to format title in a common class and remove duplication.
-        String title = Strings.ellipsize(thingData.parent.getTitle(), 50);
+        String title = Strings.safeToString(Strings.ellipsize(thingData.parent.getTitle(), 50));
         String thingId = thingData.parent.getThingId();
 
         Bundle args = new Bundle(3);
@@ -326,8 +331,14 @@ public class ThingFragment extends Fragment implements
         args.putString(ComposeActivity.EXTRA_MESSAGE_DESTINATION, author);
         args.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, thingId);
 
-        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.MESSAGE_TYPE_SET,
-                null, author, title, null, args, true);
+        MenuHelper.startComposeActivity(getActivity(),
+                ComposeActivity.MESSAGE_TYPE_SET,
+                null,
+                author,
+                title,
+                null,
+                args,
+                true);
     }
 
     private void handleOpen() {

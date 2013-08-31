@@ -15,14 +15,13 @@
  */
 package com.btmura.android.reddit.util;
 
-import com.btmura.android.reddit.util.Strings;
-
+import static com.btmura.android.reddit.util.Strings.ELLIPSIS;
 import junit.framework.TestCase;
 
 public class StringsTest extends TestCase {
 
     public void testEllipsize() throws Exception {
-        assertEquals("bri…", Strings.ellipsize("brian", 3));
+        assertEquals("bri" + ELLIPSIS, Strings.ellipsize("brian", 3));
         assertEquals("brian", Strings.ellipsize("brian", 5));
         assertEquals("", Strings.ellipsize("", 5));
         assertEquals(null, Strings.ellipsize(null, 7));

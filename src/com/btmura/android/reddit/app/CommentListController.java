@@ -96,12 +96,10 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     }
 
     public void copyUrl(int position) {
-        String label = getCommentLabel(position);
-        CharSequence text = getCommentUrl(position);
-        MenuHelper.setClipAndToast(context, label, text);
+        MenuHelper.setClipAndToast(context, getCommentLabel(position), getCommentUrl(position));
     }
 
-    private String getCommentLabel(int position) {
+    private CharSequence getCommentLabel(int position) {
         String label = position != 0 ? getBody(position) : getTitle(0);
         return Strings.ellipsize(label, 50);
     }
@@ -150,8 +148,14 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         args.putString(ComposeActivity.EXTRA_EDIT_THING_ID, thingId);
         args.putLong(ComposeActivity.EXTRA_EDIT_SESSION_ID, sessionId);
 
-        MenuHelper.startComposeActivity(context, typeSet,
-                null, null, getCommentLabel(position), getBody(position), args, false);
+        MenuHelper.startComposeActivity(context,
+                typeSet,
+                null,
+                null,
+                Strings.safeToString(getCommentLabel(position)),
+                getBody(position),
+                args,
+                false);
     }
 
     public void onListItemClick(ListView listView, View view, int position, long id) {
@@ -177,8 +181,14 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         args.putString(ComposeActivity.EXTRA_COMMENT_PARENT_THING_ID, parentThingId);
         args.putString(ComposeActivity.EXTRA_COMMENT_THING_ID, thingId);
 
-        MenuHelper.startComposeActivity(context, ComposeActivity.COMMENT_REPLY_TYPE_SET,
-                null, author, getCommentLabel(position), null, args, true);
+        MenuHelper.startComposeActivity(context,
+                ComposeActivity.COMMENT_REPLY_TYPE_SET,
+                null,
+                author,
+                Strings.safeToString(getCommentLabel(position)),
+                null,
+                args,
+                true);
     }
 
     public void save(boolean save) {
@@ -285,7 +295,9 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         MenuItem item = menu.findItem(R.id.menu_share_comment);
         item.setVisible(isCheckedCount(listView, 1) && hasThingId(position));
         if (item.isVisible()) {
-            MenuHelper.setShareProvider(item, getCommentLabel(position), getCommentUrl(position));
+            MenuHelper.setShareProvider(item,
+                    Strings.safeToString(getCommentLabel(position)),
+                    getCommentUrl(position));
         }
     }
 

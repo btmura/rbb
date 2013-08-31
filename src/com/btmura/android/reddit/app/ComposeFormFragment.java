@@ -201,7 +201,7 @@ public class ComposeFormFragment extends Fragment implements
         int type = getType();
 
         // Set the title for all types.
-        String title = Strings.ellipsize(getArguments().getString(ARG_TITLE), 100);
+        CharSequence title = Strings.ellipsize(getArguments().getString(ARG_TITLE), 100);
         switch (type) {
             case ComposeActivity.TYPE_POST:
                 titleText.setText(title);
