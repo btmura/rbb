@@ -67,7 +67,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     private final Context context;
     private final SQLiteOpenHelper dbHelper;
-    private final String sessionTag;
     private final String accountName;
     private final String thingId;
     private final String linkId;
@@ -96,7 +95,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             String cookie) {
         this.context = context;
         this.dbHelper = dbHelper;
-        this.sessionTag = !TextUtils.isEmpty(linkId) ? linkId : thingId;
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;
@@ -105,15 +103,16 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     }
 
     @Override
-    public String getSessionTag() {
-        return sessionTag;
-    }
-
-    @Override
     public int getSessionType() {
         return Sessions.TYPE_COMMENTS;
     }
 
+    @Override
+    public String getSessionThingId() {
+        return !TextUtils.isEmpty(linkId) ? linkId : thingId;
+    }
+
+    @Override
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         CharSequence url = Urls.commentListing(thingId, linkId, numComments, Urls.TYPE_JSON);
@@ -139,24 +138,30 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         }
     }
 
+    @Override
     public void performExtraWork(Context context) {
     }
 
+    @Override
     public void addCursorExtras(Bundle bundle) {
     }
 
+    @Override
     public long getNetworkTimeMs() {
         return networkTimeMs;
     }
 
+    @Override
     public long getParseTimeMs() {
         return parseTimeMs;
     }
 
+    @Override
     public String getTargetTable() {
         return Comments.TABLE_NAME;
     }
 
+    @Override
     public boolean isAppend() {
         return false;
     }
@@ -443,20 +448,24 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         }
     }
 
+    @Override
     public int getCommentCount() {
         return values.size();
     }
 
+    @Override
     public long getCommentId(int position) {
         // Cast to avoid auto-boxing in the getAsLong method.
         return ((Long) values.get(position).get(Comments._ID)).longValue();
     }
 
+    @Override
     public int getCommentNesting(int position) {
         // Cast to avoid auto-boxing in the getAsInteger method.
         return ((Integer) values.get(position).get(Comments.COLUMN_NESTING)).intValue();
     }
 
+    @Override
     public int getCommentSequence(int position) {
         // Cast to avoid auto-boxing in the getAsInteger method.
         return ((Integer) values.get(position).get(Comments.COLUMN_SEQUENCE)).intValue();

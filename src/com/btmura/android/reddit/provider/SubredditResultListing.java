@@ -40,7 +40,6 @@ class SubredditResultListing extends JsonParser implements Listing {
 
     public static final String TAG = "SubredditResultListing";
 
-    private final String sessionTag;
     private final String accountName;
     private final String query;
     private final String cookie;
@@ -54,15 +53,9 @@ class SubredditResultListing extends JsonParser implements Listing {
     }
 
     SubredditResultListing(String accountName, String query, String cookie) {
-        this.sessionTag = query;
         this.accountName = accountName;
         this.query = query;
         this.cookie = cookie;
-    }
-
-    @Override
-    public String getSessionTag() {
-        return sessionTag;
     }
 
     @Override
@@ -70,6 +63,12 @@ class SubredditResultListing extends JsonParser implements Listing {
         return Sessions.TYPE_SUBREDDIT_SEARCH;
     }
 
+    @Override
+    public String getSessionThingId() {
+        return null;
+    }
+
+    @Override
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         CharSequence url = Urls.subredditSearch(query, null);
@@ -95,24 +94,30 @@ class SubredditResultListing extends JsonParser implements Listing {
         }
     }
 
+    @Override
     public void performExtraWork(Context context) {
     }
 
+    @Override
     public void addCursorExtras(Bundle bundle) {
     }
 
+    @Override
     public long getNetworkTimeMs() {
         return networkTimeMs;
     }
 
+    @Override
     public long getParseTimeMs() {
         return parseTimeMs;
     }
 
+    @Override
     public String getTargetTable() {
         return SubredditResults.TABLE_NAME;
     }
 
+    @Override
     public boolean isAppend() {
         return false;
     }

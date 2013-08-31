@@ -26,8 +26,7 @@ public class Sessions implements BaseColumns {
 
     public static final String TABLE_NAME = "Sessions";
 
-    /** String identifier of the session like subreddit name or redditor's name. */
-    public static final String COLUMN_TAG = "tag";
+    public static final String COLUMN_THING_ID = SharedColumns.COLUMN_THING_ID;
 
     /** Integer timestamp of when the session was created. */
     public static final String COLUMN_TIMESTAMP = "timestamp";
@@ -60,13 +59,13 @@ public class Sessions implements BaseColumns {
 
     public static final String SELECT_BY_TIMESTAMP = COLUMN_TIMESTAMP + "<?";
 
-    public static final String SELECT_BY_TYPE_AND_TAG =
-            COLUMN_TYPE + "=? AND " + COLUMN_TAG + "=?";
+    public static final String SELECT_BY_TYPE_AND_THING_ID = COLUMN_TYPE + "=? AND "
+            + COLUMN_THING_ID + "=?";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_TAG + " TEXT NOT NULL,"
+                + COLUMN_THING_ID + " TEXT,"
                 + COLUMN_TIMESTAMP + " INTEGER NOT NULL,"
                 + COLUMN_TYPE + " INTEGER NOT NULL)");
     }

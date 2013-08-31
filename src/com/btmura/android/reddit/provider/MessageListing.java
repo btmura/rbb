@@ -62,7 +62,6 @@ class MessageListing extends JsonParser implements Listing {
 
     private final SQLiteOpenHelper dbHelper;
     private final int sessionType;
-    private final String sessionTag;
     private final String accountName;
     private final String thingId;
     private final int filter;
@@ -76,25 +75,47 @@ class MessageListing extends JsonParser implements Listing {
     private String moreThingId;
 
     /** Returns a listing of messages for inbox or sent. */
-    static MessageListing newInstance(SQLiteOpenHelper dbHelper, String accountName, int filter,
-            String more, boolean mark, String cookie) {
-        return new MessageListing(dbHelper, Sessions.TYPE_MESSAGES, accountName + "-" + filter,
-                accountName, null, filter, more, mark, cookie);
+    static MessageListing newInstance(SQLiteOpenHelper dbHelper,
+            String accountName,
+            int filter,
+            String more,
+            boolean mark,
+            String cookie) {
+        return new MessageListing(dbHelper,
+                Sessions.TYPE_MESSAGES,
+                accountName,
+                null,
+                filter,
+                more,
+                mark,
+                cookie);
     }
 
     /** Returns an instance for a message thread. */
-    static MessageListing newThreadInstance(SQLiteOpenHelper dbHelper, String accountName,
-            String thingId, String cookie) {
-        return new MessageListing(dbHelper, Sessions.TYPE_MESSAGE_THREAD, thingId,
-                accountName, thingId, 0, null, false, cookie);
+    static MessageListing newThreadInstance(SQLiteOpenHelper dbHelper,
+            String accountName,
+            String thingId,
+            String cookie) {
+        return new MessageListing(dbHelper,
+                Sessions.TYPE_MESSAGE_THREAD,
+                accountName,
+                thingId,
+                0,
+                null,
+                false,
+                cookie);
     }
 
-    private MessageListing(SQLiteOpenHelper dbHelper, int sessionType, String sessionTag,
-            String accountName, String thingId, int filter, String more, boolean mark,
+    private MessageListing(SQLiteOpenHelper dbHelper,
+            int sessionType,
+            String accountName,
+            String thingId,
+            int filter,
+            String more,
+            boolean mark,
             String cookie) {
         this.dbHelper = dbHelper;
         this.sessionType = sessionType;
-        this.sessionTag = sessionTag;
         this.accountName = accountName;
         this.thingId = thingId;
         this.filter = filter;
@@ -104,15 +125,16 @@ class MessageListing extends JsonParser implements Listing {
     }
 
     @Override
-    public String getSessionTag() {
-        return sessionTag;
-    }
-
-    @Override
     public int getSessionType() {
         return sessionType;
     }
 
+    @Override
+    public String getSessionThingId() {
+        return thingId;
+    }
+
+    @Override
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
         HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, true, false);
@@ -150,27 +172,33 @@ class MessageListing extends JsonParser implements Listing {
         }
     }
 
+    @Override
     public void performExtraWork(Context context) {
         if (mark) {
             Provider.clearNewMessageIndicator(context, accountName, false);
         }
     }
 
+    @Override
     public void addCursorExtras(Bundle bundle) {
     }
 
+    @Override
     public long getNetworkTimeMs() {
         return networkTimeMs;
     }
 
+    @Override
     public long getParseTimeMs() {
         return parseTimeMs;
     }
 
+    @Override
     public String getTargetTable() {
         return Messages.TABLE_NAME;
     }
 
+    @Override
     public boolean isAppend() {
         return !TextUtils.isEmpty(more);
     }

@@ -588,7 +588,7 @@ public class ThingProvider extends BaseProvider {
             if (sessionId == 0) {
                 ContentValues v = new ContentValues(3);
                 v.put(Sessions.COLUMN_TYPE, listing.getSessionType());
-                v.put(Sessions.COLUMN_TAG, listing.getSessionTag());
+                v.put(Sessions.COLUMN_THING_ID, listing.getSessionThingId());
                 v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
                 sessionId = db.insert(Sessions.TABLE_NAME, null, v);
             }
@@ -772,7 +772,7 @@ public class ThingProvider extends BaseProvider {
             // TODO: Add account scoping to sessions table.
 
             Cursor cursor = db.query(Sessions.TABLE_NAME, SESSION_ID_PROJECTION,
-                    Sessions.SELECT_BY_TYPE_AND_TAG,
+                    Sessions.SELECT_BY_TYPE_AND_THING_ID,
                     Array.of(Sessions.TYPE_COMMENTS, parentThingId),
                     null, null, null);
             try {
@@ -784,8 +784,12 @@ public class ThingProvider extends BaseProvider {
                     int position = -1;
                     int nesting = -1;
                     int sequence = -1;
-                    Cursor c = db.query(Comments.TABLE_NAME, INSERT_COMMENT_PROJECTION,
-                            Comments.SELECT_BY_SESSION_ID, Array.of(sessionId), null, null,
+                    Cursor c = db.query(Comments.TABLE_NAME,
+                            INSERT_COMMENT_PROJECTION,
+                            Comments.SELECT_BY_SESSION_ID,
+                            Array.of(sessionId),
+                            null,
+                            null,
                             Comments.SORT_BY_SEQUENCE_AND_ID);
                     try {
                         while (c.moveToNext()) {
@@ -870,8 +874,9 @@ public class ThingProvider extends BaseProvider {
 
             // TODO: Add account scoping to sessions table.
 
-            Cursor cursor = db.query(Sessions.TABLE_NAME, SESSION_ID_PROJECTION,
-                    Sessions.SELECT_BY_TYPE_AND_TAG,
+            Cursor cursor = db.query(Sessions.TABLE_NAME,
+                    SESSION_ID_PROJECTION,
+                    Sessions.SELECT_BY_TYPE_AND_THING_ID,
                     Array.of(Sessions.TYPE_MESSAGE_THREAD, thingId),
                     null, null, null);
             try {

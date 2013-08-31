@@ -32,8 +32,8 @@ interface Listing {
     /** Returns the type of session this listing creates. */
     int getSessionType();
 
-    /** Returns the tag that can be used to identify an existing session. */
-    String getSessionTag();
+    /** Returns the thing ID that may be used to identify a session. */
+    String getSessionThingId();
 
     /** Get the values for this listing possibly using the network. */
     ArrayList<ContentValues> getValues() throws IOException;

@@ -175,7 +175,6 @@ class ThingListing extends JsonParser implements Listing {
     private final Context context;
     private final SQLiteOpenHelper dbHelper;
     private final int sessionType;
-    private final String sessionTag;
     private final String accountName;
     private final String subreddit;
     private final String query;
@@ -192,34 +191,76 @@ class ThingListing extends JsonParser implements Listing {
     private String resolvedSubreddit;
     private String moreThingId;
 
-    static ThingListing newSearchInstance(Context context, SQLiteOpenHelper dbHelper,
-            String accountName, String subreddit, String query, String more, String cookie) {
-        String sessionTag = subreddit + "-" + query;
-        return new ThingListing(context, dbHelper, Sessions.TYPE_THING_SEARCH, sessionTag,
-                accountName, subreddit, query, null, 0, more, cookie);
+    static ThingListing newSearchInstance(Context context,
+            SQLiteOpenHelper dbHelper,
+            String accountName,
+            String subreddit,
+            String query,
+            String more,
+            String cookie) {
+        return new ThingListing(context,
+                dbHelper,
+                Sessions.TYPE_THING_SEARCH,
+                accountName,
+                subreddit,
+                query,
+                null,
+                0,
+                more,
+                cookie);
     }
 
-    static ThingListing newSubredditInstance(Context context, SQLiteOpenHelper dbHelper,
-            String accountName, String subreddit, int filter, String more, String cookie) {
-        String sessionTag = subreddit + "-" + filter;
-        return new ThingListing(context, dbHelper, Sessions.TYPE_SUBREDDIT, sessionTag,
-                accountName, subreddit, null, null, filter, more, cookie);
+    static ThingListing newSubredditInstance(Context context,
+            SQLiteOpenHelper dbHelper,
+            String accountName,
+            String subreddit,
+            int filter,
+            String more,
+            String cookie) {
+        return new ThingListing(context,
+                dbHelper,
+                Sessions.TYPE_SUBREDDIT,
+                accountName,
+                subreddit,
+                null,
+                null,
+                filter,
+                more,
+                cookie);
     }
 
-    static ThingListing newUserInstance(Context context, SQLiteOpenHelper dbHelper,
-            String accountName, String profileUser, int filter, String more, String cookie) {
-        String sessionTag = profileUser + "-" + filter;
-        return new ThingListing(context, dbHelper, Sessions.TYPE_USER, sessionTag, accountName,
-                null, null, profileUser, filter, more, cookie);
+    static ThingListing newUserInstance(Context context,
+            SQLiteOpenHelper dbHelper,
+            String accountName,
+            String profileUser,
+            int filter,
+            String more,
+            String cookie) {
+        return new ThingListing(context,
+                dbHelper,
+                Sessions.TYPE_USER,
+                accountName,
+                null,
+                null,
+                profileUser,
+                filter,
+                more,
+                cookie);
     }
 
-    private ThingListing(Context context, SQLiteOpenHelper dbHelper, int sessionType,
-            String sessionTag, String accountName, String subreddit, String query,
-            String profileUser, int filter, String more, String cookie) {
+    private ThingListing(Context context,
+            SQLiteOpenHelper dbHelper,
+            int sessionType,
+            String accountName,
+            String subreddit,
+            String query,
+            String profileUser,
+            int filter,
+            String more,
+            String cookie) {
         this.context = context;
         this.dbHelper = dbHelper;
         this.sessionType = sessionType;
-        this.sessionTag = sessionTag;
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;
@@ -230,15 +271,16 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     @Override
-    public String getSessionTag() {
-        return sessionTag;
-    }
-
-    @Override
     public int getSessionType() {
         return sessionType;
     }
 
+    @Override
+    public String getSessionThingId() {
+        return null;
+    }
+
+    @Override
     public ArrayList<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
 
@@ -294,27 +336,33 @@ class ThingListing extends JsonParser implements Listing {
         }
     }
 
+    @Override
     public void performExtraWork(Context context) {
     }
 
+    @Override
     public void addCursorExtras(Bundle bundle) {
         if (resolvedSubreddit != null) {
             bundle.putString(ThingProvider.EXTRA_RESOLVED_SUBREDDIT, resolvedSubreddit);
         }
     }
 
+    @Override
     public long getNetworkTimeMs() {
         return networkTimeMs;
     }
 
+    @Override
     public long getParseTimeMs() {
         return parseTimeMs;
     }
 
+    @Override
     public String getTargetTable() {
         return Things.TABLE_NAME;
     }
 
+    @Override
     public boolean isAppend() {
         return !TextUtils.isEmpty(more);
     }
