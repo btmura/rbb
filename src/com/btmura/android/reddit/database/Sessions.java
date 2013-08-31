@@ -34,6 +34,9 @@ public class Sessions implements BaseColumns {
     /** Integer type of the listing this session refers to. */
     public static final String COLUMN_TYPE = "type";
 
+    /** How many total session types there are. */
+    public static final int NUM_TYPES = 7;
+
     /** Session type when viewing a subreddit. */
     public static final int TYPE_SUBREDDIT = 0;
 
@@ -58,6 +61,8 @@ public class Sessions implements BaseColumns {
     public static final String SELECT_BY_ID = _ID + "=?";
 
     public static final String SELECT_BY_TIMESTAMP = COLUMN_TIMESTAMP + "<?";
+
+    public static final String SELECT_BY_TYPE = COLUMN_TYPE + "=?";
 
     public static final String SELECT_BY_TYPE_AND_THING_ID = COLUMN_TYPE + "=? AND "
             + COLUMN_THING_ID + "=?";

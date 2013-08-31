@@ -17,9 +17,18 @@
 package com.btmura.android.reddit.provider;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 
 public class SessionCleanerService extends IntentService {
+
+    private static final String EXTRA_SESSION_TYPE = "sessionType";
+
+    public static void startService(Context context, int sessionType) {
+        Intent intent = new Intent(context, SessionCleanerService.class);
+        intent.putExtra(EXTRA_SESSION_TYPE, sessionType);
+        context.startService(intent);
+    }
 
     public SessionCleanerService() {
         super("SessionCleanerService");
@@ -27,6 +36,7 @@ public class SessionCleanerService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        ThingProvider.cleanSessions(this);
+        int sessionType = intent.getIntExtra(EXTRA_SESSION_TYPE, 0);
+        ThingProvider.cleanSessions(this, sessionType);
     }
 }

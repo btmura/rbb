@@ -18,12 +18,10 @@ package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
@@ -228,7 +226,6 @@ public class ThingProvider extends BaseProvider {
 
     private static final String CLEAN_SORT = Sessions._ID + " DESC";
     private static final String CLEAN_OFFSET_LIMIT = "10, 1000"; // offset, limit
-    private static final int CLEAN_CYCLE = 20;
 
     private static final String[] EXPAND_PROJECTION = {
             Comments._ID,
@@ -262,7 +259,7 @@ public class ThingProvider extends BaseProvider {
     private static final boolean SYNC = true;
     private static final boolean NO_SYNC = false;
 
-    private final AtomicInteger sessionCount = new AtomicInteger();
+    private final SessionManager sessionManager = new SessionManager();
 
     public static final Bundle getSubredditSession(Context context, String accountName,
             String subreddit, int filter, long sessionId, String more) {
@@ -340,8 +337,10 @@ public class ThingProvider extends BaseProvider {
         return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle cleanSessions(Context context) {
-        return call(context, THINGS_URI, METHOD_CLEAN_SESSIONS, null, null);
+    public static final Bundle cleanSessions(Context context, int sessionType) {
+        Bundle extras = new Bundle(1);
+        extras.putInt(EXTRA_SESSION_TYPE, sessionType);
+        return call(context, THINGS_URI, METHOD_CLEAN_SESSIONS, null, extras);
     }
 
     public static final void expandComment(Context context, long id, long sessionId) {
@@ -455,7 +454,7 @@ public class ThingProvider extends BaseProvider {
             if (METHOD_GET_SESSION.equals(method)) {
                 return getSession(arg, extras);
             } else if (METHOD_CLEAN_SESSIONS.equals(method)) {
-                return cleanSessions();
+                return cleanSessions(extras);
             } else if (METHOD_COLLAPSE_COMMENT.equals(method)) {
                 return collapseComment(extras);
             } else if (METHOD_EXPAND_COMMENT.equals(method)) {
@@ -552,9 +551,7 @@ public class ThingProvider extends BaseProvider {
         }
 
         // Start cleaning service on separate thread before doing the network call.
-        if (sessionCount.getAndIncrement() % CLEAN_CYCLE == 0) {
-            getContext().startService(new Intent(getContext(), SessionCleanerService.class));
-        }
+        sessionManager.cleanIfNecessary(getContext(), listing.getSessionType());
 
         // Don't get new values if the session appears valid.
         if (sessionId != 0 && !listing.isAppend()) {
@@ -611,9 +608,11 @@ public class ThingProvider extends BaseProvider {
         }
     }
 
-    private Bundle cleanSessions() {
+    private Bundle cleanSessions(Bundle extras) {
+        int sessionType = extras.getInt(EXTRA_SESSION_TYPE);
+
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "cleanSessions");
+            Log.d(TAG, "cleanSessions sessionType: " + sessionType);
         }
 
         SQLiteDatabase db = helper.getWritableDatabase();
@@ -621,7 +620,10 @@ public class ThingProvider extends BaseProvider {
         try {
             Cursor cursor = db.query(Sessions.TABLE_NAME,
                     CLEAN_PROJECTION,
-                    null, null, null, null,
+                    Sessions.SELECT_BY_TYPE,
+                    Array.of(sessionType),
+                    null,
+                    null,
                     CLEAN_SORT,
                     CLEAN_OFFSET_LIMIT);
             while (cursor.moveToNext()) {
