@@ -44,8 +44,7 @@ public class Formatter {
 
     public CharSequence formatNoSpans(Context context, CharSequence c) {
         if (c != null) {
-            c = Escaped.format(matcher, c);
-            return Disapproval.format(context, matcher, c);
+            return Escaped.format(matcher, c);
         }
         return null;
     }
@@ -75,8 +74,11 @@ public class Formatter {
 
     static class Escaped {
 
+        // TODO(btmura): Support hexadecimal character references too.
+
         private static final Pattern AMP_PATTERN = Pattern.compile("&(amp);");
-        private static final Pattern FULL_PATTERN = Pattern.compile("&(gt|lt|amp|quot|apos|nbsp|mdash);");
+        private static final Pattern FULL_PATTERN =
+                Pattern.compile("&(gt|lt|amp|quot|apos|nbsp|mdash|#(\\d+));");
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             return format(FULL_PATTERN, matcher, format(AMP_PATTERN, matcher, text));
@@ -113,7 +115,9 @@ public class Formatter {
                     s = Formatter.replace(s, start, end, "—");
                     deleted += 4;
                 } else {
-                    throw new IllegalStateException();
+                    String r = String.valueOf(Character.toChars(Integer.parseInt(m.group(2))));
+                    s = Formatter.replace(s, start, end, r);
+                    deleted += m.group(1).length() - r.length();
                 }
             }
             return s;
@@ -392,24 +396,6 @@ public class Formatter {
                     span = new UserSpan(value);
                 }
                 s = Formatter.setSpan(s, m.start(), m.end(), span);
-            }
-            return s;
-        }
-    }
-
-    static class Disapproval {
-
-        static final Pattern PATTERN = Pattern.compile("&#3232;\\\\_&#3232;");
-        static final String FACE = "ಠ_ಠ";
-
-        static CharSequence format(Context context, Matcher matcher, CharSequence text) {
-            CharSequence s = text;
-            Matcher m = matcher.usePattern(PATTERN).reset(s);
-            for (int deleted = 0; m.find();) {
-                int start = m.start() - deleted;
-                int end = m.end() - deleted;
-                deleted += m.end() - m.start() - FACE.length();
-                s = Formatter.replace(s, start, end, FACE);
             }
             return s;
         }

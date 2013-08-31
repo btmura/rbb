@@ -50,6 +50,10 @@ public class Formatter_EscapedTest extends AbstractFormatterTest {
         assertEscapedFormat("mdash &mdash;", "mdash —");
     }
 
+    public void testFormat_characterReference() {
+        assertEscapedFormat("#3232 &#3232;", "#3232 ಠ");
+    }
+
     public void testFormat_multipleEscapes() {
         assertEscapedFormat("gt &gt; lt &lt;", "gt > lt <");
         assertEscapedFormat("&lt;3 &apos;Quote&apos; &mdash;", "<3 'Quote' —");
