@@ -102,7 +102,7 @@ public class LinkFragment extends Fragment {
     }
 
     private String getUrl() {
-        return Strings.safeToString(getArguments().getCharSequence(ARG_URL));
+        return Strings.toString(getArguments().getCharSequence(ARG_URL));
     }
 
     @Override

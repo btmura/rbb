@@ -152,7 +152,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
                 typeSet,
                 null,
                 null,
-                Strings.safeToString(getCommentLabel(position)),
+                Strings.toString(getCommentLabel(position)),
                 getBody(position),
                 args,
                 false);
@@ -185,7 +185,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
                 ComposeActivity.COMMENT_REPLY_TYPE_SET,
                 null,
                 author,
-                Strings.safeToString(getCommentLabel(position)),
+                Strings.toString(getCommentLabel(position)),
                 null,
                 args,
                 true);
@@ -296,7 +296,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         item.setVisible(isCheckedCount(listView, 1) && hasThingId(position));
         if (item.isVisible()) {
             MenuHelper.setShareProvider(item,
-                    Strings.safeToString(getCommentLabel(position)),
+                    Strings.toString(getCommentLabel(position)),
                     getCommentUrl(position));
         }
     }

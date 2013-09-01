@@ -303,7 +303,7 @@ public class ThingFragment extends Fragment implements
     private void handleNewLinkComment() {
         String author = thingData.parent.getAuthor();
         // TODO: Put the code to format title in a common class and remove duplication.
-        String title = Strings.safeToString(Strings.ellipsize(thingData.parent.getTitle(), 50));
+        String title = Strings.toString(Strings.ellipsize(thingData.parent.getTitle(), 50));
         String thingId = thingData.parent.getThingId();
 
         Bundle args = new Bundle(2);
@@ -323,7 +323,7 @@ public class ThingFragment extends Fragment implements
     private void handleNewMessageComment() {
         String author = thingData.parent.getAuthor();
         // TODO: Put the code to format title in a common class and remove duplication.
-        String title = Strings.safeToString(Strings.ellipsize(thingData.parent.getTitle(), 50));
+        String title = Strings.toString(Strings.ellipsize(thingData.parent.getTitle(), 50));
         String thingId = thingData.parent.getThingId();
 
         Bundle args = new Bundle(3);

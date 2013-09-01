@@ -80,7 +80,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     private void refreshTitle(String title) {
-        setTitle(Strings.safeToString(formatter.formatAll(this, title)));
+        setTitle(Strings.toString(formatter.formatAll(this, title)));
     }
 
     @Override

@@ -26,14 +26,20 @@ public class Strings {
         if (maxLength < 0 || TextUtils.isEmpty(text) || text.length() <= maxLength) {
             return text;
         }
-        return new StringBuilder(text.subSequence(0, maxLength)).append(ELLIPSIS);
+
+        // Trim extra whitespace if we are cutting it on a blank spot.
+        int i = maxLength - 1;
+        for (; i > 0 && Character.isWhitespace(text.charAt(i)); i--) {
+        }
+
+        return new StringBuilder(text.subSequence(0, i + 1)).append(ELLIPSIS);
     }
 
     public static String emptyToNull(String string) {
         return TextUtils.isEmpty(string) ? null : string;
     }
 
-    public static String safeToString(Object object) {
+    public static String toString(Object object) {
         return object != null ? object.toString() : null;
     }
 }

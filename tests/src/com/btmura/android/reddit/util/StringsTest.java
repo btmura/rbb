@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 public class StringsTest extends TestCase {
 
     public void testEllipsize() throws Exception {
+        assertEquals("brian" + ELLIPSIS, ellipsize("brian   whitespace", 6));
         assertEquals("bri" + ELLIPSIS, ellipsize("brian", 3));
         assertEquals("brian", ellipsize("brian", 5));
         assertEquals("", ellipsize("", 5));
@@ -28,6 +29,6 @@ public class StringsTest extends TestCase {
     }
 
     private String ellipsize(String text, int maxLength) {
-        return Strings.safeToString(Strings.ellipsize(text, maxLength));
+        return Strings.toString(Strings.ellipsize(text, maxLength));
     }
 }

@@ -40,7 +40,6 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 
 public class ThingView extends CustomView implements OnGestureListener {
@@ -132,7 +131,6 @@ public class ThingView extends CustomView implements OnGestureListener {
     private int titlePaint;
     private int bodyPaint;
     private int statusPaint;
-    private int maxTitleBodyLength;
 
     private Layout linkTitleLayout;
     private Layout titleLayout;
@@ -197,7 +195,6 @@ public class ThingView extends CustomView implements OnGestureListener {
                 titlePaint = COMMENT_TITLE;
                 bodyPaint = COMMENT_BODY;
                 statusPaint = COMMENT_STATUS;
-                maxTitleBodyLength = -1;
                 break;
 
             default:
@@ -205,7 +202,6 @@ public class ThingView extends CustomView implements OnGestureListener {
                 titlePaint = THING_TITLE;
                 bodyPaint = THING_BODY;
                 statusPaint = THING_STATUS;
-                maxTitleBodyLength = 200;
                 break;
         }
     }
@@ -213,7 +209,6 @@ public class ThingView extends CustomView implements OnGestureListener {
     public void setBody(CharSequence body, boolean isNew, Formatter formatter) {
         if (!Objects.equals(this.body, body)) {
             if (!TextUtils.isEmpty(body)) {
-                body = Strings.ellipsize(body, maxTitleBodyLength);
                 bodyText = formatter.formatSpans(getContext(), body);
                 if (bodyBounds == null) {
                     bodyBounds = new RectF();
@@ -264,10 +259,10 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.nesting = nesting;
         this.nowTimeMs = nowTimeMs;
         this.likes = likes;
-        this.linkTitle = Strings.ellipsize(linkTitle, maxTitleBodyLength);
+        this.linkTitle = linkTitle;
         this.subreddit = subreddit;
         this.thingBodyWidth = thingBodyWidth;
-        this.title = Strings.ellipsize(title, maxTitleBodyLength);
+        this.title = title;
         this.ups = ups;
 
         this.drawVotingArrows = drawVotingArrows;

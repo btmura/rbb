@@ -49,11 +49,14 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
+import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 class ThingListing extends JsonParser implements Listing {
 
     public static final String TAG = "ThingListing";
+
+    private static final int MAX_TEXT_LENGTH = 200;
 
     private static final String[] HIDE_PROJECTION = {
             HideActions._ID,
@@ -380,7 +383,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onBody(JsonReader reader, int index) throws IOException {
-        CharSequence body = formatter.formatNoSpans(context, readString(reader, ""));
+        CharSequence body = readFormattedEllipsizedString(reader);
         values.get(index).put(Things.COLUMN_BODY, body.toString());
     }
 
@@ -428,7 +431,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onLinkTitle(JsonReader reader, int index) throws IOException {
-        CharSequence title = formatter.formatNoSpans(context, readString(reader, ""));
+        CharSequence title = readFormattedEllipsizedString(reader);
         values.get(index).put(Things.COLUMN_LINK_TITLE, title.toString());
     }
 
@@ -450,7 +453,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onPermaLink(JsonReader reader, int index) throws IOException {
-        String url = formatter.formatNoSpans(context, readString(reader, "")).toString();
+        String url = readFormattedString(reader).toString();
         values.get(index).put(Things.COLUMN_PERMA_LINK, url);
     }
 
@@ -476,7 +479,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
-        CharSequence title = formatter.formatNoSpans(context, readString(reader, ""));
+        CharSequence title = readFormattedEllipsizedString(reader);
         values.get(index).put(Things.COLUMN_TITLE, title.toString());
     }
 
@@ -490,13 +493,22 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onUrl(JsonReader reader, int index) throws IOException {
-        String url = formatter.formatNoSpans(context, readString(reader, "")).toString();
+        String url = readFormattedString(reader).toString();
         values.get(index).put(Things.COLUMN_URL, url);
     }
 
     @Override
     public void onUps(JsonReader reader, int index) throws IOException {
         values.get(index).put(Things.COLUMN_UPS, reader.nextInt());
+    }
+
+    private CharSequence readFormattedString(JsonReader reader) throws IOException {
+        return formatter.formatNoSpans(context, readString(reader, ""));
+    }
+
+    private CharSequence readFormattedEllipsizedString(JsonReader reader) throws IOException {
+        return formatter.formatNoSpans(context, Strings.ellipsize(readString(reader, ""),
+                MAX_TEXT_LENGTH));
     }
 
     @Override
