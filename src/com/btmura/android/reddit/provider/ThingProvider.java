@@ -261,8 +261,12 @@ public class ThingProvider extends BaseProvider {
 
     private final SessionManager sessionManager = new SessionManager();
 
-    public static final Bundle getSubredditSession(Context context, String accountName,
-            String subreddit, int filter, long sessionId, String more) {
+    public static final Bundle getSubredditSession(Context context,
+            String accountName,
+            String subreddit,
+            int filter,
+            long sessionId,
+            String more) {
         Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_SUBREDDIT);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
@@ -272,8 +276,12 @@ public class ThingProvider extends BaseProvider {
         return call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getProfileSession(Context context, String accountName,
-            String profileUser, int filter, long sessionId, String more) {
+    public static final Bundle getProfileSession(Context context,
+            String accountName,
+            String profileUser,
+            int filter,
+            long sessionId,
+            String more) {
         Bundle extras = new Bundle(4);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_USER);
         extras.putString(EXTRA_USER, profileUser);
@@ -283,8 +291,12 @@ public class ThingProvider extends BaseProvider {
         return call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getCommentsSession(Context context, String accountName,
-            String thingId, String linkId, long sessionId, int numComments) {
+    public static final Bundle getCommentsSession(Context context,
+            String accountName,
+            String thingId,
+            String linkId,
+            long sessionId,
+            int numComments) {
         Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_COMMENTS);
         extras.putString(EXTRA_THING_ID, thingId);
@@ -294,8 +306,12 @@ public class ThingProvider extends BaseProvider {
         return call(context, COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getThingSearchSession(Context context, String accountName,
-            String subreddit, String query, long sessionId, String more) {
+    public static final Bundle getThingSearchSession(Context context,
+            String accountName,
+            String subreddit,
+            String query,
+            long sessionId,
+            String more) {
         Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_THING_SEARCH);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
@@ -305,7 +321,8 @@ public class ThingProvider extends BaseProvider {
         return call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getSubredditSearchSession(Context context, String accountName,
+    public static final Bundle getSubredditSearchSession(Context context,
+            String accountName,
             String query) {
         Bundle extras = new Bundle(2);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_SUBREDDIT_SEARCH);
@@ -313,8 +330,11 @@ public class ThingProvider extends BaseProvider {
         return call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getMessageSession(Context context, String accountName,
-            int filter, long sessionId, String more) {
+    public static final Bundle getMessageSession(Context context,
+            String accountName,
+            int filter,
+            long sessionId,
+            String more) {
         Bundle extras = new Bundle(4);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGES);
         extras.putInt(EXTRA_FILTER, filter);
@@ -328,8 +348,10 @@ public class ThingProvider extends BaseProvider {
         return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle getMessageThreadSession(Context context, String accountName,
-            String thingId, long sessionId) {
+    public static final Bundle getMessageThreadSession(Context context,
+            String accountName,
+            String thingId,
+            long sessionId) {
         Bundle extras = new Bundle(3);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGE_THREAD);
         extras.putString(EXTRA_THING_ID, thingId);
@@ -357,8 +379,11 @@ public class ThingProvider extends BaseProvider {
         call(context, COMMENTS_URI, METHOD_COLLAPSE_COMMENT, null, extras);
     }
 
-    public static final Bundle insertComment(Context context, String accountName,
-            String body, String parentThingId, String thingId) {
+    public static final Bundle insertComment(Context context,
+            String accountName,
+            String body,
+            String parentThingId,
+            String thingId) {
         Bundle extras = new Bundle(3);
         extras.putString(EXTRA_BODY, body);
         extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
@@ -366,8 +391,11 @@ public class ThingProvider extends BaseProvider {
         return call(context, COMMENT_ACTIONS_URI, METHOD_INSERT_COMMENT, accountName, extras);
     }
 
-    public static final Bundle insertMessage(Context context, String accountName,
-            String body, String parentThingId, String thingId) {
+    public static final Bundle insertMessage(Context context,
+            String accountName,
+            String body,
+            String parentThingId,
+            String thingId) {
         Bundle extras = new Bundle(3);
         extras.putString(EXTRA_BODY, body);
         extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
@@ -375,8 +403,11 @@ public class ThingProvider extends BaseProvider {
         return call(context, MESSAGE_ACTIONS_URI, METHOD_INSERT_MESSAGE, accountName, extras);
     }
 
-    private static Bundle call(Context context, Uri uri, String method,
-            String arg, Bundle extras) {
+    private static Bundle call(Context context,
+            Uri uri,
+            String method,
+            String arg,
+            Bundle extras) {
         return context.getApplicationContext().getContentResolver().call(uri, method, arg, extras);
     }
 
@@ -495,45 +526,72 @@ public class ThingProvider extends BaseProvider {
             Listing listing = null;
             switch (listingType) {
                 case Sessions.TYPE_MESSAGE_THREAD:
-                    listing = MessageListing.newThreadInstance(helper, accountName,
-                            thingId, cookie);
+                    listing = MessageListing.newThreadInstance(helper,
+                            accountName,
+                            thingId,
+                            cookie);
                     break;
 
                 case Sessions.TYPE_MESSAGES:
-                    listing = MessageListing.newInstance(helper, accountName,
-                            filter, more, mark, cookie);
+                    listing = MessageListing.newInstance(helper,
+                            accountName,
+                            filter,
+                            more,
+                            mark,
+                            cookie);
                     break;
 
                 case Sessions.TYPE_SUBREDDIT:
-                    listing = ThingListing.newSubredditInstance(context, helper, accountName,
-                            subreddit, filter, more, cookie);
+                    listing = ThingListing.newSubredditInstance(context,
+                            helper,
+                            accountName,
+                            subreddit,
+                            filter,
+                            more,
+                            cookie);
                     break;
 
                 case Sessions.TYPE_USER:
-                    listing = ThingListing.newUserInstance(context, helper, accountName,
-                            user, filter, more, cookie);
+                    listing = ThingListing.newUserInstance(context,
+                            helper,
+                            accountName,
+                            user,
+                            filter,
+                            more,
+                            cookie);
                     break;
 
                 case Sessions.TYPE_COMMENTS:
-                    listing = CommentListing.newInstance(context, helper, accountName,
-                            thingId, linkId, count, cookie);
+                    listing = CommentListing.newInstance(context,
+                            helper,
+                            accountName,
+                            thingId,
+                            linkId,
+                            count,
+                            cookie);
                     break;
 
                 case Sessions.TYPE_THING_SEARCH:
-                    listing = ThingListing.newSearchInstance(context, helper, accountName,
-                            subreddit, query, more, cookie);
+                    listing = ThingListing.newSearchInstance(context,
+                            helper,
+                            accountName,
+                            subreddit,
+                            query,
+                            more,
+                            cookie);
                     break;
 
                 case Sessions.TYPE_SUBREDDIT_SEARCH:
                     listing = SubredditResultListing.newInstance(accountName,
-                            query, cookie);
+                            query,
+                            cookie);
                     break;
 
                 default:
                     throw new IllegalArgumentException();
             }
 
-            sessionId = getListingSession(listing, sessionId);
+            sessionId = getListingSession(accountName, listing, sessionId);
             Bundle result = new Bundle(2);
             result.putLong(EXTRA_SESSION_ID, sessionId);
             listing.addCursorExtras(result);
@@ -545,9 +603,13 @@ public class ThingProvider extends BaseProvider {
         return null;
     }
 
-    private long getListingSession(Listing listing, long sessionId) throws IOException {
+    private long getListingSession(String accountName,
+            Listing listing,
+            long sessionId)
+            throws IOException {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "getListingSession sessionId: " + sessionId);
+            Log.d(TAG, "getListingSession accountName: " + accountName
+                    + " sessionId: " + sessionId);
         }
 
         // Start cleaning service on separate thread before doing the network call.
@@ -583,7 +645,8 @@ public class ThingProvider extends BaseProvider {
 
             // Create a new session if there is no id.
             if (sessionId == 0) {
-                ContentValues v = new ContentValues(3);
+                ContentValues v = new ContentValues(4);
+                v.put(Sessions.COLUMN_ACCOUNT, accountName);
                 v.put(Sessions.COLUMN_TYPE, listing.getSessionType());
                 v.put(Sessions.COLUMN_THING_ID, listing.getSessionThingId());
                 v.put(Sessions.COLUMN_TIMESTAMP, System.currentTimeMillis());
@@ -681,9 +744,13 @@ public class ThingProvider extends BaseProvider {
         db.beginTransaction();
         try {
             long sessionId = extras.getLong(EXTRA_SESSION_ID);
-            c = db.query(Comments.TABLE_NAME, EXPAND_PROJECTION,
-                    Comments.SELECT_BY_SESSION_ID, Array.of(sessionId),
-                    null, null, Comments.SORT_BY_SEQUENCE_AND_ID);
+            c = db.query(Comments.TABLE_NAME,
+                    EXPAND_PROJECTION,
+                    Comments.SELECT_BY_SESSION_ID,
+                    Array.of(sessionId),
+                    null,
+                    null,
+                    Comments.SORT_BY_SEQUENCE_AND_ID);
 
             long id = extras.getLong(EXTRA_ID);
             long[] childIds = null;
@@ -771,12 +838,13 @@ public class ThingProvider extends BaseProvider {
                 return null;
             }
 
-            // TODO: Add account scoping to sessions table.
-
-            Cursor cursor = db.query(Sessions.TABLE_NAME, SESSION_ID_PROJECTION,
+            Cursor cursor = db.query(Sessions.TABLE_NAME,
+                    SESSION_ID_PROJECTION,
                     Sessions.SELECT_BY_TYPE_AND_THING_ID,
                     Array.of(Sessions.TYPE_COMMENTS, parentThingId),
-                    null, null, null);
+                    null,
+                    null,
+                    null);
             try {
                 while (cursor.moveToNext()) {
                     long sessionId = cursor.getLong(SESSION_INDEX_ID);
@@ -874,13 +942,13 @@ public class ThingProvider extends BaseProvider {
                 return null;
             }
 
-            // TODO: Add account scoping to sessions table.
-
             Cursor cursor = db.query(Sessions.TABLE_NAME,
                     SESSION_ID_PROJECTION,
                     Sessions.SELECT_BY_TYPE_AND_THING_ID,
                     Array.of(Sessions.TYPE_MESSAGE_THREAD, thingId),
-                    null, null, null);
+                    null,
+                    null,
+                    null);
             try {
                 while (cursor.moveToNext()) {
                     long sessionId = cursor.getLong(SESSION_INDEX_ID);

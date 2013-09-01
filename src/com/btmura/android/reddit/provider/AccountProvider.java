@@ -30,10 +30,12 @@ import android.util.Log;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.CommentActions;
+import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
+import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Subreddits;
@@ -69,8 +71,7 @@ public class AccountProvider extends BaseProvider {
     }
 
     /**
-     * Initializes a new account by importing subreddits and returns true on
-     * success.
+     * Initializes a new account by importing subreddits and returns true on success.
      */
     public static boolean initializeAccount(Context context, String login, String cookie) {
         // TODO: Move to Provider class.
@@ -89,13 +90,12 @@ public class AccountProvider extends BaseProvider {
     }
 
     /**
-     * Returns a non-null empty bundle on successfully creating an account.
-     * Otherwise, it returns null on failure whether from getting the user's
-     * subreddits or encountering database issues.
-     *
-     * This method touches many tables that are not the responsibility of
-     * AccountProvider, but somebody with access to the database must do this
-     * job to assure everything is done in a single transaction.
+     * Returns a non-null empty bundle on successfully creating an account. Otherwise, it returns
+     * null on failure whether from getting the user's subreddits or encountering database issues.
+     * 
+     * This method touches many tables that are not the responsibility of AccountProvider, but
+     * somebody with access to the database must do this job to assure everything is done in a
+     * single transaction.
      */
     private Bundle initializeAccount(String login, Bundle extras) {
         String cookie = extras.getString(EXTRA_COOKIE);
@@ -111,8 +111,10 @@ public class AccountProvider extends BaseProvider {
                 Accounts.TABLE_NAME,
                 Subreddits.TABLE_NAME,
                 Things.TABLE_NAME,
+                Comments.TABLE_NAME,
                 Messages.TABLE_NAME,
                 SubredditResults.TABLE_NAME,
+                Sessions.TABLE_NAME,
                 CommentActions.TABLE_NAME,
                 MessageActions.TABLE_NAME,
                 ReadActions.TABLE_NAME,

@@ -26,6 +26,8 @@ public class Sessions implements BaseColumns {
 
     public static final String TABLE_NAME = "Sessions";
 
+    public static final String COLUMN_ACCOUNT = SharedColumns.COLUMN_ACCOUNT;
+
     public static final String COLUMN_THING_ID = SharedColumns.COLUMN_THING_ID;
 
     /** Integer timestamp of when the session was created. */
@@ -70,6 +72,7 @@ public class Sessions implements BaseColumns {
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
+                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
                 + COLUMN_THING_ID + " TEXT,"
                 + COLUMN_TIMESTAMP + " INTEGER NOT NULL,"
                 + COLUMN_TYPE + " INTEGER NOT NULL)");
@@ -78,7 +81,7 @@ public class Sessions implements BaseColumns {
     /** Creates the temporary table used in version 2. Kept for testing upgrades. */
     static void createTempTableV2(SQLiteDatabase db) {
         db.execSQL("CREATE TEMP TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-                + _ID + " INTEGER PRIMARY KEY, "
+                + _ID + " INTEGER PRIMARY KEY,"
                 + COLUMN_TIMESTAMP + " INTEGER NOT NULL)");
     }
 }
