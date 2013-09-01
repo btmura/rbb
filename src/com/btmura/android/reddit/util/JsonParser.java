@@ -392,8 +392,7 @@ public class JsonParser {
     public void onParseEnd() {
     }
 
-    // TODO: Change to protected access.
-    public boolean shouldParseReplies() {
+    protected boolean shouldParseReplies() {
         return false;
     }
 
