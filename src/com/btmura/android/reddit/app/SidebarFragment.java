@@ -141,6 +141,10 @@ public class SidebarFragment extends ListFragment
         MenuHelper.showAddSubredditDialog(getFragmentManager(), getSubreddit());
     }
 
+    @Override
+    public void onTrimMemory(int level) {
+    }
+
     private String getSubreddit() {
         return getArguments().getString(EXTRA_SUBREDDIT);
     }

@@ -23,7 +23,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -32,9 +34,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 
-public class ThumbnailLoader {
+public class ThumbnailLoader implements ComponentCallbacks2 {
 
     private static final String TAG = "ThumbnailLoader";
 
@@ -55,7 +58,13 @@ public class ThumbnailLoader {
         }
     }
 
-    public void setThumbnail(Context context, ThingView v, String url) {
+    private final Context context;
+
+    public ThumbnailLoader(Context context) {
+        this.context = context.getApplicationContext();
+    }
+
+    public void setThumbnail(ThingView v, String url) {
         if (!TextUtils.isEmpty(url)) {
             Bitmap b = BitmapCache.getInstance(context).get(url);
             v.setThumbnailBitmap(b, false);
@@ -84,6 +93,32 @@ public class ThumbnailLoader {
             task.cancel(true);
             v.setTag(null);
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+    }
+
+    @Override
+    public void onLowMemory() {
+        int evictionCount = clearCache();
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onLowMemory evictionCount: " + evictionCount);
+        }
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        int evictionCount = clearCache();
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "onTrimMemory evictionCount: " + evictionCount);
+        }
+    }
+
+    private int clearCache() {
+        BitmapCache bc = BitmapCache.getInstance(context);
+        bc.evictAll();
+        return bc.evictionCount();
     }
 
     class LoadThumbnailTask extends AsyncTask<Void, Void, Bitmap> {

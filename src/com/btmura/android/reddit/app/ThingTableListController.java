@@ -16,7 +16,9 @@
 
 package com.btmura.android.reddit.app;
 
+import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -27,7 +29,7 @@ import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingListAdapter;
 
 abstract class ThingTableListController
-        implements ThingListController<ThingListAdapter>, ThingProjection {
+        implements ThingListController<ThingListAdapter>, ComponentCallbacks2, ThingProjection {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_PARENT_SUBREDDIT = "parentSubreddit";
@@ -181,6 +183,23 @@ abstract class ThingTableListController
     @Override
     public void setThingBodyWidth(int thingBodyWidth) {
         adapter.setThingBodyWidth(thingBodyWidth);
+    }
+
+    // ComponentCallbacks2 implementation
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        adapter.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onLowMemory() {
+        adapter.onLowMemory();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        adapter.onTrimMemory(level);
     }
 
     // Getters for extras

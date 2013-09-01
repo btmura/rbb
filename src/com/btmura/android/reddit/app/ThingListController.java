@@ -16,9 +16,13 @@
 
 package com.btmura.android.reddit.app;
 
+import android.content.ComponentCallbacks2;
+
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 
-interface ThingListController<A extends AbstractThingListAdapter> extends Controller<A> {
+interface ThingListController<A extends AbstractThingListAdapter> extends
+        Controller<A>,
+        ComponentCallbacks2 {
 
     static final int SWIPE_ACTION_NONE = 0;
     static final int SWIPE_ACTION_HIDE = 1;

@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
+import android.content.ComponentCallbacks2;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -60,7 +61,8 @@ public class NavigationFragment extends ListFragment implements
         LoaderCallbacks<AccountResult>,
         OnAccountMessagesSelectedListener,
         OnPlaceSelectedListener,
-        MultiChoiceModeListener {
+        MultiChoiceModeListener,
+        ComponentCallbacks2 {
 
     public static final String TAG = "NavigationFragment";
 
@@ -467,6 +469,10 @@ public class NavigationFragment extends ListFragment implements
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
     }
 
     @Override

@@ -16,7 +16,9 @@
 
 package com.btmura.android.reddit.widget;
 
+import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.View;
@@ -28,7 +30,8 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Objects;
 
-public class ThingListAdapter extends AbstractThingListAdapter implements ThingProjection {
+public class ThingListAdapter extends AbstractThingListAdapter
+        implements ThingProjection, ComponentCallbacks2 {
 
     public static final String TAG = "ThingListAdapter";
 
@@ -45,7 +48,7 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
     };
 
     private final Formatter formatter = new Formatter();
-    private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
+    private final ThumbnailLoader thumbnailLoader;
     private final OnVoteListener listener;
 
     private String parentSubreddit;
@@ -54,6 +57,7 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
     public ThingListAdapter(Context context, String accountName, OnVoteListener listener,
             boolean singleChoice) {
         super(context, accountName, singleChoice);
+        this.thumbnailLoader = new ThumbnailLoader(context);
         this.listener = listener;
     }
 
@@ -157,7 +161,7 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
                 && Objects.equals(selectedLinkId, linkId));
         tv.setOnVoteListener(listener);
         setThingDetails(tv, kind);
-        thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
+        thumbnailLoader.setThumbnail(tv, thumbnailUrl);
     }
 
     private void setThingDetails(ThingView tv, int kind) {
@@ -221,6 +225,21 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
             }
         }
         return null;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        thumbnailLoader.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onLowMemory() {
+        thumbnailLoader.onLowMemory();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        thumbnailLoader.onTrimMemory(level);
     }
 
     @Override

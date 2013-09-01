@@ -84,4 +84,8 @@ public class SearchSubredditListFragment
     @Override
     public void setSelectedThing(String thingId, String linkId) {
     }
+
+    @Override
+    public void onTrimMemory(int level) {
+    }
 }

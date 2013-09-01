@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.app;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -168,6 +169,20 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     @Override
     public void setThingBodyWidth(int thingBodyWidth) {
         adapter.setThingBodyWidth(thingBodyWidth);
+    }
+
+    // ComponentCallbacks2 implementation
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+    }
+
+    @Override
+    public void onLowMemory() {
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
     }
 
     // Simple adapter getters.

@@ -17,6 +17,7 @@
 package com.btmura.android.reddit.app;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -139,6 +140,15 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
         setListAdapter(controller.getAdapter());
         setListShown(false);
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    private int getThingBodyWidth() {
+        return listener != null ? listener.onThingBodyMeasure() : 0;
+    }
+
+    @Override
+    public void setSelectedThing(String thingId, String linkId) {
+        controller.setSelectedThing(thingId, linkId);
     }
 
     @Override
@@ -283,12 +293,20 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
         actionModeController.saveInstanceState(outState);
     }
 
-    private int getThingBodyWidth() {
-        return listener != null ? listener.onThingBodyMeasure() : 0;
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        controller.onConfigurationChanged(newConfig);
     }
 
     @Override
-    public void setSelectedThing(String thingId, String linkId) {
-        controller.setSelectedThing(thingId, linkId);
+    public void onLowMemory() {
+        super.onLowMemory();
+        controller.onLowMemory();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        controller.onTrimMemory(level);
     }
 }
