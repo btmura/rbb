@@ -18,14 +18,22 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
+    <ProgressBar
+        android:id="@+id/progress"
+        style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:indeterminate="true"
+        android:visibility="invisible" />
+
     <EditText
         android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/progress"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
-        android:layout_marginTop="@dimen/padding"
         android:hint="@string/hint_login"
         android:imeOptions="flagNoFullscreen"
         android:inputType="textNoSuggestions"
@@ -61,14 +69,5 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/show_password"
         layout="@layout/ok_button_bar" />
-
-    <ProgressBar
-        android:id="@+id/progress"
-        style="@android:style/Widget.Holo.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/ok_button_bar"
-        android:indeterminate="true"
-        android:visibility="gone" />
 
 </RelativeLayout>

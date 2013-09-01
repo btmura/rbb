@@ -322,7 +322,7 @@ public class ComposeFormFragment extends Fragment implements
     }
 
     private void enableFields() {
-        submitProgress.setVisibility(View.GONE);
+        submitProgress.setVisibility(View.INVISIBLE);
         accountSpinner.setEnabled(true);
         destinationText.setEnabled(true);
         titleText.setEnabled(true);
@@ -393,7 +393,8 @@ public class ComposeFormFragment extends Fragment implements
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_submit).setEnabled(accountSpinner.isEnabled());
+        menu.findItem(R.id.menu_submit)
+                .setEnabled(accountSpinner != null && accountSpinner.isEnabled());
     }
 
     @Override
