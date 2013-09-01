@@ -38,6 +38,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
@@ -135,9 +136,10 @@ public class BrowserActivity extends AbstractBrowserActivity implements
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         String accountName = result.getLastAccount(this);
-        int filter = result.getLastSubredditFilter(this);
+        int filter = AccountPrefs.getLastSubredditFilter(this, FilterAdapter.SUBREDDIT_HOT);
         setSubredditFragments(accountName,
                 requestedSubreddit,
+                Subreddits.isRandom(requestedSubreddit),
                 requestedThingBundle,
                 filter);
     }
@@ -160,6 +162,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
         if (controlFrag != null && controlFrag.getFilter() != newFilter) {
             setSubredditFragments(controlFrag.getAccountName(),
                     controlFrag.getSubreddit(),
+                    controlFrag.isRandom(),
                     controlFrag.getThingBundle(),
                     newFilter);
             return true;

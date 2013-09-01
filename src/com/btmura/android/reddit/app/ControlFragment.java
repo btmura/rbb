@@ -19,8 +19,6 @@ package com.btmura.android.reddit.app;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import com.btmura.android.reddit.database.Subreddits;
-
 public class ControlFragment extends Fragment {
 
     public static final int NAVIGATION_DRAWER = 0;
@@ -50,13 +48,15 @@ public class ControlFragment extends Fragment {
         return newFragment(args);
     }
 
-    public static ControlFragment newSubredditInstance(String accountName, String subreddit,
+    public static ControlFragment newSubredditInstance(String accountName,
+            String subreddit,
+            boolean isRandom,
             int filter) {
         Bundle args = new Bundle(5);
         args.putInt(ARG_NAVIGATION, NAVIGATION_SUBREDDIT);
         args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_SUBREDDIT, subreddit);
-        args.putBoolean(ARG_IS_RANDOM, Subreddits.isRandom(subreddit));
+        args.putBoolean(ARG_IS_RANDOM, isRandom);
         args.putInt(ARG_FILTER, filter);
         return newFragment(args);
     }

@@ -18,8 +18,6 @@ package com.btmura.android.reddit.content;
 
 import android.content.Context;
 
-import com.btmura.android.reddit.database.Subreddits;
-
 public class AccountPrefs extends Prefs {
 
     /** Global preference for the last selected account. */
@@ -33,6 +31,9 @@ public class AccountPrefs extends Prefs {
 
     /** Account preference for the last selected subreddit. */
     private static final String ACCOUNT_LAST_SUBREDDIT = "lastSubreddit";
+
+    /** Account preference for whether the last selected subreddit is random. */
+    private static final String ACCOUNT_LAST_IS_RANDOM = "lastIsRandom";
 
     public static String getLastAccount(Context context, String defValue) {
         return getPrefsInstance(context).getString(GLOBAL_LAST_ACCOUNT, defValue);
@@ -58,14 +59,26 @@ public class AccountPrefs extends Prefs {
         getPrefsInstance(context).edit().putInt(GLOBAL_LAST_SUBREDDIT_FILTER, filter).apply();
     }
 
-    public static String getLastSubreddit(Context context, String accountName) {
+    public static String getLastSubreddit(Context context, String accountName, String defValue) {
         String key = getAccountPreferenceKey(accountName, ACCOUNT_LAST_SUBREDDIT);
-        return getPrefsInstance(context).getString(key, Subreddits.NAME_FRONT_PAGE);
+        return getPrefsInstance(context).getString(key, defValue);
     }
 
     public static void setLastSubreddit(Context context, String accountName, String subreddit) {
         String key = getAccountPreferenceKey(accountName, ACCOUNT_LAST_SUBREDDIT);
         getPrefsInstance(context).edit().putString(key, subreddit).apply();
+    }
+
+    public static boolean getLastIsRandom(Context context,
+            String accountName,
+            boolean defValue) {
+        String key = getAccountPreferenceKey(accountName, ACCOUNT_LAST_IS_RANDOM);
+        return getPrefsInstance(context).getBoolean(key, defValue);
+    }
+
+    public static void setLastIsRandom(Context context, String accountName, boolean isRandom) {
+        String key = getAccountPreferenceKey(accountName, ACCOUNT_LAST_IS_RANDOM);
+        getPrefsInstance(context).edit().putBoolean(key, isRandom).apply();
     }
 
     private static String getAccountPreferenceKey(String accountName, String prefName) {

@@ -61,6 +61,7 @@ public class NavigationFragment extends ListFragment implements
         LoaderCallbacks<AccountResult>,
         OnAccountMessagesSelectedListener,
         OnPlaceSelectedListener,
+        OnSubredditEventListener,
         MultiChoiceModeListener,
         ComponentCallbacks2 {
 
@@ -76,7 +77,10 @@ public class NavigationFragment extends ListFragment implements
     private static final int LOADER_SUBREDDITS = 1;
 
     public interface OnNavigationEventListener {
-        void onNavigationSubredditSelected(String accountName, String subreddit, int filter,
+        void onNavigationSubredditSelected(String accountName,
+                String subreddit,
+                boolean isRandom,
+                int filter,
                 boolean force);
 
         void onNavigationProfileSelected(String accountName, int filter, boolean force);
@@ -98,6 +102,7 @@ public class NavigationFragment extends ListFragment implements
     private String accountName;
     private int place;
     private String subreddit;
+    private boolean isRandom;
     private int filter;
 
     public static NavigationFragment newInstance() {
@@ -214,39 +219,56 @@ public class NavigationFragment extends ListFragment implements
     private void selectPlaceWithDefaultFilter(int place) {
         switch (place) {
             case PLACE_SUBREDDIT:
-                String subreddit = AccountPrefs.getLastSubreddit(getActivity(), accountName);
+                String subreddit = AccountPrefs.getLastSubreddit(getActivity(),
+                        accountName,
+                        Subreddits.NAME_FRONT_PAGE);
+                boolean isRandom = AccountPrefs.getLastIsRandom(getActivity(),
+                        accountName,
+                        false);
                 int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
                         FilterAdapter.SUBREDDIT_HOT);
-                selectPlace(place, subreddit, filter, false);
+                selectPlace(place, subreddit, isRandom, filter, false);
                 break;
 
             case PLACE_PROFILE:
-                selectPlace(place, null, FilterAdapter.PROFILE_OVERVIEW, false);
+                selectPlace(place, null, false, FilterAdapter.PROFILE_OVERVIEW, false);
                 break;
 
             case PLACE_SAVED:
-                selectPlace(place, null, FilterAdapter.PROFILE_SAVED, false);
+                selectPlace(place, null, false, FilterAdapter.PROFILE_SAVED, false);
                 break;
 
             case PLACE_MESSAGES:
-                selectPlace(place, null, FilterAdapter.MESSAGE_INBOX, false);
+                selectPlace(place, null, false, FilterAdapter.MESSAGE_INBOX, false);
                 break;
         }
     }
 
-    private void selectPlace(int place, String subreddit, int filter, boolean force) {
+    private void selectPlace(int place,
+            String subreddit,
+            boolean isRandom,
+            int filter,
+            boolean force) {
         this.place = place;
         this.subreddit = subreddit;
+        this.isRandom = isRandom;
         this.filter = filter;
         placesAdapter.setSelectedPlace(place);
         AccountPrefs.setLastPlace(getActivity(), place);
         switch (place) {
             case PLACE_SUBREDDIT:
-                subredditAdapter.setSelectedSubreddit(subreddit);
+                subredditAdapter.setSelectedSubreddit(isRandom
+                        ? Subreddits.NAME_RANDOM
+                        : subreddit);
                 AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
+                AccountPrefs.setLastIsRandom(getActivity(), accountName, isRandom);
                 AccountPrefs.setLastSubredditFilter(getActivity(), filter);
                 if (listener != null) {
-                    listener.onNavigationSubredditSelected(accountName, subreddit, filter, force);
+                    listener.onNavigationSubredditSelected(accountName,
+                            subreddit,
+                            isRandom,
+                            filter,
+                            force);
                 }
                 break;
 
@@ -275,7 +297,8 @@ public class NavigationFragment extends ListFragment implements
 
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
-        selectPlace(PLACE_SUBREDDIT, subreddit, filter, true);
+        boolean isRandom = Subreddits.isRandom(subreddit);
+        selectPlace(PLACE_SUBREDDIT, subreddit, isRandom, filter, true);
     }
 
     @Override
@@ -288,12 +311,24 @@ public class NavigationFragment extends ListFragment implements
         selectPlaceWithDefaultFilter(place);
     }
 
+    @Override
+    public void onSubredditDiscovery(String subreddit) {
+    }
+
+    public boolean isRandom() {
+        return isRandom;
+    }
+
+    public void setSubreddit(String subreddit) {
+        selectPlace(place, subreddit, isRandom, filter, false);
+    }
+
     public int getFilter() {
         return filter;
     }
 
     public void setFilter(int filter) {
-        selectPlace(place, subreddit, filter, false);
+        selectPlace(place, subreddit, isRandom, filter, false);
     }
 
     @Override

@@ -68,10 +68,6 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
             }
             return numAccounts > 0 ? accountNames[0] : null;
         }
-
-        public int getLastSubredditFilter(Context context) {
-            return AccountPrefs.getLastSubredditFilter(context, 0);
-        }
     }
 
     private static Comparator<Account> ACCOUNT_COMPARATOR = new Comparator<Account>() {

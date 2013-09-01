@@ -42,7 +42,6 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.NavigationFragment.OnNavigationEventListener;
 import com.btmura.android.reddit.app.ThingListFragment.OnThingSelectedListener;
-import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingView;
 
@@ -171,12 +170,15 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
                 NavigationFragment.newInstance());
     }
 
-    protected void setSubredditFragments(String accountName, String subreddit,
-            ThingBundle thingBundle, int filter) {
+    protected void setSubredditFragments(String accountName,
+            String subreddit,
+            boolean isRandom,
+            ThingBundle thingBundle,
+            int filter) {
         selectAccountWithFilter(accountName, filter);
 
         ControlFragment controlFrag =
-                ControlFragment.newSubredditInstance(accountName, subreddit, filter);
+                ControlFragment.newSubredditInstance(accountName, subreddit, isRandom, filter);
         setCenterFragment(R.id.right_container,
                 controlFrag,
                 SubredditThingListFragment
@@ -247,11 +249,14 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     // Callbacks triggered by calling one of the initial methods that select fragments.
 
     @Override
-    public void onNavigationSubredditSelected(String accountName, String subreddit, int filter,
+    public void onNavigationSubredditSelected(String accountName,
+            String subreddit,
+            boolean isRandom,
+            int filter,
             boolean force) {
         selectAccountWithFilter(accountName, filter);
         setRightFragment(R.id.right_container,
-                ControlFragment.newSubredditInstance(accountName, subreddit, filter),
+                ControlFragment.newSubredditInstance(accountName, subreddit, isRandom, filter),
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice),
                 force);
@@ -381,13 +386,18 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     @Override
     public void onSubredditDiscovery(String subreddit) {
-        ControlFragment controlFrag = getControlFragment();
-        if (Subreddits.isRandom(controlFrag.getSubreddit())) {
-            controlFrag = controlFrag.withSubreddit(subreddit);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(controlFrag, TAG_CONTROL_FRAGMENT);
-            ft.commitAllowingStateLoss();
-            refreshActionBar(controlFrag);
+        NavigationFragment navFrag = getNavigationFragment();
+        if (navFrag != null && navFrag.isRandom()) {
+            navFrag.setSubreddit(subreddit);
+        } else {
+            ControlFragment controlFrag = getControlFragment();
+            if (controlFrag != null && controlFrag.isRandom()) {
+                controlFrag = controlFrag.withSubreddit(subreddit);
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.add(controlFrag, TAG_CONTROL_FRAGMENT);
+                ft.commitAllowingStateLoss();
+                refreshActionBar(controlFrag);
+            }
         }
     }
 
