@@ -69,13 +69,9 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
         this.listener = listener;
     }
 
-    public boolean setSelectedAccountName(String accountName) {
-        if (!Objects.equals(this.selectedAccountName, accountName)) {
-            this.selectedAccountName = accountName;
-            notifyDataSetChanged();
-            return true;
-        }
-        return false;
+    public void setSelectedAccountName(String accountName) {
+        this.selectedAccountName = accountName;
+        notifyDataSetChanged();
     }
 
     public void setAccountResult(AccountResult result) {

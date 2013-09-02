@@ -388,16 +388,16 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public void onSubredditDiscovery(String subreddit) {
         NavigationFragment navFrag = getNavigationFragment();
         if (navFrag != null && navFrag.isRandom()) {
-            navFrag.onSubredditDiscovery(subreddit);
-        }
-
-        ControlFragment controlFrag = getControlFragment();
-        if (controlFrag != null && controlFrag.isRandom()) {
-            controlFrag = controlFrag.withSubreddit(subreddit);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(controlFrag, TAG_CONTROL_FRAGMENT);
-            ft.commitAllowingStateLoss();
-            refreshActionBar(controlFrag);
+            navFrag.setSubreddit(subreddit);
+        } else {
+            ControlFragment controlFrag = getControlFragment();
+            if (controlFrag != null && controlFrag.isRandom()) {
+                controlFrag = controlFrag.withSubreddit(subreddit);
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.add(controlFrag, TAG_CONTROL_FRAGMENT);
+                ft.commitAllowingStateLoss();
+                refreshActionBar(controlFrag);
+            }
         }
     }
 

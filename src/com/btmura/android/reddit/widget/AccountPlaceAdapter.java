@@ -27,7 +27,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.util.Objects;
 
 public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener {
 
@@ -57,11 +56,10 @@ public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener 
 
     public interface OnPlaceSelectedListener {
 
-        public static final int PLACE_NONE = 0;
-        public static final int PLACE_SUBREDDIT = 1;
-        public static final int PLACE_PROFILE = 2;
-        public static final int PLACE_SAVED = 3;
-        public static final int PLACE_MESSAGES = 4;
+        public static final int PLACE_SUBREDDIT = 0;
+        public static final int PLACE_PROFILE = 1;
+        public static final int PLACE_SAVED = 2;
+        public static final int PLACE_MESSAGES = 3;
 
         void onPlaceSelected(int place);
     }
@@ -78,13 +76,9 @@ public class AccountPlaceAdapter extends BaseAdapter implements OnClickListener 
         this.listener = listener;
     }
 
-    public boolean setSelectedPlace(int place) {
-        if (!Objects.equals(this.selectedPlace, place)) {
-            this.selectedPlace = place;
-            notifyDataSetChanged();
-            return true;
-        }
-        return false;
+    public void setSelectedPlace(int place) {
+        this.selectedPlace = place;
+        notifyDataSetChanged();
     }
 
     public void setAccountPlaces(boolean showDivider, boolean showPlaces) {

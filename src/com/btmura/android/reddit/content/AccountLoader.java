@@ -68,16 +68,6 @@ public class AccountLoader extends BaseAsyncTaskLoader<AccountResult> implements
             }
             return numAccounts > 0 ? accountNames[0] : null;
         }
-
-        public boolean hasAccount(String accountName) {
-            int numAccounts = accountNames.length;
-            for (int i = 0; i < numAccounts; i++) {
-                if (accountNames[i].equals(accountName)) {
-                    return true;
-                }
-            }
-            return false;
-        }
     }
 
     private static Comparator<Account> ACCOUNT_COMPARATOR = new Comparator<Account>() {
