@@ -269,13 +269,14 @@ public class AddAccountFragment extends Fragment implements
 
         @Override
         protected void onPostExecute(Bundle result) {
+            task = null;
             String error = result.getString(AccountManager.KEY_ERROR_MESSAGE);
             if (error != null) {
                 MessageDialogFragment.showMessage(getFragmentManager(), error);
+                hideProgress();
             } else if (listener != null) {
                 listener.onAccountAdded(result);
             }
-            hideProgress();
         }
 
         private Bundle errorBundle(int resId, String... formatArgs) {
