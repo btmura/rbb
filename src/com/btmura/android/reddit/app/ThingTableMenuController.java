@@ -33,23 +33,23 @@ class ThingTableMenuController implements MenuController {
     private final Context context;
     private final FragmentManager fragmentManager;
     private final String accountName;
-    private final String subreddit;
     private final String query;
+    private final SubredditNameHolder subredditNameHolder;
     private final ThingBundleHolder thingBundleHolder;
     private final Refreshable refreshable;
 
     ThingTableMenuController(Context context,
             FragmentManager fragmentManager,
             String accountName,
-            String subreddit,
             String query,
+            SubredditNameHolder subredditNameHolder,
             ThingBundleHolder thingBundleHolder,
             Refreshable refreshable) {
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.accountName = accountName;
-        this.subreddit = subreddit;
         this.query = query;
+        this.subredditNameHolder = subredditNameHolder;
         this.thingBundleHolder = thingBundleHolder;
         this.refreshable = refreshable;
     }
@@ -71,6 +71,8 @@ class ThingTableMenuController implements MenuController {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        String subreddit = getSubreddit();
+
         boolean isQuery = !TextUtils.isEmpty(query);
         boolean hasAccount = AccountUtils.isAccount(accountName);
         boolean hasSubreddit = subreddit != null;
@@ -116,10 +118,14 @@ class ThingTableMenuController implements MenuController {
     }
 
     private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(fragmentManager, subreddit);
+        MenuHelper.showAddSubredditDialog(fragmentManager, getSubreddit());
     }
 
     private void handleSubreddit() {
-        MenuHelper.startSidebarActivity(context, subreddit);
+        MenuHelper.startSidebarActivity(context, getSubreddit());
+    }
+
+    private String getSubreddit() {
+        return subredditNameHolder.getSubredditName();
     }
 }

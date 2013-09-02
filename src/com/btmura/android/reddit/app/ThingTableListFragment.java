@@ -36,8 +36,8 @@ abstract class ThingTableListFragment<C extends ThingListController<?>>
         return new ThingTableMenuController(getActivity(),
                 getFragmentManager(),
                 controller.getAccountName(),
-                controller.getSubreddit(),
                 controller.getQuery(),
+                controller,
                 thingBundleHolder,
                 this);
     }
