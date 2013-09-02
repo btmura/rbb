@@ -17,7 +17,7 @@
 package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -621,7 +621,7 @@ public class ThingProvider extends BaseProvider {
         }
 
         // Get new values over the network.
-        ArrayList<ContentValues> values = listing.getValues();
+        List<ContentValues> values = listing.getValues();
 
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();

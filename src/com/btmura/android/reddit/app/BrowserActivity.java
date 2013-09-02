@@ -153,21 +153,20 @@ public class BrowserActivity extends AbstractBrowserActivity implements
         int newFilter = filterAdapter.getFilter(itemPosition);
 
         NavigationFragment navFrag = getNavigationFragment();
-        if (navFrag != null && navFrag.getFilter() != newFilter) {
+        if (navFrag != null) {
             navFrag.setFilter(newFilter);
             return true;
+        } else {
+            ControlFragment controlFrag = getControlFragment();
+            if (controlFrag != null && controlFrag.getFilter() != newFilter) {
+                setSubredditFragments(controlFrag.getAccountName(),
+                        controlFrag.getSubreddit(),
+                        controlFrag.isRandom(),
+                        controlFrag.getThingBundle(),
+                        newFilter);
+                return true;
+            }
         }
-
-        ControlFragment controlFrag = getControlFragment();
-        if (controlFrag != null && controlFrag.getFilter() != newFilter) {
-            setSubredditFragments(controlFrag.getAccountName(),
-                    controlFrag.getSubreddit(),
-                    controlFrag.isRandom(),
-                    controlFrag.getThingBundle(),
-                    newFilter);
-            return true;
-        }
-
         return false;
     }
 

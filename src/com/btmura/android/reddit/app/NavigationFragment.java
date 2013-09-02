@@ -68,6 +68,10 @@ public class NavigationFragment extends ListFragment implements
     public static final String TAG = "NavigationFragment";
 
     private static final String STATE_ACCOUNT_NAME = "accountName";
+    private static final String STATE_PLACE = "place";
+    private static final String STATE_SUBREDDIT = "subreddit";
+    private static final String STATE_IS_RANDOM = "isRandom";
+    private static final String STATE_FILTER = "filter";
 
     private static final int ADAPTER_ACCOUNTS = 0;
     private static final int ADAPTER_PLACES = 1;
@@ -127,6 +131,10 @@ public class NavigationFragment extends ListFragment implements
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
             accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
+            place = savedInstanceState.getInt(STATE_PLACE);
+            subreddit = savedInstanceState.getString(STATE_SUBREDDIT);
+            isRandom = savedInstanceState.getBoolean(STATE_IS_RANDOM);
+            filter = savedInstanceState.getInt(STATE_FILTER);
         }
         accountAdapter = new AccountResultAdapter(getActivity(), this);
         placesAdapter = new AccountPlaceAdapter(getActivity(), this);
@@ -167,56 +175,40 @@ public class NavigationFragment extends ListFragment implements
         selectAccount(accountName, restart);
     }
 
-    private void selectAccount(String accountName, boolean restartLoader) {
-        this.accountName = accountName;
-        AccountPrefs.setLastAccount(getActivity(), accountName);
-        accountAdapter.setSelectedAccountName(accountName);
-        placesAdapter.setAccountPlaces(accountAdapter.getCount() > 1,
-                AccountUtils.isAccount(accountName));
-        refreshSubredditLoader(accountName, restartLoader);
-
-        int place = AccountUtils.isAccount(accountName)
-                ? AccountPrefs.getLastPlace(getActivity(), PLACE_SUBREDDIT)
-                : PLACE_SUBREDDIT;
-        selectPlaceWithDefaultFilter(place);
+    @Override
+    public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
-    private void refreshSubredditLoader(String accountName, boolean restartLoader) {
-        if (restartLoader) {
+    private void selectAccount(String accountName, boolean restart) {
+        this.accountName = accountName;
+        accountAdapter.setSelectedAccountName(accountName);
+        AccountPrefs.setLastAccount(getActivity(), accountName);
+        placesAdapter.setAccountPlaces(accountAdapter.getCount() > 1,
+                AccountUtils.isAccount(accountName));
+        refreshSubredditLoader(restart);
+        refreshPlace(restart);
+    }
+
+    private void refreshSubredditLoader(boolean restart) {
+        if (restart) {
             getLoaderManager().restartLoader(LOADER_SUBREDDITS, null, subredditLoaderCallbacks);
         } else {
             getLoaderManager().initLoader(LOADER_SUBREDDITS, null, subredditLoaderCallbacks);
         }
     }
 
-    @Override
-    public void onLoaderReset(Loader<AccountResult> loader) {
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        int adapterIndex = mergeAdapter.getAdapterIndex(position);
-        int adapterPosition = mergeAdapter.getAdapterPosition(position);
-        switch (adapterIndex) {
-            case ADAPTER_ACCOUNTS:
-                handleAccountClick(adapterPosition);
-                break;
-
-            case ADAPTER_PLACES:
-                throw new IllegalStateException();
-
-            case ADAPTER_SUBREDDITS:
-                handleSubredditClick(adapterPosition);
-                break;
+    private void refreshPlace(boolean restart) {
+        if (restart) {
+            int place = AccountUtils.isAccount(accountName)
+                    ? AccountPrefs.getLastPlace(getActivity(), PLACE_SUBREDDIT)
+                    : PLACE_SUBREDDIT;
+            selectPlaceWithDefaults(place, false);
+        } else {
+            selectPlace(place, subreddit, isRandom, filter, false);
         }
     }
 
-    private void handleAccountClick(int position) {
-        Item item = accountAdapter.getItem(position);
-        selectAccount(item.getAccountName(), true);
-    }
-
-    private void selectPlaceWithDefaultFilter(int place) {
+    private void selectPlaceWithDefaults(int place, boolean force) {
         switch (place) {
             case PLACE_SUBREDDIT:
                 String subreddit = AccountPrefs.getLastSubreddit(getActivity(),
@@ -227,19 +219,19 @@ public class NavigationFragment extends ListFragment implements
                         false);
                 int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
                         FilterAdapter.SUBREDDIT_HOT);
-                selectPlace(place, subreddit, isRandom, filter, false);
+                selectPlace(place, subreddit, isRandom, filter, force);
                 break;
 
             case PLACE_PROFILE:
-                selectPlace(place, null, false, FilterAdapter.PROFILE_OVERVIEW, false);
+                selectPlace(place, null, false, FilterAdapter.PROFILE_OVERVIEW, force);
                 break;
 
             case PLACE_SAVED:
-                selectPlace(place, null, false, FilterAdapter.PROFILE_SAVED, false);
+                selectPlace(place, null, false, FilterAdapter.PROFILE_SAVED, force);
                 break;
 
             case PLACE_MESSAGES:
-                selectPlace(place, null, false, FilterAdapter.MESSAGE_INBOX, false);
+                selectPlace(place, null, false, FilterAdapter.MESSAGE_INBOX, force);
                 break;
         }
     }
@@ -295,6 +287,29 @@ public class NavigationFragment extends ListFragment implements
         }
     }
 
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        int adapterIndex = mergeAdapter.getAdapterIndex(position);
+        int adapterPosition = mergeAdapter.getAdapterPosition(position);
+        switch (adapterIndex) {
+            case ADAPTER_ACCOUNTS:
+                handleAccountClick(adapterPosition);
+                break;
+
+            case ADAPTER_PLACES:
+                throw new IllegalStateException();
+
+            case ADAPTER_SUBREDDITS:
+                handleSubredditClick(adapterPosition);
+                break;
+        }
+    }
+
+    private void handleAccountClick(int position) {
+        Item item = accountAdapter.getItem(position);
+        selectAccount(item.getAccountName(), true);
+    }
+
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
         boolean isRandom = Subreddits.isRandom(subreddit);
@@ -303,32 +318,25 @@ public class NavigationFragment extends ListFragment implements
 
     @Override
     public void onAccountMessagesSelected(String accountName) {
-        selectPlaceWithDefaultFilter(PLACE_MESSAGES);
+        selectPlaceWithDefaults(PLACE_MESSAGES, false);
     }
 
     @Override
     public void onPlaceSelected(int place) {
-        selectPlaceWithDefaultFilter(place);
+        selectPlaceWithDefaults(place, false);
     }
 
     @Override
-    public void onSubredditDiscovery(String subreddit) {
+    public void onSubredditDiscovery(String newSubreddit) {
+        if (isRandom) {
+            selectPlace(place, newSubreddit, isRandom, filter, false);
+        }
     }
 
-    public boolean isRandom() {
-        return isRandom;
-    }
-
-    public void setSubreddit(String subreddit) {
-        selectPlace(place, subreddit, isRandom, filter, false);
-    }
-
-    public int getFilter() {
-        return filter;
-    }
-
-    public void setFilter(int filter) {
-        selectPlace(place, subreddit, isRandom, filter, false);
+    public void setFilter(int newFilter) {
+        if (this.filter != newFilter) {
+            selectPlace(place, subreddit, isRandom, newFilter, false);
+        }
     }
 
     @Override
@@ -514,6 +522,10 @@ public class NavigationFragment extends ListFragment implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_ACCOUNT_NAME, accountName);
+        outState.putInt(STATE_PLACE, place);
+        outState.putString(STATE_SUBREDDIT, subreddit);
+        outState.putBoolean(STATE_IS_RANDOM, isRandom);
+        outState.putInt(STATE_FILTER, filter);
     }
 
     class AccountSubredditLoaderCallbacks implements LoaderCallbacks<Cursor> {

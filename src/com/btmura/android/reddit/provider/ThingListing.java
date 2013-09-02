@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -284,11 +286,11 @@ class ThingListing extends JsonParser implements Listing {
     }
 
     @Override
-    public ArrayList<ContentValues> getValues() throws IOException {
+    public List<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
 
         // Always follow redirects unless we are going to /r/random. We need to
-        // catch this case so we can goto the JSON version.
+        // catch this case to get the resolved subreddit.
         boolean followRedirects = true;
 
         CharSequence url;
@@ -307,15 +309,11 @@ class ThingListing extends JsonParser implements Listing {
 
         HttpURLConnection conn = RedditApi.connect(url, cookie, followRedirects, false);
 
-        // Handle the redirect if the request was for /r/random to use JSON.
+        // Handle the redirect if the request was for /r/random to get resolved url.
         if (!followRedirects && conn.getResponseCode() == 302) {
             String location = conn.getHeaderField("Location");
             resolvedSubreddit = UriHelper.getSubreddit(Uri.parse(location));
-            url = Urls.subreddit(resolvedSubreddit, filter, more, Urls.TYPE_JSON);
-
-            // Disconnect and reconnect to the proper URL.
-            conn.disconnect();
-            conn = RedditApi.connect(url, cookie, false, false);
+            return Collections.emptyList();
         }
 
         InputStream input = null;

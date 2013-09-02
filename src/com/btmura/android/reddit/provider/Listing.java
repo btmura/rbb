@@ -17,7 +17,7 @@
 package com.btmura.android.reddit.provider;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -36,7 +36,7 @@ interface Listing {
     String getSessionThingId();
 
     /** Get the values for this listing possibly using the network. */
-    ArrayList<ContentValues> getValues() throws IOException;
+    List<ContentValues> getValues() throws IOException;
 
     /** Called after the insertion transaction to perform additional ops. */
     void performExtraWork(Context context);
