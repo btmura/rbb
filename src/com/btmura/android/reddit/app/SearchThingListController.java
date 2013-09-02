@@ -40,7 +40,7 @@ class SearchThingListController extends ThingTableListController {
     public Loader<Cursor> createLoader() {
         return new SearchThingLoader(context,
                 getAccountName(),
-                getSubredditName(),
+                getSubreddit(),
                 getQuery(),
                 getMoreId(),
                 getCursorExtras());

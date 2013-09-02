@@ -74,7 +74,7 @@ abstract class ThingTableListController
         state.putString(EXTRA_SELECTED_LINK_ID, adapter.getSelectedLinkId());
         state.putString(EXTRA_SELECTED_THING_ID, adapter.getSelectedThingId());
         state.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
-        state.putString(EXTRA_SUBREDDIT, getSubredditName());
+        state.putString(EXTRA_SUBREDDIT, getSubreddit());
     }
 
     @Override
@@ -145,7 +145,7 @@ abstract class ThingTableListController
     }
 
     @Override
-    public String getSubredditName() {
+    public String getSubreddit() {
         return adapter.getSubreddit();
     }
 

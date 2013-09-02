@@ -217,7 +217,7 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     }
 
     @Override
-    public String getSubredditName() {
+    public String getSubreddit() {
         return null;
     }
 

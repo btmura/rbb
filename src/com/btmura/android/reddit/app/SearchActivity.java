@@ -68,8 +68,9 @@ public class SearchActivity extends AbstractBrowserActivity implements
     @Override
     protected boolean skipSetup(Bundle savedInstanceState) {
         tabController = new TabController(bar, savedInstanceState);
-        if (Subreddits.hasSidebar(getSubreddit())) {
-            tabPostsInSubreddit = newTab(MenuHelper.getSubredditTitle(this, getSubreddit()));
+        if (Subreddits.hasSidebar(getSubredditArgument())) {
+            tabPostsInSubreddit = newTab(MenuHelper
+                    .getSubredditTitle(this, getSubredditArgument()));
             tabController.addTab(tabPostsInSubreddit);
         }
         tabPosts = tabController.addTab(newTab(getString(R.string.tab_posts)));
@@ -127,7 +128,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
         }
         if (tabController.selectTab(tab)) {
             if (tab == tabPostsInSubreddit) {
-                refreshThingList(getSubreddit());
+                refreshThingList(getSubredditArgument());
             } else if (tab == tabPosts) {
                 refreshThingList(null);
             } else if (tab == tabSubreddits) {
@@ -177,7 +178,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
         return accountResult;
     }
 
-    private String getSubreddit() {
+    private String getSubredditArgument() {
         return getIntent().getStringExtra(EXTRA_SUBREDDIT);
     }
 

@@ -53,7 +53,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         OnThingEventListener,
         OnBackStackChangedListener,
         AccountNameHolder,
-        SubredditNameHolder,
+        SubredditHolder,
         ThingBundleHolder {
 
     private static final String TAG_CONTROL_FRAGMENT = "control";
@@ -588,7 +588,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     }
 
     @Override
-    public String getSubredditName() {
+    public String getSubreddit() {
         ControlFragment cf = getControlFragment();
         if (cf != null) {
             ThingBundle thingBundle = cf.getThingBundle();

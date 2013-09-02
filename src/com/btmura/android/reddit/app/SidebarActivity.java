@@ -35,7 +35,7 @@ public class SidebarActivity extends AbstractBrowserActivity implements
         LoaderCallbacks<AccountResult>,
         TabListener,
         AccountResultHolder,
-        SubredditNameHolder {
+        SubredditHolder {
 
     private static final String TAG = "SidebarActivity";
 
@@ -123,11 +123,11 @@ public class SidebarActivity extends AbstractBrowserActivity implements
     }
 
     private void refreshSidebarFragments() {
-        setSidebarFragments(accountName, getSubredditName());
+        setSidebarFragments(accountName, getSubreddit());
     }
 
     private void refreshRelatedSubredditFragments() {
-        setRelatedSubredditsFragments(accountName, getSubredditName());
+        setRelatedSubredditsFragments(accountName, getSubreddit());
     }
 
     @Override
@@ -136,7 +136,7 @@ public class SidebarActivity extends AbstractBrowserActivity implements
 
     @Override
     protected void refreshActionBar(ControlFragment controlFrag) {
-        bar.setTitle(Subreddits.getTitle(this, getSubredditName()));
+        bar.setTitle(Subreddits.getTitle(this, getSubreddit()));
     }
 
     @Override
@@ -168,7 +168,7 @@ public class SidebarActivity extends AbstractBrowserActivity implements
     }
 
     @Override
-    public String getSubredditName() {
+    public String getSubreddit() {
         return getIntent().getStringExtra(EXTRA_SUBREDDIT);
     }
 

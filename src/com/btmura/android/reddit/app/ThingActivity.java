@@ -38,7 +38,7 @@ public class ThingActivity extends GlobalMenuActivity implements
         LoaderCallbacks<AccountResult>,
         OnThingEventListener,
         AccountNameHolder,
-        SubredditNameHolder {
+        SubredditHolder {
 
     public static final String EXTRA_THING_BUNDLE = "thingBundle";
 
@@ -118,7 +118,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     @Override
-    public String getSubredditName() {
+    public String getSubreddit() {
         return thingBundle.getSubreddit();
     }
 
@@ -136,7 +136,7 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     private void handleHome() {
         Intent upIntent = NavUtils.getParentActivityIntent(this);
-        upIntent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getSubredditName());
+        upIntent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, getSubreddit());
         if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
             TaskStackBuilder.create(this)
                     .addNextIntentWithParentStack(upIntent)

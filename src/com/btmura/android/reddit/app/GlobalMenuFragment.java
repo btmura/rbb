@@ -51,7 +51,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         String getQuery();
     }
 
-    private SubredditNameHolder subredditNameHolder;
+    private SubredditHolder subredditNameHolder;
     private SearchQueryHandler listener;
     private SearchView searchView;
     private MenuItem searchItem;
@@ -63,8 +63,8 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof SubredditNameHolder) {
-            subredditNameHolder = (SubredditNameHolder) activity;
+        if (activity instanceof SubredditHolder) {
+            subredditNameHolder = (SubredditHolder) activity;
         }
         if (activity instanceof SearchQueryHandler) {
             listener = (SearchQueryHandler) activity;
@@ -113,7 +113,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
 
     private void handleNewPost() {
         MenuHelper.startComposeActivity(getActivity(), ComposeActivity.DEFAULT_TYPE_SET,
-                subredditNameHolder.getSubredditName(), null, null, null, null, false);
+                subredditNameHolder.getSubreddit(), null, null, null, null, false);
     }
 
     public void handleSearch() {
@@ -147,7 +147,7 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
                     | Intent.FLAG_ACTIVITY_NO_ANIMATION);
             intent.putExtra(SearchActivity.EXTRA_SUBREDDIT,
-                    subredditNameHolder.getSubredditName());
+                    subredditNameHolder.getSubreddit());
             intent.putExtra(SearchActivity.EXTRA_QUERY, query);
             startActivityForResult(intent, REQUEST_SEARCH);
         }

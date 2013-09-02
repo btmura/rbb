@@ -22,7 +22,7 @@ import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 
 interface ThingListController<A extends AbstractThingListAdapter> extends
         Controller<A>,
-        SubredditNameHolder,
+        SubredditHolder,
         ComponentCallbacks2 {
 
     static final int SWIPE_ACTION_NONE = 0;

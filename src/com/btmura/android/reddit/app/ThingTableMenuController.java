@@ -34,7 +34,7 @@ class ThingTableMenuController implements MenuController {
     private final FragmentManager fragmentManager;
     private final String accountName;
     private final String query;
-    private final SubredditNameHolder subredditNameHolder;
+    private final SubredditHolder subredditNameHolder;
     private final ThingBundleHolder thingBundleHolder;
     private final Refreshable refreshable;
 
@@ -42,7 +42,7 @@ class ThingTableMenuController implements MenuController {
             FragmentManager fragmentManager,
             String accountName,
             String query,
-            SubredditNameHolder subredditNameHolder,
+            SubredditHolder subredditNameHolder,
             ThingBundleHolder thingBundleHolder,
             Refreshable refreshable) {
         this.context = context;
@@ -126,6 +126,6 @@ class ThingTableMenuController implements MenuController {
     }
 
     private String getSubreddit() {
-        return subredditNameHolder.getSubredditName();
+        return subredditNameHolder.getSubreddit();
     }
 }
