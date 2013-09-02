@@ -51,14 +51,11 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
-import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 class ThingListing extends JsonParser implements Listing {
 
     public static final String TAG = "ThingListing";
-
-    private static final int MAX_TEXT_LENGTH = 200;
 
     private static final String[] HIDE_PROJECTION = {
             HideActions._ID,
@@ -381,7 +378,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onBody(JsonReader reader, int index) throws IOException {
-        CharSequence body = readFormattedEllipsizedString(reader);
+        CharSequence body = readFormattedString(reader);
         values.get(index).put(Things.COLUMN_BODY, body.toString());
     }
 
@@ -429,7 +426,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onLinkTitle(JsonReader reader, int index) throws IOException {
-        CharSequence title = readFormattedEllipsizedString(reader);
+        CharSequence title = readFormattedString(reader);
         values.get(index).put(Things.COLUMN_LINK_TITLE, title.toString());
     }
 
@@ -477,7 +474,7 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void onTitle(JsonReader reader, int index) throws IOException {
-        CharSequence title = readFormattedEllipsizedString(reader);
+        CharSequence title = readFormattedString(reader);
         values.get(index).put(Things.COLUMN_TITLE, title.toString());
     }
 
@@ -502,11 +499,6 @@ class ThingListing extends JsonParser implements Listing {
 
     private CharSequence readFormattedString(JsonReader reader) throws IOException {
         return formatter.formatNoSpans(context, readString(reader, ""));
-    }
-
-    private CharSequence readFormattedEllipsizedString(JsonReader reader) throws IOException {
-        return formatter.formatNoSpans(context, Strings.ellipsize(readString(reader, ""),
-                MAX_TEXT_LENGTH));
     }
 
     @Override

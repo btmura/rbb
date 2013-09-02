@@ -40,6 +40,7 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
 import com.btmura.android.reddit.util.Objects;
+import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 
 public class ThingView extends CustomView implements OnGestureListener {
@@ -88,6 +89,9 @@ public class ThingView extends CustomView implements OnGestureListener {
     /** Formatter for building quantities for the status line. */
     private static final int FORMATTER_STATUS = 3;
 
+    /** Maximum length of titles and bodies when displaying thing lists. */
+    private static final int MAX_TEXT_LENGTH = 200;
+
     private final GestureDetector detector;
     private OnVoteListener listener;
 
@@ -131,6 +135,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private int titlePaint;
     private int bodyPaint;
     private int statusPaint;
+    private int maxTextLength;
 
     private Layout linkTitleLayout;
     private Layout titleLayout;
@@ -195,6 +200,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                 titlePaint = COMMENT_TITLE;
                 bodyPaint = COMMENT_BODY;
                 statusPaint = COMMENT_STATUS;
+                maxTextLength = -1;
                 break;
 
             default:
@@ -202,6 +208,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                 titlePaint = THING_TITLE;
                 bodyPaint = THING_BODY;
                 statusPaint = THING_STATUS;
+                maxTextLength = MAX_TEXT_LENGTH;
                 break;
         }
     }
@@ -209,7 +216,8 @@ public class ThingView extends CustomView implements OnGestureListener {
     public void setBody(CharSequence body, boolean isNew, Formatter formatter) {
         if (!Objects.equals(this.body, body)) {
             if (!TextUtils.isEmpty(body)) {
-                bodyText = formatter.formatSpans(getContext(), body);
+                bodyText = Strings.ellipsize(formatter.formatSpans(getContext(), body),
+                        maxTextLength);
                 if (bodyBounds == null) {
                     bodyBounds = new RectF();
                 }
@@ -259,10 +267,10 @@ public class ThingView extends CustomView implements OnGestureListener {
         this.nesting = nesting;
         this.nowTimeMs = nowTimeMs;
         this.likes = likes;
-        this.linkTitle = linkTitle;
+        this.linkTitle = Strings.ellipsize(linkTitle, maxTextLength);
         this.subreddit = subreddit;
         this.thingBodyWidth = thingBodyWidth;
-        this.title = title;
+        this.title = Strings.ellipsize(title, maxTextLength);
         this.ups = ups;
 
         this.drawVotingArrows = drawVotingArrows;
@@ -301,8 +309,16 @@ public class ThingView extends CustomView implements OnGestureListener {
                 && !subreddit.equalsIgnoreCase(parentSubreddit);
 
         boolean showNumComments = kind == Kinds.KIND_LINK;
-        setStatusText(over18, showSubreddit, showStatusPoints, showNumComments,
-                author, createdUtc, nowTimeMs, numComments, score, subreddit);
+        setStatusText(over18,
+                showSubreddit,
+                showStatusPoints,
+                showNumComments,
+                author,
+                createdUtc,
+                nowTimeMs,
+                numComments,
+                score,
+                subreddit);
 
         SwipeDismissTouchListener.resetAnimation(this);
         requestLayout();
@@ -315,9 +331,16 @@ public class ThingView extends CustomView implements OnGestureListener {
         invalidate(thumbRect);
     }
 
-    private void setStatusText(boolean showNsfw, boolean showSubreddit, boolean showPoints,
-            boolean showNumComments, String author, long createdUtc, long nowTimeMs,
-            int numComments, int score, String subreddit) {
+    private void setStatusText(boolean showNsfw,
+            boolean showSubreddit,
+            boolean showPoints,
+            boolean showNumComments,
+            String author,
+            long createdUtc,
+            long nowTimeMs,
+            int numComments,
+            int score,
+            String subreddit) {
         Context c = getContext();
         Resources r = getResources();
 
@@ -359,7 +382,9 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
     }
 
-    private CharSequence getQuantityString(Resources resources, int resId, int quantity,
+    private CharSequence getQuantityString(Resources resources,
+            int resId,
+            int quantity,
             int formatterIndex) {
         java.util.Formatter formatter = resetFormatter(formatterIndex, 20);
         String format = resources.getQuantityText(resId, quantity).toString();
@@ -367,7 +392,9 @@ public class ThingView extends CustomView implements OnGestureListener {
         return formatterData[formatterIndex];
     }
 
-    private CharSequence getRelativeTime(Resources resources, long nowTimeMs, long createdUtc,
+    private CharSequence getRelativeTime(Resources resources,
+            long nowTimeMs,
+            long createdUtc,
             int formatterIndex) {
         java.util.Formatter formatter = resetFormatter(formatterIndex, 15);
         RelativeTime.format(resources, formatter, nowTimeMs, createdUtc);
@@ -632,19 +659,40 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     private static Layout makeStaticLayout(int paint, CharSequence text, int width) {
-        return new StaticLayout(text, TEXT_PAINTS[paint], width,
-                Alignment.ALIGN_NORMAL, 1f, 0f, true);
+        return new StaticLayout(text,
+                TEXT_PAINTS[paint],
+                width,
+                Alignment.ALIGN_NORMAL,
+                1f,
+                0f,
+                true);
     }
 
     private BoringLayout createStatusLayout(int width) {
         TextPaint paint = TEXT_PAINTS[statusPaint];
         statusMetrics = BoringLayout.isBoring(statusText, paint, statusMetrics);
         if (statusLayout != null) {
-            statusLayout = statusLayout.replaceOrMake(statusText, paint, width,
-                    Alignment.ALIGN_NORMAL, 1f, 0f, statusMetrics, true, TruncateAt.END, width);
+            statusLayout = statusLayout.replaceOrMake(statusText,
+                    paint,
+                    width,
+                    Alignment.ALIGN_NORMAL,
+                    1f,
+                    0f,
+                    statusMetrics,
+                    true,
+                    TruncateAt.END,
+                    width);
         } else {
-            statusLayout = BoringLayout.make(statusText, paint, width,
-                    Alignment.ALIGN_NORMAL, 1f, 0f, statusMetrics, true, TruncateAt.END, width);
+            statusLayout = BoringLayout.make(statusText,
+                    paint,
+                    width,
+                    Alignment.ALIGN_NORMAL,
+                    1f,
+                    0f,
+                    statusMetrics,
+                    true,
+                    TruncateAt.END,
+                    width);
         }
         return statusLayout;
     }
@@ -701,13 +749,26 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         // Create the layout and try to reuse the existing layout.
         if (detailLayouts[i] != null) {
-            detailLayouts[i] = detailLayouts[i].replaceOrMake(text, paint,
+            detailLayouts[i] = detailLayouts[i].replaceOrMake(text,
+                    paint,
                     DETAILS_INNER_CELL_WIDTH,
-                    Alignment.ALIGN_CENTER, 1, 0, detailMetrics[i], true, TruncateAt.END,
+                    Alignment.ALIGN_CENTER,
+                    1,
+                    0,
+                    detailMetrics[i],
+                    true,
+                    TruncateAt.END,
                     DETAILS_INNER_CELL_WIDTH);
         } else {
-            detailLayouts[i] = BoringLayout.make(text, paint, DETAILS_INNER_CELL_WIDTH,
-                    Alignment.ALIGN_CENTER, 1, 0, detailMetrics[i], true, TruncateAt.END,
+            detailLayouts[i] = BoringLayout.make(text,
+                    paint,
+                    DETAILS_INNER_CELL_WIDTH,
+                    Alignment.ALIGN_CENTER,
+                    1,
+                    0,
+                    detailMetrics[i],
+                    true,
+                    TruncateAt.END,
                     DETAILS_INNER_CELL_WIDTH);
         }
     }
@@ -808,7 +869,8 @@ public class ThingView extends CustomView implements OnGestureListener {
             }
 
             Spannable bodySpan = (Spannable) bodyText;
-            ClickableSpan[] spans = bodySpan.getSpans(offset, offset,
+            ClickableSpan[] spans = bodySpan.getSpans(offset,
+                    offset,
                     ClickableSpan.class);
             if (spans != null && spans.length > 0) {
                 if (action == MotionEvent.ACTION_UP) {
@@ -829,14 +891,27 @@ public class ThingView extends CustomView implements OnGestureListener {
         c.translate(-dx, -dy);
     }
 
+    @Override
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e, getTopOffset(), getLeftOffset(),
-                drawVotingArrows, drawScore, isVotable);
+        return VotingArrows.onDown(e,
+                getTopOffset(),
+                getLeftOffset(),
+                drawVotingArrows,
+                drawScore,
+                isVotable);
     }
 
+    @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e, getTopOffset(), getLeftOffset(),
-                drawVotingArrows, drawScore, isVotable, listener, this, likes);
+        return VotingArrows.onSingleTapUp(e,
+                getTopOffset(),
+                getLeftOffset(),
+                drawVotingArrows,
+                drawScore,
+                isVotable,
+                listener,
+                this,
+                likes);
     }
 
     private float getTopOffset() {
@@ -847,17 +922,21 @@ public class ThingView extends CustomView implements OnGestureListener {
         return getNestingIndent() * nesting;
     }
 
+    @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         return false;
     }
 
+    @Override
     public void onLongPress(MotionEvent e) {
     }
 
+    @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         return false;
     }
 
+    @Override
     public void onShowPress(MotionEvent e) {
     }
 
