@@ -252,7 +252,6 @@ public class NavigationFragment extends ListFragment implements
 
         placesAdapter.setSelectedPlace(place);
         AccountPrefs.setLastPlace(getActivity(), place);
-        getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
 
         switch (place) {
             case PLACE_SUBREDDIT:
@@ -262,7 +261,12 @@ public class NavigationFragment extends ListFragment implements
                 AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
                 AccountPrefs.setLastIsRandom(getActivity(), accountName, isRandom);
                 AccountPrefs.setLastSubredditFilter(getActivity(), filter);
-                if (listener != null) {
+
+                if (Subreddits.isRandom(subreddit)) {
+                    getLoaderManager().restartLoader(LOADER_RANDOM_SUBREDDIT,
+                            null,
+                            randomLoaderCallbacks);
+                } else if (listener != null) {
                     listener.onNavigationSubredditSelected(accountName,
                             subreddit,
                             isRandom,
@@ -272,6 +276,7 @@ public class NavigationFragment extends ListFragment implements
                 break;
 
             case PLACE_PROFILE:
+                getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
                     listener.onNavigationProfileSelected(accountName, filter, force);
@@ -279,6 +284,7 @@ public class NavigationFragment extends ListFragment implements
                 break;
 
             case PLACE_SAVED:
+                getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
                     listener.onNavigationSavedSelected(accountName, filter, force);
@@ -286,11 +292,15 @@ public class NavigationFragment extends ListFragment implements
                 break;
 
             case PLACE_MESSAGES:
+                getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
                     listener.onNavigationMessagesSelected(accountName, filter, force);
                 }
                 break;
+
+            default:
+                throw new IllegalArgumentException("place: " + place);
         }
     }
 
@@ -319,11 +329,7 @@ public class NavigationFragment extends ListFragment implements
 
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
-        if (Subreddits.isRandom(subreddit)) {
-            getLoaderManager().restartLoader(LOADER_RANDOM_SUBREDDIT, null, randomLoaderCallbacks);
-        } else {
-            selectPlace(PLACE_SUBREDDIT, subreddit, false, filter, true);
-        }
+        selectPlace(PLACE_SUBREDDIT, subreddit, Subreddits.isRandom(subreddit), filter, true);
     }
 
     @Override
