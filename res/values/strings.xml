@@ -107,6 +107,7 @@
     <string name="menu_subreddit">/r/%1$s</string>
     <string name="menu_submit">Submit</string>
     <string name="menu_switch_themes">Switch themes</string>
+    <string name="menu_sync_settings">Sync settings</string>
     <string name="menu_unhide">Unhide</string>
     <string name="menu_unsave">Unsave</string>
     <string name="menu_user">/u/%1$s</string>

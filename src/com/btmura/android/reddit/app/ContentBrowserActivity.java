@@ -28,8 +28,17 @@ import android.view.MenuItem;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.ContentUriListFragment.OnUriClickListener;
 import com.btmura.android.reddit.content.ThemePrefs;
+import com.btmura.android.reddit.provider.AccountProvider;
+import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.ThingProvider;
 
 public class ContentBrowserActivity extends FragmentActivity implements OnUriClickListener {
+
+    private static final String[] AUTHORITIES = {
+            AccountProvider.AUTHORITY,
+            SubredditProvider.AUTHORITY,
+            ThingProvider.AUTHORITY,
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +79,10 @@ public class ContentBrowserActivity extends FragmentActivity implements OnUriCli
                 handleAppInfo();
                 return true;
 
+            case R.id.menu_sync_settings:
+                handleSyncSettings();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -78,6 +91,12 @@ public class ContentBrowserActivity extends FragmentActivity implements OnUriCli
     private void handleAppInfo() {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.parse("package:com.btmura.android.reddit"));
+        startActivity(intent);
+    }
+
+    private void handleSyncSettings() {
+        Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
+        intent.putExtra(Settings.EXTRA_AUTHORITIES, AUTHORITIES);
         startActivity(intent);
     }
 }

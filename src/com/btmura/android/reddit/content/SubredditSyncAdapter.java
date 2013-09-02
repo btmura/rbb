@@ -28,7 +28,6 @@ import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
@@ -76,8 +75,6 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private static final long EXPIRATION_PADDING_MS = TimeUnit.MINUTES.toMillis(5);
 
-    private static final long POLL_FREQUENCY_SECONDS = TimeUnit.HOURS.toSeconds(3);
-
     public SubredditSyncAdapter(Context context) {
         super(context, true);
     }
@@ -90,9 +87,6 @@ public class SubredditSyncAdapter extends AbstractThreadedSyncAdapter {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "accountName: " + account.name + " syncResult: " + syncResult.toString());
         }
-
-        // Always schedule the next sync to get new subreddits added.
-        ContentResolver.addPeriodicSync(account, authority, Bundle.EMPTY, POLL_FREQUENCY_SECONDS);
     }
 
     private void doSync(Account account, Bundle extras, String authority,

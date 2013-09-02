@@ -16,14 +16,11 @@
 
 package com.btmura.android.reddit.app;
 
-import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -42,7 +39,6 @@ import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
-import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
@@ -242,24 +238,6 @@ public class BrowserActivity extends AbstractBrowserActivity implements
         super.onConfigurationChanged(newConfig);
         if (drawerToggle != null) {
             drawerToggle.onConfigurationChanged(newConfig);
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        checkMailIfHasAccount();
-    }
-
-    private void checkMailIfHasAccount() {
-        final String accountName = getAccountName();
-        if (AccountUtils.isAccount(accountName)) {
-            AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-                public void run() {
-                    Account account = AccountUtils.getAccount(getApplicationContext(), accountName);
-                    ContentResolver.requestSync(account, AccountProvider.AUTHORITY, Bundle.EMPTY);
-                }
-            });
         }
     }
 

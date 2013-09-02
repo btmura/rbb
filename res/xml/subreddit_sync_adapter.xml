@@ -18,4 +18,4 @@
     android:accountType="@string/account_type"
     android:contentAuthority="@string/authority_subreddits"
     android:isAlwaysSyncable="true"
-    android:userVisible="false" />
+    android:userVisible="true" />

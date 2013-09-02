@@ -20,5 +20,9 @@
         android:id="@+id/menu_app_info"
         android:showAsAction="ifRoom"
         android:title="@string/menu_app_info"/>
+    <item
+        android:id="@+id/menu_sync_settings"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_sync_settings"/>
 
 </menu>
