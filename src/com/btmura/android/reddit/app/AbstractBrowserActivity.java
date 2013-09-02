@@ -47,7 +47,6 @@ import com.btmura.android.reddit.widget.ThingView;
 
 abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
         OnNavigationEventListener,
-        OnSubredditEventListener,
         OnSubredditSelectedListener,
         OnThingSelectedListener,
         OnThingEventListener,
@@ -381,23 +380,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             startActivity(intent, options);
         } else {
             startActivity(intent);
-        }
-    }
-
-    @Override
-    public void onSubredditDiscovery(String subreddit) {
-        NavigationFragment navFrag = getNavigationFragment();
-        if (navFrag != null) {
-            navFrag.onSubredditDiscovery(subreddit);
-        } else {
-            ControlFragment controlFrag = getControlFragment();
-            if (controlFrag != null) {
-                setSubredditFragments(controlFrag.getAccountName(),
-                        subreddit,
-                        controlFrag.isRandom(),
-                        controlFrag.getThingBundle(),
-                        controlFrag.getFilter());
-            }
         }
     }
 

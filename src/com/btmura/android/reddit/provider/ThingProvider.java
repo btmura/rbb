@@ -209,7 +209,6 @@ public class ThingProvider extends BaseProvider {
     public static final String EXTRA_PARENT_NUM_COMMENTS = "parentNumComments";
     public static final String EXTRA_PARENT_THING_ID = "parentThingId";
     public static final String EXTRA_QUERY = "query";
-    public static final String EXTRA_RESOLVED_SUBREDDIT = "resolvedSubreddit";
     public static final String EXTRA_SEQUENCE = "sequence";
     public static final String EXTRA_SESSION_ID = "sessionId";
     public static final String EXTRA_SESSION_TYPE = "sessionType";
@@ -592,9 +591,8 @@ public class ThingProvider extends BaseProvider {
             }
 
             sessionId = getListingSession(accountName, listing, sessionId);
-            Bundle result = new Bundle(2);
+            Bundle result = new Bundle(1);
             result.putLong(EXTRA_SESSION_ID, sessionId);
-            listing.addCursorExtras(result);
             listing.performExtraWork(getContext());
             return result;
         } catch (Exception e) {

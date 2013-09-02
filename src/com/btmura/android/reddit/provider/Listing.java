@@ -21,7 +21,6 @@ import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.os.Bundle;
 
 /**
  * {@link Listing} is an internal interface to enforce some uniformity on grabbing values to present
@@ -40,9 +39,6 @@ interface Listing {
 
     /** Called after the insertion transaction to perform additional ops. */
     void performExtraWork(Context context);
-
-    /** Add additional extras to a bundle if applicable. */
-    void addCursorExtras(Bundle bundle);
 
     /** Return the name of the table where the values should be inserted. */
     String getTargetTable();

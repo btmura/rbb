@@ -25,7 +25,6 @@ import java.util.ArrayList;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.os.Bundle;
 import android.util.JsonReader;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -96,10 +95,6 @@ class SubredditResultListing extends JsonParser implements Listing {
 
     @Override
     public void performExtraWork(Context context) {
-    }
-
-    @Override
-    public void addCursorExtras(Bundle bundle) {
     }
 
     @Override

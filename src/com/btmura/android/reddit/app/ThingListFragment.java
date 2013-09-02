@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,7 +37,6 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.AbstractBrowserActivity.RightFragment;
-import com.btmura.android.reddit.content.CursorExtras;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
@@ -69,7 +67,6 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
     protected AC actionModeController;
 
     private OnThingSelectedListener listener;
-    private OnSubredditEventListener eventListener;
     private boolean scrollLoading;
 
     @Override
@@ -77,9 +74,6 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
         super.onAttach(activity);
         if (activity instanceof OnThingSelectedListener) {
             listener = (OnThingSelectedListener) activity;
-        }
-        if (activity instanceof OnSubredditEventListener) {
-            eventListener = (OnSubredditEventListener) activity;
         }
     }
 
@@ -170,16 +164,6 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         controller.swapCursor(cursor);
         scrollLoading = false;
-
-        String subreddit = CursorExtras.getResolvedSubreddit(cursor);
-        if (!TextUtils.isEmpty(subreddit)) {
-            controller.setParentSubreddit(subreddit);
-            controller.setSubreddit(subreddit);
-            if (eventListener != null) {
-                eventListener.onSubredditDiscovery(subreddit);
-            }
-        }
-
         setEmptyText(getString(cursor != null ? R.string.empty_list : R.string.error));
         setListShown(true);
         getActivity().invalidateOptionsMenu();

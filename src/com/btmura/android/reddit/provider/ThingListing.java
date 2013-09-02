@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -30,8 +29,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -42,11 +39,9 @@ import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Sessions;
-import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.RedditApi;
-import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Array;
@@ -190,7 +185,6 @@ class ThingListing extends JsonParser implements Listing {
     private long networkTimeMs;
     private long parseTimeMs;
 
-    private String resolvedSubreddit;
     private String moreThingId;
 
     static ThingListing newSearchInstance(Context context,
@@ -286,10 +280,6 @@ class ThingListing extends JsonParser implements Listing {
     public List<ContentValues> getValues() throws IOException {
         long t1 = System.currentTimeMillis();
 
-        // Always follow redirects unless we are going to /r/random. We need to
-        // catch this case to get the resolved subreddit.
-        boolean followRedirects = true;
-
         CharSequence url;
         if (!TextUtils.isEmpty(profileUser)) {
             url = Urls.user(profileUser, filter, more, Urls.TYPE_JSON);
@@ -297,22 +287,13 @@ class ThingListing extends JsonParser implements Listing {
             url = Urls.search(subreddit, query, more);
         } else {
             url = Urls.subreddit(subreddit, filter, more, Urls.TYPE_JSON);
-            followRedirects = !Subreddits.isRandom(subreddit);
         }
 
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "getValues url: " + url);
         }
 
-        HttpURLConnection conn = RedditApi.connect(url, cookie, followRedirects, false);
-
-        // Handle the redirect if the request was for /r/random to get resolved url.
-        if (!followRedirects && conn.getResponseCode() == 302) {
-            String location = conn.getHeaderField("Location");
-            resolvedSubreddit = UriHelper.getSubreddit(Uri.parse(location));
-            return Collections.emptyList();
-        }
-
+        HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = null;
         try {
             input = new BufferedInputStream(conn.getInputStream());
@@ -336,13 +317,6 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void performExtraWork(Context context) {
-    }
-
-    @Override
-    public void addCursorExtras(Bundle bundle) {
-        if (resolvedSubreddit != null) {
-            bundle.putString(ThingProvider.EXTRA_RESOLVED_SUBREDDIT, resolvedSubreddit);
-        }
     }
 
     @Override

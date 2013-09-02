@@ -29,7 +29,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -140,10 +139,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void performExtraWork(Context context) {
-    }
-
-    @Override
-    public void addCursorExtras(Bundle bundle) {
     }
 
     @Override

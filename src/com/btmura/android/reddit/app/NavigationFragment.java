@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.AccountSubredditListLoader;
+import com.btmura.android.reddit.content.RandomSubredditLoader;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
@@ -61,7 +63,6 @@ public class NavigationFragment extends ListFragment implements
         LoaderCallbacks<AccountResult>,
         OnAccountMessagesSelectedListener,
         OnPlaceSelectedListener,
-        OnSubredditEventListener,
         MultiChoiceModeListener,
         ComponentCallbacks2 {
 
@@ -79,6 +80,7 @@ public class NavigationFragment extends ListFragment implements
 
     private static final int LOADER_ACCOUNTS = 0;
     private static final int LOADER_SUBREDDITS = 1;
+    private static final int LOADER_RANDOM_SUBREDDIT = 2;
 
     public interface OnNavigationEventListener {
         void onNavigationSubredditSelected(String accountName,
@@ -96,6 +98,8 @@ public class NavigationFragment extends ListFragment implements
 
     private final AccountSubredditLoaderCallbacks subredditLoaderCallbacks =
             new AccountSubredditLoaderCallbacks();
+    private final RandomSubredditLoaderCallbacks randomLoaderCallbacks =
+            new RandomSubredditLoaderCallbacks();
 
     private OnNavigationEventListener listener;
     private AccountResultAdapter accountAdapter;
@@ -245,8 +249,11 @@ public class NavigationFragment extends ListFragment implements
         this.subreddit = subreddit;
         this.isRandom = isRandom;
         this.filter = filter;
+
         placesAdapter.setSelectedPlace(place);
         AccountPrefs.setLastPlace(getActivity(), place);
+        getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
+
         switch (place) {
             case PLACE_SUBREDDIT:
                 subredditAdapter.setSelectedSubreddit(isRandom
@@ -312,8 +319,11 @@ public class NavigationFragment extends ListFragment implements
 
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
-        boolean isRandom = Subreddits.isRandom(subreddit);
-        selectPlace(PLACE_SUBREDDIT, subreddit, isRandom, filter, true);
+        if (Subreddits.isRandom(subreddit)) {
+            getLoaderManager().restartLoader(LOADER_RANDOM_SUBREDDIT, null, randomLoaderCallbacks);
+        } else {
+            selectPlace(PLACE_SUBREDDIT, subreddit, false, filter, true);
+        }
     }
 
     @Override
@@ -324,13 +334,6 @@ public class NavigationFragment extends ListFragment implements
     @Override
     public void onPlaceSelected(int place) {
         selectPlaceWithDefaults(place, false);
-    }
-
-    @Override
-    public void onSubredditDiscovery(String newSubreddit) {
-        if (isRandom) {
-            selectPlace(place, newSubreddit, isRandom, filter, false);
-        }
     }
 
     public void setFilter(int newFilter) {
@@ -529,7 +532,6 @@ public class NavigationFragment extends ListFragment implements
     }
 
     class AccountSubredditLoaderCallbacks implements LoaderCallbacks<Cursor> {
-
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             return new AccountSubredditListLoader(getActivity(), accountName);
@@ -543,6 +545,24 @@ public class NavigationFragment extends ListFragment implements
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             subredditAdapter.swapCursor(null);
+        }
+    }
+
+    class RandomSubredditLoaderCallbacks implements LoaderCallbacks<String> {
+        @Override
+        public Loader<String> onCreateLoader(int id, Bundle args) {
+            return new RandomSubredditLoader(getActivity(), accountName);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<String> loader, String resolvedSubreddit) {
+            if (!TextUtils.isEmpty(resolvedSubreddit)) {
+                selectPlace(place, resolvedSubreddit, true, filter, false);
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<String> loader) {
         }
     }
 }

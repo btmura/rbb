@@ -28,7 +28,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.JsonReader;
 
@@ -177,10 +176,6 @@ class MessageListing extends JsonParser implements Listing {
         if (mark) {
             Provider.clearNewMessageIndicator(context, accountName, false);
         }
-    }
-
-    @Override
-    public void addCursorExtras(Bundle bundle) {
     }
 
     @Override
