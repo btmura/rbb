@@ -162,30 +162,12 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     // Methods used to setup the initial fragments.
 
-    protected void setBrowserFragments() {
+    protected void setBrowserFragments(String requestedSubreddit,
+            ThingBundle requestedThingBundle) {
         int containerId = drawerLayout != null ? R.id.drawer_container : R.id.left_container;
         setLeftFragment(containerId,
                 ControlFragment.newDrawerInstance(),
-                NavigationFragment.newInstance());
-    }
-
-    protected void setSubredditFragments(String accountName,
-            String subreddit,
-            boolean isRandom,
-            ThingBundle thingBundle,
-            int filter) {
-        selectAccountWithFilter(accountName, filter);
-
-        ControlFragment controlFrag =
-                ControlFragment.newSubredditInstance(accountName, subreddit, isRandom, filter);
-        setCenterFragment(R.id.right_container,
-                controlFrag,
-                SubredditThingListFragment
-                        .newInstance(accountName, subreddit, filter, isSingleChoice),
-                false);
-        if (thingBundle != null) {
-            setThingFragment(controlFrag.withThingBundle(thingBundle));
-        }
+                NavigationFragment.newInstance(requestedSubreddit, requestedThingBundle));
     }
 
     protected void setSearchThingsFragments(String accountName,
@@ -252,13 +234,19 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
             String subreddit,
             boolean isRandom,
             int filter,
+            ThingBundle thingBundle,
             boolean force) {
         selectAccountWithFilter(accountName, filter);
+        ControlFragment controlFrag =
+                ControlFragment.newSubredditInstance(accountName, subreddit, isRandom, filter);
         setRightFragment(R.id.right_container,
-                ControlFragment.newSubredditInstance(accountName, subreddit, isRandom, filter),
+                controlFrag,
                 SubredditThingListFragment
                         .newInstance(accountName, subreddit, filter, isSingleChoice),
                 force);
+        if (thingBundle != null) {
+            setThingFragment(controlFrag.withThingBundle(thingBundle));
+        }
     }
 
     @Override

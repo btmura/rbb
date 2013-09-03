@@ -68,6 +68,12 @@ public class NavigationFragment extends ListFragment implements
 
     public static final String TAG = "NavigationFragment";
 
+    private static final String ARG_REQUESTED_SUBREDDIT = "requestedSubreddit";
+    private static final String ARG_REQUESTED_THING_BUNDLE = "requestedThingBundle";
+
+    private static final String STATE_REQUESTED_SUBREDDIT = ARG_REQUESTED_SUBREDDIT;
+    private static final String STATE_REQUESTED_THING_BUNDLE = ARG_REQUESTED_THING_BUNDLE;
+
     private static final String STATE_ACCOUNT_NAME = "accountName";
     private static final String STATE_PLACE = "place";
     private static final String STATE_SUBREDDIT = "subreddit";
@@ -87,6 +93,7 @@ public class NavigationFragment extends ListFragment implements
                 String subreddit,
                 boolean isRandom,
                 int filter,
+                ThingBundle thingBundle,
                 boolean force);
 
         void onNavigationProfileSelected(String accountName, int filter, boolean force);
@@ -107,14 +114,24 @@ public class NavigationFragment extends ListFragment implements
     private AccountSubredditAdapter subredditAdapter;
     private MergeAdapter mergeAdapter;
 
+    private String requestedSubreddit;
+    private ThingBundle requestedThingBundle;
+
     private String accountName;
     private int place;
     private String subreddit;
     private boolean isRandom;
     private int filter;
 
-    public static NavigationFragment newInstance() {
-        return new NavigationFragment();
+    public static NavigationFragment newInstance(String requestedSubreddit,
+            ThingBundle requestedThingBundle) {
+        Bundle args = new Bundle(2);
+        args.putString(ARG_REQUESTED_SUBREDDIT, requestedSubreddit);
+        args.putParcelable(ARG_REQUESTED_THING_BUNDLE, requestedThingBundle);
+
+        NavigationFragment frag = new NavigationFragment();
+        frag.setArguments(args);
+        return frag;
     }
 
     @Override
@@ -133,13 +150,20 @@ public class NavigationFragment extends ListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
+        if (savedInstanceState == null) {
+            requestedSubreddit = getArguments().getString(ARG_REQUESTED_SUBREDDIT);
+            requestedThingBundle = getArguments().getParcelable(ARG_REQUESTED_THING_BUNDLE);
+        } else {
+            requestedSubreddit = savedInstanceState.getString(STATE_REQUESTED_SUBREDDIT);
+            requestedThingBundle = savedInstanceState.getParcelable(STATE_REQUESTED_THING_BUNDLE);
+
             accountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
             place = savedInstanceState.getInt(STATE_PLACE);
             subreddit = savedInstanceState.getString(STATE_SUBREDDIT);
             isRandom = savedInstanceState.getBoolean(STATE_IS_RANDOM);
             filter = savedInstanceState.getInt(STATE_FILTER);
         }
+
         accountAdapter = new AccountResultAdapter(getActivity(), this);
         placesAdapter = new AccountPlaceAdapter(getActivity(), this);
         subredditAdapter = AccountSubredditAdapter.newAccountInstance(getActivity());
@@ -147,7 +171,8 @@ public class NavigationFragment extends ListFragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater,
+            ViewGroup container,
             Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         ListView listView = (ListView) v.findViewById(android.R.id.list);
@@ -175,41 +200,65 @@ public class NavigationFragment extends ListFragment implements
         setListShown(true);
 
         String accountName = result.getLastAccount(getActivity());
-        boolean restart = !Objects.equals(this.accountName, accountName);
-        selectAccount(accountName, restart);
+        boolean accountChanged = !Objects.equals(this.accountName, accountName);
+        selectAccount(accountName, accountChanged);
     }
 
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
-    private void selectAccount(String accountName, boolean restart) {
+    private void selectAccount(String accountName, boolean accountChanged) {
         this.accountName = accountName;
         accountAdapter.setSelectedAccountName(accountName);
         AccountPrefs.setLastAccount(getActivity(), accountName);
         placesAdapter.setAccountPlaces(accountAdapter.getCount() > 1,
                 AccountUtils.isAccount(accountName));
-        refreshSubredditLoader(restart);
-        refreshPlace(restart);
+        refreshSubredditLoader(accountChanged);
+        refreshPlace(accountChanged);
     }
 
-    private void refreshSubredditLoader(boolean restart) {
-        if (restart) {
+    private void refreshSubredditLoader(boolean restartLoader) {
+        if (restartLoader) {
             getLoaderManager().restartLoader(LOADER_SUBREDDITS, null, subredditLoaderCallbacks);
         } else {
             getLoaderManager().initLoader(LOADER_SUBREDDITS, null, subredditLoaderCallbacks);
         }
     }
 
-    private void refreshPlace(boolean restart) {
-        if (restart) {
-            int place = AccountUtils.isAccount(accountName)
-                    ? AccountPrefs.getLastPlace(getActivity(), PLACE_SUBREDDIT)
-                    : PLACE_SUBREDDIT;
-            selectPlaceWithDefaults(place, false);
+    private void refreshPlace(boolean accountChanged) {
+        if (accountChanged) {
+            if (requestedSubreddit != null) {
+                selectRequestedPlace();
+            } else {
+                selectLastPlace();
+            }
         } else {
-            selectPlace(place, subreddit, isRandom, filter, false);
+            selectCurrentPlace();
         }
+    }
+
+    private void selectRequestedPlace() {
+        selectPlace(PLACE_SUBREDDIT,
+                requestedSubreddit,
+                Subreddits.isRandom(requestedSubreddit),
+                AccountPrefs.getLastSubredditFilter(getActivity(),
+                        FilterAdapter.SUBREDDIT_HOT),
+                requestedThingBundle,
+                false);
+        requestedSubreddit = null;
+        requestedThingBundle = null;
+    }
+
+    private void selectLastPlace() {
+        int place = AccountUtils.isAccount(accountName)
+                ? AccountPrefs.getLastPlace(getActivity(), PLACE_SUBREDDIT)
+                : PLACE_SUBREDDIT;
+        selectPlaceWithDefaults(place, false);
+    }
+
+    private void selectCurrentPlace() {
+        selectPlace(place, subreddit, isRandom, filter, null, false);
     }
 
     private void selectPlaceWithDefaults(int place, boolean force) {
@@ -223,19 +272,19 @@ public class NavigationFragment extends ListFragment implements
                         false);
                 int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
                         FilterAdapter.SUBREDDIT_HOT);
-                selectPlace(place, subreddit, isRandom, filter, force);
+                selectPlace(place, subreddit, isRandom, filter, null, force);
                 break;
 
             case PLACE_PROFILE:
-                selectPlace(place, null, false, FilterAdapter.PROFILE_OVERVIEW, force);
+                selectPlace(place, null, false, FilterAdapter.PROFILE_OVERVIEW, null, force);
                 break;
 
             case PLACE_SAVED:
-                selectPlace(place, null, false, FilterAdapter.PROFILE_SAVED, force);
+                selectPlace(place, null, false, FilterAdapter.PROFILE_SAVED, null, force);
                 break;
 
             case PLACE_MESSAGES:
-                selectPlace(place, null, false, FilterAdapter.MESSAGE_INBOX, force);
+                selectPlace(place, null, false, FilterAdapter.MESSAGE_INBOX, null, force);
                 break;
         }
     }
@@ -244,6 +293,7 @@ public class NavigationFragment extends ListFragment implements
             String subreddit,
             boolean isRandom,
             int filter,
+            ThingBundle thingBundle,
             boolean force) {
         this.place = place;
         this.subreddit = subreddit;
@@ -271,6 +321,7 @@ public class NavigationFragment extends ListFragment implements
                             subreddit,
                             isRandom,
                             filter,
+                            thingBundle,
                             force);
                 }
                 break;
@@ -329,7 +380,12 @@ public class NavigationFragment extends ListFragment implements
 
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
-        selectPlace(PLACE_SUBREDDIT, subreddit, Subreddits.isRandom(subreddit), filter, true);
+        selectPlace(PLACE_SUBREDDIT,
+                subreddit,
+                Subreddits.isRandom(subreddit),
+                filter,
+                null,
+                true);
     }
 
     @Override
@@ -344,7 +400,7 @@ public class NavigationFragment extends ListFragment implements
 
     public void setFilter(int newFilter) {
         if (this.filter != newFilter) {
-            selectPlace(place, subreddit, isRandom, newFilter, false);
+            selectPlace(place, subreddit, isRandom, newFilter, null, false);
         }
     }
 
@@ -530,11 +586,22 @@ public class NavigationFragment extends ListFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putString(STATE_REQUESTED_SUBREDDIT, subreddit);
+        outState.putParcelable(STATE_REQUESTED_THING_BUNDLE, requestedThingBundle);
+
         outState.putString(STATE_ACCOUNT_NAME, accountName);
         outState.putInt(STATE_PLACE, place);
         outState.putString(STATE_SUBREDDIT, subreddit);
         outState.putBoolean(STATE_IS_RANDOM, isRandom);
         outState.putInt(STATE_FILTER, filter);
+    }
+
+    private String getRequestedSubreddit() {
+        return getArguments().getString(ARG_REQUESTED_SUBREDDIT);
+    }
+
+    private ThingBundle getRequestedThingBundle() {
+        return getArguments().getParcelable(ARG_REQUESTED_THING_BUNDLE);
     }
 
     class AccountSubredditLoaderCallbacks implements LoaderCallbacks<Cursor> {
@@ -563,7 +630,7 @@ public class NavigationFragment extends ListFragment implements
         @Override
         public void onLoadFinished(Loader<String> loader, String resolvedSubreddit) {
             if (!TextUtils.isEmpty(resolvedSubreddit)) {
-                selectPlace(place, resolvedSubreddit, true, filter, false);
+                selectPlace(place, resolvedSubreddit, true, filter, null, false);
             }
         }
 

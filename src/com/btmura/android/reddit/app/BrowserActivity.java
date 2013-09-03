@@ -23,8 +23,6 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
@@ -33,18 +31,13 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
-import com.btmura.android.reddit.content.AccountLoader;
-import com.btmura.android.reddit.content.AccountLoader.AccountResult;
-import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
-public class BrowserActivity extends AbstractBrowserActivity implements
-        LoaderCallbacks<AccountResult>,
-        OnNavigationListener {
+public class BrowserActivity extends AbstractBrowserActivity implements OnNavigationListener {
 
     public static final String EXTRA_SUBREDDIT = "subreddit";
 
@@ -116,52 +109,17 @@ public class BrowserActivity extends AbstractBrowserActivity implements
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         if (savedInstanceState == null) {
-            if (requestedSubreddit != null) {
-                getSupportLoaderManager().initLoader(0, null, this);
-            } else {
-                setBrowserFragments();
-            }
+            setBrowserFragments(requestedSubreddit, requestedThingBundle);
         }
     }
 
     @Override
-    public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
-        return new AccountLoader(this, true, false);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        String accountName = result.getLastAccount(this);
-        int filter = AccountPrefs.getLastSubredditFilter(this, FilterAdapter.SUBREDDIT_HOT);
-        setSubredditFragments(accountName,
-                requestedSubreddit,
-                Subreddits.isRandom(requestedSubreddit),
-                requestedThingBundle,
-                filter);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<AccountResult> loader) {
-    }
-
-    @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        int newFilter = filterAdapter.getFilter(itemPosition);
-
         NavigationFragment navFrag = getNavigationFragment();
         if (navFrag != null) {
+            int newFilter = filterAdapter.getFilter(itemPosition);
             navFrag.setFilter(newFilter);
             return true;
-        } else {
-            ControlFragment controlFrag = getControlFragment();
-            if (controlFrag != null && controlFrag.getFilter() != newFilter) {
-                setSubredditFragments(controlFrag.getAccountName(),
-                        controlFrag.getSubreddit(),
-                        controlFrag.isRandom(),
-                        controlFrag.getThingBundle(),
-                        newFilter);
-                return true;
-            }
         }
         return false;
     }
@@ -171,6 +129,7 @@ public class BrowserActivity extends AbstractBrowserActivity implements
         if (controlFrag != null) {
             bar.setDisplayHomeAsUpEnabled(isSinglePane
                     || drawerLayout != null
+                    || requestedSubreddit != null
                     || controlFrag.getThingBundle() != null);
             switch (controlFrag.getNavigation()) {
                 case ControlFragment.NAVIGATION_SUBREDDIT:
