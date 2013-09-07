@@ -47,7 +47,9 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
         private final String accountName;
         private final Cursor saveActionCursor;
 
-        private ThingData(String accountName, ThingBundle parent, ThingBundle child,
+        private ThingData(String accountName,
+                ThingBundle parent,
+                ThingBundle child,
                 Cursor saveActionCursor) {
             this.accountName = accountName;
             this.parent = parent;
@@ -113,28 +115,32 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
                     break;
 
                 case ThingBundle.TYPE_COMMENT:
-                    String cookie = getCookie();
-                    Formatter formatter = getFormatter();
-                    parentBundle = RedditApi.getInfo(getContext(), thingBundle.getLinkId(),
-                            cookie, formatter);
+                    parentBundle = RedditApi.getInfo(getContext(),
+                            thingBundle.getLinkId(),
+                            getCookie(),
+                            getFormatter());
                     childBundle = thingBundle;
                     break;
 
                 case ThingBundle.TYPE_LINK_REFERENCE:
-                    cookie = getCookie();
-                    formatter = getFormatter();
-                    parentBundle = RedditApi.getInfo(getContext(), thingBundle.getThingId(),
-                            cookie, formatter);
+                    parentBundle = RedditApi.getInfo(getContext(),
+                            thingBundle.getThingId(),
+                            getCookie(),
+                            getFormatter());
                     childBundle = null;
                     break;
 
                 case ThingBundle.TYPE_COMMENT_REFERENCE:
-                    cookie = getCookie();
-                    formatter = getFormatter();
-                    parentBundle = RedditApi.getInfo(getContext(), thingBundle.getLinkId(),
-                            cookie, formatter);
-                    childBundle = RedditApi.getInfo(getContext(), thingBundle.getThingId(),
-                            cookie, formatter);
+                    String cookie = getCookie();
+                    Formatter formatter = getFormatter();
+                    parentBundle = RedditApi.getInfo(getContext(),
+                            thingBundle.getLinkId(),
+                            cookie,
+                            formatter);
+                    childBundle = RedditApi.getInfo(getContext(),
+                            thingBundle.getThingId(),
+                            cookie,
+                            formatter);
                     break;
 
                 default:
@@ -144,7 +150,8 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
             Cursor saveActionCursor = null;
             if (AccountUtils.isAccount(accountName)) {
                 ContentResolver cr = getContext().getContentResolver();
-                saveActionCursor = cr.query(ThingProvider.SAVE_ACTIONS_URI, PROJECTION,
+                saveActionCursor = cr.query(ThingProvider.SAVE_ACTIONS_URI,
+                        PROJECTION,
                         SaveActions.SELECT_BY_ACCOUNT_AND_THING_ID,
                         Array.of(accountName, parentBundle.getThingId()),
                         null);

@@ -134,7 +134,7 @@ public class ComposeFormFragment extends Fragment implements
     private EditText textText;
     private ProgressBar submitProgress;
 
-    private AccountNameAdapter adapter;
+    private AccountNameAdapter accountAdapter;
     private SubredditAdapter subredditAdapter;
     private Matcher linkMatcher;
 
@@ -176,7 +176,7 @@ public class ComposeFormFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new AccountNameAdapter(getActivity(), R.layout.account_name_row);
+        accountAdapter = new AccountNameAdapter(getActivity(), R.layout.account_name_row);
         setRetainInstance(true);
         setHasOptionsMenu(true);
     }
@@ -195,7 +195,7 @@ public class ComposeFormFragment extends Fragment implements
         addAccountButton.setOnClickListener(this);
 
         accountSpinner = (Spinner) v.findViewById(R.id.account_spinner);
-        accountSpinner.setAdapter(adapter);
+        accountSpinner.setAdapter(accountAdapter);
         accountSpinner.setOnItemSelectedListener(this);
 
         destinationText = (AutoCompleteTextView) v.findViewById(R.id.destination_text);
@@ -349,11 +349,11 @@ public class ComposeFormFragment extends Fragment implements
         noAccountView.setVisibility(hasAccounts ? View.GONE : View.VISIBLE);
         accountView.setVisibility(hasAccounts ? View.VISIBLE : View.GONE);
 
-        adapter.clear();
+        accountAdapter.clear();
         if (hasAccounts) {
-            adapter.addAll(result.accountNames);
+            accountAdapter.addAll(result.accountNames);
             if (!isAccountNameInitialized) {
-                int index = adapter.findAccountName(result.getLastAccount(getActivity()));
+                int index = accountAdapter.findAccountName(result.getLastAccount(getActivity()));
                 accountSpinner.setSelection(index);
                 isAccountNameInitialized = true;
             }
@@ -374,7 +374,7 @@ public class ComposeFormFragment extends Fragment implements
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
         if (subredditAdapter != null) {
-            String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
+            String accountName = accountAdapter.getItem(accountSpinner.getSelectedItemPosition());
             subredditAdapter.setAccountName(accountName);
         }
     }
@@ -410,7 +410,7 @@ public class ComposeFormFragment extends Fragment implements
 
     private void handleSubmit() {
         // Require an account to submit anything.
-        if (adapter.isEmpty() || accountSpinner == null || !accountSpinner.isEnabled()) {
+        if (accountAdapter.isEmpty() || accountSpinner == null || !accountSpinner.isEnabled()) {
             return;
         }
 
@@ -439,7 +439,7 @@ public class ComposeFormFragment extends Fragment implements
     private void submit(String captchaId, String captchaGuess) {
         onSubmitStarted();
 
-        String accountName = adapter.getItem(accountSpinner.getSelectedItemPosition());
+        String accountName = accountAdapter.getItem(accountSpinner.getSelectedItemPosition());
         String destination = destinationText.getText().toString();
         String title = titleText.getText().toString();
         String text = textText.getText().toString();
