@@ -352,6 +352,8 @@ public class ComposeFormFragment extends Fragment implements
                 isAccountNameInitialized = true;
             }
         }
+
+        getActivity().invalidateOptionsMenu();
     }
 
     @Override
