@@ -332,7 +332,7 @@ public class ThingFragment extends Fragment implements
         args.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, thingId);
 
         MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.MESSAGE_TYPE_SET,
+                ComposeActivity.MESSAGE_REPLY_TYPE_SET,
                 null,
                 author,
                 title,
