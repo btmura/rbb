@@ -138,8 +138,13 @@ public class ComposeFormFragment extends Fragment implements
     private SubredditAdapter subredditAdapter;
     private Matcher linkMatcher;
 
-    public static ComposeFormFragment newInstance(int type, String subredditDestination,
-            String messageDestination, String title, String text, boolean isReply, Bundle extras) {
+    public static ComposeFormFragment newInstance(int type,
+            String subredditDestination,
+            String messageDestination,
+            String title,
+            String text,
+            boolean isReply,
+            Bundle extras) {
         Bundle args = new Bundle(7);
         args.putInt(ARG_TYPE, type);
         args.putString(ARG_SUBREDDIT_DESTINATION, subredditDestination);
@@ -177,7 +182,8 @@ public class ComposeFormFragment extends Fragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater,
+            ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.compose_form, container, false);
 
