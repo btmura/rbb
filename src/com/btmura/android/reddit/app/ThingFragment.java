@@ -302,8 +302,7 @@ public class ThingFragment extends Fragment implements
 
     private void handleNewLinkComment() {
         String author = thingData.parent.getAuthor();
-        // TODO: Put the code to format title in a common class and remove duplication.
-        String title = Strings.toString(Strings.ellipsize(thingData.parent.getTitle(), 50));
+        String title = getFormattedTitle();
         String thingId = thingData.parent.getThingId();
 
         Bundle args = new Bundle(2);
@@ -322,8 +321,7 @@ public class ThingFragment extends Fragment implements
 
     private void handleNewMessageComment() {
         String author = thingData.parent.getAuthor();
-        // TODO: Put the code to format title in a common class and remove duplication.
-        String title = Strings.toString(Strings.ellipsize(thingData.parent.getTitle(), 50));
+        String title = getFormattedTitle();
         String thingId = thingData.parent.getThingId();
 
         Bundle args = new Bundle(3);
@@ -339,6 +337,11 @@ public class ThingFragment extends Fragment implements
                 null,
                 args,
                 true);
+    }
+
+    // TODO: Put the code to format title in a common class and remove duplication.
+    private String getFormattedTitle() {
+        return Strings.toString(Strings.ellipsize(thingData.parent.getTitle(), 50));
     }
 
     private void handleOpen() {
