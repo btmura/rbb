@@ -22,6 +22,7 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -31,6 +32,8 @@ import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
+import com.btmura.android.reddit.database.SharedColumns;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.text.Formatter;
@@ -39,52 +42,6 @@ import com.btmura.android.reddit.util.Array;
 public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
 
     private static final String TAG = "ThingDataLoader";
-
-    public static class ThingData {
-        public final ThingBundle parent;
-        public final ThingBundle child;
-
-        private final String accountName;
-        private final Cursor saveActionCursor;
-
-        private ThingData(String accountName,
-                ThingBundle parent,
-                ThingBundle child,
-                Cursor saveActionCursor) {
-            this.accountName = accountName;
-            this.parent = parent;
-            this.child = child;
-            this.saveActionCursor = saveActionCursor;
-        }
-
-        public boolean isParentSaveable() {
-            return AccountUtils.isAccount(accountName)
-                    && parent.getKind() == Kinds.KIND_LINK;
-        }
-
-        public boolean isParentSaved() {
-            // If no local save actions are pending, then rely on server info.
-            if (saveActionCursor == null || !saveActionCursor.moveToFirst()) {
-                return parent.isSaved();
-            }
-
-            // We have a local pending action so use that to indicate if it's read.
-            return saveActionCursor.getInt(INDEX_ACTION) == SaveActions.ACTION_SAVE;
-        }
-
-        public void recycle() {
-            if (saveActionCursor != null && !saveActionCursor.isClosed()) {
-                saveActionCursor.close();
-            }
-        }
-    }
-
-    private static final String[] PROJECTION = {
-            SaveActions._ID,
-            SaveActions.COLUMN_ACTION,
-    };
-
-    private static final int INDEX_ACTION = 1;
 
     private final ForceLoadContentObserver observer = new ForceLoadContentObserver();
 
@@ -104,40 +61,40 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
         }
 
         try {
-            ThingBundle parentBundle;
-            ThingBundle childBundle;
+            ThingBundle parent;
+            ThingBundle child;
 
             switch (thingBundle.getType()) {
                 case ThingBundle.TYPE_LINK:
                 case ThingBundle.TYPE_MESSAGE:
-                    parentBundle = thingBundle;
-                    childBundle = null;
+                    parent = thingBundle;
+                    child = null;
                     break;
 
                 case ThingBundle.TYPE_COMMENT:
-                    parentBundle = RedditApi.getInfo(getContext(),
+                    parent = RedditApi.getInfo(getContext(),
                             thingBundle.getLinkId(),
                             getCookie(),
                             getFormatter());
-                    childBundle = thingBundle;
+                    child = thingBundle;
                     break;
 
                 case ThingBundle.TYPE_LINK_REFERENCE:
-                    parentBundle = RedditApi.getInfo(getContext(),
+                    parent = RedditApi.getInfo(getContext(),
                             thingBundle.getThingId(),
                             getCookie(),
                             getFormatter());
-                    childBundle = null;
+                    child = null;
                     break;
 
                 case ThingBundle.TYPE_COMMENT_REFERENCE:
                     String cookie = getCookie();
                     Formatter formatter = getFormatter();
-                    parentBundle = RedditApi.getInfo(getContext(),
+                    parent = RedditApi.getInfo(getContext(),
                             thingBundle.getLinkId(),
                             cookie,
                             formatter);
-                    childBundle = RedditApi.getInfo(getContext(),
+                    child = RedditApi.getInfo(getContext(),
                             thingBundle.getThingId(),
                             cookie,
                             formatter);
@@ -147,21 +104,7 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
                     throw new IllegalArgumentException();
             }
 
-            Cursor saveActionCursor = null;
-            if (AccountUtils.isAccount(accountName)) {
-                ContentResolver cr = getContext().getContentResolver();
-                saveActionCursor = cr.query(ThingProvider.SAVE_ACTIONS_URI,
-                        PROJECTION,
-                        SaveActions.SELECT_BY_ACCOUNT_AND_THING_ID,
-                        Array.of(accountName, parentBundle.getThingId()),
-                        null);
-                if (saveActionCursor != null) {
-                    saveActionCursor.getCount();
-                    saveActionCursor.registerContentObserver(observer);
-                }
-            }
-
-            return new ThingData(accountName, parentBundle, childBundle, saveActionCursor);
+            return ThingData.newInstance(getContext(), accountName, parent, child, observer);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
             return null;
@@ -196,4 +139,89 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
             data.recycle();
         }
     }
+
+    public static class ThingData {
+
+        private static final String[] PROJECTION = {
+                Things._ID,
+                Things.COLUMN_SAVED,
+                SharedColumns.COLUMN_HIDE_ACTION,
+                SharedColumns.COLUMN_SAVE_ACTION,
+                SharedColumns.COLUMN_VOTE_ACTION,
+        };
+
+        private static final int INDEX_SAVED = 1;
+        private static final int INDEX_SAVE_ACTION = 3;
+
+        public final ThingBundle parent;
+        public final ThingBundle child;
+
+        private final String accountName;
+        private final Cursor cursor;
+
+        static ThingData newInstance(Context context,
+                String accountName,
+                ThingBundle parent,
+                ThingBundle child,
+                ContentObserver observer) {
+            Cursor cursor = getCursor(context, accountName, parent.getThingId(), observer);
+            return new ThingData(accountName, parent, child, cursor);
+        }
+
+        private static Cursor getCursor(Context context,
+                String accountName,
+                String thingId,
+                ContentObserver observer) {
+            if (AccountUtils.isAccount(accountName)) {
+                ContentResolver cr = context.getContentResolver();
+                Cursor cursor = cr.query(ThingProvider.THINGS_WITH_ACTIONS_URI,
+                        PROJECTION,
+                        Things.SELECT_BY_ACCOUNT_AND_THING_ID,
+                        Array.of(accountName, thingId),
+                        null);
+                if (cursor != null) {
+                    cursor.getCount();
+                    cursor.registerContentObserver(observer);
+                }
+                return cursor;
+            }
+            return null;
+        }
+
+        private ThingData(String accountName,
+                ThingBundle parent,
+                ThingBundle child,
+                Cursor cursor) {
+            this.accountName = accountName;
+            this.parent = parent;
+            this.child = child;
+            this.cursor = cursor;
+        }
+
+        public boolean isParentSaveable() {
+            return AccountUtils.isAccount(accountName) && parent.getKind() == Kinds.KIND_LINK;
+        }
+
+        public boolean isParentSaved() {
+            // If there is no cursor info available then reply on the bundle.
+            if (cursor == null || !cursor.moveToFirst()) {
+                return parent.isSaved();
+            }
+
+            // If no local save actions are pending, then rely on the server info.
+            if (cursor.isNull(INDEX_SAVE_ACTION)) {
+                return cursor.getInt(INDEX_SAVED) != 0;
+            }
+
+            // We have a local pending action so use that to indicate if it's read.
+            return cursor.getInt(INDEX_SAVE_ACTION) == SaveActions.ACTION_SAVE;
+        }
+
+        public void recycle() {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+    }
+
 }
