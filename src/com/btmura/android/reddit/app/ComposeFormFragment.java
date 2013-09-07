@@ -352,8 +352,6 @@ public class ComposeFormFragment extends Fragment implements
                 isAccountNameInitialized = true;
             }
         }
-
-        getActivity().invalidateOptionsMenu();
     }
 
     @Override
@@ -393,13 +391,6 @@ public class ComposeFormFragment extends Fragment implements
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_submit)
-                .setEnabled(accountSpinner != null && accountSpinner.isEnabled());
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_submit:
@@ -412,10 +403,8 @@ public class ComposeFormFragment extends Fragment implements
     }
 
     private void handleSubmit() {
-        // Required an account to submit anything.
-        if (adapter.isEmpty()) {
-            // The UI should be showing a big error message, so it's ok not to
-            // do anything here.
+        // Require an account to submit anything.
+        if (adapter.isEmpty() || accountSpinner == null || !accountSpinner.isEnabled()) {
             return;
         }
 
