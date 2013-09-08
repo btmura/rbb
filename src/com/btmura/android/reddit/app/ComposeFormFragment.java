@@ -65,6 +65,7 @@ import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.util.Strings;
+import com.btmura.android.reddit.util.Views;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
 import com.btmura.android.reddit.widget.SubredditAdapter;
@@ -127,6 +128,7 @@ public class ComposeFormFragment extends Fragment implements
     private View accountView;
     private View addAccountButton;
 
+    private View leftContainer;
     private Spinner accountSpinner;
     private AutoCompleteTextView destinationText;
     private EditText titleText;
@@ -198,6 +200,7 @@ public class ComposeFormFragment extends Fragment implements
         accountSpinner.setAdapter(accountAdapter);
         accountSpinner.setOnItemSelectedListener(this);
 
+        leftContainer = v.findViewById(R.id.left_container);
         destinationText = (AutoCompleteTextView) v.findViewById(R.id.destination_text);
         titleText = (EditText) v.findViewById(R.id.title_text);
         linkSwitch = (Switch) v.findViewById(R.id.link_switch);
@@ -303,6 +306,8 @@ public class ComposeFormFragment extends Fragment implements
             titleText.requestFocus();
         }
 
+        setupAccountSpinner(type);
+
         if (task != null) {
             disableFields();
         } else {
@@ -310,6 +315,18 @@ public class ComposeFormFragment extends Fragment implements
         }
 
         return v;
+    }
+
+    private void setupAccountSpinner(int type) {
+        switch (type) {
+            case ComposeActivity.TYPE_MESSAGE_REPLY:
+                Views.setVisibility(View.GONE, leftContainer, accountSpinner);
+                break;
+
+            default:
+                Views.setVisibility(View.VISIBLE, leftContainer, accountSpinner);
+                break;
+        }
     }
 
     @Override
