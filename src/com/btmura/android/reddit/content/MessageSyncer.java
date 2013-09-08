@@ -50,11 +50,16 @@ class MessageSyncer implements Syncer {
     private static final int MESSAGE_THING_ID = 2;
     private static final int MESSAGE_TEXT = 3;
 
+    @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
-        return provider.query(ThingProvider.MESSAGE_ACTIONS_URI, MESSAGE_PROJECTION,
-                SharedColumns.SELECT_BY_ACCOUNT, Array.of(accountName), SharedColumns.SORT_BY_ID);
+        return provider.query(ThingProvider.MESSAGE_ACTIONS_URI,
+                MESSAGE_PROJECTION,
+                SharedColumns.SELECT_BY_ACCOUNT,
+                Array.of(accountName),
+                SharedColumns.SORT_BY_ID);
     }
 
+    @Override
     public Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException {
         int action = c.getInt(MESSAGE_ACTION);
         String thingId = c.getString(MESSAGE_THING_ID);
@@ -72,10 +77,12 @@ class MessageSyncer implements Syncer {
         }
     }
 
+    @Override
     public int getOpCount(int count) {
         return count * 2;
     }
 
+    @Override
     public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
         long id = c.getLong(MESSAGE_ID);
         ops.add(ContentProviderOperation.newDelete(ThingProvider.MESSAGE_ACTIONS_URI)
@@ -87,6 +94,7 @@ class MessageSyncer implements Syncer {
                 .build());
     }
 
+    @Override
     public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
         int count = results.length;
         for (int i = 0; i < count;) {

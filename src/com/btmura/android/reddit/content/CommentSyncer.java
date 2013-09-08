@@ -49,11 +49,16 @@ class CommentSyncer implements Syncer {
     private static final int COMMENT_TEXT = 2;
     private static final int COMMENT_THING_ID = 3;
 
+    @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
-        return provider.query(ThingProvider.COMMENT_ACTIONS_URI, COMMENT_PROJECTION,
-                SharedColumns.SELECT_BY_ACCOUNT, Array.of(accountName), SharedColumns.SORT_BY_ID);
+        return provider.query(ThingProvider.COMMENT_ACTIONS_URI,
+                COMMENT_PROJECTION,
+                SharedColumns.SELECT_BY_ACCOUNT,
+                Array.of(accountName),
+                SharedColumns.SORT_BY_ID);
     }
 
+    @Override
     public Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException {
         int action = c.getInt(COMMENT_ACTION);
         String thingId = c.getString(COMMENT_THING_ID);
@@ -73,10 +78,12 @@ class CommentSyncer implements Syncer {
         }
     }
 
+    @Override
     public int getOpCount(int count) {
         return count * 2;
     }
 
+    @Override
     public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
         long id = c.getLong(COMMENT_ID);
         ops.add(ContentProviderOperation.newDelete(ThingProvider.COMMENT_ACTIONS_URI)
@@ -88,6 +95,7 @@ class CommentSyncer implements Syncer {
                 .build());
     }
 
+    @Override
     public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
         int count = results.length;
         for (int i = 0; i < count;) {

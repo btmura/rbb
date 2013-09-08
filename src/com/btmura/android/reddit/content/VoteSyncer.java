@@ -48,21 +48,28 @@ class VoteSyncer implements Syncer {
     private static final int VOTE_ACTION = 1;
     private static final int VOTE_THING_ID = 2;
 
+    @Override
     public Cursor query(ContentProviderClient provider, String accountName) throws RemoteException {
-        return provider.query(ThingProvider.VOTE_ACTIONS_URI, VOTE_PROJECTION,
-                SharedColumns.SELECT_BY_ACCOUNT, Array.of(accountName), null);
+        return provider.query(ThingProvider.VOTE_ACTIONS_URI,
+                VOTE_PROJECTION,
+                SharedColumns.SELECT_BY_ACCOUNT,
+                Array.of(accountName),
+                null);
     }
 
+    @Override
     public int getOpCount(int count) {
         return count * 2;
     }
 
+    @Override
     public Result sync(Context context, Cursor c, String cookie, String modhash) throws IOException {
         String thingId = c.getString(VOTE_THING_ID);
         int action = c.getInt(VOTE_ACTION);
         return RedditApi.vote(context, thingId, action, cookie, modhash);
     }
 
+    @Override
     public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
         long id = c.getLong(VOTE_ID);
         String thingId = c.getString(VOTE_THING_ID);
@@ -85,6 +92,7 @@ class VoteSyncer implements Syncer {
                 .build());
     }
 
+    @Override
     public void tallyOpResults(ContentProviderResult[] results, SyncResult syncResult) {
         int count = results.length;
         for (int i = 0; i < count;) {
