@@ -36,7 +36,6 @@ import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
-import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
@@ -75,73 +74,6 @@ public class Provider {
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_COMMENTS, ThingProvider.TRUE)
                     .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
-
-    public static void addSubredditAsync(Context context, String accountName,
-            String... subreddits) {
-        changeSubredditAsync(context, accountName, subreddits, true);
-    }
-
-    public static void removeSubredditAsync(Context context, String accountName,
-            String... subreddits) {
-        changeSubredditAsync(context, accountName, subreddits, false);
-    }
-
-    private static void changeSubredditAsync(Context context, final String accountName,
-            final String[] subreddits, final boolean add) {
-        final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... fillTheVoid) {
-                // Only trigger a sync on real accounts.
-                Uri uri;
-                if (AccountUtils.isAccount(accountName)) {
-                    uri = SubredditProvider.SUBREDDITS_SYNC_URI;
-                } else {
-                    uri = SubredditProvider.SUBREDDITS_URI;
-                }
-
-                int count = subreddits.length;
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(count);
-                int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
-                for (int i = 0; i < count; i++) {
-                    // All subreddit additions require an insert. The insert
-                    // would remove any deletes due to table constraints.
-                    //
-                    // Deletes for an account require an insert with delete
-                    // state. However, app storage accounts should just
-                    // remove the row altogether.
-                    if (add || AccountUtils.isAccount(accountName)) {
-                        ops.add(ContentProviderOperation.newInsert(uri)
-                                .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
-                                .withValue(Subreddits.COLUMN_NAME, subreddits[i])
-                                .withValue(Subreddits.COLUMN_STATE, state)
-                                .build());
-                    } else {
-                        ops.add(ContentProviderOperation.newDelete(uri)
-                                .withSelection(Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
-                                        Array.of(accountName, subreddits[i]))
-                                .build());
-                    }
-                }
-
-                return applyOps(appContext, SubredditProvider.AUTHORITY, ops);
-            }
-
-            @Override
-            protected void onPostExecute(Boolean success) {
-                if (success) {
-                    scheduleBackup(appContext, accountName);
-                }
-            }
-        }.execute();
-    }
-
-    private static void scheduleBackup(Context context, String accountName) {
-        if (!AccountUtils.isAccount(accountName)) {
-            new BackupManager(context).dataChanged();
-        }
-    }
 
     /** Inserts a placeholder comment yet to be synced with Reddit. */
     public static void commentReplyAsync(Context context,
@@ -549,7 +481,8 @@ public class Provider {
         });
     }
 
-    static boolean applyOps(Context context, String authority,
+    static boolean applyOps(Context context,
+            String authority,
             ArrayList<ContentProviderOperation> ops) {
         try {
             context.getContentResolver().applyBatch(authority, ops);
@@ -562,5 +495,11 @@ public class Provider {
             Log.e(TAG, e.getMessage(), e);
         }
         return false;
+    }
+
+    static void scheduleBackup(Context context, String accountName) {
+        if (!AccountUtils.isAccount(accountName)) {
+            new BackupManager(context).dataChanged();
+        }
     }
 }

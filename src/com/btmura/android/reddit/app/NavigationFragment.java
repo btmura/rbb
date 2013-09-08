@@ -44,7 +44,7 @@ import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.content.RandomSubredditLoader;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.provider.SubredditProvider;
 import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.Views;
@@ -86,6 +86,8 @@ public class NavigationFragment extends ListFragment implements
     private static final int LOADER_SUBREDDITS = 1;
     private static final int LOADER_RANDOM_SUBREDDIT = 2;
 
+    private static final String LOADER_ARG_ACCOUNT_NAME = "accountName";
+
     public interface OnNavigationEventListener {
         void onNavigationSubredditSelected(String accountName,
                 String subreddit,
@@ -101,8 +103,8 @@ public class NavigationFragment extends ListFragment implements
         void onNavigationMessagesSelected(String accountName, int filter, boolean force);
     }
 
-    private final AccountSubredditLoaderCallbacks subredditLoaderCallbacks =
-            new AccountSubredditLoaderCallbacks();
+    private final SubredditLoaderCallbacks subredditLoaderCallbacks =
+            new SubredditLoaderCallbacks();
     private final RandomSubredditLoaderCallbacks randomLoaderCallbacks =
             new RandomSubredditLoaderCallbacks();
 
@@ -217,10 +219,11 @@ public class NavigationFragment extends ListFragment implements
     }
 
     private void refreshSubredditLoader(boolean restartLoader) {
+        Bundle args = newLoaderArgs(accountName);
         if (restartLoader) {
-            getLoaderManager().restartLoader(LOADER_SUBREDDITS, null, subredditLoaderCallbacks);
+            getLoaderManager().restartLoader(LOADER_SUBREDDITS, args, subredditLoaderCallbacks);
         } else {
-            getLoaderManager().initLoader(LOADER_SUBREDDITS, null, subredditLoaderCallbacks);
+            getLoaderManager().initLoader(LOADER_SUBREDDITS, args, subredditLoaderCallbacks);
         }
     }
 
@@ -312,7 +315,7 @@ public class NavigationFragment extends ListFragment implements
 
                 if (Subreddits.isRandom(subreddit)) {
                     getLoaderManager().restartLoader(LOADER_RANDOM_SUBREDDIT,
-                            null,
+                            newLoaderArgs(accountName),
                             randomLoaderCallbacks);
                 } else if (listener != null) {
                     listener.onNavigationSubredditSelected(accountName,
@@ -548,7 +551,7 @@ public class NavigationFragment extends ListFragment implements
 
     private void handleDelete() {
         String[] subreddits = getCheckedSubreddits();
-        Provider.removeSubredditAsync(getActivity(), accountName, subreddits);
+        SubredditProvider.removeSubredditAsync(getActivity(), accountName, subreddits);
     }
 
     private String[] getCheckedSubreddits() {
@@ -590,9 +593,17 @@ public class NavigationFragment extends ListFragment implements
         outState.putInt(STATE_FILTER, filter);
     }
 
-    class AccountSubredditLoaderCallbacks implements LoaderCallbacks<Cursor> {
+    private static Bundle newLoaderArgs(String accountName) {
+        Bundle args = new Bundle(1);
+        args.putString(LOADER_ARG_ACCOUNT_NAME, accountName);
+        return args;
+    }
+
+    class SubredditLoaderCallbacks implements LoaderCallbacks<Cursor> {
+
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            String accountName = args.getString(LOADER_ARG_ACCOUNT_NAME);
             return new AccountSubredditListLoader(getActivity(), accountName);
         }
 
@@ -610,6 +621,7 @@ public class NavigationFragment extends ListFragment implements
     class RandomSubredditLoaderCallbacks implements LoaderCallbacks<String> {
         @Override
         public Loader<String> onCreateLoader(int id, Bundle args) {
+            String accountName = args.getString(LOADER_ARG_ACCOUNT_NAME);
             return new RandomSubredditLoader(getActivity(), accountName);
         }
 

@@ -43,8 +43,8 @@ import com.btmura.android.reddit.provider.AccountProvider;
 import com.btmura.android.reddit.util.Array;
 
 /**
- * {@link AbstractThreadedSyncAdapter} for periodically syncing account
- * information using the /api/me API method to check for mail and other info.
+ * {@link AbstractThreadedSyncAdapter} for periodically syncing account information using the
+ * /api/me API method to check for mail and other info.
  */
 public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
 
@@ -65,8 +65,11 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     @Override
-    public void onPerformSync(Account account, Bundle extras, String authority,
-            ContentProviderClient provider, SyncResult syncResult) {
+    public void onPerformSync(Account account,
+            Bundle extras,
+            String authority,
+            ContentProviderClient provider,
+            SyncResult syncResult) {
         // Extra method just allows us to always print out sync stats after.
         doSync(account, extras, authority, provider, syncResult);
         if (BuildConfig.DEBUG) {
@@ -90,8 +93,10 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INDEX_COMMENT_KARMA = 2;
     private static final int INDEX_HAS_MAIL = 3;
 
-    private void doSync(Account account, Bundle extras, String authority,
-            ContentProviderClient provider, SyncResult syncResult) {
+    private void doSync(Account account,
+            Bundle extras, String authority,
+            ContentProviderClient provider,
+            SyncResult syncResult) {
         try {
             // Get the necessary account credentials or bail out.
             String cookie = AccountUtils.getCookie(getContext(), account);
@@ -104,8 +109,11 @@ public class AccountSyncAdapter extends AbstractThreadedSyncAdapter {
             AccountInfoResult result = RedditApi.aboutMe(cookie);
 
             // Only update the database if it's missing or different.
-            Cursor c = provider.query(AccountProvider.ACCOUNTS_URI, PROJECTION,
-                    Accounts.SELECT_BY_ACCOUNT, Array.of(account.name), null);
+            Cursor c = provider.query(AccountProvider.ACCOUNTS_URI,
+                    PROJECTION,
+                    Accounts.SELECT_BY_ACCOUNT,
+                    Array.of(account.name),
+                    null);
             try {
                 if (!c.moveToNext()
                         || result.linkKarma != c.getInt(INDEX_LINK_KARMA)
