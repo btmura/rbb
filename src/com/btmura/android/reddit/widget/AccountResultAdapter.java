@@ -32,6 +32,9 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.util.Objects;
 
+/**
+ * Adapter used for showing accounts in the navigation drawer.
+ */
 public class AccountResultAdapter extends BaseAdapter implements OnClickListener {
 
     public interface OnAccountMessagesSelectedListener {

@@ -17,6 +17,6 @@
 <resources>
 
     <dimen name="details_cell_width">150dp</dimen>
-    <dimen name="left_width">200dp</dimen>
+    <dimen name="left_width">240dp</dimen>
 
 </resources>
