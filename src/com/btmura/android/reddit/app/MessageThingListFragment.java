@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.util.ComparableFragments;
@@ -24,6 +25,8 @@ public class MessageThingListFragment
         extends ThingListFragment<MessageThingListController,
         MessageThingMenuController,
         MessageThingActionModeController> {
+
+    private ThingHolder thingHolder;
 
     public static MessageThingListFragment newInstance(String accountName,
             String messageUser,
@@ -41,6 +44,14 @@ public class MessageThingListFragment
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof ThingHolder) {
+            thingHolder = (ThingHolder) activity;
+        }
+    }
+
+    @Override
     protected MessageThingListController createController() {
         return new MessageThingListController(getActivity(), getArguments());
     }
@@ -48,7 +59,7 @@ public class MessageThingListFragment
     @Override
     protected MessageThingMenuController
             createMenuController(MessageThingListController controller) {
-        return new MessageThingMenuController(getActivity(), this);
+        return new MessageThingMenuController(getActivity(), thingHolder, this);
     }
 
     @Override

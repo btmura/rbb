@@ -24,13 +24,15 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 
-public class MessageThingMenuController implements MenuController {
+class MessageThingMenuController implements MenuController {
 
     private final Context context;
+    private final ThingHolder thingHolder;
     private final Refreshable refreshable;
 
-    public MessageThingMenuController(Context context, Refreshable refreshable) {
+    MessageThingMenuController(Context context, ThingHolder thingHolder, Refreshable refreshable) {
         this.context = context;
+        this.thingHolder = thingHolder;
         this.refreshable = refreshable;
     }
 
@@ -51,6 +53,11 @@ public class MessageThingMenuController implements MenuController {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        boolean hasThing = thingHolder != null && thingHolder.isShowingThing();
+        boolean showNewMessage = !hasThing;
+        boolean showRefresh = !hasThing;
+        menu.findItem(R.id.menu_new_message).setVisible(showNewMessage);
+        menu.findItem(R.id.menu_refresh).setVisible(showRefresh);
     }
 
     @Override
