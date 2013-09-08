@@ -75,6 +75,27 @@ public class Provider {
                     .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
 
+    public static void expandCommentAsync(Context context, final long id, final long sessionId) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                ThingProvider.expandComment(appContext, id, sessionId);
+            }
+        });
+    }
+
+    public static void collapseCommentAsync(Context context, final long id,
+            final long[] childIds) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                ThingProvider.collapseComment(appContext, id, childIds);
+            }
+        });
+    }
+
     public static void insertCommentAsync(Context context,
             final String accountName,
             final String body,
@@ -176,27 +197,6 @@ public class Provider {
                 }
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);
-            }
-        });
-    }
-
-    public static void expandCommentAsync(Context context, final long id, final long sessionId) {
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                ThingProvider.expandComment(appContext, id, sessionId);
-            }
-        });
-    }
-
-    public static void collapseCommentAsync(Context context, final long id,
-            final long[] childIds) {
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                ThingProvider.collapseComment(appContext, id, childIds);
             }
         });
     }

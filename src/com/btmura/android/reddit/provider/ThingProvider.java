@@ -189,8 +189,8 @@ public class ThingProvider extends BaseProvider {
 
     private static final String METHOD_GET_SESSION = "getSession";
     private static final String METHOD_CLEAN_SESSIONS = "cleanSessions";
-    private static final String METHOD_COLLAPSE_COMMENT = "collapseComment";
     private static final String METHOD_EXPAND_COMMENT = "expandComment";
+    private static final String METHOD_COLLAPSE_COMMENT = "collapseComment";
     private static final String METHOD_INSERT_COMMENT = "insertComment";
     private static final String METHOD_EDIT_COMMENT = "editComment";
     private static final String METHOD_INSERT_MESSAGE = "insertMessage";
