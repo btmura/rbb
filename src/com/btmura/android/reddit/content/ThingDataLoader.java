@@ -51,10 +51,9 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
     private final ThingBundle thingBundle;
     private final ForceLoadContentObserver observer = new ForceLoadContentObserver();
 
+    private boolean initialized;
     private ThingBundle parent;
     private ThingBundle child;
-    private boolean bundlesResolved;
-
     private Cursor saveActionCursor;
     private boolean savedState;
 
@@ -71,10 +70,10 @@ public class ThingDataLoader extends BaseAsyncTaskLoader<ThingData> {
         }
 
         try {
-            if (!bundlesResolved) {
+            if (!initialized) {
                 resolveThingBundles();
-                bundlesResolved = true;
                 savedState = parent.isSaved();
+                initialized = true;
             }
             reloadSaveActionCursor();
             return new ThingData(getContext(), accountName, parent, child, savedState);
