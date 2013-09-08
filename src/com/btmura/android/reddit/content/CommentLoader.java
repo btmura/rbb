@@ -93,11 +93,18 @@ public class CommentLoader extends AbstractSessionLoader {
     private final String thingId;
     private final String linkId;
 
-    public CommentLoader(Context context, String accountName, String thingId, String linkId,
+    public CommentLoader(Context context,
+            String accountName,
+            String thingId,
+            String linkId,
             Bundle cursorExtras) {
-        super(context, ThingProvider.COMMENTS_WITH_ACTIONS_URI, PROJECTION,
-                Comments.SELECT_VISIBLE_BY_SESSION_ID, Comments.SORT_BY_SEQUENCE_AND_ID,
-                cursorExtras, null);
+        super(context,
+                ThingProvider.COMMENTS_WITH_ACTIONS_URI,
+                PROJECTION,
+                Comments.SELECT_VISIBLE_BY_SESSION_ID,
+                Comments.SORT_BY_SEQUENCE_AND_ID,
+                cursorExtras,
+                null);
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;
@@ -105,7 +112,11 @@ public class CommentLoader extends AbstractSessionLoader {
 
     @Override
     protected Bundle createSession(long sessionId, String more) {
-        return ThingProvider.getCommentsSession(getContext(), accountName, thingId,
-                linkId, sessionId, -1);
+        return ThingProvider.getCommentsSession(getContext(),
+                accountName,
+                thingId,
+                linkId,
+                sessionId,
+                -1);
     }
 }

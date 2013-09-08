@@ -29,10 +29,19 @@ public class ProfileThingLoader extends AbstractSessionLoader implements ThingPr
     private final String profileUser;
     private final int filter;
 
-    public ProfileThingLoader(Context context, String accountName, String profileUser, int filter,
-            String more, Bundle cursorExtras) {
-        super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
-                getSelectionStatement(filter), null, cursorExtras, more);
+    public ProfileThingLoader(Context context,
+            String accountName,
+            String profileUser,
+            int filter,
+            String more,
+            Bundle cursorExtras) {
+        super(context,
+                ThingProvider.THINGS_WITH_ACTIONS_URI,
+                PROJECTION,
+                getSelectionStatement(filter),
+                null,
+                cursorExtras,
+                more);
         this.accountName = accountName;
         this.profileUser = profileUser;
         this.filter = filter;
@@ -46,7 +55,11 @@ public class ProfileThingLoader extends AbstractSessionLoader implements ThingPr
 
     @Override
     protected Bundle createSession(long sessionId, String more) {
-        return ThingProvider.getProfileSession(getContext(), accountName, profileUser,
-                filter, sessionId, more);
+        return ThingProvider.getProfileSession(getContext(),
+                accountName,
+                profileUser,
+                filter,
+                sessionId,
+                more);
     }
 }

@@ -38,10 +38,15 @@ public class SearchSubredditLoader extends AbstractSessionLoader {
     private final String accountName;
     private final String query;
 
-    public SearchSubredditLoader(Context context, String accountName, String query,
+    public SearchSubredditLoader(Context context,
+            String accountName,
+            String query,
             Bundle cursorExtras) {
-        super(context, ThingProvider.SUBREDDITS_URI, PROJECTION,
-                SubredditResults.SELECT_BY_SESSION_ID, SubredditResults.SORT_BY_NAME, cursorExtras,
+        super(context,
+                ThingProvider.SUBREDDITS_URI, PROJECTION,
+                SubredditResults.SELECT_BY_SESSION_ID,
+                SubredditResults.SORT_BY_NAME,
+                cursorExtras,
                 null);
         this.accountName = accountName;
         this.query = query;

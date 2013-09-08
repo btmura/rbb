@@ -28,10 +28,19 @@ public class SearchThingLoader extends AbstractSessionLoader implements ThingPro
     private final String subreddit;
     private final String query;
 
-    public SearchThingLoader(Context context, String accountName, String subreddit, String query,
-            String more, Bundle cursorExtras) {
-        super(context, ThingProvider.THINGS_WITH_ACTIONS_URI, PROJECTION,
-                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID, null, cursorExtras, more);
+    public SearchThingLoader(Context context,
+            String accountName,
+            String subreddit,
+            String query,
+            String more,
+            Bundle cursorExtras) {
+        super(context,
+                ThingProvider.THINGS_WITH_ACTIONS_URI,
+                PROJECTION,
+                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID,
+                null,
+                cursorExtras,
+                more);
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;
@@ -39,7 +48,11 @@ public class SearchThingLoader extends AbstractSessionLoader implements ThingPro
 
     @Override
     protected Bundle createSession(long sessionId, String more) {
-        return ThingProvider.getThingSearchSession(getContext(), accountName, subreddit, query,
-                sessionId, more);
+        return ThingProvider.getThingSearchSession(getContext(),
+                accountName,
+                subreddit,
+                query,
+                sessionId,
+                more);
     }
 }

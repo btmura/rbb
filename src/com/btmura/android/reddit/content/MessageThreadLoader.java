@@ -46,17 +46,26 @@ public class MessageThreadLoader extends AbstractSessionLoader {
     private final String accountName;
     private final String thingId;
 
-    public MessageThreadLoader(Context context, String accountName, String thingId,
+    public MessageThreadLoader(Context context,
+            String accountName,
+            String thingId,
             Bundle cursorExtras) {
-        super(context, ThingProvider.MESSAGES_WITH_ACTIONS_URI, PROJECTION,
-                Messages.SELECT_BY_SESSION_ID, null, cursorExtras, null);
+        super(context,
+                ThingProvider.MESSAGES_WITH_ACTIONS_URI,
+                PROJECTION,
+                Messages.SELECT_BY_SESSION_ID,
+                null,
+                cursorExtras,
+                null);
         this.accountName = accountName;
         this.thingId = thingId;
     }
 
     @Override
     protected Bundle createSession(long sessionId, String more) {
-        return ThingProvider.getMessageThreadSession(getContext(), accountName, thingId,
+        return ThingProvider.getMessageThreadSession(getContext(),
+                accountName,
+                thingId,
                 sessionId);
     }
 }
