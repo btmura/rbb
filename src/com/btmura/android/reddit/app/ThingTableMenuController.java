@@ -78,15 +78,16 @@ class ThingTableMenuController implements MenuController {
         boolean hasSubreddit = subreddit != null;
         boolean hasThing = thingBundleHolder != null && thingBundleHolder.getThingBundle() != null;
         boolean hasSidebar = Subreddits.hasSidebar(subreddit);
+        boolean isSubreddit = !isQuery && hasSubreddit && !hasThing;
 
-        boolean showRefresh = !isQuery && hasSubreddit && !hasThing;
-        boolean showAddSubreddit = showRefresh;
-        boolean showNewPost = showRefresh && hasAccount;
-        boolean showSubreddit = showRefresh && hasSidebar;
+        boolean showAddSubreddit = isSubreddit;
+        boolean showNewPost = isSubreddit && hasAccount;
+        boolean showSubreddit = isSubreddit && hasSidebar;
+        boolean showRefresh = !hasThing;
 
-        menu.findItem(R.id.menu_new_post).setVisible(showNewPost);
-        menu.findItem(R.id.menu_refresh).setVisible(showAddSubreddit);
         menu.findItem(R.id.menu_add_subreddit).setVisible(showAddSubreddit);
+        menu.findItem(R.id.menu_new_post).setVisible(showNewPost);
+        menu.findItem(R.id.menu_refresh).setVisible(showRefresh);
 
         MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
         subredditItem.setVisible(showSubreddit);
