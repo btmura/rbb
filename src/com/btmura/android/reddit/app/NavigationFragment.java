@@ -596,14 +596,6 @@ public class NavigationFragment extends ListFragment implements
         outState.putInt(STATE_FILTER, filter);
     }
 
-    private String getRequestedSubreddit() {
-        return getArguments().getString(ARG_REQUESTED_SUBREDDIT);
-    }
-
-    private ThingBundle getRequestedThingBundle() {
-        return getArguments().getParcelable(ARG_REQUESTED_THING_BUNDLE);
-    }
-
     class AccountSubredditLoaderCallbacks implements LoaderCallbacks<Cursor> {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
