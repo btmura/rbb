@@ -31,6 +31,7 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.BundleSupport;
 import com.btmura.android.reddit.util.JsonParser;
+import com.btmura.android.reddit.util.Strings;
 
 /**
  * {@link ThingBundle} is a {@link Bundle} representation of some thing. This class adds type
@@ -61,6 +62,7 @@ public class ThingBundle extends BundleSupport implements Parcelable {
     private static final String KEY_SAVED = "saved";
     private static final String KEY_SCORE = "score";
     private static final String KEY_SELF = "self";
+    private static final String KEY_SUBJECT = "subject";
     private static final String KEY_SUBREDDIT = "subreddit";
     private static final String KEY_THING_ID = "thingId";
     private static final String KEY_THUMBNAIL_URL = "thumbnailUrl";
@@ -175,10 +177,12 @@ public class ThingBundle extends BundleSupport implements Parcelable {
 
     public static ThingBundle newMessageInstance(String author,
             int kind,
+            String subject,
             String thingId) {
-        Bundle data = new Bundle(3);
+        Bundle data = new Bundle(4);
         data.putString(KEY_AUTHOR, author);
         data.putInt(KEY_KIND, kind);
+        data.putString(KEY_SUBJECT, subject);
         data.putString(KEY_THING_ID, thingId);
         return new ThingBundle(data, TYPE_MESSAGE);
     }
@@ -229,6 +233,16 @@ public class ThingBundle extends BundleSupport implements Parcelable {
     }
 
     // TODO: Move these methods with logic to a different class.
+
+    public String getDisplayTitle() {
+        switch (getKind()) {
+            case Kinds.KIND_MESSAGE:
+                return getSubject();
+
+            default:
+                return getTitle();
+        }
+    }
 
     public CharSequence getCommentsUrl() {
         return Urls.perma(getPermaLink(), null);
@@ -290,6 +304,10 @@ public class ThingBundle extends BundleSupport implements Parcelable {
 
     public int getScore() {
         return getInt(data, KEY_SCORE);
+    }
+
+    public String getSubject() {
+        return getString(data, KEY_SUBJECT);
     }
 
     public String getSubreddit() {
@@ -386,8 +404,7 @@ public class ThingBundle extends BundleSupport implements Parcelable {
 
         @Override
         public void onLinkTitle(JsonReader reader, int index) throws IOException {
-            CharSequence title = formatter.formatNoSpans(context, readString(reader, ""));
-            data.putString(KEY_LINK_TITLE, title.toString());
+            data.putString(KEY_LINK_TITLE, readFormattedString(reader));
         }
 
         @Override
@@ -426,6 +443,11 @@ public class ThingBundle extends BundleSupport implements Parcelable {
         }
 
         @Override
+        public void onSubject(JsonReader reader, int index) throws IOException {
+            data.putString(KEY_SUBJECT, readFormattedString(reader));
+        }
+
+        @Override
         public void onSubreddit(JsonReader reader, int index) throws IOException {
             data.putString(KEY_SUBREDDIT, readString(reader, ""));
         }
@@ -440,8 +462,7 @@ public class ThingBundle extends BundleSupport implements Parcelable {
 
         @Override
         public void onTitle(JsonReader reader, int index) throws IOException {
-            CharSequence title = formatter.formatNoSpans(context, readString(reader, ""));
-            data.putString(KEY_TITLE, title.toString());
+            data.putString(KEY_TITLE, readFormattedString(reader));
         }
 
         @Override
@@ -452,6 +473,10 @@ public class ThingBundle extends BundleSupport implements Parcelable {
         @Override
         public void onUrl(JsonReader reader, int index) throws IOException {
             data.putString(KEY_URL, readString(reader, ""));
+        }
+
+        private String readFormattedString(JsonReader reader) throws IOException {
+            return Strings.toString(formatter.formatNoSpans(context, readString(reader, "")));
         }
 
     }

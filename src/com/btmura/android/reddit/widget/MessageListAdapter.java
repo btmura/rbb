@@ -147,6 +147,7 @@ public class MessageListAdapter extends AbstractThingListAdapter {
                     return ThingBundle.newMessageInstance(
                             cursor.getString(MessageThingLoader.INDEX_AUTHOR),
                             cursor.getInt(MessageThingLoader.INDEX_KIND),
+                            cursor.getString(MessageThingLoader.INDEX_SUBJECT),
                             cursor.getString(MessageThingLoader.INDEX_THING_ID));
 
                 case Kinds.KIND_COMMENT:
