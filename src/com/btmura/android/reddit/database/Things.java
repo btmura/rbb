@@ -76,6 +76,8 @@ public class Things implements BaseColumns {
     public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
             SELECT_BY_ACCOUNT + " AND " + COLUMN_THING_ID + "=?";
 
+    public static final String SORT_BY_SESSION_ID = COLUMN_SESSION_ID + " DESC";
+
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
