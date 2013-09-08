@@ -72,7 +72,6 @@
 
         <LinearLayout
             android:layout_gravity="fill"
-            android:columnCount="3"
             android:paddingBottom="@dimen/padding"
             android:paddingLeft="@dimen/padding"
             android:paddingRight="@dimen/padding" >
