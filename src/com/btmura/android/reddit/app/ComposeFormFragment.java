@@ -111,7 +111,6 @@ public class ComposeFormFragment extends Fragment implements
     // The following extras should be passed for EDIT.
 
     public static final String EXTRA_EDIT_PARENT_THING_ID = "parentThingId";
-    public static final String EXTRA_EDIT_SESSION_ID = "sessionId";
     public static final String EXTRA_EDIT_THING_ID = "thingId";
 
     public interface OnComposeFormListener {
@@ -513,7 +512,7 @@ public class ComposeFormFragment extends Fragment implements
         Bundle extras = getExtras();
         String parentThingId = extras.getString(EXTRA_COMMENT_PARENT_THING_ID);
         String replyThingId = extras.getString(EXTRA_COMMENT_THING_ID);
-        Provider.commentReplyAsync(
+        Provider.insertCommentAsync(
                 getActivity(),
                 accountName,
                 text,
@@ -538,16 +537,13 @@ public class ComposeFormFragment extends Fragment implements
     private void handleEdit(String accountName, String text) {
         Bundle extras = getExtras();
         String parentThingId = extras.getString(EXTRA_EDIT_PARENT_THING_ID);
-        // TODO: Fix this to not require session like comment and message replies.
-        long sessionId = extras.getLong(EXTRA_EDIT_SESSION_ID);
         String thingId = extras.getString(EXTRA_EDIT_THING_ID);
-        Provider.editAsync(
+        Provider.editCommentAsync(
                 getActivity(),
                 accountName,
-                parentThingId,
-                thingId,
                 text,
-                sessionId);
+                parentThingId,
+                thingId);
         onSubmitFinished();
     }
 

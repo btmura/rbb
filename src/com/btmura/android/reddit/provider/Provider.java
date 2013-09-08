@@ -75,8 +75,7 @@ public class Provider {
                     .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
 
-    /** Inserts a placeholder comment yet to be synced with Reddit. */
-    public static void commentReplyAsync(Context context,
+    public static void insertCommentAsync(Context context,
             final String accountName,
             final String body,
             final String parentThingId,
@@ -86,6 +85,20 @@ public class Provider {
             @Override
             public void run() {
                 ThingProvider.insertComment(appContext, accountName, body, parentThingId, thingId);
+            }
+        });
+    }
+
+    public static void editCommentAsync(Context context,
+            final String accountName,
+            final String body,
+            final String parentThingId,
+            final String thingId) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                ThingProvider.editComment(appContext, accountName, body, parentThingId, thingId);
             }
         });
     }
@@ -161,39 +174,6 @@ public class Provider {
                             .withValue(Comments.COLUMN_NUM_COMMENTS, numComments)
                             .build());
                 }
-
-                applyOps(appContext, ThingProvider.AUTHORITY, ops);
-            }
-        });
-    }
-
-    public static void editAsync(Context context,
-            final String accountName,
-            final String parentThingId,
-            final String thingId,
-            final String text,
-            final long sessionId) {
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(2);
-
-                ops.add(ContentProviderOperation.newInsert(ThingProvider.COMMENT_ACTIONS_SYNC_URI)
-                        .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
-                        .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_EDIT)
-                        .withValue(CommentActions.COLUMN_TEXT, text)
-                        .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentThingId)
-                        .withValue(CommentActions.COLUMN_THING_ID, thingId)
-                        .build());
-
-                ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                        .withSelection(Comments.SELECT_BY_SESSION_ID_AND_THING_ID,
-                                Array.of(sessionId, thingId))
-                        .withValue(Comments.COLUMN_BODY, text)
-                        .withValueBackReference(Comments.COLUMN_COMMENT_ACTION_ID, 0)
-                        .build());
 
                 applyOps(appContext, ThingProvider.AUTHORITY, ops);
             }

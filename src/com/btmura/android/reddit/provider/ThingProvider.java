@@ -192,6 +192,7 @@ public class ThingProvider extends BaseProvider {
     private static final String METHOD_COLLAPSE_COMMENT = "collapseComment";
     private static final String METHOD_EXPAND_COMMENT = "expandComment";
     private static final String METHOD_INSERT_COMMENT = "insertComment";
+    private static final String METHOD_EDIT_COMMENT = "editComment";
     private static final String METHOD_INSERT_MESSAGE = "insertMessage";
 
     // List of extras used throughout the provider code.
@@ -390,6 +391,18 @@ public class ThingProvider extends BaseProvider {
         return call(context, COMMENT_ACTIONS_URI, METHOD_INSERT_COMMENT, accountName, extras);
     }
 
+    public static final Bundle editComment(Context context,
+            String accountName,
+            String body,
+            String parentThingId,
+            String thingId) {
+        Bundle extras = new Bundle(3);
+        extras.putString(EXTRA_BODY, body);
+        extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
+        extras.putString(EXTRA_THING_ID, thingId);
+        return call(context, COMMENT_ACTIONS_URI, METHOD_EDIT_COMMENT, accountName, extras);
+    }
+
     public static final Bundle insertMessage(Context context,
             String accountName,
             String body,
@@ -491,6 +504,8 @@ public class ThingProvider extends BaseProvider {
                 return expandComment(extras);
             } else if (METHOD_INSERT_COMMENT.equals(method)) {
                 return insertComment(arg, extras);
+            } else if (METHOD_EDIT_COMMENT.equals(method)) {
+                return editComment(arg, extras);
             } else if (METHOD_INSERT_MESSAGE.equals(method)) {
                 return insertMessage(arg, extras);
             } else {
@@ -916,7 +931,46 @@ public class ThingProvider extends BaseProvider {
         ContentResolver cr = getContext().getContentResolver();
         cr.notifyChange(COMMENT_ACTIONS_URI, null, SYNC);
         cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
-        cr.notifyChange(THINGS_URI, null, NO_SYNC);
+        return Bundle.EMPTY;
+    }
+
+    private Bundle editComment(String accountName, Bundle extras) {
+        String body = getBodyExtra(extras);
+        String parentThingId = getParentThingIdExtra(extras);
+        String thingId = getThingIdExtra(extras);
+
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues(5);
+            values.put(CommentActions.COLUMN_ACCOUNT, accountName);
+            values.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_EDIT);
+            values.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
+            values.put(CommentActions.COLUMN_TEXT, body);
+            values.put(CommentActions.COLUMN_THING_ID, thingId);
+
+            long actionId = db.insert(CommentActions.TABLE_NAME, null, values);
+            if (actionId == -1) {
+                return null;
+            }
+
+            values.clear();
+            values.put(Comments.COLUMN_BODY, body);
+            values.put(Comments.COLUMN_COMMENT_ACTION_ID, actionId);
+
+            db.update(Comments.TABLE_NAME,
+                    values,
+                    SharedColumns.SELECT_BY_THING_ID,
+                    Array.of(thingId));
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(COMMENT_ACTIONS_URI, null, SYNC);
+        cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
         return Bundle.EMPTY;
     }
 
