@@ -96,7 +96,6 @@ class SaveSyncer implements Syncer {
         for (int i = 0; i < count;) {
             syncResult.stats.numDeletes += results[i++].count;
             syncResult.stats.numUpdates += results[i++].count;
-            syncResult.stats.numUpdates += results[i++].count;
         }
     }
 }
