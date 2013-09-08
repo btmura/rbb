@@ -30,8 +30,9 @@ import com.btmura.android.reddit.app.ComposeFormFragment.OnComposeFormListener;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.util.Objects;
 
-public class ComposeActivity extends FragmentActivity
-        implements TabListener, OnComposeFormListener {
+public class ComposeActivity extends FragmentActivity implements
+        TabListener,
+        OnComposeFormListener {
 
     /** Type of composition when submitting a link or text. */
     public static final int TYPE_POST = 0;
@@ -121,12 +122,9 @@ public class ComposeActivity extends FragmentActivity
     public static final String EXTRA_EDIT_SESSION_ID = "sessionId";
     public static final String EXTRA_EDIT_THING_ID = "thingId";
 
-    private static final String STATE_SELECTED_TAB_INDEX = "selectedTabIndex";
-
     private int[] types;
     private ActionBar bar;
-    private int savedSelectedTabIndex;
-    private boolean tabListenerDisabled;
+    private TabController tabController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,16 +139,14 @@ public class ComposeActivity extends FragmentActivity
         if (types == null) {
             types = DEFAULT_TYPE_SET;
         }
-
-        bar = getActionBar();
-        bar.setDisplayHomeAsUpEnabled(true);
-        if (savedInstanceState != null) {
-            savedSelectedTabIndex = savedInstanceState.getInt(STATE_SELECTED_TAB_INDEX);
-        }
-        setupTabs();
+        setupTabs(savedInstanceState);
     }
 
-    private void setupTabs() {
+    private void setupTabs(Bundle savedInstanceState) {
+        bar = getActionBar();
+        bar.setDisplayHomeAsUpEnabled(true);
+        tabController = new TabController(bar, savedInstanceState);
+
         for (int i = 0; i < types.length; i++) {
             switch (types[i]) {
                 case ComposeActivity.TYPE_POST:
@@ -169,24 +165,16 @@ public class ComposeActivity extends FragmentActivity
                     break;
             }
         }
-
-        tabListenerDisabled = savedSelectedTabIndex != 0;
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        tabListenerDisabled = false;
-        if (savedSelectedTabIndex != 0) {
-            bar.setSelectedNavigationItem(savedSelectedTabIndex);
-        }
+        tabController.setupTabs();
     }
 
-    private Tab addTab(int titleResId) {
-        Tab tab = bar.newTab().setText(titleResId).setTabListener(this);
-        bar.addTab(tab);
-        return tab;
+    private void addTab(int titleResId) {
+        tabController.addTab(bar.newTab().setText(titleResId).setTabListener(this));
     }
 
     @Override
     public void onTabSelected(Tab tab, android.app.FragmentTransaction trans) {
-        if (!tabListenerDisabled) {
+        if (tabController.selectTab(tab)) {
             ComposeFormFragment frag = ComposeFormFragment.newInstance(types[tab.getPosition()],
                     getIntent().getStringExtra(EXTRA_SUBREDDIT_DESTINATION),
                     getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION),
@@ -234,7 +222,7 @@ public class ComposeActivity extends FragmentActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_TAB_INDEX, bar.getSelectedNavigationIndex());
+        tabController.saveInstanceState(outState);
     }
 
     private ComparableFragment getComposeFormFragment() {
