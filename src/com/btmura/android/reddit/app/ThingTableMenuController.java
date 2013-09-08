@@ -66,7 +66,7 @@ class ThingTableMenuController implements MenuController {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.thing_list_menu, menu);
+        inflater.inflate(R.menu.thing_table_menu, menu);
     }
 
     @Override
