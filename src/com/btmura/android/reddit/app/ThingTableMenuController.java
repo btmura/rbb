@@ -110,8 +110,10 @@ class ThingTableMenuController implements MenuController {
             case R.id.menu_subreddit:
                 handleSubreddit();
                 return true;
+
+            default:
+                return false;
         }
-        return false;
     }
 
     private void handleRefresh() {

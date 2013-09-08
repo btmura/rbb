@@ -22,11 +22,13 @@ import com.btmura.android.reddit.util.ComparableFragments;
 
 public class MessageThingListFragment
         extends ThingListFragment<MessageThingListController,
-        NoMenuController,
+        MessageThingMenuController,
         MessageThingActionModeController> {
 
-    public static MessageThingListFragment newInstance(String accountName, String messageUser,
-            int filter, boolean singleChoice) {
+    public static MessageThingListFragment newInstance(String accountName,
+            String messageUser,
+            int filter,
+            boolean singleChoice) {
         Bundle args = new Bundle(4);
         args.putString(MessageThingListController.EXTRA_ACCOUNT_NAME, accountName);
         args.putString(MessageThingListController.EXTRA_MESSAGE_USER, messageUser);
@@ -44,8 +46,9 @@ public class MessageThingListFragment
     }
 
     @Override
-    protected NoMenuController createMenuController(MessageThingListController controller) {
-        return NoMenuController.INSTANCE;
+    protected MessageThingMenuController
+            createMenuController(MessageThingListController controller) {
+        return new MessageThingMenuController(getActivity(), this);
     }
 
     @Override
