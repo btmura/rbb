@@ -34,7 +34,7 @@ import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
-import com.btmura.android.reddit.util.ListViews;
+import com.btmura.android.reddit.util.Views;
 import com.btmura.android.reddit.widget.AbstractThingListAdapter;
 
 class ThingTableActionModeController implements ThingActionModeController, ThingProjection {
@@ -88,7 +88,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu, ListView listView) {
         int count = listView.getCheckedItemCount();
-        int position = ListViews.getFirstCheckedPosition(listView);
+        int position = Views.getCheckedPosition(listView);
 
         if (count == 1 && !TextUtils.isEmpty(getDomain(position))) {
             mode.setTitle(getDomain(position));
@@ -249,7 +249,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
     }
 
     private void handleSave(ListView listView, boolean save) {
-        int position = ListViews.getFirstCheckedPosition(listView);
+        int position = Views.getCheckedPosition(listView);
         if (save) {
             Provider.saveAsync(context,
                     accountName,
@@ -275,22 +275,22 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
     }
 
     private void handleHide(ListView listView, boolean hide) {
-        int position = ListViews.getFirstCheckedPosition(listView);
+        int position = Views.getCheckedPosition(listView);
         hide(position, hide);
     }
 
     private void handleCopyUrl(ListView listView) {
-        int position = ListViews.getFirstCheckedPosition(listView);
+        int position = Views.getCheckedPosition(listView);
         MenuHelper.setClipAndToast(context, getThingTitle(position), getThingUrl(position));
     }
 
     private void handleAuthor(ListView listView) {
-        int position = ListViews.getFirstCheckedPosition(listView);
+        int position = Views.getCheckedPosition(listView);
         MenuHelper.startProfileActivity(context, getAuthor(position), -1);
     }
 
     private void handleSubreddit(ListView listView) {
-        int position = ListViews.getFirstCheckedPosition(listView);
+        int position = Views.getCheckedPosition(listView);
         MenuHelper.startSidebarActivity(context, getSubreddit(position));
     }
 

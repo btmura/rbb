@@ -30,7 +30,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.util.ListViews;
+import com.btmura.android.reddit.util.Views;
 import com.btmura.android.reddit.widget.SubredditAdapter;
 
 class SubredditActionModeController implements ActionModeController {
@@ -126,7 +126,7 @@ class SubredditActionModeController implements ActionModeController {
     }
 
     private String getFirstCheckedSubreddit(ListView listView) {
-        int position = ListViews.getFirstCheckedPosition(listView);
+        int position = Views.getCheckedPosition(listView);
         return adapter.getName(position);
     }
 

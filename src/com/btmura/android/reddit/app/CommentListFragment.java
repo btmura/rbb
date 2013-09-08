@@ -32,7 +32,7 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.util.ListViews;
+import com.btmura.android.reddit.util.Views;
 import com.btmura.android.reddit.widget.OnVoteListener;
 
 public class CommentListFragment extends ListFragment implements
@@ -127,7 +127,7 @@ public class CommentListFragment extends ListFragment implements
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         int count = getListView().getCheckedItemCount();
         mode.setTitle(getResources().getQuantityString(R.plurals.comments, count, count));
-        int position = ListViews.getFirstCheckedPosition(getListView());
+        int position = Views.getCheckedPosition(getListView());
         controller.prepareActionMenu(menu, getListView(), position);
         return true;
     }
@@ -139,7 +139,7 @@ public class CommentListFragment extends ListFragment implements
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        int position = ListViews.getFirstCheckedPosition(getListView());
+        int position = Views.getCheckedPosition(getListView());
         switch (item.getItemId()) {
             case R.id.menu_reply:
                 controller.reply(position);
