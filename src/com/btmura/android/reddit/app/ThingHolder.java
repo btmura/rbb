@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-
-public interface ThingBundleHolder {
-    ThingBundle getThingBundle();
+public interface ThingHolder {
+    boolean isShowingThing();
 }

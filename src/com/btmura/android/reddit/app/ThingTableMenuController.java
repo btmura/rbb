@@ -35,7 +35,7 @@ class ThingTableMenuController implements MenuController {
     private final String accountName;
     private final String query;
     private final SubredditHolder subredditNameHolder;
-    private final ThingBundleHolder thingBundleHolder;
+    private final ThingHolder thingHolder;
     private final Refreshable refreshable;
 
     ThingTableMenuController(Context context,
@@ -43,14 +43,14 @@ class ThingTableMenuController implements MenuController {
             String accountName,
             String query,
             SubredditHolder subredditNameHolder,
-            ThingBundleHolder thingBundleHolder,
+            ThingHolder thingHolder,
             Refreshable refreshable) {
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.accountName = accountName;
         this.query = query;
         this.subredditNameHolder = subredditNameHolder;
-        this.thingBundleHolder = thingBundleHolder;
+        this.thingHolder = thingHolder;
         this.refreshable = refreshable;
     }
 
@@ -76,7 +76,7 @@ class ThingTableMenuController implements MenuController {
         boolean isQuery = !TextUtils.isEmpty(query);
         boolean hasAccount = AccountUtils.isAccount(accountName);
         boolean hasSubreddit = subreddit != null;
-        boolean hasThing = thingBundleHolder != null && thingBundleHolder.getThingBundle() != null;
+        boolean hasThing = thingHolder != null && thingHolder.isShowingThing();
         boolean hasSidebar = Subreddits.hasSidebar(subreddit);
         boolean isSubreddit = !isQuery && hasSubreddit && !hasThing;
 

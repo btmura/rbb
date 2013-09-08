@@ -21,13 +21,13 @@ import android.app.Activity;
 abstract class ThingTableListFragment<C extends ThingListController<?>>
         extends ThingListFragment<C, ThingTableMenuController, ThingTableActionModeController> {
 
-    private ThingBundleHolder thingBundleHolder;
+    private ThingHolder thingHolder;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof ThingBundleHolder) {
-            thingBundleHolder = (ThingBundleHolder) activity;
+        if (activity instanceof ThingHolder) {
+            thingHolder = (ThingHolder) activity;
         }
     }
 
@@ -38,7 +38,7 @@ abstract class ThingTableListFragment<C extends ThingListController<?>>
                 controller.getAccountName(),
                 controller.getQuery(),
                 controller,
-                thingBundleHolder,
+                thingHolder,
                 this);
     }
 
