@@ -23,7 +23,6 @@ import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.ComponentCallbacks2;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
@@ -67,10 +66,10 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private static final int ANIMATION_EXPAND_RIGHT = 4;
     private static final int ANIMATION_COLLAPSE_RIGHT = 5;
 
-    interface LeftFragment extends ComparableFragment, ComponentCallbacks2 {
+    interface LeftFragment extends ComparableFragment {
     }
 
-    interface RightFragment extends ComparableFragment, ComponentCallbacks2 {
+    interface RightFragment extends ComparableFragment {
         void setSelectedThing(String thingId, String linkId);
     }
 
@@ -581,15 +580,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     public boolean isShowingThing() {
         ControlFragment cf = getControlFragment();
         return cf != null && cf.getThingBundle() != null;
-    }
-
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        RightFragment frag = getRightFragment();
-        if (frag != null) {
-            frag.onTrimMemory(level);
-        }
     }
 
     @Override
