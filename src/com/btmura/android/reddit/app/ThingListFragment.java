@@ -41,6 +41,7 @@ import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
 import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingView;
+import com.btmura.android.reddit.widget.ThumbnailLoader;
 
 abstract class ThingListFragment<C extends ThingListController<?>, MC extends MenuController, AC extends ThingActionModeController>
         extends ListFragment
@@ -166,6 +167,7 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
+        ThumbnailLoader.lock(scrollState != SCROLL_STATE_IDLE);
     }
 
     @Override

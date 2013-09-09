@@ -22,37 +22,36 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 
 public class ThumbnailLoader {
 
     private static final String TAG = "ThumbnailLoader";
 
-    static class BitmapCache extends LruCache<String, Bitmap> {
+    private static final boolean DEBUG = BuildConfig.DEBUG && !true;
 
-        private static BitmapCache BITMAP_CACHE;
+    private static final int LOCK_WAIT_TIME_MS = 250;
 
-        static BitmapCache getInstance(Context context) {
-            if (BITMAP_CACHE == null) {
-                int cacheSize = context.getResources().getInteger(R.integer.bitmap_cache_size);
-                BITMAP_CACHE = new BitmapCache(cacheSize);
-            }
-            return BITMAP_CACHE;
-        }
+    private static final AtomicInteger taskIdCounter = new AtomicInteger();
 
-        BitmapCache(int size) {
-            super(size);
-        }
+    private static final AtomicBoolean locked = new AtomicBoolean(false);
+
+    public static void lock(boolean lock) {
+        locked.set(lock);
     }
 
     public void setThumbnail(Context context, ThingView v, String url) {
@@ -89,22 +88,40 @@ public class ThumbnailLoader {
     class LoadThumbnailTask extends AsyncTask<Void, Void, Bitmap> {
 
         private final Context context;
+        private final int taskId;
         private final WeakReference<ThingView> ref;
         private final String url;
 
         LoadThumbnailTask(Context context, ThingView v, String url) {
             this.context = context.getApplicationContext();
+            this.taskId = taskIdCounter.getAndIncrement();
             this.ref = new WeakReference<ThingView>(v);
             this.url = url;
         }
 
         @Override
         protected Bitmap doInBackground(Void... params) {
+            while (locked.get()) {
+                if (DEBUG) {
+                    Log.d(TAG, taskId + ": locked");
+                }
+                SystemClock.sleep(LOCK_WAIT_TIME_MS);
+                if (isCancelled()) {
+                    if (DEBUG) {
+                        Log.d(TAG, taskId + ": cancelled(1)");
+                    }
+                    return null;
+                }
+            }
+
             HttpURLConnection conn = null;
             try {
                 URL u = new URL(url);
                 conn = (HttpURLConnection) u.openConnection();
                 if (isCancelled()) {
+                    if (DEBUG) {
+                        Log.d(TAG, taskId + ": cancelled(2)");
+                    }
                     return null;
                 }
 
@@ -112,6 +129,9 @@ public class ThumbnailLoader {
                 try {
                     is = conn.getInputStream();
                     if (isCancelled()) {
+                        if (DEBUG) {
+                            Log.d(TAG, taskId + ": cancelled(3)");
+                        }
                         return null;
                     }
 
@@ -152,4 +172,22 @@ public class ThumbnailLoader {
             }
         }
     }
+
+    static class BitmapCache extends LruCache<String, Bitmap> {
+
+        private static BitmapCache BITMAP_CACHE;
+
+        static BitmapCache getInstance(Context context) {
+            if (BITMAP_CACHE == null) {
+                int cacheSize = context.getResources().getInteger(R.integer.bitmap_cache_size);
+                BITMAP_CACHE = new BitmapCache(cacheSize);
+            }
+            return BITMAP_CACHE;
+        }
+
+        BitmapCache(int size) {
+            super(size);
+        }
+    }
+
 }
