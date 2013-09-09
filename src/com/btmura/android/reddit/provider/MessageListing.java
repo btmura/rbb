@@ -305,9 +305,13 @@ class MessageListing extends JsonParser implements Listing {
         String parentId = values.get(0).getAsString(Messages.COLUMN_THING_ID);
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query(MessageActions.TABLE_NAME, MERGE_PROJECTION,
-                MERGE_SELECTION, Array.of(accountName, parentId),
-                null, null, SharedColumns.SORT_BY_ID);
+        Cursor c = db.query(MessageActions.TABLE_NAME,
+                MERGE_PROJECTION,
+                MERGE_SELECTION,
+                Array.of(accountName, parentId),
+                null,
+                null,
+                SharedColumns.SORT_BY_ID);
         while (c.moveToNext()) {
             switch (c.getInt(MERGE_ACTION)) {
                 case MessageActions.ACTION_INSERT:

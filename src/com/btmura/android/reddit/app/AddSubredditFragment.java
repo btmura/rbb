@@ -33,7 +33,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.text.InputFilters;
 import com.btmura.android.reddit.widget.AccountNameAdapter;
 
@@ -165,7 +165,7 @@ public class AddSubredditFragment extends DialogFragment
     }
 
     private void addMultipleSubreddits() {
-        SubredditProvider.addSubredditAsync(getActivity(),
+        Provider.addSubredditsAsync(getActivity(),
                 getSelectedAccountName(),
                 getMultipleSubredditsArgument());
         dismiss();
@@ -181,7 +181,7 @@ public class AddSubredditFragment extends DialogFragment
             nameField.setError(getString(R.string.error_blank_field));
             return;
         }
-        SubredditProvider.addSubredditAsync(getActivity(), getSelectedAccountName(), subreddit);
+        Provider.addSubredditsAsync(getActivity(), getSelectedAccountName(), subreddit);
         dismiss();
     }
 

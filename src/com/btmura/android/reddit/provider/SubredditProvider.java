@@ -16,12 +16,12 @@
 
 package com.btmura.android.reddit.provider;
 
-import java.util.ArrayList;
-
-import android.content.ContentProviderOperation;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Bundle;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
@@ -38,6 +38,11 @@ public class SubredditProvider extends BaseProvider {
     public static final Uri SUBREDDITS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_SUBREDDITS);
     public static final Uri SUBREDDITS_SYNC_URI = makeSyncUri(SUBREDDITS_URI);
 
+    private static final String METHOD_ADD_SUBREDDITS = "addSubreddits";
+    private static final String METHOD_REMOVE_SUBREDDITS = "removeSubreddits";
+
+    private static final String EXTRA_SUBREDDIT_ARRAY = "subredditArray";
+
     public SubredditProvider() {
         super(TAG);
     }
@@ -47,68 +52,87 @@ public class SubredditProvider extends BaseProvider {
         return Subreddits.TABLE_NAME;
     }
 
-    public static void addSubredditAsync(Context context,
+    public static Bundle addSubreddits(Context context,
             String accountName,
             String... subreddits) {
-        changeSubredditAsync(context, accountName, subreddits, true);
+        Bundle extras = new Bundle(1);
+        extras.putStringArray(EXTRA_SUBREDDIT_ARRAY, subreddits);
+        return Provider.call(context,
+                SUBREDDITS_URI,
+                METHOD_ADD_SUBREDDITS,
+                accountName,
+                extras);
     }
 
-    public static void removeSubredditAsync(Context context,
+    public static Bundle removeSubreddits(Context context,
             String accountName,
             String... subreddits) {
-        changeSubredditAsync(context, accountName, subreddits, false);
+        Bundle extras = new Bundle(1);
+        extras.putStringArray(EXTRA_SUBREDDIT_ARRAY, subreddits);
+        return Provider.call(context,
+                SUBREDDITS_URI,
+                METHOD_REMOVE_SUBREDDITS,
+                accountName,
+                extras);
     }
 
-    private static void changeSubredditAsync(Context context,
-            final String accountName,
-            final String[] subreddits,
-            final boolean add) {
-        final Context appContext = context.getApplicationContext();
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... fillTheVoid) {
-                // Only trigger a sync on real accounts.
-                Uri uri;
-                if (AccountUtils.isAccount(accountName)) {
-                    uri = SubredditProvider.SUBREDDITS_SYNC_URI;
-                } else {
-                    uri = SubredditProvider.SUBREDDITS_URI;
-                }
+    @Override
+    public Bundle call(String method, String arg, Bundle extras) {
+        if (METHOD_ADD_SUBREDDITS.equals(method)) {
+            return addSubredditAsync(arg, extras);
+        } else if (METHOD_REMOVE_SUBREDDITS.equals(method)) {
+            return removeSubredditAsync(arg, extras);
+        }
+        return null;
+    }
 
-                int count = subreddits.length;
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(count);
-                int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
-                for (int i = 0; i < count; i++) {
-                    // All subreddit additions require an insert. The insert
-                    // would remove any deletes due to table constraints.
-                    //
-                    // Deletes for an account require an insert with delete
-                    // state. However, app storage accounts should just
-                    // remove the row altogether.
-                    if (add || AccountUtils.isAccount(accountName)) {
-                        ops.add(ContentProviderOperation.newInsert(uri)
-                                .withValue(Subreddits.COLUMN_ACCOUNT, accountName)
-                                .withValue(Subreddits.COLUMN_NAME, subreddits[i])
-                                .withValue(Subreddits.COLUMN_STATE, state)
-                                .build());
-                    } else {
-                        ops.add(ContentProviderOperation.newDelete(uri)
-                                .withSelection(Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
-                                        Array.of(accountName, subreddits[i]))
-                                .build());
+    private Bundle addSubredditAsync(String accountName, Bundle extras) {
+        String[] subreddits = extras.getStringArray(EXTRA_SUBREDDIT_ARRAY);
+        return changeSubreddits(accountName, subreddits, true);
+    }
+
+    private Bundle removeSubredditAsync(String accountName, Bundle extras) {
+        String[] subreddits = extras.getStringArray(EXTRA_SUBREDDIT_ARRAY);
+        return changeSubreddits(accountName, subreddits, false);
+    }
+
+    private Bundle changeSubreddits(String accountName, String[] subreddits, boolean add) {
+        ContentValues values = new ContentValues(3);
+        int state = add ? Subreddits.STATE_INSERTING : Subreddits.STATE_DELETING;
+
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            int count = subreddits.length;
+            for (int i = 0; i < count; i++) {
+                // All subreddit additions require an insert. The insert would remove any deletes
+                // due to table constraints.
+                //
+                // Deletes for an account require an insert with delete state. However, app storage
+                // accounts should just remove the row altogether.
+                if (add || AccountUtils.isAccount(accountName)) {
+                    values.clear();
+                    values.put(Subreddits.COLUMN_ACCOUNT, accountName);
+                    values.put(Subreddits.COLUMN_NAME, subreddits[i]);
+                    values.put(Subreddits.COLUMN_STATE, state);
+                    if (db.replace(Subreddits.TABLE_NAME, null, values) == -1) {
+                        return null;
                     }
-                }
-
-                return Provider.applyOps(appContext, SubredditProvider.AUTHORITY, ops);
-            }
-
-            @Override
-            protected void onPostExecute(Boolean success) {
-                if (success) {
-                    Provider.scheduleBackup(appContext, accountName);
+                } else {
+                    db.delete(Subreddits.TABLE_NAME,
+                            Subreddits.SELECT_BY_ACCOUNT_AND_NAME,
+                            Array.of(accountName, subreddits[i]));
                 }
             }
-        }.execute();
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        Provider.scheduleBackup(getContext(), accountName);
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(SUBREDDITS_URI, null, AccountUtils.isAccount(accountName));
+        return Bundle.EMPTY;
     }
 }

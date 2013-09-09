@@ -341,7 +341,7 @@ public class ThingProvider extends BaseProvider {
         extras.putInt(EXTRA_FILTER, filter);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
         extras.putString(EXTRA_MORE, more);
-        return call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
+        return Provider.call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getProfileSession(Context context,
@@ -356,7 +356,7 @@ public class ThingProvider extends BaseProvider {
         extras.putInt(EXTRA_FILTER, filter);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
         extras.putString(EXTRA_MORE, more);
-        return call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
+        return Provider.call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getCommentsSession(Context context,
@@ -371,7 +371,7 @@ public class ThingProvider extends BaseProvider {
         extras.putString(EXTRA_LINK_ID, linkId);
         extras.putInt(EXTRA_COUNT, numComments);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
-        return call(context, COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
+        return Provider.call(context, COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getThingSearchSession(Context context,
@@ -386,7 +386,7 @@ public class ThingProvider extends BaseProvider {
         extras.putString(EXTRA_QUERY, query);
         extras.putString(EXTRA_MORE, more);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
-        return call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
+        return Provider.call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getSubredditSearchSession(Context context,
@@ -395,7 +395,7 @@ public class ThingProvider extends BaseProvider {
         Bundle extras = new Bundle(2);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_SUBREDDIT_SEARCH);
         extras.putString(EXTRA_QUERY, query);
-        return call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
+        return Provider.call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getMessageSession(Context context,
@@ -413,7 +413,7 @@ public class ThingProvider extends BaseProvider {
                 || filter == FilterAdapter.MESSAGE_UNREAD) {
             extras.putBoolean(EXTRA_MARK, true);
         }
-        return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
+        return Provider.call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getMessageThreadSession(Context context,
@@ -424,27 +424,27 @@ public class ThingProvider extends BaseProvider {
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGE_THREAD);
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
-        return call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
+        return Provider.call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle cleanSessions(Context context, int sessionType) {
         Bundle extras = new Bundle(1);
         extras.putInt(EXTRA_SESSION_TYPE, sessionType);
-        return call(context, THINGS_URI, METHOD_CLEAN_SESSIONS, null, extras);
+        return Provider.call(context, THINGS_URI, METHOD_CLEAN_SESSIONS, null, extras);
     }
 
-    public static final void expandComment(Context context, long id, long sessionId) {
+    public static final Bundle expandComment(Context context, long id, long sessionId) {
         Bundle extras = new Bundle(2);
         extras.putLong(EXTRA_ID, id);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
-        call(context, COMMENTS_URI, METHOD_EXPAND_COMMENT, null, extras);
+        return Provider.call(context, COMMENTS_URI, METHOD_EXPAND_COMMENT, null, extras);
     }
 
-    public static final void collapseComment(Context context, long id, long[] childIds) {
+    public static final Bundle collapseComment(Context context, long id, long[] childIds) {
         Bundle extras = new Bundle(2);
         extras.putLong(EXTRA_ID, id);
         extras.putLongArray(EXTRA_ID_ARRAY, childIds);
-        call(context, COMMENTS_URI, METHOD_COLLAPSE_COMMENT, null, extras);
+        return Provider.call(context, COMMENTS_URI, METHOD_COLLAPSE_COMMENT, null, extras);
     }
 
     public static final Bundle insertComment(Context context,
@@ -456,7 +456,11 @@ public class ThingProvider extends BaseProvider {
         extras.putString(EXTRA_BODY, body);
         extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
         extras.putString(EXTRA_THING_ID, thingId);
-        return call(context, COMMENT_ACTIONS_URI, METHOD_INSERT_COMMENT, accountName, extras);
+        return Provider.call(context,
+                COMMENT_ACTIONS_URI,
+                METHOD_INSERT_COMMENT,
+                accountName,
+                extras);
     }
 
     public static final Bundle editComment(Context context,
@@ -468,7 +472,11 @@ public class ThingProvider extends BaseProvider {
         extras.putString(EXTRA_BODY, body);
         extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
         extras.putString(EXTRA_THING_ID, thingId);
-        return call(context, COMMENT_ACTIONS_URI, METHOD_EDIT_COMMENT, accountName, extras);
+        return Provider.call(context,
+                COMMENT_ACTIONS_URI,
+                METHOD_EDIT_COMMENT,
+                accountName,
+                extras);
     }
 
     public static final Bundle deleteComment(Context context,
@@ -482,7 +490,11 @@ public class ThingProvider extends BaseProvider {
         extras.putLongArray(EXTRA_ID_ARRAY, ids);
         extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
         extras.putStringArray(EXTRA_THING_ID_ARRAY, thingIds);
-        return call(context, COMMENT_ACTIONS_URI, METHOD_DELETE_COMMENT, accountName, extras);
+        return Provider.call(context,
+                COMMENT_ACTIONS_URI,
+                METHOD_DELETE_COMMENT,
+                accountName,
+                extras);
     }
 
     public static final Bundle insertMessage(Context context,
@@ -494,15 +506,11 @@ public class ThingProvider extends BaseProvider {
         extras.putString(EXTRA_BODY, body);
         extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
         extras.putString(EXTRA_THING_ID, thingId);
-        return call(context, MESSAGE_ACTIONS_URI, METHOD_INSERT_MESSAGE, accountName, extras);
-    }
-
-    private static Bundle call(Context context,
-            Uri uri,
-            String method,
-            String arg,
-            Bundle extras) {
-        return context.getApplicationContext().getContentResolver().call(uri, method, arg, extras);
+        return Provider.call(context,
+                MESSAGE_ACTIONS_URI,
+                METHOD_INSERT_MESSAGE,
+                accountName,
+                extras);
     }
 
     @Override

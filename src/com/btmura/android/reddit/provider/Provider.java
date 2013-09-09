@@ -16,18 +16,13 @@
 
 package com.btmura.android.reddit.provider;
 
-import java.util.ArrayList;
-
 import android.app.backup.BackupManager;
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.OperationApplicationException;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.RemoteException;
-import android.util.Log;
+import android.os.Bundle;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Accounts;
@@ -42,8 +37,6 @@ import com.btmura.android.reddit.util.Array;
  * content provider operations.
  */
 public class Provider {
-
-    private static final String TAG = "Provider";
 
     private static final Uri HIDE_URI =
             ThingProvider.HIDE_ACTIONS_URI.buildUpon()
@@ -70,6 +63,30 @@ public class Provider {
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_COMMENTS, ThingProvider.TRUE)
                     .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
+
+    public static void addSubredditsAsync(Context context,
+            final String accountName,
+            final String... subreddits) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                SubredditProvider.addSubreddits(appContext, accountName, subreddits);
+            }
+        });
+    }
+
+    public static void removeSubredditsAsync(Context context,
+            final String accountName,
+            final String... subreddits) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                SubredditProvider.removeSubreddits(appContext, accountName, subreddits);
+            }
+        });
+    }
 
     public static void expandCommentAsync(Context context, final long id, final long sessionId) {
         final Context appContext = context.getApplicationContext();
@@ -405,20 +422,12 @@ public class Provider {
         });
     }
 
-    static boolean applyOps(Context context,
-            String authority,
-            ArrayList<ContentProviderOperation> ops) {
-        try {
-            context.getContentResolver().applyBatch(authority, ops);
-            return true;
-        } catch (RemoteException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (OperationApplicationException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        return false;
+    static Bundle call(Context context,
+            Uri uri,
+            String method,
+            String arg,
+            Bundle extras) {
+        return context.getApplicationContext().getContentResolver().call(uri, method, arg, extras);
     }
 
     static void scheduleBackup(Context context, String accountName) {

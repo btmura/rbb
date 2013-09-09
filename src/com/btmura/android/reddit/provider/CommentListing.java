@@ -79,9 +79,19 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private long networkTimeMs;
     private long parseTimeMs;
 
-    static CommentListing newInstance(Context context, SQLiteOpenHelper dbHelper,
-            String accountName, String thingId, String linkId, int numComments, String cookie) {
-        return new CommentListing(context, dbHelper, accountName, thingId, linkId, numComments,
+    static CommentListing newInstance(Context context,
+            SQLiteOpenHelper dbHelper,
+            String accountName,
+            String thingId,
+            String linkId,
+            int numComments,
+            String cookie) {
+        return new CommentListing(context,
+                dbHelper,
+                accountName,
+                thingId,
+                linkId,
+                numComments,
                 cookie);
     }
 
@@ -324,16 +334,17 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     }
 
     private void mergeActions() {
-        // Track the fake number of insertions and deletions.
-        int delta = 0;
-
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         // Select by parent ID to see changes by all accounts, since the user can pick what account
         // to use when making a comment. Do the same for edits and deletes to be consistent.
-        Cursor c = db.query(CommentActions.TABLE_NAME, PROJECTION,
-                CommentActions.SELECT_BY_PARENT_THING_ID, Array.of(thingId),
-                null, null, CommentActions.SORT_BY_ID);
+        Cursor c = db.query(CommentActions.TABLE_NAME,
+                PROJECTION,
+                CommentActions.SELECT_BY_PARENT_THING_ID,
+                Array.of(thingId),
+                null,
+                null,
+                CommentActions.SORT_BY_ID);
         try {
             while (c.moveToNext()) {
                 long actionId = c.getLong(INDEX_ID);
@@ -343,15 +354,11 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 String actionThingId = c.getString(INDEX_THING_ID);
                 switch (action) {
                     case CommentActions.ACTION_INSERT:
-                        if (insertThing(actionId, actionAccountName, actionThingId, text)) {
-                            delta++;
-                        }
+                        insertThing(actionId, actionAccountName, actionThingId, text);
                         break;
 
                     case CommentActions.ACTION_DELETE:
-                        if (deleteThing(actionThingId)) {
-                            delta--;
-                        }
+                        deleteThing(actionThingId);
                         break;
 
                     case CommentActions.ACTION_EDIT:
@@ -364,12 +371,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             }
         } finally {
             c.close();
-        }
-
-        if (!values.isEmpty() && delta != 0) {
-            // Update the header comment count with our fake inserts and deletes.
-            Integer numComments = (Integer) values.get(0).get(Comments.COLUMN_NUM_COMMENTS);
-            values.get(0).put(Comments.COLUMN_NUM_COMMENTS, numComments.intValue() + delta);
         }
     }
 

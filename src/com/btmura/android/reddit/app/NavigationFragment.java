@@ -44,7 +44,7 @@ import com.btmura.android.reddit.content.AccountSubredditListLoader;
 import com.btmura.android.reddit.content.RandomSubredditLoader;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.provider.SubredditProvider;
+import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.Views;
@@ -551,7 +551,7 @@ public class NavigationFragment extends ListFragment implements
 
     private void handleDelete() {
         String[] subreddits = getCheckedSubreddits();
-        SubredditProvider.removeSubredditAsync(getActivity(), accountName, subreddits);
+        Provider.removeSubredditsAsync(getActivity(), accountName, subreddits);
     }
 
     private String[] getCheckedSubreddits() {

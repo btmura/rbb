@@ -19,7 +19,6 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -73,12 +72,14 @@ public class AccountProvider extends BaseProvider {
     /**
      * Initializes a new account by importing subreddits and returns true on success.
      */
-    public static boolean initializeAccount(Context context, String login, String cookie) {
-        // TODO: Move to Provider class.
+    public static boolean initializeAccount(Context context, String accountName, String cookie) {
         Bundle args = new Bundle(1);
         args.putString(EXTRA_COOKIE, cookie);
-        ContentResolver cr = context.getContentResolver();
-        return cr.call(ACCOUNTS_URI, METHOD_INITIALIZE_ACCOUNT, login, args) != null;
+        return Provider.call(context,
+                ACCOUNTS_URI,
+                METHOD_INITIALIZE_ACCOUNT,
+                accountName,
+                args) != null;
     }
 
     @Override
