@@ -261,6 +261,74 @@ public class ThingProvider extends BaseProvider {
 
     private final SessionManager sessionManager = new SessionManager();
 
+    public ThingProvider() {
+        super(TAG);
+    }
+
+    @Override
+    protected String getTable(Uri uri) {
+        switch (MATCHER.match(uri)) {
+            case MATCH_THINGS:
+                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
+                        ? JOINED_THINGS_TABLE
+                        : Things.TABLE_NAME;
+
+            case MATCH_COMMENTS:
+                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
+                        ? JOINED_COMMENTS_TABLE
+                        : Comments.TABLE_NAME;
+
+            case MATCH_MESSAGES:
+                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
+                        ? JOINED_MESSAGES_TABLE
+                        : Messages.TABLE_NAME;
+
+            case MATCH_SUBREDDITS:
+                return SubredditResults.TABLE_NAME;
+
+            case MATCH_SESSIONS:
+                return Sessions.TABLE_NAME;
+
+            case MATCH_COMMENT_ACTIONS:
+                return CommentActions.TABLE_NAME;
+
+            case MATCH_HIDE_ACTIONS:
+                return HideActions.TABLE_NAME;
+
+            case MATCH_MESSAGE_ACTIONS:
+                return MessageActions.TABLE_NAME;
+
+            case MATCH_READ_ACTIONS:
+                return ReadActions.TABLE_NAME;
+
+            case MATCH_SAVE_ACTIONS:
+                return SaveActions.TABLE_NAME;
+
+            case MATCH_VOTE_ACTIONS:
+                return VoteActions.TABLE_NAME;
+
+            default:
+                throw new IllegalArgumentException("uri: " + uri);
+        }
+    }
+
+    @Override
+    protected void notifyChange(Uri uri) {
+        super.notifyChange(uri);
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_ACCOUNTS, false)) {
+            getContext().getContentResolver().notifyChange(AccountProvider.ACCOUNTS_URI, null);
+        }
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_COMMENTS, false)) {
+            getContext().getContentResolver().notifyChange(COMMENTS_URI, null);
+        }
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_THINGS, false)) {
+            getContext().getContentResolver().notifyChange(THINGS_URI, null);
+        }
+        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_MESSAGES, false)) {
+            getContext().getContentResolver().notifyChange(MESSAGES_URI, null);
+        }
+    }
+
     public static final Bundle getSubredditSession(Context context,
             String accountName,
             String subreddit,
@@ -435,74 +503,6 @@ public class ThingProvider extends BaseProvider {
             String arg,
             Bundle extras) {
         return context.getApplicationContext().getContentResolver().call(uri, method, arg, extras);
-    }
-
-    public ThingProvider() {
-        super(TAG);
-    }
-
-    @Override
-    protected String getTable(Uri uri) {
-        switch (MATCHER.match(uri)) {
-            case MATCH_THINGS:
-                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
-                        ? JOINED_THINGS_TABLE
-                        : Things.TABLE_NAME;
-
-            case MATCH_COMMENTS:
-                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
-                        ? JOINED_COMMENTS_TABLE
-                        : Comments.TABLE_NAME;
-
-            case MATCH_MESSAGES:
-                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
-                        ? JOINED_MESSAGES_TABLE
-                        : Messages.TABLE_NAME;
-
-            case MATCH_SUBREDDITS:
-                return SubredditResults.TABLE_NAME;
-
-            case MATCH_SESSIONS:
-                return Sessions.TABLE_NAME;
-
-            case MATCH_COMMENT_ACTIONS:
-                return CommentActions.TABLE_NAME;
-
-            case MATCH_HIDE_ACTIONS:
-                return HideActions.TABLE_NAME;
-
-            case MATCH_MESSAGE_ACTIONS:
-                return MessageActions.TABLE_NAME;
-
-            case MATCH_READ_ACTIONS:
-                return ReadActions.TABLE_NAME;
-
-            case MATCH_SAVE_ACTIONS:
-                return SaveActions.TABLE_NAME;
-
-            case MATCH_VOTE_ACTIONS:
-                return VoteActions.TABLE_NAME;
-
-            default:
-                throw new IllegalArgumentException("uri: " + uri);
-        }
-    }
-
-    @Override
-    protected void notifyChange(Uri uri) {
-        super.notifyChange(uri);
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_ACCOUNTS, false)) {
-            getContext().getContentResolver().notifyChange(AccountProvider.ACCOUNTS_URI, null);
-        }
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_COMMENTS, false)) {
-            getContext().getContentResolver().notifyChange(COMMENTS_URI, null);
-        }
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_THINGS, false)) {
-            getContext().getContentResolver().notifyChange(THINGS_URI, null);
-        }
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_MESSAGES, false)) {
-            getContext().getContentResolver().notifyChange(MESSAGES_URI, null);
-        }
     }
 
     @Override
