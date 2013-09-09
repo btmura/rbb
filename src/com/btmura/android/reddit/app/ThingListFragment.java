@@ -109,6 +109,7 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
         SwipeDismissTouchListener touchListener = new SwipeDismissTouchListener(listView, this);
         listView.setOnTouchListener(touchListener);
 
+        ThumbnailLoader.lock(false);
         final OnScrollListener scrollListener = touchListener.makeScrollListener();
         listView.setOnScrollListener(new OnScrollListener() {
             @Override
@@ -124,6 +125,7 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
                 ThingListFragment.this.onScrollStateChanged(view, scrollState);
             }
         });
+
         return v;
     }
 
