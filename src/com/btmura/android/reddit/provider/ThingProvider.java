@@ -50,6 +50,7 @@ import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
@@ -193,6 +194,7 @@ public class ThingProvider extends BaseProvider {
     private static final String METHOD_COLLAPSE_COMMENT = "collapseComment";
     private static final String METHOD_INSERT_COMMENT = "insertComment";
     private static final String METHOD_EDIT_COMMENT = "editComment";
+    private static final String METHOD_DELETE_COMMENT = "deleteComment";
     private static final String METHOD_INSERT_MESSAGE = "insertMessage";
 
     // List of extras used throughout the provider code.
@@ -200,8 +202,9 @@ public class ThingProvider extends BaseProvider {
     public static final String EXTRA_BODY = "body";
     public static final String EXTRA_COUNT = "count";
     public static final String EXTRA_FILTER = "filter";
+    public static final String EXTRA_HAS_CHILDREN = "hasChildren";
     public static final String EXTRA_ID = "id";
-    public static final String EXTRA_IDS = "ids";
+    public static final String EXTRA_ID_ARRAY = "idArray";
     public static final String EXTRA_LINK_ID = "linkId";
     public static final String EXTRA_MARK = "mark";
     public static final String EXTRA_MORE = "more";
@@ -215,6 +218,7 @@ public class ThingProvider extends BaseProvider {
     public static final String EXTRA_SESSION_TYPE = "sessionType";
     public static final String EXTRA_SUBREDDIT = "subreddit";
     public static final String EXTRA_THING_ID = "thingId";
+    public static final String EXTRA_THING_ID_ARRAY = "thingIdArray";
     public static final String EXTRA_USER = "user";
 
     private static final String[] CLEAN_PROJECTION = {
@@ -375,7 +379,7 @@ public class ThingProvider extends BaseProvider {
     public static final void collapseComment(Context context, long id, long[] childIds) {
         Bundle extras = new Bundle(2);
         extras.putLong(EXTRA_ID, id);
-        extras.putLongArray(EXTRA_IDS, childIds);
+        extras.putLongArray(EXTRA_ID_ARRAY, childIds);
         call(context, COMMENTS_URI, METHOD_COLLAPSE_COMMENT, null, extras);
     }
 
@@ -401,6 +405,20 @@ public class ThingProvider extends BaseProvider {
         extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
         extras.putString(EXTRA_THING_ID, thingId);
         return call(context, COMMENT_ACTIONS_URI, METHOD_EDIT_COMMENT, accountName, extras);
+    }
+
+    public static final Bundle deleteComment(Context context,
+            String accountName,
+            boolean[] hasChildren,
+            long[] ids,
+            String parentThingId,
+            String[] thingIds) {
+        Bundle extras = new Bundle(4);
+        extras.putBooleanArray(EXTRA_HAS_CHILDREN, hasChildren);
+        extras.putLongArray(EXTRA_ID_ARRAY, ids);
+        extras.putString(EXTRA_PARENT_THING_ID, parentThingId);
+        extras.putStringArray(EXTRA_THING_ID_ARRAY, thingIds);
+        return call(context, COMMENT_ACTIONS_URI, METHOD_DELETE_COMMENT, accountName, extras);
     }
 
     public static final Bundle insertMessage(Context context,
@@ -498,14 +516,16 @@ public class ThingProvider extends BaseProvider {
                 return getSession(arg, extras);
             } else if (METHOD_CLEAN_SESSIONS.equals(method)) {
                 return cleanSessions(extras);
-            } else if (METHOD_COLLAPSE_COMMENT.equals(method)) {
-                return collapseComment(extras);
             } else if (METHOD_EXPAND_COMMENT.equals(method)) {
                 return expandComment(extras);
+            } else if (METHOD_COLLAPSE_COMMENT.equals(method)) {
+                return collapseComment(extras);
             } else if (METHOD_INSERT_COMMENT.equals(method)) {
                 return insertComment(arg, extras);
             } else if (METHOD_EDIT_COMMENT.equals(method)) {
                 return editComment(arg, extras);
+            } else if (METHOD_DELETE_COMMENT.equals(method)) {
+                return deleteComment(arg, extras);
             } else if (METHOD_INSERT_MESSAGE.equals(method)) {
                 return insertMessage(arg, extras);
             } else {
@@ -813,7 +833,7 @@ public class ThingProvider extends BaseProvider {
             values.clear();
             values.put(Comments.COLUMN_EXPANDED, true);
             values.put(Comments.COLUMN_VISIBLE, false);
-            long[] childIds = extras.getLongArray(EXTRA_IDS);
+            long[] childIds = extras.getLongArray(EXTRA_ID_ARRAY);
             int childCount = childIds != null ? childIds.length : 0;
             for (int i = 0; i < childCount; i++) {
                 db.update(Comments.TABLE_NAME, values, ID_SELECTION, Array.of(childIds[i]));
@@ -974,6 +994,59 @@ public class ThingProvider extends BaseProvider {
         return Bundle.EMPTY;
     }
 
+    private Bundle deleteComment(String accountName, Bundle extras) {
+        boolean[] hasChildren = getHasChildren(extras);
+        long[] ids = getIdArrayExtra(extras);
+        String parentThingId = getParentThingIdExtra(extras);
+        String[] thingIds = getThingIdArrayExtra(extras);
+
+        ContentValues values = new ContentValues(5);
+
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            int count = thingIds.length;
+            for (int i = 0; i < count; i++) {
+                values.clear();
+                values.put(CommentActions.COLUMN_ACCOUNT, accountName);
+                values.put(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE);
+                values.put(CommentActions.COLUMN_PARENT_THING_ID, parentThingId);
+                values.put(CommentActions.COLUMN_THING_ID, thingIds[i]);
+
+                long actionId = db.insert(CommentActions.TABLE_NAME, null, values);
+                if (actionId == -1) {
+                    return null;
+                }
+
+                // Make sure to sync this logic is duplicated in CommentListing#deleteThing.
+                if (Objects.equals(parentThingId, thingIds[i])) {
+                    values.clear();
+                    values.put(Comments.COLUMN_AUTHOR, Comments.DELETED_AUTHOR);
+                    db.update(Comments.TABLE_NAME,
+                            values,
+                            Comments.SELECT_BY_ACCOUNT_AND_THING_ID,
+                            Array.of(accountName, parentThingId));
+                } else if (hasChildren[i]) {
+                    values.clear();
+                    values.put(Comments.COLUMN_AUTHOR, Comments.DELETED_AUTHOR);
+                    values.put(Comments.COLUMN_BODY, Comments.DELETED_BODY);
+                    db.update(Comments.TABLE_NAME, values, ID_SELECTION, Array.of(ids[i]));
+                } else {
+                    db.delete(Comments.TABLE_NAME, ID_SELECTION, Array.of(ids[i]));
+                }
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(COMMENT_ACTIONS_URI, null, SYNC);
+        cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
+        return Bundle.EMPTY;
+    }
+
     private Bundle insertMessage(String accountName, Bundle extras) {
         String body = getBodyExtra(extras);
         String parentThingId = getParentThingIdExtra(extras);
@@ -1038,11 +1111,23 @@ public class ThingProvider extends BaseProvider {
         return extras.getString(EXTRA_BODY);
     }
 
+    private static boolean[] getHasChildren(Bundle extras) {
+        return extras.getBooleanArray(EXTRA_HAS_CHILDREN);
+    }
+
+    private static long[] getIdArrayExtra(Bundle extras) {
+        return extras.getLongArray(EXTRA_ID_ARRAY);
+    }
+
     private static String getParentThingIdExtra(Bundle extras) {
         return extras.getString(EXTRA_PARENT_THING_ID);
     }
 
     private static String getThingIdExtra(Bundle extras) {
         return extras.getString(EXTRA_THING_ID);
+    }
+
+    private static String[] getThingIdArrayExtra(Bundle extras) {
+        return extras.getStringArray(EXTRA_THING_ID_ARRAY);
     }
 }

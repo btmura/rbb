@@ -117,8 +117,13 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         String[] checkedThingIds = new String[checkedItemIds.length];
         boolean[] hasChildren = new boolean[checkedItemIds.length];
         fillCheckedInfo(checkedItemPositions, checkedThingIds, hasChildren);
-        Provider.deleteCommentAsync(context, accountName, getId(0), getNumComments(0),
-                getThingId(0), checkedItemIds, checkedThingIds, hasChildren);
+
+        Provider.deleteCommentAsync(context,
+                accountName,
+                hasChildren,
+                checkedItemIds,
+                getThingId(0),
+                checkedThingIds);
     }
 
     private void fillCheckedInfo(SparseBooleanArray checkedPositions, String[] checkedThingIds,

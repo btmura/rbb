@@ -31,15 +31,11 @@ import android.util.Log;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Accounts;
-import com.btmura.android.reddit.database.CommentActions;
-import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
-import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
-import com.btmura.android.reddit.util.Objects;
 
 /**
  * Provider is a collection of static methods that do user actions which correspond to multiple
@@ -124,79 +120,22 @@ public class Provider {
         });
     }
 
-    // TODO: Move this to ThingProvider#call like commentReplyAsync.
     public static void deleteCommentAsync(Context context,
             final String accountName,
-            final long headerId,
-            final int headerNumComments,
-            final String parentThingId,
+            final boolean[] hasChildren,
             final long[] ids,
-            final String[] thingIds,
-            final boolean[] hasChildren) {
+            final String parentThingId,
+            final String[] thingIds) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
-                int count = ids.length;
-                ArrayList<ContentProviderOperation> ops =
-                        new ArrayList<ContentProviderOperation>(count * 2 + 2);
-
-                boolean thingDeleted = false;
-                int numDeletes = 0;
-                for (int i = 0; i < count; i++) {
-                    ops.add(ContentProviderOperation.newInsert(
-                            ThingProvider.COMMENT_ACTIONS_SYNC_URI)
-                            .withValue(CommentActions.COLUMN_ACTION, CommentActions.ACTION_DELETE)
-                            .withValue(CommentActions.COLUMN_ACCOUNT, accountName)
-                            .withValue(CommentActions.COLUMN_PARENT_THING_ID, parentThingId)
-                            .withValue(CommentActions.COLUMN_THING_ID, thingIds[i])
-                            .build());
-
-                    // Make sure to sync this logic is duplicated in CommentListing#deleteThing.
-                    if (Objects.equals(parentThingId, thingIds[i])) {
-                        // Update things viewed by this account as [deleted] even in the thing list.
-                        String[] selection = Array.of(accountName, parentThingId);
-                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                                .withValue(Things.COLUMN_AUTHOR, Things.DELETED_AUTHOR)
-                                .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
-                                .build());
-                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                                .withValue(Comments.COLUMN_AUTHOR, Comments.DELETED_AUTHOR)
-                                .withSelection(Comments.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
-                                .build());
-                        thingDeleted = true;
-                        // TODO: Make ThingProvider also show [deleted] in thing list on refresh.
-                    } else if (hasChildren[i]) {
-                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                                .withValue(Comments.COLUMN_AUTHOR, Comments.DELETED_AUTHOR)
-                                .withValue(Comments.COLUMN_BODY, Comments.DELETED_BODY)
-                                .withSelection(BaseProvider.ID_SELECTION, Array.of(ids[i]))
-                                .build());
-                    } else {
-                        ops.add(ContentProviderOperation.newDelete(ThingProvider.COMMENTS_URI)
-                                .withSelection(BaseProvider.ID_SELECTION, Array.of(ids[i]))
-                                .build());
-                        numDeletes++;
-                    }
-                }
-
-                // Update the header comment by how comments were truly deleted.
-                if (numDeletes > 0) {
-                    String[] selection = Array.of(accountName, parentThingId);
-                    int numComments = headerNumComments - numDeletes;
-                    if (!thingDeleted) {
-                        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                                .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
-                                .withValue(Things.COLUMN_NUM_COMMENTS, numComments)
-                                .build());
-                    }
-                    ops.add(ContentProviderOperation.newUpdate(ThingProvider.COMMENTS_URI)
-                            .withSelection(Comments.SELECT_BY_ACCOUNT_AND_THING_ID, selection)
-                            .withValue(Comments.COLUMN_NUM_COMMENTS, numComments)
-                            .build());
-                }
-
-                applyOps(appContext, ThingProvider.AUTHORITY, ops);
+                ThingProvider.deleteComment(appContext,
+                        accountName,
+                        hasChildren,
+                        ids,
+                        parentThingId,
+                        thingIds);
             }
         });
     }
