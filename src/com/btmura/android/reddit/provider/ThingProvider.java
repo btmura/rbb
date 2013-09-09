@@ -199,27 +199,23 @@ public class ThingProvider extends BaseProvider {
 
     // List of extras used throughout the provider code.
 
-    public static final String EXTRA_BODY = "body";
-    public static final String EXTRA_COUNT = "count";
-    public static final String EXTRA_FILTER = "filter";
-    public static final String EXTRA_HAS_CHILDREN = "hasChildren";
-    public static final String EXTRA_ID = "id";
-    public static final String EXTRA_ID_ARRAY = "idArray";
-    public static final String EXTRA_LINK_ID = "linkId";
-    public static final String EXTRA_MARK = "mark";
-    public static final String EXTRA_MORE = "more";
-    public static final String EXTRA_NESTING = "nesting";
-    public static final String EXTRA_PARENT_ID = "parentId";
-    public static final String EXTRA_PARENT_NUM_COMMENTS = "parentNumComments";
-    public static final String EXTRA_PARENT_THING_ID = "parentThingId";
-    public static final String EXTRA_QUERY = "query";
-    public static final String EXTRA_SEQUENCE = "sequence";
-    public static final String EXTRA_SESSION_ID = "sessionId";
-    public static final String EXTRA_SESSION_TYPE = "sessionType";
-    public static final String EXTRA_SUBREDDIT = "subreddit";
-    public static final String EXTRA_THING_ID = "thingId";
-    public static final String EXTRA_THING_ID_ARRAY = "thingIdArray";
-    public static final String EXTRA_USER = "user";
+    private static final String EXTRA_BODY = "body";
+    private static final String EXTRA_COUNT = "count";
+    private static final String EXTRA_FILTER = "filter";
+    private static final String EXTRA_HAS_CHILDREN = "hasChildren";
+    private static final String EXTRA_ID = "id";
+    private static final String EXTRA_ID_ARRAY = "idArray";
+    private static final String EXTRA_LINK_ID = "linkId";
+    private static final String EXTRA_MARK = "mark";
+    private static final String EXTRA_MORE = "more";
+    private static final String EXTRA_PARENT_THING_ID = "parentThingId";
+    private static final String EXTRA_QUERY = "query";
+    private static final String EXTRA_SESSION_ID = "sessionId";
+    private static final String EXTRA_SESSION_TYPE = "sessionType";
+    private static final String EXTRA_SUBREDDIT = "subreddit";
+    private static final String EXTRA_THING_ID = "thingId";
+    private static final String EXTRA_THING_ID_ARRAY = "thingIdArray";
+    private static final String EXTRA_USER = "user";
 
     private static final String[] CLEAN_PROJECTION = {
             Sessions._ID,
