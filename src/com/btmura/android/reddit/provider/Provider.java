@@ -43,7 +43,7 @@ import com.btmura.android.reddit.util.Array;
  */
 public class Provider {
 
-    public static final String TAG = "Provider";
+    private static final String TAG = "Provider";
 
     private static final Uri HIDE_URI =
             ThingProvider.HIDE_ACTIONS_URI.buildUpon()
@@ -140,23 +140,7 @@ public class Provider {
         });
     }
 
-    public static void clearNewMessageIndicator(Context context, final String accountName,
-            final boolean hasMail) {
-        final ContentResolver cr = context.getApplicationContext().getContentResolver();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                // Update the existing row. If there isn't such a row, it will
-                // be created upon sync, where it will have the proper value.
-                ContentValues values = new ContentValues(1);
-                values.put(Accounts.COLUMN_HAS_MAIL, false);
-                cr.update(AccountProvider.ACCOUNTS_URI, values,
-                        Accounts.SELECT_BY_ACCOUNT, Array.of(accountName));
-            }
-        });
-    }
-
-    public static void messageReplyAsync(Context context,
+    public static void insertMessageAsync(Context context,
             final String accountName,
             final String body,
             final String parentThingId,
@@ -170,9 +154,30 @@ public class Provider {
         });
     }
 
+    public static void clearNewMessageIndicator(Context context,
+            final String accountName,
+            final boolean hasMail) {
+        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                // Update the existing row. If there isn't such a row, it will
+                // be created upon sync, where it will have the proper value.
+                ContentValues values = new ContentValues(1);
+                values.put(Accounts.COLUMN_HAS_MAIL, false);
+                cr.update(AccountProvider.ACCOUNTS_URI,
+                        values,
+                        Accounts.SELECT_BY_ACCOUNT,
+                        Array.of(accountName));
+            }
+        });
+    }
+
     /** Mark a message either read or unread. */
-    public static void readMessageAsync(final Context context, final String accountName,
-            final String thingId, final boolean read) {
+    public static void readMessageAsync(final Context context,
+            final String accountName,
+            final String thingId,
+            final boolean read) {
         final ContentResolver cr = context.getApplicationContext().getContentResolver();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
@@ -189,8 +194,8 @@ public class Provider {
 
     public static void hideAsync(final Context context,
             final String accountName,
+
             // Following parameters are for faking a thing.
-            // TODO: Use a bundle argument for this instead.
             final String author,
             final long createdUtc,
             final String domain,

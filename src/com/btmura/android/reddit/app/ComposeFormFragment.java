@@ -525,7 +525,7 @@ public class ComposeFormFragment extends Fragment implements
         Bundle extras = getExtras();
         String parentThingId = extras.getString(EXTRA_MESSAGE_PARENT_THING_ID);
         String thingId = extras.getString(EXTRA_MESSAGE_THING_ID);
-        Provider.messageReplyAsync(
+        Provider.insertMessageAsync(
                 getActivity(),
                 accountName,
                 text,
