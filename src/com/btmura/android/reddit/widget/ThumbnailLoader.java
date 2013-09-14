@@ -22,7 +22,6 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.content.Context;
@@ -46,12 +45,12 @@ public class ThumbnailLoader {
 
     private static final int LOCK_WAIT_TIME_MS = 250;
 
-    private static final AtomicInteger taskIdCounter = new AtomicInteger();
+    private static final AtomicInteger taskIdCounter = DEBUG ? new AtomicInteger() : null;
 
-    private static final AtomicBoolean locked = new AtomicBoolean(false);
+    private static volatile boolean locked = false;
 
     public static void lock(boolean lock) {
-        locked.set(lock);
+        locked = lock;
     }
 
     public void setThumbnail(Context context, ThingView v, String url) {
@@ -94,14 +93,14 @@ public class ThumbnailLoader {
 
         LoadThumbnailTask(Context context, ThingView v, String url) {
             this.context = context.getApplicationContext();
-            this.taskId = taskIdCounter.getAndIncrement();
+            this.taskId = taskIdCounter != null ? taskIdCounter.getAndIncrement() : -1;
             this.ref = new WeakReference<ThingView>(v);
             this.url = url;
         }
 
         @Override
         protected Bitmap doInBackground(Void... params) {
-            while (locked.get()) {
+            while (locked) {
                 if (DEBUG) {
                     Log.d(TAG, taskId + ": locked");
                 }
