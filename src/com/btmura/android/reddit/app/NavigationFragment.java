@@ -248,9 +248,9 @@ public class NavigationFragment extends ListFragment implements
         selectPlace(PLACE_SUBREDDIT,
                 requestedSubreddit,
                 Subreddits.isRandom(requestedSubreddit),
-                AccountPrefs.getLastSubredditFilter(getActivity(),
-                        FilterAdapter.SUBREDDIT_HOT),
+                AccountPrefs.getLastSubredditFilter(getActivity(), FilterAdapter.SUBREDDIT_HOT),
                 requestedThingBundle,
+                false,
                 false);
         requestedSubreddit = null;
         requestedThingBundle = null;
@@ -264,7 +264,7 @@ public class NavigationFragment extends ListFragment implements
     }
 
     private void selectCurrentPlace() {
-        selectPlace(place, subreddit, isRandom, filter, null, false);
+        selectPlace(place, subreddit, isRandom, filter, null, true, false);
     }
 
     private void selectPlaceWithDefaults(int place, boolean force) {
@@ -278,7 +278,7 @@ public class NavigationFragment extends ListFragment implements
                         false);
                 int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
                         FilterAdapter.SUBREDDIT_HOT);
-                selectPlace(place, subreddit, isRandom, filter, null, force);
+                selectPlace(place, subreddit, isRandom, filter, null, true, force);
                 break;
 
             case PLACE_PROFILE:
@@ -296,11 +296,11 @@ public class NavigationFragment extends ListFragment implements
     }
 
     private void selectPlaceWithNoSubreddit(int place, int filter, boolean force) {
-        selectPlace(place, null, false, filter, null, force);
+        selectPlace(place, null, false, filter, null, true, force);
     }
 
     private void selectPlaceWithFilter(int newFilter, boolean force) {
-        selectPlace(place, subreddit, isRandom, newFilter, null, force);
+        selectPlace(place, subreddit, isRandom, newFilter, null, true, force);
     }
 
     private void selectPlace(int place,
@@ -308,6 +308,7 @@ public class NavigationFragment extends ListFragment implements
             boolean isRandom,
             int filter,
             ThingBundle thingBundle,
+            boolean savePrefs,
             boolean force) {
         this.place = place;
         this.subreddit = subreddit;
@@ -315,16 +316,20 @@ public class NavigationFragment extends ListFragment implements
         this.filter = filter;
 
         placesAdapter.setSelectedPlace(place);
-        AccountPrefs.setLastPlace(getActivity(), place);
+        if (savePrefs) {
+            AccountPrefs.setLastPlace(getActivity(), place);
+        }
 
         switch (place) {
             case PLACE_SUBREDDIT:
                 subredditAdapter.setSelectedSubreddit(isRandom
                         ? Subreddits.NAME_RANDOM
                         : subreddit);
-                AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
-                AccountPrefs.setLastIsRandom(getActivity(), accountName, isRandom);
-                AccountPrefs.setLastSubredditFilter(getActivity(), filter);
+                if (savePrefs) {
+                    AccountPrefs.setLastSubreddit(getActivity(), accountName, subreddit);
+                    AccountPrefs.setLastIsRandom(getActivity(), accountName, isRandom);
+                    AccountPrefs.setLastSubredditFilter(getActivity(), filter);
+                }
 
                 if (Subreddits.isRandom(subreddit)) {
                     getLoaderManager().restartLoader(LOADER_RANDOM_SUBREDDIT,
@@ -412,7 +417,7 @@ public class NavigationFragment extends ListFragment implements
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
         boolean isRandom = Subreddits.isRandom(subreddit);
-        selectPlace(PLACE_SUBREDDIT, subreddit, isRandom, filter, null, true);
+        selectPlace(PLACE_SUBREDDIT, subreddit, isRandom, filter, null, true, true);
     }
 
     @Override
@@ -640,7 +645,7 @@ public class NavigationFragment extends ListFragment implements
         @Override
         public void onLoadFinished(Loader<String> loader, String resolvedSubreddit) {
             if (!TextUtils.isEmpty(resolvedSubreddit)) {
-                selectPlace(place, resolvedSubreddit, true, filter, null, false);
+                selectPlace(place, resolvedSubreddit, true, filter, null, true, false);
             }
         }
 
