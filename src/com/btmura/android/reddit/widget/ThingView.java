@@ -211,8 +211,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
     }
 
-    public void setData(String accountName,
-            String author,
+    public void setData(String author,
             CharSequence body,
             long createdUtc,
             String destination,

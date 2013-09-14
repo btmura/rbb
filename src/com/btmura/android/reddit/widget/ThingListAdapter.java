@@ -128,8 +128,7 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
                 || kind == Kinds.KIND_COMMENT;
 
         ThingView tv = (ThingView) view;
-        tv.setData(accountName,
-                author,
+        tv.setData(author,
                 body,
                 createdUtc,
                 destination,

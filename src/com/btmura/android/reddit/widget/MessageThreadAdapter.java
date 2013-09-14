@@ -78,8 +78,7 @@ public class MessageThreadAdapter extends BaseCursorAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_MESSAGE_THREAD_LIST);
-        tv.setData(accountName,
-                author,
+        tv.setData(author,
                 body,
                 createdUtc,
                 destination,

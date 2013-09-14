@@ -81,8 +81,7 @@ public class MessageListAdapter extends AbstractThingListAdapter {
         final boolean showStatusPoints = false; // No points for messages.
 
         ThingView tv = (ThingView) view;
-        tv.setData(accountName,
-                author,
+        tv.setData(author,
                 body,
                 createdUtc,
                 destination,
