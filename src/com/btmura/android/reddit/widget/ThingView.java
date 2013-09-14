@@ -551,27 +551,24 @@ public class ThingView extends CustomView implements OnGestureListener {
             leftHeight = Math.max(leftHeight, Thumbnail.getHeight());
         }
 
-        linkTitleLayout = null;
-        titleLayout = null;
-        bodyLayout = null;
         rightHeight = 0;
 
-        if (expanded && !TextUtils.isEmpty(linkTitle)) {
+        if (hasLinkTitle()) {
             linkTitleLayout = createLinkTitleLayout(linkTitleWidth);
             rightHeight += linkTitleLayout.getHeight() + ELEMENT_PADDING;
         }
 
-        if (expanded && !TextUtils.isEmpty(title)) {
+        if (hasTitle()) {
             titleLayout = createTitleLayout(titleWidth);
             rightHeight += titleLayout.getHeight() + ELEMENT_PADDING;
         }
 
-        if (expanded && !TextUtils.isEmpty(body)) {
+        if (hasBody()) {
             bodyLayout = createBodyLayout(titleWidth);
             rightHeight += bodyLayout.getHeight() + ELEMENT_PADDING;
         }
 
-        if (!TextUtils.isEmpty(statusText)) {
+        if (hasStatus()) {
             statusLayout = createStatusLayout(statusWidth);
             rightHeight += statusLayout.getHeight();
         }
@@ -584,7 +581,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             x += VotingArrows.getWidth(drawVotingArrows);
             x += PADDING;
         }
-        if (bodyLayout != null) {
+        if (hasBody()) {
             bodyBounds.left = x;
             x += bodyLayout.getWidth();
             bodyBounds.right = x;
@@ -593,19 +590,19 @@ public class ThingView extends CustomView implements OnGestureListener {
         // Move from top to bottom one more time.
         int y = (minHeight - rightHeight) / 2;
 
-        if (linkTitleLayout != null) {
+        if (hasLinkTitle()) {
             y += linkTitleLayout.getHeight() + ELEMENT_PADDING;
         }
 
-        if (titleLayout != null) {
+        if (hasTitle()) {
             y += titleLayout.getHeight() + ELEMENT_PADDING;
         }
 
-        if (isTopStatus() && statusLayout != null) {
+        if (hasTopStatus() && hasStatus()) {
             y += statusLayout.getHeight() + ELEMENT_PADDING;
         }
 
-        if (bodyLayout != null) {
+        if (hasBody()) {
             bodyBounds.top = y;
             y += bodyLayout.getHeight();
             bodyBounds.bottom = y;
@@ -638,13 +635,31 @@ public class ThingView extends CustomView implements OnGestureListener {
         return PADDING + VotingArrows.getWidth(drawVotingArrows);
     }
 
-    private boolean isTopStatus() {
+    private boolean hasTopStatus() {
         return kind == Kinds.KIND_COMMENT;
+    }
+
+    private boolean hasLinkTitle() {
+        return expanded && !TextUtils.isEmpty(linkTitle);
+    }
+
+    private boolean hasTitle() {
+        return expanded && !TextUtils.isEmpty(title);
+    }
+
+    private boolean hasBody() {
+        return expanded && !TextUtils.isEmpty(body);
+    }
+
+    private boolean hasStatus() {
+        return !TextUtils.isEmpty(statusText);
     }
 
     private Layout createLinkTitleLayout(int width) {
         CharSequence truncated = TextUtils.ellipsize(linkTitle,
-                TEXT_PAINTS[linkTitlePaint], width, TruncateAt.END);
+                TEXT_PAINTS[linkTitlePaint],
+                width,
+                TruncateAt.END);
         return makeStaticLayout(linkTitlePaint, truncated, width);
     }
 
@@ -795,7 +810,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         int nestingIndent = getNestingIndent();
         c.translate(nestingIndent * nesting + PADDING, PADDING);
 
-        if (!TextUtils.isEmpty(linkTitle)) {
+        if (hasLinkTitle()) {
             linkTitleLayout.draw(c);
             c.translate(0, linkTitleLayout.getHeight() + ELEMENT_PADDING);
         }
@@ -815,23 +830,23 @@ public class ThingView extends CustomView implements OnGestureListener {
         c.translate(0, -PADDING + (minHeight - rightHeight) / 2);
 
         // Render the status at the top for comments.
-        if (isTopStatus() && !TextUtils.isEmpty(statusText)) {
+        if (hasTopStatus() && hasStatus()) {
             statusLayout.draw(c);
             c.translate(0, statusLayout.getHeight() + ELEMENT_PADDING);
         }
 
-        if (!TextUtils.isEmpty(title)) {
+        if (hasTitle()) {
             titleLayout.draw(c);
             c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
         }
 
-        if (!TextUtils.isEmpty(body)) {
+        if (hasBody()) {
             bodyLayout.draw(c);
             c.translate(0, bodyLayout.getHeight() + ELEMENT_PADDING);
         }
 
         // Render the status at the bottom for non-comments.
-        if (!isTopStatus() && !TextUtils.isEmpty(statusText)) {
+        if (!hasTopStatus() && hasStatus()) {
             statusLayout.draw(c);
         }
     }
@@ -844,8 +859,8 @@ public class ThingView extends CustomView implements OnGestureListener {
     private boolean onBodyTouchEvent(MotionEvent e) {
         int action = e.getAction();
         if ((action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
+                && hasBody()
                 && body instanceof Spannable
-                && bodyLayout != null
                 && bodyBounds != null
                 && bodyBounds.contains(e.getX(), e.getY())) {
             float localX = e.getX() - bodyBounds.left;
@@ -867,9 +882,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             }
 
             Spannable bodySpan = (Spannable) body;
-            ClickableSpan[] spans = bodySpan.getSpans(offset,
-                    offset,
-                    ClickableSpan.class);
+            ClickableSpan[] spans = bodySpan.getSpans(offset, offset, ClickableSpan.class);
             if (spans != null && spans.length > 0) {
                 if (action == MotionEvent.ACTION_UP) {
                     spans[0].onClick(this);
@@ -913,7 +926,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     private float getTopOffset() {
-        return linkTitleLayout != null ? linkTitleLayout.getHeight() + ELEMENT_PADDING : 0;
+        return hasLinkTitle() ? linkTitleLayout.getHeight() + ELEMENT_PADDING : 0;
     }
 
     private float getLeftOffset() {
