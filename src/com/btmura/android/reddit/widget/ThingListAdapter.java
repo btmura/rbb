@@ -92,6 +92,7 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
         final String domain = cursor.getString(ThingProjection.INDEX_DOMAIN);
         final int downs = cursor.getInt(ThingProjection.INDEX_DOWNS);
         final boolean expanded = true; // Expanded only for comments handled by different adapter.
+        final boolean isNew = false; // Only messages can be new.
         final int kind = cursor.getInt(ThingProjection.INDEX_KIND);
         final String linkId = cursor.getString(ThingProjection.INDEX_LINK_ID);
         final String linkTitle = cursor.getString(ThingProjection.INDEX_LINK_TITLE);
@@ -127,14 +128,15 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
                 || kind == Kinds.KIND_COMMENT;
 
         ThingView tv = (ThingView) view;
-        tv.setBody(body, false, formatter);
         tv.setData(accountName,
                 author,
+                body,
                 createdUtc,
                 destination,
                 domain,
                 downs,
                 expanded,
+                isNew,
                 kind,
                 likes,
                 linkTitle,
@@ -151,7 +153,8 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
                 ups,
                 drawVotingArrows,
                 showThumbnail,
-                showStatusPoints);
+                showStatusPoints,
+                formatter);
         tv.setChosen(singleChoice
                 && Objects.equals(selectedThingId, thingId)
                 && Objects.equals(selectedLinkId, linkId));

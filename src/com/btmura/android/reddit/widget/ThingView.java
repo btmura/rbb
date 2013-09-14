@@ -39,7 +39,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.text.RelativeTime;
-import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 
@@ -96,6 +95,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private OnVoteListener listener;
 
     private String author;
+    private CharSequence body;
     private long createdUtc;
     private String destination;
     private String domain;
@@ -125,8 +125,6 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     private float[] nestingPoints;
 
-    private String body;
-    private CharSequence bodyText;
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
     private StyleSpan italicSpan;
@@ -213,30 +211,15 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
     }
 
-    public void setBody(CharSequence body, boolean isNew, Formatter formatter) {
-        if (!Objects.equals(this.body, body)) {
-            if (!TextUtils.isEmpty(body)) {
-                bodyText = Strings.ellipsize(formatter.formatSpans(getContext(), body),
-                        maxTextLength);
-                if (bodyBounds == null) {
-                    bodyBounds = new RectF();
-                }
-            } else {
-                bodyText = null;
-            }
-
-            bodyPaint = isNew ? THING_NEW_BODY : THING_BODY;
-            requestLayout();
-        }
-    }
-
     public void setData(String accountName,
             String author,
+            CharSequence body,
             long createdUtc,
             String destination,
             String domain,
             int downs,
             boolean expanded,
+            boolean isNew,
             int kind,
             int likes,
             String linkTitle,
@@ -253,7 +236,10 @@ public class ThingView extends CustomView implements OnGestureListener {
             int ups,
             boolean drawVotingArrows,
             boolean showThumbnail,
-            boolean showStatusPoints) {
+            boolean showStatusPoints,
+            Formatter formatter) {
+
+        setBody(body, isNew, formatter);
 
         // Save the attributes needed by onMeasure or may be used to construct
         // details if we discover extra space while measuring.
@@ -322,6 +308,18 @@ public class ThingView extends CustomView implements OnGestureListener {
 
         SwipeDismissTouchListener.resetAnimation(this);
         requestLayout();
+    }
+
+    private void setBody(CharSequence body, boolean isNew, Formatter formatter) {
+        if (!TextUtils.isEmpty(body)) {
+            this.body = Strings.ellipsize(formatter.formatSpans(getContext(), body), maxTextLength);
+            if (bodyBounds == null) {
+                bodyBounds = new RectF();
+            }
+        } else {
+            this.body = null;
+        }
+        bodyPaint = isNew ? THING_NEW_BODY : THING_BODY;
     }
 
     /** Sets the thumbnail alpha. Called by the thumbnail alpha ObjectAnimator. */
@@ -568,7 +566,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             rightHeight += titleLayout.getHeight() + ELEMENT_PADDING;
         }
 
-        if (expanded && !TextUtils.isEmpty(bodyText)) {
+        if (expanded && !TextUtils.isEmpty(body)) {
             bodyLayout = createBodyLayout(titleWidth);
             rightHeight += bodyLayout.getHeight() + ELEMENT_PADDING;
         }
@@ -655,7 +653,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     private Layout createBodyLayout(int width) {
-        return makeStaticLayout(bodyPaint, bodyText, width);
+        return makeStaticLayout(bodyPaint, body, width);
     }
 
     private static Layout makeStaticLayout(int paint, CharSequence text, int width) {
@@ -797,7 +795,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         int nestingIndent = getNestingIndent();
         c.translate(nestingIndent * nesting + PADDING, PADDING);
 
-        if (linkTitleLayout != null) {
+        if (!TextUtils.isEmpty(linkTitle)) {
             linkTitleLayout.draw(c);
             c.translate(0, linkTitleLayout.getHeight() + ELEMENT_PADDING);
         }
@@ -822,12 +820,12 @@ public class ThingView extends CustomView implements OnGestureListener {
             c.translate(0, statusLayout.getHeight() + ELEMENT_PADDING);
         }
 
-        if (titleLayout != null) {
+        if (!TextUtils.isEmpty(title)) {
             titleLayout.draw(c);
             c.translate(0, titleLayout.getHeight() + ELEMENT_PADDING);
         }
 
-        if (bodyLayout != null) {
+        if (!TextUtils.isEmpty(body)) {
             bodyLayout.draw(c);
             c.translate(0, bodyLayout.getHeight() + ELEMENT_PADDING);
         }
@@ -846,7 +844,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private boolean onBodyTouchEvent(MotionEvent e) {
         int action = e.getAction();
         if ((action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
-                && bodyText instanceof Spannable
+                && body instanceof Spannable
                 && bodyLayout != null
                 && bodyBounds != null
                 && bodyBounds.contains(e.getX(), e.getY())) {
@@ -868,7 +866,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                 return false;
             }
 
-            Spannable bodySpan = (Spannable) bodyText;
+            Spannable bodySpan = (Spannable) body;
             ClickableSpan[] spans = bodySpan.getSpans(offset,
                     offset,
                     ClickableSpan.class);

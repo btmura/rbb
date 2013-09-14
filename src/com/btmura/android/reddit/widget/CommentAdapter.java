@@ -53,6 +53,7 @@ public class CommentAdapter extends BaseCursorAdapter {
         final String domain = null; // Only posts have domains.
         final int downs = cursor.getInt(CommentLoader.INDEX_DOWNS);
         final boolean expanded = cursor.getInt(CommentLoader.INDEX_EXPANDED) == 1;
+        final boolean isNew = false; // Only messages might be new.
         final int kind = cursor.getInt(CommentLoader.INDEX_KIND);
         final String linkTitle = null; // Only post replies have link titles.
         final int nesting = cursor.getInt(CommentLoader.INDEX_NESTING);
@@ -86,14 +87,15 @@ public class CommentAdapter extends BaseCursorAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_COMMENT_LIST);
-        tv.setBody(body, false, formatter);
         tv.setData(accountName,
                 author,
+                body,
                 createdUtc,
                 destination,
                 domain,
                 downs,
                 expanded,
+                isNew,
                 kind,
                 likes,
                 linkTitle,
@@ -110,7 +112,8 @@ public class CommentAdapter extends BaseCursorAdapter {
                 ups,
                 drawVotingArrows,
                 showThumbnail,
-                showStatusPoints);
+                showStatusPoints,
+                formatter);
         tv.setOnVoteListener(listener);
     }
 }

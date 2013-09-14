@@ -55,6 +55,7 @@ public class MessageThreadAdapter extends BaseCursorAdapter {
         final String domain = null;
         final int downs = 0;
         final boolean expanded = true;
+        final boolean isNew = false;
         final int kind = cursor.getInt(MessageThreadLoader.INDEX_KIND);
         final int likes = 0;
         final String linkTitle = null;
@@ -77,14 +78,15 @@ public class MessageThreadAdapter extends BaseCursorAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_MESSAGE_THREAD_LIST);
-        tv.setBody(body, false, formatter);
         tv.setData(accountName,
                 author,
+                body,
                 createdUtc,
                 destination,
                 domain,
                 downs,
                 expanded,
+                isNew,
                 kind,
                 likes,
                 linkTitle,
@@ -101,7 +103,8 @@ public class MessageThreadAdapter extends BaseCursorAdapter {
                 ups,
                 drawVotingArrows,
                 showThumbnail,
-                showStatusPoints);
+                showStatusPoints,
+                formatter);
     }
 
     public void setAccountName(String accountName) {

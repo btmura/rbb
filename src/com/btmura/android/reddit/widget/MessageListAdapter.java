@@ -62,9 +62,9 @@ public class MessageListAdapter extends AbstractThingListAdapter {
         final String domain = null; // No domain for messages.
         final int downs = 0; // No downs for messages.
         final boolean expanded = true; // Messages are always expanded.
+        final boolean isNew = isNew(cursor.getPosition());
         final int kind = cursor.getInt(MessageThingLoader.INDEX_KIND);
         final int likes = 0; // No likes for messages.
-        final boolean isNew = isNew(cursor.getPosition());
         final int nesting = 0; // No nesting for messages.
         final int numComments = 0; // No comments for messages.
         final boolean over18 = false; // No over18 for messages.
@@ -81,17 +81,18 @@ public class MessageListAdapter extends AbstractThingListAdapter {
         final boolean showStatusPoints = false; // No points for messages.
 
         ThingView tv = (ThingView) view;
-        tv.setBody(body, isNew, formatter);
         tv.setData(accountName,
                 author,
+                body,
                 createdUtc,
                 destination,
                 domain,
                 downs,
                 expanded,
+                isNew,
                 kind,
-                likes,
-                subject, // actually linkTitle
+                likes, // actually linkTitle
+                subject,
                 nesting,
                 nowTimeMs,
                 numComments,
@@ -105,7 +106,8 @@ public class MessageListAdapter extends AbstractThingListAdapter {
                 ups,
                 drawVotingArrows,
                 showThumbnail,
-                showStatusPoints);
+                showStatusPoints,
+                formatter);
         tv.setChosen(singleChoice && Objects.equals(selectedThingId, thingId));
         setThingDetails(tv, kind);
     }
