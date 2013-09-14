@@ -200,22 +200,27 @@ public class NavigationFragment extends ListFragment implements
         setListShown(true);
 
         String accountName = result.getLastAccount(getActivity());
-        boolean accountChanged = !Objects.equals(this.accountName, accountName);
-        selectAccount(accountName, accountChanged);
+        refreshAccount(accountName);
     }
 
     @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
-    private void selectAccount(String accountName, boolean accountChanged) {
+    private void refreshAccount(String accountName) {
+        boolean accountChanged = selectAccount(accountName);
+        refreshPlace(accountChanged);
+    }
+
+    private boolean selectAccount(String accountName) {
+        boolean accountChanged = !Objects.equals(this.accountName, accountName);
         this.accountName = accountName;
         accountAdapter.setSelectedAccountName(accountName);
         AccountPrefs.setLastAccount(getActivity(), accountName);
         placesAdapter.setAccountPlaces(accountAdapter.getCount() > 1,
                 AccountUtils.isAccount(accountName));
         refreshSubredditLoader(accountChanged);
-        refreshPlace(accountChanged);
+        return accountChanged;
     }
 
     private void refreshSubredditLoader(boolean restartLoader) {
@@ -277,17 +282,25 @@ public class NavigationFragment extends ListFragment implements
                 break;
 
             case PLACE_PROFILE:
-                selectPlace(place, null, false, FilterAdapter.PROFILE_OVERVIEW, null, force);
+                selectPlaceWithNoSubreddit(place, FilterAdapter.PROFILE_OVERVIEW, force);
                 break;
 
             case PLACE_SAVED:
-                selectPlace(place, null, false, FilterAdapter.PROFILE_SAVED, null, force);
+                selectPlaceWithNoSubreddit(place, FilterAdapter.PROFILE_SAVED, force);
                 break;
 
             case PLACE_MESSAGES:
-                selectPlace(place, null, false, FilterAdapter.MESSAGE_INBOX, null, force);
+                selectPlaceWithNoSubreddit(place, FilterAdapter.MESSAGE_INBOX, force);
                 break;
         }
+    }
+
+    private void selectPlaceWithNoSubreddit(int place, int filter, boolean force) {
+        selectPlace(place, null, false, filter, null, force);
+    }
+
+    private void selectPlaceWithFilter(int newFilter, boolean force) {
+        selectPlace(place, subreddit, isRandom, newFilter, null, force);
     }
 
     private void selectPlace(int place,
@@ -357,6 +370,23 @@ public class NavigationFragment extends ListFragment implements
     }
 
     @Override
+    public void onAccountMessagesSelected(String accountName) {
+        selectAccount(accountName);
+        selectPlaceWithNoSubreddit(PLACE_MESSAGES, FilterAdapter.MESSAGE_UNREAD, true);
+    }
+
+    @Override
+    public void onPlaceSelected(int place) {
+        selectPlaceWithDefaults(place, false);
+    }
+
+    public void setFilter(int newFilter) {
+        if (this.filter != newFilter) {
+            selectPlaceWithFilter(newFilter, false);
+        }
+    }
+
+    @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         int adapterIndex = mergeAdapter.getAdapterIndex(position);
         int adapterPosition = mergeAdapter.getAdapterPosition(position);
@@ -376,33 +406,13 @@ public class NavigationFragment extends ListFragment implements
 
     private void handleAccountClick(int position) {
         Item item = accountAdapter.getItem(position);
-        selectAccount(item.getAccountName(), true);
+        refreshAccount(item.getAccountName());
     }
 
     private void handleSubredditClick(int position) {
         String subreddit = subredditAdapter.getName(position);
-        selectPlace(PLACE_SUBREDDIT,
-                subreddit,
-                Subreddits.isRandom(subreddit),
-                filter,
-                null,
-                true);
-    }
-
-    @Override
-    public void onAccountMessagesSelected(String accountName) {
-        selectPlaceWithDefaults(PLACE_MESSAGES, false);
-    }
-
-    @Override
-    public void onPlaceSelected(int place) {
-        selectPlaceWithDefaults(place, false);
-    }
-
-    public void setFilter(int newFilter) {
-        if (this.filter != newFilter) {
-            selectPlace(place, subreddit, isRandom, newFilter, null, false);
-        }
+        boolean isRandom = Subreddits.isRandom(subreddit);
+        selectPlace(PLACE_SUBREDDIT, subreddit, isRandom, filter, null, true);
     }
 
     @Override
@@ -504,7 +514,9 @@ public class NavigationFragment extends ListFragment implements
     }
 
     @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+    public void onItemCheckedStateChanged(ActionMode mode,
+            int position,
+            long id,
             boolean checked) {
         mode.invalidate();
     }
