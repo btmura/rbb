@@ -319,6 +319,8 @@ public class ComposeFormFragment extends Fragment implements
     private void setupAccountSpinner(int type) {
         switch (type) {
             case ComposeActivity.TYPE_MESSAGE_REPLY:
+            case ComposeActivity.TYPE_EDIT_COMMENT:
+            case ComposeActivity.TYPE_EDIT_POST:
                 Views.setVisibility(View.GONE, leftContainer, accountSpinner);
                 break;
 
