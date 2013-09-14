@@ -127,7 +127,8 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
-    private StyleSpan italicSpan;
+    private Object nsfwSpan;
+    private Object italicSpan;
 
     private int linkTitlePaint;
     private int titlePaint;
@@ -238,8 +239,6 @@ public class ThingView extends CustomView implements OnGestureListener {
             boolean showStatusPoints,
             Formatter formatter) {
 
-        setBody(body, isNew, formatter);
-
         // Save the attributes needed by onMeasure or may be used to construct
         // details if we discover extra space while measuring.
         this.author = author;
@@ -268,21 +267,8 @@ public class ThingView extends CustomView implements OnGestureListener {
             scoreText = VotingArrows.getScoreText(score);
         }
 
-        this.showThumbnail = showThumbnail;
-        if (showThumbnail) {
-            // Allocate these now rather then during scrolling or animating.
-            if (thumbMatrix == null) {
-                thumbMatrix = new Matrix();
-            }
-            if (thumbAlphaAnimator == null) {
-                thumbAlphaAnimator = ObjectAnimator.ofInt(this, "thumbnailAlpha", 0, 255);
-                thumbAlphaAnimator.setDuration(getResources()
-                        .getInteger(android.R.integer.config_shortAnimTime));
-            }
-            if (thumbRect == null) {
-                thumbRect = new Rect();
-            }
-        }
+        setBodyFields(body, isNew, formatter);
+        setThumbnailFields(showThumbnail);
 
         if (nesting > 0) {
             if (nestingPoints == null || nestingPoints.length < nesting * 4) {
@@ -309,7 +295,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         requestLayout();
     }
 
-    private void setBody(CharSequence body, boolean isNew, Formatter formatter) {
+    private void setBodyFields(CharSequence body, boolean isNew, Formatter formatter) {
         if (!TextUtils.isEmpty(body)) {
             this.body = Strings.ellipsize(formatter.formatSpans(getContext(), body), maxTextLength);
             if (bodyBounds == null) {
@@ -319,6 +305,24 @@ public class ThingView extends CustomView implements OnGestureListener {
             this.body = null;
         }
         bodyPaint = isNew ? THING_NEW_BODY : THING_BODY;
+    }
+
+    private void setThumbnailFields(boolean showThumbnail) {
+        this.showThumbnail = showThumbnail;
+        if (showThumbnail) {
+            // Allocate these now rather then during scrolling or animating.
+            if (thumbMatrix == null) {
+                thumbMatrix = new Matrix();
+            }
+            if (thumbAlphaAnimator == null) {
+                thumbAlphaAnimator = ObjectAnimator.ofInt(this, "thumbnailAlpha", 0, 255);
+                thumbAlphaAnimator.setDuration(getResources()
+                        .getInteger(android.R.integer.config_shortAnimTime));
+            }
+            if (thumbRect == null) {
+                thumbRect = new Rect();
+            }
+        }
     }
 
     /** Sets the thumbnail alpha. Called by the thumbnail alpha ObjectAnimator. */
@@ -338,16 +342,13 @@ public class ThingView extends CustomView implements OnGestureListener {
             int numComments,
             int score,
             String subreddit) {
-        Context c = getContext();
-        Resources r = getResources();
-
         statusText.clear();
         statusText.clearSpans();
 
         if (showNsfw) {
-            String nsfw = c.getString(R.string.nsfw);
+            String nsfw = getContext().getString(R.string.nsfw);
             statusText.append(nsfw).append("  ");
-            statusText.setSpan(new ForegroundColorSpan(Color.RED), 0, nsfw.length(), 0);
+            statusText.setSpan(getNsfwSpan(), 0, nsfw.length(), 0);
         }
 
         if (showSubreddit) {
@@ -357,44 +358,36 @@ public class ThingView extends CustomView implements OnGestureListener {
         statusText.append(author).append("  ");
 
         if (showPoints) {
-            statusText.append(getQuantityString(r, R.plurals.points, score,
-                    FORMATTER_STATUS)).append("  ");
+            statusText.append(getQuantityString(R.plurals.points, score, FORMATTER_STATUS));
+            statusText.append("  ");
         }
 
         if (createdUtc != 0) {
-            statusText.append(getRelativeTime(r, nowTimeMs, createdUtc,
-                    FORMATTER_STATUS)).append("  ");
+            statusText.append(getRelativeTime(nowTimeMs, createdUtc, FORMATTER_STATUS));
+            statusText.append("  ");
         }
 
         if (showNumComments) {
-            statusText.append(getQuantityString(r, R.plurals.comments, numComments,
-                    FORMATTER_STATUS));
+            statusText.append(getQuantityString(R.plurals.comments, numComments, FORMATTER_STATUS));
         }
 
         if (!expanded) {
-            if (italicSpan == null) {
-                italicSpan = new StyleSpan(Typeface.ITALIC);
-            }
-            statusText.setSpan(italicSpan, 0, statusText.length(), 0);
+            statusText.setSpan(getItalicSpan(), 0, statusText.length(), 0);
         }
     }
 
-    private CharSequence getQuantityString(Resources resources,
-            int resId,
-            int quantity,
-            int formatterIndex) {
+    private CharSequence getQuantityString(int resId, int quantity, int formatterIndex) {
+        Resources r = getResources();
         java.util.Formatter formatter = resetFormatter(formatterIndex, 20);
-        String format = resources.getQuantityText(resId, quantity).toString();
-        formatter.format(resources.getConfiguration().locale, format, quantity);
+        String format = r.getQuantityText(resId, quantity).toString();
+        formatter.format(r.getConfiguration().locale, format, quantity);
         return formatterData[formatterIndex];
     }
 
-    private CharSequence getRelativeTime(Resources resources,
-            long nowTimeMs,
-            long createdUtc,
-            int formatterIndex) {
+    private CharSequence getRelativeTime(long nowTimeMs, long createdUtc, int formatterIndex) {
+        Resources r = getResources();
         java.util.Formatter formatter = resetFormatter(formatterIndex, 15);
-        RelativeTime.format(resources, formatter, nowTimeMs, createdUtc);
+        RelativeTime.format(r, formatter, nowTimeMs, createdUtc);
         return formatterData[formatterIndex];
     }
 
@@ -710,14 +703,13 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     private void makeDetails(int index) {
-        Resources r = getResources();
         switch (details[index]) {
             case DETAIL_UP_VOTES:
-                makeDetailsLayout(index, getQuantityString(r, R.plurals.votes_up, ups, index));
+                makeDetailsLayout(index, getQuantityString(R.plurals.votes_up, ups, index));
                 break;
 
             case DETAIL_DOWN_VOTES:
-                makeDetailsLayout(index, getQuantityString(r, R.plurals.votes_down, downs, index));
+                makeDetailsLayout(index, getQuantityString(R.plurals.votes_down, downs, index));
                 break;
 
             case DETAIL_DOMAIN:
@@ -733,7 +725,7 @@ public class ThingView extends CustomView implements OnGestureListener {
                 break;
 
             case DETAIL_TIMESTAMP:
-                makeDetailsLayout(index, getRelativeTime(r, nowTimeMs, createdUtc, index));
+                makeDetailsLayout(index, getRelativeTime(nowTimeMs, createdUtc, index));
                 break;
 
             case DETAIL_DESTINATION:
@@ -963,5 +955,19 @@ public class ThingView extends CustomView implements OnGestureListener {
             }
         }
         return null;
+    }
+
+    private Object getNsfwSpan() {
+        if (nsfwSpan == null) {
+            nsfwSpan = new ForegroundColorSpan(Color.RED);
+        }
+        return nsfwSpan;
+    }
+
+    private Object getItalicSpan() {
+        if (italicSpan == null) {
+            italicSpan = new StyleSpan(Typeface.ITALIC);
+        }
+        return italicSpan;
     }
 }
