@@ -196,8 +196,14 @@ public class UserProfileActivity extends AbstractBrowserActivity implements
     }
 
     private void handleNewMessage() {
-        MenuHelper.startComposeActivity(this, ComposeActivity.MESSAGE_TYPE_SET,
-                null, currentUser, null, null, null, false);
+        MenuHelper.startComposeActivity(this,
+                ComposeActivity.MESSAGE_TYPE_SET,
+                null,
+                currentUser,
+                null,
+                null,
+                null,
+                false);
     }
 
     @Override

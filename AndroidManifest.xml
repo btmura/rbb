@@ -146,6 +146,7 @@
         <activity
             android:name=".app.UserProfileActivity"
             android:launchMode="singleTop"
+            android:uiOptions="splitActionBarWhenNarrow"
             tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
