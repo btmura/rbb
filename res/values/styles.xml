@@ -16,14 +16,132 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--
-    We need a theme to animate from a translucent look to a runtime determined theme. The stock 
-    Translucent theme disables orientation changes on small screens, so we need to create our own 
-    theme based off of a theme that has animations. 
-    -->
-    <style name="Theme.Transition" parent="@android:style/Theme.Holo">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
+    <style name="AccountListRowText" parent="@style/ListRowText" />
+
+    <style name="AccountLoginText" parent="@style/SubredditTitleText" />
+
+    <style name="AccountNameText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title" />
+
+    <style name="AccountNameDropdownText" parent="@style/AccountNameText">
+        <item name="android:padding">@dimen/padding</item>
+    </style>
+
+    <style name="ButtonBar" parent="@android:style/Holo.ButtonBar.AlertDialog" />
+
+    <style name="ButtonBarButton" parent="@android:style/Widget.Holo.Button.Borderless.Small">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="ButtonBarContainer">
+        <item name="android:divider">?android:attr/dividerHorizontal</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:showDividers">beginning</item>
+    </style>
+
+    <style name="CommentBodyText" parent="@style/SubredditTitleText" />
+
+    <style name="CommentStatusText" parent="@style/SubredditStatusText" />
+
+    <style name="CommentTitleText" parent="@android:style/TextAppearance.Holo.Medium">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="ContentRowText">
+        <item name="android:typeface">monospace</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="ContentUriRowText" parent="@style/ListRowText">
+        <item name="android:ellipsize">start</item>
+    </style>
+
+    <!-- Style for a single line TextView row with padding. -->
+    <style name="ListRowText" parent="@android:style/TextAppearance.Holo.Medium">
+        <item name="android:background">?android:attr/activatedBackgroundIndicator</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:padding">@dimen/padding</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="SlimProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
+        <item name="android:minHeight">4dp</item>
+        <item name="android:maxHeight">4dp</item>
+    </style>
+
+    <style name="SubredditTitleText" parent="@android:style/TextAppearance.Holo.Medium">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="SubredditStatusText" parent="@android:style/TextAppearance.Holo.Small">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="SidebarTitleText" parent="@style/CommentTitleText" />
+
+    <style name="SidebarStatusText" parent="@style/CommentStatusText" />
+
+    <style name="SidebarDescriptionText" parent="@style/CommentBodyText" />
+
+    <style name="Theme.Dark" parent="@android:style/Theme.Holo">
+        <item name="drawer_icon">@drawable/ic_drawer_dark</item>
+        <item name="menu_about_icon">@drawable/ic_action_about_dark</item>
+        <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
+        <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
+        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
+        <item name="menu_edit_icon">@drawable/ic_action_edit_dark</item>
+        <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
+        <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
+        <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
+        <item name="menu_refresh_icon">@drawable/ic_action_refresh_dark</item>
+        <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
+        <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
+        <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
+        <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
+        <item name="nesting_line_color">@android:color/holo_blue_bright</item>
+        <item name="next_icon">@drawable/ic_next_dark</item>
+        <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
+    </style>
+
+    <style name="Theme.Dark.Dialog" parent="@android:style/Theme.Holo.Dialog">
+        <item name="drawer_icon">@drawable/ic_drawer_dark</item>
+        <item name="menu_about_icon">@drawable/ic_action_about_dark</item>
+        <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
+        <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
+        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
+        <item name="menu_edit_icon">@drawable/ic_action_edit_dark</item>
+        <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
+        <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
+        <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
+        <item name="menu_refresh_icon">@drawable/ic_action_refresh_dark</item>
+        <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
+        <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
+        <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
+        <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
+        <item name="nesting_line_color">@android:color/holo_blue_bright</item>
+        <item name="next_icon">@drawable/ic_next_dark</item>
+        <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
+    </style>
+
+    <style name="Theme.Dark.DialogWhenLarge" parent="@android:style/Theme.Holo.DialogWhenLarge">
+        <item name="drawer_icon">@drawable/ic_drawer_dark</item>
+        <item name="menu_about_icon">@drawable/ic_action_about_dark</item>
+        <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
+        <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
+        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
+        <item name="menu_edit_icon">@drawable/ic_action_edit_dark</item>
+        <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
+        <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
+        <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
+        <item name="menu_refresh_icon">@drawable/ic_action_refresh_dark</item>
+        <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
+        <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
+        <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
+        <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
+        <item name="nesting_line_color">@android:color/holo_blue_bright</item>
+        <item name="next_icon">@drawable/ic_next_dark</item>
+        <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
     </style>
 
     <style name="Theme.Light" parent="@android:style/Theme.Holo.Light">
@@ -86,96 +204,14 @@
         <item name="primary_activatable_text">@color/primary_activatable_text_light</item>
     </style>
 
-    <style name="Theme.Dark" parent="@android:style/Theme.Holo">
-        <item name="drawer_icon">@drawable/ic_drawer_dark</item>
-        <item name="menu_about_icon">@drawable/ic_action_about_dark</item>
-        <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
-        <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
-        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
-        <item name="menu_edit_icon">@drawable/ic_action_edit_dark</item>
-        <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
-        <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
-        <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
-        <item name="menu_refresh_icon">@drawable/ic_action_refresh_dark</item>
-        <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
-        <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
-        <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
-        <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
-        <item name="nesting_line_color">@android:color/holo_blue_bright</item>
-        <item name="next_icon">@drawable/ic_next_dark</item>
-        <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
-    </style>
-
-    <style name="Theme.Dark.Dialog" parent="@android:style/Theme.Holo.Dialog">
-        <item name="drawer_icon">@drawable/ic_drawer_dark</item>
-        <item name="menu_about_icon">@drawable/ic_action_about_dark</item>
-        <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
-        <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
-        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
-        <item name="menu_edit_icon">@drawable/ic_action_edit_dark</item>
-        <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
-        <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
-        <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
-        <item name="menu_refresh_icon">@drawable/ic_action_refresh_dark</item>
-        <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
-        <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
-        <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
-        <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
-        <item name="nesting_line_color">@android:color/holo_blue_bright</item>
-        <item name="next_icon">@drawable/ic_next_dark</item>
-        <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
-    </style>
-
-    <style name="Theme.Dark.DialogWhenLarge" parent="@android:style/Theme.Holo.DialogWhenLarge">
-        <item name="drawer_icon">@drawable/ic_drawer_dark</item>
-        <item name="menu_about_icon">@drawable/ic_action_about_dark</item>
-        <item name="menu_add_icon">@drawable/ic_action_add_dark</item>
-        <item name="menu_comments_icon">@drawable/ic_action_comments_dark</item>
-        <item name="menu_delete_icon">@drawable/ic_action_delete_dark</item>
-        <item name="menu_edit_icon">@drawable/ic_action_edit_dark</item>
-        <item name="menu_link_icon">@drawable/ic_action_link_dark</item>
-        <item name="menu_messages_icon">@drawable/ic_action_messages_dark</item>
-        <item name="menu_profile_icon">@drawable/ic_action_profile_dark</item>
-        <item name="menu_refresh_icon">@drawable/ic_action_refresh_dark</item>
-        <item name="menu_saved_icon">@drawable/ic_action_saved_dark</item>
-        <item name="menu_search_icon">@drawable/ic_action_search_dark</item>
-        <item name="menu_send_icon">@drawable/ic_action_send_dark</item>
-        <item name="menu_unsaved_icon">@drawable/ic_action_unsaved_dark</item>
-        <item name="nesting_line_color">@android:color/holo_blue_bright</item>
-        <item name="next_icon">@drawable/ic_next_dark</item>
-        <item name="primary_activatable_text">@color/primary_activatable_text_dark</item>
-    </style>
-
-    <style name="AccountNameText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title" />
-
-    <style name="AccountNameDropdownText" parent="@style/AccountNameText">
-        <item name="android:padding">@dimen/padding</item>
-    </style>
-
-    <style name="ButtonBar" parent="@android:style/Holo.ButtonBar.AlertDialog" />
-
-    <style name="ButtonBarButton" parent="@android:style/Widget.Holo.Button.Borderless.Small">
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
-
-    <style name="ButtonBarContainer">
-        <item name="android:divider">?android:attr/dividerHorizontal</item>
-        <item name="android:orientation">vertical</item>
-        <item name="android:showDividers">beginning</item>
-    </style>
-
-    <style name="SlimProgressBar" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
-        <item name="android:minHeight">4dp</item>
-        <item name="android:maxHeight">4dp</item>
-    </style>
-
-    <style name="SubredditTitleText" parent="@android:style/TextAppearance.Holo.Medium">
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="SubredditStatusText" parent="@android:style/TextAppearance.Holo.Small">
-        <item name="android:textSize">14sp</item>
+    <!--
+    We need a theme to animate from a translucent look to a runtime determined theme. The stock 
+    Translucent theme disables orientation changes on small screens, so we need to create our own 
+    theme based off of a theme that has animations. 
+    -->
+    <style name="Theme.Transition" parent="@android:style/Theme.Holo">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
     <style name="ThingLinkTitleText" parent="@style/SubredditStatusText">
@@ -192,62 +228,16 @@
 
     <style name="ThingStatusText" parent="@style/SubredditStatusText" />
 
+    <style name="ThingDownScoreText" parent="@style/SubredditStatusText">
+        <item name="android:textColor">@color/score_text_down</item>
+    </style>
+
     <style name="ThingNeutralScoreText" parent="@style/SubredditStatusText">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
     <style name="ThingUpScoreText" parent="@style/SubredditStatusText">
         <item name="android:textColor">@color/score_text_up</item>
-    </style>
-
-    <style name="ThingDownScoreText" parent="@style/SubredditStatusText">
-        <item name="android:textColor">@color/score_text_down</item>
-    </style>
-
-    <style name="CommentTitleText" parent="@android:style/TextAppearance.Holo.Medium">
-        <item name="android:textSize">18sp</item>
-    </style>
-
-    <style name="CommentBodyText" parent="@style/SubredditTitleText" />
-
-    <style name="CommentStatusText" parent="@style/SubredditStatusText" />
-
-    <style name="SidebarTitleText" parent="@style/CommentTitleText">
-        <!--
-        <item name="android:singleLine">true</item>
-        <item name="android:ellipsize">end</item>
-        -->
-    </style>
-
-    <style name="SidebarStatusText" parent="@style/CommentStatusText">
-        <!--
-        <item name="android:singleLine">true</item>
-        <item name="android:ellipsize">end</item>
-        -->
-    </style>
-
-    <style name="SidebarDescriptionText" parent="@style/CommentBodyText" />
-
-    <style name="AccountLoginText" parent="@style/SubredditTitleText" />
-
-    <!-- Style for a single line TextView row with padding. -->
-    <style name="ListRowText" parent="@android:style/TextAppearance.Holo.Medium">
-        <item name="android:background">?android:attr/activatedBackgroundIndicator</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:padding">@dimen/padding</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="AccountListRowText" parent="@style/ListRowText" />
-
-    <style name="ContentUriRowText" parent="@style/ListRowText">
-        <item name="android:ellipsize">start</item>
-    </style>
-
-    <style name="ContentRowText">
-        <item name="android:typeface">monospace</item>
-        <item name="android:textSize">16sp</item>
     </style>
 
 </resources>
