@@ -158,16 +158,19 @@ public class MessageThreadListController
         int position = Views.getCheckedPosition(listView);
         String user = adapter.getAuthor(position);
 
-        Bundle extras = new Bundle(2);
-
         // Message threads are odd in that the thing id doesn't refer to the
         // topmost message, so the actions may not match up with the id. So get
         // the parent id from the first element.
-        extras.putString(ComposeActivity.EXTRA_MESSAGE_PARENT_THING_ID, adapter.getThingId(0));
-        extras.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, adapter.getThingId(position));
+        String parentThingId = adapter.getThingId(0);
+        String thingId = adapter.getThingId(position);
 
-        MenuHelper.startComposeActivity(context, ComposeActivity.MESSAGE_REPLY_TYPE_SET,
-                null, user, null, null, extras, false);
+        MenuHelper.startMessageReplyComposer(context,
+                accountName,
+                user,
+                null,
+                parentThingId,
+                thingId,
+                false);
     }
 
     private void handleAuthor(ListView listView) {

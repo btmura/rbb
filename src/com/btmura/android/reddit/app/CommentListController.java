@@ -140,27 +140,30 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     }
 
     public void edit(int position) {
-        int[] typeSet = position == 0
-                ? ComposeActivity.EDIT_POST_TYPE_SET
-                : ComposeActivity.EDIT_COMMENT_TYPE_SET;
-
+        String title = Strings.toString(getCommentLabel(position));
+        String text = getBody(position);
         String parentThingId = getThingId(0);
         String thingId = getThingId(position);
-        long sessionId = getSessionId(position);
 
-        Bundle args = new Bundle(3);
-        args.putString(ComposeActivity.EXTRA_EDIT_PARENT_THING_ID, parentThingId);
-        args.putString(ComposeActivity.EXTRA_EDIT_THING_ID, thingId);
-        args.putLong(ComposeActivity.EXTRA_EDIT_SESSION_ID, sessionId);
+        switch (position) {
+            case 0:
+                MenuHelper.startEditPostComposer(context,
+                        accountName,
+                        title,
+                        text,
+                        parentThingId,
+                        thingId);
+                break;
 
-        MenuHelper.startComposeActivity(context,
-                typeSet,
-                null,
-                null,
-                Strings.toString(getCommentLabel(position)),
-                getBody(position),
-                args,
-                false);
+            default:
+                MenuHelper.startEditCommentComposer(context,
+                        accountName,
+                        title,
+                        text,
+                        parentThingId,
+                        thingId);
+                break;
+        }
     }
 
     public void onListItemClick(ListView listView, View view, int position, long id) {
@@ -178,22 +181,16 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     }
 
     public void reply(int position) {
-        String author = getAuthor(position);
+        String messageDestination = getAuthor(position);
+        String title = Strings.toString(getCommentLabel(position));
         String parentThingId = getThingId(0);
         String thingId = getThingId(position);
-
-        Bundle args = new Bundle(2);
-        args.putString(ComposeActivity.EXTRA_COMMENT_PARENT_THING_ID, parentThingId);
-        args.putString(ComposeActivity.EXTRA_COMMENT_THING_ID, thingId);
-
-        MenuHelper.startComposeActivity(context,
-                ComposeActivity.COMMENT_REPLY_TYPE_SET,
-                null,
-                author,
-                Strings.toString(getCommentLabel(position)),
-                null,
-                args,
-                true);
+        MenuHelper.startCommentReplyComposer(context,
+                accountName,
+                messageDestination,
+                title,
+                parentThingId,
+                thingId);
     }
 
     public void save(boolean save) {

@@ -59,7 +59,10 @@ public class MessageThingListFragment
     @Override
     protected MessageThingMenuController
             createMenuController(MessageThingListController controller) {
-        return new MessageThingMenuController(getActivity(), thingHolder, this);
+        return new MessageThingMenuController(getActivity(),
+                controller.getAccountName(),
+                thingHolder,
+                this);
     }
 
     @Override

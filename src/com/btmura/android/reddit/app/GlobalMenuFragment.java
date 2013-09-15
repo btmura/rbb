@@ -94,10 +94,6 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
         // convenience. Some other items have complicated visibility logic, so
         // they aren't inflated in this fragment.
         switch (item.getItemId()) {
-            case R.id.menu_new_post:
-                handleNewPost();
-                return true;
-
             case R.id.menu_search:
                 handleSearch();
                 return true;
@@ -109,11 +105,6 @@ public class GlobalMenuFragment extends Fragment implements OnFocusChangeListene
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void handleNewPost() {
-        MenuHelper.startComposeActivity(getActivity(), ComposeActivity.DEFAULT_TYPE_SET,
-                subredditNameHolder.getSubreddit(), null, null, null, null, false);
     }
 
     public void handleSearch() {

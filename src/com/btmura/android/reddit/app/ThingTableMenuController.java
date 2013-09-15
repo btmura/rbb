@@ -99,16 +99,20 @@ class ThingTableMenuController implements MenuController {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_new_post:
+                handleNewPost();
+                return true;
+
             case R.id.menu_refresh:
                 handleRefresh();
                 return true;
 
-            case R.id.menu_add_subreddit:
-                handleAddSubreddit();
-                return true;
-
             case R.id.menu_subreddit:
                 handleSubreddit();
+                return true;
+
+            case R.id.menu_add_subreddit:
+                handleAddSubreddit();
                 return true;
 
             default:
@@ -116,16 +120,20 @@ class ThingTableMenuController implements MenuController {
         }
     }
 
+    private void handleNewPost() {
+        MenuHelper.startNewPostComposer(context, accountName, getSubreddit());
+    }
+
     private void handleRefresh() {
         refreshable.refresh();
     }
 
-    private void handleAddSubreddit() {
-        MenuHelper.showAddSubredditDialog(fragmentManager, getSubreddit());
-    }
-
     private void handleSubreddit() {
         MenuHelper.startSidebarActivity(context, getSubreddit());
+    }
+
+    private void handleAddSubreddit() {
+        MenuHelper.showAddSubredditDialog(fragmentManager, getSubreddit());
     }
 
     private String getSubreddit() {

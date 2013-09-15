@@ -97,20 +97,6 @@ public class MenuHelper {
         context.startActivity(intent);
     }
 
-    public static void startComposeActivity(Context context, int[] types,
-            String subredditDestination, String messageDestination, String title, String text,
-            Bundle extras, boolean isReply) {
-        Intent intent = new Intent(context, ComposeActivity.class);
-        intent.putExtra(ComposeActivity.EXTRA_TYPES, types);
-        intent.putExtra(ComposeActivity.EXTRA_SUBREDDIT_DESTINATION, subredditDestination);
-        intent.putExtra(ComposeActivity.EXTRA_MESSAGE_DESTINATION, messageDestination);
-        intent.putExtra(ComposeActivity.EXTRA_TITLE, title);
-        intent.putExtra(ComposeActivity.EXTRA_TEXT, text);
-        intent.putExtra(ComposeActivity.EXTRA_IS_REPLY, isReply);
-        intent.putExtra(ComposeActivity.EXTRA_EXTRAS, extras);
-        context.startActivity(intent);
-    }
-
     public static void startContentBrowserActivity(Context context) {
         context.startActivity(new Intent(context, ContentBrowserActivity.class));
     }
@@ -139,4 +125,137 @@ public class MenuHelper {
         intent.setData(Uri.parse(Urls.subreddit(subreddit, -1, null, Urls.TYPE_HTML).toString()));
         context.startActivity(intent);
     }
+
+    // Helper methods to start composer activities
+
+    public static void startCommentReplyComposer(Context context,
+            String accountName,
+            String messageDestination,
+            String title,
+            String parentThingId,
+            String thingId) {
+        Bundle extras = new Bundle(2);
+        extras.putString(ComposeActivity.EXTRA_COMMENT_PARENT_THING_ID, parentThingId);
+        extras.putString(ComposeActivity.EXTRA_COMMENT_THING_ID, thingId);
+        startComposeActivity(context,
+                accountName,
+                ComposeActivity.COMMENT_REPLY_TYPE_SET,
+                null,
+                messageDestination,
+                title,
+                null,
+                extras,
+                true);
+    }
+
+    public static void startMessageReplyComposer(Context context,
+            String accountName,
+            String messageDestination,
+            String title,
+            String parentThingId,
+            String thingId,
+            boolean isReply) {
+        Bundle extras = new Bundle(1);
+        extras.putString(ComposeActivity.EXTRA_MESSAGE_PARENT_THING_ID, parentThingId);
+        extras.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, thingId);
+        startComposeActivity(context,
+                accountName,
+                ComposeActivity.MESSAGE_REPLY_TYPE_SET,
+                null,
+                messageDestination,
+                title,
+                null,
+                extras,
+                isReply);
+    }
+
+    public static void startEditCommentComposer(Context context,
+            String accountName,
+            String title,
+            String text,
+            String parentThingId,
+            String thingId) {
+        Bundle extras = new Bundle(2);
+        extras.putString(ComposeActivity.EXTRA_EDIT_PARENT_THING_ID, parentThingId);
+        extras.putString(ComposeActivity.EXTRA_EDIT_THING_ID, thingId);
+        startComposeActivity(context,
+                accountName,
+                ComposeActivity.EDIT_COMMENT_TYPE_SET,
+                null,
+                null,
+                title,
+                text,
+                extras,
+                false);
+    }
+
+    public static void startEditPostComposer(Context context,
+            String accountName,
+            String title,
+            String text,
+            String parentThingId,
+            String thingId) {
+        Bundle extras = new Bundle(2);
+        extras.putString(ComposeActivity.EXTRA_EDIT_PARENT_THING_ID, parentThingId);
+        extras.putString(ComposeActivity.EXTRA_EDIT_THING_ID, thingId);
+        startComposeActivity(context,
+                accountName,
+                ComposeActivity.EDIT_POST_TYPE_SET,
+                null,
+                null,
+                title,
+                text,
+                extras,
+                false);
+    }
+
+    public static void startNewMessageComposer(Context context,
+            String accountName,
+            String messageDestination) {
+        startComposeActivity(context,
+                accountName,
+                ComposeActivity.MESSAGE_TYPE_SET,
+                null,
+                messageDestination,
+                null,
+                null,
+                null,
+                false);
+    }
+
+    public static void startNewPostComposer(Context context,
+            String accountName,
+            String subreddit) {
+        startComposeActivity(context,
+                accountName,
+                ComposeActivity.DEFAULT_TYPE_SET,
+                subreddit,
+                null,
+                null,
+                null,
+                null,
+                false);
+    }
+
+    private static void startComposeActivity(Context context,
+            String accountName,
+            int[] types,
+            String subredditDestination,
+            String messageDestination,
+            String title,
+            String text,
+            Bundle extras,
+            boolean isReply) {
+        Intent intent = new Intent(context, ComposeActivity.class);
+        intent.putExtra(ComposeActivity.EXTRA_ACCOUNT_NAME, accountName);
+        intent.putExtra(ComposeActivity.EXTRA_TYPES, types);
+        intent.putExtra(ComposeActivity.EXTRA_SUBREDDIT_DESTINATION, subredditDestination);
+        intent.putExtra(ComposeActivity.EXTRA_MESSAGE_DESTINATION, messageDestination);
+        intent.putExtra(ComposeActivity.EXTRA_TITLE, title);
+        intent.putExtra(ComposeActivity.EXTRA_TEXT, text);
+        intent.putExtra(ComposeActivity.EXTRA_IS_REPLY, isReply);
+        intent.putExtra(ComposeActivity.EXTRA_EXTRAS, extras);
+        context.startActivity(intent);
+    }
+
 }

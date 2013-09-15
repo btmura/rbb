@@ -307,38 +307,24 @@ public class ThingFragment extends Fragment implements
         String author = thingData.parent.getAuthor();
         String title = getFormattedTitle();
         String thingId = thingData.parent.getThingId();
-
-        Bundle args = new Bundle(2);
-        args.putString(ComposeActivity.EXTRA_COMMENT_PARENT_THING_ID, thingId);
-        args.putString(ComposeActivity.EXTRA_COMMENT_THING_ID, thingId);
-
-        MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.COMMENT_REPLY_TYPE_SET,
-                null,
+        MenuHelper.startCommentReplyComposer(getActivity(),
+                getAccountName(),
                 author,
                 title,
-                null,
-                args,
-                true);
+                thingId,
+                thingId);
     }
 
     private void handleNewMessageComment() {
         String author = thingData.parent.getAuthor();
         String title = getFormattedTitle();
         String thingId = thingData.parent.getThingId();
-
-        Bundle args = new Bundle(3);
-        args.putString(ComposeActivity.EXTRA_MESSAGE_PARENT_THING_ID, thingId);
-        args.putString(ComposeActivity.EXTRA_MESSAGE_DESTINATION, author);
-        args.putString(ComposeActivity.EXTRA_MESSAGE_THING_ID, thingId);
-
-        MenuHelper.startComposeActivity(getActivity(),
-                ComposeActivity.MESSAGE_REPLY_TYPE_SET,
-                null,
+        MenuHelper.startMessageReplyComposer(getActivity(),
+                getAccountName(),
                 author,
                 title,
-                null,
-                args,
+                thingId,
+                thingId,
                 true);
     }
 

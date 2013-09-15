@@ -85,6 +85,9 @@ public class ComposeActivity extends FragmentActivity implements
             TYPE_EDIT_COMMENT,
     };
 
+    /** String extra of the account name selected when starting the composer. */
+    public static final String EXTRA_ACCOUNT_NAME = "accountName";
+
     /** Array of ints specifying what types to show we can compose. */
     public static final String EXTRA_TYPES = "types";
 
@@ -119,7 +122,6 @@ public class ComposeActivity extends FragmentActivity implements
     // The following extras should be passed for EDIT.
 
     public static final String EXTRA_EDIT_PARENT_THING_ID = "parentThingId";
-    public static final String EXTRA_EDIT_SESSION_ID = "sessionId";
     public static final String EXTRA_EDIT_THING_ID = "thingId";
 
     private int[] types;

@@ -27,11 +27,16 @@ import com.btmura.android.reddit.R;
 class MessageThingMenuController implements MenuController {
 
     private final Context context;
+    private final String accountName;
     private final ThingHolder thingHolder;
     private final Refreshable refreshable;
 
-    MessageThingMenuController(Context context, ThingHolder thingHolder, Refreshable refreshable) {
+    MessageThingMenuController(Context context,
+            String accountName,
+            ThingHolder thingHolder,
+            Refreshable refreshable) {
         this.context = context;
+        this.accountName = accountName;
         this.thingHolder = thingHolder;
         this.refreshable = refreshable;
     }
@@ -77,14 +82,7 @@ class MessageThingMenuController implements MenuController {
     }
 
     private void handleNewMessage() {
-        MenuHelper.startComposeActivity(context,
-                ComposeActivity.MESSAGE_TYPE_SET,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false);
+        MenuHelper.startNewMessageComposer(context, accountName, null);
     }
 
     private void handleRefresh() {
