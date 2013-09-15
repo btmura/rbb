@@ -86,8 +86,13 @@ public class SwipeDismissTouchListener implements OnTouchListener {
 
             case MotionEvent.ACTION_UP:
                 return handleActionUp(e);
+
+            case MotionEvent.ACTION_CANCEL:
+                return handleActionCancel(e);
+
+            default:
+                return false;
         }
-        return false;
     }
 
     private boolean handleActionDown(MotionEvent event) {
@@ -221,25 +226,42 @@ public class SwipeDismissTouchListener implements OnTouchListener {
             } else {
                 // Shift the view back to its original state. We must set the listener back to null
                 // or else a previous listener on a swiped view might get fired again!
-                final View view = downView;
-                downView.animate()
-                        .setDuration(animationTime)
-                        .translationX(0)
-                        .alpha(1)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-                                view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                            }
-                        });
+                resetView();
             }
         }
 
+        cancelSwipe();
+        return false;
+    }
+
+    private boolean handleActionCancel(MotionEvent event) {
+        if (!disabled && swiping) {
+            resetView();
+        }
+        cancelSwipe();
+        return false;
+    }
+
+    private void resetView() {
+        final View view = downView;
+        downView.animate()
+                .setDuration(animationTime)
+                .translationX(0)
+                .alpha(1)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                    }
+                });
+    }
+
+    private void cancelSwipe() {
         if (velocityTracker != null) {
             velocityTracker.recycle();
             velocityTracker = null;
@@ -249,7 +271,6 @@ public class SwipeDismissTouchListener implements OnTouchListener {
         downY = 0;
         downPosition = ListView.INVALID_POSITION;
         swiping = false;
-        return false;
     }
 
     /** Create a {@link OnScrollListener} that disables the swipe listener when scrolling. */
