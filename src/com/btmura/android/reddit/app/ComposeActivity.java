@@ -178,6 +178,7 @@ public class ComposeActivity extends FragmentActivity implements
     public void onTabSelected(Tab tab, android.app.FragmentTransaction trans) {
         if (tabController.selectTab(tab)) {
             ComposeFormFragment frag = ComposeFormFragment.newInstance(types[tab.getPosition()],
+                    getIntent().getStringExtra(EXTRA_ACCOUNT_NAME),
                     getIntent().getStringExtra(EXTRA_SUBREDDIT_DESTINATION),
                     getIntent().getStringExtra(EXTRA_MESSAGE_DESTINATION),
                     getIntent().getStringExtra(EXTRA_TITLE),
@@ -206,6 +207,11 @@ public class ComposeActivity extends FragmentActivity implements
 
     @Override
     public void onComposeFinished() {
+        finish();
+    }
+
+    @Override
+    public void onComposeCancelled() {
         finish();
     }
 

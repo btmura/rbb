@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.util.Objects;
 
 /**
  * {@link BaseAdapter} for showing a list of account names.
@@ -61,7 +62,7 @@ public class AccountNameAdapter extends BaseAdapter {
     public int findAccountName(String accountName) {
         int count = getCount();
         for (int i = 0; i < count; i++) {
-            if (accountName.equals(getItem(i))) {
+            if (Objects.equals(accountName, getItem(i))) {
                 return i;
             }
         }

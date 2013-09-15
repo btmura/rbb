@@ -84,6 +84,8 @@ public class ComposeFormFragment extends Fragment implements
 
     public static final String TAG = "ComposeFragment";
 
+    private static final String ARG_ACCOUNT_NAME = "accountName";
+
     private static final String ARG_TYPE = "type";
 
     private static final String ARG_SUBREDDIT_DESTINATION = "subredditDestination";
@@ -116,6 +118,8 @@ public class ComposeFormFragment extends Fragment implements
     public interface OnComposeFormListener {
 
         void onComposeFinished();
+
+        void onComposeCancelled();
     }
 
     private OnComposeFormListener listener;
@@ -140,14 +144,16 @@ public class ComposeFormFragment extends Fragment implements
     private Matcher linkMatcher;
 
     public static ComposeFormFragment newInstance(int type,
+            String accountName,
             String subredditDestination,
             String messageDestination,
             String title,
             String text,
             boolean isReply,
             Bundle extras) {
-        Bundle args = new Bundle(7);
+        Bundle args = new Bundle(8);
         args.putInt(ARG_TYPE, type);
+        args.putString(ARG_ACCOUNT_NAME, accountName);
         args.putString(ARG_SUBREDDIT_DESTINATION, subredditDestination);
         args.putString(ARG_MESSAGE_DESTINATION, messageDestination);
         args.putString(ARG_TITLE, title);
@@ -368,13 +374,34 @@ public class ComposeFormFragment extends Fragment implements
         accountView.setVisibility(hasAccounts ? View.VISIBLE : View.GONE);
 
         accountAdapter.clear();
+        accountAdapter.addAll(result.accountNames);
+
+        if (!hasAccounts && isSpecificAccountRequired()) {
+            onComposeCancelled();
+        }
+
         if (hasAccounts) {
-            accountAdapter.addAll(result.accountNames);
             if (!isAccountNameInitialized) {
-                int index = accountAdapter.findAccountName(result.getLastAccount(getActivity()));
-                accountSpinner.setSelection(index);
+                int index = accountAdapter.findAccountName(getAccountName());
+                if (index == -1 && isSpecificAccountRequired()) {
+                    onComposeCancelled();
+                } else {
+                    accountSpinner.setSelection(index);
+                }
                 isAccountNameInitialized = true;
             }
+        }
+    }
+
+    private boolean isSpecificAccountRequired() {
+        switch (getType()) {
+            case ComposeActivity.TYPE_MESSAGE_REPLY:
+            case ComposeActivity.TYPE_EDIT_COMMENT:
+            case ComposeActivity.TYPE_EDIT_POST:
+                return true;
+
+            default:
+                return false;
         }
     }
 
@@ -573,6 +600,12 @@ public class ComposeFormFragment extends Fragment implements
         resetTask();
     }
 
+    private void onComposeCancelled() {
+        if (listener != null) {
+            listener.onComposeCancelled();
+        }
+    }
+
     private void resetTask() {
         if (task != null) {
             task.cancel(true);
@@ -736,6 +769,10 @@ public class ComposeFormFragment extends Fragment implements
             default:
                 throw new IllegalArgumentException();
         }
+    }
+
+    private String getAccountName() {
+        return getArguments().getString(ARG_ACCOUNT_NAME);
     }
 
     private int getType() {
