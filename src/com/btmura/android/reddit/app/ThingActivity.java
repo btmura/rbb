@@ -32,6 +32,7 @@ import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.util.Strings;
 
 public class ThingActivity extends GlobalMenuActivity implements
@@ -40,13 +41,15 @@ public class ThingActivity extends GlobalMenuActivity implements
         AccountNameHolder,
         SubredditHolder {
 
+    public static final String EXTRA_ACCOUNT_NAME = "accountName";
+
     public static final String EXTRA_THING_BUNDLE = "thingBundle";
 
     private static final String THING_FRAGMENT_TAG = "thing";
 
-    private final Formatter formatter = new Formatter();
-    private ThingBundle thingBundle;
     private String accountName;
+    private ThingBundle thingBundle;
+    private final Formatter formatter = new Formatter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,7 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     private void setupPrereqs(Bundle savedInstanceState) {
+        accountName = getIntent().getStringExtra(EXTRA_ACCOUNT_NAME);
         thingBundle = getIntent().getParcelableExtra(EXTRA_THING_BUNDLE);
     }
 
@@ -90,7 +94,10 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        accountName = result.getLastAccount(this);
+        // Finish if the account has changed.
+        if (!Objects.equals(accountName, result.getLastAccount(this))) {
+            finish();
+        }
 
         // Commit the fragment here to avoid some menu item jank.
         if (getThingFragment() == null) {

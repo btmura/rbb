@@ -341,6 +341,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected void selectThingSinglePane(View view, ThingBundle thingBundle) {
         Intent intent = new Intent(this, thingActivityClass);
+        intent.putExtra(ThingActivity.EXTRA_ACCOUNT_NAME, accountName);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         launchActivity(view, intent);
     }
