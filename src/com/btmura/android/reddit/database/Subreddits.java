@@ -68,15 +68,12 @@ public class Subreddits implements BaseColumns {
         return NAME_RANDOM.equalsIgnoreCase(subreddit);
     }
 
-    // TODO: Remove duplicate logic with hasSidebar.
-    public static boolean isSyncable(String subreddit) {
-        return !isFrontPage(subreddit)
-                && !NAME_ALL.equalsIgnoreCase(subreddit)
-                && !NAME_RANDOM.equalsIgnoreCase(subreddit);
-    }
-
     public static boolean hasSidebar(String subreddit) {
         return !isFrontPage(subreddit) && !isAll(subreddit) && !isRandom(subreddit);
+    }
+
+    public static boolean isSyncable(String subreddit) {
+        return hasSidebar(subreddit);
     }
 
     public static String getTitle(Context c, String subreddit) {
