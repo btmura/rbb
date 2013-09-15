@@ -624,7 +624,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     }
 
     private int getNestingIndent() {
-        return PADDING + VotingArrows.getWidth(drawVotingArrows);
+        return PADDING + VotingArrows.getWidth(drawVotingArrows) / 2;
     }
 
     private boolean hasTopStatus() {
