@@ -196,9 +196,11 @@ public class ThingProvider extends BaseProvider {
     private static final String METHOD_EDIT_COMMENT = "editComment";
     private static final String METHOD_DELETE_COMMENT = "deleteComment";
     private static final String METHOD_INSERT_MESSAGE = "insertMessage";
+    private static final String METHOD_VOTE = "vote";
 
     // List of extras used throughout the provider code.
 
+    private static final String EXTRA_ACTION = "action";
     private static final String EXTRA_BODY = "body";
     private static final String EXTRA_COUNT = "count";
     private static final String EXTRA_FILTER = "filter";
@@ -513,11 +515,25 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
+    public static final Bundle vote(Context context,
+            String accountName,
+            int action,
+            String thingId) {
+        Bundle extras = new Bundle(2);
+        extras.putInt(EXTRA_ACTION, action);
+        extras.putString(EXTRA_THING_ID, thingId);
+        return Provider.call(context,
+                VOTE_ACTIONS_URI,
+                METHOD_VOTE,
+                accountName,
+                extras);
+    }
+
     @Override
-    public Bundle call(String method, String arg, Bundle extras) {
+    public Bundle call(String method, String accountName, Bundle extras) {
         try {
             if (METHOD_GET_SESSION.equals(method)) {
-                return getSession(arg, extras);
+                return getSession(accountName, extras);
             } else if (METHOD_CLEAN_SESSIONS.equals(method)) {
                 return cleanSessions(extras);
             } else if (METHOD_EXPAND_COMMENT.equals(method)) {
@@ -525,13 +541,15 @@ public class ThingProvider extends BaseProvider {
             } else if (METHOD_COLLAPSE_COMMENT.equals(method)) {
                 return collapseComment(extras);
             } else if (METHOD_INSERT_COMMENT.equals(method)) {
-                return insertComment(arg, extras);
+                return insertComment(accountName, extras);
             } else if (METHOD_EDIT_COMMENT.equals(method)) {
-                return editComment(arg, extras);
+                return editComment(accountName, extras);
             } else if (METHOD_DELETE_COMMENT.equals(method)) {
-                return deleteComment(arg, extras);
+                return deleteComment(accountName, extras);
             } else if (METHOD_INSERT_MESSAGE.equals(method)) {
-                return insertMessage(arg, extras);
+                return insertMessage(accountName, extras);
+            } else if (METHOD_VOTE.equals(method)) {
+                return vote(accountName, extras);
             } else {
                 throw new IllegalArgumentException();
             }
@@ -1109,6 +1127,39 @@ public class ThingProvider extends BaseProvider {
         cr.notifyChange(MESSAGE_ACTIONS_URI, null, SYNC);
         cr.notifyChange(MESSAGES_URI, null, NO_SYNC);
         return Bundle.EMPTY;
+    }
+
+    private Bundle vote(String accountName, Bundle extras) {
+        int action = getActionExtra(extras);
+        String thingId = getThingIdExtra(extras);
+
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues(3);
+            values.put(VoteActions.COLUMN_ACCOUNT, accountName);
+            values.put(VoteActions.COLUMN_ACTION, action);
+            values.put(VoteActions.COLUMN_THING_ID, thingId);
+
+            long actionId = db.replace(VoteActions.TABLE_NAME, null, values);
+            if (actionId == -1) {
+                return null;
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(VOTE_ACTIONS_URI, null, SYNC);
+        cr.notifyChange(THINGS_URI, null, NO_SYNC);
+        cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
+        return Bundle.EMPTY;
+    }
+
+    private int getActionExtra(Bundle extras) {
+        return extras.getInt(EXTRA_ACTION);
     }
 
     private static String getBodyExtra(Bundle extras) {

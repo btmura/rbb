@@ -351,15 +351,11 @@ public class Provider {
             final String accountName,
             final int action,
             final String thingId) {
-        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
-                ContentValues v = new ContentValues(3);
-                v.put(VoteActions.COLUMN_ACCOUNT, accountName);
-                v.put(VoteActions.COLUMN_ACTION, action);
-                v.put(VoteActions.COLUMN_THING_ID, thingId);
-                cr.insert(VOTE_URI, v);
+                ThingProvider.vote(appContext, accountName, action, thingId);
             }
         });
     }
