@@ -55,6 +55,7 @@ public class CommentAdapter extends BaseCursorAdapter {
         final boolean expanded = cursor.getInt(CommentLoader.INDEX_EXPANDED) == 1;
         final boolean isNew = false; // Only messages might be new.
         final int kind = cursor.getInt(CommentLoader.INDEX_KIND);
+        final int likes = cursor.getInt(CommentLoader.INDEX_LIKES);
         final String linkTitle = null; // Only post replies have link titles.
         final int nesting = cursor.getInt(CommentLoader.INDEX_NESTING);
         final int numComments = cursor.getInt(CommentLoader.INDEX_NUM_COMMENTS);
@@ -67,18 +68,7 @@ public class CommentAdapter extends BaseCursorAdapter {
         final int ups = cursor.getInt(CommentLoader.INDEX_UPS);
 
         // CommentActions don't have a score so calculate our own.
-        int score = ups - downs;
-
-        // TODO: Remove code duplication with ThingAdapter.
-        // Local votes take precedence over those from reddit.
-        int likes = cursor.getInt(CommentLoader.INDEX_LIKES);
-        if (!cursor.isNull(CommentLoader.INDEX_VOTE_ACTION)) {
-            // Local votes take precedence over those from reddit.
-            likes = cursor.getInt(CommentLoader.INDEX_VOTE_ACTION);
-
-            // Modify the score since the vote is still pending.
-            score += likes;
-        }
+        final int score = ups - downs;
 
         final boolean drawVotingArrows = AccountUtils.isAccount(accountName);
         final boolean showThumbnail = false;

@@ -56,8 +56,8 @@ public class CommentLoader extends AbstractSessionLoader {
             Comments.COLUMN_URL,
 
             // Following columns are from joined tables at the end.
+            SharedColumns.COLUMN_HIDE_ACTION,
             SharedColumns.COLUMN_SAVE_ACTION,
-            SharedColumns.COLUMN_VOTE_ACTION,
     };
 
     public static final int INDEX_ID = 0;
@@ -86,8 +86,8 @@ public class CommentLoader extends AbstractSessionLoader {
     public static final int INDEX_URL = 23;
 
     // Following columns are from joined tables at the end.
-    public static final int INDEX_SAVE_ACTION = 24;
-    public static final int INDEX_VOTE_ACTION = 25;
+    public static final int INDEX_HIDE_ACTION = 24;
+    public static final int INDEX_SAVE_ACTION = 25;
 
     private final String accountName;
     private final String thingId;

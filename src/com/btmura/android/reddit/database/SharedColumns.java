@@ -35,8 +35,6 @@ public class SharedColumns {
     /** Full string name of some thing with the kind tag attached. */
     public static final String COLUMN_THING_ID = "thingId";
 
-    public static final String COLUMN_VOTE_ACTION = "voteAction";
-
     public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "=?";
 
     public static final String SELECT_BY_ID = BaseColumns._ID + "=?";

@@ -164,15 +164,6 @@ public class ThingProvider extends BaseProvider {
             + SaveActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_SAVE_ACTION
             + " FROM " + SaveActions.TABLE_NAME + ") USING ("
             + SaveActions.COLUMN_ACCOUNT + ", "
-            + SharedColumns.COLUMN_THING_ID + ")"
-
-            // Join with pending votes to fake that the vote happened.
-            + " LEFT OUTER JOIN (SELECT "
-            + VoteActions.COLUMN_ACCOUNT + ","
-            + VoteActions.COLUMN_THING_ID + ","
-            + VoteActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_VOTE_ACTION
-            + " FROM " + VoteActions.TABLE_NAME + ") USING ("
-            + VoteActions.COLUMN_ACCOUNT + ","
             + SharedColumns.COLUMN_THING_ID + ")";
 
     private static final String JOINED_THINGS_TABLE = Things.TABLE_NAME + JOINED_TABLE;
@@ -1155,34 +1146,44 @@ public class ThingProvider extends BaseProvider {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
-            ContentValues values = new ContentValues(thingBundle == null ? 4 : 19);
-            values.put(VoteActions.COLUMN_ACCOUNT, accountName);
-            values.put(VoteActions.COLUMN_ACTION, action);
-            values.put(VoteActions.COLUMN_THING_ID, thingId);
-            values.put(VoteActions.COLUMN_SHOW_IN_LISTING, thingBundle != null);
+            ContentValues v = new ContentValues(thingBundle == null ? 4 : 19);
+            v.put(VoteActions.COLUMN_ACCOUNT, accountName);
+            v.put(VoteActions.COLUMN_ACTION, action);
+            v.put(VoteActions.COLUMN_THING_ID, thingId);
+            v.put(VoteActions.COLUMN_SHOW_IN_LISTING, thingBundle != null);
 
             if (thingBundle != null) {
-                values.put(VoteActions.COLUMN_AUTHOR, thingBundle.getAuthor());
-                values.put(VoteActions.COLUMN_CREATED_UTC, thingBundle.getCreatedUtc());
-                values.put(VoteActions.COLUMN_DOMAIN, thingBundle.getDomain());
-                values.put(VoteActions.COLUMN_DOWNS, thingBundle.getDowns());
-                values.put(VoteActions.COLUMN_LIKES, thingBundle.getLikes());
-                values.put(VoteActions.COLUMN_NUM_COMMENTS, thingBundle.getNumComments());
-                values.put(VoteActions.COLUMN_OVER_18, thingBundle.isOver18());
-                values.put(VoteActions.COLUMN_PERMA_LINK, thingBundle.getPermaLink());
-                values.put(VoteActions.COLUMN_SCORE, thingBundle.getScore());
-                values.put(VoteActions.COLUMN_SELF, thingBundle.isSelf());
-                values.put(VoteActions.COLUMN_SUBREDDIT, thingBundle.getSubreddit());
-                values.put(VoteActions.COLUMN_TITLE, thingBundle.getTitle());
-                values.put(VoteActions.COLUMN_THUMBNAIL_URL, thingBundle.getThumbnailUrl());
-                values.put(VoteActions.COLUMN_UPS, thingBundle.getUps());
-                values.put(VoteActions.COLUMN_URL, thingBundle.getUrl());
+                v.put(VoteActions.COLUMN_AUTHOR, thingBundle.getAuthor());
+                v.put(VoteActions.COLUMN_CREATED_UTC, thingBundle.getCreatedUtc());
+                v.put(VoteActions.COLUMN_DOMAIN, thingBundle.getDomain());
+                v.put(VoteActions.COLUMN_DOWNS, thingBundle.getDowns());
+                v.put(VoteActions.COLUMN_LIKES, thingBundle.getLikes());
+                v.put(VoteActions.COLUMN_NUM_COMMENTS, thingBundle.getNumComments());
+                v.put(VoteActions.COLUMN_OVER_18, thingBundle.isOver18());
+                v.put(VoteActions.COLUMN_PERMA_LINK, thingBundle.getPermaLink());
+                v.put(VoteActions.COLUMN_SCORE, thingBundle.getScore());
+                v.put(VoteActions.COLUMN_SELF, thingBundle.isSelf());
+                v.put(VoteActions.COLUMN_SUBREDDIT, thingBundle.getSubreddit());
+                v.put(VoteActions.COLUMN_TITLE, thingBundle.getTitle());
+                v.put(VoteActions.COLUMN_THUMBNAIL_URL, thingBundle.getThumbnailUrl());
+                v.put(VoteActions.COLUMN_UPS, thingBundle.getUps());
+                v.put(VoteActions.COLUMN_URL, thingBundle.getUrl());
             }
 
-            long actionId = db.replace(VoteActions.TABLE_NAME, null, values);
+            long actionId = db.replace(VoteActions.TABLE_NAME, null, v);
             if (actionId == -1) {
                 return null;
             }
+
+            String[] selectionArgs = Array.of(accountName, thingId);
+
+            v.clear();
+            v.put(Things.COLUMN_LIKES, action);
+            db.update(Things.TABLE_NAME, v, Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs);
+
+            v.clear();
+            v.put(Comments.COLUMN_LIKES, action);
+            db.update(Comments.TABLE_NAME, v, Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs);
 
             db.setTransactionSuccessful();
         } finally {

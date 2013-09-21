@@ -96,6 +96,7 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
         final boolean expanded = true; // Expanded only for comments handled by different adapter.
         final boolean isNew = false; // Only messages can be new.
         final int kind = cursor.getInt(INDEX_KIND);
+        final int likes = cursor.getInt(INDEX_LIKES);
         final String linkId = cursor.getString(INDEX_LINK_ID);
         final String linkTitle = cursor.getString(INDEX_LINK_TITLE);
         final int nesting = 0; // Nesting only for comments handled by different adapter.
@@ -108,20 +109,9 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
         final int ups = cursor.getInt(INDEX_UPS);
 
         // Comments don't have a score so calculate our own.
-        int score = cursor.getInt(INDEX_SCORE);
-        if (kind == Kinds.KIND_COMMENT) {
-            score = ups - downs;
-        }
-
-        // Reconcile local and remote votes.
-        int likes = cursor.getInt(INDEX_LIKES);
-        if (!cursor.isNull(INDEX_VOTE_ACTION)) {
-            // Local votes take precedence over those from reddit.
-            likes = cursor.getInt(INDEX_VOTE_ACTION);
-
-            // Modify the score since the vote is still pending.
-            score += likes;
-        }
+        final int score = kind == Kinds.KIND_COMMENT
+                ? ups - downs
+                : cursor.getInt(INDEX_SCORE);
 
         final boolean drawVotingArrows = AccountUtils.isAccount(accountName)
                 && kind != Kinds.KIND_MESSAGE;
