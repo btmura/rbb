@@ -25,11 +25,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
-import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
 
 /**
@@ -52,13 +52,6 @@ public class Provider {
 
     private static final Uri SAVE_URI =
             ThingProvider.SAVE_ACTIONS_URI.buildUpon()
-                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, ThingProvider.TRUE)
-                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_COMMENTS, ThingProvider.TRUE)
-                    .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
-                    .build();
-
-    private static final Uri VOTE_URI =
-            ThingProvider.VOTE_ACTIONS_URI.buildUpon()
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, ThingProvider.TRUE)
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_COMMENTS, ThingProvider.TRUE)
                     .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
@@ -343,10 +336,20 @@ public class Provider {
         });
     }
 
-    /**
-     * Vote on something but don't make it visible in the liked/disliked listing while the vote is
-     * still pending.
-     */
+    public static void voteAsync(Context context,
+            final String accountName,
+            final int action,
+            final String thingId,
+            final ThingBundle thingBundle) {
+        final Context appContext = context.getApplicationContext();
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                ThingProvider.vote(appContext, accountName, action, thingId, thingBundle);
+            }
+        });
+    }
+
     public static void voteAsync(Context context,
             final String accountName,
             final int action,
@@ -356,64 +359,6 @@ public class Provider {
             @Override
             public void run() {
                 ThingProvider.vote(appContext, accountName, action, thingId);
-            }
-        });
-    }
-
-    /**
-     * Vote on something and store additional information to make it visible in the liked/disliked
-     * listing while the vote is still pending.
-     */
-    public static void voteAsync(Context context,
-            final String accountName,
-            final int action,
-
-            // Following parameters are for faking a thing.
-            final String author,
-            final long createdUtc,
-            final String domain,
-            final int downs,
-            final int likes,
-            final int numComments,
-            final boolean over18,
-            final String permaLink,
-            final int score,
-            final boolean self,
-            final String subreddit,
-            final String thingId,
-            final String thumbnailUrl,
-            final String title,
-            final int ups,
-            final String url) {
-        final ContentResolver cr = context.getApplicationContext().getContentResolver();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                ContentValues v = new ContentValues(19);
-                v.put(VoteActions.COLUMN_ACCOUNT, accountName);
-                v.put(VoteActions.COLUMN_ACTION, action);
-                v.put(VoteActions.COLUMN_SHOW_IN_LISTING, true);
-                v.put(VoteActions.COLUMN_THING_ID, thingId);
-
-                // Following values are for faking a thing.
-                v.put(VoteActions.COLUMN_AUTHOR, author);
-                v.put(VoteActions.COLUMN_CREATED_UTC, createdUtc);
-                v.put(VoteActions.COLUMN_DOMAIN, domain);
-                v.put(VoteActions.COLUMN_DOWNS, downs);
-                v.put(VoteActions.COLUMN_LIKES, likes);
-                v.put(VoteActions.COLUMN_NUM_COMMENTS, numComments);
-                v.put(VoteActions.COLUMN_OVER_18, over18);
-                v.put(VoteActions.COLUMN_PERMA_LINK, permaLink);
-                v.put(VoteActions.COLUMN_SCORE, score);
-                v.put(VoteActions.COLUMN_SELF, self);
-                v.put(VoteActions.COLUMN_SUBREDDIT, subreddit);
-                v.put(VoteActions.COLUMN_TITLE, title);
-                v.put(VoteActions.COLUMN_THUMBNAIL_URL, thumbnailUrl);
-                v.put(VoteActions.COLUMN_UPS, ups);
-                v.put(VoteActions.COLUMN_URL, url);
-
-                // No toast needed, since the vote arrows will reflect success.
-                cr.insert(VOTE_URI, v);
             }
         });
     }

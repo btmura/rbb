@@ -351,17 +351,16 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
 
     @Override
     public void vote(int position, int action) {
-        Provider.voteAsync(context,
-                accountName,
-                action,
-                getAuthor(position),
+        ThingBundle thingBundle = ThingBundle.newLinkInstance(getAuthor(position),
                 getCreatedUtc(position),
                 getDomain(position),
                 getDowns(position),
                 getLikes(position),
+                getKind(position),
                 getNumComments(position),
                 isOver18(position),
                 getPermaLink(position),
+                getSaved(position),
                 getScore(position),
                 isSelf(position),
                 getSubreddit(position),
@@ -370,6 +369,8 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
                 getTitle(position),
                 getUps(position),
                 getUrl(position));
+
+        Provider.voteAsync(context, accountName, action, getThingId(position), thingBundle);
     }
 
     // Utility methods
@@ -430,6 +431,10 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
 
     private String getPermaLink(int position) {
         return adapter.getString(position, INDEX_PERMA_LINK);
+    }
+
+    private boolean getSaved(int position) {
+        return adapter.getBoolean(position, INDEX_SAVED);
     }
 
     private int getScore(int position) {

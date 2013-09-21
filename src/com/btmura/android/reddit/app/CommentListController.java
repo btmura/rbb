@@ -222,15 +222,16 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
             // Store additional information when the user votes on the header
             // comment which represents the overall thing so that it appears in
             // the liked and disliked listing when the vote is still pending.
-            Provider.voteAsync(context, accountName, action,
-                    getAuthor(position),
+            ThingBundle thingBundle = ThingBundle.newLinkInstance(getAuthor(position),
                     getCreatedUtc(position),
                     getDomain(position),
                     getDowns(position),
                     getLikes(position),
+                    getKind(position),
                     getNumComments(position),
                     isOver18(position),
                     getPermaLink(position),
+                    getSaved(position),
                     getScore(position),
                     isSelf(position),
                     getSubreddit(position),
@@ -239,6 +240,8 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
                     getTitle(position),
                     getUps(position),
                     getUrl(position));
+            Provider.voteAsync(context, accountName, action, getThingId(position), thingBundle);
+
         } else {
             // Voting on just the comments won't appear in the liked/disliked
             // listing, so there is no need to send additional info about what
@@ -363,6 +366,10 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         return adapter.getInt(position, CommentLoader.INDEX_DOWNS);
     }
 
+    private int getKind(int position) {
+        return adapter.getInt(position, CommentLoader.INDEX_KIND);
+    }
+
     private int getLikes(int position) {
         return adapter.getInt(position, CommentLoader.INDEX_LIKES);
     }
@@ -381,6 +388,10 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
 
     private String getPermaLink(int position) {
         return adapter.getString(position, CommentLoader.INDEX_PERMA_LINK);
+    }
+
+    private boolean getSaved(int position) {
+        return adapter.getBoolean(position, CommentLoader.INDEX_SAVED);
     }
 
     private int getScore(int position) {

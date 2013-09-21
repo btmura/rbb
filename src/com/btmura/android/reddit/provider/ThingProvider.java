@@ -36,6 +36,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.CommentLogic;
 import com.btmura.android.reddit.app.CommentLogic.CursorCommentList;
+import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.HideActions;
@@ -215,6 +216,7 @@ public class ThingProvider extends BaseProvider {
     private static final String EXTRA_SESSION_ID = "sessionId";
     private static final String EXTRA_SESSION_TYPE = "sessionType";
     private static final String EXTRA_SUBREDDIT = "subreddit";
+    private static final String EXTRA_THING_BUNDLE = "thingBundle";
     private static final String EXTRA_THING_ID = "thingId";
     private static final String EXTRA_THING_ID_ARRAY = "thingIdArray";
     private static final String EXTRA_USER = "user";
@@ -522,6 +524,22 @@ public class ThingProvider extends BaseProvider {
         Bundle extras = new Bundle(2);
         extras.putInt(EXTRA_ACTION, action);
         extras.putString(EXTRA_THING_ID, thingId);
+        return Provider.call(context,
+                VOTE_ACTIONS_URI,
+                METHOD_VOTE,
+                accountName,
+                extras);
+    }
+
+    public static final Bundle vote(Context context,
+            String accountName,
+            int action,
+            String thingId,
+            ThingBundle thingBundle) {
+        Bundle extras = new Bundle(3);
+        extras.putInt(EXTRA_ACTION, action);
+        extras.putString(EXTRA_THING_ID, thingId);
+        extras.putParcelable(EXTRA_THING_BUNDLE, thingBundle);
         return Provider.call(context,
                 VOTE_ACTIONS_URI,
                 METHOD_VOTE,
@@ -1132,14 +1150,34 @@ public class ThingProvider extends BaseProvider {
     private Bundle vote(String accountName, Bundle extras) {
         int action = getActionExtra(extras);
         String thingId = getThingIdExtra(extras);
+        ThingBundle thingBundle = getThingBundleExtra(extras);
 
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
-            ContentValues values = new ContentValues(3);
+            ContentValues values = new ContentValues(thingBundle == null ? 4 : 19);
             values.put(VoteActions.COLUMN_ACCOUNT, accountName);
             values.put(VoteActions.COLUMN_ACTION, action);
             values.put(VoteActions.COLUMN_THING_ID, thingId);
+            values.put(VoteActions.COLUMN_SHOW_IN_LISTING, thingBundle != null);
+
+            if (thingBundle != null) {
+                values.put(VoteActions.COLUMN_AUTHOR, thingBundle.getAuthor());
+                values.put(VoteActions.COLUMN_CREATED_UTC, thingBundle.getCreatedUtc());
+                values.put(VoteActions.COLUMN_DOMAIN, thingBundle.getDomain());
+                values.put(VoteActions.COLUMN_DOWNS, thingBundle.getDowns());
+                values.put(VoteActions.COLUMN_LIKES, thingBundle.getLikes());
+                values.put(VoteActions.COLUMN_NUM_COMMENTS, thingBundle.getNumComments());
+                values.put(VoteActions.COLUMN_OVER_18, thingBundle.isOver18());
+                values.put(VoteActions.COLUMN_PERMA_LINK, thingBundle.getPermaLink());
+                values.put(VoteActions.COLUMN_SCORE, thingBundle.getScore());
+                values.put(VoteActions.COLUMN_SELF, thingBundle.isSelf());
+                values.put(VoteActions.COLUMN_SUBREDDIT, thingBundle.getSubreddit());
+                values.put(VoteActions.COLUMN_TITLE, thingBundle.getTitle());
+                values.put(VoteActions.COLUMN_THUMBNAIL_URL, thingBundle.getThumbnailUrl());
+                values.put(VoteActions.COLUMN_UPS, thingBundle.getUps());
+                values.put(VoteActions.COLUMN_URL, thingBundle.getUrl());
+            }
 
             long actionId = db.replace(VoteActions.TABLE_NAME, null, values);
             if (actionId == -1) {
@@ -1176,6 +1214,10 @@ public class ThingProvider extends BaseProvider {
 
     private static String getParentThingIdExtra(Bundle extras) {
         return extras.getString(EXTRA_PARENT_THING_ID);
+    }
+
+    private static ThingBundle getThingBundleExtra(Bundle extras) {
+        return extras.getParcelable(EXTRA_THING_BUNDLE);
     }
 
     private static String getThingIdExtra(Bundle extras) {
