@@ -21,16 +21,7 @@ import android.os.Bundle;
 
 public class CursorExtras {
 
-    private static final String EXTRA_RESOLVED_SUBREDDIT = "resolvedSubreddit";
     private static final String EXTRA_SESSION_ID = "sessionId";
-
-    public static String getResolvedSubreddit(Cursor cursor) {
-        return cursor != null ? getResolvedSubreddit(cursor.getExtras()) : null;
-    }
-
-    public static String getResolvedSubreddit(Bundle extras) {
-        return extras != null ? extras.getString(EXTRA_RESOLVED_SUBREDDIT) : null;
-    }
 
     public static long getSessionId(Cursor cursor) {
         return cursor != null ? getSessionId(cursor.getExtras()) : 0;

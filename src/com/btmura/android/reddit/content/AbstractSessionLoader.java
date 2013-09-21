@@ -35,8 +35,13 @@ abstract class AbstractSessionLoader extends CursorLoader {
     private Bundle cursorExtras;
     private String more;
 
-    AbstractSessionLoader(Context context, Uri uri, String[] projection, String selection,
-            String sortOrder, Bundle cursorExtras, String more) {
+    AbstractSessionLoader(Context context,
+            Uri uri,
+            String[] projection,
+            String selection,
+            String sortOrder,
+            Bundle cursorExtras,
+            String more) {
         super(context, uri, projection, selection, null, sortOrder);
         this.cursorExtras = cursorExtras;
         this.more = more;
