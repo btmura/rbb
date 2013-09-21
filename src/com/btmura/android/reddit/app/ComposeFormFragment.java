@@ -382,7 +382,7 @@ public class ComposeFormFragment extends Fragment implements
 
         if (hasAccounts) {
             if (!isAccountNameInitialized) {
-                int index = accountAdapter.findAccountName(getAccountName());
+                int index = getInitialAccountIndex(result);
                 if (index == -1 && isSpecificAccountRequired()) {
                     onComposeCancelled();
                 } else {
@@ -403,6 +403,15 @@ public class ComposeFormFragment extends Fragment implements
             default:
                 return false;
         }
+    }
+
+    private int getInitialAccountIndex(AccountResult result) {
+        // Try to get the specific account specified by the arguments. Otherwise fall back to prefs.
+        String accountName = getAccountName();
+        if (TextUtils.isEmpty(accountName)) {
+            accountName = result.getLastAccount(getActivity());
+        }
+        return accountAdapter.findAccountName(accountName);
     }
 
     @Override
