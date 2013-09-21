@@ -51,7 +51,9 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
     private String parentSubreddit;
     private String subreddit;
 
-    public ThingListAdapter(Context context, String accountName, OnVoteListener listener,
+    public ThingListAdapter(Context context,
+            String accountName,
+            OnVoteListener listener,
             boolean singleChoice) {
         super(context, accountName, singleChoice);
         this.listener = listener;
@@ -85,37 +87,37 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
     }
 
     private void bindThingView(View view, Context context, Cursor cursor) {
-        final String author = cursor.getString(ThingProjection.INDEX_AUTHOR);
-        final String body = cursor.getString(ThingProjection.INDEX_BODY);
-        final long createdUtc = cursor.getLong(ThingProjection.INDEX_CREATED_UTC);
+        final String author = cursor.getString(INDEX_AUTHOR);
+        final String body = cursor.getString(INDEX_BODY);
+        final long createdUtc = cursor.getLong(INDEX_CREATED_UTC);
         final String destination = null; // Only messages have destinations.
-        final String domain = cursor.getString(ThingProjection.INDEX_DOMAIN);
-        final int downs = cursor.getInt(ThingProjection.INDEX_DOWNS);
+        final String domain = cursor.getString(INDEX_DOMAIN);
+        final int downs = cursor.getInt(INDEX_DOWNS);
         final boolean expanded = true; // Expanded only for comments handled by different adapter.
         final boolean isNew = false; // Only messages can be new.
-        final int kind = cursor.getInt(ThingProjection.INDEX_KIND);
-        final String linkId = cursor.getString(ThingProjection.INDEX_LINK_ID);
-        final String linkTitle = cursor.getString(ThingProjection.INDEX_LINK_TITLE);
+        final int kind = cursor.getInt(INDEX_KIND);
+        final String linkId = cursor.getString(INDEX_LINK_ID);
+        final String linkTitle = cursor.getString(INDEX_LINK_TITLE);
         final int nesting = 0; // Nesting only for comments handled by different adapter.
-        final int numComments = cursor.getInt(ThingProjection.INDEX_NUM_COMMENTS);
-        final boolean over18 = cursor.getInt(ThingProjection.INDEX_OVER_18) == 1;
-        final String subreddit = cursor.getString(ThingProjection.INDEX_SUBREDDIT);
-        final String thingId = cursor.getString(ThingProjection.INDEX_THING_ID);
-        final String thumbnailUrl = cursor.getString(ThingProjection.INDEX_THUMBNAIL_URL);
-        final String title = cursor.getString(ThingProjection.INDEX_TITLE);
-        final int ups = cursor.getInt(ThingProjection.INDEX_UPS);
+        final int numComments = cursor.getInt(INDEX_NUM_COMMENTS);
+        final boolean over18 = cursor.getInt(INDEX_OVER_18) == 1;
+        final String subreddit = cursor.getString(INDEX_SUBREDDIT);
+        final String thingId = cursor.getString(INDEX_THING_ID);
+        final String thumbnailUrl = cursor.getString(INDEX_THUMBNAIL_URL);
+        final String title = cursor.getString(INDEX_TITLE);
+        final int ups = cursor.getInt(INDEX_UPS);
 
         // Comments don't have a score so calculate our own.
-        int score = cursor.getInt(ThingProjection.INDEX_SCORE);
+        int score = cursor.getInt(INDEX_SCORE);
         if (kind == Kinds.KIND_COMMENT) {
             score = ups - downs;
         }
 
         // Reconcile local and remote votes.
-        int likes = cursor.getInt(ThingProjection.INDEX_LIKES);
-        if (!cursor.isNull(ThingProjection.INDEX_VOTE_ACTION)) {
+        int likes = cursor.getInt(INDEX_LIKES);
+        if (!cursor.isNull(INDEX_VOTE_ACTION)) {
             // Local votes take precedence over those from reddit.
-            likes = cursor.getInt(ThingProjection.INDEX_VOTE_ACTION);
+            likes = cursor.getInt(INDEX_VOTE_ACTION);
 
             // Modify the score since the vote is still pending.
             score += likes;
@@ -227,16 +229,16 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
 
     @Override
     int getKindIndex() {
-        return ThingProjection.INDEX_KIND;
+        return INDEX_KIND;
     }
 
     @Override
     String getLinkId(int position) {
-        return getString(position, ThingProjection.INDEX_LINK_ID);
+        return getString(position, INDEX_LINK_ID);
     }
 
     @Override
     String getThingId(int position) {
-        return getString(position, ThingProjection.INDEX_THING_ID);
+        return getString(position, INDEX_THING_ID);
     }
 }
