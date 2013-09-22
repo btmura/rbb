@@ -194,60 +194,37 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     }
 
     public void save(boolean save) {
-        if (save) {
-            Provider.saveAsync(context, accountName,
-                    getAuthor(0),
-                    getCreatedUtc(0),
-                    getDomain(0),
-                    getDowns(0),
-                    getLikes(0),
-                    getNumComments(0),
-                    isOver18(0),
-                    getPermaLink(0),
-                    getScore(0),
-                    isSelf(0),
-                    getSubreddit(0),
-                    getThingId(0),
-                    getThumbnailUrl(0),
-                    getTitle(0),
-                    getUps(0),
-                    getUrl(0));
-        } else {
-            Provider.unsaveAsync(context, accountName, getThingId(0));
-        }
+        ThingBundle thingBundle = save ? getThingBundle(0) : null;
+        Provider.saveAsync(context, accountName, thingId, thingBundle, save);
     }
 
     public void vote(int action, int position) {
-        if (position == 0) {
-            // Store additional information when the user votes on the header
-            // comment which represents the overall thing so that it appears in
-            // the liked and disliked listing when the vote is still pending.
-            ThingBundle thingBundle = ThingBundle.newLinkInstance(getAuthor(position),
-                    getCreatedUtc(position),
-                    getDomain(position),
-                    getDowns(position),
-                    getLikes(position),
-                    getKind(position),
-                    getNumComments(position),
-                    isOver18(position),
-                    getPermaLink(position),
-                    getSaved(position),
-                    getScore(position),
-                    isSelf(position),
-                    getSubreddit(position),
-                    getThingId(position),
-                    getThumbnailUrl(position),
-                    getTitle(position),
-                    getUps(position),
-                    getUrl(position));
-            Provider.voteAsync(context, accountName, action, getThingId(position), thingBundle);
+        // Store additional information when the user votes on the header comment which represents
+        // the overall thing so that it appears in the liked and disliked listing when the vote is
+        // still pending.
+        ThingBundle thingBundle = position == 0 ? getThingBundle(position) : null;
+        Provider.voteAsync(context, accountName, action, getThingId(position), thingBundle);
+    }
 
-        } else {
-            // Voting on just the comments won't appear in the liked/disliked
-            // listing, so there is no need to send additional info about what
-            // we voted upon except the id.
-            Provider.voteAsync(context, accountName, action, getThingId(position));
-        }
+    private ThingBundle getThingBundle(int position) {
+        return ThingBundle.newLinkInstance(getAuthor(position),
+                getCreatedUtc(position),
+                getDomain(position),
+                getDowns(position),
+                getLikes(position),
+                getKind(position),
+                getNumComments(position),
+                isOver18(position),
+                getPermaLink(position),
+                getSaved(position),
+                getScore(position),
+                isSelf(position),
+                getSubreddit(position),
+                getThingId(position),
+                getThumbnailUrl(position),
+                getTitle(position),
+                getUps(position),
+                getUrl(position));
     }
 
     // Menu preparation methods.

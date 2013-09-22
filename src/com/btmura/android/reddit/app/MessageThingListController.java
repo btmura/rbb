@@ -94,7 +94,7 @@ class MessageThingListController implements ThingListController<MessageListAdapt
     @Override
     public void onThingSelected(int position) {
         if (adapter.isNew(position)) {
-            Provider.readMessageAsync(context, accountName, getThingId(position));
+            Provider.readMessageAsync(context, accountName, getThingId(position), true);
         }
     }
 

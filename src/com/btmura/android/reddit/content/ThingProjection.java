@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.content;
 
-import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 
 /**
@@ -48,9 +47,6 @@ public interface ThingProjection {
             Things.COLUMN_THUMBNAIL_URL,
             Things.COLUMN_UPS,
             Things.COLUMN_URL,
-
-            // Following columns are from joined tables at the end.
-            SharedColumns.COLUMN_SAVE_ACTION,
     };
 
     public static final int INDEX_AUTHOR = 1;
@@ -75,7 +71,4 @@ public interface ThingProjection {
     public static final int INDEX_THUMBNAIL_URL = 20;
     public static final int INDEX_UPS = 21;
     public static final int INDEX_URL = 22;
-
-    // Following columns are from joined tables at the end.
-    public static final int INDEX_SAVE_ACTION = 23;
 }

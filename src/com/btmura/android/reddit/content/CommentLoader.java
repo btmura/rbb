@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
 
 import com.btmura.android.reddit.database.Comments;
-import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.provider.ThingProvider;
 
 /**
@@ -54,9 +53,6 @@ public class CommentLoader extends AbstractSessionLoader {
             Comments.COLUMN_THUMBNAIL_URL,
             Comments.COLUMN_UPS,
             Comments.COLUMN_URL,
-
-            // Following columns are from joined tables at the end.
-            SharedColumns.COLUMN_SAVE_ACTION,
     };
 
     public static final int INDEX_ID = 0;
@@ -84,9 +80,6 @@ public class CommentLoader extends AbstractSessionLoader {
     public static final int INDEX_UPS = 22;
     public static final int INDEX_URL = 23;
 
-    // Following columns are from joined tables at the end.
-    public static final int INDEX_SAVE_ACTION = 24;
-
     private final String accountName;
     private final String thingId;
     private final String linkId;
@@ -97,7 +90,7 @@ public class CommentLoader extends AbstractSessionLoader {
             String linkId,
             Bundle cursorExtras) {
         super(context,
-                ThingProvider.COMMENTS_WITH_ACTIONS_URI,
+                ThingProvider.COMMENTS_URI,
                 PROJECTION,
                 Comments.SELECT_VISIBLE_BY_SESSION_ID,
                 Comments.SORT_BY_SEQUENCE_AND_ID,

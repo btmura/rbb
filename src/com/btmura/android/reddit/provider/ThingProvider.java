@@ -106,10 +106,6 @@ public class ThingProvider extends BaseProvider {
     public static final Uri MESSAGES_SYNC_URI = makeSyncUri(MESSAGES_URI);
     public static final Uri COMMENT_ACTIONS_SYNC_URI = makeSyncUri(COMMENT_ACTIONS_URI);
 
-    public static final Uri THINGS_WITH_ACTIONS_URI = makeJoinUri(THINGS_URI);
-    public static final Uri COMMENTS_WITH_ACTIONS_URI = makeJoinUri(COMMENTS_URI);
-    public static final Uri MESSAGES_WITH_ACTIONS_URI = makeJoinUri(MESSAGES_URI);
-
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;
     private static final int MATCH_COMMENTS = 2;
@@ -141,26 +137,6 @@ public class ThingProvider extends BaseProvider {
     static final String PARAM_NOTIFY_THINGS = "notifyThings";
     static final String PARAM_NOTIFY_MESSAGES = "notifyMessages";
 
-    private static final String PARAM_JOIN = "join";
-
-    private static final Uri makeJoinUri(Uri uri) {
-        return uri.buildUpon().appendQueryParameter(PARAM_JOIN, TRUE).build();
-    }
-
-    private static final String JOINED_TABLE = ""
-            // Join with pending saves to fake that the save happened.
-            + " LEFT OUTER JOIN (SELECT "
-            + SaveActions.COLUMN_ACCOUNT + ","
-            + SaveActions.COLUMN_THING_ID + ","
-            + SaveActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_SAVE_ACTION
-            + " FROM " + SaveActions.TABLE_NAME + ") USING ("
-            + SaveActions.COLUMN_ACCOUNT + ", "
-            + SharedColumns.COLUMN_THING_ID + ")";
-
-    private static final String JOINED_THINGS_TABLE = Things.TABLE_NAME + JOINED_TABLE;
-
-    private static final String JOINED_COMMENTS_TABLE = Comments.TABLE_NAME + JOINED_TABLE;
-
     private static final String METHOD_GET_SESSION = "getSession";
     private static final String METHOD_CLEAN_SESSIONS = "cleanSessions";
     private static final String METHOD_EXPAND_COMMENT = "expandComment";
@@ -171,6 +147,7 @@ public class ThingProvider extends BaseProvider {
     private static final String METHOD_INSERT_MESSAGE = "insertMessage";
     private static final String METHOD_READ_MESSAGE = "readMessage";
     private static final String METHOD_HIDE = "hide";
+    private static final String METHOD_SAVE = "save";
     private static final String METHOD_VOTE = "vote";
 
     // List of extras used throughout the provider code.
@@ -244,14 +221,10 @@ public class ThingProvider extends BaseProvider {
     protected String getTable(Uri uri) {
         switch (MATCHER.match(uri)) {
             case MATCH_THINGS:
-                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
-                        ? JOINED_THINGS_TABLE
-                        : Things.TABLE_NAME;
+                return Things.TABLE_NAME;
 
             case MATCH_COMMENTS:
-                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
-                        ? JOINED_COMMENTS_TABLE
-                        : Comments.TABLE_NAME;
+                return Comments.TABLE_NAME;
 
             case MATCH_MESSAGES:
                 return Messages.TABLE_NAME;
@@ -488,8 +461,8 @@ public class ThingProvider extends BaseProvider {
 
     public static final Bundle readMessage(Context context,
             String accountName,
-            String thingId,
-            int action) {
+            int action,
+            String thingId) {
         Bundle extras = new Bundle(2);
         extras.putInt(EXTRA_ACTION, action);
         extras.putString(EXTRA_THING_ID, thingId);
@@ -526,6 +499,36 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context,
                 HIDE_ACTIONS_URI,
                 METHOD_HIDE,
+                accountName,
+                extras);
+    }
+
+    public static final Bundle save(Context context,
+            String accountName,
+            int action,
+            String thingId) {
+        Bundle extras = new Bundle(2);
+        extras.putInt(EXTRA_ACTION, action);
+        extras.putString(EXTRA_THING_ID, thingId);
+        return Provider.call(context,
+                SAVE_ACTIONS_URI,
+                METHOD_SAVE,
+                accountName,
+                extras);
+    }
+
+    public static final Bundle save(Context context,
+            String accountName,
+            int action,
+            String thingId,
+            ThingBundle thingBundle) {
+        Bundle extras = new Bundle(3);
+        extras.putInt(EXTRA_ACTION, action);
+        extras.putString(EXTRA_THING_ID, thingId);
+        extras.putParcelable(EXTRA_THING_BUNDLE, thingBundle);
+        return Provider.call(context,
+                SAVE_ACTIONS_URI,
+                METHOD_SAVE,
                 accountName,
                 extras);
     }

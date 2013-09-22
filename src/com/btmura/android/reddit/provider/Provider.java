@@ -17,8 +17,6 @@
 package com.btmura.android.reddit.provider;
 
 import android.app.backup.BackupManager;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -35,13 +33,6 @@ import com.btmura.android.reddit.database.SaveActions;
  * content provider operations.
  */
 public class Provider {
-
-    private static final Uri SAVE_URI =
-            ThingProvider.SAVE_ACTIONS_URI.buildUpon()
-                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, ThingProvider.TRUE)
-                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_COMMENTS, ThingProvider.TRUE)
-                    .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
-                    .build();
 
     public static void addSubredditsAsync(Context context,
             final String accountName,
@@ -160,18 +151,16 @@ public class Provider {
         });
     }
 
-    /** Mark a message either read or unread. */
     public static void readMessageAsync(final Context context,
             final String accountName,
-            final String thingId) {
+            final String thingId,
+            final boolean read) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
-                ThingProvider.readMessage(appContext,
-                        accountName,
-                        thingId,
-                        ReadActions.ACTION_READ);
+                int action = read ? ReadActions.ACTION_READ : ReadActions.ACTION_UNREAD;
+                ThingProvider.readMessage(appContext, accountName, action, thingId);
             }
         });
     }
@@ -191,83 +180,17 @@ public class Provider {
         });
     }
 
-    public static void hideAsync(Context context,
+    public static void saveAsync(final Context context,
             final String accountName,
             final String thingId,
-            final boolean hide) {
+            final ThingBundle thingBundle,
+            final boolean save) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
-                int action = hide ? HideActions.ACTION_HIDE : HideActions.ACTION_UNHIDE;
-                ThingProvider.hide(appContext, accountName, action, thingId);
-            }
-        });
-    }
-
-    public static void saveAsync(final Context context,
-            final String accountName,
-
-            // Following parameters are for faking a thing.
-            final String author,
-            final long createdUtc,
-            final String domain,
-            final int downs,
-            final int likes,
-            final int numComments,
-            final boolean over18,
-            final String permaLink,
-            final int score,
-            final boolean self,
-            final String subreddit,
-            final String thingId,
-            final String thumbnailUrl,
-            final String title,
-            final int ups,
-            final String url) {
-
-        final ContentResolver cr = context.getApplicationContext().getContentResolver();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                ContentValues v = new ContentValues(18);
-                v.put(SaveActions.COLUMN_ACCOUNT, accountName);
-                v.put(SaveActions.COLUMN_THING_ID, thingId);
-                v.put(SaveActions.COLUMN_ACTION, SaveActions.ACTION_SAVE);
-
-                // Following values are for faking a thing.
-                v.put(SaveActions.COLUMN_AUTHOR, author);
-                v.put(SaveActions.COLUMN_CREATED_UTC, createdUtc);
-                v.put(SaveActions.COLUMN_DOMAIN, domain);
-                v.put(SaveActions.COLUMN_DOWNS, downs);
-                v.put(SaveActions.COLUMN_LIKES, likes);
-                v.put(SaveActions.COLUMN_NUM_COMMENTS, numComments);
-                v.put(SaveActions.COLUMN_OVER_18, over18);
-                v.put(SaveActions.COLUMN_PERMA_LINK, permaLink);
-                v.put(SaveActions.COLUMN_SELF, self);
-                v.put(SaveActions.COLUMN_SCORE, score);
-                v.put(SaveActions.COLUMN_SUBREDDIT, subreddit);
-                v.put(SaveActions.COLUMN_TITLE, title);
-                v.put(SaveActions.COLUMN_THUMBNAIL_URL, thumbnailUrl);
-                v.put(SaveActions.COLUMN_UPS, ups);
-                v.put(SaveActions.COLUMN_URL, url);
-
-                cr.insert(SAVE_URI, v);
-            }
-        });
-    }
-
-    public static void unsaveAsync(final Context context, final String accountName,
-            final String thingId) {
-        final ContentResolver cr = context.getApplicationContext().getContentResolver();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                ContentValues v = new ContentValues(3);
-                v.put(SaveActions.COLUMN_ACCOUNT, accountName);
-                v.put(SaveActions.COLUMN_THING_ID, thingId);
-                v.put(SaveActions.COLUMN_ACTION, SaveActions.ACTION_UNSAVE);
-                cr.insert(SAVE_URI, v);
+                int action = save ? SaveActions.ACTION_SAVE : SaveActions.ACTION_UNSAVE;
+                ThingProvider.save(appContext, accountName, action, thingId, thingBundle);
             }
         });
     }
@@ -282,19 +205,6 @@ public class Provider {
             @Override
             public void run() {
                 ThingProvider.vote(appContext, accountName, action, thingId, thingBundle);
-            }
-        });
-    }
-
-    public static void voteAsync(Context context,
-            final String accountName,
-            final int action,
-            final String thingId) {
-        final Context appContext = context.getApplicationContext();
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                ThingProvider.vote(appContext, accountName, action, thingId);
             }
         });
     }

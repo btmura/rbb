@@ -29,7 +29,6 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.ThingProjection;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
@@ -146,13 +145,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
     }
 
     private boolean isSaved(int position) {
-        // If no local save actions are pending, then rely on server info.
-        if (adapter.isNull(position, INDEX_SAVE_ACTION)) {
-            return adapter.getBoolean(position, INDEX_SAVED);
-        }
-
-        // We have a local pending action so use that to indicate if it's read.
-        return adapter.getInt(position, INDEX_SAVE_ACTION) == SaveActions.ACTION_SAVE;
+        return adapter.getBoolean(position, INDEX_SAVED);
     }
 
     private void prepareShareActionItem(Menu menu, ListView listView, int position) {
@@ -241,28 +234,7 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
 
     private void handleSave(ListView listView, boolean save) {
         int position = Views.getCheckedPosition(listView);
-        if (save) {
-            Provider.saveAsync(context,
-                    accountName,
-                    getAuthor(position),
-                    getCreatedUtc(position),
-                    getDomain(position),
-                    getDowns(position),
-                    getLikes(position),
-                    getNumComments(position),
-                    isOver18(position),
-                    getPermaLink(position),
-                    getScore(position),
-                    isSelf(position),
-                    getSubreddit(position),
-                    getThingId(position),
-                    getThumbnailUrl(position),
-                    getTitle(position),
-                    getUps(position),
-                    getUrl(position));
-        } else {
-            Provider.unsaveAsync(context, accountName, getThingId(position));
-        }
+        save(position, save);
     }
 
     private void handleHide(ListView listView, boolean hide) {
@@ -315,13 +287,14 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
         hide(position, swipeAction == ThingListController.SWIPE_ACTION_HIDE);
     }
 
+    private void save(int position, boolean save) {
+        ThingBundle thingBundle = save ? getThingBundle(position) : null;
+        Provider.saveAsync(context, accountName, getThingId(position), thingBundle, save);
+    }
+
     private void hide(int position, boolean hide) {
-        if (hide) {
-            ThingBundle thingBundle = getThingBundle(position);
-            Provider.hideAsync(context, accountName, getThingId(position), thingBundle, true);
-        } else {
-            Provider.hideAsync(context, accountName, getThingId(position), false);
-        }
+        ThingBundle thingBundle = hide ? getThingBundle(position) : null;
+        Provider.hideAsync(context, accountName, getThingId(position), thingBundle, hide);
     }
 
     @Override

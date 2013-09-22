@@ -62,7 +62,7 @@ public class MessageThingLoader extends AbstractSessionLoader {
             String more,
             Bundle cursorExtras) {
         super(context,
-                ThingProvider.MESSAGES_WITH_ACTIONS_URI,
+                ThingProvider.MESSAGES_URI,
                 PROJECTION,
                 Messages.SELECT_BY_SESSION_ID,
                 null,

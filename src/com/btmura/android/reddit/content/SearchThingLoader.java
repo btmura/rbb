@@ -35,7 +35,7 @@ public class SearchThingLoader extends AbstractSessionLoader implements ThingPro
             String more,
             Bundle cursorExtras) {
         super(context,
-                ThingProvider.THINGS_WITH_ACTIONS_URI,
+                ThingProvider.THINGS_URI,
                 PROJECTION,
                 Things.SELECT_NOT_HIDDEN_BY_SESSION_ID,
                 null,

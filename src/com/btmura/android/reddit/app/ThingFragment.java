@@ -265,27 +265,19 @@ public class ThingFragment extends Fragment implements
     }
 
     private void handleSaved() {
-        Provider.unsaveAsync(getActivity(), getAccountName(), thingData.parent.getThingId());
+        Provider.saveAsync(getActivity(),
+                getAccountName(),
+                thingData.parent.getThingId(),
+                null,
+                false);
     }
 
     private void handleUnsaved() {
-        Provider.saveAsync(getActivity(), getAccountName(),
-                thingData.parent.getAuthor(),
-                thingData.parent.getCreatedUtc(),
-                thingData.parent.getDomain(),
-                thingData.parent.getDowns(),
-                thingData.parent.getLikes(),
-                thingData.parent.getNumComments(),
-                thingData.parent.isOver18(),
-                thingData.parent.getPermaLink(),
-                thingData.parent.getScore(),
-                thingData.parent.isSelf(),
-                thingData.parent.getSubreddit(),
+        Provider.saveAsync(getActivity(),
+                getAccountName(),
                 thingData.parent.getThingId(),
-                thingData.parent.getThumbnailUrl(),
-                thingData.parent.getTitle(),
-                thingData.parent.getUps(),
-                thingData.parent.getUrl());
+                thingData.parent,
+                true);
     }
 
     private void handleNewComment() {
