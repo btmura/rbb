@@ -19,7 +19,7 @@ package com.btmura.android.reddit.content;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.btmura.android.reddit.database.HideActions;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
 import com.btmura.android.reddit.widget.FilterAdapter;
 
@@ -49,8 +49,8 @@ public class ProfileThingLoader extends AbstractSessionLoader implements ThingPr
 
     private static String getSelectionStatement(int filter) {
         return filter == FilterAdapter.PROFILE_HIDDEN
-                ? HideActions.SELECT_HIDDEN_BY_SESSION_ID
-                : HideActions.SELECT_UNHIDDEN_BY_SESSION_ID;
+                ? Things.SELECT_HIDDEN_BY_SESSION_ID
+                : Things.SELECT_NOT_HIDDEN_BY_SESSION_ID;
     }
 
     @Override

@@ -50,7 +50,6 @@ public interface ThingProjection {
             Things.COLUMN_URL,
 
             // Following columns are from joined tables at the end.
-            SharedColumns.COLUMN_HIDE_ACTION,
             SharedColumns.COLUMN_SAVE_ACTION,
     };
 
@@ -78,6 +77,5 @@ public interface ThingProjection {
     public static final int INDEX_URL = 22;
 
     // Following columns are from joined tables at the end.
-    public static final int INDEX_HIDE_ACTION = 23;
-    public static final int INDEX_SAVE_ACTION = 24;
+    public static final int INDEX_SAVE_ACTION = 23;
 }

@@ -19,7 +19,7 @@ package com.btmura.android.reddit.content;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.btmura.android.reddit.database.HideActions;
+import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.provider.ThingProvider;
 
 public class SearchThingLoader extends AbstractSessionLoader implements ThingProjection {
@@ -37,7 +37,7 @@ public class SearchThingLoader extends AbstractSessionLoader implements ThingPro
         super(context,
                 ThingProvider.THINGS_WITH_ACTIONS_URI,
                 PROJECTION,
-                HideActions.SELECT_UNHIDDEN_BY_SESSION_ID,
+                Things.SELECT_NOT_HIDDEN_BY_SESSION_ID,
                 null,
                 cursorExtras,
                 more);

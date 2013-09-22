@@ -148,15 +148,6 @@ public class ThingProvider extends BaseProvider {
     }
 
     private static final String JOINED_TABLE = ""
-            // Join with pending hides to fake that the things were hidden.
-            + " LEFT OUTER JOIN (SELECT "
-            + HideActions.COLUMN_ACCOUNT + ","
-            + HideActions.COLUMN_THING_ID + ","
-            + HideActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_HIDE_ACTION
-            + " FROM " + HideActions.TABLE_NAME + ") USING ("
-            + HideActions.COLUMN_ACCOUNT + ","
-            + SharedColumns.COLUMN_THING_ID + ")"
-
             // Join with pending saves to fake that the save happened.
             + " LEFT OUTER JOIN (SELECT "
             + SaveActions.COLUMN_ACCOUNT + ","

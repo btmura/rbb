@@ -28,7 +28,6 @@ import android.widget.ListView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.ThingProjection;
-import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.Subreddits;
@@ -130,19 +129,11 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
         return hasAccount()
                 && actionMode == null
                 && isKind(position, Kinds.KIND_LINK)
-                && (hide && isUnhidden(position) || !hide && isHidden(position));
+                && (hide && !isHidden(position) || !hide && isHidden(position));
     }
 
     private boolean isHidden(int position) {
-        return !adapter.isNull(position, INDEX_HIDE_ACTION)
-                && adapter.getInt(position, INDEX_HIDE_ACTION) == HideActions.ACTION_HIDE
-                || adapter.getBoolean(position, INDEX_HIDDEN);
-    }
-
-    private boolean isUnhidden(int position) {
-        return !adapter.isNull(position, INDEX_HIDE_ACTION)
-                && adapter.getInt(position, INDEX_HIDE_ACTION) == HideActions.ACTION_UNHIDE
-                || !adapter.getBoolean(position, INDEX_HIDDEN);
+        return adapter.getBoolean(position, INDEX_HIDDEN);
     }
 
     private void prepareSaveActionItems(Menu menu, ListView listView, int position) {

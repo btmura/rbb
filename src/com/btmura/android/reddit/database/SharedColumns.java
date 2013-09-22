@@ -23,8 +23,6 @@ public class SharedColumns {
     /** String account name. */
     public static final String COLUMN_ACCOUNT = "account";
 
-    public static final String COLUMN_HIDE_ACTION = "hideAction";
-
     public static final String COLUMN_SAVE_ACTION = "saveAction";
 
     /** Long session id referring to the primary key in the sessions table. */
