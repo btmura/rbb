@@ -41,8 +41,10 @@ abstract class BaseProvider extends ContentProvider {
     public static final String ID_SELECTION = BaseColumns._ID + "= ?";
 
     public static final String TRUE = Boolean.toString(true);
-
     public static final String FALSE = Boolean.toString(false);
+
+    static final boolean SYNC = true;
+    static final boolean NO_SYNC = false;
 
     /**
      * Sync changes back to the network. Don't set this in sync adapters or else we'll get stuck in

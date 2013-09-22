@@ -19,6 +19,7 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -54,8 +55,8 @@ public class AccountProvider extends BaseProvider {
     static final String BASE_AUTHORITY_URI = "content://" + AUTHORITY + "/";
     public static final Uri ACCOUNTS_URI = Uri.parse(BASE_AUTHORITY_URI + PATH_ACCOUNTS);
 
-    /** Method name to initialize account used by call. */
     private static final String METHOD_INITIALIZE_ACCOUNT = "initializeAccount";
+    private static final String METHOD_CLEAR_MESSAGES = "clearMessages";
 
     /** String extra containing the cookie for an account. */
     private static final String EXTRA_COOKIE = "cookie";
@@ -82,10 +83,16 @@ public class AccountProvider extends BaseProvider {
                 args) != null;
     }
 
+    public static void clearMessages(Context context, String accountName) {
+        Provider.call(context, ACCOUNTS_URI, METHOD_CLEAR_MESSAGES, accountName, null);
+    }
+
     @Override
-    public Bundle call(String method, String login, Bundle extras) {
+    public Bundle call(String method, String accountName, Bundle extras) {
         if (METHOD_INITIALIZE_ACCOUNT.equals(method)) {
-            return initializeAccount(login, extras);
+            return initializeAccount(accountName, extras);
+        } else if (METHOD_CLEAR_MESSAGES.equals(method)) {
+            return clearMessages(accountName);
         }
         return null;
     }
@@ -98,7 +105,7 @@ public class AccountProvider extends BaseProvider {
      * somebody with access to the database must do this job to assure everything is done in a
      * single transaction.
      */
-    private Bundle initializeAccount(String login, Bundle extras) {
+    private Bundle initializeAccount(String accountName, Bundle extras) {
         String cookie = extras.getString(EXTRA_COOKIE);
         ArrayList<String> subreddits;
         try {
@@ -124,7 +131,7 @@ public class AccountProvider extends BaseProvider {
         };
 
         String selection = SharedColumns.SELECT_BY_ACCOUNT;
-        String[] selectionArgs = Array.of(login);
+        String[] selectionArgs = Array.of(accountName);
 
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
@@ -136,7 +143,7 @@ public class AccountProvider extends BaseProvider {
             }
 
             ContentValues values = new ContentValues(3);
-            values.put(Subreddits.COLUMN_ACCOUNT, login);
+            values.put(Subreddits.COLUMN_ACCOUNT, accountName);
             values.put(Subreddits.COLUMN_STATE, Subreddits.STATE_NORMAL);
 
             int subredditCount = subreddits.size();
@@ -155,5 +162,30 @@ public class AccountProvider extends BaseProvider {
         } finally {
             db.endTransaction();
         }
+    }
+
+    private Bundle clearMessages(String accountName) {
+        int changed = 0;
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            // Update the existing row. If there isn't such a row, it will be created upon sync,
+            // where it will have the proper value.
+            ContentValues values = new ContentValues(1);
+            values.put(Accounts.COLUMN_HAS_MAIL, false);
+            changed += db.update(Accounts.TABLE_NAME,
+                    values,
+                    Accounts.SELECT_BY_ACCOUNT,
+                    Array.of(accountName));
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        if (changed > 0) {
+            cr.notifyChange(ACCOUNTS_URI, null, SYNC);
+        }
+        return Bundle.EMPTY;
     }
 }

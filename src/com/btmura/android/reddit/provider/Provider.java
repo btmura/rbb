@@ -26,11 +26,9 @@ import android.os.Bundle;
 
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.ThingBundle;
-import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.database.SaveActions;
-import com.btmura.android.reddit.util.Array;
 
 /**
  * Provider is a collection of static methods that do user actions which correspond to multiple
@@ -158,21 +156,12 @@ public class Provider {
         });
     }
 
-    public static void clearNewMessageIndicator(Context context,
-            final String accountName,
-            final boolean hasMail) {
-        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+    public static void clearMessagesAsync(Context context, final String accountName) {
+        final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
-                // Update the existing row. If there isn't such a row, it will
-                // be created upon sync, where it will have the proper value.
-                ContentValues values = new ContentValues(1);
-                values.put(Accounts.COLUMN_HAS_MAIL, false);
-                cr.update(AccountProvider.ACCOUNTS_URI,
-                        values,
-                        Accounts.SELECT_BY_ACCOUNT,
-                        Array.of(accountName));
+                AccountProvider.clearMessages(appContext, accountName);
             }
         });
     }

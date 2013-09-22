@@ -242,9 +242,6 @@ public class ThingProvider extends BaseProvider {
     private static final String SELECT_MORE_WITH_SESSION_ID = Kinds.COLUMN_KIND + "="
             + Kinds.KIND_MORE + " AND " + SharedColumns.COLUMN_SESSION_ID + "=?";
 
-    private static final boolean SYNC = true;
-    private static final boolean NO_SYNC = false;
-
     private final SessionManager sessionManager = new SessionManager();
 
     public ThingProvider() {

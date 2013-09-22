@@ -166,7 +166,7 @@ class MessageListing extends JsonParser implements Listing {
     @Override
     public void performExtraWork(Context context) {
         if (mark) {
-            Provider.clearNewMessageIndicator(context, accountName, false);
+            Provider.clearMessagesAsync(context, accountName);
         }
     }
 
