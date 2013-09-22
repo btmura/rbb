@@ -20,18 +20,36 @@ import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_DOWNS;
 import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_LIKES;
 import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_SCORE;
 import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_UPS;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
 import com.btmura.android.reddit.database.Comments;
 import com.btmura.android.reddit.database.SharedColumns;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
+import com.btmura.android.reddit.util.Array;
 
 class VoteStatements {
 
-    private static final String THING_UPDATE = "UPDATE " + Things.TABLE_NAME;
+    private static final String[] VOTE_PROJECTION = {
+            VoteActions._ID,
+            VoteActions.COLUMN_ACTION,
+            VoteActions.COLUMN_THING_ID,
+    };
 
+    private static final int VOTE_INDEX_ACTION = 1;
+    private static final int VOTE_INDEX_THING_ID = 2;
+
+    private static final String VOTE_SELECTION = SharedColumns.SELECT_BY_ACCOUNT;
+
+    private static final String THING_UPDATE = "UPDATE " + Things.TABLE_NAME;
     private static final String COMMENT_UPDATE = "UPDATE " + Comments.TABLE_NAME;
 
     private static final String UP_DOWN_SET = " SET "
@@ -66,6 +84,32 @@ class VoteStatements {
     private static final String UP_DOWN_COMMENT_VOTE = COMMENT_UPDATE + UP_DOWN_SET + WHERE;
     private static final String NEUTRAL_THING_VOTE = THING_UPDATE + NEUTRAL_SET + WHERE;
     private static final String NEUTRAL_COMMENT_VOTE = COMMENT_UPDATE + NEUTRAL_SET + WHERE;
+
+    static Map<String, Integer> getVoteActionMap(SQLiteOpenHelper dbHelper, String accountName) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(VoteActions.TABLE_NAME,
+                VOTE_PROJECTION,
+                VOTE_SELECTION,
+                Array.of(accountName),
+                null,
+                null,
+                null);
+        try {
+            if (c.getCount() == 0) {
+                return Collections.emptyMap();
+            }
+
+            Map<String, Integer> map = new HashMap<String, Integer>(c.getCount());
+            while (c.moveToNext()) {
+                int action = c.getInt(VOTE_INDEX_ACTION);
+                String thingId = c.getString(VOTE_INDEX_THING_ID);
+                map.put(thingId, action);
+            }
+            return map;
+        } finally {
+            c.close();
+        }
+    }
 
     static void execute(SQLiteDatabase db, String accountName, int action, String thingId) {
         switch (action) {
