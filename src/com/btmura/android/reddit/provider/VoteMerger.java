@@ -117,7 +117,7 @@ class VoteMerger {
         }
     }
 
-    static void execute(SQLiteDatabase db, String accountName, int action, String thingId) {
+    static void updateDatabase(SQLiteDatabase db, String accountName, int action, String thingId) {
         switch (action) {
             case VoteActions.ACTION_VOTE_UP:
                 upVote(db, UP_DOWN_THING_VOTE, accountName, thingId);
