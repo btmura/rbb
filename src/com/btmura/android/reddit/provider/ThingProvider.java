@@ -1175,7 +1175,7 @@ public class ThingProvider extends BaseProvider {
                 return null;
             }
 
-            VoteStatements.execute(db, accountName, action, thingId);
+            VoteMerger.execute(db, accountName, action, thingId);
 
             db.setTransactionSuccessful();
         } finally {

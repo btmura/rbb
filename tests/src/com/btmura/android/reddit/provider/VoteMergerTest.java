@@ -14,7 +14,7 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
 
-public class VoteStatementsTest extends AndroidTestCase {
+public class VoteMergerTest extends AndroidTestCase {
 
     private static final String ACCOUNT_NAME = "account1";
     private static final String THING_ID = "thing1";
@@ -64,22 +64,22 @@ public class VoteStatementsTest extends AndroidTestCase {
         long commentId = insertComment();
         assertTrue(commentId != -1);
 
-        VoteStatements.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_UP, THING_ID);
+        VoteMerger.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_UP, THING_ID);
         assertVote(thingId, 1, VoteActions.ACTION_VOTE_UP, 1, 0);
 
-        VoteStatements.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_UP, THING_ID);
+        VoteMerger.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_UP, THING_ID);
         assertVote(thingId, 2, VoteActions.ACTION_VOTE_UP, 2, 0);
 
-        VoteStatements.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_DOWN, THING_ID);
+        VoteMerger.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_DOWN, THING_ID);
         assertVote(thingId, 1, VoteActions.ACTION_VOTE_DOWN, 2, 1);
 
-        VoteStatements.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_NEUTRAL, THING_ID);
+        VoteMerger.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_NEUTRAL, THING_ID);
         assertVote(thingId, 2, VoteActions.ACTION_VOTE_NEUTRAL, 2, 0);
 
-        VoteStatements.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_UP, THING_ID);
+        VoteMerger.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_UP, THING_ID);
         assertVote(thingId, 3, VoteActions.ACTION_VOTE_UP, 3, 0);
 
-        VoteStatements.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_NEUTRAL, THING_ID);
+        VoteMerger.execute(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_NEUTRAL, THING_ID);
         assertVote(thingId, 2, VoteActions.ACTION_VOTE_NEUTRAL, 2, 0);
     }
 

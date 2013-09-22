@@ -125,7 +125,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         CharSequence url = Urls.commentListing(thingId, linkId, numComments, Urls.TYPE_JSON);
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = null;
-        voteActionMap = VoteStatements.getVoteActionMap(dbHelper, accountName);
+        voteActionMap = VoteMerger.getVoteActionMap(dbHelper, accountName);
         try {
             input = new BufferedInputStream(conn.getInputStream());
             JsonReader reader = new JsonReader(new InputStreamReader(input));

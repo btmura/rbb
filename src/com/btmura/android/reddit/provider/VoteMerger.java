@@ -36,7 +36,7 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
 
-class VoteStatements {
+class VoteMerger {
 
     private static final String[] VOTE_PROJECTION = {
             VoteActions._ID,
