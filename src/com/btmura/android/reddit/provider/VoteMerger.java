@@ -16,10 +16,16 @@
 
 package com.btmura.android.reddit.provider;
 
+import static android.provider.BaseColumns._ID;
 import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_DOWNS;
 import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_LIKES;
 import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_SCORE;
 import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_UPS;
+import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_DOWN;
+import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_UP;
+import static com.btmura.android.reddit.database.VoteActions.COLUMN_ACCOUNT;
+import static com.btmura.android.reddit.database.VoteActions.COLUMN_ACTION;
+import static com.btmura.android.reddit.database.VoteActions.COLUMN_THING_ID;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,9 +45,9 @@ import com.btmura.android.reddit.util.Array;
 class VoteMerger {
 
     private static final String[] VOTE_PROJECTION = {
-            VoteActions._ID,
-            VoteActions.COLUMN_ACTION,
-            VoteActions.COLUMN_THING_ID,
+            _ID,
+            COLUMN_ACTION,
+            COLUMN_THING_ID,
     };
 
     private static final int VOTE_INDEX_ACTION = 1;
@@ -60,25 +66,25 @@ class VoteMerger {
 
     private static final String NEUTRAL_SET = " SET "
             + COLUMN_SCORE + "= CASE " + COLUMN_LIKES
-            + " WHEN " + VoteActions.ACTION_VOTE_UP + " THEN " + COLUMN_SCORE + "-1"
-            + " WHEN " + VoteActions.ACTION_VOTE_DOWN + " THEN " + COLUMN_SCORE + "+1"
+            + " WHEN " + ACTION_VOTE_UP + " THEN " + COLUMN_SCORE + "-1"
+            + " WHEN " + ACTION_VOTE_DOWN + " THEN " + COLUMN_SCORE + "+1"
             + " ELSE " + COLUMN_SCORE
             + " END,"
 
             + COLUMN_LIKES + "=" + VoteActions.ACTION_VOTE_NEUTRAL + ","
 
             + COLUMN_UPS + "= CASE " + COLUMN_LIKES
-            + " WHEN " + VoteActions.ACTION_VOTE_UP + " THEN " + COLUMN_UPS + "-1"
+            + " WHEN " + ACTION_VOTE_UP + " THEN " + COLUMN_UPS + "-1"
             + " ELSE " + COLUMN_UPS
             + " END,"
 
             + COLUMN_DOWNS + "= CASE " + COLUMN_LIKES
-            + " WHEN " + VoteActions.ACTION_VOTE_DOWN + " THEN " + COLUMN_DOWNS + "-1"
+            + " WHEN " + ACTION_VOTE_DOWN + " THEN " + COLUMN_DOWNS + "-1"
             + " ELSE " + COLUMN_DOWNS
             + " END ";
 
     private static final String WHERE = " WHERE "
-            + SharedColumns.COLUMN_ACCOUNT + "=? AND " + SharedColumns.COLUMN_THING_ID + "=?";
+            + COLUMN_ACCOUNT + "=? AND " + COLUMN_THING_ID + "=?";
 
     private static final String UP_DOWN_THING_VOTE = THING_UPDATE + UP_DOWN_SET + WHERE;
     private static final String UP_DOWN_COMMENT_VOTE = COMMENT_UPDATE + UP_DOWN_SET + WHERE;
@@ -136,7 +142,7 @@ class VoteMerger {
             String thingId) {
         SQLiteStatement sql = db.compileStatement(statement);
         sql.bindLong(1, 1);
-        sql.bindLong(2, VoteActions.ACTION_VOTE_UP);
+        sql.bindLong(2, ACTION_VOTE_UP);
         sql.bindLong(3, 1);
         sql.bindLong(4, 0);
         sql.bindString(5, accountName);
@@ -150,7 +156,7 @@ class VoteMerger {
             String thingId) {
         SQLiteStatement sql = db.compileStatement(statement);
         sql.bindLong(1, -1);
-        sql.bindLong(2, VoteActions.ACTION_VOTE_DOWN);
+        sql.bindLong(2, ACTION_VOTE_DOWN);
         sql.bindLong(3, 0);
         sql.bindLong(4, 1);
         sql.bindString(5, accountName);
