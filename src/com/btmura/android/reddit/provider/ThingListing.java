@@ -661,30 +661,10 @@ class ThingListing extends JsonParser implements Listing {
         int count = values.size();
         for (int i = 0; i < count; i++) {
             ContentValues v = values.get(i);
-            applyPendingVotes(v);
+            VoteMerger.updateContentValues(v, voteActionMap);
         }
 
         appendLoadingMore();
-    }
-
-    private void applyPendingVotes(ContentValues v) {
-        if (!voteActionMap.isEmpty()) {
-            String thingId = (String) v.get(Things.COLUMN_THING_ID);
-            Integer action = voteActionMap.remove(thingId);
-            if (action != null) {
-                v.put(Things.COLUMN_LIKES, action);
-                switch (action) {
-                    case VoteActions.ACTION_VOTE_UP:
-                        break;
-
-                    case VoteActions.ACTION_VOTE_DOWN:
-                        break;
-
-                    case VoteActions.ACTION_VOTE_NEUTRAL:
-                        break;
-                }
-            }
-        }
     }
 
     private void appendLoadingMore() {

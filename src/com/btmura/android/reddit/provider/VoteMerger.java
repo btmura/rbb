@@ -22,6 +22,7 @@ import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_LIKES;
 import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_SCORE;
 import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_UPS;
 import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_DOWN;
+import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_NEUTRAL;
 import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_UP;
 import static com.btmura.android.reddit.database.VoteActions.COLUMN_ACCOUNT;
 import static com.btmura.android.reddit.database.VoteActions.COLUMN_ACTION;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -117,19 +119,62 @@ class VoteMerger {
         }
     }
 
+    static void updateContentValues(ContentValues v, Map<String, Integer> actionMap) {
+        if (!actionMap.isEmpty()) {
+            String thingId = (String) v.get(SharedColumns.COLUMN_THING_ID);
+            Integer action = actionMap.remove(thingId);
+            if (action != null) {
+                updateContentValues(v, action);
+            }
+        }
+    }
+
+    static void updateContentValues(ContentValues v, int action) {
+        switch (action) {
+            case ACTION_VOTE_UP:
+                change(v, COLUMN_SCORE, 1);
+                change(v, COLUMN_UPS, 1);
+                break;
+
+            case ACTION_VOTE_DOWN:
+                change(v, COLUMN_SCORE, -1);
+                change(v, COLUMN_DOWNS, 1);
+                break;
+
+            case ACTION_VOTE_NEUTRAL:
+                if (v.containsKey(COLUMN_LIKES)) {
+                    Integer likes = (Integer) v.get(COLUMN_LIKES);
+                    if (likes == ACTION_VOTE_UP) {
+                        change(v, COLUMN_SCORE, -1);
+                        change(v, COLUMN_UPS, -1);
+                    } else if (likes == ACTION_VOTE_DOWN) {
+                        change(v, COLUMN_SCORE, 1);
+                        change(v, COLUMN_DOWNS, -1);
+                    }
+                }
+                break;
+        }
+        v.put(COLUMN_LIKES, action);
+    }
+
+    private static void change(ContentValues v, String key, int delta) {
+        Integer value = (Integer) v.get(key);
+        v.put(key, (value != null ? value : 0) + delta);
+    }
+
     static void updateDatabase(SQLiteDatabase db, String accountName, int action, String thingId) {
         switch (action) {
-            case VoteActions.ACTION_VOTE_UP:
+            case ACTION_VOTE_UP:
                 upVote(db, UP_DOWN_THING_VOTE, accountName, thingId);
                 upVote(db, UP_DOWN_COMMENT_VOTE, accountName, thingId);
                 break;
 
-            case VoteActions.ACTION_VOTE_DOWN:
+            case ACTION_VOTE_DOWN:
                 downVote(db, UP_DOWN_THING_VOTE, accountName, thingId);
                 downVote(db, UP_DOWN_COMMENT_VOTE, accountName, thingId);
                 break;
 
-            case VoteActions.ACTION_VOTE_NEUTRAL:
+            case ACTION_VOTE_NEUTRAL:
                 neutralVote(db, NEUTRAL_THING_VOTE, accountName, thingId);
                 neutralVote(db, NEUTRAL_COMMENT_VOTE, accountName, thingId);
                 break;

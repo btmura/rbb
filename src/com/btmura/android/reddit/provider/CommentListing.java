@@ -413,7 +413,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 continue;
             }
 
-            applyPendingVotes(v);
+            VoteMerger.updateContentValues(v, voteActionMap);
             applySequenceNumber(v, i);
         }
     }
@@ -421,16 +421,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private boolean isLoadingMore(ContentValues v) {
         Integer type = (Integer) v.get(Comments.COLUMN_KIND);
         return type.intValue() == Kinds.KIND_MORE;
-    }
-
-    private void applyPendingVotes(ContentValues v) {
-        if (!voteActionMap.isEmpty()) {
-            String thingId = (String) v.get(Comments.COLUMN_THING_ID);
-            Integer action = voteActionMap.remove(thingId);
-            if (action != null) {
-                v.put(Comments.COLUMN_LIKES, action);
-            }
-        }
     }
 
     private void applySequenceNumber(ContentValues v, int sequence) {

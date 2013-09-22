@@ -1,5 +1,12 @@
 package com.btmura.android.reddit.provider;
 
+import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_DOWNS;
+import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_LIKES;
+import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_SCORE;
+import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_UPS;
+import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_DOWN;
+import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_NEUTRAL;
+import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_UP;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -57,47 +64,88 @@ public class VoteMergerTest extends AndroidTestCase {
         mContext.deleteDatabase(DbHelper.DATABASE_TEST);
     }
 
-    public void testExecute() {
+    public void testUpdateContentValues() {
+        ContentValues thingValues = newThingValues();
+
+        VoteMerger.updateContentValues(thingValues, ACTION_VOTE_UP);
+        assertContentValues(thingValues, 1, ACTION_VOTE_UP, 1, 0);
+
+        VoteMerger.updateContentValues(thingValues, ACTION_VOTE_UP);
+        assertContentValues(thingValues, 2, ACTION_VOTE_UP, 2, 0);
+
+        VoteMerger.updateContentValues(thingValues, ACTION_VOTE_DOWN);
+        assertContentValues(thingValues, 1, ACTION_VOTE_DOWN, 2, 1);
+
+        VoteMerger.updateContentValues(thingValues, ACTION_VOTE_NEUTRAL);
+        assertContentValues(thingValues, 2, ACTION_VOTE_NEUTRAL, 2, 0);
+
+        VoteMerger.updateContentValues(thingValues, ACTION_VOTE_UP);
+        assertContentValues(thingValues, 3, ACTION_VOTE_UP, 3, 0);
+
+        VoteMerger.updateContentValues(thingValues, ACTION_VOTE_NEUTRAL);
+        assertContentValues(thingValues, 2, ACTION_VOTE_NEUTRAL, 2, 0);
+    }
+
+    public void testUpdateDatabase() {
         long thingId = insertThing();
         assertTrue(thingId != -1);
 
         long commentId = insertComment();
         assertTrue(commentId != -1);
 
-        VoteMerger.updateDatabase(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_UP, THING_ID);
-        assertVote(thingId, 1, VoteActions.ACTION_VOTE_UP, 1, 0);
+        VoteMerger.updateDatabase(db, ACCOUNT_NAME, ACTION_VOTE_UP, THING_ID);
+        assertTable(thingId, 1, VoteActions.ACTION_VOTE_UP, 1, 0);
 
-        VoteMerger.updateDatabase(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_UP, THING_ID);
-        assertVote(thingId, 2, VoteActions.ACTION_VOTE_UP, 2, 0);
+        VoteMerger.updateDatabase(db, ACCOUNT_NAME, ACTION_VOTE_UP, THING_ID);
+        assertTable(thingId, 2, VoteActions.ACTION_VOTE_UP, 2, 0);
 
-        VoteMerger.updateDatabase(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_DOWN, THING_ID);
-        assertVote(thingId, 1, VoteActions.ACTION_VOTE_DOWN, 2, 1);
+        VoteMerger.updateDatabase(db, ACCOUNT_NAME, ACTION_VOTE_DOWN, THING_ID);
+        assertTable(thingId, 1, VoteActions.ACTION_VOTE_DOWN, 2, 1);
 
-        VoteMerger.updateDatabase(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_NEUTRAL, THING_ID);
-        assertVote(thingId, 2, VoteActions.ACTION_VOTE_NEUTRAL, 2, 0);
+        VoteMerger.updateDatabase(db, ACCOUNT_NAME, ACTION_VOTE_NEUTRAL, THING_ID);
+        assertTable(thingId, 2, VoteActions.ACTION_VOTE_NEUTRAL, 2, 0);
 
-        VoteMerger.updateDatabase(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_UP, THING_ID);
-        assertVote(thingId, 3, VoteActions.ACTION_VOTE_UP, 3, 0);
+        VoteMerger.updateDatabase(db, ACCOUNT_NAME, ACTION_VOTE_UP, THING_ID);
+        assertTable(thingId, 3, VoteActions.ACTION_VOTE_UP, 3, 0);
 
-        VoteMerger.updateDatabase(db, ACCOUNT_NAME, VoteActions.ACTION_VOTE_NEUTRAL, THING_ID);
-        assertVote(thingId, 2, VoteActions.ACTION_VOTE_NEUTRAL, 2, 0);
+        VoteMerger.updateDatabase(db, ACCOUNT_NAME, ACTION_VOTE_NEUTRAL, THING_ID);
+        assertTable(thingId, 2, VoteActions.ACTION_VOTE_NEUTRAL, 2, 0);
     }
 
-    private long insertThing() {
+    private ContentValues newThingValues() {
         ContentValues v = new ContentValues();
         v.put(Things.COLUMN_ACCOUNT, ACCOUNT_NAME);
         v.put(Things.COLUMN_THING_ID, THING_ID);
-        return db.insert(Things.TABLE_NAME, null, v);
+        return v;
     }
 
-    private long insertComment() {
+    private ContentValues newCommentValues() {
         ContentValues v = new ContentValues();
         v.put(Comments.COLUMN_ACCOUNT, ACCOUNT_NAME);
         v.put(Comments.COLUMN_THING_ID, THING_ID);
-        return db.insert(Comments.TABLE_NAME, null, v);
+        return v;
     }
 
-    private void assertVote(long id, int score, int likes, int ups, int downs) {
+    private void assertContentValues(ContentValues v, int score, int likes, int ups, int downs) {
+        assertValue(score, v, COLUMN_SCORE);
+        assertValue(likes, v, COLUMN_LIKES);
+        assertValue(ups, v, COLUMN_UPS);
+        assertValue(downs, v, COLUMN_DOWNS);
+    }
+
+    private void assertValue(int expected, ContentValues v, String key) {
+        assertEquals(expected, v.containsKey(key) ? v.getAsInteger(key).intValue() : 0);
+    }
+
+    private long insertThing() {
+        return db.insert(Things.TABLE_NAME, null, newThingValues());
+    }
+
+    private long insertComment() {
+        return db.insert(Comments.TABLE_NAME, null, newCommentValues());
+    }
+
+    private void assertTable(long id, int score, int likes, int ups, int downs) {
         for (String table : TABLES) {
             Cursor cursor = getCursor(table, id);
             assertTrue(table, cursor.moveToNext());
