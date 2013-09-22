@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -79,6 +80,8 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private long networkTimeMs;
     private long parseTimeMs;
 
+    private Map<String, Integer> voteActionMap;
+
     static CommentListing newInstance(Context context,
             SQLiteOpenHelper dbHelper,
             String accountName,
@@ -130,6 +133,8 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         try {
             input = new BufferedInputStream(conn.getInputStream());
             long t2 = System.currentTimeMillis();
+
+            voteActionMap = ListingUtils.getVoteActions(dbHelper, accountName);
 
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingArray(reader);
@@ -309,28 +314,10 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void onParseEnd() {
-        // We don't support loading more comments right now.
-        removeMoreComments();
-
         // Merge local inserts and deletes that haven't been synced yet.
         mergeActions();
 
-        // Tag each row with a sequence number for later insertions.
-        writeSequenceNumbers();
-    }
-
-    private void removeMoreComments() {
-        int size = values.size();
-        for (int i = 0; i < size;) {
-            ContentValues v = values.get(i);
-            Integer type = (Integer) v.get(Comments.COLUMN_KIND);
-            if (type.intValue() == Kinds.KIND_MORE) {
-                values.remove(i);
-                size--;
-            } else {
-                i++;
-            }
-        }
+        doFinalMerge();
     }
 
     private void mergeActions() {
@@ -371,13 +358,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             }
         } finally {
             c.close();
-        }
-    }
-
-    private void writeSequenceNumbers() {
-        int count = values.size();
-        for (int i = 0; i < count; i++) {
-            values.get(i).put(Comments.COLUMN_SEQUENCE, i);
         }
     }
 
@@ -441,6 +421,33 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         if (v != null) {
             v.put(Comments.COLUMN_BODY, text);
             v.put(Comments.COLUMN_COMMENT_ACTION_ID, actionId);
+        }
+    }
+
+    private void doFinalMerge() {
+        int count = values.size();
+        for (int i = 0; i < count; i++) {
+            ContentValues v = values.get(i);
+
+            // Remove any load more rows. We don't support them yet.
+            Integer type = (Integer) v.get(Comments.COLUMN_KIND);
+            if (type.intValue() == Kinds.KIND_MORE) {
+                values.remove(i--);
+                count--;
+                continue;
+            }
+
+            // Apply any pending votes by overriding the server values.
+            if (!voteActionMap.isEmpty()) {
+                String thingId = (String) v.get(Comments.COLUMN_THING_ID);
+                Integer action = voteActionMap.remove(thingId);
+                if (action != null) {
+                    v.put(Comments.COLUMN_LIKES, action);
+                }
+            }
+
+            // Set the sequence number on any row that remains.
+            v.put(Comments.COLUMN_SEQUENCE, i);
         }
     }
 
