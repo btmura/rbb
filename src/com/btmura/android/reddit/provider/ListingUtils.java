@@ -41,7 +41,7 @@ class ListingUtils {
 
     private static final String VOTE_SELECTION = SharedColumns.SELECT_BY_ACCOUNT;
 
-    static Map<String, Integer> getVoteActions(SQLiteOpenHelper dbHelper, String accountName) {
+    static Map<String, Integer> getVoteActionMap(SQLiteOpenHelper dbHelper, String accountName) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(VoteActions.TABLE_NAME,
                 VOTE_PROJECTION,

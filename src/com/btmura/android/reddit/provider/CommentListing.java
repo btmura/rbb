@@ -134,7 +134,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             input = new BufferedInputStream(conn.getInputStream());
             long t2 = System.currentTimeMillis();
 
-            voteActionMap = ListingUtils.getVoteActions(dbHelper, accountName);
+            voteActionMap = ListingUtils.getVoteActionMap(dbHelper, accountName);
 
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingArray(reader);
@@ -430,25 +430,34 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             ContentValues v = values.get(i);
 
             // Remove any load more rows. We don't support them yet.
-            Integer type = (Integer) v.get(Comments.COLUMN_KIND);
-            if (type.intValue() == Kinds.KIND_MORE) {
+            if (isLoadingMore(v)) {
                 values.remove(i--);
                 count--;
                 continue;
             }
 
-            // Apply any pending votes by overriding the server values.
-            if (!voteActionMap.isEmpty()) {
-                String thingId = (String) v.get(Comments.COLUMN_THING_ID);
-                Integer action = voteActionMap.remove(thingId);
-                if (action != null) {
-                    v.put(Comments.COLUMN_LIKES, action);
-                }
-            }
-
-            // Set the sequence number on any row that remains.
-            v.put(Comments.COLUMN_SEQUENCE, i);
+            applyPendingVotes(v);
+            applySequenceNumber(v, i);
         }
+    }
+
+    private boolean isLoadingMore(ContentValues v) {
+        Integer type = (Integer) v.get(Comments.COLUMN_KIND);
+        return type.intValue() == Kinds.KIND_MORE;
+    }
+
+    private void applyPendingVotes(ContentValues v) {
+        if (!voteActionMap.isEmpty()) {
+            String thingId = (String) v.get(Comments.COLUMN_THING_ID);
+            Integer action = voteActionMap.remove(thingId);
+            if (action != null) {
+                v.put(Comments.COLUMN_LIKES, action);
+            }
+        }
+    }
+
+    private void applySequenceNumber(ContentValues v, int sequence) {
+        v.put(Comments.COLUMN_SEQUENCE, sequence);
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -185,6 +186,7 @@ class ThingListing extends JsonParser implements Listing {
     private long networkTimeMs;
     private long parseTimeMs;
 
+    private Map<String, Integer> voteActionMap;
     private String moreThingId;
 
     static ThingListing newSearchInstance(Context context,
@@ -298,6 +300,8 @@ class ThingListing extends JsonParser implements Listing {
         try {
             input = new BufferedInputStream(conn.getInputStream());
             long t2 = System.currentTimeMillis();
+
+            voteActionMap = ListingUtils.getVoteActionMap(dbHelper, accountName);
 
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingObject(reader);
@@ -501,9 +505,7 @@ class ThingListing extends JsonParser implements Listing {
             }
         }
 
-        if (!TextUtils.isEmpty(moreThingId)) {
-            values.add(newContentValues(Kinds.KIND_MORE, moreThingId, 1));
-        }
+        doFinalMerge();
     }
 
     private ContentValues newContentValues(int kind, String thingId, int extraCapacity) {
@@ -681,6 +683,32 @@ class ThingListing extends JsonParser implements Listing {
                 values.remove(i);
                 break;
             }
+        }
+    }
+
+    private void doFinalMerge() {
+        int count = values.size();
+        for (int i = 0; i < count; i++) {
+            ContentValues v = values.get(i);
+            applyPendingVotes(v);
+        }
+
+        appendLoadingMore();
+    }
+
+    private void applyPendingVotes(ContentValues v) {
+        if (!voteActionMap.isEmpty()) {
+            String thingId = (String) v.get(Things.COLUMN_THING_ID);
+            Integer action = voteActionMap.remove(thingId);
+            if (action != null) {
+                v.put(Things.COLUMN_LIKES, action);
+            }
+        }
+    }
+
+    private void appendLoadingMore() {
+        if (!TextUtils.isEmpty(moreThingId)) {
+            values.add(newContentValues(Kinds.KIND_MORE, moreThingId, 1));
         }
     }
 }
