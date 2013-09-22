@@ -46,9 +46,4 @@ interface Listing {
     /** Return whether this query is appending to an existing data set. */
     boolean isAppend();
 
-    /** Return the network time for statistical purposes. */
-    long getNetworkTimeMs();
-
-    /** Return the parsing time for statistical purposes. */
-    long getParseTimeMs();
 }

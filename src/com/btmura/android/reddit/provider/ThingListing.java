@@ -33,9 +33,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
-import android.util.Log;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.SaveActions;
@@ -280,8 +278,6 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public List<ContentValues> getValues() throws IOException {
-        long t1 = System.currentTimeMillis();
-
         CharSequence url;
         if (!TextUtils.isEmpty(profileUser)) {
             url = Urls.user(profileUser, filter, more, Urls.TYPE_JSON);
@@ -291,25 +287,13 @@ class ThingListing extends JsonParser implements Listing {
             url = Urls.subreddit(subreddit, filter, more, Urls.TYPE_JSON);
         }
 
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "getValues url: " + url);
-        }
-
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = null;
+        voteActionMap = ListingUtils.getVoteActionMap(dbHelper, accountName);
         try {
             input = new BufferedInputStream(conn.getInputStream());
-            long t2 = System.currentTimeMillis();
-
-            voteActionMap = ListingUtils.getVoteActionMap(dbHelper, accountName);
-
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingObject(reader);
-            if (BuildConfig.DEBUG) {
-                long t3 = System.currentTimeMillis();
-                networkTimeMs = t2 - t1;
-                parseTimeMs = t3 - t2;
-            }
             return values;
         } finally {
             if (input != null) {
@@ -321,16 +305,6 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public void performExtraWork(Context context) {
-    }
-
-    @Override
-    public long getNetworkTimeMs() {
-        return networkTimeMs;
-    }
-
-    @Override
-    public long getParseTimeMs() {
-        return parseTimeMs;
     }
 
     @Override

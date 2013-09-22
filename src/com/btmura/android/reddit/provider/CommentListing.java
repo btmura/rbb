@@ -34,7 +34,6 @@ import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.app.CommentLogic;
 import com.btmura.android.reddit.app.CommentLogic.CommentList;
 import com.btmura.android.reddit.database.CommentActions;
@@ -77,9 +76,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     // TODO: Pass estimate of size to CommentListing rather than doing this.
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
     private final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
-    private long networkTimeMs;
-    private long parseTimeMs;
-
     private Map<String, Integer> voteActionMap;
 
     static CommentListing newInstance(Context context,
@@ -126,23 +122,14 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public ArrayList<ContentValues> getValues() throws IOException {
-        long t1 = System.currentTimeMillis();
         CharSequence url = Urls.commentListing(thingId, linkId, numComments, Urls.TYPE_JSON);
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = null;
+        voteActionMap = ListingUtils.getVoteActionMap(dbHelper, accountName);
         try {
             input = new BufferedInputStream(conn.getInputStream());
-            long t2 = System.currentTimeMillis();
-
-            voteActionMap = ListingUtils.getVoteActionMap(dbHelper, accountName);
-
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingArray(reader);
-            if (BuildConfig.DEBUG) {
-                long t3 = System.currentTimeMillis();
-                networkTimeMs = t2 - t1;
-                parseTimeMs = t3 - t2;
-            }
             return values;
         } finally {
             if (input != null) {
@@ -154,16 +141,6 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public void performExtraWork(Context context) {
-    }
-
-    @Override
-    public long getNetworkTimeMs() {
-        return networkTimeMs;
-    }
-
-    @Override
-    public long getParseTimeMs() {
-        return parseTimeMs;
     }
 
     @Override

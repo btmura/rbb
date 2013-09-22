@@ -27,7 +27,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.database.SubredditResults;
 import com.btmura.android.reddit.database.Things;
@@ -44,8 +43,6 @@ class SubredditResultListing extends JsonParser implements Listing {
     private final String cookie;
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(25);
-    private long networkTimeMs;
-    private long parseTimeMs;
 
     static SubredditResultListing newInstance(String accountName, String query, String cookie) {
         return new SubredditResultListing(accountName, query, cookie);
@@ -69,21 +66,13 @@ class SubredditResultListing extends JsonParser implements Listing {
 
     @Override
     public ArrayList<ContentValues> getValues() throws IOException {
-        long t1 = System.currentTimeMillis();
         CharSequence url = Urls.subredditSearch(query, null);
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = null;
         try {
             input = new BufferedInputStream(conn.getInputStream());
-            long t2 = System.currentTimeMillis();
-
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingObject(reader);
-            if (BuildConfig.DEBUG) {
-                long t3 = System.currentTimeMillis();
-                networkTimeMs = t2 - t1;
-                parseTimeMs = t3 - t2;
-            }
             return values;
         } finally {
             if (input != null) {
@@ -95,16 +84,6 @@ class SubredditResultListing extends JsonParser implements Listing {
 
     @Override
     public void performExtraWork(Context context) {
-    }
-
-    @Override
-    public long getNetworkTimeMs() {
-        return networkTimeMs;
-    }
-
-    @Override
-    public long getParseTimeMs() {
-        return parseTimeMs;
     }
 
     @Override

@@ -31,7 +31,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 import android.util.JsonReader;
 
-import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.MessageActions;
 import com.btmura.android.reddit.database.Messages;
@@ -69,8 +68,6 @@ class MessageListing extends JsonParser implements Listing {
     private final String cookie;
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
-    private long networkTimeMs;
-    private long parseTimeMs;
     private String moreThingId;
 
     /** Returns a listing of messages for inbox or sent. */
@@ -135,20 +132,12 @@ class MessageListing extends JsonParser implements Listing {
 
     @Override
     public ArrayList<ContentValues> getValues() throws IOException {
-        long t1 = System.currentTimeMillis();
         HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, true, false);
         InputStream input = null;
         try {
             input = new BufferedInputStream(conn.getInputStream());
-            long t2 = System.currentTimeMillis();
-
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingObject(reader);
-            if (BuildConfig.DEBUG) {
-                long t3 = System.currentTimeMillis();
-                networkTimeMs = t2 - t1;
-                parseTimeMs = t3 - t2;
-            }
             return values;
         } finally {
             if (input != null) {
@@ -176,16 +165,6 @@ class MessageListing extends JsonParser implements Listing {
         if (mark) {
             Provider.clearNewMessageIndicator(context, accountName, false);
         }
-    }
-
-    @Override
-    public long getNetworkTimeMs() {
-        return networkTimeMs;
-    }
-
-    @Override
-    public long getParseTimeMs() {
-        return parseTimeMs;
     }
 
     @Override
