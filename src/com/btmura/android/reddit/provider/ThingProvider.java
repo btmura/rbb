@@ -170,16 +170,6 @@ public class ThingProvider extends BaseProvider {
 
     private static final String JOINED_COMMENTS_TABLE = Comments.TABLE_NAME + JOINED_TABLE;
 
-    private static final String JOINED_MESSAGES_TABLE = Messages.TABLE_NAME
-            // Join with pending actions to decide if need to mark as read.
-            + " LEFT OUTER JOIN (SELECT "
-            + ReadActions.COLUMN_ACCOUNT + ", "
-            + ReadActions.COLUMN_THING_ID + ", "
-            + ReadActions.COLUMN_ACTION + " AS " + SharedColumns.COLUMN_READ_ACTION
-            + " FROM " + ReadActions.TABLE_NAME + ") USING ("
-            + ReadActions.COLUMN_ACCOUNT + ", "
-            + SharedColumns.COLUMN_THING_ID + ")";
-
     private static final String METHOD_GET_SESSION = "getSession";
     private static final String METHOD_CLEAN_SESSIONS = "cleanSessions";
     private static final String METHOD_EXPAND_COMMENT = "expandComment";
@@ -274,9 +264,7 @@ public class ThingProvider extends BaseProvider {
                         : Comments.TABLE_NAME;
 
             case MATCH_MESSAGES:
-                return uri.getBooleanQueryParameter(PARAM_JOIN, false)
-                        ? JOINED_MESSAGES_TABLE
-                        : Messages.TABLE_NAME;
+                return Messages.TABLE_NAME;
 
             case MATCH_SUBREDDITS:
                 return SubredditResults.TABLE_NAME;

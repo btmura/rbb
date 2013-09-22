@@ -23,7 +23,6 @@ import android.view.View;
 import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.content.MessageThingLoader;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.database.ReadActions;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Objects;
 
@@ -114,13 +113,7 @@ public class MessageListAdapter extends AbstractThingListAdapter {
     public boolean isNew(int position) {
         Cursor cursor = getCursor();
         if (cursor != null && cursor.moveToPosition(position)) {
-            // If no local read actions are pending, then rely on what reddit thinks.
-            if (cursor.isNull(MessageThingLoader.INDEX_READ_ACTION)) {
-                return cursor.getInt(MessageThingLoader.INDEX_NEW) == 1;
-            }
-
-            // We have a local pending action so use that to indicate if it's new.
-            return cursor.getInt(MessageThingLoader.INDEX_READ_ACTION) == ReadActions.ACTION_UNREAD;
+            return cursor.getInt(MessageThingLoader.INDEX_NEW) == 1;
         }
         return false;
     }
