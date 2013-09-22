@@ -182,6 +182,7 @@ class ThingListing extends JsonParser implements Listing {
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
     private Map<String, Integer> hideActionMap;
+    private Map<String, Integer> saveActionMap;
     private Map<String, Integer> voteActionMap;
     private String moreThingId;
 
@@ -276,21 +277,14 @@ class ThingListing extends JsonParser implements Listing {
 
     @Override
     public List<ContentValues> getValues() throws IOException {
-        CharSequence url;
-        if (!TextUtils.isEmpty(profileUser)) {
-            url = Urls.user(profileUser, filter, more, Urls.TYPE_JSON);
-        } else if (!TextUtils.isEmpty(query)) {
-            url = Urls.search(subreddit, query, more);
-        } else {
-            url = Urls.subreddit(subreddit, filter, more, Urls.TYPE_JSON);
-        }
-
-        HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
+        HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, true, false);
         InputStream input = null;
-        hideActionMap = HideMerger.getActionMap(dbHelper, accountName);
-        voteActionMap = VoteMerger.getActionMap(dbHelper, accountName);
         try {
             input = new BufferedInputStream(conn.getInputStream());
+            hideActionMap = HideMerger.getActionMap(dbHelper, accountName);
+            saveActionMap = SaveMerger.getActionMap(dbHelper, accountName);
+            voteActionMap = VoteMerger.getActionMap(dbHelper, accountName);
+
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingObject(reader);
             return values;
@@ -299,6 +293,16 @@ class ThingListing extends JsonParser implements Listing {
                 input.close();
             }
             conn.disconnect();
+        }
+    }
+
+    private CharSequence getUrl() {
+        if (!TextUtils.isEmpty(profileUser)) {
+            return Urls.user(profileUser, filter, more, Urls.TYPE_JSON);
+        } else if (!TextUtils.isEmpty(query)) {
+            return Urls.search(subreddit, query, more);
+        } else {
+            return Urls.subreddit(subreddit, filter, more, Urls.TYPE_JSON);
         }
     }
 
@@ -542,18 +546,20 @@ class ThingListing extends JsonParser implements Listing {
         String selection;
         switch (filter) {
             case FilterAdapter.PROFILE_LIKED:
-                // If we're on the first page, then grab both likes, dislikes,
-                // and neutral votes. The liked items will be prepended to the
-                // top and disliked and netural items will be pruned.
+                // If we're on the first page, then grab both likes, dislikes, and neutral votes.
+                // The liked items will be prepended to the top and disliked and netural items will
+                // be pruned.
                 //
-                // If we're just appending, then just grab the disliked and
-                // neutral items we need to prune.
-                selection = firstPage ? VoteActions.SELECT_SHOWABLE_BY_ACCOUNT
+                // If we're just appending, then just grab the disliked and neutral items we need to
+                // prune.
+                selection = firstPage
+                        ? VoteActions.SELECT_SHOWABLE_BY_ACCOUNT
                         : VoteActions.SELECT_SHOWABLE_NOT_UP_BY_ACCOUNT;
                 break;
 
             case FilterAdapter.PROFILE_DISLIKED:
-                selection = firstPage ? VoteActions.SELECT_SHOWABLE_BY_ACCOUNT
+                selection = firstPage
+                        ? VoteActions.SELECT_SHOWABLE_BY_ACCOUNT
                         : VoteActions.SELECT_SHOWABLE_NOT_DOWN_BY_ACCOUNT;
                 break;
 
@@ -664,6 +670,7 @@ class ThingListing extends JsonParser implements Listing {
         for (int i = 0; i < count; i++) {
             ContentValues v = values.get(i);
             HideMerger.updateContentValues(v, hideActionMap);
+            SaveMerger.updateContentValues(v, saveActionMap);
             VoteMerger.updateContentValues(v, voteActionMap);
         }
         appendLoadingMore();

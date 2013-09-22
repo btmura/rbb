@@ -586,6 +586,8 @@ public class ThingProvider extends BaseProvider {
                 return readMessage(accountName, extras);
             } else if (METHOD_HIDE.equals(method)) {
                 return hide(accountName, extras);
+            } else if (METHOD_SAVE.equals(method)) {
+                return save(accountName, extras);
             } else if (METHOD_VOTE.equals(method)) {
                 return vote(accountName, extras);
             } else {
@@ -1248,6 +1250,59 @@ public class ThingProvider extends BaseProvider {
         cr.notifyChange(HIDE_ACTIONS_URI, null, SYNC);
         if (changed > 0) {
             cr.notifyChange(THINGS_URI, null, NO_SYNC);
+        }
+        return Bundle.EMPTY;
+    }
+
+    private Bundle save(String accountName, Bundle extras) {
+        int action = getActionExtra(extras);
+        String thingId = getThingIdExtra(extras);
+        ThingBundle thingBundle = getThingBundleExtra(extras);
+
+        int changed = 0;
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues v = new ContentValues(thingBundle == null ? 4 : 19);
+            v.put(SaveActions.COLUMN_ACCOUNT, accountName);
+            v.put(SaveActions.COLUMN_ACTION, action);
+            v.put(SaveActions.COLUMN_THING_ID, thingId);
+
+            if (thingBundle != null) {
+                v.put(SaveActions.COLUMN_AUTHOR, thingBundle.getAuthor());
+                v.put(SaveActions.COLUMN_CREATED_UTC, thingBundle.getCreatedUtc());
+                v.put(SaveActions.COLUMN_DOMAIN, thingBundle.getDomain());
+                v.put(SaveActions.COLUMN_DOWNS, thingBundle.getDowns());
+                v.put(SaveActions.COLUMN_LIKES, thingBundle.getLikes());
+                v.put(SaveActions.COLUMN_NUM_COMMENTS, thingBundle.getNumComments());
+                v.put(SaveActions.COLUMN_OVER_18, thingBundle.isOver18());
+                v.put(SaveActions.COLUMN_PERMA_LINK, thingBundle.getPermaLink());
+                v.put(SaveActions.COLUMN_SCORE, thingBundle.getScore());
+                v.put(SaveActions.COLUMN_SELF, thingBundle.isSelf());
+                v.put(SaveActions.COLUMN_SUBREDDIT, thingBundle.getSubreddit());
+                v.put(SaveActions.COLUMN_TITLE, thingBundle.getTitle());
+                v.put(SaveActions.COLUMN_THUMBNAIL_URL, thingBundle.getThumbnailUrl());
+                v.put(SaveActions.COLUMN_UPS, thingBundle.getUps());
+                v.put(SaveActions.COLUMN_URL, thingBundle.getUrl());
+            }
+
+            long actionId = db.replace(SaveActions.TABLE_NAME, null, v);
+            if (actionId == -1) {
+                return null;
+            }
+
+            changed += SaveMerger.updateDatabase(db, accountName, action, thingId, v);
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(SAVE_ACTIONS_URI, null, SYNC);
+        if (changed > 0) {
+            cr.notifyChange(THINGS_URI, null, NO_SYNC);
+            cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
         }
         return Bundle.EMPTY;
     }

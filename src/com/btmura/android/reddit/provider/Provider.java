@@ -209,11 +209,7 @@ public class Provider {
         });
     }
 
-    static Bundle call(Context context,
-            Uri uri,
-            String method,
-            String arg,
-            Bundle extras) {
+    static Bundle call(Context context, Uri uri, String method, String arg, Bundle extras) {
         return context.getApplicationContext().getContentResolver().call(uri, method, arg, extras);
     }
 

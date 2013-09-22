@@ -29,7 +29,6 @@ import android.os.RemoteException;
 
 import com.btmura.android.reddit.database.SaveActions;
 import com.btmura.android.reddit.database.SharedColumns;
-import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -70,23 +69,11 @@ class SaveSyncer implements Syncer {
     }
 
     @Override
-    public void addOps(String accountName, Cursor c,
-            ArrayList<ContentProviderOperation> ops) {
-        long id = c.getLong(SAVE_ID);
-        String thingId = c.getString(SAVE_THING_ID);
-        int action = c.getInt(SAVE_ACTION);
-        boolean saved = action == SaveActions.ACTION_SAVE;
-
+    public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
         // Delete the row corresponding to the pending save.
+        long id = c.getLong(SAVE_ID);
         ops.add(ContentProviderOperation.newDelete(ThingProvider.SAVE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                .build());
-
-        // Update the tables that join with the saves table since we will delete the pending rows.
-        String[] selectionArgs = Array.of(accountName, thingId);
-        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
-                .withValue(Things.COLUMN_SAVED, saved)
                 .build());
     }
 
@@ -95,7 +82,6 @@ class SaveSyncer implements Syncer {
         int count = results.length;
         for (int i = 0; i < count;) {
             syncResult.stats.numDeletes += results[i++].count;
-            syncResult.stats.numUpdates += results[i++].count;
         }
     }
 }

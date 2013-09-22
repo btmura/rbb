@@ -76,6 +76,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     // TODO: Pass estimate of size to CommentListing rather than doing this.
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);
     private final HashMap<String, ContentValues> valueMap = new HashMap<String, ContentValues>();
+    private Map<String, Integer> saveActionMap;
     private Map<String, Integer> voteActionMap;
 
     static CommentListing newInstance(Context context,
@@ -125,9 +126,11 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         CharSequence url = Urls.commentListing(thingId, linkId, numComments, Urls.TYPE_JSON);
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = null;
-        voteActionMap = VoteMerger.getActionMap(dbHelper, accountName);
         try {
             input = new BufferedInputStream(conn.getInputStream());
+            saveActionMap = SaveMerger.getActionMap(dbHelper, accountName);
+            voteActionMap = VoteMerger.getActionMap(dbHelper, accountName);
+
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingArray(reader);
             return values;
@@ -413,6 +416,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 continue;
             }
 
+            SaveMerger.updateContentValues(v, saveActionMap);
             VoteMerger.updateContentValues(v, voteActionMap);
             applySequenceNumber(v, i);
         }

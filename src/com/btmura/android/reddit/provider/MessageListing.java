@@ -136,9 +136,10 @@ class MessageListing extends JsonParser implements Listing {
     public ArrayList<ContentValues> getValues() throws IOException {
         HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, true, false);
         InputStream input = null;
-        readActionMap = ReadMerger.getActionMap(dbHelper, accountName);
         try {
             input = new BufferedInputStream(conn.getInputStream());
+            readActionMap = ReadMerger.getActionMap(dbHelper, accountName);
+
             JsonReader reader = new JsonReader(new InputStreamReader(input));
             parseListingObject(reader);
             return values;
