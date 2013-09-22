@@ -16,7 +16,7 @@
 
 package com.btmura.android.reddit.database;
 
-interface BaseThingColumns {
+public interface BaseThingColumns {
 
     // The following columns allow us to show pending saves to the user before
     // we have had a chance to sync them back to the server.

@@ -181,9 +181,6 @@ class ThingListing extends JsonParser implements Listing {
     private final Formatter formatter = new Formatter();
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
-    private long networkTimeMs;
-    private long parseTimeMs;
-
     private Map<String, Integer> voteActionMap;
     private String moreThingId;
 
@@ -676,6 +673,16 @@ class ThingListing extends JsonParser implements Listing {
             Integer action = voteActionMap.remove(thingId);
             if (action != null) {
                 v.put(Things.COLUMN_LIKES, action);
+                switch (action) {
+                    case VoteActions.ACTION_VOTE_UP:
+                        break;
+
+                    case VoteActions.ACTION_VOTE_DOWN:
+                        break;
+
+                    case VoteActions.ACTION_VOTE_NEUTRAL:
+                        break;
+                }
             }
         }
     }

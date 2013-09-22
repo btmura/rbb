@@ -89,7 +89,7 @@ public class Comments implements BaseThingColumns, BaseColumns {
     static void createTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_ACCOUNT + " TEXT NOT NULL,"
+                + COLUMN_ACCOUNT + " TEXT,"
                 + COLUMN_BODY + " TEXT,"
                 + COLUMN_COMMENT_ACTION_ID + " INTEGER,"
                 + COLUMN_EXPANDED + " INTEGER DEFAULT 1,"
@@ -97,7 +97,7 @@ public class Comments implements BaseThingColumns, BaseColumns {
                 + COLUMN_NESTING + " INTEGER,"
                 + COLUMN_SELF_TEXT + " TEXT DEFAULT '',"
                 + COLUMN_SEQUENCE + " INTEGER,"
-                + COLUMN_SESSION_ID + " TEXT NOT NULL,"
+                + COLUMN_SESSION_ID + " TEXT,"
                 + COLUMN_THING_ID + " TEXT,"
                 + COLUMN_VISIBLE + " INTEGER DEFAULT 1,"
                 + CREATE_THING_COLUMNS_V2 + ")");

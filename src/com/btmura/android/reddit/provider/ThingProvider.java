@@ -1175,15 +1175,7 @@ public class ThingProvider extends BaseProvider {
                 return null;
             }
 
-            String[] selectionArgs = Array.of(accountName, thingId);
-
-            v.clear();
-            v.put(Things.COLUMN_LIKES, action);
-            db.update(Things.TABLE_NAME, v, Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs);
-
-            v.clear();
-            v.put(Comments.COLUMN_LIKES, action);
-            db.update(Comments.TABLE_NAME, v, Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs);
+            VoteStatements.execute(db, accountName, action, thingId);
 
             db.setTransactionSuccessful();
         } finally {

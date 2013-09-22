@@ -22,9 +22,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DbHelper extends SQLiteOpenHelper {
 
-    static final String DATABASE_REDDIT = "reddit";
-    static final String DATABASE_TEST = "test";
-    static final int LATEST_VERSION = 3;
+    public static final String DATABASE_REDDIT = "reddit";
+    public static final String DATABASE_TEST = "test";
+    public static final int LATEST_VERSION = 3;
 
     /** Singleton instances accessible via {@link #getInstance(Context)}. */
     private static DbHelper INSTANCE;
@@ -37,7 +37,8 @@ public class DbHelper extends SQLiteOpenHelper {
         synchronized (DbHelper.class) {
             if (INSTANCE == null) {
                 INSTANCE = new DbHelper(context.getApplicationContext(),
-                        DATABASE_REDDIT, LATEST_VERSION);
+                        DATABASE_REDDIT,
+                        LATEST_VERSION);
             }
             return INSTANCE;
         }
@@ -47,7 +48,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private final int version;
 
     /** Test constructor. Use {@link #getInstance(Context, String, int)}. */
-    DbHelper(Context context, String name, int version) {
+    public DbHelper(Context context, String name, int version) {
         super(context, name, null, version);
         this.version = version;
     }
