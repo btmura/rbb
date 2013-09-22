@@ -102,10 +102,6 @@ public class ThingProvider extends BaseProvider {
     public static final Uri SAVE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_SAVE_ACTIONS);
     public static final Uri VOTE_ACTIONS_URI = Uri.parse(AUTHORITY_URI + PATH_VOTE_ACTIONS);
 
-    public static final Uri THINGS_SYNC_URI = makeSyncUri(THINGS_URI);
-    public static final Uri MESSAGES_SYNC_URI = makeSyncUri(MESSAGES_URI);
-    public static final Uri COMMENT_ACTIONS_SYNC_URI = makeSyncUri(COMMENT_ACTIONS_URI);
-
     private static final UriMatcher MATCHER = new UriMatcher(0);
     private static final int MATCH_THINGS = 1;
     private static final int MATCH_COMMENTS = 2;
@@ -131,11 +127,6 @@ public class ThingProvider extends BaseProvider {
         MATCHER.addURI(AUTHORITY, PATH_SAVE_ACTIONS, MATCH_SAVE_ACTIONS);
         MATCHER.addURI(AUTHORITY, PATH_VOTE_ACTIONS, MATCH_VOTE_ACTIONS);
     }
-
-    static final String PARAM_NOTIFY_ACCOUNTS = "notifyAccounts";
-    static final String PARAM_NOTIFY_COMMENTS = "notifyComments";
-    static final String PARAM_NOTIFY_THINGS = "notifyThings";
-    static final String PARAM_NOTIFY_MESSAGES = "notifyMessages";
 
     private static final String METHOD_GET_SESSION = "getSession";
     private static final String METHOD_CLEAN_SESSIONS = "cleanSessions";
@@ -258,23 +249,6 @@ public class ThingProvider extends BaseProvider {
         }
     }
 
-    @Override
-    protected void notifyChange(Uri uri) {
-        super.notifyChange(uri);
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_ACCOUNTS, false)) {
-            getContext().getContentResolver().notifyChange(AccountProvider.ACCOUNTS_URI, null);
-        }
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_COMMENTS, false)) {
-            getContext().getContentResolver().notifyChange(COMMENTS_URI, null);
-        }
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_THINGS, false)) {
-            getContext().getContentResolver().notifyChange(THINGS_URI, null);
-        }
-        if (uri.getBooleanQueryParameter(PARAM_NOTIFY_MESSAGES, false)) {
-            getContext().getContentResolver().notifyChange(MESSAGES_URI, null);
-        }
-    }
-
     public static final Bundle getSubredditSession(Context context,
             String accountName,
             String subreddit,
@@ -373,27 +347,27 @@ public class ThingProvider extends BaseProvider {
         return Provider.call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
-    public static final Bundle cleanSessions(Context context, int sessionType) {
+    static final Bundle cleanSessions(Context context, int sessionType) {
         Bundle extras = new Bundle(1);
         extras.putInt(EXTRA_SESSION_TYPE, sessionType);
         return Provider.call(context, THINGS_URI, METHOD_CLEAN_SESSIONS, null, extras);
     }
 
-    public static final Bundle expandComment(Context context, long id, long sessionId) {
+    static final Bundle expandComment(Context context, long id, long sessionId) {
         Bundle extras = new Bundle(2);
         extras.putLong(EXTRA_ID, id);
         extras.putLong(EXTRA_SESSION_ID, sessionId);
         return Provider.call(context, COMMENTS_URI, METHOD_EXPAND_COMMENT, null, extras);
     }
 
-    public static final Bundle collapseComment(Context context, long id, long[] childIds) {
+    static final Bundle collapseComment(Context context, long id, long[] childIds) {
         Bundle extras = new Bundle(2);
         extras.putLong(EXTRA_ID, id);
         extras.putLongArray(EXTRA_ID_ARRAY, childIds);
         return Provider.call(context, COMMENTS_URI, METHOD_COLLAPSE_COMMENT, null, extras);
     }
 
-    public static final Bundle insertComment(Context context,
+    static final Bundle insertComment(Context context,
             String accountName,
             String body,
             String parentThingId,
@@ -409,7 +383,7 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
-    public static final Bundle editComment(Context context,
+    static final Bundle editComment(Context context,
             String accountName,
             String body,
             String parentThingId,
@@ -425,7 +399,7 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
-    public static final Bundle deleteComment(Context context,
+    static final Bundle deleteComment(Context context,
             String accountName,
             boolean[] hasChildren,
             long[] ids,
@@ -443,7 +417,7 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
-    public static final Bundle insertMessage(Context context,
+    static final Bundle insertMessage(Context context,
             String accountName,
             String body,
             String parentThingId,
@@ -459,35 +433,17 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
-    public static final Bundle readMessage(Context context,
+    static final Bundle readMessage(Context context,
             String accountName,
             int action,
             String thingId) {
         Bundle extras = new Bundle(2);
         extras.putInt(EXTRA_ACTION, action);
         extras.putString(EXTRA_THING_ID, thingId);
-        return Provider.call(context,
-                READ_ACTIONS_URI,
-                METHOD_READ_MESSAGE,
-                accountName,
-                extras);
+        return Provider.call(context, READ_ACTIONS_URI, METHOD_READ_MESSAGE, accountName, extras);
     }
 
-    public static final Bundle hide(Context context,
-            String accountName,
-            int action,
-            String thingId) {
-        Bundle extras = new Bundle(2);
-        extras.putInt(EXTRA_ACTION, action);
-        extras.putString(EXTRA_THING_ID, thingId);
-        return Provider.call(context,
-                HIDE_ACTIONS_URI,
-                METHOD_HIDE,
-                accountName,
-                extras);
-    }
-
-    public static final Bundle hide(Context context,
+    static final Bundle hide(Context context,
             String accountName,
             int action,
             String thingId,
@@ -496,28 +452,10 @@ public class ThingProvider extends BaseProvider {
         extras.putInt(EXTRA_ACTION, action);
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putParcelable(EXTRA_THING_BUNDLE, thingBundle);
-        return Provider.call(context,
-                HIDE_ACTIONS_URI,
-                METHOD_HIDE,
-                accountName,
-                extras);
+        return Provider.call(context, HIDE_ACTIONS_URI, METHOD_HIDE, accountName, extras);
     }
 
-    public static final Bundle save(Context context,
-            String accountName,
-            int action,
-            String thingId) {
-        Bundle extras = new Bundle(2);
-        extras.putInt(EXTRA_ACTION, action);
-        extras.putString(EXTRA_THING_ID, thingId);
-        return Provider.call(context,
-                SAVE_ACTIONS_URI,
-                METHOD_SAVE,
-                accountName,
-                extras);
-    }
-
-    public static final Bundle save(Context context,
+    static final Bundle save(Context context,
             String accountName,
             int action,
             String thingId,
@@ -526,28 +464,10 @@ public class ThingProvider extends BaseProvider {
         extras.putInt(EXTRA_ACTION, action);
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putParcelable(EXTRA_THING_BUNDLE, thingBundle);
-        return Provider.call(context,
-                SAVE_ACTIONS_URI,
-                METHOD_SAVE,
-                accountName,
-                extras);
+        return Provider.call(context, SAVE_ACTIONS_URI, METHOD_SAVE, accountName, extras);
     }
 
-    public static final Bundle vote(Context context,
-            String accountName,
-            int action,
-            String thingId) {
-        Bundle extras = new Bundle(2);
-        extras.putInt(EXTRA_ACTION, action);
-        extras.putString(EXTRA_THING_ID, thingId);
-        return Provider.call(context,
-                VOTE_ACTIONS_URI,
-                METHOD_VOTE,
-                accountName,
-                extras);
-    }
-
-    public static final Bundle vote(Context context,
+    static final Bundle vote(Context context,
             String accountName,
             int action,
             String thingId,
@@ -556,11 +476,7 @@ public class ThingProvider extends BaseProvider {
         extras.putInt(EXTRA_ACTION, action);
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putParcelable(EXTRA_THING_BUNDLE, thingBundle);
-        return Provider.call(context,
-                VOTE_ACTIONS_URI,
-                METHOD_VOTE,
-                accountName,
-                extras);
+        return Provider.call(context, VOTE_ACTIONS_URI, METHOD_VOTE, accountName, extras);
     }
 
     @Override
