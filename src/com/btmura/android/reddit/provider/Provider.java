@@ -169,14 +169,15 @@ public class Provider {
     /** Mark a message either read or unread. */
     public static void readMessageAsync(final Context context,
             final String accountName,
-            final String thingId,
-            final boolean read) {
+            final String thingId) {
         final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
-                int action = read ? ReadActions.ACTION_READ : ReadActions.ACTION_UNREAD;
-                ThingProvider.readMessage(appContext, accountName, thingId, action);
+                ThingProvider.readMessage(appContext,
+                        accountName,
+                        thingId,
+                        ReadActions.ACTION_READ);
             }
         });
     }
