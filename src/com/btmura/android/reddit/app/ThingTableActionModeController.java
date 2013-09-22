@@ -317,32 +317,21 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
 
     private void hide(int position, boolean hide) {
         if (hide) {
-            Provider.hideAsync(context,
-                    accountName,
-                    getAuthor(position),
-                    getCreatedUtc(position),
-                    getDomain(position),
-                    getDowns(position),
-                    getLikes(position),
-                    getNumComments(position),
-                    isOver18(position),
-                    getPermaLink(position),
-                    getScore(position),
-                    isSelf(position),
-                    getSubreddit(position),
-                    getThingId(position),
-                    getThumbnailUrl(position),
-                    getTitle(position),
-                    getUps(position),
-                    getUrl(position));
+            ThingBundle thingBundle = getThingBundle(position);
+            Provider.hideAsync(context, accountName, getThingId(position), thingBundle, true);
         } else {
-            Provider.unhideAsync(context, accountName, getThingId(position));
+            Provider.hideAsync(context, accountName, getThingId(position), false);
         }
     }
 
     @Override
     public void vote(int position, int action) {
-        ThingBundle thingBundle = ThingBundle.newLinkInstance(getAuthor(position),
+        ThingBundle thingBundle = getThingBundle(position);
+        Provider.voteAsync(context, accountName, action, getThingId(position), thingBundle);
+    }
+
+    private ThingBundle getThingBundle(int position) {
+        return ThingBundle.newLinkInstance(getAuthor(position),
                 getCreatedUtc(position),
                 getDomain(position),
                 getDowns(position),
@@ -360,8 +349,6 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
                 getTitle(position),
                 getUps(position),
                 getUrl(position));
-
-        Provider.voteAsync(context, accountName, action, getThingId(position), thingBundle);
     }
 
     // Utility methods

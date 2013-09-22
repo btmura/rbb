@@ -29,7 +29,6 @@ import android.os.RemoteException;
 
 import com.btmura.android.reddit.database.HideActions;
 import com.btmura.android.reddit.database.SharedColumns;
-import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Result;
 import com.btmura.android.reddit.provider.ThingProvider;
@@ -65,25 +64,15 @@ class HideSyncer implements Syncer {
 
     @Override
     public int getOpCount(int count) {
-        return count * 2;
+        return count;
     }
 
     @Override
     public void addOps(String accountName, Cursor c, ArrayList<ContentProviderOperation> ops) {
-        long id = c.getLong(HIDE_ID);
-        String thingId = c.getString(HIDE_THING_ID);
-        int action = c.getInt(HIDE_ACTION);
-
         // Delete the row corresponding to the pending hide.
+        long id = c.getLong(HIDE_ID);
         ops.add(ContentProviderOperation.newDelete(ThingProvider.HIDE_ACTIONS_URI)
                 .withSelection(ThingProvider.ID_SELECTION, Array.of(id))
-                .build());
-
-        // Update the tables that join with the actions table since we will delete the pending rows.
-        String[] selectionArgs = Array.of(accountName, thingId);
-        ops.add(ContentProviderOperation.newUpdate(ThingProvider.THINGS_URI)
-                .withSelection(Things.SELECT_BY_ACCOUNT_AND_THING_ID, selectionArgs)
-                .withValue(Things.COLUMN_HIDDEN, action == HideActions.ACTION_HIDE)
                 .build());
     }
 
@@ -92,7 +81,6 @@ class HideSyncer implements Syncer {
         int count = results.length;
         for (int i = 0; i < count;) {
             syncResult.stats.numDeletes += results[i++].count;
-            syncResult.stats.numUpdates += results[i++].count;
         }
     }
 }

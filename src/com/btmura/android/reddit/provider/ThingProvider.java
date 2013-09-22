@@ -170,6 +170,7 @@ public class ThingProvider extends BaseProvider {
     private static final String METHOD_DELETE_COMMENT = "deleteComment";
     private static final String METHOD_INSERT_MESSAGE = "insertMessage";
     private static final String METHOD_READ_MESSAGE = "readMessage";
+    private static final String METHOD_HIDE = "hide";
     private static final String METHOD_VOTE = "vote";
 
     // List of extras used throughout the provider code.
@@ -499,6 +500,36 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
+    public static final Bundle hide(Context context,
+            String accountName,
+            int action,
+            String thingId) {
+        Bundle extras = new Bundle(2);
+        extras.putInt(EXTRA_ACTION, action);
+        extras.putString(EXTRA_THING_ID, thingId);
+        return Provider.call(context,
+                HIDE_ACTIONS_URI,
+                METHOD_HIDE,
+                accountName,
+                extras);
+    }
+
+    public static final Bundle hide(Context context,
+            String accountName,
+            int action,
+            String thingId,
+            ThingBundle thingBundle) {
+        Bundle extras = new Bundle(3);
+        extras.putInt(EXTRA_ACTION, action);
+        extras.putString(EXTRA_THING_ID, thingId);
+        extras.putParcelable(EXTRA_THING_BUNDLE, thingBundle);
+        return Provider.call(context,
+                HIDE_ACTIONS_URI,
+                METHOD_HIDE,
+                accountName,
+                extras);
+    }
+
     public static final Bundle vote(Context context,
             String accountName,
             int action,
@@ -550,6 +581,8 @@ public class ThingProvider extends BaseProvider {
                 return insertMessage(accountName, extras);
             } else if (METHOD_READ_MESSAGE.equals(method)) {
                 return readMessage(accountName, extras);
+            } else if (METHOD_HIDE.equals(method)) {
+                return hide(accountName, extras);
             } else if (METHOD_VOTE.equals(method)) {
                 return vote(accountName, extras);
             } else {
@@ -1160,6 +1193,58 @@ public class ThingProvider extends BaseProvider {
         cr.notifyChange(READ_ACTIONS_URI, null, SYNC);
         if (changed > 0) {
             cr.notifyChange(MESSAGES_URI, null, NO_SYNC);
+        }
+        return Bundle.EMPTY;
+    }
+
+    private Bundle hide(String accountName, Bundle extras) {
+        int action = getActionExtra(extras);
+        String thingId = getThingIdExtra(extras);
+        ThingBundle thingBundle = getThingBundleExtra(extras);
+
+        int changed = 0;
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues v = new ContentValues(thingBundle == null ? 3 : 19);
+            v.put(HideActions.COLUMN_ACCOUNT, accountName);
+            v.put(HideActions.COLUMN_ACTION, action);
+            v.put(HideActions.COLUMN_THING_ID, thingId);
+
+            if (thingBundle != null) {
+                v.put(HideActions.COLUMN_AUTHOR, thingBundle.getAuthor());
+                v.put(HideActions.COLUMN_CREATED_UTC, thingBundle.getCreatedUtc());
+                v.put(HideActions.COLUMN_DOMAIN, thingBundle.getDomain());
+                v.put(HideActions.COLUMN_DOWNS, thingBundle.getDowns());
+                v.put(HideActions.COLUMN_LIKES, thingBundle.getLikes());
+                v.put(HideActions.COLUMN_NUM_COMMENTS, thingBundle.getNumComments());
+                v.put(HideActions.COLUMN_OVER_18, thingBundle.isOver18());
+                v.put(HideActions.COLUMN_PERMA_LINK, thingBundle.getPermaLink());
+                v.put(HideActions.COLUMN_SCORE, thingBundle.getScore());
+                v.put(HideActions.COLUMN_SELF, thingBundle.isSelf());
+                v.put(HideActions.COLUMN_SUBREDDIT, thingBundle.getSubreddit());
+                v.put(HideActions.COLUMN_TITLE, thingBundle.getTitle());
+                v.put(HideActions.COLUMN_THUMBNAIL_URL, thingBundle.getThumbnailUrl());
+                v.put(HideActions.COLUMN_UPS, thingBundle.getUps());
+                v.put(HideActions.COLUMN_URL, thingBundle.getUrl());
+            }
+
+            long actionId = db.replace(HideActions.TABLE_NAME, null, v);
+            if (actionId == -1) {
+                return null;
+            }
+
+            changed += HideMerger.updateDatabase(db, accountName, action, thingId, v);
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(HIDE_ACTIONS_URI, null, SYNC);
+        if (changed > 0) {
+            cr.notifyChange(THINGS_URI, null, NO_SYNC);
         }
         return Bundle.EMPTY;
     }

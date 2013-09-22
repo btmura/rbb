@@ -181,6 +181,7 @@ class ThingListing extends JsonParser implements Listing {
     private final Formatter formatter = new Formatter();
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
+    private Map<String, Integer> hideActionMap;
     private Map<String, Integer> voteActionMap;
     private String moreThingId;
 
@@ -286,6 +287,7 @@ class ThingListing extends JsonParser implements Listing {
 
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = null;
+        hideActionMap = HideMerger.getActionMap(dbHelper, accountName);
         voteActionMap = VoteMerger.getActionMap(dbHelper, accountName);
         try {
             input = new BufferedInputStream(conn.getInputStream());
@@ -661,6 +663,7 @@ class ThingListing extends JsonParser implements Listing {
         int count = values.size();
         for (int i = 0; i < count; i++) {
             ContentValues v = values.get(i);
+            HideMerger.updateContentValues(v, hideActionMap);
             VoteMerger.updateContentValues(v, voteActionMap);
         }
         appendLoadingMore();
