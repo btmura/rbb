@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -68,6 +69,7 @@ class MessageListing extends JsonParser implements Listing {
     private final String cookie;
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
+    private Map<String, Integer> readActionMap;
     private String moreThingId;
 
     /** Returns a listing of messages for inbox or sent. */
@@ -134,6 +136,7 @@ class MessageListing extends JsonParser implements Listing {
     public ArrayList<ContentValues> getValues() throws IOException {
         HttpURLConnection conn = RedditApi.connect(getUrl(), cookie, true, false);
         InputStream input = null;
+        readActionMap = ReadMerger.getActionMap(dbHelper, accountName);
         try {
             input = new BufferedInputStream(conn.getInputStream());
             JsonReader reader = new JsonReader(new InputStreamReader(input));
@@ -264,13 +267,7 @@ class MessageListing extends JsonParser implements Listing {
             mergeThreadActions();
         }
 
-        if (!TextUtils.isEmpty(moreThingId)) {
-            ContentValues v = new ContentValues(3 + 1); // 1 for session id.
-            v.put(Messages.COLUMN_ACCOUNT, accountName);
-            v.put(Messages.COLUMN_KIND, Kinds.KIND_MORE);
-            v.put(Messages.COLUMN_THING_ID, moreThingId);
-            values.add(v);
-        }
+        doFinalMerge();
     }
 
     private void mergeThreadActions() {
@@ -314,5 +311,26 @@ class MessageListing extends JsonParser implements Listing {
 
         // Just append to the bottom for messages.
         values.add(v);
+    }
+
+    private void doFinalMerge() {
+        if (sessionType == Sessions.TYPE_MESSAGES) {
+            int count = values.size();
+            for (int i = 0; i < count; i++) {
+                ContentValues v = values.get(i);
+                ReadMerger.updateContentValues(v, readActionMap);
+            }
+        }
+        appendLoadingMore();
+    }
+
+    private void appendLoadingMore() {
+        if (!TextUtils.isEmpty(moreThingId)) {
+            ContentValues v = new ContentValues(3 + 1); // 1 for session id.
+            v.put(Messages.COLUMN_ACCOUNT, accountName);
+            v.put(Messages.COLUMN_KIND, Kinds.KIND_MORE);
+            v.put(Messages.COLUMN_THING_ID, moreThingId);
+            values.add(v);
+        }
     }
 }

@@ -35,6 +35,9 @@ public class SharedColumns {
 
     public static final String SELECT_BY_ACCOUNT = COLUMN_ACCOUNT + "=?";
 
+    public static final String SELECT_BY_ACCOUNT_AND_THING_ID =
+            COLUMN_ACCOUNT + "=? AND " + COLUMN_THING_ID + "=?";
+
     public static final String SELECT_BY_ID = BaseColumns._ID + "=?";
 
     public static final String SELECT_BY_SESSION_ID = COLUMN_SESSION_ID + "=?";

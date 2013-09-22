@@ -57,7 +57,7 @@ class VoteSyncer implements Syncer {
 
     @Override
     public int getOpCount(int count) {
-        return count * 2;
+        return count;
     }
 
     @Override

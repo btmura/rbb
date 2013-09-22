@@ -286,7 +286,7 @@ class ThingListing extends JsonParser implements Listing {
 
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = null;
-        voteActionMap = VoteMerger.getVoteActionMap(dbHelper, accountName);
+        voteActionMap = VoteMerger.getActionMap(dbHelper, accountName);
         try {
             input = new BufferedInputStream(conn.getInputStream());
             JsonReader reader = new JsonReader(new InputStreamReader(input));
@@ -663,7 +663,6 @@ class ThingListing extends JsonParser implements Listing {
             ContentValues v = values.get(i);
             VoteMerger.updateContentValues(v, voteActionMap);
         }
-
         appendLoadingMore();
     }
 

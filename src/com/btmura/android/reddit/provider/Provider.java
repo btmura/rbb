@@ -44,12 +44,6 @@ public class Provider {
                     .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
                     .build();
 
-    private static final Uri READ_URI =
-            ThingProvider.READ_ACTIONS_URI.buildUpon()
-                    .appendQueryParameter(ThingProvider.PARAM_NOTIFY_MESSAGES, ThingProvider.TRUE)
-                    .appendQueryParameter(ThingProvider.PARAM_SYNC, ThingProvider.TRUE)
-                    .build();
-
     private static final Uri SAVE_URI =
             ThingProvider.SAVE_ACTIONS_URI.buildUpon()
                     .appendQueryParameter(ThingProvider.PARAM_NOTIFY_THINGS, ThingProvider.TRUE)
@@ -188,16 +182,12 @@ public class Provider {
             final String accountName,
             final String thingId,
             final boolean read) {
-        final ContentResolver cr = context.getApplicationContext().getContentResolver();
+        final Context appContext = context.getApplicationContext();
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
                 int action = read ? ReadActions.ACTION_READ : ReadActions.ACTION_UNREAD;
-                ContentValues v = new ContentValues(3);
-                v.put(ReadActions.COLUMN_ACCOUNT, accountName);
-                v.put(ReadActions.COLUMN_THING_ID, thingId);
-                v.put(ReadActions.COLUMN_ACTION, action);
-                cr.insert(READ_URI, v);
+                ThingProvider.readMessage(appContext, accountName, thingId, action);
             }
         });
     }

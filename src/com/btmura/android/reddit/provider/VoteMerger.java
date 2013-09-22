@@ -24,7 +24,6 @@ import static com.btmura.android.reddit.database.BaseThingColumns.COLUMN_UPS;
 import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_DOWN;
 import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_NEUTRAL;
 import static com.btmura.android.reddit.database.VoteActions.ACTION_VOTE_UP;
-import static com.btmura.android.reddit.database.VoteActions.COLUMN_ACCOUNT;
 import static com.btmura.android.reddit.database.VoteActions.COLUMN_ACTION;
 import static com.btmura.android.reddit.database.VoteActions.COLUMN_THING_ID;
 
@@ -55,8 +54,6 @@ class VoteMerger {
     private static final int VOTE_INDEX_ACTION = 1;
     private static final int VOTE_INDEX_THING_ID = 2;
 
-    private static final String VOTE_SELECTION = SharedColumns.SELECT_BY_ACCOUNT;
-
     private static final String THING_UPDATE = "UPDATE " + Things.TABLE_NAME;
     private static final String COMMENT_UPDATE = "UPDATE " + Comments.TABLE_NAME;
 
@@ -85,19 +82,18 @@ class VoteMerger {
             + " ELSE " + COLUMN_DOWNS
             + " END ";
 
-    private static final String WHERE = " WHERE "
-            + COLUMN_ACCOUNT + "=? AND " + COLUMN_THING_ID + "=?";
+    private static final String WHERE = " WHERE " + SharedColumns.SELECT_BY_ACCOUNT_AND_THING_ID;
 
     private static final String UP_DOWN_THING_VOTE = THING_UPDATE + UP_DOWN_SET + WHERE;
     private static final String UP_DOWN_COMMENT_VOTE = COMMENT_UPDATE + UP_DOWN_SET + WHERE;
     private static final String NEUTRAL_THING_VOTE = THING_UPDATE + NEUTRAL_SET + WHERE;
     private static final String NEUTRAL_COMMENT_VOTE = COMMENT_UPDATE + NEUTRAL_SET + WHERE;
 
-    static Map<String, Integer> getVoteActionMap(SQLiteOpenHelper dbHelper, String accountName) {
+    static Map<String, Integer> getActionMap(SQLiteOpenHelper dbHelper, String accountName) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query(VoteActions.TABLE_NAME,
                 VOTE_PROJECTION,
-                VOTE_SELECTION,
+                SharedColumns.SELECT_BY_ACCOUNT,
                 Array.of(accountName),
                 null,
                 null,
@@ -162,26 +158,28 @@ class VoteMerger {
         v.put(key, (value != null ? value : 0) + delta);
     }
 
-    static void updateDatabase(SQLiteDatabase db, String accountName, int action, String thingId) {
+    static int updateDatabase(SQLiteDatabase db, String accountName, int action, String thingId) {
+        int changed = 0;
         switch (action) {
             case ACTION_VOTE_UP:
-                upVote(db, UP_DOWN_THING_VOTE, accountName, thingId);
-                upVote(db, UP_DOWN_COMMENT_VOTE, accountName, thingId);
+                changed += upVote(db, UP_DOWN_THING_VOTE, accountName, thingId);
+                changed += upVote(db, UP_DOWN_COMMENT_VOTE, accountName, thingId);
                 break;
 
             case ACTION_VOTE_DOWN:
-                downVote(db, UP_DOWN_THING_VOTE, accountName, thingId);
-                downVote(db, UP_DOWN_COMMENT_VOTE, accountName, thingId);
+                changed += downVote(db, UP_DOWN_THING_VOTE, accountName, thingId);
+                changed += downVote(db, UP_DOWN_COMMENT_VOTE, accountName, thingId);
                 break;
 
             case ACTION_VOTE_NEUTRAL:
-                neutralVote(db, NEUTRAL_THING_VOTE, accountName, thingId);
-                neutralVote(db, NEUTRAL_COMMENT_VOTE, accountName, thingId);
+                changed += neutralVote(db, NEUTRAL_THING_VOTE, accountName, thingId);
+                changed += neutralVote(db, NEUTRAL_COMMENT_VOTE, accountName, thingId);
                 break;
         }
+        return changed;
     }
 
-    private static void upVote(SQLiteDatabase db,
+    private static int upVote(SQLiteDatabase db,
             String statement,
             String accountName,
             String thingId) {
@@ -192,10 +190,10 @@ class VoteMerger {
         sql.bindLong(4, 0);
         sql.bindString(5, accountName);
         sql.bindString(6, thingId);
-        sql.executeUpdateDelete();
+        return sql.executeUpdateDelete();
     }
 
-    private static void downVote(SQLiteDatabase db,
+    private static int downVote(SQLiteDatabase db,
             String statement,
             String accountName,
             String thingId) {
@@ -206,16 +204,16 @@ class VoteMerger {
         sql.bindLong(4, 1);
         sql.bindString(5, accountName);
         sql.bindString(6, thingId);
-        sql.executeUpdateDelete();
+        return sql.executeUpdateDelete();
     }
 
-    private static void neutralVote(SQLiteDatabase db,
+    private static int neutralVote(SQLiteDatabase db,
             String statement,
             String accountName,
             String thingId) {
         SQLiteStatement sql = db.compileStatement(statement);
         sql.bindString(1, accountName);
         sql.bindString(2, thingId);
-        sql.executeUpdateDelete();
+        return sql.executeUpdateDelete();
     }
 }

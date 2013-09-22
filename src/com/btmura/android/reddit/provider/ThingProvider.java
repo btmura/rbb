@@ -178,6 +178,7 @@ public class ThingProvider extends BaseProvider {
     private static final String METHOD_EDIT_COMMENT = "editComment";
     private static final String METHOD_DELETE_COMMENT = "deleteComment";
     private static final String METHOD_INSERT_MESSAGE = "insertMessage";
+    private static final String METHOD_READ_MESSAGE = "readMessage";
     private static final String METHOD_VOTE = "vote";
 
     // List of extras used throughout the provider code.
@@ -496,6 +497,20 @@ public class ThingProvider extends BaseProvider {
                 extras);
     }
 
+    public static final Bundle readMessage(Context context,
+            String accountName,
+            String thingId,
+            int action) {
+        Bundle extras = new Bundle(2);
+        extras.putInt(EXTRA_ACTION, action);
+        extras.putString(EXTRA_THING_ID, thingId);
+        return Provider.call(context,
+                READ_ACTIONS_URI,
+                METHOD_READ_MESSAGE,
+                accountName,
+                extras);
+    }
+
     public static final Bundle vote(Context context,
             String accountName,
             int action,
@@ -545,6 +560,8 @@ public class ThingProvider extends BaseProvider {
                 return deleteComment(accountName, extras);
             } else if (METHOD_INSERT_MESSAGE.equals(method)) {
                 return insertMessage(accountName, extras);
+            } else if (METHOD_READ_MESSAGE.equals(method)) {
+                return readMessage(accountName, extras);
             } else if (METHOD_VOTE.equals(method)) {
                 return vote(accountName, extras);
             } else {
@@ -1126,11 +1143,45 @@ public class ThingProvider extends BaseProvider {
         return Bundle.EMPTY;
     }
 
+    private Bundle readMessage(String accountName, Bundle extras) {
+        int action = getActionExtra(extras);
+        String thingId = getThingIdExtra(extras);
+
+        int changed = 0;
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues v = new ContentValues(3);
+            v.put(ReadActions.COLUMN_ACCOUNT, accountName);
+            v.put(ReadActions.COLUMN_ACTION, action);
+            v.put(ReadActions.COLUMN_THING_ID, thingId);
+
+            long actionId = db.replace(ReadActions.TABLE_NAME, null, v);
+            if (actionId == -1) {
+                return null;
+            }
+
+            changed += ReadMerger.updateDatabase(db, accountName, action, thingId, v);
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        ContentResolver cr = getContext().getContentResolver();
+        cr.notifyChange(READ_ACTIONS_URI, null, SYNC);
+        if (changed > 0) {
+            cr.notifyChange(MESSAGES_URI, null, NO_SYNC);
+        }
+        return Bundle.EMPTY;
+    }
+
     private Bundle vote(String accountName, Bundle extras) {
         int action = getActionExtra(extras);
         String thingId = getThingIdExtra(extras);
         ThingBundle thingBundle = getThingBundleExtra(extras);
 
+        int changed = 0;
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
@@ -1163,7 +1214,7 @@ public class ThingProvider extends BaseProvider {
                 return null;
             }
 
-            VoteMerger.updateDatabase(db, accountName, action, thingId);
+            changed += VoteMerger.updateDatabase(db, accountName, action, thingId);
 
             db.setTransactionSuccessful();
         } finally {
@@ -1172,8 +1223,10 @@ public class ThingProvider extends BaseProvider {
 
         ContentResolver cr = getContext().getContentResolver();
         cr.notifyChange(VOTE_ACTIONS_URI, null, SYNC);
-        cr.notifyChange(THINGS_URI, null, NO_SYNC);
-        cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
+        if (changed > 0) {
+            cr.notifyChange(THINGS_URI, null, NO_SYNC);
+            cr.notifyChange(COMMENTS_URI, null, NO_SYNC);
+        }
         return Bundle.EMPTY;
     }
 
