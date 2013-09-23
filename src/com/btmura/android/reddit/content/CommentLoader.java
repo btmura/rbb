@@ -102,12 +102,12 @@ public class CommentLoader extends AbstractSessionLoader {
     }
 
     @Override
-    protected Bundle createSession(long sessionId, String more) {
+    protected Bundle getSession(Bundle sessionData, String more) {
         return ThingProvider.getCommentsSession(getContext(),
                 accountName,
                 thingId,
                 linkId,
-                sessionId,
+                sessionData,
                 -1);
     }
 }

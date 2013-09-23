@@ -21,7 +21,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -32,7 +31,7 @@ abstract class AbstractSessionLoader extends CursorLoader {
 
     private static final String TAG = "AbstractSessionLoader";
 
-    private Bundle cursorExtras;
+    private Bundle sessionData;
     private String more;
 
     AbstractSessionLoader(Context context,
@@ -40,10 +39,10 @@ abstract class AbstractSessionLoader extends CursorLoader {
             String[] projection,
             String selection,
             String sortOrder,
-            Bundle cursorExtras,
+            Bundle sessionData,
             String more) {
         super(context, uri, projection, selection, null, sortOrder);
-        this.cursorExtras = cursorExtras;
+        this.sessionData = sessionData;
         this.more = more;
     }
 
@@ -52,26 +51,17 @@ abstract class AbstractSessionLoader extends CursorLoader {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
-
-        if (cursorExtras == null || !TextUtils.isEmpty(more)) {
-            long sessionId = CursorExtras.getSessionId(cursorExtras);
-            Bundle newExtras = createSession(sessionId, more);
-            if (newExtras == null) {
-                return cursorExtras != null ? newCursor() : null;
-            }
-            cursorExtras = newExtras;
-            more = null;
-        }
-
+        sessionData = getSession(sessionData, more);
+        more = null;
         return newCursor();
     }
 
+    protected abstract Bundle getSession(Bundle sessionData, String more);
+
     private Cursor newCursor() {
-        long sessionId = CursorExtras.getSessionId(cursorExtras);
+        long sessionId = CursorExtras.getSessionId(sessionData);
         setSelectionArgs(Array.of(sessionId));
         Cursor c = super.loadInBackground();
-        return c != null ? new CursorExtrasWrapper(c, cursorExtras) : null;
+        return c != null ? new CursorExtrasWrapper(c, sessionData) : null;
     }
-
-    protected abstract Bundle createSession(long sessionId, String more);
 }

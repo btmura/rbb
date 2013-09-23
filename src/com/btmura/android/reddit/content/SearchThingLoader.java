@@ -47,12 +47,12 @@ public class SearchThingLoader extends AbstractSessionLoader implements ThingPro
     }
 
     @Override
-    protected Bundle createSession(long sessionId, String more) {
+    protected Bundle getSession(Bundle sessionData, String more) {
         return ThingProvider.getThingSearchSession(getContext(),
                 accountName,
                 subreddit,
                 query,
-                sessionId,
+                sessionData,
                 more);
     }
 }

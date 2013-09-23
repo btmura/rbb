@@ -19,11 +19,14 @@ package com.btmura.android.reddit.provider;
 import java.io.IOException;
 import java.util.List;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -155,6 +158,7 @@ public class ThingProvider extends BaseProvider {
     private static final String EXTRA_MORE = "more";
     private static final String EXTRA_PARENT_THING_ID = "parentThingId";
     private static final String EXTRA_QUERY = "query";
+    private static final String EXTRA_SESSION_DATA = "sessionData";
     private static final String EXTRA_SESSION_ID = "sessionId";
     private static final String EXTRA_SESSION_TYPE = "sessionType";
     private static final String EXTRA_SUBREDDIT = "subreddit";
@@ -253,13 +257,13 @@ public class ThingProvider extends BaseProvider {
             String accountName,
             String subreddit,
             int filter,
-            long sessionId,
+            Bundle sessionData,
             String more) {
         Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_SUBREDDIT);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
         extras.putInt(EXTRA_FILTER, filter);
-        extras.putLong(EXTRA_SESSION_ID, sessionId);
+        extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         extras.putString(EXTRA_MORE, more);
         return Provider.call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
@@ -268,13 +272,13 @@ public class ThingProvider extends BaseProvider {
             String accountName,
             String profileUser,
             int filter,
-            long sessionId,
+            Bundle sessionData,
             String more) {
         Bundle extras = new Bundle(4);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_USER);
         extras.putString(EXTRA_USER, profileUser);
         extras.putInt(EXTRA_FILTER, filter);
-        extras.putLong(EXTRA_SESSION_ID, sessionId);
+        extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         extras.putString(EXTRA_MORE, more);
         return Provider.call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
@@ -283,14 +287,14 @@ public class ThingProvider extends BaseProvider {
             String accountName,
             String thingId,
             String linkId,
-            long sessionId,
+            Bundle sessionData,
             int numComments) {
         Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_COMMENTS);
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putString(EXTRA_LINK_ID, linkId);
         extras.putInt(EXTRA_COUNT, numComments);
-        extras.putLong(EXTRA_SESSION_ID, sessionId);
+        extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         return Provider.call(context, COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
@@ -298,35 +302,37 @@ public class ThingProvider extends BaseProvider {
             String accountName,
             String subreddit,
             String query,
-            long sessionId,
+            Bundle sessionData,
             String more) {
         Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_THING_SEARCH);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
         extras.putString(EXTRA_QUERY, query);
         extras.putString(EXTRA_MORE, more);
-        extras.putLong(EXTRA_SESSION_ID, sessionId);
+        extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         return Provider.call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getSubredditSearchSession(Context context,
             String accountName,
-            String query) {
-        Bundle extras = new Bundle(2);
+            String query,
+            Bundle sessionData) {
+        Bundle extras = new Bundle(3);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_SUBREDDIT_SEARCH);
         extras.putString(EXTRA_QUERY, query);
+        extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         return Provider.call(context, SUBREDDITS_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
     public static final Bundle getMessageSession(Context context,
             String accountName,
             int filter,
-            long sessionId,
+            Bundle sessionData,
             String more) {
         Bundle extras = new Bundle(4);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGES);
         extras.putInt(EXTRA_FILTER, filter);
-        extras.putLong(EXTRA_SESSION_ID, sessionId);
+        extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         if (!TextUtils.isEmpty(more)) {
             extras.putString(EXTRA_MORE, more);
         } else if (filter == FilterAdapter.MESSAGE_INBOX
@@ -339,11 +345,11 @@ public class ThingProvider extends BaseProvider {
     public static final Bundle getMessageThreadSession(Context context,
             String accountName,
             String thingId,
-            long sessionId) {
+            Bundle sessionData) {
         Bundle extras = new Bundle(3);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_MESSAGE_THREAD);
         extras.putString(EXTRA_THING_ID, thingId);
-        extras.putLong(EXTRA_SESSION_ID, sessionId);
+        extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         return Provider.call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
     }
 
@@ -516,120 +522,127 @@ public class ThingProvider extends BaseProvider {
     }
 
     private Bundle getSession(String accountName, Bundle extras) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "getSession accountName: " + accountName + " extras: " + extras);
+        }
+        Bundle sessionData = extras.getBundle(EXTRA_SESSION_DATA);
+        String more = extras.getString(EXTRA_MORE);
+        if (isExistingSession(sessionData, more)) {
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "getSession --> EXISTING " + sessionData);
+            }
+            return sessionData;
+        }
+
         try {
-            Context context = getContext();
-            String cookie = AccountUtils.getCookie(context, accountName);
-            if (cookie == null && AccountUtils.isAccount(accountName)) {
-                return null;
-            }
-
-            int count = extras.getInt(EXTRA_COUNT);
-            int filter = extras.getInt(EXTRA_FILTER, -1);
-            String linkId = extras.getString(EXTRA_LINK_ID);
-            boolean mark = extras.getBoolean(EXTRA_MARK, false);
-            String more = extras.getString(EXTRA_MORE);
-            String query = extras.getString(EXTRA_QUERY);
-            long sessionId = extras.getLong(EXTRA_SESSION_ID);
-            String subreddit = extras.getString(EXTRA_SUBREDDIT);
-            String thingId = extras.getString(EXTRA_THING_ID);
-            String user = extras.getString(EXTRA_USER);
-
-            int listingType = extras.getInt(EXTRA_SESSION_TYPE);
-            Listing listing = null;
-            switch (listingType) {
-                case Sessions.TYPE_MESSAGE_THREAD:
-                    listing = MessageListing.newThreadInstance(helper,
-                            accountName,
-                            thingId,
-                            cookie);
-                    break;
-
-                case Sessions.TYPE_MESSAGES:
-                    listing = MessageListing.newInstance(helper,
-                            accountName,
-                            filter,
-                            more,
-                            mark,
-                            cookie);
-                    break;
-
-                case Sessions.TYPE_SUBREDDIT:
-                    listing = ThingListing.newSubredditInstance(context,
-                            helper,
-                            accountName,
-                            subreddit,
-                            filter,
-                            more,
-                            cookie);
-                    break;
-
-                case Sessions.TYPE_USER:
-                    listing = ThingListing.newUserInstance(context,
-                            helper,
-                            accountName,
-                            user,
-                            filter,
-                            more,
-                            cookie);
-                    break;
-
-                case Sessions.TYPE_COMMENTS:
-                    listing = CommentListing.newInstance(context,
-                            helper,
-                            accountName,
-                            thingId,
-                            linkId,
-                            count,
-                            cookie);
-                    break;
-
-                case Sessions.TYPE_THING_SEARCH:
-                    listing = ThingListing.newSearchInstance(context,
-                            helper,
-                            accountName,
-                            subreddit,
-                            query,
-                            more,
-                            cookie);
-                    break;
-
-                case Sessions.TYPE_SUBREDDIT_SEARCH:
-                    listing = SubredditResultListing.newInstance(accountName,
-                            query,
-                            cookie);
-                    break;
-
-                default:
-                    throw new IllegalArgumentException();
-            }
-
-            sessionId = getListingSession(accountName, listing, sessionId);
-            Bundle result = new Bundle(1);
-            result.putLong(EXTRA_SESSION_ID, sessionId);
+            Listing listing = createListing(accountName, extras);
+            Bundle newSessionData = getListingSession(accountName, listing, sessionData);
             listing.performExtraWork(getContext());
-            return result;
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "getSession --> NEW " + newSessionData);
+            }
+            return newSessionData;
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
         return null;
     }
 
-    private long getListingSession(String accountName,
-            Listing listing,
-            long sessionId)
+    private boolean isExistingSession(Bundle sessionData, String more) {
+        long sessionId = sessionData != null ? sessionData.getLong(EXTRA_SESSION_ID) : 0;
+        if (sessionId != 0 && more == null) {
+            SQLiteDatabase db = helper.getReadableDatabase();
+            long count = DatabaseUtils.queryNumEntries(db,
+                    Sessions.TABLE_NAME,
+                    ID_SELECTION,
+                    Array.of(sessionId));
+            return count > 0;
+        }
+        return false;
+    }
+
+    private Listing createListing(String accountName, Bundle extras)
+            throws OperationCanceledException, AuthenticatorException, IOException {
+        Context context = getContext();
+        String cookie = AccountUtils.getCookie(context, accountName);
+        if (cookie == null && AccountUtils.isAccount(accountName)) {
+            return null;
+        }
+
+        int count = extras.getInt(EXTRA_COUNT);
+        int filter = extras.getInt(EXTRA_FILTER, -1);
+        String linkId = extras.getString(EXTRA_LINK_ID);
+        boolean mark = extras.getBoolean(EXTRA_MARK, false);
+        String more = extras.getString(EXTRA_MORE);
+        String query = extras.getString(EXTRA_QUERY);
+        String subreddit = extras.getString(EXTRA_SUBREDDIT);
+        String thingId = extras.getString(EXTRA_THING_ID);
+        String user = extras.getString(EXTRA_USER);
+
+        int listingType = extras.getInt(EXTRA_SESSION_TYPE);
+        switch (listingType) {
+            case Sessions.TYPE_MESSAGE_THREAD:
+                return MessageListing.newThreadInstance(helper, accountName, thingId, cookie);
+
+            case Sessions.TYPE_MESSAGES:
+                return MessageListing.newInstance(helper,
+                        accountName,
+                        filter,
+                        more,
+                        mark,
+                        cookie);
+
+            case Sessions.TYPE_SUBREDDIT:
+                return ThingListing.newSubredditInstance(context,
+                        helper,
+                        accountName,
+                        subreddit,
+                        filter,
+                        more,
+                        cookie);
+
+            case Sessions.TYPE_USER:
+                return ThingListing.newUserInstance(context,
+                        helper,
+                        accountName,
+                        user,
+                        filter,
+                        more,
+                        cookie);
+
+            case Sessions.TYPE_COMMENTS:
+                return CommentListing.newInstance(context,
+                        helper,
+                        accountName,
+                        thingId,
+                        linkId,
+                        count,
+                        cookie);
+
+            case Sessions.TYPE_THING_SEARCH:
+                return ThingListing.newSearchInstance(context,
+                        helper,
+                        accountName,
+                        subreddit,
+                        query,
+                        more,
+                        cookie);
+
+            case Sessions.TYPE_SUBREDDIT_SEARCH:
+                return SubredditResultListing.newInstance(accountName, query, cookie);
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private Bundle getListingSession(String accountName, Listing listing, Bundle sessionData)
             throws IOException {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "getListingSession accountName: " + accountName
-                    + " sessionId: " + sessionId);
+                    + " sessionData: " + sessionData);
         }
-
-        // Start cleaning service on separate thread before doing the network call.
-        sessionManager.cleanIfNecessary(getContext(), listing.getSessionType());
-
-        // Don't get new values if the session appears valid.
-        if (sessionId != 0 && !listing.isAppend()) {
-            return sessionId;
-        }
+        long sessionId = sessionData != null ? sessionData.getLong(EXTRA_SESSION_ID) : 0;
 
         // Get new values over the network.
         List<ContentValues> values = listing.getValues();
@@ -650,7 +663,7 @@ public class ThingProvider extends BaseProvider {
                 int count = db.delete(listing.getTargetTable(),
                         SELECT_MORE_WITH_SESSION_ID, Array.of(sessionId));
                 if (count == 0) {
-                    return sessionId;
+                    return sessionData;
                 }
             }
 
@@ -676,10 +689,16 @@ public class ThingProvider extends BaseProvider {
                 helper.insert(values.get(i));
             }
             db.setTransactionSuccessful();
-            return sessionId;
         } finally {
             db.endTransaction();
         }
+
+        // Start cleaning service on separate thread after the latest session was made.
+        sessionManager.cleanIfNecessary(getContext(), listing.getSessionType());
+
+        Bundle newSessionData = new Bundle(1);
+        newSessionData.putLong(EXTRA_SESSION_ID, sessionId);
+        return newSessionData;
     }
 
     private Bundle cleanSessions(Bundle extras) {
@@ -734,7 +753,7 @@ public class ThingProvider extends BaseProvider {
                 int count2 = db.delete(Sessions.TABLE_NAME, Sessions.SELECT_BY_ID, selectionArgs);
                 int count = db.delete(tableName, SharedColumns.SELECT_BY_SESSION_ID, selectionArgs);
                 if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "session id: " + sessionId
+                    Log.d(TAG, "cleanSessions sessionId: " + sessionId
                             + " type: " + type
                             + " table: " + tableName
                             + " deleted: " + count2 + "," + count);

@@ -53,7 +53,10 @@ public class SearchSubredditLoader extends AbstractSessionLoader {
     }
 
     @Override
-    protected Bundle createSession(long sessionId, String more) {
-        return ThingProvider.getSubredditSearchSession(getContext(), accountName, query);
+    protected Bundle getSession(Bundle sessionData, String more) {
+        return ThingProvider.getSubredditSearchSession(getContext(),
+                accountName,
+                query,
+                sessionData);
     }
 }

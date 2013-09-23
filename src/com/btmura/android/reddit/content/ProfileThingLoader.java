@@ -54,12 +54,12 @@ public class ProfileThingLoader extends AbstractSessionLoader implements ThingPr
     }
 
     @Override
-    protected Bundle createSession(long sessionId, String more) {
+    protected Bundle getSession(Bundle sessionData, String more) {
         return ThingProvider.getProfileSession(getContext(),
                 accountName,
                 profileUser,
                 filter,
-                sessionId,
+                sessionData,
                 more);
     }
 }

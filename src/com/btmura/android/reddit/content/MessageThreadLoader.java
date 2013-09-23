@@ -62,10 +62,10 @@ public class MessageThreadLoader extends AbstractSessionLoader {
     }
 
     @Override
-    protected Bundle createSession(long sessionId, String more) {
+    protected Bundle getSession(Bundle sessionData, String more) {
         return ThingProvider.getMessageThreadSession(getContext(),
                 accountName,
                 thingId,
-                sessionId);
+                sessionData);
     }
 }

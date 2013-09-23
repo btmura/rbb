@@ -36,13 +36,13 @@ public class SubredditThingLoader extends AbstractSessionLoader implements Thing
             String subreddit,
             int filter,
             String more,
-            Bundle cursorExtras) {
+            Bundle sessionData) {
         super(context,
                 ThingProvider.THINGS_URI,
                 PROJECTION,
                 Things.SELECT_NOT_HIDDEN_BY_SESSION_ID,
                 null,
-                cursorExtras,
+                sessionData,
                 more);
         this.accountName = accountName;
         this.subreddit = subreddit;
@@ -50,12 +50,12 @@ public class SubredditThingLoader extends AbstractSessionLoader implements Thing
     }
 
     @Override
-    protected Bundle createSession(long sessionId, String more) {
+    protected Bundle getSession(Bundle sessionData, String more) {
         return ThingProvider.getSubredditSession(getContext(),
                 accountName,
                 subreddit,
                 filter,
-                sessionId,
+                sessionData,
                 more);
     }
 }
