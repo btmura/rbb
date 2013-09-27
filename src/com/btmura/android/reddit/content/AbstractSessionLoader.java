@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -51,17 +52,32 @@ abstract class AbstractSessionLoader extends CursorLoader {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "loadInBackground");
         }
-        sessionData = getSession(sessionData, more);
+
+        // 1. Use the new session data if non-null.
+        // 2. If this is not a request for more data and it failed, then show no data but an error.
+        // 3. If this is a request for more data and it failed, then just show existing data.
+        Bundle newSessionData = getSession(sessionData, more);
+        if (newSessionData != null) {
+            sessionData = newSessionData;
+        } else if (TextUtils.isEmpty(more)) {
+            sessionData = null;
+        }
+
+        // Reset the request for more data after attempting to get it.
         more = null;
+
         return newCursor();
     }
 
     protected abstract Bundle getSession(Bundle sessionData, String more);
 
     private Cursor newCursor() {
-        long sessionId = CursorExtras.getSessionId(sessionData);
-        setSelectionArgs(Array.of(sessionId));
-        Cursor c = super.loadInBackground();
-        return c != null ? new CursorExtrasWrapper(c, sessionData) : null;
+        if (sessionData != null) {
+            long sessionId = CursorExtras.getSessionId(sessionData);
+            setSelectionArgs(Array.of(sessionId));
+            Cursor c = super.loadInBackground();
+            return c != null ? new CursorExtrasWrapper(c, sessionData) : null;
+        }
+        return null;
     }
 }
