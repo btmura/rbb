@@ -613,7 +613,7 @@ public class NavigationFragment extends ListFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_REQUESTED_SUBREDDIT, subreddit);
+        outState.putString(STATE_REQUESTED_SUBREDDIT, requestedSubreddit);
         outState.putParcelable(STATE_REQUESTED_THING_BUNDLE, requestedThingBundle);
 
         outState.putString(STATE_ACCOUNT_NAME, accountName);
