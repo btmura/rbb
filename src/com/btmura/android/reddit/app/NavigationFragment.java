@@ -23,6 +23,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 
+import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.AbstractBrowserActivity.LeftFragment;
@@ -310,6 +312,17 @@ public class NavigationFragment extends ListFragment implements
             ThingBundle thingBundle,
             boolean savePrefs,
             boolean force) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "selectPlace accountName: " + accountName
+                    + " place: " + place
+                    + " subreddit: " + subreddit
+                    + " isRandom: " + isRandom
+                    + " filter: " + filter
+                    + " thingBundle: " + thingBundle
+                    + " savePrefs: " + savePrefs
+                    + " force: " + force);
+        }
+
         this.place = place;
         this.subreddit = subreddit;
         this.isRandom = isRandom;
