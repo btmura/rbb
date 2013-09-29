@@ -43,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="@dimen/element_padding"
+            android:gravity="center"
             android:text="@string/error_account_required" />
 
         <Button
