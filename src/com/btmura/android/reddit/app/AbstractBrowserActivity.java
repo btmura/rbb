@@ -341,7 +341,6 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     protected void selectThingSinglePane(View view, ThingBundle thingBundle) {
         Intent intent = new Intent(this, thingActivityClass);
-        intent.putExtra(ThingActivity.EXTRA_ACCOUNT_NAME, accountName);
         intent.putExtra(ThingActivity.EXTRA_THING_BUNDLE, thingBundle);
         launchActivity(view, intent);
     }
@@ -379,7 +378,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
 
     private <F extends Fragment & LeftFragment>
             void setLeftFragment(int containerId, ControlFragment controlFrag, F frag) {
-        if (!Objects.fragmentEquals(frag, getLeftFragment())) {
+        if (!Objects.equals(frag, getLeftFragment())) {
             safePopBackStackImmediate();
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -410,7 +409,7 @@ abstract class AbstractBrowserActivity extends GlobalMenuActivity implements
     private <F extends Fragment & RightFragment>
             void setRightFragmentRemoveLeft(int containerId, ControlFragment controlFrag,
                     F rightFrag, boolean force, boolean removeLeft) {
-        if (force || !Objects.fragmentEquals(rightFrag, getRightFragment())) {
+        if (force || !Objects.equals(rightFrag, getRightFragment())) {
             safePopBackStackImmediate();
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

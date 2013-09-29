@@ -22,5 +22,5 @@ public interface ComparableFragment {
 
     Bundle getArguments();
 
-    boolean fragmentEquals(ComparableFragment o);
+    boolean equalFragments(ComparableFragment o);
 }

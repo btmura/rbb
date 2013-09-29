@@ -51,11 +51,11 @@ public class Objects {
     }
 
     /** Check for fragment equality. */
-    public static boolean fragmentEquals(ComparableFragment f1, ComparableFragment f2) {
+    public static boolean equals(ComparableFragment f1, ComparableFragment f2) {
         if (f1 != null) {
-            return f1.fragmentEquals(f2);
+            return f1.equalFragments(f2);
         } else if (f2 != null) {
-            return f2.fragmentEquals(f1);
+            return f2.equalFragments(f1);
         }
         return true;
     }

@@ -167,8 +167,8 @@ public class ComposeFormFragment extends Fragment implements
     }
 
     @Override
-    public boolean fragmentEquals(ComparableFragment o) {
-        return ComparableFragments.baseEquals(this, o)
+    public boolean equalFragments(ComparableFragment o) {
+        return ComparableFragments.equalClasses(this, o)
                 && ComparableFragments.equalInts(this, o, ARG_TYPE);
     }
 

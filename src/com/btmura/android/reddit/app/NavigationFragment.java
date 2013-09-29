@@ -137,8 +137,8 @@ public class NavigationFragment extends ListFragment implements
     }
 
     @Override
-    public boolean fragmentEquals(ComparableFragment o) {
-        return ComparableFragments.baseEquals(this, o);
+    public boolean equalFragments(ComparableFragment o) {
+        return ComparableFragments.equalClasses(this, o);
     }
 
     @Override

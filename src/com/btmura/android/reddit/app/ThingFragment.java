@@ -38,9 +38,11 @@ import com.btmura.android.reddit.content.ThingDataLoader.ThingData;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.provider.Provider;
+import com.btmura.android.reddit.util.ComparableFragments;
 import com.btmura.android.reddit.util.Strings;
 
 public class ThingFragment extends Fragment implements
+        ComparableFragment,
         LoaderCallbacks<ThingData>,
         OnPageChangeListener {
 
@@ -72,6 +74,12 @@ public class ThingFragment extends Fragment implements
         ThingFragment frag = new ThingFragment();
         frag.setArguments(args);
         return frag;
+    }
+
+    @Override
+    public boolean equalFragments(ComparableFragment o) {
+        return ComparableFragments.equalClasses(this, o)
+                && ComparableFragments.equalStrings(this, o, ARG_ACCOUNT_NAME);
     }
 
     @Override

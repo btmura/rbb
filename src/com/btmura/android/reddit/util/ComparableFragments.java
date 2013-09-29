@@ -20,7 +20,7 @@ import com.btmura.android.reddit.app.ComparableFragment;
 
 public class ComparableFragments {
 
-    public static boolean baseEquals(ComparableFragment o1, ComparableFragment o2) {
+    public static boolean equalClasses(ComparableFragment o1, ComparableFragment o2) {
         return o1 != null && o2 != null && o1.getClass() == o2.getClass();
     }
 

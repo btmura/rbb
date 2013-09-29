@@ -187,7 +187,7 @@ public class ComposeActivity extends FragmentActivity implements
                     getIntent().getBundleExtra(EXTRA_EXTRAS));
             bar.setTitle(frag.getTitle(this));
 
-            if (!Objects.fragmentEquals(frag, getComposeFormFragment())) {
+            if (!Objects.equals(frag, getComposeFormFragment())) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.container, frag, ComposeFormFragment.TAG);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN

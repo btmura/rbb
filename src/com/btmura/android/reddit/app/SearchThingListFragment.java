@@ -43,8 +43,8 @@ public class SearchThingListFragment
     }
 
     @Override
-    public boolean fragmentEquals(ComparableFragment o) {
-        return ComparableFragments.baseEquals(this, o)
+    public boolean equalFragments(ComparableFragment o) {
+        return ComparableFragments.equalClasses(this, o)
                 && ComparableFragments.equalStrings(this, o,
                         SearchThingListController.EXTRA_ACCOUNT_NAME)
                 && ComparableFragments.equalStrings(this, o,

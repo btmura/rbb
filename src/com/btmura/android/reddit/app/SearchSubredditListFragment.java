@@ -46,8 +46,8 @@ public class SearchSubredditListFragment
     }
 
     @Override
-    public boolean fragmentEquals(ComparableFragment o) {
-        return ComparableFragments.baseEquals(this, o)
+    public boolean equalFragments(ComparableFragment o) {
+        return ComparableFragments.equalClasses(this, o)
                 && ComparableFragments.equalStrings(this, o,
                         SearchSubredditListController.EXTRA_ACCOUNT_NAME)
                 && ComparableFragments.equalStrings(this, o,

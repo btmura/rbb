@@ -19,7 +19,6 @@ package com.btmura.android.reddit.app;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.app.NavUtils;
@@ -41,8 +40,6 @@ public class ThingActivity extends GlobalMenuActivity implements
         AccountNameHolder,
         SubredditHolder {
 
-    public static final String EXTRA_ACCOUNT_NAME = "accountName";
-
     public static final String EXTRA_THING_BUNDLE = "thingBundle";
 
     private static final String THING_FRAGMENT_TAG = "thing";
@@ -63,7 +60,6 @@ public class ThingActivity extends GlobalMenuActivity implements
     }
 
     private void setupPrereqs(Bundle savedInstanceState) {
-        accountName = getIntent().getStringExtra(EXTRA_ACCOUNT_NAME);
         thingBundle = getIntent().getParcelableExtra(EXTRA_THING_BUNDLE);
     }
 
@@ -94,20 +90,14 @@ public class ThingActivity extends GlobalMenuActivity implements
 
     @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
-        // Finish if the account has changed.
-        if (!Objects.equals(accountName, result.getLastAccount(this))) {
-            finish();
-        }
-
-        // Commit the fragment here to avoid some menu item jank.
-        if (getThingFragment() == null) {
-            Fragment thingFrag = ThingFragment.newInstance(accountName, thingBundle);
+        this.accountName = result.getLastAccount(this);
+        ThingFragment frag = ThingFragment.newInstance(accountName, thingBundle);
+        if (!Objects.equals(frag, getThingFragment())) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.thing_container, thingFrag, THING_FRAGMENT_TAG);
+            ft.replace(R.id.thing_container, frag, THING_FRAGMENT_TAG);
             ft.commitAllowingStateLoss();
+            invalidateOptionsMenu();
         }
-
-        invalidateOptionsMenu();
     }
 
     @Override
