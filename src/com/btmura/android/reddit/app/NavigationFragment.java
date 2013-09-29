@@ -306,12 +306,12 @@ public class NavigationFragment extends ListFragment implements
     }
 
     private void selectPlace(int place,
-            String subreddit,
-            boolean isRandom,
-            int filter,
-            ThingBundle thingBundle,
+            final String subreddit,
+            final boolean isRandom,
+            final int filter,
+            final ThingBundle thingBundle,
             boolean savePrefs,
-            boolean force) {
+            final boolean force) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "selectPlace accountName: " + accountName
                     + " place: " + place
@@ -349,12 +349,17 @@ public class NavigationFragment extends ListFragment implements
                             newLoaderArgs(accountName),
                             randomLoaderCallbacks);
                 } else if (listener != null) {
-                    listener.onNavigationSubredditSelected(accountName,
-                            subreddit,
-                            isRandom,
-                            filter,
-                            thingBundle,
-                            force);
+                    getListView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onNavigationSubredditSelected(accountName,
+                                    subreddit,
+                                    isRandom,
+                                    filter,
+                                    thingBundle,
+                                    force);
+                        }
+                    });
                 }
                 break;
 
@@ -362,7 +367,12 @@ public class NavigationFragment extends ListFragment implements
                 getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    listener.onNavigationProfileSelected(accountName, filter, force);
+                    getListView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onNavigationProfileSelected(accountName, filter, force);
+                        }
+                    });
                 }
                 break;
 
@@ -370,7 +380,12 @@ public class NavigationFragment extends ListFragment implements
                 getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    listener.onNavigationSavedSelected(accountName, filter, force);
+                    getListView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onNavigationSavedSelected(accountName, filter, force);
+                        }
+                    });
                 }
                 break;
 
@@ -378,7 +393,12 @@ public class NavigationFragment extends ListFragment implements
                 getLoaderManager().destroyLoader(LOADER_RANDOM_SUBREDDIT);
                 subredditAdapter.setSelectedSubreddit(null);
                 if (listener != null) {
-                    listener.onNavigationMessagesSelected(accountName, filter, force);
+                    getListView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onNavigationMessagesSelected(accountName, filter, force);
+                        }
+                    });
                 }
                 break;
 
