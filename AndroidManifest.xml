@@ -112,7 +112,6 @@
         </activity>
         <activity
             android:name=".app.SidebarActivity"
-            android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -145,7 +144,6 @@
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.UserProfileActivity"
-            android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow"
             tools:ignore="ExportedActivity" >
             <intent-filter>
