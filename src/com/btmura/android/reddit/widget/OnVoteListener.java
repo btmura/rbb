@@ -23,7 +23,6 @@ public interface OnVoteListener {
     /** Notifies the listener that the status area was clicked. */
     void onStatusClick(View view);
 
-    // TODO(btmura): Rename this method to match onStatusClick.
     /** Notifies the listener that a voting arrow was clicked. */
-    void onVote(View view, int action);
+    void onVoteClick(View view, int action);
 }

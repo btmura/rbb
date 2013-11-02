@@ -221,7 +221,7 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
     }
 
     @Override
-    public void onVote(View v, int action) {
+    public void onVoteClick(View v, int action) {
         int position = getListView().getPositionForView(v);
         actionModeController.vote(position, action);
     }

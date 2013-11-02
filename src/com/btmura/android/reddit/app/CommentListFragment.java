@@ -110,7 +110,7 @@ public class CommentListFragment extends ListFragment implements
     }
 
     @Override
-    public void onVote(View view, int action) {
+    public void onVoteClick(View view, int action) {
         int position = getListView().getPositionForView(view);
         controller.vote(action, position);
     }
