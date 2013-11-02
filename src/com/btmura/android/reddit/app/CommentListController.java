@@ -36,7 +36,7 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.CommentAdapter;
-import com.btmura.android.reddit.widget.OnVoteListener;
+import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 /**
  * Controller that handles all the logic required by {@link CommentListFragment}.
@@ -55,7 +55,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     private final CommentAdapter adapter;
     private Bundle cursorExtras;
 
-    CommentListController(Context context, Bundle args, OnVoteListener listener) {
+    CommentListController(Context context, Bundle args, OnThingViewClickListener listener) {
         this.context = context;
         this.accountName = getAccountNameExtra(args);
         this.thingId = getThingIdExtra(args);

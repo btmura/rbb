@@ -35,6 +35,7 @@ import android.view.View;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.VoteActions;
+import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 class VotingArrows {
 
@@ -212,7 +213,7 @@ class VotingArrows {
     }
 
     static boolean onSingleTapUp(MotionEvent e, float top, float left, boolean drawArrows,
-            boolean drawScore, boolean isVotable, OnVoteListener listener, View view, int likes) {
+            boolean drawScore, boolean isVotable, OnThingViewClickListener listener, View view, int likes) {
         if (listener != null) {
             int event = getEvent(e, top, left, drawArrows, drawScore, isVotable);
             switch (event) {

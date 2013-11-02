@@ -39,8 +39,8 @@ import com.btmura.android.reddit.app.AbstractBrowserActivity.RightFragment;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener.OnSwipeDismissListener;
-import com.btmura.android.reddit.widget.OnVoteListener;
 import com.btmura.android.reddit.widget.ThingView;
+import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 import com.btmura.android.reddit.widget.ThumbnailLoader;
 
 abstract class ThingListFragment<C extends ThingListController<?>, MC extends MenuController, AC extends ThingActionModeController>
@@ -50,7 +50,7 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
         Refreshable,
         OnScrollListener,
         OnSwipeDismissListener,
-        OnVoteListener,
+        OnThingViewClickListener,
         MultiChoiceModeListener {
 
     /** String argument that is used to paginate things. */

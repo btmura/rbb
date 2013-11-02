@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 public class CommentAdapter extends BaseCursorAdapter {
 
@@ -31,9 +32,9 @@ public class CommentAdapter extends BaseCursorAdapter {
     private final long nowTimeMs = System.currentTimeMillis();
 
     private final String accountName;
-    private final OnVoteListener listener;
+    private final OnThingViewClickListener listener;
 
-    public CommentAdapter(Context context, String accountName, OnVoteListener listener) {
+    public CommentAdapter(Context context, String accountName, OnThingViewClickListener listener) {
         super(context, null, 0);
         this.accountName = accountName;
         this.listener = listener;
@@ -103,6 +104,6 @@ public class CommentAdapter extends BaseCursorAdapter {
                 showThumbnail,
                 showStatusPoints,
                 formatter);
-        tv.setOnVoteListener(listener);
+        tv.setThingViewOnClickListener(listener);
     }
 }

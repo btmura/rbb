@@ -27,6 +27,7 @@ import com.btmura.android.reddit.content.ThingProjection;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.text.Formatter;
 import com.btmura.android.reddit.util.Objects;
+import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 public class ThingListAdapter extends AbstractThingListAdapter implements ThingProjection {
 
@@ -46,14 +47,14 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
 
     private final Formatter formatter = new Formatter();
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
-    private final OnVoteListener listener;
+    private final OnThingViewClickListener listener;
 
     private String parentSubreddit;
     private String subreddit;
 
     public ThingListAdapter(Context context,
             String accountName,
-            OnVoteListener listener,
+            OnThingViewClickListener listener,
             boolean singleChoice) {
         super(context, accountName, singleChoice);
         this.listener = listener;
@@ -149,7 +150,7 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
         tv.setChosen(singleChoice
                 && Objects.equals(selectedThingId, thingId)
                 && Objects.equals(selectedLinkId, linkId));
-        tv.setOnVoteListener(listener);
+        tv.setThingViewOnClickListener(listener);
         setThingDetails(tv, kind);
         thumbnailLoader.setThumbnail(context, tv, thumbnailUrl);
     }

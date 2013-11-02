@@ -23,7 +23,7 @@ import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.content.SearchThingLoader;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.widget.OnVoteListener;
+import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 class SearchThingListController extends ThingTableListController {
 
@@ -32,7 +32,7 @@ class SearchThingListController extends ThingTableListController {
 
     private String query;
 
-    public SearchThingListController(Context context, Bundle args, OnVoteListener listener) {
+    public SearchThingListController(Context context, Bundle args, OnThingViewClickListener listener) {
         super(context, args, listener);
     }
 

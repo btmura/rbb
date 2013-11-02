@@ -91,8 +91,16 @@ public class ThingView extends CustomView implements OnGestureListener {
     /** Maximum length of titles and bodies when displaying thing lists. */
     private static final int MAX_TEXT_LENGTH = 200;
 
+    public interface OnThingViewClickListener {
+        /** Notifies the listener that the status area was clicked. */
+        void onStatusClick(View view);
+
+        /** Notifies the listener that a voting arrow was clicked. */
+        void onVoteClick(View view, int action);
+    }
+
     private final GestureDetector detector;
-    private OnVoteListener listener;
+    private OnThingViewClickListener listener;
 
     private String author;
     private CharSequence body;
@@ -185,8 +193,8 @@ public class ThingView extends CustomView implements OnGestureListener {
         setType(TYPE_THING_LIST);
         DETAILS_INNER_CELL_WIDTH = DETAILS_CELL_WIDTH - ELEMENT_PADDING * 2;
     }
-
-    public void setOnVoteListener(OnVoteListener listener) {
+    
+    public void setThingViewOnClickListener(OnThingViewClickListener listener) {
         this.listener = listener;
     }
 

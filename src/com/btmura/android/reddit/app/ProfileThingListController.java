@@ -23,7 +23,7 @@ import android.support.v4.content.Loader;
 
 import com.btmura.android.reddit.content.ProfileThingLoader;
 import com.btmura.android.reddit.widget.FilterAdapter;
-import com.btmura.android.reddit.widget.OnVoteListener;
+import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 class ProfileThingListController extends ThingTableListController {
 
@@ -33,7 +33,7 @@ class ProfileThingListController extends ThingTableListController {
     private final String profileUser;
     private final int swipeAction;
 
-    ProfileThingListController(Context context, Bundle args, OnVoteListener listener) {
+    ProfileThingListController(Context context, Bundle args, OnThingViewClickListener listener) {
         super(context, args, listener);
         this.profileUser = getProfileUserExtra(args);
         this.swipeAction = getSwipeActionExtra(args);

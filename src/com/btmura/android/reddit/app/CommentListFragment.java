@@ -33,12 +33,12 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.util.Views;
-import com.btmura.android.reddit.widget.OnVoteListener;
+import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 public class CommentListFragment extends ListFragment implements
         LoaderCallbacks<Cursor>,
         MultiChoiceModeListener,
-        OnVoteListener {
+        OnThingViewClickListener {
 
     public static final String TAG = "CommentListFragment";
 
