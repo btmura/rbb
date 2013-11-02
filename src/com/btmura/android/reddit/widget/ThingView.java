@@ -135,6 +135,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
+    private RectF statusBounds;
     private Object nsfwSpan;
     private Object italicSpan;
 
@@ -193,7 +194,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         setType(TYPE_THING_LIST);
         DETAILS_INNER_CELL_WIDTH = DETAILS_CELL_WIDTH - ELEMENT_PADDING * 2;
     }
-    
+
     public void setThingViewOnClickListener(OnThingViewClickListener listener) {
         this.listener = listener;
     }
@@ -340,6 +341,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         invalidate(thumbRect);
     }
 
+    // TODO(btmura): Move to StatusLine class.
     private void setStatusText(boolean showNsfw,
             boolean showSubreddit,
             boolean showPoints,
@@ -352,6 +354,9 @@ public class ThingView extends CustomView implements OnGestureListener {
             String subreddit) {
         statusText.clear();
         statusText.clearSpans();
+        if (statusBounds == null) {
+            statusBounds = new RectF();
+        }
 
         if (showNsfw) {
             String nsfw = getContext().getString(R.string.nsfw);
@@ -583,8 +588,11 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
         if (hasBody()) {
             bodyBounds.left = x;
-            x += bodyLayout.getWidth();
-            bodyBounds.right = x;
+            bodyBounds.right = x + bodyLayout.getWidth();
+        }
+        if (hasStatus()) {
+            statusBounds.left = x;
+            statusBounds.right = x + statusLayout.getWidth();
         }
 
         // Move from top to bottom one more time.
@@ -599,13 +607,21 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         if (hasTopStatus() && hasStatus()) {
+            statusBounds.top = y;
+            statusBounds.bottom = y + statusLayout.getHeight();
             y += statusLayout.getHeight() + ELEMENT_PADDING;
         }
 
         if (hasBody()) {
             bodyBounds.top = y;
-            y += bodyLayout.getHeight();
-            bodyBounds.bottom = y;
+            bodyBounds.bottom = y + bodyLayout.getHeight();
+            y += bodyLayout.getHeight() + ELEMENT_PADDING;
+        }
+
+        if (!hasTopStatus() && hasStatus()) {
+            statusBounds.top = y;
+            statusBounds.bottom = y + statusLayout.getHeight();
+            y += statusLayout.getHeight() + ELEMENT_PADDING;
         }
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -903,25 +919,27 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     @Override
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e,
-                getTopOffset(),
-                getLeftOffset(),
-                drawVotingArrows,
-                drawScore,
-                isVotable);
+        return StatusLine.onDown(e, statusBounds, listener)
+                || VotingArrows.onDown(e,
+                        getTopOffset(),
+                        getLeftOffset(),
+                        drawVotingArrows,
+                        drawScore,
+                        isVotable);
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e,
-                getTopOffset(),
-                getLeftOffset(),
-                drawVotingArrows,
-                drawScore,
-                isVotable,
-                listener,
-                this,
-                likes);
+        return StatusLine.onSingleTapUp(e, statusBounds, listener, this)
+                || VotingArrows.onSingleTapUp(e,
+                        getTopOffset(),
+                        getLeftOffset(),
+                        drawVotingArrows,
+                        drawScore,
+                        isVotable,
+                        listener,
+                        this,
+                        likes);
     }
 
     private float getTopOffset() {
