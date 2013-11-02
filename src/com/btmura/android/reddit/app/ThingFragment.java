@@ -122,8 +122,7 @@ public class ThingFragment extends Fragment implements
     public void onLoadFinished(Loader<ThingData> loader, ThingData data) {
         thingData = data;
         if (pagerAdapter == null) {
-            pagerAdapter = new ThingPagerAdapter(getActivity(),
-                    getChildFragmentManager(),
+            pagerAdapter = new ThingPagerAdapter(getChildFragmentManager(),
                     getAccountName(),
                     data);
             pager.setAdapter(pagerAdapter);

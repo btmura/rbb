@@ -18,7 +18,6 @@ package com.btmura.android.reddit.app;
 
 import java.util.ArrayList;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -50,14 +49,11 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
 
     private final ArrayList<Integer> pageTypes = new ArrayList<Integer>(2);
     private final ArrayList<Integer> oldPageTypes = new ArrayList<Integer>(2);
-    private final Context context;
     private final String accountName;
     private final ThingData thingData;
 
-    public ThingPagerAdapter(Context context, FragmentManager fm, String accountName,
-            ThingData thingData) {
+    public ThingPagerAdapter(FragmentManager fm, String accountName, ThingData thingData) {
         super(fm);
-        this.context = context.getApplicationContext();
         this.accountName = accountName;
         this.thingData = thingData;
         setupPages(thingData.parent);
@@ -187,11 +183,7 @@ public class ThingPagerAdapter extends FragmentStateItemPagerAdapter {
         switch (pageTypes.get(position)) {
             case TYPE_LINK:
                 String url = thingData.parent.getLinkUrl().toString();
-                if (YouTubePlayerFragment.isPlayableWithYouTube(context, url)) {
-                    return YouTubePlayerFragment.newInstance(url);
-                } else {
-                    return LinkFragment.newInstance(url);
-                }
+                return LinkFragment.newInstance(url);
 
             case TYPE_COMMENTS:
                 // TODO: Standardize parentId/childId selector throughout app.
