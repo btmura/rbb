@@ -16,10 +16,12 @@
 
 package com.btmura.android.reddit.app;
 
-
+// TODO(btmura): Rename methods to match the listener ones.
 interface ThingActionModeController extends ActionModeController {
 
     boolean isSwipeable(int position);
+
+    void clickStatus(int position);
 
     void swipe(int position);
 

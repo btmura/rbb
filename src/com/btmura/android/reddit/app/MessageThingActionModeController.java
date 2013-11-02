@@ -188,6 +188,10 @@ public class MessageThingActionModeController implements ThingActionModeControll
     }
 
     @Override
+    public void clickStatus(int position) {
+    }
+
+    @Override
     public void swipe(int position) {
     }
 

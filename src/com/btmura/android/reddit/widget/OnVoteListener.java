@@ -18,6 +18,12 @@ package com.btmura.android.reddit.widget;
 
 import android.view.View;
 
+// TODO(btmura): Rename this class and move inside of ThingView.
 public interface OnVoteListener {
+    /** Notifies the listener that the status area was clicked. */
+    void onStatusClick(View view);
+
+    // TODO(btmura): Rename this method to match onStatusClick.
+    /** Notifies the listener that a voting arrow was clicked. */
     void onVote(View view, int action);
 }

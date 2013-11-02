@@ -214,6 +214,13 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
         actionModeController.swipe(position);
     }
 
+    @Override
+    public void onStatusClick(View view) {
+        int position = getListView().getPositionForView(view);
+        actionModeController.clickStatus(position);
+    }
+
+    @Override
     public void onVote(View v, int action) {
         int position = getListView().getPositionForView(v);
         actionModeController.vote(position, action);

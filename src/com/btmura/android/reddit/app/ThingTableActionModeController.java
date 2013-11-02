@@ -298,6 +298,10 @@ class ThingTableActionModeController implements ThingActionModeController, Thing
     }
 
     @Override
+    public void clickStatus(int position) {
+    }
+
+    @Override
     public void vote(int position, int action) {
         boolean isLink = getKind(position) == Kinds.KIND_LINK;
         ThingBundle thingBundle = isLink ? getThingBundle(position) : null;
