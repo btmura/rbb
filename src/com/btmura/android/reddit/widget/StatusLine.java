@@ -26,21 +26,25 @@ import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 /** Logic related to the status line that is shown in a {@link ThingView}. */
 final class StatusLine {
 
+    /** Returns whether or not there was a down event within the status line. */
     static boolean onDown(
-            MotionEvent e,
-            RectF rect,
-            OnThingViewClickListener listener) {
+            boolean isStatusClickable,
+            OnThingViewClickListener listener,
+            RectF statusBounds,
+            MotionEvent e) {
 
-        return isReportableClick(e, rect, listener);
+        return shouldReportClick(isStatusClickable, listener, statusBounds, e);
     }
 
+    /** Possibly notifies the listener that a single tap up has occurred within the status line. */
     static boolean onSingleTapUp(
-            MotionEvent e,
-            RectF rect,
+            boolean isStatusClickable,
             OnThingViewClickListener listener,
+            RectF statusBounds,
+            MotionEvent e,
             View view) {
 
-        if (isReportableClick(e, rect, listener)) {
+        if (shouldReportClick(isStatusClickable, listener, statusBounds, e)) {
             view.playSoundEffect(SoundEffectConstants.CLICK);
             listener.onStatusClick(view);
             return true;
@@ -48,11 +52,12 @@ final class StatusLine {
         return false;
     }
 
-    private static boolean isReportableClick(
-            MotionEvent e,
-            RectF rect,
-            OnThingViewClickListener listener) {
+    private static boolean shouldReportClick(
+            boolean isStatusClickable,
+            OnThingViewClickListener listener,
+            RectF statusBounds,
+            MotionEvent e) {
 
-        return listener != null && rect.contains(e.getX(), e.getY());
+        return isStatusClickable && listener != null && statusBounds.contains(e.getX(), e.getY());
     }
 }

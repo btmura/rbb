@@ -78,6 +78,7 @@ public class CommentAdapter extends BaseCursorAdapter {
 
         ThingView tv = (ThingView) view;
         tv.setType(ThingView.TYPE_COMMENT_LIST);
+        tv.setStatusClickable(true);
         tv.setData(author,
                 body,
                 createdUtc,

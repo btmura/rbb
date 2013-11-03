@@ -136,6 +136,7 @@ public class ThingView extends CustomView implements OnGestureListener {
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
     private RectF statusBounds;
+    private boolean isStatusClickable;
     private Object nsfwSpan;
     private Object italicSpan;
 
@@ -195,8 +196,14 @@ public class ThingView extends CustomView implements OnGestureListener {
         DETAILS_INNER_CELL_WIDTH = DETAILS_CELL_WIDTH - ELEMENT_PADDING * 2;
     }
 
+    /** Set a listener that will be notified when certain parts of the view are clicked. */
     public void setThingViewOnClickListener(OnThingViewClickListener listener) {
         this.listener = listener;
+    }
+
+    /** Set whether status clicks will be reported to the {@link OnThingViewClickListener}. */
+    public void setStatusClickable(boolean isStatusClickable) {
+        this.isStatusClickable = isStatusClickable;
     }
 
     public void setType(int type) {
@@ -919,7 +926,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     @Override
     public boolean onDown(MotionEvent e) {
-        return StatusLine.onDown(e, statusBounds, listener)
+        return StatusLine.onDown(isStatusClickable, listener, statusBounds, e)
                 || VotingArrows.onDown(e,
                         getTopOffset(),
                         getLeftOffset(),
@@ -930,7 +937,7 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        return StatusLine.onSingleTapUp(e, statusBounds, listener, this)
+        return StatusLine.onSingleTapUp(isStatusClickable, listener, statusBounds, e, this)
                 || VotingArrows.onSingleTapUp(e,
                         getTopOffset(),
                         getLeftOffset(),
