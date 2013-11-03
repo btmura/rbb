@@ -216,8 +216,6 @@ abstract class ThingListFragment<C extends ThingListController<?>, MC extends Me
 
     @Override
     public void onStatusClick(View view) {
-        int position = getListView().getPositionForView(view);
-        actionModeController.clickStatus(position);
     }
 
     @Override

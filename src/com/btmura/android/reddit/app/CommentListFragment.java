@@ -103,10 +103,9 @@ public class CommentListFragment extends ListFragment implements
 
     @Override
     public void onStatusClick(View view) {
-        // TODO(btmura): Rename onListItemClick to onStatusClick.
         int position = getListView().getPositionForView(view);
         long id = getListView().getItemIdAtPosition(position);
-        controller.onListItemClick(getListView(), view, position, id);
+        controller.expandOrCollapse(getListView(), view, position, id);
     }
 
     @Override

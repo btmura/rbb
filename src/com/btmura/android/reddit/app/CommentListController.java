@@ -166,7 +166,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         }
     }
 
-    public void onListItemClick(ListView listView, View view, int position, long id) {
+    public void expandOrCollapse(ListView listView, View view, int position, long id) {
         if (position == 0) {
             return; // Don't allow expanding or collapsing on the header comment.
         }
