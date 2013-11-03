@@ -10,6 +10,7 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -588,18 +589,14 @@ public class ThingView extends CustomView implements OnGestureListener {
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         // Move from left to right one more time.
-        int x = nestingIndent * nesting + PADDING;
-        if (drawVotingArrows) {
-            x += VotingArrows.getWidth(drawVotingArrows);
-            x += PADDING;
-        }
+        int x = PADDING + leftGadgetWidth + nestingIndent * nesting;
         if (hasBody()) {
             bodyBounds.left = x;
-            bodyBounds.right = x + bodyLayout.getWidth();
+            bodyBounds.right = bodyBounds.left + bodyLayout.getWidth();
         }
         if (hasStatus()) {
             statusBounds.left = x;
-            statusBounds.right = x + statusLayout.getWidth();
+            statusBounds.right = statusBounds.left + statusLayout.getWidth();
         }
 
         // Move from top to bottom one more time.
@@ -645,6 +642,11 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         setMeasuredDimension(measuredWidth, measuredHeight);
+
+        // Increase the status boundary to make it easier to click once its all measured.
+        if (hasStatus()) {
+            statusBounds.inset(-ELEMENT_PADDING, -ELEMENT_PADDING);
+        }
 
         for (int i = 0; i < nesting; i++) {
             int offset = i * 4;
@@ -810,6 +812,8 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     @Override
     protected void onDraw(Canvas c) {
+        // drawDebugBounds(c);
+
         // Draw nesting lines if the nesting is greater than zero.
         if (nesting > 0) {
             c.drawLines(nestingPoints, 0, nesting * 4, NESTING_LINES_PAINT);
@@ -870,6 +874,21 @@ public class ThingView extends CustomView implements OnGestureListener {
         // Render the status at the bottom for non-comments.
         if (!hasTopStatus() && hasStatus()) {
             statusLayout.draw(c);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private void drawDebugBounds(Canvas c) {
+        if (BuildConfig.DEBUG) {
+            Paint paint = new Paint();
+            if (bodyBounds != null) {
+                paint.setColor(Color.GREEN);
+                c.drawRect(bodyBounds, paint);
+            }
+            if (statusBounds != null) {
+                paint.setColor(Color.RED);
+                c.drawRect(statusBounds, paint);
+            }
         }
     }
 
