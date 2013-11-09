@@ -10,6 +10,7 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -91,8 +92,16 @@ public class ThingView extends CustomView implements OnGestureListener {
     /** Maximum length of titles and bodies when displaying thing lists. */
     private static final int MAX_TEXT_LENGTH = 200;
 
+    public interface OnThingViewClickListener {
+        /** Notifies the listener that the status area was clicked. */
+        void onStatusClick(View view);
+
+        /** Notifies the listener that a voting arrow was clicked. */
+        void onVoteClick(View view, int action);
+    }
+
     private final GestureDetector detector;
-    private OnVoteListener listener;
+    private OnThingViewClickListener listener;
 
     private String author;
     private CharSequence body;
@@ -127,6 +136,8 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     private String scoreText;
     private final SpannableStringBuilder statusText = new SpannableStringBuilder();
+    private RectF statusBounds;
+    private boolean isStatusClickable;
     private Object nsfwSpan;
     private Object italicSpan;
 
@@ -186,8 +197,14 @@ public class ThingView extends CustomView implements OnGestureListener {
         DETAILS_INNER_CELL_WIDTH = DETAILS_CELL_WIDTH - ELEMENT_PADDING * 2;
     }
 
-    public void setOnVoteListener(OnVoteListener listener) {
+    /** Set a listener that will be notified when certain parts of the view are clicked. */
+    public void setThingViewOnClickListener(OnThingViewClickListener listener) {
         this.listener = listener;
+    }
+
+    /** Set whether status clicks will be reported to the {@link OnThingViewClickListener}. */
+    public void setStatusClickable(boolean isStatusClickable) {
+        this.isStatusClickable = isStatusClickable;
     }
 
     public void setType(int type) {
@@ -332,6 +349,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         invalidate(thumbRect);
     }
 
+    // TODO(btmura): Move to StatusLine class.
     private void setStatusText(boolean showNsfw,
             boolean showSubreddit,
             boolean showPoints,
@@ -344,6 +362,9 @@ public class ThingView extends CustomView implements OnGestureListener {
             String subreddit) {
         statusText.clear();
         statusText.clearSpans();
+        if (statusBounds == null) {
+            statusBounds = new RectF();
+        }
 
         if (showNsfw) {
             String nsfw = getContext().getString(R.string.nsfw);
@@ -568,15 +589,14 @@ public class ThingView extends CustomView implements OnGestureListener {
         minHeight = PADDING + Math.max(leftHeight, rightHeight) + PADDING;
 
         // Move from left to right one more time.
-        int x = nestingIndent * nesting + PADDING;
-        if (drawVotingArrows) {
-            x += VotingArrows.getWidth(drawVotingArrows);
-            x += PADDING;
-        }
+        int x = PADDING + leftGadgetWidth + nestingIndent * nesting;
         if (hasBody()) {
             bodyBounds.left = x;
-            x += bodyLayout.getWidth();
-            bodyBounds.right = x;
+            bodyBounds.right = bodyBounds.left + bodyLayout.getWidth();
+        }
+        if (hasStatus()) {
+            statusBounds.left = x;
+            statusBounds.right = statusBounds.left + statusLayout.getWidth();
         }
 
         // Move from top to bottom one more time.
@@ -591,13 +611,21 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         if (hasTopStatus() && hasStatus()) {
+            statusBounds.top = y;
+            statusBounds.bottom = y + statusLayout.getHeight();
             y += statusLayout.getHeight() + ELEMENT_PADDING;
         }
 
         if (hasBody()) {
             bodyBounds.top = y;
-            y += bodyLayout.getHeight();
-            bodyBounds.bottom = y;
+            bodyBounds.bottom = y + bodyLayout.getHeight();
+            y += bodyLayout.getHeight() + ELEMENT_PADDING;
+        }
+
+        if (!hasTopStatus() && hasStatus()) {
+            statusBounds.top = y;
+            statusBounds.bottom = y + statusLayout.getHeight();
+            y += statusLayout.getHeight() + ELEMENT_PADDING;
         }
 
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -614,6 +642,11 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
 
         setMeasuredDimension(measuredWidth, measuredHeight);
+
+        // Increase the status boundary to make it easier to click once its all measured.
+        if (hasStatus()) {
+            statusBounds.inset(-ELEMENT_PADDING, -ELEMENT_PADDING);
+        }
 
         for (int i = 0; i < nesting; i++) {
             int offset = i * 4;
@@ -779,6 +812,8 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     @Override
     protected void onDraw(Canvas c) {
+        // drawDebugBounds(c);
+
         // Draw nesting lines if the nesting is greater than zero.
         if (nesting > 0) {
             c.drawLines(nestingPoints, 0, nesting * 4, NESTING_LINES_PAINT);
@@ -842,6 +877,21 @@ public class ThingView extends CustomView implements OnGestureListener {
         }
     }
 
+    @SuppressWarnings("unused")
+    private void drawDebugBounds(Canvas c) {
+        if (BuildConfig.DEBUG) {
+            Paint paint = new Paint();
+            if (bodyBounds != null) {
+                paint.setColor(Color.GREEN);
+                c.drawRect(bodyBounds, paint);
+            }
+            if (statusBounds != null) {
+                paint.setColor(Color.RED);
+                c.drawRect(statusBounds, paint);
+            }
+        }
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         return detector.onTouchEvent(e) || onBodyTouchEvent(e) || super.onTouchEvent(e);
@@ -895,25 +945,27 @@ public class ThingView extends CustomView implements OnGestureListener {
 
     @Override
     public boolean onDown(MotionEvent e) {
-        return VotingArrows.onDown(e,
-                getTopOffset(),
-                getLeftOffset(),
-                drawVotingArrows,
-                drawScore,
-                isVotable);
+        return StatusLine.onDown(isStatusClickable, listener, statusBounds, e)
+                || VotingArrows.onDown(e,
+                        getTopOffset(),
+                        getLeftOffset(),
+                        drawVotingArrows,
+                        drawScore,
+                        isVotable);
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        return VotingArrows.onSingleTapUp(e,
-                getTopOffset(),
-                getLeftOffset(),
-                drawVotingArrows,
-                drawScore,
-                isVotable,
-                listener,
-                this,
-                likes);
+        return StatusLine.onSingleTapUp(isStatusClickable, listener, statusBounds, e, this)
+                || VotingArrows.onSingleTapUp(e,
+                        getTopOffset(),
+                        getLeftOffset(),
+                        drawVotingArrows,
+                        drawScore,
+                        isVotable,
+                        listener,
+                        this,
+                        likes);
     }
 
     private float getTopOffset() {

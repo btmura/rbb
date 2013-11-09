@@ -33,12 +33,12 @@ import android.widget.ListView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.util.Views;
-import com.btmura.android.reddit.widget.OnVoteListener;
+import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 public class CommentListFragment extends ListFragment implements
         LoaderCallbacks<Cursor>,
         MultiChoiceModeListener,
-        OnVoteListener {
+        OnThingViewClickListener {
 
     public static final String TAG = "CommentListFragment";
 
@@ -102,12 +102,14 @@ public class CommentListFragment extends ListFragment implements
     }
 
     @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-        controller.onListItemClick(listView, view, position, id);
+    public void onStatusClick(View view) {
+        int position = getListView().getPositionForView(view);
+        long id = getListView().getItemIdAtPosition(position);
+        controller.expandOrCollapse(getListView(), view, position, id);
     }
 
     @Override
-    public void onVote(View view, int action) {
+    public void onVoteClick(View view, int action) {
         int position = getListView().getPositionForView(view);
         controller.vote(action, position);
     }

@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-
 interface ThingActionModeController extends ActionModeController {
 
     boolean isSwipeable(int position);
@@ -24,5 +23,4 @@ interface ThingActionModeController extends ActionModeController {
     void swipe(int position);
 
     void vote(int position, int action);
-
 }
