@@ -112,7 +112,6 @@
     <string name="menu_unsave">Unsave</string>
     <string name="menu_user">/u/%1$s</string>
     <string name="nsfw">"NSFW"</string>
-    <string name="permission_sync_accounts">com.btmura.android.reddit.permission.SYNC_ACCOUNTS</string>
     <string name="place_messages">Messages</string>
     <string name="place_profile">Profile</string>
     <string name="place_saved">Saved</string>

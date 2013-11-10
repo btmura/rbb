@@ -17,8 +17,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.btmura.android.reddit"
-    android:versionCode="8"
-    android:versionName="3.1" >
+    android:versionCode="9"
+    android:versionName="3.2" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -214,7 +214,7 @@
         <service
             android:name=".content.AccountSyncAdapter$Service"
             android:exported="true"
-            android:permission="@string/permission_sync_accounts" >
+            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -226,7 +226,7 @@
         <service
             android:name=".content.SubredditSyncAdapter$Service"
             android:exported="true"
-            android:permission="@string/permission_sync_accounts" >
+            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -238,7 +238,7 @@
         <service
             android:name=".content.ThingSyncAdapter$Service"
             android:exported="true"
-            android:permission="@string/permission_sync_accounts" >
+            android:permission="com.btmura.android.reddit.permission.SYNC_ACCOUNTS" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
