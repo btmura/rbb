@@ -61,6 +61,11 @@
     <string name="filter_profile_disliked">disliked</string>
     <string name="filter_profile_hidden">hidden</string>
     <string name="filter_profile_saved">saved</string>
+    <string name="filter_search_comments">comments</string>
+    <string name="filter_search_hot">hot</string>
+    <string name="filter_search_new">new</string>
+    <string name="filter_search_relevance">relevance</string>
+    <string name="filter_search_top">top</string>
     <string name="filter_subreddit_controversial">controversial</string>
     <string name="filter_subreddit_hot">what\'s hot</string>
     <string name="filter_subreddit_new">new</string>
@@ -104,6 +109,7 @@
     <string name="menu_save">Save</string>
     <string name="menu_search">Search</string>
     <string name="menu_share">Share</string>
+    <string name="menu_sort">Sort</string>
     <string name="menu_subreddit">/r/%1$s</string>
     <string name="menu_submit">Submit</string>
     <string name="menu_switch_themes">Switch themes</string>
@@ -122,6 +128,7 @@
     <string name="reddit_error">Reddit says: %1$s</string>
     <string name="reddit_error_line">%1$s - %2$s</string>
     <string name="show_password">Show password</string>
+    <string name="sort_by">Sort by</string>
     <string name="subreddits_category">Subreddits</string>
     <string name="subtitle_profile">profile</string>
     <string name="subtitle_messages">messages</string>

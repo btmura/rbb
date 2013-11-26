@@ -38,6 +38,12 @@ abstract class BaseFilterAdapter extends BaseAdapter {
     public static final int PROFILE_HIDDEN = 5;
     public static final int PROFILE_SAVED = 6;
 
+    public static final int SEARCH_RELEVANCE = 0;
+    public static final int SEARCH_NEW = 1;
+    public static final int SEARCH_HOT = 2;
+    public static final int SEARCH_TOP = 3;
+    public static final int SEARCH_COMMENTS = 4;
+
     public static final int SUBREDDIT_HOT = 0;
     public static final int SUBREDDIT_TOP = 1;
     public static final int SUBREDDIT_CONTROVERSIAL = 2;

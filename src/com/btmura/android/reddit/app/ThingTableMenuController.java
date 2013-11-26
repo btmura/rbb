@@ -16,6 +16,7 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -84,10 +85,12 @@ class ThingTableMenuController implements MenuController {
         boolean showNewPost = isSubreddit && hasAccount;
         boolean showSubreddit = isSubreddit && hasSidebar;
         boolean showRefresh = !hasThing;
+        boolean showSort = isQuery;
 
         menu.findItem(R.id.menu_add_subreddit).setVisible(showAddSubreddit);
         menu.findItem(R.id.menu_new_post).setVisible(showNewPost);
         menu.findItem(R.id.menu_refresh).setVisible(showRefresh);
+        menu.findItem(R.id.menu_sort).setVisible(showSort);
 
         MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
         subredditItem.setVisible(showSubreddit);
@@ -105,6 +108,10 @@ class ThingTableMenuController implements MenuController {
 
             case R.id.menu_refresh:
                 handleRefresh();
+                return true;
+
+            case R.id.menu_sort:
+                handleSort();
                 return true;
 
             case R.id.menu_subreddit:
@@ -126,6 +133,13 @@ class ThingTableMenuController implements MenuController {
 
     private void handleRefresh() {
         refreshable.refresh();
+    }
+
+    private void handleSort() {
+        new AlertDialog.Builder(context)
+                .setTitle(R.string.sort_by)
+                .setSingleChoiceItems(R.array.filters_search, 0, null)
+                .show();
     }
 
     private void handleSubreddit() {
