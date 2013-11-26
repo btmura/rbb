@@ -18,6 +18,7 @@ package com.btmura.android.reddit.content;
 
 import android.content.Context;
 
+// TODO(btmura): rename class due to global prefs or separate into other classes
 public class AccountPrefs extends Prefs {
 
     /** Global preference for the last selected account. */
@@ -28,6 +29,9 @@ public class AccountPrefs extends Prefs {
 
     /** Global preference for the last selected subreddit filter by any account. */
     private static final String GLOBAL_LAST_SUBREDDIT_FILTER = "lastSubredditFilter";
+
+    /** Global preference for the last selected comment filter by any account. */
+    private static final String GLOBAL_LAST_COMMENT_FILTER = "lastCommentFilter";
 
     /** Global preference for the last selected search filter by any account. */
     private static final String GLOBAL_LAST_SEARCH_FILTER = "lastSearchFilter";
@@ -60,6 +64,14 @@ public class AccountPrefs extends Prefs {
 
     public static void setLastSubredditFilter(Context context, int filter) {
         getPrefsInstance(context).edit().putInt(GLOBAL_LAST_SUBREDDIT_FILTER, filter).apply();
+    }
+
+    public static int getLastCommentFilter(Context context, int defValue) {
+        return getPrefsInstance(context).getInt(GLOBAL_LAST_COMMENT_FILTER, defValue);
+    }
+
+    public static void setLastCommentFilter(Context context, int filter) {
+        getPrefsInstance(context).edit().putInt(GLOBAL_LAST_COMMENT_FILTER, filter).apply();
     }
 
     public static int getLastSearchFilter(Context context, int defValue) {
