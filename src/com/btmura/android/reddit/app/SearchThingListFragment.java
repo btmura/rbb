@@ -78,10 +78,13 @@ public class SearchThingListFragment
 
     @Override
     public void setFilter(int filter) {
-        controller.setFilter(filter);
-        controller.swapCursor(null);
-        setListAdapter(controller.getAdapter());
-        setListShown(false);
-        getLoaderManager().restartLoader(0, null, this);
+        // TODO(btmura): remove code duplication with CommentListFragment.
+        if (filter != controller.getFilter()) {
+            controller.setFilter(filter);
+            controller.swapCursor(null);
+            setListAdapter(controller.getAdapter());
+            setListShown(false);
+            getLoaderManager().restartLoader(0, null, this);
+        }
     }
 }

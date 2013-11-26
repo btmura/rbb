@@ -349,6 +349,7 @@ public class NavigationFragment extends ListFragment implements
                             newLoaderArgs(accountName),
                             randomLoaderCallbacks);
                 } else if (listener != null) {
+                    // TODO(btmura): remove posting which crashes if activity is destroyed
                     getListView().post(new Runnable() {
                         @Override
                         public void run() {

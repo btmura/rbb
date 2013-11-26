@@ -41,11 +41,12 @@ import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 /**
  * Controller that handles all the logic required by {@link CommentListFragment}.
  */
-class CommentListController implements Controller<CommentAdapter>, CommentList {
+class CommentListController implements Controller<CommentAdapter>, Filterable, CommentList {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_THING_ID = "thingId";
     static final String EXTRA_LINK_ID = "linkId";
+    static final String EXTRA_FILTER = "filter";
     static final String EXTRA_CURSOR_EXTRAS = "cursorExtras";
 
     private final Context context;
@@ -53,6 +54,7 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     private final String thingId;
     private final String linkId;
     private final CommentAdapter adapter;
+    private int filter;
     private Bundle cursorExtras;
 
     CommentListController(Context context, Bundle args, OnThingViewClickListener listener) {
@@ -61,15 +63,18 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         this.thingId = getThingIdExtra(args);
         this.linkId = getLinkIdExtra(args);
         this.adapter = new CommentAdapter(context, accountName, listener);
+        restoreInstanceState(args);
     }
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
+        this.filter = savedInstanceState.getInt(EXTRA_FILTER);
         this.cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
     @Override
     public void saveInstanceState(Bundle outState) {
+        outState.putInt(EXTRA_FILTER, filter);
         outState.putBundle(EXTRA_CURSOR_EXTRAS, cursorExtras);
     }
 
@@ -419,7 +424,19 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
         return adapter.getBoolean(position, CommentLoader.INDEX_SELF);
     }
 
-    // CommentList implementation.
+    // Filterable implementation
+
+    @Override
+    public int getFilter() {
+        return filter;
+    }
+
+    @Override
+    public void setFilter(int filter) {
+        this.filter = filter;
+    }
+
+    // CommentList implementation
 
     @Override
     public int getCommentCount() {
@@ -454,5 +471,4 @@ class CommentListController implements Controller<CommentAdapter>, CommentList {
     private static String getLinkIdExtra(Bundle extras) {
         return extras.getString(EXTRA_LINK_ID);
     }
-
 }

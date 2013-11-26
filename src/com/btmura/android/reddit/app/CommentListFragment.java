@@ -121,11 +121,18 @@ public class CommentListFragment extends ListFragment implements
 
     @Override
     public int getFilter() {
-        return 0;
+        return controller.getFilter();
     }
 
     @Override
     public void setFilter(int filter) {
+        if (filter != controller.getFilter()) {
+            controller.setFilter(filter);
+            controller.swapCursor(null);
+            setListAdapter(controller.getAdapter());
+            setListShown(false);
+            getLoaderManager().restartLoader(0, null, this);
+        }
     }
 
     @Override
@@ -145,6 +152,8 @@ public class CommentListFragment extends ListFragment implements
         return menuController.onOptionsItemSelected(item)
                 || super.onOptionsItemSelected(item);
     }
+
+    // TODO(btmura): Move action mode code into separate ActionModeController impl.
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
