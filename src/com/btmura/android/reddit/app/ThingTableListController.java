@@ -27,7 +27,7 @@ import com.btmura.android.reddit.widget.ThingListAdapter;
 import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 abstract class ThingTableListController
-        implements ThingListController<ThingListAdapter>, ThingProjection {
+        implements ThingListController<ThingListAdapter>, ThingProjection, Filterable {
 
     static final String EXTRA_ACCOUNT_NAME = "accountName";
     static final String EXTRA_PARENT_SUBREDDIT = "parentSubreddit";

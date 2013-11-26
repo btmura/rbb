@@ -30,12 +30,14 @@ import android.widget.ListView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.CommentLogic.CommentList;
+import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.CommentLoader;
 import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.CommentAdapter;
+import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 /**
@@ -68,7 +70,8 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        this.filter = savedInstanceState.getInt(EXTRA_FILTER);
+        int defFilter = AccountPrefs.getLastCommentFilter(context, FilterAdapter.COMMENTS_BEST);
+        this.filter = savedInstanceState.getInt(EXTRA_FILTER, defFilter);
         this.cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }
 
@@ -434,6 +437,7 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
     @Override
     public void setFilter(int filter) {
         this.filter = filter;
+        AccountPrefs.setLastCommentFilter(context, filter);
     }
 
     // CommentList implementation
