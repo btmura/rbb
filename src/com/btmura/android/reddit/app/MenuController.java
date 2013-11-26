@@ -23,8 +23,10 @@ import android.view.MenuItem;
 
 interface MenuController {
 
+    // TODO(btmura): do we need this method?
     void restoreInstanceState(Bundle savedInstanceState);
 
+    // TODO(btmura): do we need this method?
     void saveInstanceState(Bundle outState);
 
     // Menu handling methods

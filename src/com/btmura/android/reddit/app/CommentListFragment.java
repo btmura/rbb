@@ -43,6 +43,7 @@ public class CommentListFragment extends ListFragment implements
     public static final String TAG = "CommentListFragment";
 
     private CommentListController controller;
+    private CommentMenuController menuController;
 
     public static CommentListFragment newInstance(String accountName, String thingId,
             String linkId) {
@@ -60,9 +61,12 @@ public class CommentListFragment extends ListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controller = new CommentListController(getActivity(), getArguments(), this);
+        menuController = new CommentMenuController();
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
+            menuController.restoreInstanceState(savedInstanceState);
         }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -112,6 +116,24 @@ public class CommentListFragment extends ListFragment implements
     public void onVoteClick(View view, int action) {
         int position = getListView().getPositionForView(view);
         controller.vote(action, position);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menuController.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menuController.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return menuController.onOptionsItemSelected(item)
+                || super.onOptionsItemSelected(item);
     }
 
     @Override
