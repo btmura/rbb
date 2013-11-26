@@ -26,6 +26,8 @@ import com.btmura.android.reddit.R;
  */
 abstract class BaseFilterAdapter extends BaseAdapter {
 
+    // TODO(btmura): move constants out of the widget class
+
     public static final int MESSAGE_INBOX = 0;
     public static final int MESSAGE_UNREAD = 1;
     public static final int MESSAGE_SENT = 2;

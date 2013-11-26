@@ -27,6 +27,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.database.Subreddits;
 
+// TODO(btmura): Split this apart into separate classes for profile and subreddits.
 class ThingTableMenuController implements MenuController {
 
     private final Context context;
