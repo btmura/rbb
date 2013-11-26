@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -81,10 +80,7 @@ class SearchThingMenuController implements MenuController, OnClickListener {
     }
 
     private void handleSort() {
-        new AlertDialog.Builder(context)
-                .setTitle(R.string.sort_by)
-                .setSingleChoiceItems(R.array.filters_search, filterable.getFilter(), this)
-                .show();
+        MenuHelper.showSortSearchThingsDialog(context, filterable);
     }
 
     @Override

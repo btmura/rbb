@@ -16,9 +16,12 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -85,6 +88,31 @@ public class MenuHelper {
 
     public static void showAddSubredditDialog(FragmentManager fm, String[] subreddits) {
         AddSubredditFragment.newInstance(subreddits).show(fm, AddSubredditFragment.TAG);
+    }
+
+    public static void showSortCommentsDialog(Context context, final Filterable filterable) {
+        showSortDialog(context, filterable, R.array.filters_comments);
+    }
+
+    public static void showSortSearchThingsDialog(Context context, final Filterable filterable) {
+        showSortDialog(context, filterable, R.array.filters_search);
+    }
+
+    private static void showSortDialog(Context context,
+            final Filterable filterable,
+            int arrayResId) {
+        new AlertDialog.Builder(context)
+                .setTitle(R.string.sort_by)
+                .setSingleChoiceItems(arrayResId,
+                        filterable.getFilter(),
+                        new OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                filterable.setFilter(which);
+                            }
+                        })
+                .show();
     }
 
     public static void startAccountListActivity(Context context) {
