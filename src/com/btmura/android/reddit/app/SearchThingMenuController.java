@@ -19,7 +19,6 @@ package com.btmura.android.reddit.app;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,16 +36,6 @@ class SearchThingMenuController implements MenuController, OnClickListener {
         this.context = context;
         this.refreshable = refreshable;
         this.filterable = filterable;
-    }
-
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        // No state to restore
-    }
-
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        // No state to save
     }
 
     @Override

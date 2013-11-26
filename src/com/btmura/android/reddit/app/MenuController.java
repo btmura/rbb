@@ -16,20 +16,11 @@
 
 package com.btmura.android.reddit.app;
 
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 interface MenuController {
-
-    // TODO(btmura): do we need this method?
-    void restoreInstanceState(Bundle savedInstanceState);
-
-    // TODO(btmura): do we need this method?
-    void saveInstanceState(Bundle outState);
-
-    // Menu handling methods
 
     void onCreateOptionsMenu(Menu menu, MenuInflater inflater);
 

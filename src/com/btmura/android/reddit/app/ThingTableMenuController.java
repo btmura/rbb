@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,16 +49,6 @@ class ThingTableMenuController implements MenuController {
         this.subredditNameHolder = subredditNameHolder;
         this.thingHolder = thingHolder;
         this.refreshable = refreshable;
-    }
-
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        // No state to restore
-    }
-
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        // No state to save
     }
 
     @Override

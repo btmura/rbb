@@ -50,8 +50,6 @@ abstract class AbstractListFragment<C extends Controller<A>, MC extends MenuCont
         actionModeController = createActionModeController(controller);
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
-            menuController.restoreInstanceState(savedInstanceState);
-            actionModeController.restoreInstanceState(savedInstanceState);
         }
     }
 
@@ -148,7 +146,5 @@ abstract class AbstractListFragment<C extends Controller<A>, MC extends MenuCont
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         controller.saveInstanceState(outState);
-        menuController.saveInstanceState(outState);
-        actionModeController.saveInstanceState(outState);
     }
 }

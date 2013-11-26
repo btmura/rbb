@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -41,16 +40,6 @@ public class MessageThingActionModeController implements ThingActionModeControll
     MessageThingActionModeController(Context context, MessageListAdapter adapter) {
         this.context = context;
         this.adapter = adapter;
-    }
-
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        // No state to restore
-    }
-
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        // No state to save
     }
 
     @Override

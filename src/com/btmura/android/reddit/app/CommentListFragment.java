@@ -65,7 +65,6 @@ public class CommentListFragment extends ListFragment implements
         menuController = new CommentMenuController(getActivity(), this);
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
-            menuController.restoreInstanceState(savedInstanceState);
         }
         setHasOptionsMenu(true);
     }

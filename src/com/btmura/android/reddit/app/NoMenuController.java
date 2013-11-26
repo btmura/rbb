@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,14 +23,6 @@ import android.view.MenuItem;
 class NoMenuController implements MenuController {
 
     static final NoMenuController INSTANCE = new NoMenuController();
-
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-    }
-
-    @Override
-    public void saveInstanceState(Bundle outState) {
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

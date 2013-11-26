@@ -17,7 +17,6 @@
 package com.btmura.android.reddit.app;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -47,16 +46,6 @@ class SubredditActionModeController implements ActionModeController {
         this.fragmentManager = fragmentManager;
         this.adapter = adapter;
         this.accountResultHolder = accountResultHolder;
-    }
-
-    @Override
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        // No state to restore
-    }
-
-    @Override
-    public void saveInstanceState(Bundle outState) {
-        // No state to save
     }
 
     @Override
