@@ -40,7 +40,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
         SearchQueryHandler,
         AccountResultHolder {
 
-    public static final String TAG = "SearchActivity";
+    private static final String TAG = "SearchActivity";
 
     /** Optional string subreddit to additionally search within a subreddit. */
     public static final String EXTRA_SUBREDDIT = "subreddit";
