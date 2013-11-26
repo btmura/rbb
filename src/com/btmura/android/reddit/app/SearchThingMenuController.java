@@ -26,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.AccountPrefs;
 
 class SearchThingMenuController implements MenuController, OnClickListener {
 
@@ -90,5 +91,6 @@ class SearchThingMenuController implements MenuController, OnClickListener {
     public void onClick(DialogInterface dialog, int which) {
         dialog.dismiss();
         filterable.setFilter(which);
+        AccountPrefs.setLastSearchFilter(context, which);
     }
 }

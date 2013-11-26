@@ -26,12 +26,13 @@ public class SearchThingListFragment
         implements Filterable {
 
     public static SearchThingListFragment newInstance(String accountName, String subreddit,
-            String query, boolean singleChoice) {
-        Bundle args = new Bundle(5);
+            String query, int filter, boolean singleChoice) {
+        Bundle args = new Bundle(6);
         args.putString(SearchThingListController.EXTRA_ACCOUNT_NAME, accountName);
         args.putString(SearchThingListController.EXTRA_PARENT_SUBREDDIT, subreddit);
         args.putString(SearchThingListController.EXTRA_SUBREDDIT, subreddit);
         args.putString(SearchThingListController.EXTRA_QUERY, query);
+        args.putInt(SearchThingListController.EXTRA_FILTER, filter);
         args.putBoolean(SearchThingListController.EXTRA_SINGLE_CHOICE, singleChoice);
 
         SearchThingListFragment frag = new SearchThingListFragment();

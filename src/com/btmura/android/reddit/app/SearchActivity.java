@@ -29,6 +29,7 @@ import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.app.GlobalMenuFragment.SearchQueryHandler;
 import com.btmura.android.reddit.content.AccountLoader;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
+import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.widget.FilterAdapter;
@@ -138,11 +139,17 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     private void refreshSubredditList() {
-        setSearchSubredditsFragments(accountName, getQuery(), FilterAdapter.SUBREDDIT_HOT);
+        setSearchSubredditsFragments(accountName,
+                getQuery(),
+                FilterAdapter.SUBREDDIT_HOT);
     }
 
     private void refreshThingList(String subreddit) {
-        setSearchThingsFragments(accountName, subreddit, getQuery(), FilterAdapter.SUBREDDIT_HOT);
+        int filter = AccountPrefs.getLastSearchFilter(this, FilterAdapter.SEARCH_RELEVANCE);
+        setSearchThingsFragments(accountName,
+                subreddit,
+                getQuery(),
+                filter);
     }
 
     @Override
