@@ -16,6 +16,10 @@
 
 package com.btmura.android.reddit.app;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +27,15 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 
-class CommentMenuController implements MenuController {
+class CommentMenuController implements MenuController, OnClickListener {
+
+    private final Context context;
+    private final Filterable filterable;
+
+    CommentMenuController(Context context, Filterable filterable) {
+        this.context = context;
+        this.filterable = filterable;
+    }
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
@@ -57,6 +69,15 @@ class CommentMenuController implements MenuController {
     }
 
     private void handleSort() {
+        new AlertDialog.Builder(context)
+                .setTitle(R.string.sort_by)
+                .setSingleChoiceItems(R.array.filters_comments, filterable.getFilter(), this)
+                .show();
+    }
 
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        dialog.dismiss();
+        filterable.setFilter(which);
     }
 }

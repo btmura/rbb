@@ -16,6 +16,17 @@
 -->
 <resources>
 
+    <!-- Order of elements MUST match the constant values in the Java code. -->
+    <string-array name="filters_comments">
+        <item>@string/filter_comments_best</item>
+        <item>@string/filter_comments_top</item>
+        <item>@string/filter_comments_new</item>
+        <item>@string/filter_comments_hot</item>
+        <item>@string/filter_comments_controversial</item>
+        <item>@string/filter_comments_old</item>
+    </string-array>
+
+    <!-- Order of elements MUST match the constant values in the Java code. -->
     <string-array name="filters_search">
         <item>@string/filter_search_relevance</item>
         <item>@string/filter_search_new</item>

@@ -28,6 +28,13 @@ abstract class BaseFilterAdapter extends BaseAdapter {
 
     // TODO(btmura): move constants out of the widget class
 
+    public static final int COMMENTS_BEST = 0;
+    public static final int COMMENTS_TOP = 1;
+    public static final int COMMENTS_NEW = 2;
+    public static final int COMMENTS_HOT = 3;
+    public static final int COMMENTS_CONTROVERSIAL = 4;
+    public static final int COMMENTS_OLD = 5;
+
     public static final int MESSAGE_INBOX = 0;
     public static final int MESSAGE_UNREAD = 1;
     public static final int MESSAGE_SENT = 2;

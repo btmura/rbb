@@ -38,7 +38,8 @@ import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 public class CommentListFragment extends ListFragment implements
         LoaderCallbacks<Cursor>,
         MultiChoiceModeListener,
-        OnThingViewClickListener {
+        OnThingViewClickListener,
+        Filterable {
 
     public static final String TAG = "CommentListFragment";
 
@@ -61,7 +62,7 @@ public class CommentListFragment extends ListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controller = new CommentListController(getActivity(), getArguments(), this);
-        menuController = new CommentMenuController();
+        menuController = new CommentMenuController(getActivity(), this);
         if (savedInstanceState != null) {
             controller.restoreInstanceState(savedInstanceState);
             menuController.restoreInstanceState(savedInstanceState);
@@ -116,6 +117,15 @@ public class CommentListFragment extends ListFragment implements
     public void onVoteClick(View view, int action) {
         int position = getListView().getPositionForView(view);
         controller.vote(action, position);
+    }
+
+    @Override
+    public int getFilter() {
+        return 0;
+    }
+
+    @Override
+    public void setFilter(int filter) {
     }
 
     @Override
