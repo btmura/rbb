@@ -287,14 +287,14 @@ public class Urls {
         return save ? API_SAVE_URL : API_UNSAVE_URL;
     }
 
-    public static CharSequence search(String subreddit, String query, String more) {
+    public static CharSequence search(String subreddit, String query, int filter, String more) {
         if (!TextUtils.isEmpty(subreddit)) {
             StringBuilder b = new StringBuilder(BASE_SUBREDDIT_URL);
             b.append(encode(subreddit));
             b.append(BASE_SEARCH_QUERY);
-            return newSearchUrl(b.toString(), query, more, true);
+            return newSearchUrl(b.toString(), query, filter, more, true);
         } else {
-            return newSearchUrl(BASE_SEARCH_URL, query, more, false);
+            return newSearchUrl(BASE_SEARCH_URL, query, filter, more, false);
         }
     }
 
@@ -375,7 +375,7 @@ public class Urls {
     }
 
     public static CharSequence subredditSearch(String query, String more) {
-        return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, more, false);
+        return newSearchUrl(BASE_SUBREDDIT_SEARCH_URL, query, -1, more, false);
     }
 
     public static CharSequence subscribe() {
@@ -457,9 +457,33 @@ public class Urls {
         return b;
     }
 
-    private static CharSequence newSearchUrl(String base, String query, String more,
+    private static CharSequence newSearchUrl(String base, String query, int filter, String more,
             boolean restrict) {
         StringBuilder b = new StringBuilder(base).append(encode(query));
+        switch (filter) {
+            case FilterAdapter.SEARCH_RELEVANCE:
+                b.append("&sort=relevance");
+                break;
+
+            case FilterAdapter.SEARCH_NEW:
+                b.append("&sort=new");
+                break;
+
+            case FilterAdapter.SEARCH_HOT:
+                b.append("&sort=hot");
+                break;
+
+            case FilterAdapter.SEARCH_TOP:
+                b.append("&sort=top");
+                break;
+
+            case FilterAdapter.SEARCH_COMMENTS:
+                b.append("&sort=comments");
+                break;
+
+            default:
+                break;
+        }
         if (more != null) {
             b.append("&count=25&after=").append(encode(more));
         }

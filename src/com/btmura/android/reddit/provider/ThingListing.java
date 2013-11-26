@@ -191,6 +191,7 @@ class ThingListing extends JsonParser implements Listing {
             String accountName,
             String subreddit,
             String query,
+            int filter,
             String more,
             String cookie) {
         return new ThingListing(context,
@@ -200,7 +201,7 @@ class ThingListing extends JsonParser implements Listing {
                 subreddit,
                 query,
                 null,
-                0,
+                filter,
                 more,
                 cookie);
     }
@@ -300,7 +301,7 @@ class ThingListing extends JsonParser implements Listing {
         if (!TextUtils.isEmpty(profileUser)) {
             return Urls.user(profileUser, filter, more, Urls.TYPE_JSON);
         } else if (!TextUtils.isEmpty(query)) {
-            return Urls.search(subreddit, query, more);
+            return Urls.search(subreddit, query, filter, more);
         } else {
             return Urls.subreddit(subreddit, filter, more, Urls.TYPE_JSON);
         }

@@ -18,6 +18,8 @@ package com.btmura.android.reddit.app;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,14 +27,16 @@ import android.view.MenuItem;
 
 import com.btmura.android.reddit.R;
 
-class SearchThingMenuController implements MenuController {
+class SearchThingMenuController implements MenuController, OnClickListener {
 
     private final Context context;
     private final Refreshable refreshable;
+    private final Filterable filterable;
 
-    SearchThingMenuController(Context context, Refreshable refreshable) {
+    SearchThingMenuController(Context context, Refreshable refreshable, Filterable filterable) {
         this.context = context;
         this.refreshable = refreshable;
+        this.filterable = filterable;
     }
 
     @Override
@@ -78,7 +82,13 @@ class SearchThingMenuController implements MenuController {
     private void handleSort() {
         new AlertDialog.Builder(context)
                 .setTitle(R.string.sort_by)
-                .setSingleChoiceItems(R.array.filters_search, 0, null)
+                .setSingleChoiceItems(R.array.filters_search, filterable.getFilter(), this)
                 .show();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        dialog.dismiss();
+        filterable.setFilter(which);
     }
 }

@@ -27,11 +27,13 @@ public class SearchThingLoader extends AbstractSessionLoader implements ThingPro
     private final String accountName;
     private final String subreddit;
     private final String query;
+    private final int filter;
 
     public SearchThingLoader(Context context,
             String accountName,
             String subreddit,
             String query,
+            int filter,
             String more,
             Bundle cursorExtras) {
         super(context,
@@ -44,6 +46,7 @@ public class SearchThingLoader extends AbstractSessionLoader implements ThingPro
         this.accountName = accountName;
         this.subreddit = subreddit;
         this.query = query;
+        this.filter = filter;
     }
 
     @Override
@@ -52,6 +55,7 @@ public class SearchThingLoader extends AbstractSessionLoader implements ThingPro
                 accountName,
                 subreddit,
                 query,
+                filter,
                 sessionData,
                 more);
     }

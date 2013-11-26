@@ -49,7 +49,6 @@ abstract class ThingTableListController
     ThingTableListController(Context context, Bundle args, OnThingViewClickListener listener) {
         this.context = context;
         this.accountName = getAccountNameExtra(args);
-        this.filter = getFilterExtra(args);
         this.adapter = new ThingListAdapter(context,
                 accountName,
                 listener,
@@ -59,6 +58,7 @@ abstract class ThingTableListController
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
+        setFilter(getFilterExtra(savedInstanceState));
         setParentSubreddit(getParentSubredditExtra(savedInstanceState));
         setSubreddit(getSubredditExtra(savedInstanceState));
         setSelectedThing(getSelectedThingId(savedInstanceState),
@@ -68,6 +68,7 @@ abstract class ThingTableListController
 
     @Override
     public void saveInstanceState(Bundle state) {
+        state.putInt(EXTRA_FILTER, getFilter());
         state.putString(EXTRA_PARENT_SUBREDDIT, adapter.getParentSubreddit());
         state.putString(EXTRA_SELECTED_LINK_ID, adapter.getSelectedLinkId());
         state.putString(EXTRA_SELECTED_THING_ID, adapter.getSelectedThingId());
@@ -152,6 +153,11 @@ abstract class ThingTableListController
     }
 
     // Simple setters for state members.
+
+    @Override
+    public void setFilter(int filter) {
+        this.filter = filter;
+    }
 
     @Override
     public void setMoreId(String moreId) {

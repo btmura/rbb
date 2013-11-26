@@ -22,7 +22,8 @@ import com.btmura.android.reddit.util.ComparableFragments;
 
 public class SearchThingListFragment
         extends ThingListFragment<SearchThingListController, SearchThingMenuController,
-        ThingTableActionModeController> {
+        ThingTableActionModeController>
+        implements Filterable {
 
     public static SearchThingListFragment newInstance(String accountName, String subreddit,
             String query, boolean singleChoice) {
@@ -46,7 +47,7 @@ public class SearchThingListFragment
     @Override
     protected SearchThingMenuController createMenuController(
             SearchThingListController controller) {
-        return new SearchThingMenuController(getActivity(), this);
+        return new SearchThingMenuController(getActivity(), this, this);
     }
 
     @Override
@@ -67,5 +68,19 @@ public class SearchThingListFragment
                         SearchThingListController.EXTRA_SUBREDDIT)
                 && ComparableFragments.equalStrings(this, o,
                         SearchThingListController.EXTRA_QUERY);
+    }
+
+    @Override
+    public int getFilter() {
+        return controller.getFilter();
+    }
+
+    @Override
+    public void setFilter(int filter) {
+        controller.setFilter(filter);
+        controller.swapCursor(null);
+        setListAdapter(controller.getAdapter());
+        setListShown(false);
+        getLoaderManager().restartLoader(0, null, this);
     }
 }

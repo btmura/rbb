@@ -32,7 +32,9 @@ class SearchThingListController extends ThingTableListController {
 
     private String query;
 
-    public SearchThingListController(Context context, Bundle args, OnThingViewClickListener listener) {
+    public SearchThingListController(Context context,
+            Bundle args,
+            OnThingViewClickListener listener) {
         super(context, args, listener);
     }
 
@@ -42,6 +44,7 @@ class SearchThingListController extends ThingTableListController {
                 getAccountName(),
                 getSubreddit(),
                 getQuery(),
+                getFilter(),
                 getMoreId(),
                 getCursorExtras());
     }

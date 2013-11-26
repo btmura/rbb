@@ -302,12 +302,14 @@ public class ThingProvider extends BaseProvider {
             String accountName,
             String subreddit,
             String query,
+            int filter,
             Bundle sessionData,
             String more) {
         Bundle extras = new Bundle(5);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_THING_SEARCH);
         extras.putString(EXTRA_SUBREDDIT, subreddit);
         extras.putString(EXTRA_QUERY, query);
+        extras.putInt(EXTRA_FILTER, filter);
         extras.putString(EXTRA_MORE, more);
         extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         return Provider.call(context, THINGS_URI, METHOD_GET_SESSION, accountName, extras);
@@ -625,6 +627,7 @@ public class ThingProvider extends BaseProvider {
                         accountName,
                         subreddit,
                         query,
+                        filter,
                         more,
                         cookie);
 
