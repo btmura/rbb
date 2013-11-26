@@ -82,7 +82,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:paddingRight="@dimen/element_padding" >
+                android:paddingRight="@dimen/element_padding"
+                tools:ignore="InconsistentLayout" >
 
                 <Spinner
                     android:id="@+id/account_spinner"
