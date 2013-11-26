@@ -80,7 +80,7 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
 
     @Override
     public Loader<Cursor> createLoader() {
-        return new CommentLoader(context, accountName, thingId, linkId, cursorExtras);
+        return new CommentLoader(context, accountName, thingId, linkId, filter, cursorExtras);
     }
 
     @Override

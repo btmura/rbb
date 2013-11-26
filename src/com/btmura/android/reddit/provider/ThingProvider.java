@@ -287,12 +287,14 @@ public class ThingProvider extends BaseProvider {
             String accountName,
             String thingId,
             String linkId,
+            int filter,
             Bundle sessionData,
             int numComments) {
-        Bundle extras = new Bundle(5);
+        Bundle extras = new Bundle(6);
         extras.putInt(EXTRA_SESSION_TYPE, Sessions.TYPE_COMMENTS);
         extras.putString(EXTRA_THING_ID, thingId);
         extras.putString(EXTRA_LINK_ID, linkId);
+        extras.putInt(EXTRA_FILTER, filter);
         extras.putInt(EXTRA_COUNT, numComments);
         extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         return Provider.call(context, COMMENTS_URI, METHOD_GET_SESSION, accountName, extras);
@@ -618,6 +620,7 @@ public class ThingProvider extends BaseProvider {
                         accountName,
                         thingId,
                         linkId,
+                        filter,
                         count,
                         cookie);
 

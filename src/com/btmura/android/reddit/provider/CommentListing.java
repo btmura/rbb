@@ -69,6 +69,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private final String accountName;
     private final String thingId;
     private final String linkId;
+    private final int filter;
     private final int numComments;
     private final String cookie;
     private final Formatter formatter = new Formatter();
@@ -84,6 +85,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             String accountName,
             String thingId,
             String linkId,
+            int filter,
             int numComments,
             String cookie) {
         return new CommentListing(context,
@@ -91,6 +93,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
                 accountName,
                 thingId,
                 linkId,
+                filter,
                 numComments,
                 cookie);
     }
@@ -100,6 +103,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
             String accountName,
             String thingId,
             String linkId,
+            int filter,
             int numComments,
             String cookie) {
         this.context = context;
@@ -107,6 +111,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;
+        this.filter = filter;
         this.numComments = numComments;
         this.cookie = cookie;
     }
@@ -123,7 +128,11 @@ class CommentListing extends JsonParser implements Listing, CommentList {
 
     @Override
     public ArrayList<ContentValues> getValues() throws IOException {
-        CharSequence url = Urls.commentListing(thingId, linkId, numComments, Urls.TYPE_JSON);
+        CharSequence url = Urls.commentListing(thingId,
+                linkId,
+                filter,
+                numComments,
+                Urls.TYPE_JSON);
         HttpURLConnection conn = RedditApi.connect(url, cookie, true, false);
         InputStream input = null;
         try {

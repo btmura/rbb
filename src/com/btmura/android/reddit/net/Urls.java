@@ -114,7 +114,10 @@ public class Urls {
         return b.toString();
     }
 
-    public static CharSequence commentListing(String id, String linkId, int numComments,
+    public static CharSequence commentListing(String id,
+            String linkId,
+            int filter,
+            int numComments,
             int apiType) {
         boolean hasLinkId = !TextUtils.isEmpty(linkId);
         boolean hasLimit = numComments != -1;
@@ -124,11 +127,40 @@ public class Urls {
         if (apiType == TYPE_JSON) {
             b.append(".json");
         }
-        if (hasLinkId || hasLimit) {
+        if (hasLinkId || hasLimit || filter != -1) {
             b.append("?");
         }
         if (hasLinkId) {
             b.append("&comment=").append(id).append("&context=3");
+        } else if (filter != -1) {
+            switch (filter) {
+                case FilterAdapter.COMMENTS_BEST:
+                    b.append("&sort=confidence");
+                    break;
+
+                case FilterAdapter.COMMENTS_CONTROVERSIAL:
+                    b.append("&sort=controversial");
+                    break;
+
+                case FilterAdapter.COMMENTS_HOT:
+                    b.append("&sort=hot");
+                    break;
+
+                case FilterAdapter.COMMENTS_NEW:
+                    b.append("&sort=new");
+                    break;
+
+                case FilterAdapter.COMMENTS_OLD:
+                    b.append("&sort=old");
+                    break;
+
+                case FilterAdapter.COMMENTS_TOP:
+                    b.append("&sort=top");
+                    break;
+
+                default:
+                    break;
+            }
         }
         if (hasLimit) {
             b.append("&limit=").append(numComments);

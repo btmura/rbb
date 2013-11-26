@@ -83,11 +83,13 @@ public class CommentLoader extends AbstractSessionLoader {
     private final String accountName;
     private final String thingId;
     private final String linkId;
+    private final int filter;
 
     public CommentLoader(Context context,
             String accountName,
             String thingId,
             String linkId,
+            int filter,
             Bundle cursorExtras) {
         super(context,
                 ThingProvider.COMMENTS_URI,
@@ -99,6 +101,7 @@ public class CommentLoader extends AbstractSessionLoader {
         this.accountName = accountName;
         this.thingId = thingId;
         this.linkId = linkId;
+        this.filter = filter;
     }
 
     @Override
@@ -107,6 +110,7 @@ public class CommentLoader extends AbstractSessionLoader {
                 accountName,
                 thingId,
                 linkId,
+                filter,
                 sessionData,
                 -1);
     }
