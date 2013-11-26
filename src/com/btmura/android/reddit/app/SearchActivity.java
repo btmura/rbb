@@ -145,6 +145,7 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     private void refreshThingList(String subreddit) {
+        // TODO(btmura): don't load the preferences here
         int filter = AccountPrefs.getLastSearchFilter(this, FilterAdapter.SEARCH_RELEVANCE);
         setSearchThingsFragments(accountName,
                 subreddit,
