@@ -19,7 +19,6 @@ package com.btmura.android.reddit.app;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,7 +32,6 @@ class ThingTableMenuController implements MenuController {
     private final Context context;
     private final FragmentManager fragmentManager;
     private final String accountName;
-    private final String query;
     private final SubredditHolder subredditNameHolder;
     private final ThingHolder thingHolder;
     private final Refreshable refreshable;
@@ -48,7 +46,6 @@ class ThingTableMenuController implements MenuController {
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.accountName = accountName;
-        this.query = query;
         this.subredditNameHolder = subredditNameHolder;
         this.thingHolder = thingHolder;
         this.refreshable = refreshable;
@@ -73,23 +70,20 @@ class ThingTableMenuController implements MenuController {
     public void onPrepareOptionsMenu(Menu menu) {
         String subreddit = getSubreddit();
 
-        boolean isQuery = !TextUtils.isEmpty(query);
         boolean hasAccount = AccountUtils.isAccount(accountName);
         boolean hasSubreddit = subreddit != null;
         boolean hasThing = thingHolder != null && thingHolder.isShowingThing();
         boolean hasSidebar = Subreddits.hasSidebar(subreddit);
-        boolean isSubreddit = !isQuery && hasSubreddit && !hasThing;
+        boolean isSubreddit = hasSubreddit && !hasThing;
 
         boolean showAddSubreddit = isSubreddit;
         boolean showNewPost = isSubreddit && hasAccount;
         boolean showSubreddit = isSubreddit && hasSidebar;
         boolean showRefresh = !hasThing;
-        boolean showSort = isQuery;
 
         menu.findItem(R.id.menu_add_subreddit).setVisible(showAddSubreddit);
         menu.findItem(R.id.menu_new_post).setVisible(showNewPost);
         menu.findItem(R.id.menu_refresh).setVisible(showRefresh);
-        menu.findItem(R.id.menu_sort).setVisible(showSort);
 
         MenuItem subredditItem = menu.findItem(R.id.menu_subreddit);
         subredditItem.setVisible(showSubreddit);
