@@ -21,7 +21,8 @@ import android.os.Bundle;
 import com.btmura.android.reddit.util.ComparableFragments;
 
 public class SearchThingListFragment
-        extends ThingTableListFragment<SearchThingListController> {
+        extends ThingListFragment<SearchThingListController, SearchThingMenuController,
+        ThingTableActionModeController> {
 
     public static SearchThingListFragment newInstance(String accountName, String subreddit,
             String query, boolean singleChoice) {
@@ -40,6 +41,21 @@ public class SearchThingListFragment
     @Override
     protected SearchThingListController createController() {
         return new SearchThingListController(getActivity(), getArguments(), this);
+    }
+
+    @Override
+    protected SearchThingMenuController createMenuController(
+            SearchThingListController controller) {
+        return new SearchThingMenuController(getActivity(), this);
+    }
+
+    @Override
+    protected ThingTableActionModeController createActionModeController(
+            SearchThingListController controller) {
+        return new ThingTableActionModeController(getActivity(),
+                controller.getAccountName(),
+                controller.getSwipeAction(),
+                controller.getAdapter());
     }
 
     @Override

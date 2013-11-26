@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -110,10 +109,6 @@ class ThingTableMenuController implements MenuController {
                 handleRefresh();
                 return true;
 
-            case R.id.menu_sort:
-                handleSort();
-                return true;
-
             case R.id.menu_subreddit:
                 handleSubreddit();
                 return true;
@@ -133,13 +128,6 @@ class ThingTableMenuController implements MenuController {
 
     private void handleRefresh() {
         refreshable.refresh();
-    }
-
-    private void handleSort() {
-        new AlertDialog.Builder(context)
-                .setTitle(R.string.sort_by)
-                .setSingleChoiceItems(R.array.filters_search, 0, null)
-                .show();
     }
 
     private void handleSubreddit() {
