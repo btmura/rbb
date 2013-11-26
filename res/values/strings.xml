@@ -115,7 +115,7 @@
     <string name="menu_save">Save</string>
     <string name="menu_search">Search</string>
     <string name="menu_share">Share</string>
-    <string name="menu_sort">Sort</string>
+    <string name="menu_sort">Sort by</string>
     <string name="menu_subreddit">/r/%1$s</string>
     <string name="menu_submit">Submit</string>
     <string name="menu_switch_themes">Switch themes</string>
