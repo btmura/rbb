@@ -55,7 +55,7 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(ThemePrefs.getDialogWhenLargeTheme(this));
+        setTheme(ThemePrefs.getTheme(this));
         setContentView(R.layout.account_list);
         setupViews(savedInstanceState);
     }

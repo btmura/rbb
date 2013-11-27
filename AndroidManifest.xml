@@ -45,7 +45,6 @@
         <activity
             android:name="com.btmura.android.reddit.app.AccountListActivity"
             android:label="@string/label_accounts"
-            android:theme="@android:style/Theme.Holo.DialogWhenLarge"
             tools:ignore="ExportedActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
