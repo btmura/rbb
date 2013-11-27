@@ -1,8 +1,8 @@
-package com.btmura.android.reddit.app;
+package com.btmura.android.reddit.net;
 
 import junit.framework.TestCase;
 
-public class YouTubePlayerFragmentTest extends TestCase {
+public class YouTubeUrlsTest extends TestCase {
 
     public void testIsYouTubeVideoUrl() throws Exception {
         assertUrl("http://www.youtube.com", false);
@@ -14,7 +14,7 @@ public class YouTubePlayerFragmentTest extends TestCase {
     }
 
     private void assertUrl(String url, boolean matches) {
-        assertEquals(matches, YouTubePlayerFragment.isYouTubeVideoUrl(url));
+        assertEquals(matches, YouTubeUrls.isYouTubeVideoUrl(url));
     }
 
     public void testGetVideoId() throws Exception {
@@ -26,6 +26,6 @@ public class YouTubePlayerFragmentTest extends TestCase {
     }
 
     private void assertVideoId(String url, String expectedVideoId) {
-        assertEquals(expectedVideoId, YouTubePlayerFragment.getVideoId(url));
+        assertEquals(expectedVideoId, YouTubeUrls.getVideoId(url));
     }
 }
