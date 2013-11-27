@@ -20,7 +20,9 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -37,6 +39,8 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.Contexts;
+import com.btmura.android.reddit.net.YouTubeUrls;
 import com.btmura.android.reddit.util.Strings;
 
 public class LinkFragment extends Fragment implements OnLongClickListener {
@@ -89,6 +93,18 @@ public class LinkFragment extends Fragment implements OnLongClickListener {
             @Override
             public void onPageFinished(WebView view, String url) {
                 progress.setVisibility(View.GONE);
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (YouTubeUrls.isYouTubeVideoUrl(url)) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(url));
+                    if (Contexts.startActivity(getActivity(), intent)) {
+                        return true;
+                    }
+                }
+                return false;
             }
         });
 
