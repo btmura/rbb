@@ -141,26 +141,37 @@ public class LinkFragment extends Fragment implements OnLongClickListener {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public boolean onLongClick(View v) {
         HitTestResult hit = webView.getHitTestResult();
-        switch (hit.getType()) {
-            case HitTestResult.IMAGE_TYPE:
-                handleImageHit(hit);
-                return true;
+        if (!TextUtils.isEmpty(hit.getExtra())) {
+            switch (hit.getType()) {
+                case HitTestResult.IMAGE_TYPE:
+                case HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
+                    handleHit(hit,
+                            R.array.link_image_menu_items,
+                            new ImageClickListener(hit.getExtra()));
+                    return true;
 
-            default:
-                return false;
+                case HitTestResult.ANCHOR_TYPE:
+                case HitTestResult.SRC_ANCHOR_TYPE:
+                    handleHit(hit,
+                            R.array.link_anchor_menu_items,
+                            new AnchorClickListener(hit.getExtra()));
+                    return true;
+
+                default:
+                    return false;
+            }
         }
+        return false;
     }
 
-    private void handleImageHit(HitTestResult hit) {
-        if (!TextUtils.isEmpty(hit.getExtra())) {
-            new AlertDialog.Builder(getActivity())
-                    .setTitle(hit.getExtra())
-                    .setItems(R.array.link_image_menu_items,
-                            new ImageClickListener(hit.getExtra()))
-                    .show();
-        }
+    private void handleHit(HitTestResult hit, int arrayResId, OnClickListener listener) {
+        new AlertDialog.Builder(getActivity())
+                .setTitle(hit.getExtra())
+                .setItems(arrayResId, listener)
+                .show();
     }
 
     class ImageClickListener implements OnClickListener {
@@ -187,6 +198,41 @@ public class LinkFragment extends Fragment implements OnLongClickListener {
 
                 case ITEM_SAVE:
                     MenuHelper.downloadUrl(getActivity(), url, url);
+                    break;
+
+                case ITEM_SHARE:
+                    MenuHelper.shareImageUrl(getActivity(), url);
+                    break;
+
+                case ITEM_COPY_URL:
+                    MenuHelper.copyUrl(getActivity(), url, url);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    class AnchorClickListener implements OnClickListener {
+
+        // The following constants need to match the R.array.link_image_menu_items array.
+
+        private static final int ITEM_OPEN = 0;
+        private static final int ITEM_SHARE = 1;
+        private static final int ITEM_COPY_URL = 2;
+
+        private final String url;
+
+        AnchorClickListener(String url) {
+            this.url = url;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which) {
+                case ITEM_OPEN:
+                    MenuHelper.openUrl(getActivity(), url);
                     break;
 
                 case ITEM_SHARE:

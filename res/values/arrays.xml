@@ -17,6 +17,13 @@
 <resources>
 
     <!-- Order of elements MUST match the constant values in the Java code. -->
+    <string-array name="link_anchor_menu_items">
+        <item>@string/menu_open</item>
+        <item>@string/menu_share</item>
+        <item>@string/menu_copy_url</item>
+    </string-array>
+
+    <!-- Order of elements MUST match the constant values in the Java code. -->
     <string-array name="link_image_menu_items">
         <item>@string/menu_open</item>
         <item>@string/menu_save</item>
