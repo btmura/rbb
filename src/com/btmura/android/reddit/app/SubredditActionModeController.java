@@ -194,7 +194,7 @@ class SubredditActionModeController implements ActionModeController {
     }
 
     private void handleCopyUrl(ListView listView) {
-        MenuHelper.setClipAndToast(context, getClipLabel(listView), getClipText(listView));
+        MenuHelper.copyUrl(context, getClipLabel(listView), getClipText(listView));
     }
 
     @Override

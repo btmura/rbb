@@ -17,23 +17,29 @@
 package com.btmura.android.reddit.app;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
+import android.webkit.WebView.HitTestResult;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.util.Strings;
 
-public class LinkFragment extends Fragment {
+public class LinkFragment extends Fragment implements OnLongClickListener {
 
     public static final String TAG = "LinkFragment";
 
@@ -71,6 +77,8 @@ public class LinkFragment extends Fragment {
         settings.setSupportZoom(true);
         settings.setPluginState(PluginState.ON_DEMAND);
         settings.setUseWideViewPort(true);
+
+        webView.setOnLongClickListener(this);
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -130,5 +138,68 @@ public class LinkFragment extends Fragment {
         webView = null;
         progress = null;
         super.onDetach();
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        HitTestResult hit = webView.getHitTestResult();
+        switch (hit.getType()) {
+            case HitTestResult.IMAGE_TYPE:
+                handleImageHit(hit);
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    private void handleImageHit(HitTestResult hit) {
+        if (!TextUtils.isEmpty(hit.getExtra())) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(hit.getExtra())
+                    .setItems(R.array.link_image_menu_items,
+                            new ImageClickListener(hit.getExtra()))
+                    .show();
+        }
+    }
+
+    class ImageClickListener implements OnClickListener {
+
+        // The following constants need to match the R.array.link_image_menu_items array.
+
+        private static final int ITEM_OPEN = 0;
+        private static final int ITEM_SAVE = 1;
+        private static final int ITEM_SHARE = 2;
+        private static final int ITEM_COPY_URL = 3;
+
+        private final String url;
+
+        ImageClickListener(String url) {
+            this.url = url;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which) {
+                case ITEM_OPEN:
+                    MenuHelper.openUrl(getActivity(), url);
+                    break;
+
+                case ITEM_SAVE:
+                    MenuHelper.downloadUrl(getActivity(), url, url);
+                    break;
+
+                case ITEM_SHARE:
+                    MenuHelper.shareImageUrl(getActivity(), url);
+                    break;
+
+                case ITEM_COPY_URL:
+                    MenuHelper.copyUrl(getActivity(), url, url);
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 }

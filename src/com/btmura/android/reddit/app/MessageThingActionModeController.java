@@ -147,7 +147,7 @@ public class MessageThingActionModeController implements ThingActionModeControll
 
     private void handleCopyUrl(ListView listView) {
         int position = Views.getCheckedPosition(listView);
-        MenuHelper.setClipAndToast(context, getMessageTitle(position), getMessageUrl(position));
+        MenuHelper.copyUrl(context, getMessageTitle(position), getMessageUrl(position));
     }
 
     private void handleAuthor(ListView listView) {

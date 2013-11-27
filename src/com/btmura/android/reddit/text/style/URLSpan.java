@@ -16,7 +16,6 @@
 
 package com.btmura.android.reddit.text.style;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -26,6 +25,7 @@ import android.view.View;
 
 import com.btmura.android.reddit.app.BrowserActivity;
 import com.btmura.android.reddit.app.UserProfileActivity;
+import com.btmura.android.reddit.content.Contexts;
 import com.btmura.android.reddit.net.UriHelper;
 
 /**
@@ -63,39 +63,26 @@ public class URLSpan extends ClickableSpan {
     private void startSubredditActivity(Context context, Uri uri) {
         Intent intent = new Intent(context, BrowserActivity.class);
         intent.setData(uri);
-        startActivity(context, intent);
+        Contexts.startActivity(context, intent);
     }
 
     private void startUserActivity(Context context, Uri uri) {
         Intent intent = new Intent(context, UserProfileActivity.class);
         intent.setData(uri);
-        startActivity(context, intent);
+        Contexts.startActivity(context, intent);
     }
 
     private void startBrowserActivity(Context context, Uri uri) {
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
-        if (!startActivity(context, intent)) {
+        if (!Contexts.startActivity(context, intent)) {
             // There was no activity found so try adding an http scheme if it
             // was missing and some authority is present.
             if (uri.getScheme() == null) {
                 uri = uri.buildUpon().scheme("http").build();
                 intent.setData(uri);
-                startActivity(context, intent);
+                Contexts.startActivity(context, intent);
             }
-        }
-    }
-
-    /**
-     * Start an activity for the intent and return true on success or false if
-     * no activity to handle the intent was found.
-     */
-    private boolean startActivity(Context context, Intent intent) {
-        try {
-            context.startActivity(intent);
-            return true;
-        } catch (ActivityNotFoundException e) {
-            return false;
         }
     }
 }

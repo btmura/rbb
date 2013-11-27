@@ -104,7 +104,7 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
     }
 
     public void copyUrl(int position) {
-        MenuHelper.setClipAndToast(context, getCommentLabel(position), getCommentUrl(position));
+        MenuHelper.copyUrl(context, getCommentLabel(position), getCommentUrl(position));
     }
 
     private CharSequence getCommentLabel(int position) {

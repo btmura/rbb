@@ -22,6 +22,7 @@ import android.text.style.ClickableSpan;
 import android.view.View;
 
 import com.btmura.android.reddit.app.BrowserActivity;
+import com.btmura.android.reddit.content.Contexts;
 
 public class SubredditSpan extends ClickableSpan {
 
@@ -36,6 +37,6 @@ public class SubredditSpan extends ClickableSpan {
         Context context = widget.getContext();
         Intent intent = new Intent(context, BrowserActivity.class);
         intent.putExtra(BrowserActivity.EXTRA_SUBREDDIT, subreddit);
-        context.startActivity(intent);
+        Contexts.startActivity(context, intent);
     }
 }

@@ -624,7 +624,7 @@ public class NavigationFragment extends ListFragment implements
     }
 
     private void handleCopyUrl() {
-        MenuHelper.setClipAndToast(getActivity(), getClipLabel(), getClipText());
+        MenuHelper.copyUrl(getActivity(), getClipLabel(), getClipText());
     }
 
     @Override
