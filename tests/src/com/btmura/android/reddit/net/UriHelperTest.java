@@ -18,21 +18,18 @@ package com.btmura.android.reddit.net;
 import junit.framework.TestCase;
 import android.net.Uri;
 
+import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.app.ThingBundle;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class UriHelperTest extends TestCase {
 
     public void testGetSubreddit() {
         assertSubreddit("pics", -1, "http://www.reddit.com/r/pics");
 
-        assertSubreddit("pics", FilterAdapter.SUBREDDIT_HOT,
-                "http://reddit.com/r/pics/hot");
-        assertSubreddit("pics", FilterAdapter.SUBREDDIT_NEW,
-                "http://www.reddit.com/r/pics/new");
-        assertSubreddit("pics", FilterAdapter.SUBREDDIT_TOP,
-                "http://reddit.com/r/pics/top");
-        assertSubreddit("pics", FilterAdapter.SUBREDDIT_CONTROVERSIAL,
+        assertSubreddit("pics", Filter.SUBREDDIT_HOT, "http://reddit.com/r/pics/hot");
+        assertSubreddit("pics", Filter.SUBREDDIT_NEW, "http://www.reddit.com/r/pics/new");
+        assertSubreddit("pics", Filter.SUBREDDIT_TOP, "http://reddit.com/r/pics/top");
+        assertSubreddit("pics", Filter.SUBREDDIT_CONTROVERSIAL,
                 "http://www.reddit.com/r/pics/controversial");
 
         assertSubreddit("funny", -1, "http://reddit.com/r/funny");
@@ -56,12 +53,10 @@ public class UriHelperTest extends TestCase {
         assertUser("btmura", -1, "http://www.reddit.com/u/btmura");
         assertUser("rbbtest1", -1, "http://reddit.com/u/rbbtest1");
 
-        assertUser("rbbtest1", FilterAdapter.PROFILE_OVERVIEW,
-                "http://reddit.com/u/rbbtest1/overview");
-        assertUser("rbbtest2", FilterAdapter.PROFILE_COMMENTS,
+        assertUser("rbbtest1", Filter.PROFILE_OVERVIEW, "http://reddit.com/u/rbbtest1/overview");
+        assertUser("rbbtest2", Filter.PROFILE_COMMENTS,
                 "http://www.reddit.com/u/rbbtest2/comments");
-        assertUser("rbbtest1", FilterAdapter.PROFILE_SUBMITTED,
-                "http://reddit.com/u/rbbtest1/submitted");
+        assertUser("rbbtest1", Filter.PROFILE_SUBMITTED, "http://reddit.com/u/rbbtest1/submitted");
 
         assertUser(null, -1, "http://www.reddit.com/r/pics");
     }

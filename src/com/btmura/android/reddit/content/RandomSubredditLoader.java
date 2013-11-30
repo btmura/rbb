@@ -27,11 +27,11 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
+import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.UriHelper;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
 
@@ -52,7 +52,7 @@ public class RandomSubredditLoader extends BaseAsyncTaskLoader<String> {
 
         try {
             CharSequence url = Urls.subreddit(Subreddits.NAME_RANDOM,
-                    FilterAdapter.SUBREDDIT_HOT,
+                    Filter.SUBREDDIT_HOT,
                     null,
                     Urls.TYPE_JSON);
             String cookie = AccountUtils.getCookie(getContext(), accountName);

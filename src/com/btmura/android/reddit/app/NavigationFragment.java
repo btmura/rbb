@@ -56,7 +56,6 @@ import com.btmura.android.reddit.widget.AccountResultAdapter;
 import com.btmura.android.reddit.widget.AccountResultAdapter.Item;
 import com.btmura.android.reddit.widget.AccountResultAdapter.OnAccountMessagesSelectedListener;
 import com.btmura.android.reddit.widget.AccountSubredditAdapter;
-import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.MergeAdapter;
 
 public class NavigationFragment extends ListFragment implements
@@ -251,7 +250,7 @@ public class NavigationFragment extends ListFragment implements
         selectPlace(PLACE_SUBREDDIT,
                 requestedSubreddit,
                 Subreddits.isRandom(requestedSubreddit),
-                AccountPrefs.getLastSubredditFilter(getActivity(), FilterAdapter.SUBREDDIT_HOT),
+                AccountPrefs.getLastSubredditFilter(getActivity(), Filter.SUBREDDIT_HOT),
                 requestedThingBundle,
                 false,
                 false);
@@ -280,20 +279,20 @@ public class NavigationFragment extends ListFragment implements
                         accountName,
                         false);
                 int filter = AccountPrefs.getLastSubredditFilter(getActivity(),
-                        FilterAdapter.SUBREDDIT_HOT);
+                        Filter.SUBREDDIT_HOT);
                 selectPlace(place, subreddit, isRandom, filter, null, true, force);
                 break;
 
             case PLACE_PROFILE:
-                selectPlaceWithNoSubreddit(place, FilterAdapter.PROFILE_OVERVIEW, force);
+                selectPlaceWithNoSubreddit(place, Filter.PROFILE_OVERVIEW, force);
                 break;
 
             case PLACE_SAVED:
-                selectPlaceWithNoSubreddit(place, FilterAdapter.PROFILE_SAVED, force);
+                selectPlaceWithNoSubreddit(place, Filter.PROFILE_SAVED, force);
                 break;
 
             case PLACE_MESSAGES:
-                selectPlaceWithNoSubreddit(place, FilterAdapter.MESSAGE_INBOX, force);
+                selectPlaceWithNoSubreddit(place, Filter.MESSAGE_INBOX, force);
                 break;
         }
     }
@@ -391,7 +390,7 @@ public class NavigationFragment extends ListFragment implements
     @Override
     public void onAccountMessagesSelected(String accountName) {
         selectAccount(accountName);
-        selectPlaceWithNoSubreddit(PLACE_MESSAGES, FilterAdapter.MESSAGE_UNREAD, true);
+        selectPlaceWithNoSubreddit(PLACE_MESSAGES, Filter.MESSAGE_UNREAD, true);
     }
 
     @Override

@@ -23,10 +23,10 @@ import java.net.URLEncoder;
 
 import android.text.TextUtils;
 
+import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Subreddits;
 import com.btmura.android.reddit.util.ThingIds;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class Urls {
 
@@ -134,27 +134,27 @@ public class Urls {
             b.append("&comment=").append(id).append("&context=3");
         } else if (filter != -1) {
             switch (filter) {
-                case FilterAdapter.COMMENTS_BEST:
+                case Filter.COMMENTS_BEST:
                     b.append("&sort=confidence");
                     break;
 
-                case FilterAdapter.COMMENTS_CONTROVERSIAL:
+                case Filter.COMMENTS_CONTROVERSIAL:
                     b.append("&sort=controversial");
                     break;
 
-                case FilterAdapter.COMMENTS_HOT:
+                case Filter.COMMENTS_HOT:
                     b.append("&sort=hot");
                     break;
 
-                case FilterAdapter.COMMENTS_NEW:
+                case Filter.COMMENTS_NEW:
                     b.append("&sort=new");
                     break;
 
-                case FilterAdapter.COMMENTS_OLD:
+                case Filter.COMMENTS_OLD:
                     b.append("&sort=old");
                     break;
 
-                case FilterAdapter.COMMENTS_TOP:
+                case Filter.COMMENTS_TOP:
                     b.append("&sort=top");
                     break;
 
@@ -241,15 +241,15 @@ public class Urls {
     public static CharSequence message(int filter, String more, boolean mark) {
         StringBuilder b = new StringBuilder(BASE_MESSAGE_URL);
         switch (filter) {
-            case FilterAdapter.MESSAGE_INBOX:
+            case Filter.MESSAGE_INBOX:
                 b.append("inbox");
                 break;
 
-            case FilterAdapter.MESSAGE_UNREAD:
+            case Filter.MESSAGE_UNREAD:
                 b.append("unread");
                 break;
 
-            case FilterAdapter.MESSAGE_SENT:
+            case Filter.MESSAGE_SENT:
                 b.append("sent");
                 break;
 
@@ -366,23 +366,23 @@ public class Urls {
         // Only add the filter for non random subreddits.
         if (!Subreddits.isRandom(subreddit)) {
             switch (filter) {
-                case FilterAdapter.SUBREDDIT_CONTROVERSIAL:
+                case Filter.SUBREDDIT_CONTROVERSIAL:
                     b.append("/controversial");
                     break;
 
-                case FilterAdapter.SUBREDDIT_HOT:
+                case Filter.SUBREDDIT_HOT:
                     b.append("/hot");
                     break;
 
-                case FilterAdapter.SUBREDDIT_NEW:
+                case Filter.SUBREDDIT_NEW:
                     b.append("/new");
                     break;
 
-                case FilterAdapter.SUBREDDIT_RISING:
+                case Filter.SUBREDDIT_RISING:
                     b.append("/rising");
                     break;
 
-                case FilterAdapter.SUBREDDIT_TOP:
+                case Filter.SUBREDDIT_TOP:
                     b.append("/top");
                     break;
             }
@@ -439,31 +439,31 @@ public class Urls {
         b.append(encode(user));
 
         switch (filter) {
-            case FilterAdapter.PROFILE_OVERVIEW:
+            case Filter.PROFILE_OVERVIEW:
                 b.append("/overview");
                 break;
 
-            case FilterAdapter.PROFILE_COMMENTS:
+            case Filter.PROFILE_COMMENTS:
                 b.append("/comments");
                 break;
 
-            case FilterAdapter.PROFILE_SUBMITTED:
+            case Filter.PROFILE_SUBMITTED:
                 b.append("/submitted");
                 break;
 
-            case FilterAdapter.PROFILE_LIKED:
+            case Filter.PROFILE_LIKED:
                 b.append("/liked");
                 break;
 
-            case FilterAdapter.PROFILE_DISLIKED:
+            case Filter.PROFILE_DISLIKED:
                 b.append("/disliked");
                 break;
 
-            case FilterAdapter.PROFILE_HIDDEN:
+            case Filter.PROFILE_HIDDEN:
                 b.append("/hidden");
                 break;
 
-            case FilterAdapter.PROFILE_SAVED:
+            case Filter.PROFILE_SAVED:
                 b.append("/saved");
                 break;
         }
@@ -493,23 +493,23 @@ public class Urls {
             boolean restrict) {
         StringBuilder b = new StringBuilder(base).append(encode(query));
         switch (filter) {
-            case FilterAdapter.SEARCH_RELEVANCE:
+            case Filter.SEARCH_RELEVANCE:
                 b.append("&sort=relevance");
                 break;
 
-            case FilterAdapter.SEARCH_NEW:
+            case Filter.SEARCH_NEW:
                 b.append("&sort=new");
                 break;
 
-            case FilterAdapter.SEARCH_HOT:
+            case Filter.SEARCH_HOT:
                 b.append("&sort=hot");
                 break;
 
-            case FilterAdapter.SEARCH_TOP:
+            case Filter.SEARCH_TOP:
                 b.append("&sort=top");
                 break;
 
-            case FilterAdapter.SEARCH_COMMENTS:
+            case Filter.SEARCH_COMMENTS:
                 b.append("&sort=comments");
                 break;
 

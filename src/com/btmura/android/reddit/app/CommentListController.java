@@ -37,7 +37,6 @@ import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.provider.Provider;
 import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.widget.CommentAdapter;
-import com.btmura.android.reddit.widget.FilterAdapter;
 import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
 /**
@@ -70,7 +69,7 @@ class CommentListController implements Controller<CommentAdapter>, Filterable, C
 
     @Override
     public void restoreInstanceState(Bundle savedInstanceState) {
-        int defFilter = AccountPrefs.getLastCommentFilter(context, FilterAdapter.COMMENTS_BEST);
+        int defFilter = AccountPrefs.getLastCommentFilter(context, Filter.COMMENTS_BEST);
         this.filter = savedInstanceState.getInt(EXTRA_FILTER, defFilter);
         this.cursorExtras = savedInstanceState.getBundle(EXTRA_CURSOR_EXTRAS);
     }

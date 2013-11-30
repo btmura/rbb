@@ -32,7 +32,6 @@ import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.content.AccountPrefs;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.database.Subreddits;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 public class SearchActivity extends AbstractBrowserActivity implements
         LoaderCallbacks<AccountResult>,
@@ -139,14 +138,12 @@ public class SearchActivity extends AbstractBrowserActivity implements
     }
 
     private void refreshSubredditList() {
-        setSearchSubredditsFragments(accountName,
-                getQuery(),
-                FilterAdapter.SUBREDDIT_HOT);
+        setSearchSubredditsFragments(accountName, getQuery(), Filter.SUBREDDIT_HOT);
     }
 
     private void refreshThingList(String subreddit) {
         // TODO(btmura): don't load the preferences here
-        int filter = AccountPrefs.getLastSearchFilter(this, FilterAdapter.SEARCH_RELEVANCE);
+        int filter = AccountPrefs.getLastSearchFilter(this, Filter.SEARCH_RELEVANCE);
         setSearchThingsFragments(accountName,
                 subreddit,
                 getQuery(),

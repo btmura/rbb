@@ -39,6 +39,7 @@ import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.CommentLogic;
 import com.btmura.android.reddit.app.CommentLogic.CursorCommentList;
+import com.btmura.android.reddit.app.Filter;
 import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.database.CommentActions;
 import com.btmura.android.reddit.database.Comments;
@@ -55,7 +56,6 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
-import com.btmura.android.reddit.widget.FilterAdapter;
 
 /**
  * URI MATCHING PATTERNS:
@@ -339,8 +339,7 @@ public class ThingProvider extends BaseProvider {
         extras.putBundle(EXTRA_SESSION_DATA, sessionData);
         if (!TextUtils.isEmpty(more)) {
             extras.putString(EXTRA_MORE, more);
-        } else if (filter == FilterAdapter.MESSAGE_INBOX
-                || filter == FilterAdapter.MESSAGE_UNREAD) {
+        } else if (filter == Filter.MESSAGE_INBOX || filter == Filter.MESSAGE_UNREAD) {
             extras.putBoolean(EXTRA_MARK, true);
         }
         return Provider.call(context, MESSAGES_URI, METHOD_GET_SESSION, accountName, extras);
