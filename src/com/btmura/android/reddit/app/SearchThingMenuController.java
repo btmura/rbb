@@ -54,7 +54,7 @@ class SearchThingMenuController implements MenuController, OnClickListener {
                 handleRefresh();
                 return true;
 
-            case R.id.menu_sort:
+            case R.id.menu_sort_results:
                 handleSort();
                 return true;
 

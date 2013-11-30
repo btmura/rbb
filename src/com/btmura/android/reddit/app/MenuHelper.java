@@ -113,19 +113,20 @@ public class MenuHelper {
     }
 
     public static void showSortCommentsDialog(Context context, final Filterable filterable) {
-        showSortDialog(context, filterable, R.array.filters_comments);
+        showSortDialog(context, filterable, R.string.menu_sort_comments, R.array.filters_comments);
     }
 
     public static void showSortSearchThingsDialog(Context context, final Filterable filterable) {
-        showSortDialog(context, filterable, R.array.filters_search);
+        showSortDialog(context, filterable, R.string.menu_sort_results, R.array.filters_search);
     }
 
     private static void showSortDialog(Context context,
             final Filterable filterable,
-            int arrayResId) {
+            int titleResId,
+            int itemArrayResId) {
         new AlertDialog.Builder(context)
-                .setTitle(R.string.sort_by)
-                .setSingleChoiceItems(arrayResId,
+                .setTitle(titleResId)
+                .setSingleChoiceItems(itemArrayResId,
                         filterable.getFilter(),
                         new OnClickListener() {
                             @Override

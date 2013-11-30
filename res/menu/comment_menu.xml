@@ -18,10 +18,10 @@
 
     <group android:orderInCategory="@integer/menu_order_thing" >
         <item
-            android:id="@+id/menu_sort"
+            android:id="@+id/menu_sort_comments"
             android:icon="?attr/menu_filter_icon"
             android:showAsAction="ifRoom"
-            android:title="@string/menu_sort"/>
+            android:title="@string/menu_sort_comments"/>
     </group>
 
 </menu>

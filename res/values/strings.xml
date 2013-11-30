@@ -115,7 +115,8 @@
     <string name="menu_save">Save</string>
     <string name="menu_search">Search</string>
     <string name="menu_share">Share</string>
-    <string name="menu_sort">Sort by</string>
+    <string name="menu_sort_comments">Sort comments</string>
+    <string name="menu_sort_results">Sort results</string>
     <string name="menu_subreddit">/r/%1$s</string>
     <string name="menu_submit">Submit</string>
     <string name="menu_switch_themes">Switch themes</string>
@@ -134,7 +135,6 @@
     <string name="reddit_error">Reddit says: %1$s</string>
     <string name="reddit_error_line">%1$s - %2$s</string>
     <string name="show_password">Show password</string>
-    <string name="sort_by">Sort by</string>
     <string name="subreddits_category">Subreddits</string>
     <string name="subtitle_profile">profile</string>
     <string name="subtitle_messages">messages</string>

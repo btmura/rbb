@@ -45,7 +45,7 @@ class CommentMenuController implements MenuController {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_sort:
+            case R.id.menu_sort_comments:
                 handleSort();
                 return true;
 

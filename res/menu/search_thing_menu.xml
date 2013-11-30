@@ -23,10 +23,10 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_refresh"/>
     <item
-        android:id="@+id/menu_sort"
+        android:id="@+id/menu_sort_results"
         android:icon="?attr/menu_filter_icon"
         android:orderInCategory="@integer/menu_order_subreddit"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_sort"/>
+        android:title="@string/menu_sort_results"/>
 
 </menu>
