@@ -22,11 +22,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.btmura.android.reddit.content.MessageThreadLoader;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 
 public class MessageThreadAdapter extends BaseCursorAdapter {
 
-    private final Formatter formatter = new Formatter();
+    private final MarkdownFormatter formatter = new MarkdownFormatter();
     private String accountName;
     private String thingId;
     private long nowTimeMs;

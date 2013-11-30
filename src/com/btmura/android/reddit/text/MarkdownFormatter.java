@@ -36,8 +36,7 @@ import com.btmura.android.reddit.text.style.URLSpan;
 import com.btmura.android.reddit.text.style.UserSpan;
 import com.btmura.android.reddit.util.Array;
 
-// TODO: Rename class to stop clashing with framework class.
-public class Formatter {
+public class MarkdownFormatter {
 
     private final Matcher matcher = RawLinks.PATTERN.matcher("");
     private final StringBuilder builder = new StringBuilder();
@@ -92,29 +91,29 @@ public class Formatter {
 
                 deleted += 2;
                 if ("amp".equals(value)) {
-                    s = Formatter.replace(s, start, end, "&");
+                    s = replace(s, start, end, "&");
                     deleted += 2;
                 } else if ("gt".equals(value)) {
-                    s = Formatter.replace(s, start, end, ">");
+                    s = replace(s, start, end, ">");
                     deleted += 1;
                 } else if ("lt".equals(value)) {
-                    s = Formatter.replace(s, start, end, "<");
+                    s = replace(s, start, end, "<");
                     deleted += 1;
                 } else if ("quot".equals(value)) {
-                    s = Formatter.replace(s, start, end, "\"");
+                    s = replace(s, start, end, "\"");
                     deleted += 3;
                 } else if ("apos".equals(value)) {
-                    s = Formatter.replace(s, start, end, "'");
+                    s = replace(s, start, end, "'");
                     deleted += 3;
                 } else if ("nbsp".equals(value)) {
-                    s = Formatter.replace(s, start, end, " ");
+                    s = replace(s, start, end, " ");
                     deleted += 3;
                 } else if ("mdash".equals(value)) {
-                    s = Formatter.replace(s, start, end, "—");
+                    s = replace(s, start, end, "—");
                     deleted += 4;
                 } else {
                     String r = decodeReference(m);
-                    s = Formatter.replace(s, start, end, r);
+                    s = replace(s, start, end, r);
                     deleted += value.length() - r.length();
                 }
             }
@@ -141,7 +140,7 @@ public class Formatter {
                 // Remove the leading indentation on the line.
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
-                s = Formatter.replace(s, start, end, m.group(2));
+                s = replace(s, start, end, m.group(2));
 
                 // Update the end of the match and the deleted count.
                 end -= m.group(1).length();
@@ -155,7 +154,7 @@ public class Formatter {
 
                 // New block or 1st time. Set the span on the prior block and reset the markers.
                 if (totalStart != -1) {
-                    s = Formatter.setSpan(s, totalStart, totalEnd, new TypefaceSpan("monospace"));
+                    s = setSpan(s, totalStart, totalEnd, new TypefaceSpan("monospace"));
                 }
                 totalStart = start;
                 totalEnd = end;
@@ -163,7 +162,7 @@ public class Formatter {
 
             // There may not have been a new match to flush out the pending block so do it here.
             if (totalStart != -1) {
-                s = Formatter.setSpan(s, totalStart, totalEnd, new TypefaceSpan("monospace"));
+                s = setSpan(s, totalStart, totalEnd, new TypefaceSpan("monospace"));
             }
 
             return s;
@@ -228,7 +227,7 @@ public class Formatter {
                 }
 
                 String value = m.group(1);
-                s = Formatter.replace(s, start, end, value);
+                s = replace(s, start, end, value);
                 deleted += charsDeleted;
 
                 Object span = null;
@@ -249,7 +248,7 @@ public class Formatter {
                         throw new IllegalArgumentException("Unsupported style: " + style);
                 }
 
-                s = Formatter.setSpan(s, start, start + value.length(), span);
+                s = setSpan(s, start, start + value.length(), span);
             }
 
             return s;
@@ -275,8 +274,8 @@ public class Formatter {
                 deleted += m.group(1).length();
                 String value = m.group(2);
 
-                s = Formatter.setSpan(s, start, end, new BulletSpan(20));
-                s = Formatter.replace(s, start, end, value);
+                s = setSpan(s, start, end, new BulletSpan(20));
+                s = replace(s, start, end, value);
             }
             return s;
         }
@@ -292,7 +291,7 @@ public class Formatter {
             while (m.find()) {
                 String url = m.group();
                 URLSpan span = new URLSpan(url);
-                s = Formatter.setSpan(s, m.start(), m.end(), span);
+                s = setSpan(s, m.start(), m.end(), span);
             }
             return s;
         }
@@ -338,11 +337,11 @@ public class Formatter {
                 }
 
                 String url = s.subSequence(startParen + 1, endUrl).toString();
-                Object span = Formatter.getUrlSpan(url, builder);
+                Object span = getUrlSpan(url, builder);
 
-                s = Formatter.setSpan(s, startBrack + 1, endParen, span);
-                s = Formatter.delete(s, startBrack, startBrack + 1);
-                s = Formatter.delete(s, endBrack - 1, endParen);
+                s = setSpan(s, startBrack + 1, endParen, span);
+                s = delete(s, startBrack, startBrack + 1);
+                s = delete(s, endBrack - 1, endParen);
             }
             return s;
         }
@@ -399,7 +398,7 @@ public class Formatter {
                 } else {
                     span = new UserSpan(value);
                 }
-                s = Formatter.setSpan(s, m.start(), m.end(), span);
+                s = setSpan(s, m.start(), m.end(), span);
             }
             return s;
         }
@@ -424,8 +423,8 @@ public class Formatter {
                 deleted += m.group(1).length() + m.group(3).length();
                 String value = m.group(2);
 
-                s = Formatter.setSpan(s, start, end, new StyleSpan(Typeface.BOLD_ITALIC));
-                s = Formatter.replace(s, start, end, value);
+                s = setSpan(s, start, end, new StyleSpan(Typeface.BOLD_ITALIC));
+                s = replace(s, start, end, value);
             }
             return s;
         }

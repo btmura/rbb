@@ -38,7 +38,7 @@ import android.util.Log;
 
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.app.ThingBundle;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 
 public class RedditApi {
 
@@ -108,7 +108,7 @@ public class RedditApi {
     }
 
     public static ThingBundle getInfo(Context context, String thingId, String cookie,
-            Formatter formatter) throws IOException {
+            MarkdownFormatter formatter) throws IOException {
         HttpURLConnection conn = null;
         InputStream in = null;
         try {

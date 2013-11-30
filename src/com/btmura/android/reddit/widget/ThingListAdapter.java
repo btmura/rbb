@@ -25,7 +25,7 @@ import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.content.ThingProjection;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Objects;
 import com.btmura.android.reddit.widget.ThingView.OnThingViewClickListener;
 
@@ -45,7 +45,7 @@ public class ThingListAdapter extends AbstractThingListAdapter implements ThingP
             ThingView.DETAIL_SUBREDDIT,
     };
 
-    private final Formatter formatter = new Formatter();
+    private final MarkdownFormatter formatter = new MarkdownFormatter();
     private final ThumbnailLoader thumbnailLoader = new ThumbnailLoader();
     private final OnThingViewClickListener listener;
 

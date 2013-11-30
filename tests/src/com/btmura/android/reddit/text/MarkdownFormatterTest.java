@@ -16,16 +16,16 @@
 
 package com.btmura.android.reddit.text;
 
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 
-public class FormatterTest extends AbstractFormatterTest {
+public class MarkdownFormatterTest extends AbstractFormatterTest {
 
-    protected Formatter formatter;
+    protected MarkdownFormatter formatter;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        formatter = new Formatter();
+        formatter = new MarkdownFormatter();
     }
 
     public void testFormatAll() {

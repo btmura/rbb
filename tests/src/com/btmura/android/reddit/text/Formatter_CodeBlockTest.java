@@ -18,7 +18,7 @@ package com.btmura.android.reddit.text;
 
 import android.text.style.TypefaceSpan;
 
-import com.btmura.android.reddit.text.Formatter.CodeBlock;
+import com.btmura.android.reddit.text.MarkdownFormatter.CodeBlock;
 
 public class Formatter_CodeBlockTest extends AbstractFormatterTest {
 

@@ -18,7 +18,7 @@ package com.btmura.android.reddit.text;
 
 import android.graphics.Typeface;
 
-import com.btmura.android.reddit.text.Formatter.Styles;
+import com.btmura.android.reddit.text.MarkdownFormatter.Styles;
 
 public class Formatter_StylesTest extends AbstractFormatterTest {
 

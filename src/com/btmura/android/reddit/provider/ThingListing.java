@@ -43,7 +43,7 @@ import com.btmura.android.reddit.database.Things;
 import com.btmura.android.reddit.database.VoteActions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
 
@@ -178,7 +178,7 @@ class ThingListing extends JsonParser implements Listing {
     private final int filter;
     private final String more;
     private final String cookie;
-    private final Formatter formatter = new Formatter();
+    private final MarkdownFormatter formatter = new MarkdownFormatter();
 
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(30);
     private Map<String, Integer> hideActionMap;

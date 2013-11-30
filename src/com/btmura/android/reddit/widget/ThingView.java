@@ -38,7 +38,7 @@ import android.view.View;
 import com.btmura.android.reddit.BuildConfig;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.text.RelativeTime;
 import com.btmura.android.reddit.util.Strings;
 import com.btmura.android.reddit.view.SwipeDismissTouchListener;
@@ -254,7 +254,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             boolean drawVotingArrows,
             boolean showThumbnail,
             boolean showStatusPoints,
-            Formatter formatter) {
+            MarkdownFormatter formatter) {
 
         // Save the attributes needed by onMeasure or may be used to construct
         // details if we discover extra space while measuring.
@@ -312,7 +312,7 @@ public class ThingView extends CustomView implements OnGestureListener {
         requestLayout();
     }
 
-    private void setBodyFields(CharSequence body, boolean isNew, Formatter formatter) {
+    private void setBodyFields(CharSequence body, boolean isNew, MarkdownFormatter formatter) {
         if (!TextUtils.isEmpty(body)) {
             this.body = Strings.ellipsize(formatter.formatSpans(getContext(), body), maxTextLength);
             if (bodyBounds == null) {

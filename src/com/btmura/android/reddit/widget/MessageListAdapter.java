@@ -23,7 +23,7 @@ import android.view.View;
 import com.btmura.android.reddit.app.ThingBundle;
 import com.btmura.android.reddit.content.MessageThingLoader;
 import com.btmura.android.reddit.database.Kinds;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Objects;
 
 public class MessageListAdapter extends AbstractThingListAdapter {
@@ -40,7 +40,7 @@ public class MessageListAdapter extends AbstractThingListAdapter {
             ThingView.DETAIL_SUBREDDIT,
     };
 
-    private final Formatter formatter = new Formatter();
+    private final MarkdownFormatter formatter = new MarkdownFormatter();
 
     public MessageListAdapter(Context context, String accountName, boolean singleChoice) {
         super(context, accountName, singleChoice);

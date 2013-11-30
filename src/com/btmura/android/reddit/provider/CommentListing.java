@@ -42,7 +42,7 @@ import com.btmura.android.reddit.database.Kinds;
 import com.btmura.android.reddit.database.Sessions;
 import com.btmura.android.reddit.net.RedditApi;
 import com.btmura.android.reddit.net.Urls;
-import com.btmura.android.reddit.text.Formatter;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.JsonParser;
 
@@ -72,7 +72,7 @@ class CommentListing extends JsonParser implements Listing, CommentList {
     private final int filter;
     private final int numComments;
     private final String cookie;
-    private final Formatter formatter = new Formatter();
+    private final MarkdownFormatter formatter = new MarkdownFormatter();
 
     // TODO: Pass estimate of size to CommentListing rather than doing this.
     private final ArrayList<ContentValues> values = new ArrayList<ContentValues>(360);

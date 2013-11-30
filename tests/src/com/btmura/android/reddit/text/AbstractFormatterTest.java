@@ -26,10 +26,10 @@ import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 
-import com.btmura.android.reddit.text.Formatter.Escaped;
-import com.btmura.android.reddit.text.Formatter.RawLinks;
-import com.btmura.android.reddit.text.Formatter.RelativeLinks;
-import com.btmura.android.reddit.text.Formatter.Styles;
+import com.btmura.android.reddit.text.MarkdownFormatter.Escaped;
+import com.btmura.android.reddit.text.MarkdownFormatter.RawLinks;
+import com.btmura.android.reddit.text.MarkdownFormatter.RelativeLinks;
+import com.btmura.android.reddit.text.MarkdownFormatter.Styles;
 import com.btmura.android.reddit.text.style.SubredditSpan;
 import com.btmura.android.reddit.text.style.URLSpan;
 import com.btmura.android.reddit.text.style.UserSpan;
@@ -58,28 +58,28 @@ abstract class AbstractFormatterTest extends AndroidTestCase {
     }
 
     CharSequence assertBulletFormat(String input, String expected) {
-        CharSequence cs = Formatter.Bullets.format(matcher, input);
+        CharSequence cs = MarkdownFormatter.Bullets.format(matcher, input);
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
     }
 
     CharSequence assertCodeBlockFormat(String input, String expected) {
-        CharSequence cs = Formatter.CodeBlock.format(matcher, input);
+        CharSequence cs = MarkdownFormatter.CodeBlock.format(matcher, input);
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
     }
 
     CharSequence assertRawLinksFormat(String input, String expected) {
-        CharSequence cs = Formatter.RawLinks.format(matcher, input);
+        CharSequence cs = MarkdownFormatter.RawLinks.format(matcher, input);
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
     }
 
     CharSequence assertNamedLinksFormat(String input, String expected) {
-        CharSequence cs = Formatter.NamedLinks.format(input, new StringBuilder());
+        CharSequence cs = MarkdownFormatter.NamedLinks.format(input, new StringBuilder());
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
@@ -93,7 +93,7 @@ abstract class AbstractFormatterTest extends AndroidTestCase {
     }
 
     CharSequence assertHeadingFormat(String input, String expected) {
-        CharSequence cs = Formatter.Heading.format(matcher, input);
+        CharSequence cs = MarkdownFormatter.Heading.format(matcher, input);
         String actual = cs.toString();
         assertEquals("Expected: " + expected + " Actual: " + actual, expected, actual);
         return cs;
