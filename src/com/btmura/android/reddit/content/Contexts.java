@@ -27,7 +27,6 @@ public class Contexts {
      * Starts an activity for the intent and return true on success or false if no activity to
      * handle the intent was found.
      */
-    // TODO(btmura): use this method everywhere
     public static boolean startActivity(Context context, Intent intent) {
         try {
             context.startActivity(intent);
