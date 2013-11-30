@@ -166,7 +166,8 @@ public class NavigationFragment extends ListFragment implements
             filter = savedInstanceState.getInt(STATE_FILTER);
         }
 
-        accountAdapter = new AccountResultAdapter(getActivity(), this);
+        accountAdapter = AccountResultAdapter.newNavigationFragmentInstance(getActivity());
+        accountAdapter.setOnAccountMessagesSelectedListener(this);
         placesAdapter = new AccountPlaceAdapter(getActivity(), this);
         subredditAdapter = AccountSubredditAdapter.newAccountInstance(getActivity());
         mergeAdapter = new MergeAdapter(accountAdapter, placesAdapter, subredditAdapter);

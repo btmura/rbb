@@ -30,12 +30,21 @@ import android.widget.TextView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Accounts;
+import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
 /**
  * Adapter used for showing accounts in the navigation drawer.
  */
 public class AccountResultAdapter extends BaseAdapter implements OnClickListener {
+
+    private final ArrayList<Item> items = new ArrayList<Item>();
+    private final Context context;
+    private final LayoutInflater inflater;
+    private final int layout;
+
+    private OnAccountMessagesSelectedListener listener;
+    private String selectedAccountName;
 
     public interface OnAccountMessagesSelectedListener {
         void onAccountMessagesSelected(String accountName);
@@ -60,15 +69,25 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
         }
     }
 
-    private final ArrayList<Item> items = new ArrayList<Item>();
-    private final Context context;
-    private final LayoutInflater inflater;
-    private final OnAccountMessagesSelectedListener listener;
-    private String selectedAccountName;
+    public static AccountResultAdapter newNavigationFragmentInstance(Context context) {
+        return new AccountResultAdapter(context, R.layout.account_navigation_row);
+    }
 
-    public AccountResultAdapter(Context context, OnAccountMessagesSelectedListener listener) {
+    public static AccountResultAdapter newAccountListInstance(Context context) {
+        return new AccountResultAdapter(context, R.layout.account_list_row);
+    }
+
+    public static AccountResultAdapter newNameInstance(Context context) {
+        return new AccountResultAdapter(context, R.layout.account_name_row);
+    }
+
+    private AccountResultAdapter(Context context, int layout) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
+        this.layout = layout;
+    }
+
+    public void setOnAccountMessagesSelectedListener(OnAccountMessagesSelectedListener listener) {
         this.listener = listener;
     }
 
@@ -81,7 +100,7 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
 
     public void setAccountResult(AccountResult result) {
         items.clear();
-        if (result.accountNames != null && result.accountNames.length > 1) {
+        if (result != null && !Array.isEmpty(result.accountNames)) {
             int count = result.accountNames.length;
             for (int i = 0; i < count; i++) {
                 String linkKarma = getKarmaCount(result.linkKarma, i);
@@ -135,7 +154,7 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
     }
 
     static class ViewHolder {
-        TextView accountFilter;
+        TextView accountName;
         ImageButton messagesButton;
         TextView linkKarma;
         TextView commentKarma;
@@ -145,9 +164,9 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
-            v = inflater.inflate(R.layout.account_row, parent, false);
+            v = inflater.inflate(layout, parent, false);
             ViewHolder vh = new ViewHolder();
-            vh.accountFilter = (TextView) v.findViewById(R.id.account_name);
+            vh.accountName = (TextView) v.findViewById(R.id.account_name);
             vh.messagesButton = (ImageButton) v.findViewById(R.id.messages_button);
             vh.linkKarma = (TextView) v.findViewById(R.id.link_karma);
             vh.commentKarma = (TextView) v.findViewById(R.id.comment_karma);
@@ -159,22 +178,41 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
 
     private void setView(View view, int position) {
         Item item = getItem(position);
-
-        ViewHolder vh = (ViewHolder) view.getTag();
-        vh.accountFilter.setText(Accounts.getTitle(context, item.accountName));
-        vh.accountFilter.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-
-        vh.messagesButton.setVisibility(item.hasMail ? View.VISIBLE : View.GONE);
-        vh.messagesButton.setTag(item.accountName);
-        vh.messagesButton.setOnClickListener(this);
-
-        vh.linkKarma.setText(item.linkKarma);
-        vh.commentKarma.setText(item.commentKarma);
-
         boolean activated = Objects.equals(selectedAccountName, item.accountName);
-        vh.accountFilter.setActivated(activated);
-        vh.linkKarma.setActivated(activated);
-        vh.commentKarma.setActivated(activated);
+        ViewHolder vh = (ViewHolder) view.getTag();
+
+        if (vh.accountName != null) {
+            vh.accountName.setText(Accounts.getTitle(context, item.accountName));
+            vh.accountName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            vh.accountName.setActivated(activated);
+        }
+
+        if (vh.messagesButton != null) {
+            vh.messagesButton.setVisibility(item.hasMail ? View.VISIBLE : View.GONE);
+            vh.messagesButton.setTag(item.accountName);
+            vh.messagesButton.setOnClickListener(this);
+        }
+
+        if (vh.linkKarma != null) {
+            vh.linkKarma.setText(item.linkKarma);
+            vh.linkKarma.setActivated(activated);
+        }
+
+        if (vh.commentKarma != null) {
+            vh.commentKarma.setText(item.commentKarma);
+            vh.commentKarma.setActivated(activated);
+        }
+    }
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        Item item = getItem(position);
+        TextView tv = (TextView) convertView;
+        if (tv == null) {
+            tv = (TextView) inflater.inflate(R.layout.account_name_dropdown_row, parent, false);
+        }
+        tv.setText(Accounts.getTitle(context, item.accountName));
+        return tv;
     }
 
     @Override
