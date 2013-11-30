@@ -83,11 +83,13 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
         }
     }
 
+    @Override
     public void onAccountSelected(String accountName) {
         SelectAccountBroadcast.sendBroadcast(this, accountName);
         finish();
     }
 
+    @Override
     public void onAccountsRemoved(final String[] accountNames) {
         final Context appContext = getApplicationContext();
         new AsyncTask<Void, Void, Integer>() {
@@ -125,6 +127,7 @@ public class AccountListActivity extends FragmentActivity implements OnAccountEv
         }.execute();
     }
 
+    @Override
     public void onClick(View v) {
         if (v == addAccount) {
             handleAddAccount();

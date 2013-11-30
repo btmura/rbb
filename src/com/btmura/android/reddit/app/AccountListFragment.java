@@ -97,10 +97,12 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
     public Loader<AccountResult> onCreateLoader(int id, Bundle args) {
         return new AccountLoader(getActivity(), false, false);
     }
 
+    @Override
     public void onLoadFinished(Loader<AccountResult> loader, AccountResult result) {
         adapter.clear();
         adapter.addAll(result.accountNames);
@@ -108,6 +110,7 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
         setListShown(true);
     }
 
+    @Override
     public void onLoaderReset(Loader<AccountResult> loader) {
     }
 
@@ -118,21 +121,25 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
         }
     }
 
+    @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         mode.getMenuInflater().inflate(R.menu.account_action_menu, menu);
         return true;
     }
 
+    @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         int count = getListView().getCheckedItemCount();
         mode.setTitle(getResources().getQuantityString(R.plurals.accounts, count, count));
         return true;
     }
 
+    @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         mode.invalidate();
     }
 
+    @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete:
@@ -184,6 +191,7 @@ public class AccountListFragment extends ListFragment implements LoaderCallbacks
         }.execute();
     }
 
+    @Override
     public void onDestroyActionMode(ActionMode mode) {
     }
 }
