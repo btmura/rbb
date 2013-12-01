@@ -16,8 +16,13 @@
 
 package com.btmura.android.reddit.text.style;
 
+import android.content.Context;
+import android.content.Intent;
 import android.text.style.ClickableSpan;
 import android.view.View;
+
+import com.btmura.android.reddit.app.MarkdownTableActivity;
+import com.btmura.android.reddit.content.Contexts;
 
 public class MarkdownTableSpan extends ClickableSpan {
 
@@ -29,5 +34,9 @@ public class MarkdownTableSpan extends ClickableSpan {
 
     @Override
     public void onClick(View widget) {
+        Context context = widget.getContext();
+        Intent intent = new Intent(context, MarkdownTableActivity.class);
+        intent.putExtra(MarkdownTableActivity.EXTRA_TABLE_DATA, tableData);
+        Contexts.startActivity(widget.getContext(), intent);
     }
 }
