@@ -37,6 +37,8 @@ public class URLSpan extends ClickableSpan {
     // additional checking of the uri at click time and handling of
     // ActivityNotFoundExceptions.
 
+    // TODO(btmura): rename class to avoid naming clash with framework URLSpan.
+
     private final String url;
 
     public URLSpan(String url) {

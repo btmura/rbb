@@ -31,6 +31,7 @@ import android.text.style.TypefaceSpan;
 import android.util.Patterns;
 
 import com.btmura.android.reddit.net.Urls;
+import com.btmura.android.reddit.text.style.MarkdownTableSpan;
 import com.btmura.android.reddit.text.style.SubredditSpan;
 import com.btmura.android.reddit.text.style.URLSpan;
 import com.btmura.android.reddit.text.style.UserSpan;
@@ -58,6 +59,7 @@ public class MarkdownFormatter {
             c = Bullets.format(matcher, c);
             c = NamedLinks.format(c, builder);
             c = RawLinks.format(matcher, c);
+            c = Tables.format(matcher, c);
             return RelativeLinks.format(matcher, c);
         }
         return null;
@@ -425,6 +427,23 @@ public class MarkdownFormatter {
 
                 s = setSpan(s, start, end, new StyleSpan(Typeface.BOLD_ITALIC));
                 s = replace(s, start, end, value);
+            }
+            return s;
+        }
+    }
+
+    static class Tables {
+
+        static final Pattern PATTERN =
+                Pattern.compile("^(([^\\|\n])*?\\|)+[^\\|\n]*?$", Pattern.MULTILINE);
+
+        static CharSequence format(Matcher matcher, CharSequence text) {
+            CharSequence s = text;
+            Matcher m = matcher.usePattern(PATTERN).reset(text);
+            for (int deleted = 0; m.find();) {
+                int start = m.start() - deleted;
+                int end = m.end() - deleted;
+                s = setSpan(s, start, end, new MarkdownTableSpan(m.group(0)));
             }
             return s;
         }
