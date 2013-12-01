@@ -26,7 +26,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
-import android.widget.GridLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
@@ -77,9 +76,8 @@ public class MarkdownTableFragment extends DialogFragment {
         boolean columnCountSet = false;
 
         Scanner scanner = new Scanner(tableData);
-        while (scanner.hasNextLine()) {
-            String row = scanner.nextLine();
-            String[] cells = row.split("\\|");
+        for (int row = 0; scanner.hasNextLine(); row++) {
+            String[] cells = scanner.nextLine().split("\\|");
             int cellCount = cells.length;
             if (!columnCountSet) {
                 columnCountSet = true;
@@ -87,12 +85,12 @@ public class MarkdownTableFragment extends DialogFragment {
             }
 
             for (int j = 0; j < cellCount; j++) {
-                TextView tv = new TextView(view.getContext());
+                int layout = row == 0
+                        ? R.layout.markdown_table_cell_header
+                        : R.layout.markdown_table_cell;
+                TextView tv = (TextView) inflater.inflate(layout, container, false);
                 tv.setText(cells[j]);
-
-                LayoutParams layoutParams = new GridLayout.LayoutParams();
-                layoutParams.setMargins(5, 5, 5, 5);
-                gridLayout.addView(tv, layoutParams);
+                gridLayout.addView(tv);
             }
         }
         scanner.close();

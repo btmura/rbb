@@ -246,4 +246,17 @@
         <item name="android:textColor">@color/score_text_up</item>
     </style>
 
+    <!-- Empty style for other widget styles to inherit from. -->
+    <style name="Widget" />
+
+    <style name="Widget.MarkdownTable">
+        <item name="android:padding">@dimen/element_padding</item>
+    </style>
+
+    <style name="Widget.MarkdownTable.Cell"></style>
+
+    <style name="Widget.MarkdownTable.Cell.Header">
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>
