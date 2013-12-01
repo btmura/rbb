@@ -6,33 +6,22 @@ public class MarkdownFormatter_TablesTest extends AbstractFormatterTest {
 
     public void testPattern_singleLine() {
         matcher = Tables.PATTERN.matcher("a|b|c");
-        assertTrue(matcher.find());
-        assertEquals(0, matcher.start());
-        assertEquals(5, matcher.end());
         assertFalse(matcher.find());
     }
 
     public void testPattern_emptyLastColumn() {
-        matcher = Tables.PATTERN.matcher("a|b|");
+        matcher = Tables.PATTERN.matcher("h1|h2|h3\n-|-|-\na|b|");
         assertTrue(matcher.find());
         assertEquals(0, matcher.start());
-        assertEquals(4, matcher.end());
+        assertEquals(19, matcher.end());
         assertFalse(matcher.find());
     }
 
     public void testPattern_surrounded() {
-        matcher = Tables.PATTERN.matcher("hello\na|b|c\nbye");
+        matcher = Tables.PATTERN.matcher("hello\nh1|h2|h3\n-|-|-\na|b|c\nbye");
         assertTrue(matcher.find());
         assertEquals(6, matcher.start());
-        assertEquals(12, matcher.end());
-        assertFalse(matcher.find());
-    }
-
-    public void testPattern_multiLine() {
-        matcher = Tables.PATTERN.matcher("a|b|c\nd|e|f\ng|h|i");
-        assertTrue(matcher.find());
-        assertEquals(0, matcher.start());
-        assertEquals(17, matcher.end());
+        assertEquals(27, matcher.end());
         assertFalse(matcher.find());
     }
 }

@@ -435,7 +435,7 @@ public class MarkdownFormatter {
     static class Tables {
 
         static final Pattern PATTERN =
-                Pattern.compile("(^.*\\|.*[\\r\\n]*)+", Pattern.MULTILINE);
+                Pattern.compile("(^.*\\|.*[\\r\\n]*){3,}", Pattern.MULTILINE);
 
         static final String REPLACEMENT = "View Table\n";
 
