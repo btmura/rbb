@@ -16,17 +16,33 @@
 
 package com.btmura.android.reddit.app;
 
+import java.util.Scanner;
+
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
+import android.widget.GridLayout.LayoutParams;
+import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.ThemePrefs;
 
-public class MarkdownTableFragment extends Fragment {
+public class MarkdownTableFragment extends DialogFragment {
+
+    static final String TAG = "MarkdownTableFragment";
 
     private static final String EXTRA_TABLE_DATA = "tableData";
+
+    public interface OnMarkdownTableFragmentEventListener {
+        void onCancel();
+    }
+
+    private OnMarkdownTableFragmentEventListener listener;
 
     public static MarkdownTableFragment newInstance(String tableData) {
         Bundle args = new Bundle(1);
@@ -37,9 +53,62 @@ public class MarkdownTableFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof OnMarkdownTableFragmentEventListener) {
+            listener = (OnMarkdownTableFragmentEventListener) activity;
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NO_TITLE, ThemePrefs.getDialogTheme(getActivity()));
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater,
             ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.markdown_table_frag, container, false);
+        View view = inflater.inflate(R.layout.markdown_table_frag, container, false);
+        GridLayout gridLayout = (GridLayout) view.findViewById(R.id.table);
+
+        String tableData = getTableDataExtra();
+        boolean columnCountSet = false;
+
+        Scanner scanner = new Scanner(tableData);
+        while (scanner.hasNextLine()) {
+            String row = scanner.nextLine();
+            String[] cells = row.split("\\|");
+            int cellCount = cells.length;
+            if (!columnCountSet) {
+                columnCountSet = true;
+                gridLayout.setColumnCount(cellCount);
+            }
+
+            for (int j = 0; j < cellCount; j++) {
+                TextView tv = new TextView(view.getContext());
+                tv.setText(cells[j]);
+
+                LayoutParams layoutParams = new GridLayout.LayoutParams();
+                layoutParams.setMargins(5, 5, 5, 5);
+                gridLayout.addView(tv, layoutParams);
+            }
+        }
+        scanner.close();
+
+        return view;
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        if (listener != null) {
+            listener.onCancel();
+        }
+        super.onCancel(dialog);
+    }
+
+    private String getTableDataExtra() {
+        return getArguments().getString(EXTRA_TABLE_DATA);
     }
 }

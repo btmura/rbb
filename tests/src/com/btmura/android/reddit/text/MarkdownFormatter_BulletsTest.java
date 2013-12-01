@@ -16,7 +16,7 @@
 
 package com.btmura.android.reddit.text;
 
-public class Formatter_BulletsTest extends AbstractFormatterTest {
+public class MarkdownFormatter_BulletsTest extends AbstractFormatterTest {
 
     public void testFormat_bullet() {
         CharSequence cs = assertBulletFormat("* bullet1\n* bullet2", "bullet1\nbullet2");

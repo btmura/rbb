@@ -435,7 +435,9 @@ public class MarkdownFormatter {
     static class Tables {
 
         static final Pattern PATTERN =
-                Pattern.compile("^(([^\\|\n])*?\\|)+[^\\|\n]*?$", Pattern.MULTILINE);
+                Pattern.compile("(^.*\\|.*[\\r\\n]*)+", Pattern.MULTILINE);
+
+        static final String REPLACEMENT = "View Table\n";
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
@@ -443,7 +445,9 @@ public class MarkdownFormatter {
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
+                deleted += m.group().length() - REPLACEMENT.length();
                 s = setSpan(s, start, end, new MarkdownTableSpan(m.group(0)));
+                s = replace(s, start, end, REPLACEMENT);
             }
             return s;
         }

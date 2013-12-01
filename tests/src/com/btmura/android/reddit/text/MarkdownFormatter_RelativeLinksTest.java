@@ -16,7 +16,7 @@
 
 package com.btmura.android.reddit.text;
 
-public class Formatter_RelativeLinksTest extends AbstractFormatterTest {
+public class MarkdownFormatter_RelativeLinksTest extends AbstractFormatterTest {
 
     public void testFormat_subreddit() {
         CharSequence s = assertSubredditFormat("/r/food", "/r/food");

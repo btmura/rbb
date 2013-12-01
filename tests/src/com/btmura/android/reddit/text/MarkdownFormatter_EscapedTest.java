@@ -16,7 +16,7 @@
 
 package com.btmura.android.reddit.text;
 
-public class Formatter_EscapedTest extends AbstractFormatterTest {
+public class MarkdownFormatter_EscapedTest extends AbstractFormatterTest {
 
     public void testFormat_noEscapes() {
         assertEscapedFormat("title", "title");

@@ -87,7 +87,15 @@
         <activity
             android:name=".app.ContentBrowserActivity"
             android:label="@string/content_browser" />
-        <activity android:name=".app.MarkdownTableActivity" />
+        <activity
+            android:name=".app.MarkdownTableActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <!-- Ignore exported activity warning. Eclipse can't start it otherwise. -->
         <activity
             android:name=".app.SearchActivity"

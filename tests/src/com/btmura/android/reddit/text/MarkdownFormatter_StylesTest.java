@@ -20,7 +20,7 @@ import android.graphics.Typeface;
 
 import com.btmura.android.reddit.text.MarkdownFormatter.Styles;
 
-public class Formatter_StylesTest extends AbstractFormatterTest {
+public class MarkdownFormatter_StylesTest extends AbstractFormatterTest {
 
     public void testFormatComment_bold() {
         CharSequence cs = assertStyleFormat(Styles.STYLE_BOLD, "**bold**", "bold");
