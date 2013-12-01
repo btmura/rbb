@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,23 +76,50 @@ public class MarkdownTableFragment extends DialogFragment {
 
         String tableData = getTableDataExtra();
         Scanner scanner = new Scanner(tableData);
+        int[] gravitySpecs = null;
         for (int row = 0; scanner.hasNextLine(); row++) {
             String[] cells = scanner.nextLine().split("\\|");
             int cellCount = cells.length;
             TableRow tableRow = new TableRow(getActivity());
             for (int j = 0; j < cellCount; j++) {
-                int layout = row == 0
-                        ? R.layout.markdown_table_cell_header
-                        : R.layout.markdown_table_cell;
-                TextView tv = (TextView) inflater.inflate(layout, container, false);
-                tv.setText(cells[j]);
-                tableRow.addView(tv);
+                if (row == 1) {
+                    gravitySpecs = getGravitySpecs(cells);
+                } else {
+                    int layout = row == 0
+                            ? R.layout.markdown_table_cell_header
+                            : R.layout.markdown_table_cell;
+                    int gravity = gravitySpecs != null && j < gravitySpecs.length
+                            ? gravitySpecs[j]
+                            : Gravity.LEFT;
+                    TextView tv = (TextView) inflater.inflate(layout, container, false);
+                    tv.setText(cells[j]);
+                    tv.setGravity(gravity);
+                    tableRow.addView(tv);
+                }
             }
             tableLayout.addView(tableRow);
         }
         scanner.close();
 
         return view;
+    }
+
+    // TODO(btmura): look up specification of how many dashes and colons are required
+    private int[] getGravitySpecs(String[] cells) {
+        int cellCount = cells.length;
+        int[] specs = new int[cellCount];
+        for (int i = 0; i < cellCount; i++) {
+            if (cells[i].length() > 2 && cells[i].startsWith(":") && cells[i].endsWith(":")) {
+                specs[i] = Gravity.CENTER;
+            } else if (cells[i].startsWith(":")) {
+                specs[i] = Gravity.LEFT;
+            } else if (cells[i].endsWith(":")) {
+                specs[i] = Gravity.RIGHT;
+            } else {
+                specs[i] = Gravity.LEFT;
+            }
+        }
+        return specs;
     }
 
     @Override
