@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent" >
 
-        <GridLayout
+        <TableLayout
             android:id="@+id/table"
             style="@style/Widget.MarkdownTable"
             android:layout_width="wrap_content"

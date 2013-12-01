@@ -14,8 +14,11 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Widget.MarkdownTable.Cell"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="fill" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle" >
+
+    <stroke
+        android:width="1dp"
+        android:color="@android:color/darker_gray" />
+
+</shape>

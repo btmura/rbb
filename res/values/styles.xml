@@ -250,10 +250,14 @@
     <style name="Widget" />
 
     <style name="Widget.MarkdownTable">
-        <item name="android:padding">@dimen/element_padding</item>
+        <item name="android:background">@drawable/markdown_table_cell_background</item>
+        <item name="android:layout_margin">@dimen/padding</item>
+        <item name="android:padding">1dp</item>
     </style>
 
-    <style name="Widget.MarkdownTable.Cell"></style>
+    <style name="Widget.MarkdownTable.Cell">
+        <item name="android:padding">@dimen/element_padding</item>
+    </style>
 
     <style name="Widget.MarkdownTable.Cell.Header">
         <item name="android:textStyle">bold</item>

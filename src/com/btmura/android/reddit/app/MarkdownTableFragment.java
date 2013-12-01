@@ -25,7 +25,8 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
@@ -70,28 +71,23 @@ public class MarkdownTableFragment extends DialogFragment {
             ViewGroup container,
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.markdown_table, container, false);
-        GridLayout gridLayout = (GridLayout) view.findViewById(R.id.table);
+        TableLayout tableLayout = (TableLayout) view.findViewById(R.id.table);
 
         String tableData = getTableDataExtra();
-        boolean columnCountSet = false;
-
         Scanner scanner = new Scanner(tableData);
         for (int row = 0; scanner.hasNextLine(); row++) {
             String[] cells = scanner.nextLine().split("\\|");
             int cellCount = cells.length;
-            if (!columnCountSet) {
-                columnCountSet = true;
-                gridLayout.setColumnCount(cellCount);
-            }
-
+            TableRow tableRow = new TableRow(getActivity());
             for (int j = 0; j < cellCount; j++) {
                 int layout = row == 0
                         ? R.layout.markdown_table_cell_header
                         : R.layout.markdown_table_cell;
                 TextView tv = (TextView) inflater.inflate(layout, container, false);
                 tv.setText(cells[j]);
-                gridLayout.addView(tv);
+                tableRow.addView(tv);
             }
+            tableLayout.addView(tableRow);
         }
         scanner.close();
 
