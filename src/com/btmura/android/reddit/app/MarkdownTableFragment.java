@@ -70,7 +70,7 @@ public class MarkdownTableFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater,
             ViewGroup container,
             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.markdown_table_frag, container, false);
+        View view = inflater.inflate(R.layout.markdown_table, container, false);
         GridLayout gridLayout = (GridLayout) view.findViewById(R.id.table);
 
         String tableData = getTableDataExtra();
