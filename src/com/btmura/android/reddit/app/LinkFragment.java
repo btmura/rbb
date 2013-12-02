@@ -83,19 +83,25 @@ public class LinkFragment extends Fragment implements OnLongClickListener {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                progress.setVisibility(View.VISIBLE);
+                if (progress != null) {
+                    progress.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                progress.setVisibility(View.GONE);
+                if (progress != null) {
+                    progress.setVisibility(View.GONE);
+                }
             }
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                progress.setProgress(newProgress);
+                if (progress != null) {
+                    progress.setProgress(newProgress);
+                }
             }
         });
     }
