@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ThemePrefs;
+import com.btmura.android.reddit.util.MarkdownUtils;
 
 public class MarkdownTableFragment extends DialogFragment {
 
@@ -87,7 +88,7 @@ public class MarkdownTableFragment extends DialogFragment {
             String[] cells = scanner.nextLine().split("\\|");
             int cellCount = cells.length;
             if (row == 1) {
-                gravitySpecs = getGravitySpecs(cells);
+                gravitySpecs = getRowGravity(cells);
             } else {
                 TableRow tableRow = new TableRow(getActivity());
                 for (int j = 0; j < cellCount; j++) {
@@ -112,20 +113,11 @@ public class MarkdownTableFragment extends DialogFragment {
         scanner.close();
     }
 
-    // TODO(btmura): look up specification of how many dashes and colons are required
-    private int[] getGravitySpecs(String[] cells) {
+    private int[] getRowGravity(String[] cells) {
         int cellCount = cells.length;
         int[] specs = new int[cellCount];
         for (int i = 0; i < cellCount; i++) {
-            if (cells[i].length() > 2 && cells[i].startsWith(":") && cells[i].endsWith(":")) {
-                specs[i] = Gravity.CENTER;
-            } else if (cells[i].startsWith(":")) {
-                specs[i] = Gravity.LEFT;
-            } else if (cells[i].endsWith(":")) {
-                specs[i] = Gravity.RIGHT;
-            } else {
-                specs[i] = Gravity.LEFT;
-            }
+            specs[i] = MarkdownUtils.getTableCellGravity(cells[i]);
         }
         return specs;
     }
