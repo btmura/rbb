@@ -80,11 +80,11 @@ public class MarkdownTableFragment extends DialogFragment {
         for (int row = 0; scanner.hasNextLine(); row++) {
             String[] cells = scanner.nextLine().split("\\|");
             int cellCount = cells.length;
-            TableRow tableRow = new TableRow(getActivity());
-            for (int j = 0; j < cellCount; j++) {
-                if (row == 1) {
-                    gravitySpecs = getGravitySpecs(cells);
-                } else {
+            if (row == 1) {
+                gravitySpecs = getGravitySpecs(cells);
+            } else {
+                TableRow tableRow = new TableRow(getActivity());
+                for (int j = 0; j < cellCount; j++) {
                     int layout = row == 0
                             ? R.layout.markdown_table_cell_header
                             : R.layout.markdown_table_cell;
@@ -92,12 +92,12 @@ public class MarkdownTableFragment extends DialogFragment {
                             ? gravitySpecs[j]
                             : Gravity.LEFT;
                     TextView tv = (TextView) inflater.inflate(layout, container, false);
-                    tv.setText(cells[j]);
+                    tv.setText(cells[j].trim());
                     tv.setGravity(gravity);
                     tableRow.addView(tv);
                 }
+                tableLayout.addView(tableRow);
             }
-            tableLayout.addView(tableRow);
         }
         scanner.close();
 

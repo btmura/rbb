@@ -36,5 +36,6 @@
     <dimen name="thumb_width">70dp</dimen>
     <dimen name="radius">6dp</dimen>
     <dimen name="required_fling_distance">50dp</dimen>
+    <dimen name="markdown_table_cell_max_width">300dp</dimen>
 
 </resources>
