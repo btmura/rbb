@@ -142,5 +142,6 @@
     <string name="tab_posts">Posts</string>
     <string name="tab_related">Related</string>
     <string name="tab_subreddits">Subreddits</string>
+    <string name="view_table">View table</string>
 
 </resources>

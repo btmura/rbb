@@ -30,6 +30,7 @@ import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.util.Patterns;
 
+import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.net.Urls;
 import com.btmura.android.reddit.text.style.MarkdownTableSpan;
 import com.btmura.android.reddit.text.style.SubredditSpan;
@@ -59,7 +60,7 @@ public class MarkdownFormatter {
             c = Bullets.format(matcher, c);
             c = NamedLinks.format(c, builder);
             c = RawLinks.format(matcher, c);
-            c = Tables.format(matcher, c);
+            c = Tables.format(context, matcher, c);
             return RelativeLinks.format(matcher, c);
         }
         return null;
@@ -436,17 +437,17 @@ public class MarkdownFormatter {
 
         static final Pattern PATTERN = Pattern.compile("(?m)(^.*\\|.*[\\r\\n]?){3,}");
 
-        static final String REPLACEMENT = "View Table";
-
-        static CharSequence format(Matcher matcher, CharSequence text) {
+        static CharSequence format(Context context, Matcher matcher, CharSequence text) {
             CharSequence s = text;
             Matcher m = matcher.usePattern(PATTERN).reset(text);
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
-                deleted += m.group().length() - REPLACEMENT.length();
                 s = setSpan(s, start, end, new MarkdownTableSpan(m.group(0)));
-                s = replace(s, start, end, REPLACEMENT);
+
+                String replacement = context.getString(R.string.view_table);
+                deleted += m.group().length() - replacement.length();
+                s = replace(s, start, end, replacement);
             }
             return s;
         }
