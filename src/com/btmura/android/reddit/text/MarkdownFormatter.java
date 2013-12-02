@@ -443,10 +443,15 @@ public class MarkdownFormatter {
             for (int deleted = 0; m.find();) {
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
-                s = setSpan(s, start, end, new MarkdownTableSpan(m.group(0)));
+
+                // Don't apply formatting within code blocks.
+                if (CodeBlock.isCodeBlock(s, start, end)) {
+                    continue;
+                }
 
                 String replacement = context.getString(R.string.view_table);
                 deleted += m.group().length() - replacement.length();
+                s = setSpan(s, start, end, new MarkdownTableSpan(m.group(0)));
                 s = replace(s, start, end, replacement);
             }
             return s;
