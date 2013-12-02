@@ -74,52 +74,66 @@ public class MarkdownTableFragment extends DialogFragment {
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.markdown_table, container, false);
         TableLayout tableLayout = (TableLayout) view.findViewById(R.id.table);
-        populateTableLayout(tableLayout, inflater);
+        int[] gravitySpecs = getGravitySpecs();
+        populateTableLayout(tableLayout, gravitySpecs, inflater);
         return view;
     }
 
-    private void populateTableLayout(TableLayout tableLayout, LayoutInflater inflater) {
-        String tableData = getTableDataExtra();
-        Scanner scanner = new Scanner(tableData);
-        int[] gravitySpecs = null;
-        for (int row = 0; scanner.hasNextLine(); row++) {
-            // Adds empty columns if someone adds optional surrounding pipes, but this is OK,
-            // since we do not display column borders at all.
-            String[] cells = scanner.nextLine().split("\\|");
-            int cellCount = cells.length;
-            if (row == 1) {
-                gravitySpecs = getRowGravity(cells);
-            } else {
-                TableRow tableRow = new TableRow(getActivity());
-                for (int j = 0; j < cellCount; j++) {
-                    int layout = row == 0
-                            ? R.layout.markdown_table_cell_header
-                            : R.layout.markdown_table_cell;
-                    int gravity = gravitySpecs != null && j < gravitySpecs.length
-                            ? gravitySpecs[j]
-                            : Gravity.LEFT;
+    private void populateTableLayout(TableLayout tableLayout,
+            int[] gravitySpecs,
+            LayoutInflater inflater) {
+        Scanner scanner = new Scanner(getTableDataExtra());
+        try {
+            for (int row = 0; scanner.hasNextLine(); row++) {
+                // Adds empty columns if someone adds optional surrounding pipes, but this is OK,
+                // since we do not display column borders at all.
+                String[] cells = scanner.nextLine().split("\\|");
+                int cellCount = cells.length;
+                if (row != 1) {
+                    TableRow tableRow = new TableRow(getActivity());
+                    for (int j = 0; j < cellCount; j++) {
+                        int layout = row == 0
+                                ? R.layout.markdown_table_cell_header
+                                : R.layout.markdown_table_cell;
+                        int gravity = gravitySpecs != null && j < gravitySpecs.length
+                                ? gravitySpecs[j]
+                                : Gravity.LEFT;
 
-                    TextView tv = (TextView) inflater.inflate(layout, tableRow, false);
-                    tv.setGravity(gravity);
-                    tv.setText(cells[j].trim());
-                    tableRow.addView(tv);
+                        TextView tv = (TextView) inflater.inflate(layout, tableRow, false);
+                        tv.setGravity(gravity);
+                        tv.setText(cells[j].trim());
+                        tableRow.addView(tv);
 
-                    tableLayout.setColumnShrinkable(j, true);
-                    tableLayout.setColumnStretchable(j, true);
+                        tableLayout.setColumnShrinkable(j, true);
+                        tableLayout.setColumnStretchable(j, true);
+                    }
+                    tableLayout.addView(tableRow);
                 }
-                tableLayout.addView(tableRow);
             }
+        } finally {
+            scanner.close();
         }
-        scanner.close();
     }
 
-    private int[] getRowGravity(String[] cells) {
-        int cellCount = cells.length;
-        int[] specs = new int[cellCount];
-        for (int i = 0; i < cellCount; i++) {
-            specs[i] = MarkdownUtils.getTableCellGravity(cells[i]);
+    private int[] getGravitySpecs() {
+        Scanner scanner = new Scanner(getTableDataExtra());
+        try {
+            if (scanner.hasNextLine()) {
+                scanner.nextLine();
+                if (scanner.hasNextLine()) {
+                    String[] cells = scanner.nextLine().split("\\|");
+                    int cellCount = cells.length;
+                    int[] specs = new int[cellCount];
+                    for (int i = 0; i < cellCount; i++) {
+                        specs[i] = MarkdownUtils.getTableCellGravity(cells[i]);
+                    }
+                    return specs;
+                }
+            }
+            return null;
+        } finally {
+            scanner.close();
         }
-        return specs;
     }
 
     @Override
