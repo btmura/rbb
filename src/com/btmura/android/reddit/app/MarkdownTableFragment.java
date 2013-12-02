@@ -82,7 +82,8 @@ public class MarkdownTableFragment extends DialogFragment {
         Scanner scanner = new Scanner(tableData);
         int[] gravitySpecs = null;
         for (int row = 0; scanner.hasNextLine(); row++) {
-            // TODO(btmura): Fix adding empty column if optional pipes surround the table.
+            // Adds empty columns if someone adds optional surrounding pipes, but this is OK,
+            // since we do not display column borders at all.
             String[] cells = scanner.nextLine().split("\\|");
             int cellCount = cells.length;
             if (row == 1) {
