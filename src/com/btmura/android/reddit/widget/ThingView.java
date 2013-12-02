@@ -33,6 +33,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
 
 import com.btmura.android.reddit.BuildConfig;
@@ -926,6 +927,7 @@ public class ThingView extends CustomView implements OnGestureListener {
             ClickableSpan[] spans = bodySpan.getSpans(offset, offset, ClickableSpan.class);
             if (spans != null && spans.length > 0) {
                 if (action == MotionEvent.ACTION_UP) {
+                    playSoundEffect(SoundEffectConstants.CLICK);
                     spans[0].onClick(this);
                 }
                 return true;
