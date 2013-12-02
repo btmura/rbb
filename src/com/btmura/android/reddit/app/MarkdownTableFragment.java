@@ -73,11 +73,16 @@ public class MarkdownTableFragment extends DialogFragment {
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.markdown_table, container, false);
         TableLayout tableLayout = (TableLayout) view.findViewById(R.id.table);
+        populateTableLayout(tableLayout, inflater);
+        return view;
+    }
 
+    private void populateTableLayout(TableLayout tableLayout, LayoutInflater inflater) {
         String tableData = getTableDataExtra();
         Scanner scanner = new Scanner(tableData);
         int[] gravitySpecs = null;
         for (int row = 0; scanner.hasNextLine(); row++) {
+            // TODO(btmura): Fix adding empty column if optional pipes surround the table.
             String[] cells = scanner.nextLine().split("\\|");
             int cellCount = cells.length;
             if (row == 1) {
@@ -91,17 +96,19 @@ public class MarkdownTableFragment extends DialogFragment {
                     int gravity = gravitySpecs != null && j < gravitySpecs.length
                             ? gravitySpecs[j]
                             : Gravity.LEFT;
-                    TextView tv = (TextView) inflater.inflate(layout, container, false);
-                    tv.setText(cells[j].trim());
+
+                    TextView tv = (TextView) inflater.inflate(layout, tableRow, false);
                     tv.setGravity(gravity);
+                    tv.setText(cells[j].trim());
                     tableRow.addView(tv);
+
+                    tableLayout.setColumnShrinkable(j, true);
+                    tableLayout.setColumnStretchable(j, true);
                 }
                 tableLayout.addView(tableRow);
             }
         }
         scanner.close();
-
-        return view;
     }
 
     // TODO(btmura): look up specification of how many dashes and colons are required

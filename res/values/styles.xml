@@ -250,7 +250,7 @@
     <style name="Widget" />
 
     <style name="Widget.MarkdownTable">
-        <item name="android:layout_margin">@dimen/padding</item>
+        <item name="android:layout_margin">@dimen/element_padding</item>
     </style>
 
     <style name="Widget.MarkdownTable.Cell">
