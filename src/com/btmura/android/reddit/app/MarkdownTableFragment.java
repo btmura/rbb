@@ -65,7 +65,7 @@ public class MarkdownTableFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NO_TITLE, ThemePrefs.getDialogTheme(getActivity()));
+        setStyle(DialogFragment.STYLE_NO_TITLE, ThemePrefs.getDialogWhenLargeTheme(getActivity()));
     }
 
     @Override
