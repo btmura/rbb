@@ -271,7 +271,7 @@ public class MarkdownFormatter {
 
     static class Bullets {
 
-        private static Pattern PATTERN = Pattern.compile("(?m)^( *\\* )(?:.+)$");
+        private static Pattern PATTERN = Pattern.compile("(?m)^( *[*+-] )(?:.+)$");
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
