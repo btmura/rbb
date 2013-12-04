@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ThemePrefs;
+import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.MarkdownUtils;
 
 public class MarkdownTableFragment extends DialogFragment {
@@ -44,6 +46,7 @@ public class MarkdownTableFragment extends DialogFragment {
         void onCancel();
     }
 
+    private final MarkdownFormatter formatter = new MarkdownFormatter();
     private OnMarkdownTableFragmentEventListener listener;
 
     public static MarkdownTableFragment newInstance(String tableData) {
@@ -101,7 +104,8 @@ public class MarkdownTableFragment extends DialogFragment {
 
                         TextView tv = (TextView) inflater.inflate(layout, tableRow, false);
                         tv.setGravity(gravity);
-                        tv.setText(cells[j].trim());
+                        tv.setMovementMethod(LinkMovementMethod.getInstance());
+                        tv.setText(formatter.formatAll(getActivity(), cells[j].trim()));
                         tableRow.addView(tv);
 
                         tableLayout.setColumnShrinkable(j, true);
