@@ -30,7 +30,6 @@ import android.widget.TextView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Accounts;
-import com.btmura.android.reddit.util.Array;
 import com.btmura.android.reddit.util.Objects;
 
 /**
@@ -100,7 +99,8 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
 
     public void setAccountResult(AccountResult result) {
         items.clear();
-        if (result != null && !Array.isEmpty(result.accountNames)) {
+        // Only show names if we have more than the app storage account.
+        if (result != null && result.accountNames != null && result.accountNames.length > 1) {
             int count = result.accountNames.length;
             for (int i = 0; i < count; i++) {
                 String linkKarma = getKarmaCount(result.linkKarma, i);
