@@ -132,7 +132,7 @@ public class MarkdownFormatter {
 
     static class CodeBlock {
 
-        static Pattern PATTERN_CODE_BLOCK = Pattern.compile("^(    |\t)(.*)$", Pattern.MULTILINE);
+        static Pattern PATTERN_CODE_BLOCK = Pattern.compile("(?m)^(    |\t)(?:.*)$");
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
@@ -140,10 +140,13 @@ public class MarkdownFormatter {
             int totalStart = -1;
             int totalEnd = -1;
             for (int deleted = 0; m.find();) {
-                // Remove the leading indentation on the line.
                 int start = m.start() - deleted;
                 int end = m.end() - deleted;
-                s = replace(s, start, end, m.group(2));
+
+                // Remove the leading indentation on the line.
+                int headStart = start;
+                int headEnd = start + m.group(1).length();
+                s = delete(s, headStart, headEnd);
 
                 // Update the end of the match and the deleted count.
                 end -= m.group(1).length();
@@ -190,9 +193,9 @@ public class MarkdownFormatter {
         static final int STYLE_ITALIC = 1;
         static final int STYLE_STRIKETHROUGH = 2;
 
-        private static final Pattern PATTERN_BOLD = Pattern.compile("\\*\\*(.+?)\\*\\*");
-        private static final Pattern PATTERN_ITALIC = Pattern.compile("\\*(.+?)\\*");
-        private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile("~~(.+?)~~");
+        private static final Pattern PATTERN_BOLD = Pattern.compile("\\*\\*.+?\\*\\*");
+        private static final Pattern PATTERN_ITALIC = Pattern.compile("\\*.+?\\*");
+        private static final Pattern PATTERN_STRIKETHROUGH = Pattern.compile("~~.+?~~");
 
         static CharSequence format(Matcher matcher, CharSequence text, int style) {
             Pattern p = null;
@@ -229,9 +232,13 @@ public class MarkdownFormatter {
                     continue;
                 }
 
-                String value = m.group(1);
-                s = replace(s, start, end, value);
-                deleted += charsDeleted;
+                int headStart = start;
+                int headEnd = start + charsDeleted / 2;
+                s = delete(s, headStart, headEnd);
+
+                int tailEnd = end - charsDeleted / 2;
+                int tailStart = tailEnd - charsDeleted / 2;
+                s = delete(s, tailStart, tailEnd);
 
                 Object span = null;
                 switch (style) {
@@ -251,7 +258,11 @@ public class MarkdownFormatter {
                         throw new IllegalArgumentException("Unsupported style: " + style);
                 }
 
-                s = setSpan(s, start, start + value.length(), span);
+                int totalStart = start;
+                int totalEnd = end - charsDeleted;
+                s = setSpan(s, totalStart, totalEnd, span);
+
+                deleted += charsDeleted;
             }
 
             return s;
@@ -260,7 +271,7 @@ public class MarkdownFormatter {
 
     static class Bullets {
 
-        private static Pattern PATTERN = Pattern.compile("^( *\\* )(.+)$", Pattern.MULTILINE);
+        private static Pattern PATTERN = Pattern.compile("(?m)^( *\\* )(?:.+)$");
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
@@ -274,11 +285,16 @@ public class MarkdownFormatter {
                     continue;
                 }
 
-                deleted += m.group(1).length();
-                String value = m.group(2);
-
+                // Apply the bullet span to the entire line.
                 s = setSpan(s, start, end, new BulletSpan(20));
-                s = replace(s, start, end, value);
+
+                // Delete the beginning *s.
+                int headStart = start;
+                int headEnd = start + m.group(1).length();
+                s = delete(s, headStart, headEnd);
+
+                // Increment how much we deleted.
+                deleted += m.group(1).length();
             }
             return s;
         }
@@ -409,7 +425,7 @@ public class MarkdownFormatter {
 
     static class Heading {
 
-        private static Pattern PATTERN = Pattern.compile("^(#{1,} ?)(.+?)(#*)$", Pattern.MULTILINE);
+        private static Pattern PATTERN = Pattern.compile("(?m)^(#{1,} ?)(?:.+?)(#*)$");
 
         static CharSequence format(Matcher matcher, CharSequence text) {
             CharSequence s = text;
@@ -423,11 +439,21 @@ public class MarkdownFormatter {
                     continue;
                 }
 
-                deleted += m.group(1).length() + m.group(3).length();
-                String value = m.group(2);
-
+                // Apply the span to the entire matching line.
                 s = setSpan(s, start, end, new StyleSpan(Typeface.BOLD_ITALIC));
-                s = replace(s, start, end, value);
+
+                // Trim off the beginning #s
+                int headStart = start;
+                int headEnd = start + m.group(1).length();
+                s = delete(s, headStart, headEnd);
+
+                // Trim off the ending #s
+                int tailEnd = end - m.group(1).length();
+                int tailStart = tailEnd - m.group(2).length();
+                s = delete(s, tailStart, tailEnd);
+
+                // Increment how much we deleted.
+                deleted += m.group(1).length() + m.group(2).length();
             }
             return s;
         }
@@ -435,7 +461,7 @@ public class MarkdownFormatter {
 
     static class Tables {
 
-        static final Pattern PATTERN = Pattern.compile("(?m)(^.*\\|.*[\\r\\n]?){3,}");
+        static final Pattern PATTERN = Pattern.compile("(?m)(?:^.*\\|.*[\\r\\n]?){3,}");
 
         static CharSequence format(Context context, Matcher matcher, CharSequence text) {
             CharSequence s = text;
@@ -451,7 +477,7 @@ public class MarkdownFormatter {
 
                 String replacement = context.getString(R.string.view_table);
                 deleted += m.group().length() - replacement.length();
-                s = setSpan(s, start, end, new MarkdownTableSpan(m.group(0)));
+                s = setSpan(s, start, end, new MarkdownTableSpan(m.group()));
                 s = replace(s, start, end, replacement);
             }
             return s;
