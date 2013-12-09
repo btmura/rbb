@@ -16,17 +16,15 @@
 
 package com.btmura.android.reddit.app;
 
-import java.util.Scanner;
-
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.method.LinkMovementMethod;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -34,13 +32,19 @@ import android.widget.TextView;
 import com.btmura.android.reddit.R;
 import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.text.MarkdownFormatter;
-import com.btmura.android.reddit.util.MarkdownUtils;
+import com.btmura.android.reddit.util.MarkdownTableScanner;
+import com.btmura.android.reddit.util.MarkdownTableScanner.OnTableScanListener;
 
 public class MarkdownTableFragment extends DialogFragment {
 
     static final String TAG = "MarkdownTableFragment";
 
     private static final String EXTRA_TABLE_DATA = "tableData";
+
+    private static final String STATE_SCROLL_X = "scrollX";
+    private static final String STATE_SCROLL_Y = "scrollY";
+
+    private ScrollView tableScrollView;
 
     public interface OnMarkdownTableFragmentEventListener {
         void onCancel();
@@ -76,67 +80,55 @@ public class MarkdownTableFragment extends DialogFragment {
             ViewGroup container,
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.markdown_table, container, false);
-        TableLayout tableLayout = (TableLayout) view.findViewById(R.id.table);
-        int[] gravitySpecs = getGravitySpecs();
-        populateTableLayout(tableLayout, gravitySpecs, inflater);
+        populateTable(view, inflater);
+        setupScrollView(view, savedInstanceState);
         return view;
     }
 
-    private void populateTableLayout(TableLayout tableLayout,
-            int[] gravitySpecs,
-            LayoutInflater inflater) {
-        Scanner scanner = new Scanner(getTableDataExtra());
-        try {
-            for (int row = 0; scanner.hasNextLine(); row++) {
-                // Adds empty columns if someone adds optional surrounding pipes, but this is OK,
-                // since we do not display column borders at all.
-                String[] cells = scanner.nextLine().split("\\|");
-                int cellCount = cells.length;
-                if (row != 1) {
-                    TableRow tableRow = new TableRow(getActivity());
-                    for (int j = 0; j < cellCount; j++) {
-                        int layout = row == 0
+    private void populateTable(final View view, final LayoutInflater inflater) {
+        final TableLayout table = (TableLayout) view.findViewById(R.id.table);
+        MarkdownTableScanner.scan(getTableDataExtra(),
+                new OnTableScanListener<TableRow>() {
+                    @Override
+                    public TableRow onRowStart() {
+                        return new TableRow(getActivity());
+                    }
+
+                    @Override
+                    public void onCell(TableRow container, Cell cell) {
+                        int layout = cell.isHeader
                                 ? R.layout.markdown_table_cell_header
                                 : R.layout.markdown_table_cell;
-                        int gravity = gravitySpecs != null && j < gravitySpecs.length
-                                ? gravitySpecs[j]
-                                : Gravity.LEFT;
 
-                        TextView tv = (TextView) inflater.inflate(layout, tableRow, false);
-                        tv.setGravity(gravity);
+                        TextView tv = (TextView) inflater.inflate(layout, container, false);
+                        tv.setGravity(cell.gravity);
                         tv.setMovementMethod(LinkMovementMethod.getInstance());
-                        tv.setText(formatter.formatAll(getActivity(), cells[j].trim()));
-                        tableRow.addView(tv);
+                        tv.setText(formatter.formatAll(getActivity(), cell.contents));
+                        container.addView(tv);
 
-                        tableLayout.setColumnShrinkable(j, true);
-                        tableLayout.setColumnStretchable(j, true);
+                        table.setColumnShrinkable(cell.column, true);
+                        table.setColumnStretchable(cell.column, true);
                     }
-                    tableLayout.addView(tableRow);
-                }
-            }
-        } finally {
-            scanner.close();
-        }
+
+                    @Override
+                    public void onRowEnd(TableRow row) {
+                        table.addView(row);
+                    }
+                });
     }
 
-    private int[] getGravitySpecs() {
-        Scanner scanner = new Scanner(getTableDataExtra());
-        try {
-            if (scanner.hasNextLine()) {
-                scanner.nextLine();
-                if (scanner.hasNextLine()) {
-                    String[] cells = scanner.nextLine().split("\\|");
-                    int cellCount = cells.length;
-                    int[] specs = new int[cellCount];
-                    for (int i = 0; i < cellCount; i++) {
-                        specs[i] = MarkdownUtils.getTableCellGravity(cells[i]);
-                    }
-                    return specs;
+    private void setupScrollView(View view, Bundle savedInstanceState) {
+        tableScrollView = (ScrollView) view.findViewById(R.id.table_scroller);
+        if (savedInstanceState != null) {
+            final int scrollX = savedInstanceState.getInt(STATE_SCROLL_X);
+            final int scrollY = savedInstanceState.getInt(STATE_SCROLL_Y);
+            tableScrollView.post(new Runnable() {
+                @Override
+                public void run() {
+                    tableScrollView.setScrollX(scrollX);
+                    tableScrollView.setScrollY(scrollY);
                 }
-            }
-            return null;
-        } finally {
-            scanner.close();
+            });
         }
     }
 
@@ -146,6 +138,13 @@ public class MarkdownTableFragment extends DialogFragment {
             listener.onCancel();
         }
         super.onCancel(dialog);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_SCROLL_X, tableScrollView.getScrollX());
+        outState.putInt(STATE_SCROLL_Y, tableScrollView.getScrollY());
     }
 
     private String getTableDataExtra() {
