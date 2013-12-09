@@ -15,7 +15,15 @@
      limitations under the License.
 -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:id="@+id/table_scroller"
+    android:layout_height="match_parent" >
+
+    <TableLayout
+        android:id="@+id/table"
+        style="@style/Widget.MarkdownTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</ScrollView>

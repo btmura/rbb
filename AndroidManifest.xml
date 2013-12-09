@@ -89,7 +89,7 @@
             android:label="@string/content_browser" />
         <activity
             android:name=".app.MarkdownTableActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+            android:theme="@style/Theme.Transition.DialogWhenLarge" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

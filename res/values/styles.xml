@@ -219,6 +219,11 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
+    
+    <style name="Theme.Transition.DialogWhenLarge" parent="@android:style/Theme.Holo.DialogWhenLarge">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 
     <style name="ThingLinkTitleText" parent="@style/SubredditStatusText">
         <item name="android:textColor">?android:attr/textColorTertiary</item>

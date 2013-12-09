@@ -16,10 +16,8 @@
 
 package com.btmura.android.reddit.app;
 
-import android.app.Activity;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,12 +28,11 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
-import com.btmura.android.reddit.content.ThemePrefs;
 import com.btmura.android.reddit.text.MarkdownFormatter;
 import com.btmura.android.reddit.util.MarkdownTableScanner;
 import com.btmura.android.reddit.util.MarkdownTableScanner.OnTableScanListener;
 
-public class MarkdownTableFragment extends DialogFragment {
+public class MarkdownTableFragment extends Fragment {
 
     static final String TAG = "MarkdownTableFragment";
 
@@ -46,12 +43,7 @@ public class MarkdownTableFragment extends DialogFragment {
 
     private ScrollView tableScrollView;
 
-    public interface OnMarkdownTableFragmentEventListener {
-        void onCancel();
-    }
-
     private final MarkdownFormatter formatter = new MarkdownFormatter();
-    private OnMarkdownTableFragmentEventListener listener;
 
     public static MarkdownTableFragment newInstance(String tableData) {
         Bundle args = new Bundle(1);
@@ -62,24 +54,10 @@ public class MarkdownTableFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof OnMarkdownTableFragmentEventListener) {
-            listener = (OnMarkdownTableFragmentEventListener) activity;
-        }
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NO_TITLE, ThemePrefs.getDialogWhenLargeTheme(getActivity()));
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater,
             ViewGroup container,
             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.markdown_table, container, false);
+        View view = inflater.inflate(R.layout.markdown_table_frag, container, false);
         populateTable(view, inflater);
         setupScrollView(view, savedInstanceState);
         return view;
@@ -130,14 +108,6 @@ public class MarkdownTableFragment extends DialogFragment {
                 }
             });
         }
-    }
-
-    @Override
-    public void onCancel(DialogInterface dialog) {
-        if (listener != null) {
-            listener.onCancel();
-        }
-        super.onCancel(dialog);
     }
 
     @Override

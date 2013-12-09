@@ -18,26 +18,31 @@ package com.btmura.android.reddit.app;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.view.Window;
 
-import com.btmura.android.reddit.app.MarkdownTableFragment.OnMarkdownTableFragmentEventListener;
+import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.content.ThemePrefs;
 
-public class MarkdownTableActivity extends FragmentActivity
-        implements OnMarkdownTableFragmentEventListener {
+public class MarkdownTableActivity extends FragmentActivity {
 
     public static final String EXTRA_TABLE_DATA = "tableData";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {
-            MarkdownTableFragment dialog = MarkdownTableFragment.newInstance(getTableData());
-            dialog.show(getSupportFragmentManager(), MarkdownTableFragment.TAG);
-        }
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setTheme(ThemePrefs.getDialogWhenLargeTheme(this));
+        setContentView(R.layout.markdown_table);
+        setFragments(savedInstanceState);
     }
 
-    @Override
-    public void onCancel() {
-        finish();
+    private void setFragments(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, MarkdownTableFragment.newInstance(getTableData()));
+            ft.commit();
+        }
     }
 
     private String getTableData() {
