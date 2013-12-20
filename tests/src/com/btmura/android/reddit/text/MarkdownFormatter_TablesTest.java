@@ -40,4 +40,17 @@ public class MarkdownFormatter_TablesTest extends AbstractFormatterTest {
         assertEquals(27, matcher.end());
         assertFalse(matcher.find());
     }
+
+    public void testPattern_noJustificationDashes() {
+        matcher = Tables.PATTERN.matcher("h1|h2|h3\n||\na|b|c");
+        assertTrue(matcher.find());
+        assertEquals(0, matcher.start());
+        assertEquals(17, matcher.end());
+        assertFalse(matcher.find());
+    }
+
+    public void testPattern_missingJustificationRow() {
+        matcher = Tables.PATTERN.matcher("h1|h2|h3\na|b|c\nd|e|f");
+        assertFalse(matcher.find());
+    }
 }

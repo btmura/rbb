@@ -461,7 +461,11 @@ public class MarkdownFormatter {
 
     static class Tables {
 
-        static final Pattern PATTERN = Pattern.compile("(?m)(?:^.*\\|.*[\\r\\n]?){3,}");
+        static final Pattern PATTERN = Pattern.compile("(?m)(?:"
+                + "^.*\\|.*[\\r\\n]" // Header row
+                + "(?:[-:]*\\|)+.*[\\r\\n]" // Justification row with dashes, colons, or nothing.
+                + "(?:^.*\\|.*[\\r\\n]?){1,}" // 1 or more data rows.
+                + ")");
 
         static CharSequence format(Context context, Matcher matcher, CharSequence text) {
             CharSequence s = text;
