@@ -73,7 +73,7 @@ public class AddSubredditFragment extends DialogFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = AccountResultAdapter.newNameInstance(getActivity());
+        adapter = AccountResultAdapter.newAccountNameListInstance(getActivity());
         restoringState = savedInstanceState != null;
     }
 

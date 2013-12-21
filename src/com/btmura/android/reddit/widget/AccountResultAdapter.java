@@ -28,6 +28,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.btmura.android.reddit.R;
+import com.btmura.android.reddit.accounts.AccountUtils;
 import com.btmura.android.reddit.content.AccountLoader.AccountResult;
 import com.btmura.android.reddit.database.Accounts;
 import com.btmura.android.reddit.util.Objects;
@@ -41,6 +42,7 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
     private final Context context;
     private final LayoutInflater inflater;
     private final int layout;
+    private final boolean hideAppStorageIfNoAccounts;
 
     private OnAccountMessagesSelectedListener listener;
     private String selectedAccountName;
@@ -69,21 +71,25 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
     }
 
     public static AccountResultAdapter newNavigationFragmentInstance(Context context) {
-        return new AccountResultAdapter(context, R.layout.account_navigation_row);
+        return new AccountResultAdapter(context, R.layout.account_navigation_row, true);
     }
 
     public static AccountResultAdapter newAccountListInstance(Context context) {
-        return new AccountResultAdapter(context, R.layout.account_list_row);
+        return new AccountResultAdapter(context, R.layout.account_list_row, false);
     }
 
-    public static AccountResultAdapter newNameInstance(Context context) {
-        return new AccountResultAdapter(context, R.layout.account_name_row);
+    public static AccountResultAdapter newAccountNameListInstance(Context context) {
+        return new AccountResultAdapter(context, R.layout.account_name_row, false);
     }
 
-    private AccountResultAdapter(Context context, int layout) {
+    private AccountResultAdapter(Context context,
+            int layout,
+            boolean hideAppStorageIfNoAccounts) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.layout = layout;
+        this.hideAppStorageIfNoAccounts = hideAppStorageIfNoAccounts;
+
     }
 
     public void setOnAccountMessagesSelectedListener(OnAccountMessagesSelectedListener listener) {
@@ -99,8 +105,7 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
 
     public void setAccountResult(AccountResult result) {
         items.clear();
-        // Only show names if we have more than the app storage account.
-        if (result != null && result.accountNames != null && result.accountNames.length > 1) {
+        if (hasVisibleAccounts(result)) {
             int count = result.accountNames.length;
             for (int i = 0; i < count; i++) {
                 String linkKarma = getKarmaCount(result.linkKarma, i);
@@ -110,6 +115,14 @@ public class AccountResultAdapter extends BaseAdapter implements OnClickListener
             }
         }
         notifyDataSetChanged();
+    }
+
+    private boolean hasVisibleAccounts(AccountResult result) {
+        return result != null
+                && result.accountNames != null
+                && (!hideAppStorageIfNoAccounts
+                        || result.accountNames.length != 1
+                        || AccountUtils.isAccount(result.accountNames[0]));
     }
 
     private String getKarmaCount(int[] karmaCounts, int index) {

@@ -183,7 +183,7 @@ public class ComposeFormFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        accountAdapter = AccountResultAdapter.newNameInstance(getActivity());
+        accountAdapter = AccountResultAdapter.newAccountNameListInstance(getActivity());
         setRetainInstance(true);
         setHasOptionsMenu(true);
     }
